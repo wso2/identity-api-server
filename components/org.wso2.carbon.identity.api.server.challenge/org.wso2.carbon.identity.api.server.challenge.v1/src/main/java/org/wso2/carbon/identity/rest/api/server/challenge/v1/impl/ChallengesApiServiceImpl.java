@@ -17,37 +17,44 @@ public class ChallengesApiServiceImpl extends ChallengesApiService {
 
     @Override
     public Response addChallengeQuestionToASet(String challengeSetId,ChallengeQuestionPatchDTO challengeQuestion){
-        // do some magic!
-        return Response.ok().entity(challengeService.patchChallengeSet(challengeSetId, challengeQuestion)).build();
+
+        challengeService.patchChallengeSet(challengeSetId, challengeQuestion);
+        return Response.ok().build();
     }
+
     @Override
     public Response addChallenges(List<ChallengeSetDTO> challengeSet){
-        // do some magic!
-        return Response.ok().entity(challengeService.addChallengeSets(challengeSet)).build();
+
+        challengeService.addChallengeSets(challengeSet);
+        return Response.ok().build();
     }
+
     @Override
     public Response deleteChallengeQuestion(String questionId,String challengeSetId,String locale){
-        // do some magic!
-        return Response.ok().entity(challengeService.deleteQuestion(challengeSetId, questionId, locale)).build();
+
+        challengeService.deleteQuestion(challengeSetId, questionId, locale);
+        return Response.ok().build();
     }
     @Override
     public Response deleteChallengeQuestionSet(String challengeSetId,String locale){
-        // do some magic!
-        return Response.ok().entity(challengeService.deleteQuestionSet(challengeSetId, locale)).build();
+
+        challengeService.deleteQuestionSet(challengeSetId, locale);
+        return Response.ok().build();
     }
     @Override
     public Response getChallengeQuestionSet(String challengeSetId,String locale,Integer offset,Integer limit){
-        // do some magic!
+
         return Response.ok().entity(challengeService.getChallengeSet(challengeSetId, locale, limit, offset)).build();
     }
     @Override
     public Response searchChallenges(String locale,Integer offset,Integer limit){
-        // do some magic!
+
         return Response.ok().entity(challengeService.getChallenges(locale, limit, offset)).build();
     }
     @Override
     public Response updateChallengeQuestionSet(String challengeSetId,List<ChallengeQuestionDTO> challengeSet){
-        // do some magic!
-        return Response.ok().entity(challengeService.updateChallengeSets(challengeSetId, challengeSet)).build();
+
+        challengeService.updateChallengeSets(challengeSetId, challengeSet);
+        return Response.ok().build();
     }
 }
