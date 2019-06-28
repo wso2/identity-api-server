@@ -34,7 +34,6 @@ import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ChallengeQuesti
 import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ChallengeQuestionPatchDTO;
 import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ChallengeSetDTO;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +41,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
-import static org.wso2.carbon.identity.api.server.common.Constants.OPERATION_ADD;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.api.server.common.Constants.ErrorMessages.ERROR_CHALLENGE_SET_NOT_EXISTS;
+import static org.wso2.carbon.identity.api.server.common.Constants.ErrorMessages.ERROR_CODE_ERROR_OPERATION_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.common.Constants.ErrorPrefix.CHALLENGE_QUESTION_PREFIX;
+import static org.wso2.carbon.identity.api.server.common.Constants.OPERATION_ADD;
 import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.LOCALE_EN_US;
 
 public class ServerChallengeService {
@@ -63,32 +64,28 @@ public class ServerChallengeService {
 
     public List<ChallengeSetDTO> getChallenges(String locale, Integer offset, Integer limit) {
 
-        if (StringUtils.isEmpty(locale)) {
-            try {
+        try {
+            if (StringUtils.isEmpty(locale)) {
+
                 return buildChallengesDTO(questionManager.getAllChallengeQuestions(getTenantDomainFromContext()),
                         offset, limit);
-            } catch (IdentityRecoveryServerException e) {
-                //TODO handle and throw correct error
-                throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, new ErrorResponse.Builder().withCode("somecodee")
-                        .withMessage("some message").withDescription("some description").build());
-            }
-        } else {
-            try {
+            } else {
                 return buildChallengesDTO(questionManager.getAllChallengeQuestions(getTenantDomainFromContext(), locale),
                         offset, limit);
-            } catch (IdentityRecoveryException e) {
-                //TODO handle and throw correct error
-                throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, new ErrorResponse.Builder().withCode("somecodee")
-                        .withMessage("some message").withDescription("some description").build());
             }
+        } catch (IdentityRecoveryException e) {
+            handleIdentityRecoveryException(e, Constants.ErrorMessages.ERROR_CODE_ERROR_RETRIVING_CHALLENGES);
+            return null;
         }
-
     }
 
     public ChallengeSetDTO getChallengeSet(String challengeSetId, String locale, Integer offset, Integer
             limit) {
 
         try {
+            if (!isChallengeSetExists(challengeSetId, getTenantDomainFromContext())) {
+                handleError(Response.Status.NOT_FOUND, ERROR_CHALLENGE_SET_NOT_EXISTS);
+            }
             if (StringUtils.isEmpty(locale)) {
                 return buildChallengeDTO(questionManager.getAllChallengeQuestions(getTenantDomainFromContext()),
                         challengeSetId,
@@ -98,10 +95,8 @@ public class ServerChallengeService {
                         challengeSetId, offset, limit);
             }
         } catch (IdentityRecoveryException e) {
-            //TODO handle and throw correct error
-            throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, new ErrorResponse.Builder().withCode("somecodee")
-                    .withMessage("some message").withDescription("some description").build());
-
+            handleIdentityRecoveryException(e, Constants.ErrorMessages.ERROR_CODE_ERROR_RETRIVING_CHALLENGE);
+            return null;
         }
 
     }
@@ -111,14 +106,15 @@ public class ServerChallengeService {
         if (StringUtils.isEmpty(locale)) {
             locale = StringUtils.EMPTY;
         }
-        ChallengeQuestion[] toDelete = {new ChallengeQuestion(challengeSetId, questionId, StringUtils.EMPTY, locale)};
         try {
+            if (!isChallengeSetExists(challengeSetId, getTenantDomainFromContext())) {
+                handleError(Response.Status.NOT_FOUND, ERROR_CHALLENGE_SET_NOT_EXISTS);
+            }
+
+            ChallengeQuestion[] toDelete = {new ChallengeQuestion(challengeSetId, questionId, StringUtils.EMPTY, locale)};
             questionManager.deleteChallengeQuestions(toDelete, getTenantDomainFromContext());
         } catch (IdentityRecoveryException e) {
-            //TODO handle and throw correct error
-            throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, new ErrorResponse.Builder().withCode("somecodee")
-                    .withMessage("some message").withDescription("some description").build());
-
+            handleIdentityRecoveryException(e, Constants.ErrorMessages.ERROR_CODE_ERROR_DELETING_CHALLENGE);
         }
         return true;
     }
@@ -128,7 +124,14 @@ public class ServerChallengeService {
         if (StringUtils.isEmpty(locale)) {
             locale = StringUtils.EMPTY;
         }
-//        questionManager.deleteChallengeQuestionSet(challengeSetId, locale, getTenantDomainFromContext());
+        try {
+            if (!isChallengeSetExists(challengeSetId, getTenantDomainFromContext())) {
+                handleError(Response.Status.NOT_FOUND, ERROR_CHALLENGE_SET_NOT_EXISTS);
+            }
+            questionManager.deleteChallengeQuestionSet(challengeSetId, locale, getTenantDomainFromContext());
+        } catch (IdentityRecoveryException e) {
+            handleIdentityRecoveryException(e, Constants.ErrorMessages.ERROR_CODE_ERROR_DELETING_CHALLENGES);
+        }
         return true;
     }
 
@@ -139,9 +142,7 @@ public class ServerChallengeService {
         try {
             questionManager.addChallengeQuestions(toAdd, getTenantDomainFromContext());
         } catch (IdentityRecoveryException e) {
-            //TODO handle and throw correct error
-            throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, new ErrorResponse.Builder().withCode("somecodee")
-                    .withMessage("some message").withDescription("some description").build());
+            handleIdentityRecoveryException(e, Constants.ErrorMessages.ERROR_CODE_ERROR_ADDING_CHALLENGES);
 
         }
         return true;
@@ -149,6 +150,9 @@ public class ServerChallengeService {
 
     public boolean updateChallengeSets(String challengeSetId, List<ChallengeQuestionDTO> challenges) {
 
+        if (!isChallengeSetExists(challengeSetId, getTenantDomainFromContext())) {
+            handleError(Response.Status.NOT_FOUND, ERROR_CHALLENGE_SET_NOT_EXISTS);
+        }
         deleteQuestionSet(challengeSetId, null);
 
         List<ChallengeQuestion> questions = buildChallengeQuestions(challenges, challengeSetId);
@@ -156,9 +160,7 @@ public class ServerChallengeService {
         try {
             questionManager.addChallengeQuestions(toPut, getTenantDomainFromContext());
         } catch (IdentityRecoveryException e) {
-            //TODO handle and throw correct error
-            throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, new ErrorResponse.Builder().withCode("somecodee")
-                    .withMessage("some message").withDescription("some description").build());
+            handleIdentityRecoveryException(e, Constants.ErrorMessages.ERROR_CODE_ERROR_UPDATING_CHALLENGE_SET);
         }
         return true;
     }
@@ -166,6 +168,9 @@ public class ServerChallengeService {
     public boolean patchChallengeSet(String challengeSetId, ChallengeQuestionPatchDTO
             challengeQuestionPatchDTO) {
 
+        if (!isChallengeSetExists(challengeSetId, getTenantDomainFromContext())) {
+            handleError(Response.Status.NOT_FOUND, ERROR_CHALLENGE_SET_NOT_EXISTS);
+        }
         if (OPERATION_ADD.equalsIgnoreCase(challengeQuestionPatchDTO.getOperation())) {
             List<ChallengeQuestionDTO> challenges = new ArrayList<>();
             ChallengeQuestionDTO challengeQuestion = challengeQuestionPatchDTO.getChallengeQuestion();
@@ -177,16 +182,14 @@ public class ServerChallengeService {
             try {
                 questionManager.addChallengeQuestions(toPatch, getTenantDomainFromContext());
             } catch (IdentityRecoveryException e) {
-                //TODO handle and throw correct error
-                throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, new ErrorResponse.Builder().withCode("somecodee")
-                        .withMessage("some message").withDescription("some description").build());
+                handleIdentityRecoveryException(e, Constants.ErrorMessages
+                        .ERROR_CODE_ERROR_ADDING_CHALLENGE_QUESTION_TO_A_SET);
             }
             return true;
         } else {
-            //TODO throw correct error
-            throw new WebApplicationException();
+            handleError(Response.Status.NOT_IMPLEMENTED, ERROR_CODE_ERROR_OPERATION_NOT_SUPPORTED);
         }
-
+        return false;
     }
 
     private ChallengeQuestion[] buildChallengeQuestionSets(List<ChallengeSetDTO> challengeSets) {
@@ -248,6 +251,19 @@ public class ServerChallengeService {
         return challengeQuestions.stream()
                 .filter(question -> question.getQuestionSetId().split(WSO2_CLAIM_DIALECT)[1].equals(setId))
                 .collect(Collectors.toList());
+    }
+
+    private boolean isChallengeSetExists(String setID, String tenantDomain) {
+
+        try {
+            List<String> existingChallenges = questionManager.getAllChallengeQuestionSetsURIs(tenantDomain);
+            if (existingChallenges.contains(WSO2_CLAIM_DIALECT.concat(setID))) {
+                return true;
+            }
+        } catch (IdentityRecoveryServerException e) {
+            log.error("Unable to retrieve existing challenge sets.", e);
+        }
+        return false;
     }
 
     private void handleIdentityRecoveryException(IdentityRecoveryException e, Constants.ErrorMessages errorEnum) {
