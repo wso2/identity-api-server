@@ -67,10 +67,10 @@ public class Constants {
                 "Unable to remove challenge question.",
                 "Server Encountered an error while removing the challenge question."),
         ERROR_CODE_ERROR_OPERATION_NOT_SUPPORTED(CHALLENGE_QUESTION_PREFIX.getPrefix() + "20009",
-                "Patch operation Not Supported.",
+                "Patch operation not supported.",
                 "Operation is not supported on the challenge set patch API."),
         ERROR_CHALLENGE_SET_NOT_EXISTS(CHALLENGE_QUESTION_PREFIX.getPrefix() + "20010",
-                "Challenge Does not exists.", "Specified Challenge does not exist in the system, hence unable to " +
+                "Challenge set does not exists.", "Specified Challenge does not exist in the system, hence unable to " +
                 "proceed.");
 
         private final String code;
