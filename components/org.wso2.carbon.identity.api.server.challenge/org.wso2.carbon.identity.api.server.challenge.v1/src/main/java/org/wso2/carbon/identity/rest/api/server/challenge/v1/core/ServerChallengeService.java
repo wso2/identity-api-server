@@ -20,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
@@ -50,7 +51,9 @@ import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.LOCALE
 
 public class ServerChallengeService {
     private static final Log log = LogFactory.getLog(ServerChallengeService.class);
-    private static ChallengeQuestionManager questionManager = ChallengeQuestionManager.getInstance();
+//    private static ChallengeQuestionManager questionManager = ChallengeQuestionManager.getInstance();
+    private static ChallengeQuestionManager questionManager = (ChallengeQuestionManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+        .getOSGiService(ChallengeQuestionManager.class, null);
     public static final String WSO2_CLAIM_DIALECT = "http://wso2.org/claims/";
 
     public String getTenantDomainFromContext() {
