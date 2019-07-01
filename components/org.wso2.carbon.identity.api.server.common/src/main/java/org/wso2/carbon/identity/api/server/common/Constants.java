@@ -16,7 +16,6 @@
 
 package org.wso2.carbon.identity.api.server.common;
 
-import static org.wso2.carbon.identity.api.server.common.Constants.ErrorPrefix.CHALLENGE_QUESTION_PREFIX;
 import static org.wso2.carbon.identity.api.server.common.Constants.ErrorPrefix.USER_MANAGEMENT_PREFIX;
 
 public class Constants {
@@ -27,7 +26,6 @@ public class Constants {
 
     public enum ErrorPrefix {
 
-        CHALLENGE_QUESTION_PREFIX("CQM-"),
         USER_MANAGEMENT_PREFIX("UMG-");
 
         private final String prefix;
@@ -44,34 +42,7 @@ public class Constants {
     public enum ErrorMessages {
 
         ERROR_CODE_INVALID_USERNAME(USER_MANAGEMENT_PREFIX.getPrefix() + "10001", "Invalid UserID provided", "The " +
-                "provided userId is invalid."),
-        ERROR_CODE_ERROR_RETRIVING_CHALLENGE(CHALLENGE_QUESTION_PREFIX.getPrefix() + "20002",
-                "Unable to get the challenge.",
-                "Server Encountered an error while retrieving the challenge."),
-        ERROR_CODE_ERROR_RETRIVING_CHALLENGES(CHALLENGE_QUESTION_PREFIX.getPrefix() + "20003",
-                "Unable to get the challenges.",
-                "Server Encountered an error while retrieving challenges."),
-        ERROR_CODE_ERROR_ADDING_CHALLENGES(CHALLENGE_QUESTION_PREFIX.getPrefix() + "20004",
-                "Unable to add challenge set.",
-                "Server Encountered an error while setting answers to the user challenges."),
-        ERROR_CODE_ERROR_UPDATING_CHALLENGE_SET(CHALLENGE_QUESTION_PREFIX.getPrefix() + "20005",
-                "Unable to update challenge set.",
-                "Server Encountered an error while updating the challenge set."),
-        ERROR_CODE_ERROR_ADDING_CHALLENGE_QUESTION_TO_A_SET(CHALLENGE_QUESTION_PREFIX.getPrefix() + "20006",
-                "Unable to add a new challenge question.",
-                "Server Encountered an error while adding a new question to the set."),
-        ERROR_CODE_ERROR_DELETING_CHALLENGES(CHALLENGE_QUESTION_PREFIX.getPrefix() + "20007",
-                "Unable to remove challenges.",
-                "Server Encountered an error while removing the challenge set."),
-        ERROR_CODE_ERROR_DELETING_CHALLENGE(CHALLENGE_QUESTION_PREFIX.getPrefix() + "20008",
-                "Unable to remove challenge question.",
-                "Server Encountered an error while removing the challenge question."),
-        ERROR_CODE_ERROR_OPERATION_NOT_SUPPORTED(CHALLENGE_QUESTION_PREFIX.getPrefix() + "20009",
-                "Patch operation not supported.",
-                "Operation is not supported on the challenge set patch API."),
-        ERROR_CHALLENGE_SET_NOT_EXISTS(CHALLENGE_QUESTION_PREFIX.getPrefix() + "20010",
-                "Challenge set does not exists.", "Specified Challenge does not exist in the system, hence unable to " +
-                "proceed.");
+                "provided userId is invalid.");
 
         private final String code;
         private final String message;
