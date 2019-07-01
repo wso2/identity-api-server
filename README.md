@@ -1,4 +1,4 @@
-# identity-server-api
+# identity-api-server
 
 This repository contains modules related to the server related rest apis 
 
@@ -32,10 +32,10 @@ Under this component the implementation of each major version will have a unique
 
 #### Implement a new API with a new swagger definition - version one
 
-1. Include the API swagger definition in the given location of this maven project (identity-server-api). Suggested name 
+1. Include the API swagger definition in the given location of this maven project (identity-api-server). Suggested name 
 for the file name of the API definition is `<resource>.yaml`
     ```
-    +-- identity-server-api
+    +-- identity-api-server
     |   +-- components
     |       +-- org.wso2.carbon.identity.api.server.<resource>
     |           +-- org.wso2.carbon.identity.api.server.<resource>.<version>
@@ -49,7 +49,7 @@ for the file name of the API definition is `<resource>.yaml`
      
      Let's consider sample definition as *challenge.yaml*
      
-        +-- identity-server-api
+        +-- identity-api-server
         |   +-- components
         |       +-- org.wso2.carbon.identity.api.server.challenge
         |           +-- org.wso2.carbon.identity.api.server.challenge.v1
@@ -100,7 +100,7 @@ A new version is introduced only when a major version of API swagger definition 
 and include the API swagger definition in the new module project . Suggested name 
 for the file name of the API definition is *<resource>.yaml*
     ```
-    +-- identity-server-api
+    +-- identity-api-server
     |   +-- components
     |       +-- org.wso2.carbon.identity.api.server.<resource>
     |           +-- org.wso2.carbon.identity.api.server.<resource>.<version>
@@ -120,7 +120,7 @@ for the file name of the API definition is *<resource>.yaml*
      
      Let's consider sample definition as *challenge.yaml*
      
-        +-- identity-server-api
+        +-- identity-api-server
         |   +-- components
         |       +-- org.wso2.carbon.identity.api.server.challenge
         |           +-- org.wso2.carbon.identity.api.server.challenge.v1
@@ -198,7 +198,7 @@ Inorder to improve re-usability of common implementations between versions, we e
 component `org.wso2.carbon.identity.api.server.<resource>.common` for your resource type component as below.
 
  ```
-    +-- identity-server-api
+    +-- identity-api-server
     |   +-- components
     |       +-- org.wso2.carbon.identity.api.server.<resource>
     |           +-- org.wso2.carbon.identity.api.server.<resource>.common
@@ -223,7 +223,7 @@ component `org.wso2.carbon.identity.api.server.<resource>.common` for your resou
   Let's consider sample resource
     
    ``` 
-        +-- identity-server-api
+        +-- identity-api-server
         |   +-- components
         |       +-- org.wso2.carbon.identity.api.server.challenge
         |           +-- org.wso2.carbon.identity.api.server.challenge.common

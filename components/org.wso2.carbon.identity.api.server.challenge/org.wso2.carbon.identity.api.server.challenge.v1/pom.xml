@@ -146,13 +146,13 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>
-            <artifactId>org.wso2.carbon.identity.api.server.challenge.common</artifactId>
+            <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
             <scope>provided</scope>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>
-            <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
+            <artifactId>org.wso2.carbon.identity.api.server.challenge.common</artifactId>
             <scope>provided</scope>
             <version>${project.version}</version>
         </dependency>

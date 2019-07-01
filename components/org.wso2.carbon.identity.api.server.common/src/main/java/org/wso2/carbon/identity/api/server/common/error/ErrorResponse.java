@@ -52,13 +52,6 @@ public class ErrorResponse extends ErrorDTO {
             return this;
         }
 
-        public Builder withError(Constants.ErrorMessages error) {
-            this.code = error.getCode();
-            this.message = error.getMessage();
-            this.description = error.getDescription();
-            return this;
-        }
-
         public ErrorResponse build() {
             ErrorResponse error = new ErrorResponse();
             error.setCode(this.code);

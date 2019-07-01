@@ -30,6 +30,8 @@ import javax.ws.rs.core.Response;
 import java.util.Base64;
 import java.util.function.Function;
 
+import static org.wso2.carbon.identity.api.server.common.Constants.ErrorMessages.ERROR_CODE_INVALID_USERNAME;
+
 public class UserIdtoUser implements Function<String[],User> {
 
     private static final Log log = LogFactory.getLog(UserIdtoUser.class);
@@ -69,8 +71,9 @@ public class UserIdtoUser implements Function<String[],User> {
 
             return user;
         } catch (Exception e){
-            throw new APIError(Response.Status.BAD_REQUEST, new ErrorResponse.Builder().withError
-                    (Constants.ErrorMessages.ERROR_CODE_INVALID_USERNAME).build(log, e, "Invalid userId: " +
+            throw new APIError(Response.Status.BAD_REQUEST, new ErrorResponse.Builder()
+                    .withCode(ERROR_CODE_INVALID_USERNAME.getCode()).withMessage(ERROR_CODE_INVALID_USERNAME.getMessage())
+                    .withDescription(ERROR_CODE_INVALID_USERNAME.getDescription()).build(log, e, "Invalid userId: " +
                     userId));
         }
     }
