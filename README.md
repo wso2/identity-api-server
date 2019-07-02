@@ -1,8 +1,8 @@
 # identity-server-api
 
-|  Branch | Build Status |
-| :------------ |:------------- |
-| master      | [![Build Status](https://wso2.org/jenkins/job/platform-builds/job/identity-api-server/badge/icon)](https://wso2.org/jenkins/job/platform-builds/job/identity-api-server/) |
+|  Branch | Build Status | Travis CI Status |
+| :------------ |:------------- |:-------------
+| master      | [![Build Status](https://wso2.org/jenkins/job/platform-builds/job/identity-api-server/badge/icon)](https://wso2.org/jenkins/job/platform-builds/job/identity-api-server/) | [![Travis CI Status](https://travis-ci.org/wso2/identity-api-server.svg?branch=master)](https://travis-ci.org/wso2/identity-api-server?branch=master)|
 
 This repository contains modules related to the server related rest apis 
 
