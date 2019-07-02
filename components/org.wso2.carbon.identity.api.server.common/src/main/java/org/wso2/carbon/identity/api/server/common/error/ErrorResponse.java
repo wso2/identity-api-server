@@ -23,6 +23,9 @@ import org.wso2.carbon.identity.api.server.common.Constants;
 
 import java.util.UUID;
 
+import static org.wso2.carbon.identity.api.server.common.Util.getCorrelation;
+import static org.wso2.carbon.identity.api.server.common.Util.isCorrelationIDPresent;
+
 public class ErrorResponse extends ErrorDTO {
 
     public static class Builder {
@@ -70,21 +73,6 @@ public class ErrorResponse extends ErrorDTO {
             }
             log.error(errorMsg, e);
             return error;
-        }
-
-        private String getCorrelation() {
-
-            if (isCorrelationIDPresent()) {
-                this.ref = MDC.get(Constants.CORRELATION_ID_MDC).toString();
-            } else {
-                this.ref = UUID.randomUUID().toString();
-
-            }
-            return this.ref;
-        }
-
-        private boolean isCorrelationIDPresent() {
-            return MDC.get(Constants.CORRELATION_ID_MDC) != null;
         }
     }
 }
