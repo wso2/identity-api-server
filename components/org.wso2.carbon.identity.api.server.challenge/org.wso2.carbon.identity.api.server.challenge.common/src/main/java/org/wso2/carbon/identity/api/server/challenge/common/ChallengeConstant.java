@@ -22,33 +22,33 @@ public class ChallengeConstant {
 
     public enum ErrorMessage {
 
-        ERROR_CODE_ERROR_RETRIVING_CHALLENGE("20002",
+        ERROR_CODE_ERROR_RETRIVING_CHALLENGE("50002",
                 "Unable to get the challenge.",
                 "Server Encountered an error while retrieving the challenge."),
-        ERROR_CODE_ERROR_RETRIVING_CHALLENGES("20003",
+        ERROR_CODE_ERROR_RETRIVING_CHALLENGES("50003",
                 "Unable to get the challenges.",
                 "Server Encountered an error while retrieving challenges."),
-        ERROR_CODE_ERROR_ADDING_CHALLENGES("20004",
+        ERROR_CODE_ERROR_ADDING_CHALLENGES("50004",
                 "Unable to add challenge set.",
                 "Server Encountered an error while setting answers to the user challenges."),
-        ERROR_CODE_ERROR_UPDATING_CHALLENGE_SET("20005",
+        ERROR_CODE_ERROR_UPDATING_CHALLENGE_SET("50005",
                 "Unable to update challenge set.",
                 "Server Encountered an error while updating the challenge set."),
-        ERROR_CODE_ERROR_ADDING_CHALLENGE_QUESTION_TO_A_SET("20006",
+        ERROR_CODE_ERROR_ADDING_CHALLENGE_QUESTION_TO_A_SET("50006",
                 "Unable to add a new challenge question.",
                 "Server Encountered an error while adding a new question to the set."),
-        ERROR_CODE_ERROR_DELETING_CHALLENGES("20007",
+        ERROR_CODE_ERROR_DELETING_CHALLENGES("50007",
                 "Unable to remove challenges.",
                 "Server Encountered an error while removing the challenge set."),
-        ERROR_CODE_ERROR_DELETING_CHALLENGE("20008",
+        ERROR_CODE_ERROR_DELETING_CHALLENGE("50008",
                 "Unable to remove challenge question.",
                 "Server Encountered an error while removing the challenge question."),
-        ERROR_CODE_ERROR_OPERATION_NOT_SUPPORTED("20009",
+        ERROR_CODE_ERROR_OPERATION_NOT_SUPPORTED("50009",
                 "Patch operation not supported.",
                 "Operation is not supported on the challenge set patch API."),
-        ERROR_CHALLENGE_SET_NOT_EXISTS("20010",
-                "Challenge set does not exists.", "Specified Challenge does not exist in the system, hence unable to " +
-                "proceed.");
+        ERROR_CHALLENGE_SET_NOT_EXISTS("500010",
+                "Challenge set does not exists.",
+                "Specified Challenge does not exist in the system, hence unable to proceed.");
 
         private final String code;
         private final String message;
