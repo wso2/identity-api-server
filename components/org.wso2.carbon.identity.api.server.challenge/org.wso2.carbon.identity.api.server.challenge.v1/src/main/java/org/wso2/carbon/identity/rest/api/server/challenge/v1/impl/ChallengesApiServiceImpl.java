@@ -33,13 +33,13 @@ public class ChallengesApiServiceImpl extends ChallengesApiService {
     public Response deleteChallengeQuestion(String questionId,String challengeSetId,String locale){
 
         challengeService.deleteQuestion(challengeSetId, questionId, locale);
-        return Response.ok().build();
+        return Response.noContent().build();
     }
     @Override
     public Response deleteChallengeQuestionSet(String challengeSetId,String locale){
 
         challengeService.deleteQuestionSet(challengeSetId, locale);
-        return Response.ok().build();
+        return Response.noContent().build();
     }
     @Override
     public Response getChallengeQuestionSet(String challengeSetId,String locale,Integer offset,Integer limit){
