@@ -21,6 +21,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+/**
+ * Common Exception for all the server API related errors
+ */
 public class APIError extends WebApplicationException {
 
     private String message;

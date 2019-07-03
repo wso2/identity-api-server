@@ -54,10 +54,20 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
 import static org.wso2.carbon.identity.api.server.common.Util.getChallengeQuestionManager;
 import static org.wso2.carbon.identity.recovery.IdentityRecoveryConstants.LOCALE_EN_US;
 
+/**
+ * Call internal osgi services to perform server challenge related operations
+ */
 public class ServerChallengeService {
     private static final Log log = LogFactory.getLog(ServerChallengeService.class);
     public static final String WSO2_CLAIM_DIALECT = "http://wso2.org/claims/";
 
+    /**
+     * Get all challenges of the loaded tenant
+     * @param locale
+     * @param offset
+     * @param limit
+     * @return
+     */
     public List<ChallengeSetDTO> getChallenges(String locale, Integer offset, Integer limit) {
 
         try {
@@ -74,6 +84,14 @@ public class ServerChallengeService {
         }
     }
 
+    /**
+     * Get an specific challenge set of the loaded tenant
+     * @param challengeSetId
+     * @param locale
+     * @param offset
+     * @param limit
+     * @return
+     */
     public ChallengeSetDTO getChallengeSet(String challengeSetId, String locale, Integer offset, Integer
             limit) {
 
@@ -95,6 +113,13 @@ public class ServerChallengeService {
 
     }
 
+    /**
+     * Delete specific challenge question of a given set
+     * @param challengeSetId
+     * @param questionId
+     * @param locale
+     * @return
+     */
     public boolean deleteQuestion(String challengeSetId, String questionId, String locale) {
 
         if (StringUtils.isEmpty(locale)) {
@@ -113,6 +138,12 @@ public class ServerChallengeService {
         return true;
     }
 
+    /**
+     * Delete a challenge set
+     * @param challengeSetId
+     * @param locale
+     * @return
+     */
     public boolean deleteQuestionSet(String challengeSetId, String locale) {
 
         if (StringUtils.isEmpty(locale)) {
@@ -129,6 +160,11 @@ public class ServerChallengeService {
         return true;
     }
 
+    /**
+     * Add a new challenge set
+     * @param challengeSets
+     * @return
+     */
     public boolean addChallengeSets(List<ChallengeSetDTO> challengeSets) {
 
         ChallengeQuestion[] toAdd = buildChallengeQuestionSets(challengeSets);
@@ -142,6 +178,12 @@ public class ServerChallengeService {
         return true;
     }
 
+    /**
+     * Update an existing challenge set with new questions
+     * @param challengeSetId
+     * @param challenges
+     * @return
+     */
     public boolean updateChallengeSets(String challengeSetId, List<ChallengeQuestionDTO> challenges) {
 
         if (!isChallengeSetExists(challengeSetId, getTenantDomainFromContext())) {
@@ -159,6 +201,12 @@ public class ServerChallengeService {
         return true;
     }
 
+    /**
+     * Update a specific challenge questions of an existing set
+     * @param challengeSetId
+     * @param challengeQuestionPatchDTO
+     * @return
+     */
     public boolean patchChallengeSet(String challengeSetId, ChallengeQuestionPatchDTO
             challengeQuestionPatchDTO) {
 
@@ -258,6 +306,13 @@ public class ServerChallengeService {
         return false;
     }
 
+    /**
+     * Handle IdentityRecoveryException, extract error code, error description and status code to be sent in the
+     * response
+     * @param e
+     * @param errorEnum
+     * @return
+     */
     private APIError handleIdentityRecoveryException(IdentityRecoveryException e, ChallengeConstant.ErrorMessage errorEnum) {
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(log, e, errorEnum
                 .getDescription());

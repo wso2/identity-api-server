@@ -23,7 +23,9 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
 
-
+/**
+ * Common DTO for all the server API related error responses
+ */
 @ApiModel(description = "")
 public class ErrorDTO {
 

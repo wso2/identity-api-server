@@ -32,6 +32,9 @@ import java.util.function.Function;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ErrorMessages.ERROR_CODE_INVALID_USERNAME;
 
+/**
+ * Build user object from user id and tenant domain
+ */
 public class UserIdtoUser implements Function<String[],User> {
 
     private static final Log log = LogFactory.getLog(UserIdtoUser.class);

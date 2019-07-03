@@ -22,13 +22,24 @@ import org.wso2.carbon.identity.recovery.ChallengeQuestionManager;
 
 import java.util.UUID;
 
+/**
+ * Common util class
+ */
 public class Util {
 
+    /**
+     * Get ChallengeQuestionManager osgi service
+     * @return ChallengeQuestionManager
+     */
     public static ChallengeQuestionManager getChallengeQuestionManager() {
         return (ChallengeQuestionManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                 .getOSGiService(ChallengeQuestionManager.class, null);
     }
 
+    /**
+     * Get correlation id of current thread
+     * @return correlation-id
+     */
     public static String getCorrelation() {
         String ref;
         if (isCorrelationIDPresent()) {
@@ -40,6 +51,10 @@ public class Util {
         return ref;
     }
 
+    /**
+     * Check whether correlation id present in the log MDC
+     * @return
+     */
     public static boolean isCorrelationIDPresent() {
         return MDC.get(Constants.CORRELATION_ID_MDC) != null;
     }
