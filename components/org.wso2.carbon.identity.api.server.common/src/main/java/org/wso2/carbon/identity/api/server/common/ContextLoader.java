@@ -22,8 +22,15 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_NAME_FROM_CONTEXT;
 
+/**
+ * Load information from context
+ */
 public class ContextLoader {
 
+    /**
+     * Retrieves loaded tenant domain from carbon context.
+     * @return tenant domain of the request is being served.
+     */
     public static String getTenantDomainFromContext() {
 
         String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;

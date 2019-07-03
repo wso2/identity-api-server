@@ -18,16 +18,18 @@ package org.wso2.carbon.identity.api.server.common.error;
 
 
 import org.apache.commons.logging.Log;
-import org.apache.log4j.MDC;
-import org.wso2.carbon.identity.api.server.common.Constants;
-
-import java.util.UUID;
 
 import static org.wso2.carbon.identity.api.server.common.Util.getCorrelation;
 import static org.wso2.carbon.identity.api.server.common.Util.isCorrelationIDPresent;
 
+/**
+ * Common ErrorResponse Object for all the server API related errors
+ */
 public class ErrorResponse extends ErrorDTO {
 
+    /**
+     * ErrorResponse Builder
+     */
     public static class Builder {
         private String code;
         private String message;
