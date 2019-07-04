@@ -23,8 +23,6 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>org.wso2.carbon.identity.server.api</groupId>
     <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
     <packaging>jar</packaging>
 
