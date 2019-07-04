@@ -8,11 +8,12 @@ import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ChallengeQuesti
 import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ChallengeSetDTO;
 
 import javax.ws.rs.core.Response;
-import java.net.URI;
 import java.util.List;
 
-import static org.wso2.carbon.identity.api.server.challenge.common.ChallengeConstant.API_SERVER_CONTEXT_V1_CHALLENGES;
-import static org.wso2.carbon.identity.api.server.challenge.common.ChallengeConstant.API_SERVER_CONTEXT_V1_CHALLENGE_QUESTIONS;
+import static org.wso2.carbon.identity.api.server.challenge.common.ChallengeConstant.CHALLENGES_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.challenge.common.ChallengeConstant.CHALLENGE_QUESTION_SET_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.common.Constants.VI_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURI;
 
 public class ChallengesApiServiceImpl extends ChallengesApiService {
 
@@ -23,9 +24,9 @@ public class ChallengesApiServiceImpl extends ChallengesApiService {
     public Response addChallengeQuestionToASet(String challengeSetId,ChallengeQuestionPatchDTO challengeQuestion){
 
         challengeService.patchChallengeSet(challengeSetId, challengeQuestion);
-        String challengeQuestionPath = String.format(API_SERVER_CONTEXT_V1_CHALLENGE_QUESTIONS, challengeSetId,
-                challengeQuestion.getChallengeQuestion().getQuestionId());
-        return Response.created(URI.create(challengeQuestionPath))
+        String challengeQuestionPath = String.format(VI_API_PATH_COMPONENT + CHALLENGE_QUESTION_SET_PATH_COMPONENT,
+                challengeSetId);
+        return Response.created(buildURI(challengeQuestionPath))
                 .build();
     }
 
@@ -33,7 +34,7 @@ public class ChallengesApiServiceImpl extends ChallengesApiService {
     public Response addChallenges(List<ChallengeSetDTO> challengeSet){
 
         challengeService.addChallengeSets(challengeSet);
-        return Response.created(URI.create(API_SERVER_CONTEXT_V1_CHALLENGES)).build();
+        return Response.created(buildURI(VI_API_PATH_COMPONENT + CHALLENGES_PATH_COMPONENT)).build();
     }
 
     @Override

@@ -26,8 +26,9 @@ public class Constants {
     public static final String TENANT_NAME_FROM_CONTEXT = "TenantNameFromContext";
     public static final String ERROR_CODE_DELIMITER = "-";
     public static final String CORRELATION_ID_MDC = "Correlation-ID";
-    public static final String SERVER_API_CONTEXT_V1= "/api/server/v1";
-
+    public static final String SERVER_API_PATH_COMPONENT= "/api/server";
+    public static final String VI_API_PATH_COMPONENT = "/v1";
+    public static final String TENANT_CONTEXT_PATH_COMPONENT = "/t/%s";
 
     /**
      * Enum for server error prefixes
