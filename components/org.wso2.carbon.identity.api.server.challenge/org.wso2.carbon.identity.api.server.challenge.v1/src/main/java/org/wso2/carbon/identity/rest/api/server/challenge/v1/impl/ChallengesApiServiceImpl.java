@@ -8,7 +8,11 @@ import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ChallengeQuesti
 import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ChallengeSetDTO;
 
 import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.List;
+
+import static org.wso2.carbon.identity.api.server.challenge.common.ChallengeConstant.API_SERVER_CONTEXT_V1_CHALLENGES;
+import static org.wso2.carbon.identity.api.server.challenge.common.ChallengeConstant.API_SERVER_CONTEXT_V1_CHALLENGE_QUESTIONS;
 
 public class ChallengesApiServiceImpl extends ChallengesApiService {
 
@@ -19,14 +23,17 @@ public class ChallengesApiServiceImpl extends ChallengesApiService {
     public Response addChallengeQuestionToASet(String challengeSetId,ChallengeQuestionPatchDTO challengeQuestion){
 
         challengeService.patchChallengeSet(challengeSetId, challengeQuestion);
-        return Response.ok().build();
+        String challengeQuestionPath = String.format(API_SERVER_CONTEXT_V1_CHALLENGE_QUESTIONS, challengeSetId,
+                challengeQuestion.getChallengeQuestion().getQuestionId());
+        return Response.created(URI.create(challengeQuestionPath))
+                .build();
     }
 
     @Override
     public Response addChallenges(List<ChallengeSetDTO> challengeSet){
 
         challengeService.addChallengeSets(challengeSet);
-        return Response.ok().build();
+        return Response.created(URI.create(API_SERVER_CONTEXT_V1_CHALLENGES)).build();
     }
 
     @Override

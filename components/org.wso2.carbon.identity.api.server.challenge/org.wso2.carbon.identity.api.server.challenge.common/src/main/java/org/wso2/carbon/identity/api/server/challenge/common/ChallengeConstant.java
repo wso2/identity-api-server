@@ -19,6 +19,9 @@ package org.wso2.carbon.identity.api.server.challenge.common;
 public class ChallengeConstant {
 
     public static final String CHALLENGE_QUESTION_PREFIX = "CQM-";
+    public static final String API_SERVER_CONTEXT_V1_CHALLENGES = "/challenges";
+    public static final String API_SERVER_CONTEXT_V1_CHALLENGE_QUESTIONS = API_SERVER_CONTEXT_V1_CHALLENGES +
+            "/%s/questions/%s";
 
     public enum ErrorMessage {
 
