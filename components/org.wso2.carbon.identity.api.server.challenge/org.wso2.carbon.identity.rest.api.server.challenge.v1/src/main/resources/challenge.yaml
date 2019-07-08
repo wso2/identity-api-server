@@ -126,9 +126,7 @@ paths:
         200:
           description: search results matching criteria
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/ChallengeSet'
+            $ref: '#/definitions/ChallengeSet'
         400:
           $ref: '#/responses/InvalidInput'
         401:

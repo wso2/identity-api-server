@@ -1,26 +1,23 @@
 package org.wso2.carbon.identity.rest.api.server.challenge.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.*;
-import org.wso2.carbon.identity.rest.api.server.challenge.v1.ChallengesApiService;
-import org.wso2.carbon.identity.rest.api.server.challenge.v1.factories.ChallengesApiServiceFactory;
-
 import io.swagger.annotations.ApiParam;
-
-import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ChallengeQuestionPatchDTO;
-import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ErrorDTO;
-import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ChallengeSetDTO;
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ChallengeQuestionDTO;
+import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ChallengeQuestionPatchDTO;
+import org.wso2.carbon.identity.rest.api.server.challenge.v1.dto.ChallengeSetDTO;
 
-import java.util.List;
-
-import java.io.InputStream;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.*;
+import java.util.List;
 
 @Path("/challenges")
 
@@ -119,7 +116,7 @@ public class ChallengesApi  {
     @Path("/{challenge-set-id}")
     
     
-    @io.swagger.annotations.ApiOperation(value = "searches challenge-question", notes = "By passing in the appropriate options, you can search for\navailable challenge-question in the system\n", response = ChallengeSetDTO.class, responseContainer = "List")
+    @io.swagger.annotations.ApiOperation(value = "searches challenge-question", notes = "By passing in the appropriate options, you can search for\navailable challenge-question in the system\n", response = ChallengeSetDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "search results matching criteria"),
         
