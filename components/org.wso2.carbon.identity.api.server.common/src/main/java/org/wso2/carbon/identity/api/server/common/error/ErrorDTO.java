@@ -16,19 +16,20 @@
 
 package org.wso2.carbon.identity.api.server.common.error;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.io.Serializable;
 import javax.validation.constraints.NotNull;
 
 /**
  * Common DTO for all the server API related error responses
  */
 @ApiModel(description = "")
-public class ErrorDTO {
+public class ErrorDTO implements Serializable {
 
+    private static final long serialVersionUID = 1984062651956875663L;
 
     @NotNull
     private String code = null;
@@ -36,12 +37,9 @@ public class ErrorDTO {
     @NotNull
     private String message = null;
 
-
     private String description = null;
 
-
     private String ref = null;
-
 
     /**
      **/
@@ -55,7 +53,6 @@ public class ErrorDTO {
         this.code = code;
     }
 
-
     /**
      **/
     @ApiModelProperty(required = true, value = "")
@@ -67,7 +64,6 @@ public class ErrorDTO {
     public void setMessage(String message) {
         this.message = message;
     }
-
 
     /**
      **/
@@ -81,7 +77,6 @@ public class ErrorDTO {
         this.description = description;
     }
 
-
     /**
      **/
     @ApiModelProperty(value = "")
@@ -93,7 +88,6 @@ public class ErrorDTO {
     public void setRef(String ref) {
         this.ref = ref;
     }
-
 
     @Override
     public String toString() {

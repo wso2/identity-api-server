@@ -22,8 +22,8 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 
 import java.net.URI;
 
-import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_CONTEXT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.SERVER_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_CONTEXT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_NAME_FROM_CONTEXT;
 
 /**
@@ -33,6 +33,7 @@ public class ContextLoader {
 
     /**
      * Retrieves loaded tenant domain from carbon context.
+     *
      * @return tenant domain of the request is being served.
      */
     public static String getTenantDomainFromContext() {
@@ -57,13 +58,14 @@ public class ContextLoader {
     /**
      * Build URI prepending the user API context with to the endpoint
      * https://<hostname>:<port>/t/<tenant-domain>/api/users/<endpoint>
+     *
      * @param endpoint relative endpoint path
      * @return
      */
-    public static URI buildURI(String endpoint){
+    public static URI buildURI(String endpoint) {
 
-        String tenantQualifiedRelativePath = String.format(TENANT_CONTEXT_PATH_COMPONENT, getTenantDomainFromContext()) +
-                SERVER_API_PATH_COMPONENT;
+        String tenantQualifiedRelativePath =
+                String.format(TENANT_CONTEXT_PATH_COMPONENT, getTenantDomainFromContext()) + SERVER_API_PATH_COMPONENT;
         String url = IdentityUtil.getServerURL(tenantQualifiedRelativePath + endpoint, true, true);
         return URI.create(url);
     }

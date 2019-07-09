@@ -17,8 +17,6 @@
 package org.wso2.carbon.identity.api.server.common.error;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -31,7 +29,7 @@ public class APIError extends WebApplicationException {
     private ErrorDTO responseEntity;
     private Response.Status status;
 
-    public APIError(Response.Status status , ErrorDTO errorResponse) {
+    public APIError(Response.Status status, ErrorDTO errorResponse) {
         this.responseEntity = errorResponse;
         this.message = status.getReasonPhrase();
         this.code = errorResponse.getCode();

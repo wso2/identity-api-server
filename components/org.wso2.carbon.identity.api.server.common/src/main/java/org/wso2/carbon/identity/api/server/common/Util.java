@@ -29,6 +29,7 @@ public class Util {
 
     /**
      * Get ChallengeQuestionManager osgi service
+     *
      * @return ChallengeQuestionManager
      */
     public static ChallengeQuestionManager getChallengeQuestionManager() {
@@ -38,6 +39,7 @@ public class Util {
 
     /**
      * Get correlation id of current thread
+     *
      * @return correlation-id
      */
     public static String getCorrelation() {
@@ -53,6 +55,7 @@ public class Util {
 
     /**
      * Check whether correlation id present in the log MDC
+     *
      * @return
      */
     public static boolean isCorrelationIDPresent() {

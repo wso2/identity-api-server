@@ -26,7 +26,7 @@ public class Constants {
     public static final String TENANT_NAME_FROM_CONTEXT = "TenantNameFromContext";
     public static final String ERROR_CODE_DELIMITER = "-";
     public static final String CORRELATION_ID_MDC = "Correlation-ID";
-    public static final String SERVER_API_PATH_COMPONENT= "/api/server";
+    public static final String SERVER_API_PATH_COMPONENT = "/api/server";
     public static final String VI_API_PATH_COMPONENT = "/v1";
     public static final String TENANT_CONTEXT_PATH_COMPONENT = "/t/%s";
 
@@ -53,8 +53,8 @@ public class Constants {
      */
     public enum ErrorMessages {
 
-        ERROR_CODE_INVALID_USERNAME(USER_MANAGEMENT_PREFIX.getPrefix() + "10001", "Invalid UserID provided", "The " +
-                "provided userId is invalid.");
+        ERROR_CODE_INVALID_USERNAME(USER_MANAGEMENT_PREFIX.getPrefix() + "10001", "Invalid UserID provided",
+                "The " + "provided userId is invalid.");
 
         private final String code;
         private final String message;

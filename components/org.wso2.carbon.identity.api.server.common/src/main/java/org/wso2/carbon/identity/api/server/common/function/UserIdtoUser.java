@@ -25,17 +25,16 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.application.common.model.User;
 import org.wso2.carbon.user.core.UserStoreConfigConstants;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.function.Function;
-
-import static org.wso2.carbon.identity.api.server.common.Constants.ErrorMessages.ERROR_CODE_INVALID_USERNAME;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 /**
  * Build user object from user id and tenant domain
  */
-public class UserIdtoUser implements Function<String[],User> {
+public class UserIdtoUser implements Function<String[], User> {
 
     private static final Log log = LogFactory.getLog(UserIdtoUser.class);
 
@@ -47,7 +46,7 @@ public class UserIdtoUser implements Function<String[],User> {
     private User extractUser(String userId, String tenantDomain) {
 
         try {
-            String decodedUsername = new String(Base64.getDecoder().decode(userId));
+            String decodedUsername = new String(Base64.getDecoder().decode(userId), StandardCharsets.UTF_8);
 
             if (StringUtils.isBlank(userId)) {
                 throw new WebApplicationException("UserID is empty.");
@@ -63,8 +62,7 @@ public class UserIdtoUser implements Function<String[],User> {
                 realm = strComponent[0];
                 username = strComponent[1];
             } else {
-                throw new WebApplicationException("Provided UserID is " +
-                        "not in the correct format.");
+                throw new WebApplicationException("Provided UserID is " + "not in the correct format.");
             }
 
             User user = new User();
@@ -73,11 +71,12 @@ public class UserIdtoUser implements Function<String[],User> {
             user.setTenantDomain(tenantDomain);
 
             return user;
-        } catch (Exception e){
-            throw new APIError(Response.Status.BAD_REQUEST, new ErrorResponse.Builder()
-                    .withCode(ERROR_CODE_INVALID_USERNAME.getCode()).withMessage(ERROR_CODE_INVALID_USERNAME.getMessage())
-                    .withDescription(ERROR_CODE_INVALID_USERNAME.getDescription()).build(log, e, "Invalid userId: " +
-                    userId));
+        } catch (Exception e) {
+            throw new APIError(Response.Status.BAD_REQUEST,
+                    new ErrorResponse.Builder().withCode(Constants.ErrorMessages.ERROR_CODE_INVALID_USERNAME.getCode())
+                            .withMessage(Constants.ErrorMessages.ERROR_CODE_INVALID_USERNAME.getMessage())
+                            .withDescription(Constants.ErrorMessages.ERROR_CODE_INVALID_USERNAME.getDescription())
+                            .build(log, e, "Invalid userId: " + userId));
         }
     }
 }
