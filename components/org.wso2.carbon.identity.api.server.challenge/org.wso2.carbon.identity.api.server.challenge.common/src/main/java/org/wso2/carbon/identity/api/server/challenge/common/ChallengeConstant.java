@@ -16,6 +16,9 @@
 
 package org.wso2.carbon.identity.api.server.challenge.common;
 
+/**
+ * Contains all the server challenge management related constants.
+ */
 public class ChallengeConstant {
 
     public static final String CHALLENGE_QUESTION_PREFIX = "CQM-";
@@ -23,6 +26,12 @@ public class ChallengeConstant {
     public static final String CHALLENGE_QUESTION_SET_PATH_COMPONENT = CHALLENGES_PATH_COMPONENT +
             "/%s";
 
+    /**
+     * Enum for server challenge management related errors in the format of
+     * Error Code - code to identify the error
+     * Error Message - What went wrong
+     * Error Description - Why it went wrong
+     */
     public enum ErrorMessage {
 
         ERROR_CODE_ERROR_RETRIVING_CHALLENGE("50002",

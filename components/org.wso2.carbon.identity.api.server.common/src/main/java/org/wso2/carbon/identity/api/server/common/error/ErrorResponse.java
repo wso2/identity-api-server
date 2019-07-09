@@ -16,7 +16,6 @@
 
 package org.wso2.carbon.identity.api.server.common.error;
 
-
 import org.apache.commons.logging.Log;
 
 import static org.wso2.carbon.identity.api.server.common.Util.getCorrelation;
@@ -27,6 +26,8 @@ import static org.wso2.carbon.identity.api.server.common.Util.isCorrelationIDPre
  */
 public class ErrorResponse extends ErrorDTO {
 
+    private static final long serialVersionUID = -3502358623560083025L;
+
     /**
      * ErrorResponse Builder
      */
@@ -34,7 +35,6 @@ public class ErrorResponse extends ErrorDTO {
         private String code;
         private String message;
         private String description;
-        private String ref;
 
         public Builder() {
 
