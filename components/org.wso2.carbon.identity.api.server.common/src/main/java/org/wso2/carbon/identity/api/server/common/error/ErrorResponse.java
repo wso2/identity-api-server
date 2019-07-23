@@ -76,5 +76,27 @@ public class ErrorResponse extends ErrorDTO {
             log.error(errorMsg, e);
             return error;
         }
+
+        /**
+         * Error response builder for bad requests without exceptions.
+         *
+         * @param log Logger.
+         * @param message Error message.
+         * @return ErrorResponse object.
+         */
+        public ErrorResponse build(Log log, String message) {
+
+            ErrorResponse error = build();
+            String errorMessageFormat = "errorCode: %s | message: %s";
+            String errorMsg = String.format(errorMessageFormat, error.getCode(), message);
+            if (!isCorrelationIDPresent()) {
+                errorMsg = String.format("correlationID: %s | " + errorMsg, error.getRef());
+            }
+
+            if (log.isDebugEnabled()) {
+                log.debug(errorMsg);
+            }
+            return error;
+        }
     }
 }
