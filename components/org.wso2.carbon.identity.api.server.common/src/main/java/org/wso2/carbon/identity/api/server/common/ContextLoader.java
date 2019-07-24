@@ -27,7 +27,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_CONTEX
 import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_NAME_FROM_CONTEXT;
 
 /**
- * Load information from context
+ * Load information from context.
  */
 public class ContextLoader {
 
@@ -56,11 +56,11 @@ public class ContextLoader {
     }
 
     /**
-     * Build URI prepending the user API context with to the endpoint
+     * Build URI prepending the user API context with to the endpoint.
      * https://<hostname>:<port>/t/<tenant-domain>/api/users/<endpoint>
      *
-     * @param endpoint relative endpoint path
-     * @return
+     * @param endpoint relative endpoint path.
+     * @return Fully qualified URI.
      */
     public static URI buildURI(String endpoint) {
 

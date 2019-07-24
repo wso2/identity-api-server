@@ -192,18 +192,12 @@
                 <version>${identity.governance.version}</version>
                 <scope>provided</scope>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon.identity.framework</groupId>-->
-            <!--<artifactId>org.wso2.carbon.identity.application.dispatcher</artifactId>-->
-            <!--<version>${carbon.identity.framework.version}</version>-->
-            <!--<scope>provided</scope>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.wso2.carbon.identity.framework</groupId>-->
-            <!--<artifactId>org.wso2.carbon.identity.base</artifactId>-->
-            <!--<version>${carbon.identity.framework.version}</version>-->
-            <!--<scope>provided</scope>-->
-            <!--</dependency>-->
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.claim.metadata.mgt</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -300,13 +294,14 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.2.6</identity.governance.version>
-        <carbon.identity.framework.version>5.13.8</carbon.identity.framework.version>
+        <carbon.identity.framework.version>5.13.45</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.4</maven.findbugsplugin.version>
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
     </properties>
 
     <modules>
         <module>components/org.wso2.carbon.identity.api.server.challenge</module>
+        <module>components/org.wso2.carbon.identity.api.server.claim.management</module>
         <module>components/org.wso2.carbon.identity.api.server.common</module>
     </modules>
 
