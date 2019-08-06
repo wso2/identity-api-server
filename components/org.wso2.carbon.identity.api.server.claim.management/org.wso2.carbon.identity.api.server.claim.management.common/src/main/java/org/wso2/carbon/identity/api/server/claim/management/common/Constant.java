@@ -143,7 +143,10 @@ public class Constant {
         ERROR_CODE_MAPPED_TO_EMPTY_LOCAL_CLAIM_URI("500035",
                 "Empty mapped local claim URI.",
                 "Mapped local claim URI cannot be empty."),
-        ERROR_CODE_INVALID_INPUT("500036",
+        ERROR_CODE_MAPPED_TO_INVALID_LOCAL_CLAIM_URI("500036",
+                "Invalid mapped local claim URI.",
+                "Mapped local claim URI is invalid."),
+        ERROR_CODE_INVALID_INPUT("500037",
                 "Invalid input.",
                 "One of the given inputs is invalid.")
         ;
