@@ -61,6 +61,8 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
         
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
+        
         @io.swagger.annotations.ApiResponse(code = 409, message = "Element Already Exists."),
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
@@ -80,6 +82,8 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid input request."),
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
+        
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
         
         @io.swagger.annotations.ApiResponse(code = 409, message = "Element Already Exists."),
         
@@ -102,6 +106,8 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
         
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
+        
         @io.swagger.annotations.ApiResponse(code = 409, message = "Element Already Exists."),
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
@@ -122,6 +128,8 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
         
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
+        
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
     public Response deleteClaimDialect(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId)
@@ -139,6 +147,8 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid input request."),
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
+        
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
@@ -159,6 +169,8 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
         
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
+        
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
     public Response deleteLocalClaim(@ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId)
@@ -176,6 +188,8 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid input request."),
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
+        
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
         
         @io.swagger.annotations.ApiResponse(code = 404, message = "The specified resource is not found."),
         
@@ -218,6 +232,8 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
         
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
+        
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
     public Response getExternalClaim(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
@@ -251,13 +267,15 @@ public class ClaimManagementApi  {
     @Path("/local/claims/{claim-id}")
     
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Retrieve local claim.", notes = "Retrieve a local claim matching the given claim id.", response = LocalClaimReqDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Retrieve local claim.", notes = "Retrieve a local claim matching the given claim id.", response = LocalClaimResDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "Requested claim."),
         
         @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid input request."),
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
+        
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
@@ -299,6 +317,8 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
         
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
+        
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
     public Response updateClaimDialect(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
@@ -317,6 +337,8 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid input request."),
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
+        
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
         
         @io.swagger.annotations.ApiResponse(code = 409, message = "Element Already Exists."),
         
@@ -339,6 +361,8 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid input request."),
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
+        
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
         
         @io.swagger.annotations.ApiResponse(code = 409, message = "Element Already Exists."),
         
