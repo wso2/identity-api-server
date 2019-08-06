@@ -80,6 +80,8 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_LOCAL_CLAIM_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DESCRIPTION;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_NAME;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_ORDER;
@@ -152,7 +154,13 @@ public class ServerClaimManagementService {
         try {
             List<ClaimDialect> claimDialectList = getClaimMetadataManagementService().getClaimDialects(
                     ContextLoader.getTenantDomainFromContext());
-            ClaimDialect claimDialect = extractDialectFromDialectList(base64DecodeId(dialectId), claimDialectList);
+            String decodedDialectId;
+            if (StringUtils.equals(dialectId, LOCAL_DIALECT_PATH)) {
+                decodedDialectId = LOCAL_DIALECT;
+            } else {
+                decodedDialectId = base64DecodeId(dialectId);
+            }
+            ClaimDialect claimDialect = extractDialectFromDialectList(decodedDialectId, claimDialectList);
 
             if (claimDialect == null) {
                 throw handleClaimManagementClientError(ERROR_CODE_DIALECT_NOT_FOUND, NOT_FOUND, dialectId);
@@ -533,7 +541,12 @@ public class ServerClaimManagementService {
 
         ClaimDialectResDTO claimDialectResDTO = new ClaimDialectResDTO();
 
-        String dialectId = base64EncodeId(claimDialect.getClaimDialectURI());
+        String dialectId;
+        if (StringUtils.equals(claimDialect.getClaimDialectURI(), LOCAL_DIALECT)) {
+            dialectId = LOCAL_DIALECT_PATH;
+        } else {
+            dialectId = base64EncodeId(claimDialect.getClaimDialectURI());
+        }
         claimDialectResDTO.setId(dialectId);
         claimDialectResDTO.setDialectURI(claimDialect.getClaimDialectURI());
 
