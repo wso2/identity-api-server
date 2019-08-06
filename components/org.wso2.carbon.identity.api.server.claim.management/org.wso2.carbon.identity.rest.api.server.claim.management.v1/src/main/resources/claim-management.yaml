@@ -48,6 +48,8 @@ paths:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
         409:
           $ref: '#/responses/Conflict'
         500:
@@ -97,11 +99,13 @@ paths:
         200:
           description: Requested claim.
           schema:
-            $ref: '#/definitions/LocalClaimReq'
+            $ref: '#/definitions/LocalClaimRes'
         400:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
         500:
           $ref: '#/responses/ServerError'
 
@@ -128,6 +132,8 @@ paths:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
         409:
           $ref: '#/responses/Conflict'
         500:
@@ -149,6 +155,8 @@ paths:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
         500:
           $ref: '#/responses/ServerError'
 
@@ -175,6 +183,8 @@ paths:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
         409:
           $ref: '#/responses/Conflict'
         500:
@@ -228,6 +238,8 @@ paths:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
         404:
           $ref: '#/responses/NotFound'
         500:
@@ -256,6 +268,8 @@ paths:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
         500:
           $ref: '#/responses/ServerError'
 
@@ -275,6 +289,8 @@ paths:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
         500:
           $ref: '#/responses/ServerError'
 
@@ -302,6 +318,8 @@ paths:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
         409:
           $ref: '#/responses/Conflict'
         500:
@@ -357,6 +375,8 @@ paths:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
         500:
           $ref: '#/responses/ServerError'
 
@@ -384,6 +404,8 @@ paths:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
         409:
           $ref: '#/responses/Conflict'
         500:
@@ -406,6 +428,8 @@ paths:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
         500:
           $ref: '#/responses/ServerError'
 
@@ -776,6 +800,8 @@ responses:
     description: OK.
   NoContent:
     description: No Content.
+  Forbidden:
+    description: Resource Forbidden.
 
 host: is.wso2.com
 basePath: /t/{tenant-domain}/api/server/v1
