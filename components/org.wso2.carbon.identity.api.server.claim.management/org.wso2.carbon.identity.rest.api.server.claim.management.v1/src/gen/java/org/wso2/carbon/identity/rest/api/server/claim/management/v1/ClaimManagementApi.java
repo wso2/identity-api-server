@@ -234,6 +234,8 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
         
+        @io.swagger.annotations.ApiResponse(code = 404, message = "The specified resource is not found."),
+        
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
     public Response getExternalClaim(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
@@ -250,6 +252,8 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 200, message = "External claims."),
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "The specified resource is not found."),
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error."),
         
@@ -276,6 +280,8 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
         
         @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "The specified resource is not found."),
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
