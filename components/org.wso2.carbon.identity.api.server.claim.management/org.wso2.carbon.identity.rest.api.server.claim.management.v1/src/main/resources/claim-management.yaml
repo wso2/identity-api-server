@@ -54,6 +54,7 @@ paths:
           $ref: '#/responses/Conflict'
         500:
           $ref: '#/responses/ServerError'
+
     get:
       tags:
       - management
@@ -106,6 +107,8 @@ paths:
           $ref: '#/responses/Unauthorized'
         403:
           $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
         500:
           $ref: '#/responses/ServerError'
 
@@ -189,6 +192,7 @@ paths:
           $ref: '#/responses/Conflict'
         500:
           $ref: '#/responses/ServerError'
+
     get:
       tags:
       - management
@@ -324,6 +328,7 @@ paths:
           $ref: '#/responses/Conflict'
         500:
           $ref: '#/responses/ServerError'
+
     get:
       tags:
       - management
@@ -348,6 +353,8 @@ paths:
               $ref: '#/definitions/ExternalClaimRes'
         401:
           $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
         500:
           $ref: '#/responses/ServerError'
         501:
@@ -377,6 +384,8 @@ paths:
           $ref: '#/responses/Unauthorized'
         403:
           $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
         500:
           $ref: '#/responses/ServerError'
 
