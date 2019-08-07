@@ -413,7 +413,7 @@ public class ServerClaimManagementService {
                     ContextLoader.getTenantDomainFromContext());
 
             if (CollectionUtils.isEmpty(externalClaimList)) {
-                throw handleClaimManagementClientError(ERROR_CODE_DIALECT_NOT_FOUND, NOT_FOUND, dialectId);
+                throw handleClaimManagementClientError(ERROR_CODE_CLAIMS_NOT_FOUND_FOR_DIALECT, NOT_FOUND, dialectId);
             }
 
             ExternalClaim externalClaim = extractExternalClaimFromClaimList(base64DecodeId(claimId), externalClaimList);
