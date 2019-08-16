@@ -198,6 +198,12 @@
                 <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.workflow.impl.bps</groupId>
+                <artifactId>org.wso2.carbon.identity.workflow.impl</artifactId>
+                <version>${identity.workflow.impl.bps.version}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -296,6 +302,7 @@
         <identity.governance.version>1.2.7</identity.governance.version>
         <carbon.identity.framework.version>5.13.45</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.4</maven.findbugsplugin.version>
+        <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
     </properties>
 
@@ -303,6 +310,7 @@
         <module>components/org.wso2.carbon.identity.api.server.challenge</module>
         <module>components/org.wso2.carbon.identity.api.server.claim.management</module>
         <module>components/org.wso2.carbon.identity.api.server.common</module>
+        <module>components/org.wso2.carbon.identity.api.server.workflow.engine</module>
     </modules>
 
 </project>
