@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.identity.rest.api.server.challenge.v1.dto;
+package org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.dto;
 
 
 import io.swagger.annotations.*;

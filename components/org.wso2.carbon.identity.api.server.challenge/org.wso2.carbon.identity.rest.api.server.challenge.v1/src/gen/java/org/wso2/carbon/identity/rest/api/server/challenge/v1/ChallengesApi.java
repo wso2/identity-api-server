@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.wso2.carbon.identity.rest.api.server.challenge.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +50,8 @@ public class ChallengesApi  {
     @PATCH
     @Path("/{challenge-set-id}")
     @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "update challenge question", notes = "Add new challenge question for an existing set\n", response = void.class)
+    
+    @io.swagger.annotations.ApiOperation(value = "Add a challenge question to a set", notes = "Add new challenge question to an existing set.\n\n  <b>Permission required:</b>\n    * /permission/admin/manage/identity/challenge/update\n", response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK"),
         
@@ -47,16 +63,16 @@ public class ChallengesApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error") })
 
-    public Response addChallengeQuestionToASet(@ApiParam(value = "Challenge Question set Id",required=true ) @PathParam("challenge-set-id")  String challengeSetId,
-    @ApiParam(value = "challenge-question to update"  ) ChallengeQuestionPatchDTO challengeQuestion)
+    public Response addChallengeQuestionToASet(@ApiParam(value = "Challenge Question set ID",required=true ) @PathParam("challenge-set-id")  String challengeSetId,
+    @ApiParam(value = "A challenge question to add."  ) ChallengeQuestionPatchDTO challengeQuestion)
     {
     return delegate.addChallengeQuestionToASet(challengeSetId,challengeQuestion);
     }
     @POST
     
     @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "adds a new challenge question", notes = "Adds a new challenge question to the system\n", response = void.class)
+    
+    @io.swagger.annotations.ApiOperation(value = "Add a new challenge question set.", notes = "Adds a new challenge question set to the system. A challenge question set can have any number of questions.\n\n  <b>Permission required:</b>\n    * /permission/admin/manage/identity/challenge/create\n", response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 201, message = "Item Created"),
         
@@ -68,7 +84,7 @@ public class ChallengesApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error") })
 
-    public Response addChallenges(@ApiParam(value = "challenge-question to add"  ) List<ChallengeSetDTO> challengeSet)
+    public Response addChallenges(@ApiParam(value = "Challenge question set to add"  ) List<ChallengeSetDTO> challengeSet)
     {
     return delegate.addChallenges(challengeSet);
     }
@@ -76,7 +92,7 @@ public class ChallengesApi  {
     @Path("/{challenge-set-id}/questions/{question-id}")
     
     
-    @io.swagger.annotations.ApiOperation(value = "removes a challenge question", notes = "Removes an existing challenge question set from the system. By specifying the locale query parameter, locale specific entry for the question can be deleted.\n", response = void.class)
+    @io.swagger.annotations.ApiOperation(value = "Remove a challenge question in a set.", notes = "Removes a specific question from an existing challenge question set. By specifying the locale query parameter, locale specific challenge question entry for the question can be deleted.\n\n  <b>Permission required:</b>\n    * /permission/admin/manage/identity/challenge/delete\n", response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "Item Deleted"),
         
@@ -88,9 +104,9 @@ public class ChallengesApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error") })
 
-    public Response deleteChallengeQuestion(@ApiParam(value = "Challenge Question Id",required=true ) @PathParam("question-id")  String questionId,
-    @ApiParam(value = "Challenge Question set Id",required=true ) @PathParam("challenge-set-id")  String challengeSetId,
-    @ApiParam(value = "pass an optional search string for looking up challenge-question based on locale") @QueryParam("locale")  String locale)
+    public Response deleteChallengeQuestion(@ApiParam(value = "Challenge Question ID",required=true ) @PathParam("question-id")  String questionId,
+    @ApiParam(value = "Challenge Question set ID",required=true ) @PathParam("challenge-set-id")  String challengeSetId,
+    @ApiParam(value = "An optional search string to look-up challenge-questions based on locale.\n") @QueryParam("locale")  String locale)
     {
     return delegate.deleteChallengeQuestion(questionId,challengeSetId,locale);
     }
@@ -98,7 +114,7 @@ public class ChallengesApi  {
     @Path("/{challenge-set-id}")
     
     
-    @io.swagger.annotations.ApiOperation(value = "removes a challenge question set", notes = "Removes an existing challenge question set from the system. By specifying the locale query parameter, questions of specific locale can be deleted within the Set.\n", response = void.class)
+    @io.swagger.annotations.ApiOperation(value = "Removes a challenge question set.", notes = "Removes an existing challenge question set from the system. By specifying the locale query parameter, questions of specific locale can be deleted within the Set.\n\n  <b>Permission required:</b>\n    * /permission/admin/manage/identity/challenge/delete\n", response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "Item Deleted"),
         
@@ -110,8 +126,8 @@ public class ChallengesApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error") })
 
-    public Response deleteChallengeQuestionSet(@ApiParam(value = "Challenge Question set Id",required=true ) @PathParam("challenge-set-id")  String challengeSetId,
-    @ApiParam(value = "pass an optional search string for looking up challenge-question based on locale") @QueryParam("locale")  String locale)
+    public Response deleteChallengeQuestionSet(@ApiParam(value = "Challenge Question set ID",required=true ) @PathParam("challenge-set-id")  String challengeSetId,
+    @ApiParam(value = "An optional search string to look-up challenge-questions based on locale.\n") @QueryParam("locale")  String locale)
     {
     return delegate.deleteChallengeQuestionSet(challengeSetId,locale);
     }
@@ -119,7 +135,7 @@ public class ChallengesApi  {
     @Path("/{challenge-set-id}")
     
     
-    @io.swagger.annotations.ApiOperation(value = "searches challenge-question", notes = "By passing in the appropriate options, you can search for\navailable challenge-question in the system\n", response = ChallengeSetDTO.class, responseContainer = "List")
+    @io.swagger.annotations.ApiOperation(value = "Retrieve a challenge set.", notes = "Retrieve the challenge questions in the system in a set identified by the challenge-set-id.\n\n  <b>Permission required:</b>\n    * /permission/admin/manage/identity/challenge/view\n", response = ChallengeSetDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "search results matching criteria"),
         
@@ -131,10 +147,10 @@ public class ChallengesApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error") })
 
-    public Response getChallengeQuestionSet(@ApiParam(value = "Challenge Question set Id",required=true ) @PathParam("challenge-set-id")  String challengeSetId,
-    @ApiParam(value = "pass an optional search string for looking up challenge-question based on locale") @QueryParam("locale")  String locale,
-    @ApiParam(value = "number of records to skip for pagination") @QueryParam("offset")  Integer offset,
-    @ApiParam(value = "maximum number of records to return") @QueryParam("limit")  Integer limit)
+    public Response getChallengeQuestionSet(@ApiParam(value = "Challenge Question set ID",required=true ) @PathParam("challenge-set-id")  String challengeSetId,
+    @ApiParam(value = "An optional search string to look-up challenge-questions based on locale.\n") @QueryParam("locale")  String locale,
+    @ApiParam(value = "Number of records to skip for pagination. _*This filtering is not yet supported._") @QueryParam("offset")  Integer offset,
+    @ApiParam(value = "Maximum number of records to return. _*This filtering is not yet supported._") @QueryParam("limit")  Integer limit)
     {
     return delegate.getChallengeQuestionSet(challengeSetId,locale,offset,limit);
     }
@@ -142,7 +158,7 @@ public class ChallengesApi  {
     
     
     
-    @io.swagger.annotations.ApiOperation(value = "searches challenge-question", notes = "By passing in the appropriate options, you can search for\navailable challenge-question in the system\n", response = ChallengeSetDTO.class, responseContainer = "List")
+    @io.swagger.annotations.ApiOperation(value = "Retrieve all the challenge questions.", notes = "Retrieve all the challenge questions in the system.\n\n  <b>Permission required:</b>\n    * /permission/admin/manage/identity/challenge/view\n", response = ChallengeSetDTO.class, responseContainer = "List")
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "search results matching criteria"),
         
@@ -150,17 +166,17 @@ public class ChallengesApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error") })
 
-    public Response searchChallenges(@ApiParam(value = "pass an optional search string for looking up challenge-question based on locale") @QueryParam("locale")  String locale,
-    @ApiParam(value = "number of records to skip for pagination") @QueryParam("offset")  Integer offset,
-    @ApiParam(value = "maximum number of records to return") @QueryParam("limit")  Integer limit)
+    public Response searchChallenges(@ApiParam(value = "An optional search string to look-up challenge-questions based on locale.\n") @QueryParam("locale")  String locale,
+    @ApiParam(value = "Number of records to skip for pagination. _*This filtering is not yet supported._") @QueryParam("offset")  Integer offset,
+    @ApiParam(value = "Maximum number of records to return. _*This filtering is not yet supported._") @QueryParam("limit")  Integer limit)
     {
     return delegate.searchChallenges(locale,offset,limit);
     }
     @PUT
     @Path("/{challenge-set-id}")
     @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "update challenge question", notes = "Updates an existing challenge question set in the system\n", response = void.class)
+    
+    @io.swagger.annotations.ApiOperation(value = "Update challenge questions of a set.", notes = "Updates an existing challenge question set in the system. This will override the existing challenge questions in the set by new challenge questions.\n\n  <b>Permission required:</b>\n    * /permission/admin/manage/identity/challenge/update\n", response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK"),
         
@@ -172,8 +188,8 @@ public class ChallengesApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error") })
 
-    public Response updateChallengeQuestionSet(@ApiParam(value = "Challenge Question set Id",required=true ) @PathParam("challenge-set-id")  String challengeSetId,
-    @ApiParam(value = "challenge-question for the set"  ) List<ChallengeQuestionDTO> challengeSet)
+    public Response updateChallengeQuestionSet(@ApiParam(value = "Challenge Question set ID",required=true ) @PathParam("challenge-set-id")  String challengeSetId,
+    @ApiParam(value = "Challenge-questions for the set"  ) List<ChallengeQuestionDTO> challengeSet)
     {
     return delegate.updateChallengeQuestionSet(challengeSetId,challengeSet);
     }
