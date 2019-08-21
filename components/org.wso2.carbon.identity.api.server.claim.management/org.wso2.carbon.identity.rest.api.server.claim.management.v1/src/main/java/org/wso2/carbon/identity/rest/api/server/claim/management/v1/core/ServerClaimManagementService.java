@@ -342,11 +342,21 @@ public class ServerClaimManagementService {
         }
 
         try {
+            for (AttributeMappingDTO attributeMappingDTO :
+                    localClaimReqDTO.getAttributeMapping()) {
+                if (!isUserStoreExists(attributeMappingDTO.getUserstore())) {
+                    throw handleClaimManagementClientError(ERROR_CODE_INVALID_USERSTORE, BAD_REQUEST,
+                            attributeMappingDTO.getUserstore());
+                }
+            }
+
             getClaimMetadataManagementService().updateLocalClaim(
                     createLocalClaim(localClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_UPDATING_LOCAL_CLAIM, claimId);
+        } catch (UserStoreException e) {
+            throw handleException(e, ERROR_CODE_ERROR_ADDING_LOCAL_CLAIM, localClaimReqDTO.getClaimURI());
         }
 
         return getResourceId(localClaimReqDTO.getClaimURI());
