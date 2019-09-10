@@ -233,6 +233,18 @@
                 <version>${spring-web.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.governance</groupId>
+                <artifactId>org.wso2.carbon.identity.governance</artifactId>
+                <version>${identity.governance.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
+                <scope>provided</scope>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -338,6 +350,7 @@
     <modules>
         <module>components/org.wso2.carbon.identity.api.server.challenge</module>
         <module>components/org.wso2.carbon.identity.api.server.claim.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.identity.governance</module>
         <module>components/org.wso2.carbon.identity.api.server.common</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow.engine</module>
         <module>components/org.wso2.carbon.identity.api.server.permission.management</module>

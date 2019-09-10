@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
   ~ Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
@@ -17,18 +16,17 @@
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
-        <artifactId>org.wso2.carbon.identity.api.server.challenge</artifactId>
+        <artifactId>org.wso2.carbon.identity.api.server.identity.governance</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.0.29-SNAPSHOT</version>
+        <version>1.0.25-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.identity.rest.api.server.challenge.v1</artifactId>
+    <artifactId>org.wso2.carbon.identity.api.server.identity.governance.v1</artifactId>
     <packaging>jar</packaging>
-    <name>WSO2 Identity Server - Challenges Rest API</name>
-    <description>WSO2 Identity Server - Challenges Rest API</description>
+    <name>WSO2 Identity Server - Claim Management Rest API v1</name>
+    <description>WSO2 Identity Server - Claim Management Rest API v1</description>
 
     <build>
         <plugins>
@@ -41,14 +39,14 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-                <!--<groupId>org.wso2.maven.plugins</groupId>-->
-                <!--<artifactId>swagger2cxf-maven-plugin</artifactId>-->
-                <!--<version>1.0-SNAPSHOT</version>-->
-                <!--<configuration>-->
-                    <!--<inputSpec>${project.basedir}/src/main/resources/challenge.yaml</inputSpec>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
+<!--            <plugin>-->
+<!--                <groupId>org.wso2.maven.plugins</groupId>-->
+<!--                <artifactId>swagger2cxf-maven-plugin</artifactId>-->
+<!--                <version>1.0-SNAPSHOT</version>-->
+<!--                <configuration>-->
+<!--                    <inputSpec>${project.basedir}/src/main/resources/identity-governance.yaml</inputSpec>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -134,26 +132,13 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.governance</groupId>
-            <artifactId>org.wso2.carbon.identity.recovery</artifactId>
+            <artifactId>org.wso2.carbon.identity.governance</artifactId>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.ws.rs</groupId>
-                    <artifactId>jsr311-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.identity.server.api</groupId>
-            <artifactId>org.wso2.carbon.identity.api.server.challenge.common</artifactId>
-            <scope>provided</scope>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
-
 </project>

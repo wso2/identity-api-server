@@ -1,0 +1,389 @@
+swagger: '2.0'
+info:
+  description: This is the RESTful API for claims managment related operations in WSO2 Identity Server
+  version: "1.0.0"
+  title: WSO2 Identity Server - Governance connectors Admin API
+  contact:
+    name: "WSO2 Identity Server"
+    url: "https://wso2.com/identity-and-access-management"
+    email: "architecture@wso2.org"
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+schemes:
+  - https
+
+host: localhost:9443
+basePath: /t/{tenant-domain}/api/server/v1/
+
+# Tags are used for organizing operations.
+tags:
+  - name: management
+    description: Secured Admin-only calls
+
+# Applicable authentication mechanisms.
+security:
+  - OAuth2: []
+  - BasicAuth: []
+
+paths:
+  /identity-governance/:
+    get:
+      tags:
+        - management
+      summary: Retrieve governance connector categories.
+      operationId: getCategories
+      description: Retrieve governance connector categories.
+      produces:
+        - application/json
+      parameters:
+        - $ref : '#/parameters/limitQueryParam'
+        - $ref : '#/parameters/offsetQueryParam'
+        - $ref : '#/parameters/filterQueryParam'
+        - $ref : '#/parameters/sortQueryParam'
+      responses:
+        200:
+          description: Governance connector categories.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CategoriesRes'
+        401:
+          $ref: '#/responses/Unauthorized'
+        500:
+          $ref: '#/responses/ServerError'
+        501:
+          $ref: '#/responses/NotImplemented'
+
+  /identity-governance/{category-id}:
+    get:
+      tags:
+        - management
+      summary: Retrieve governance connectors of a category.
+      operationId: getConnectorCategory
+      description: Retrieve governance connectors of a category.
+      produces:
+        - application/json
+      parameters:
+        - $ref : '#/parameters/categoryIdPathParam'
+      responses:
+        200:
+          description: Requested governance connector category.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ConnectorsRes'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/ServerError'
+
+  /identity-governance/{category-id}/{connector-id}:
+    get:
+      tags:
+        - management
+      summary: Retrieve governance connector.
+      operationId: getConnector
+      description: Retrieve governance connector.
+      produces:
+        - application/json
+      parameters:
+        - $ref : '#/parameters/categoryIdPathParam'
+        - $ref : '#/parameters/connectorIdPathParam'
+      responses:
+        200:
+          description: Requested governance connector.
+          schema:
+            $ref: '#/definitions/ConnectorsRes'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/ServerError'
+    patch:
+      tags:
+        - management
+      summary: Patch governance connector.
+      operationId: patchConnector
+      description: Patch governance connector.
+      produces:
+        - application/json
+      parameters:
+        - $ref : '#/parameters/categoryIdPathParam'
+        - $ref : '#/parameters/connectorIdPathParam'
+        - in: body
+          name: governance-connector
+          description: governance-connector to update
+          schema:
+            $ref: '#/definitions/ConnectorsReq'
+      responses:
+        200:
+          $ref: '#/responses/OK'
+        400:
+          $ref: '#/responses/InvalidInput'
+        401:
+          $ref: '#/responses/Unauthorized'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/ServerError'
+
+#-----------------------------------------------------
+# Definitions
+#-----------------------------------------------------
+definitions:
+  #-----------------------------------------------------
+  # The Governance Connector Response object
+  #-----------------------------------------------------
+  ConnectorsRes:
+    type: object
+    description: Governance connector response.
+    properties:
+      id:
+        type: string
+        description: Connector id.
+        example: "c3VzcGVuc2lvbi5ub3RpZmljYXRpb24"
+      name:
+        type: string
+        description: Connector name.
+        example: "suspension.notification"
+      category:
+        type: string
+        description: Connector category.
+        example: "Account Management Policies"
+      friendlyName:
+        type: string
+        description: Connector friendly name.
+        example: "Lock Idle Accounts"
+      order:
+        type: integer
+        description: Connector order.
+        example: 0
+      subCategory:
+        type: string
+        description: Connector subcategory.
+        example: "DEFAULT"
+      properties:
+        type: array
+        description: Define any additional properties if required.
+        items:
+          $ref: '#/definitions/PropertyRes'
+  #-----------------------------------------------------
+  # The Governance Connector Response object for Categories
+  #-----------------------------------------------------
+  CategoryConnectorsRes:
+    type: object
+    description: Governance connector response.
+    properties:
+      id:
+        type: string
+        description: Connector id.
+        example: "c3VzcGVuc2lvbi5ub3RpZmljYXRpb24"
+      location:
+        type: string
+        description: Connector location .
+        example: "https://localhost:9443/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz/c3VzcGVuc2lvbi5ub3RpZmljYXRpb24"
+  #-----------------------------------------------------
+  # The Governance Connector Categories Response object
+  #-----------------------------------------------------
+  CategoriesRes:
+    type: object
+    description: Governance connector category response.
+    properties:
+      id:
+        type: string
+        description: Connector category id.
+        example: "QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz"
+      name:
+        type: string
+        description: Connector category name.
+        example: "Account Management Policies"
+      location:
+        type: string
+        description: Location to retrieve connector category.
+        example: "https://localhost:9443/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz"
+      connectors:
+        type: array
+        description: Connectors of the category.
+        items:
+          $ref: '#/definitions/CategoryConnectorsRes'
+
+  #-----------------------------------------------------
+  # Property Object For Response
+  #-----------------------------------------------------
+  PropertyRes:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        description: Property name.
+        example: "suspension.notification.enable"
+      value:
+        type: string
+        description: Property value.
+        example: "false"
+      displayName:
+        type: string
+        description: Display name of the property.
+        example: "Enable"
+      description:
+        type: string
+        description: Description of the property.
+        example: "Enable account suspend notifications."
+
+  #-----------------------------------------------------
+  # The Governance Connector Response object
+  #-----------------------------------------------------
+  ConnectorsReq:
+    type: object
+    description: Governance connector response.
+    properties:
+      operation:
+        type: string
+        example: update
+      properties:
+        type: array
+        description: Define any additional properties if required.
+        items:
+          $ref: '#/definitions/PropertyReq'
+
+  #-----------------------------------------------------
+  # Property Object For Request
+  #-----------------------------------------------------
+  PropertyReq:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        description: Property name.
+        example: "suspension.notification.enable"
+      value:
+        type: string
+        description: Property value.
+        example: "false"
+
+  #-----------------------------------------------------
+  # The Error  object
+  #-----------------------------------------------------
+  Error:
+    type: object
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: string
+        example: "AAA-00000"
+      message:
+        type: string
+        example: "Some Error Message"
+      description:
+        type: string
+        example: "Some Error Description"
+      traceId:
+        type: string
+        example: "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047"
+
+#-----------------------------------------------------
+# Security Definitions
+#-----------------------------------------------------
+securityDefinitions:
+  BasicAuth:
+    type: basic
+  # ClientCertificate:
+  #   type: custom
+  OAuth2:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: https://localhost:9443/oauth/authorize
+    tokenUrl: https://localhost:9443/oauth/token
+    scopes:
+      read: Grants read access
+      write: Grants write access
+      admin: Grants read and write access to administrative information
+
+#-----------------------------------------------------
+# Parameters
+#-----------------------------------------------------
+parameters:
+  limitQueryParam:
+    in: query
+    name: limit
+    required: false
+    description: maximum number of records to return
+    type: integer
+    format: int32
+  offsetQueryParam:
+    in: query
+    name: offset
+    required: false
+    description: number of records to skip for pagination
+    type: integer
+    format: int32
+  filterQueryParam:
+    in: query
+    name: filter
+    required: false
+    description: Condition to filter the retrival of records.
+    type: string
+  sortQueryParam:
+    in: query
+    name: sort
+    required: false
+    description: Define the order how the retrieved records should be sorted.
+    type: string
+  attributesQueryParam:
+    in: query
+    name: attributes
+    required: false
+    description: Define only the required attributes to be sent in the response object.
+    type: string
+  categoryIdPathParam:
+    in: path
+    name: category-id
+    required: true
+    type: string
+    description: Id of the connector category.
+  connectorIdPathParam:
+    in: path
+    name: connector-id
+    required: true
+    type: string
+    description: Id of the connector.
+
+#-----------------------------------------------------
+# Descriptions of common responses
+#-----------------------------------------------------
+responses:
+  Unauthorized:
+    description: Unauthorized.
+  ServerError:
+    description: Internal Server Error.
+    schema:
+      $ref: '#/definitions/Error'
+  NotImplemented:
+    description: Not Implemented.
+    schema:
+      $ref: '#/definitions/Error'
+  NotFound:
+    description: Not Found.
+    schema:
+      $ref: '#/definitions/Error'
+  InvalidInput:
+    description: Bad Request.
+    schema:
+      $ref: '#/definitions/Error'
+  OK:
+    description: OK.
+  NoContent:
+    description: No Content.
+  Forbidden:
+    description: Resource Forbidden.
