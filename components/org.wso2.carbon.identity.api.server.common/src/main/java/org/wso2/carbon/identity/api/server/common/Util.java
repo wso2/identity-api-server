@@ -18,6 +18,7 @@ package org.wso2.carbon.identity.api.server.common;
 
 import org.apache.log4j.MDC;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.recovery.ChallengeQuestionManager;
 
 import java.util.UUID;
@@ -35,6 +36,11 @@ public class Util {
     public static ChallengeQuestionManager getChallengeQuestionManager() {
         return (ChallengeQuestionManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                 .getOSGiService(ChallengeQuestionManager.class, null);
+    }
+
+    public static IdentityGovernanceService getIdentityGovernanceService() {
+        return (IdentityGovernanceService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                .getOSGiService(IdentityGovernanceService.class, null);
     }
 
     /**
