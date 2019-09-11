@@ -289,8 +289,8 @@
         <!--Maven Plugin Version-->
         <maven.compiler.plugin.version>2.3.1</maven.compiler.plugin.version>
         <maven.bundle.plugin.version>2.4.0</maven.bundle.plugin.version>
-        <jackson-jaxrs-json-provider.version>2.9.7</jackson-jaxrs-json-provider.version>
-        <jackson-databind.version>2.9.7</jackson-databind.version>
+        <jackson-jaxrs-json-provider.version>2.9.9</jackson-jaxrs-json-provider.version>
+        <jackson-databind.version>2.9.9.1</jackson-databind.version>
         <cxf-bundle.version>3.2.8</cxf-bundle.version>
         <jackson.version>1.9.13</jackson.version>
         <spring-web.version>5.1.1.RELEASE</spring-web.version>
