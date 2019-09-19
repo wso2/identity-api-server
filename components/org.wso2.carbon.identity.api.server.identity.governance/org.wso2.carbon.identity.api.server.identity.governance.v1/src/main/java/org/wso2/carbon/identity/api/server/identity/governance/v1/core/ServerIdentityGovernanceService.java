@@ -26,8 +26,8 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.GovernanceConstant;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.CategoriesResDTO;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.CategoryConnectorsResDTO;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorsReqDTO;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorsResDTO;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorResDTO;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorsPatchReqDTO;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.PropertyReqDTO;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.PropertyResDTO;
 import org.wso2.carbon.identity.application.common.model.Property;
@@ -35,9 +35,7 @@ import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.governance.bean.ConnectorConfig;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -95,7 +93,7 @@ public class ServerIdentityGovernanceService {
      * @param categoryId Governance connector category id.
      * @return List of governance connectors for the give id.
      */
-    public List<ConnectorsResDTO> getGovernanceConnectorsByCategory(String categoryId) {
+    public List<ConnectorResDTO> getGovernanceConnectorsByCategory(String categoryId) {
 
         try {
             IdentityGovernanceService identityGovernanceService = Util.getIdentityGovernanceService();
@@ -125,7 +123,7 @@ public class ServerIdentityGovernanceService {
      * @param connectorId Governance connector id.
      * @return Governance connectors for the give id.
      */
-    public ConnectorsResDTO getGovernanceConnector(String categoryId, String connectorId) {
+    public ConnectorResDTO getGovernanceConnector(String categoryId, String connectorId) {
 
         try {
             IdentityGovernanceService identityGovernanceService = Util.getIdentityGovernanceService();
@@ -136,8 +134,14 @@ public class ServerIdentityGovernanceService {
             if (connectorConfig == null) {
                 throw handleNotFoundError(connectorId, GovernanceConstant.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
             }
+            String categoryIdFound = Base64.getUrlEncoder()
+                    .withoutPadding()
+                    .encodeToString(connectorConfig.getCategory().getBytes(StandardCharsets.UTF_8));
+            if (!categoryId.equals(categoryIdFound)) {
+                throw handleNotFoundError(connectorId, GovernanceConstant.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
+            }
 
-            return buildConnectorsResDTO(connectorConfig);
+            return buildConnectorResDTO(connectorConfig);
 
         } catch (IdentityGovernanceException e) {
             GovernanceConstant.ErrorMessage errorEnum =
@@ -155,13 +159,13 @@ public class ServerIdentityGovernanceService {
      * @param governanceConnector Connector property to update.
      */
     public void updateGovernanceConnectorProperty(String categoryId, String connectorId,
-                                                  ConnectorsReqDTO governanceConnector) {
+                                                  ConnectorsPatchReqDTO governanceConnector) {
 
         try {
             IdentityGovernanceService identityGovernanceService = Util.getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
-            ConnectorsResDTO connector = getGovernanceConnector(categoryId, connectorId);
+            ConnectorResDTO connector = getGovernanceConnector(categoryId, connectorId);
             if (connector == null) {
                 throw handleNotFoundError(connectorId, GovernanceConstant.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
             }
@@ -212,12 +216,12 @@ public class ServerIdentityGovernanceService {
         return categories;
     }
 
-    private List<ConnectorsResDTO> buildConnectorsResDTOS(List<ConnectorConfig> connectorConfigList) {
+    private List<ConnectorResDTO> buildConnectorsResDTOS(List<ConnectorConfig> connectorConfigList) {
 
-        List<ConnectorsResDTO> connectors = new ArrayList<>();
+        List<ConnectorResDTO> connectors = new ArrayList<>();
         for (ConnectorConfig connectorConfig : connectorConfigList) {
-            ConnectorsResDTO connectorsResDTO = buildConnectorsResDTO(connectorConfig);
-            connectors.add(connectorsResDTO);
+            ConnectorResDTO connectorResDTO = buildConnectorResDTO(connectorConfig);
+            connectors.add(connectorResDTO);
         }
         return connectors;
     }
@@ -241,9 +245,9 @@ public class ServerIdentityGovernanceService {
         return connectors;
     }
 
-    private ConnectorsResDTO buildConnectorsResDTO(ConnectorConfig connectorConfig) {
+    private ConnectorResDTO buildConnectorResDTO(ConnectorConfig connectorConfig) {
 
-        ConnectorsResDTO connectorsResDTO = new ConnectorsResDTO();
+        ConnectorResDTO connectorsResDTO = new ConnectorResDTO();
         connectorsResDTO.setId(Base64.getUrlEncoder()
                 .withoutPadding()
                 .encodeToString(connectorConfig.getName().getBytes(StandardCharsets.UTF_8)));

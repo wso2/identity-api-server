@@ -16,7 +16,18 @@
 
 package org.wso2.carbon.identity.api.server.identity.governance.v1;
 
-import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorsReqDTO;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.*;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.*;
+
+import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.CategoriesResDTO;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ErrorDTO;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorResDTO;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorsPatchReqDTO;
+
+import java.util.List;
+
+import java.io.InputStream;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import javax.ws.rs.core.Response;
 
@@ -24,6 +35,6 @@ public abstract class IdentityGovernanceApiService {
     public abstract Response getCategories(Integer limit,Integer offset,String filter,String sort);
     public abstract Response getConnector(String categoryId,String connectorId);
     public abstract Response getConnectorCategory(String categoryId);
-    public abstract Response patchConnector(String categoryId,String connectorId,ConnectorsReqDTO governanceConnector);
+    public abstract Response patchConnector(String categoryId,String connectorId,ConnectorsPatchReqDTO governanceConnector);
 }
 

@@ -27,11 +27,11 @@ import javax.validation.constraints.Pattern;
 
 
 /**
- * Governance connector response.
+ * Governance connector response with minimal attributes.
  **/
 
 
-@ApiModel(description = "Governance connector response.")
+@ApiModel(description = "Governance connector response with minimal attributes.")
 public class CategoryConnectorsResDTO  {
   
   
@@ -56,9 +56,9 @@ public class CategoryConnectorsResDTO  {
 
   
   /**
-   * Connector location .
+   * Connector location to retrieve the connector configuration.
    **/
-  @ApiModelProperty(value = "Connector location .")
+  @ApiModelProperty(value = "Connector location to retrieve the connector configuration.")
   @JsonProperty("location")
   public String getLocation() {
     return location;

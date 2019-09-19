@@ -25,8 +25,8 @@ import io.swagger.annotations.ApiParam;
 
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.CategoriesResDTO;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ErrorDTO;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorsResDTO;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorsReqDTO;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorResDTO;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorsPatchReqDTO;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class IdentityGovernanceApi  {
     @Path("/")
     
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Retrieve governance connector categories.", notes = "Retrieve governance connector categories.", response = CategoriesResDTO.class, responseContainer = "List")
+    @io.swagger.annotations.ApiOperation(value = "Retrieve governance connector categories.", notes = "Retrieve governance connector categories.\n\n<b>Permission required:</b>\n  * /permission/admin/manage\n", response = CategoriesResDTO.class, responseContainer = "List")
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "Governance connector categories."),
         
@@ -71,11 +71,13 @@ public class IdentityGovernanceApi  {
     @Path("/{category-id}/{connector-id}")
     
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Retrieve governance connector.", notes = "Retrieve governance connector.", response = ConnectorsResDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Retrieve governance connector.", notes = "Retrieve governance connector.\n\n<b>Permission required:</b>\n  * /permission/admin/manage\n", response = ConnectorResDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "Requested governance connector."),
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found."),
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
@@ -88,11 +90,13 @@ public class IdentityGovernanceApi  {
     @Path("/{category-id}")
     
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Retrieve governance connectors of a category.", notes = "Retrieve governance connectors of a category.", response = ConnectorsResDTO.class, responseContainer = "List")
+    @io.swagger.annotations.ApiOperation(value = "Retrieve governance connectors of a category.", notes = "Retrieve governance connectors of a category.\n\n<b>Permission required:</b>\n  * /permission/admin/manage\n", response = ConnectorResDTO.class, responseContainer = "List")
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "Requested governance connector category."),
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found."),
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
@@ -102,9 +106,9 @@ public class IdentityGovernanceApi  {
     }
     @PATCH
     @Path("/{category-id}/{connector-id}")
-    
+    @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Patch governance connector.", notes = "Patch governance connector.", response = void.class)
+    @io.swagger.annotations.ApiOperation(value = "Patch governance connector.", notes = "Patch governance connector.\n\n<b>Permission required:</b>\n  * /permission/admin/manage\n", response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK."),
         
@@ -112,11 +116,13 @@ public class IdentityGovernanceApi  {
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
         
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found."),
+        
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
     public Response patchConnector(@ApiParam(value = "Id of the connector category.",required=true ) @PathParam("category-id")  String categoryId,
     @ApiParam(value = "Id of the connector.",required=true ) @PathParam("connector-id")  String connectorId,
-    @ApiParam(value = "governance-connector to update"  ) ConnectorsReqDTO governanceConnector)
+    @ApiParam(value = "governance-connector to update"  ) ConnectorsPatchReqDTO governanceConnector)
     {
     return delegate.patchConnector(categoryId,connectorId,governanceConnector);
     }
