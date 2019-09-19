@@ -19,7 +19,7 @@ package org.wso2.carbon.identity.api.server.identity.governance.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.IdentityGovernanceApiService;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.core.ServerIdentityGovernanceService;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorsReqDTO;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorsPatchReqDTO;
 
 import javax.ws.rs.core.Response;
 
@@ -51,7 +51,7 @@ public class IdentityGovernanceApiServiceImpl extends IdentityGovernanceApiServi
     }
 
     @Override
-    public Response patchConnector(String categoryId, String connectorId, ConnectorsReqDTO governanceConnector) {
+    public Response patchConnector(String categoryId, String connectorId, ConnectorsPatchReqDTO governanceConnector) {
 
         identityGovernanceService.updateGovernanceConnectorProperty(categoryId, connectorId, governanceConnector);
         return Response.ok().build();

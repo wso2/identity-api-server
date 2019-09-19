@@ -91,9 +91,9 @@ public class CategoriesResDTO  {
 
   
   /**
-   * Connectors of the category.
+   * Connectors of the category with minimal attributes.
    **/
-  @ApiModelProperty(value = "Connectors of the category.")
+  @ApiModelProperty(value = "Connectors of the category with minimal attributes.")
   @JsonProperty("connectors")
   public List<CategoryConnectorsResDTO> getConnectors() {
     return connectors;

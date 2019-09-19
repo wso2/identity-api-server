@@ -35,7 +35,7 @@ import javax.validation.constraints.Pattern;
 
 
 @ApiModel(description = "Governance connector response.")
-public class ConnectorsResDTO  {
+public class ConnectorResDTO  {
   
   
   
@@ -155,7 +155,7 @@ public class ConnectorsResDTO  {
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ConnectorsResDTO {\n");
+    sb.append("class ConnectorResDTO {\n");
     
     sb.append("  id: ").append(id).append("\n");
     sb.append("  name: ").append(name).append("\n");

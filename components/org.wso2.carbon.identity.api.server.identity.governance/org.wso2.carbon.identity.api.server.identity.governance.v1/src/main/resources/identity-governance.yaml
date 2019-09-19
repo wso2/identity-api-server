@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  description: This is the RESTful API for claims managment related operations in WSO2 Identity Server
+  description: This is the RESTful API for identity governance configurations in WSO2 Identity Server
   version: "1.0.0"
   title: WSO2 Identity Server - Governance connectors Admin API
   contact:
@@ -19,7 +19,7 @@ basePath: /t/{tenant-domain}/api/server/v1/
 
 # Tags are used for organizing operations.
 tags:
-  - name: management
+  - name: Management
     description: Secured Admin-only calls
 
 # Applicable authentication mechanisms.
@@ -31,10 +31,14 @@ paths:
   /identity-governance/:
     get:
       tags:
-        - management
+        - Management
       summary: Retrieve governance connector categories.
       operationId: getCategories
-      description: Retrieve governance connector categories.
+      description: |
+        Retrieve governance connector categories.
+
+        <b>Permission required:</b>
+          * /permission/admin/manage
       produces:
         - application/json
       parameters:
@@ -59,10 +63,14 @@ paths:
   /identity-governance/{category-id}:
     get:
       tags:
-        - management
+        - Management
       summary: Retrieve governance connectors of a category.
       operationId: getConnectorCategory
-      description: Retrieve governance connectors of a category.
+      description: |
+        Retrieve governance connectors of a category.
+
+        <b>Permission required:</b>
+          * /permission/admin/manage
       produces:
         - application/json
       parameters:
@@ -73,7 +81,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/ConnectorsRes'
+              $ref: '#/definitions/ConnectorRes'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -84,10 +92,14 @@ paths:
   /identity-governance/{category-id}/{connector-id}:
     get:
       tags:
-        - management
+        - Management
       summary: Retrieve governance connector.
       operationId: getConnector
-      description: Retrieve governance connector.
+      description: |
+        Retrieve governance connector.
+
+        <b>Permission required:</b>
+          * /permission/admin/manage
       produces:
         - application/json
       parameters:
@@ -97,7 +109,7 @@ paths:
         200:
           description: Requested governance connector.
           schema:
-            $ref: '#/definitions/ConnectorsRes'
+            $ref: '#/definitions/ConnectorRes'
         401:
           $ref: '#/responses/Unauthorized'
         404:
@@ -106,11 +118,17 @@ paths:
           $ref: '#/responses/ServerError'
     patch:
       tags:
-        - management
+        - Management
       summary: Patch governance connector.
       operationId: patchConnector
-      description: Patch governance connector.
+      description: |
+        Patch governance connector.
+
+        <b>Permission required:</b>
+          * /permission/admin/manage
       produces:
+        - application/json
+      consumes:
         - application/json
       parameters:
         - $ref : '#/parameters/categoryIdPathParam'
@@ -119,7 +137,7 @@ paths:
           name: governance-connector
           description: governance-connector to update
           schema:
-            $ref: '#/definitions/ConnectorsReq'
+            $ref: '#/definitions/ConnectorsPatchReq'
       responses:
         200:
           $ref: '#/responses/OK'
@@ -137,9 +155,48 @@ paths:
 #-----------------------------------------------------
 definitions:
   #-----------------------------------------------------
+  # The Governance Connector Categories Response object
+  #-----------------------------------------------------
+  CategoriesRes:
+    type: object
+    description: Governance connector category response.
+    properties:
+      id:
+        type: string
+        description: Connector category id.
+        example: "QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz"
+      name:
+        type: string
+        description: Connector category name.
+        example: "Account Management Policies"
+      location:
+        type: string
+        description: Location to retrieve connector category.
+        example: "https://localhost:9443/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz"
+      connectors:
+        type: array
+        description: Connectors of the category with minimal attributes.
+        items:
+          $ref: '#/definitions/CategoryConnectorsRes'
+  #-----------------------------------------------------
+  # The Governance Connector Response object for Categories
+  #-----------------------------------------------------
+  CategoryConnectorsRes:
+    type: object
+    description: Governance connector response with minimal attributes.
+    properties:
+      id:
+        type: string
+        description: Connector id.
+        example: "c3VzcGVuc2lvbi5ub3RpZmljYXRpb24"
+      location:
+        type: string
+        description: Connector location to retrieve the connector configuration.
+        example: "https://localhost:9443/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz/c3VzcGVuc2lvbi5ub3RpZmljYXRpb24"
+  #-----------------------------------------------------
   # The Governance Connector Response object
   #-----------------------------------------------------
-  ConnectorsRes:
+  ConnectorRes:
     type: object
     description: Governance connector response.
     properties:
@@ -173,52 +230,11 @@ definitions:
         items:
           $ref: '#/definitions/PropertyRes'
   #-----------------------------------------------------
-  # The Governance Connector Response object for Categories
-  #-----------------------------------------------------
-  CategoryConnectorsRes:
-    type: object
-    description: Governance connector response.
-    properties:
-      id:
-        type: string
-        description: Connector id.
-        example: "c3VzcGVuc2lvbi5ub3RpZmljYXRpb24"
-      location:
-        type: string
-        description: Connector location .
-        example: "https://localhost:9443/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz/c3VzcGVuc2lvbi5ub3RpZmljYXRpb24"
-  #-----------------------------------------------------
-  # The Governance Connector Categories Response object
-  #-----------------------------------------------------
-  CategoriesRes:
-    type: object
-    description: Governance connector category response.
-    properties:
-      id:
-        type: string
-        description: Connector category id.
-        example: "QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz"
-      name:
-        type: string
-        description: Connector category name.
-        example: "Account Management Policies"
-      location:
-        type: string
-        description: Location to retrieve connector category.
-        example: "https://localhost:9443/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz"
-      connectors:
-        type: array
-        description: Connectors of the category.
-        items:
-          $ref: '#/definitions/CategoryConnectorsRes'
-
-  #-----------------------------------------------------
   # Property Object For Response
   #-----------------------------------------------------
   PropertyRes:
     type: object
-    required:
-      - name
+    description: Governance connector property.
     properties:
       name:
         type: string
@@ -230,26 +246,28 @@ definitions:
         example: "false"
       displayName:
         type: string
-        description: Display name of the property.
+        description: Property display name.
         example: "Enable"
       description:
         type: string
-        description: Description of the property.
+        description: Property description.
         example: "Enable account suspend notifications."
 
   #-----------------------------------------------------
-  # The Governance Connector Response object
+  # The Governance Connector Patch Request object
   #-----------------------------------------------------
-  ConnectorsReq:
+  ConnectorsPatchReq:
     type: object
-    description: Governance connector response.
+    description: Governance connector property patch request.
     properties:
       operation:
         type: string
+        description: Governance connector properties patch operation.
+        enum: ["update"]
         example: update
       properties:
         type: array
-        description: Define any additional properties if required.
+        description: Governance connector properties to patch.
         items:
           $ref: '#/definitions/PropertyReq'
 
@@ -258,6 +276,7 @@ definitions:
   #-----------------------------------------------------
   PropertyReq:
     type: object
+    description: Governance connector property to patch.
     required:
       - name
     properties:
@@ -298,17 +317,11 @@ definitions:
 securityDefinitions:
   BasicAuth:
     type: basic
-  # ClientCertificate:
-  #   type: custom
   OAuth2:
     type: oauth2
     flow: accessCode
     authorizationUrl: https://localhost:9443/oauth/authorize
     tokenUrl: https://localhost:9443/oauth/token
-    scopes:
-      read: Grants read access
-      write: Grants write access
-      admin: Grants read and write access to administrative information
 
 #-----------------------------------------------------
 # Parameters
@@ -339,12 +352,6 @@ parameters:
     name: sort
     required: false
     description: Define the order how the retrieved records should be sorted.
-    type: string
-  attributesQueryParam:
-    in: query
-    name: attributes
-    required: false
-    description: Define only the required attributes to be sent in the response object.
     type: string
   categoryIdPathParam:
     in: path
@@ -383,7 +390,3 @@ responses:
       $ref: '#/definitions/Error'
   OK:
     description: OK.
-  NoContent:
-    description: No Content.
-  Forbidden:
-    description: Resource Forbidden.

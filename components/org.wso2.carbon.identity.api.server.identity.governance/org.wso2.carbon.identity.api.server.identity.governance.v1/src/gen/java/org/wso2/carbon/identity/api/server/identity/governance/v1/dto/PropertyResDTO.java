@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.identity.governance.v1.dto;
 
+import io.swagger.annotations.ApiModel;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
@@ -25,13 +26,16 @@ import javax.validation.constraints.Pattern;
 
 
 
+/**
+ * Governance connector property.
+ **/
 
 
-@ApiModel(description = "")
+@ApiModel(description = "Governance connector property.")
 public class PropertyResDTO  {
   
   
-  @NotNull 
+  
   private String name = null;
   
   
@@ -47,7 +51,7 @@ public class PropertyResDTO  {
   /**
    * Property name.
    **/
-  @ApiModelProperty(required = true, value = "Property name.")
+  @ApiModelProperty(value = "Property name.")
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -71,9 +75,9 @@ public class PropertyResDTO  {
 
   
   /**
-   * Display name of the property.
+   * Property display name.
    **/
-  @ApiModelProperty(value = "Display name of the property.")
+  @ApiModelProperty(value = "Property display name.")
   @JsonProperty("displayName")
   public String getDisplayName() {
     return displayName;
@@ -84,9 +88,9 @@ public class PropertyResDTO  {
 
   
   /**
-   * Description of the property.
+   * Property description.
    **/
-  @ApiModelProperty(value = "Description of the property.")
+  @ApiModelProperty(value = "Property description.")
   @JsonProperty("description")
   public String getDescription() {
     return description;

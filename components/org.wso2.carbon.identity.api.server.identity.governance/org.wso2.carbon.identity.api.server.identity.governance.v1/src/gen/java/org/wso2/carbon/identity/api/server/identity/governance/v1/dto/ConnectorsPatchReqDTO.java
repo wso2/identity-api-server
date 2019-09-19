@@ -30,37 +30,41 @@ import javax.validation.constraints.Pattern;
 
 
 /**
- * Governance connector response.
+ * Governance connector property patch request.
  **/
 
 
-@ApiModel(description = "Governance connector response.")
-public class ConnectorsReqDTO  {
+@ApiModel(description = "Governance connector property patch request.")
+public class ConnectorsPatchReqDTO  {
   
   
+  public enum OperationEnum {
+     update, 
+  };
   
-  private String operation = null;
+  private OperationEnum operation = null;
   
   
   private List<PropertyReqDTO> properties = new ArrayList<PropertyReqDTO>();
 
   
   /**
+   * Governance connector properties patch operation.
    **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(value = "Governance connector properties patch operation.")
   @JsonProperty("operation")
-  public String getOperation() {
+  public OperationEnum getOperation() {
     return operation;
   }
-  public void setOperation(String operation) {
+  public void setOperation(OperationEnum operation) {
     this.operation = operation;
   }
 
   
   /**
-   * Define any additional properties if required.
+   * Governance connector properties to patch.
    **/
-  @ApiModelProperty(value = "Define any additional properties if required.")
+  @ApiModelProperty(value = "Governance connector properties to patch.")
   @JsonProperty("properties")
   public List<PropertyReqDTO> getProperties() {
     return properties;
@@ -74,7 +78,7 @@ public class ConnectorsReqDTO  {
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ConnectorsReqDTO {\n");
+    sb.append("class ConnectorsPatchReqDTO {\n");
     
     sb.append("  operation: ").append(operation).append("\n");
     sb.append("  properties: ").append(properties).append("\n");

@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.identity.governance.v1.dto;
 
+import io.swagger.annotations.ApiModel;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
@@ -25,9 +26,12 @@ import javax.validation.constraints.Pattern;
 
 
 
+/**
+ * Governance connector property to patch.
+ **/
 
 
-@ApiModel(description = "")
+@ApiModel(description = "Governance connector property to patch.")
 public class PropertyReqDTO  {
   
   
