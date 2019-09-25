@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.identity.api.server.identity.governance.v1;
+package org.wso2.carbon.identity.api.server.identity.governance.common;
 
 /**
  * Contains all the identity governance related constants.

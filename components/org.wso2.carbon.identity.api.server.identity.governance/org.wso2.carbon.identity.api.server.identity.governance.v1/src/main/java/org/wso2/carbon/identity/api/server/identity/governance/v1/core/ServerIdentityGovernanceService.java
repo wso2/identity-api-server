@@ -20,10 +20,10 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.GovernanceConstant;
+import org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstant;
+import org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceDataHolder;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.CategoriesResDTO;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.CategoryConnectorsResDTO;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorResDTO;
@@ -46,9 +46,9 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURI;
-import static org.wso2.carbon.identity.api.server.identity.governance.v1.GovernanceConstant.ErrorMessage.ERROR_CODE_FILTERING_NOT_IMPLEMENTED;
-import static org.wso2.carbon.identity.api.server.identity.governance.v1.GovernanceConstant.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
-import static org.wso2.carbon.identity.api.server.identity.governance.v1.GovernanceConstant.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstant.ErrorMessage.ERROR_CODE_FILTERING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstant.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstant.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
 
 /**
  * Call internal osgi services to perform identity governance related operations.
@@ -72,7 +72,7 @@ public class ServerIdentityGovernanceService {
         handleNotImplementedCapabilities(limit, offset, filter, sort);
 
         try {
-            IdentityGovernanceService identityGovernanceService = Util.getIdentityGovernanceService();
+            IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             Map<String, List<ConnectorConfig>> connectorConfigs =
                     identityGovernanceService.getCategorizedConnectorListWithConfigs(tenantDomain);
@@ -96,7 +96,7 @@ public class ServerIdentityGovernanceService {
     public List<ConnectorResDTO> getGovernanceConnectorsByCategory(String categoryId) {
 
         try {
-            IdentityGovernanceService identityGovernanceService = Util.getIdentityGovernanceService();
+            IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             String category = new String(Base64.getUrlDecoder().decode(categoryId), StandardCharsets.UTF_8);
             List<ConnectorConfig> connectorConfigs =
@@ -126,7 +126,7 @@ public class ServerIdentityGovernanceService {
     public ConnectorResDTO getGovernanceConnector(String categoryId, String connectorId) {
 
         try {
-            IdentityGovernanceService identityGovernanceService = Util.getIdentityGovernanceService();
+            IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             String connectorName = new String(Base64.getUrlDecoder().decode(connectorId), StandardCharsets.UTF_8);
             ConnectorConfig connectorConfig =
@@ -162,7 +162,7 @@ public class ServerIdentityGovernanceService {
                                                   ConnectorsPatchReqDTO governanceConnector) {
 
         try {
-            IdentityGovernanceService identityGovernanceService = Util.getIdentityGovernanceService();
+            IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
             ConnectorResDTO connector = getGovernanceConnector(categoryId, connectorId);
