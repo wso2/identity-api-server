@@ -86,6 +86,5 @@ public class GovernanceConstant {
         public String toString() {
             return code + " | " + message;
         }
-
     }
 }
