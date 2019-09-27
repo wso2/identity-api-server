@@ -193,6 +193,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.event.handler.notification</groupId>
+                <artifactId>org.wso2.carbon.email.mgt</artifactId>
+                <version>${identity.event.handler.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.claim.metadata.mgt</artifactId>
                 <version>${carbon.identity.framework.version}</version>
@@ -305,6 +311,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.2.7</identity.governance.version>
+        <identity.event.handler.version>1.2.7</identity.event.handler.version>
         <carbon.identity.framework.version>5.14.94</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.4</maven.findbugsplugin.version>
         <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
@@ -316,6 +323,7 @@
         <module>components/org.wso2.carbon.identity.api.server.claim.management</module>
         <module>components/org.wso2.carbon.identity.api.server.common</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow.engine</module>
+        <module>components/org.wso2.carbon.identity.api.server.email.template</module>
     </modules>
 
 </project>
