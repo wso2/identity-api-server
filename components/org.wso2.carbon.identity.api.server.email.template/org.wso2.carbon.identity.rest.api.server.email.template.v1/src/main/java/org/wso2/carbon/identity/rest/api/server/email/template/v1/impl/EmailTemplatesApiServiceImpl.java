@@ -17,26 +17,12 @@
 package org.wso2.carbon.identity.rest.api.server.email.template.v1.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.wso2.carbon.identity.rest.api.server.email.template.v1.*;
+import org.wso2.carbon.identity.rest.api.server.email.template.v1.EmailApiService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.core.ServerEmailTemplatesService;
-import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.*;
-
-
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.CompleteEmailTemplateRequestDTO;
-import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.ErrorDTO;
-import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.SimpleEmailTemplateResponseDTO;
-import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.SimpleEmailTemplateTypeDTO;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.CompleteEmailTemplateTypeDTO;
-import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.CompleteEmailTemplateResponseDTO;
-import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.CompleteEmailTemplateTypeResponseDTO;
-import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.LocaleResponseDTO;
-import java.util.List;
 
 import java.util.List;
-
-import java.io.InputStream;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-
 import javax.ws.rs.core.Response;
 
 public class EmailTemplatesApiServiceImpl extends EmailApiService {
