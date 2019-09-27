@@ -20,6 +20,7 @@ git clone https://github.com/IsuraD/swagger2cxf-maven-plugin.git
 ```
 2. Checkout the branch **swagger_to_jar**
 ```
+cd swagger2cxf-maven-plugin
 git checkout swagger_to_jar
 ```
 3. Build the plugin 

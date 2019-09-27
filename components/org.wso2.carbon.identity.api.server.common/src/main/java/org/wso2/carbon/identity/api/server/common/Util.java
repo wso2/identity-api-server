@@ -20,6 +20,8 @@ import org.apache.log4j.MDC;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.recovery.ChallengeQuestionManager;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.UUID;
 
 /**
@@ -60,5 +62,31 @@ public class Util {
      */
     public static boolean isCorrelationIDPresent() {
         return MDC.get(Constants.CORRELATION_ID_MDC) != null;
+    }
+
+    /**
+     * Base64 URL encodes a given string.
+     *
+     * @param value String to be encoded.
+     * @return Encoded string.
+     */
+    public static String base64URLEncode(String value) {
+
+        return Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(value.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Base64 URL decode a given encoded string.
+     *
+     * @param value Encoded string to be decoded.
+     * @return Decoded string.
+     */
+    public static String base64URLDecode(String value) {
+
+        return new String(
+                Base64.getUrlDecoder().decode(value),
+                StandardCharsets.UTF_8);
     }
 }
