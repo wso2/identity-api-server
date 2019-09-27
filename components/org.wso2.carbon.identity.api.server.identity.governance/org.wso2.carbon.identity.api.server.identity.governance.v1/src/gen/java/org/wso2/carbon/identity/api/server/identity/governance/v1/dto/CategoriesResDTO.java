@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiModel;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.CategoryConnectorsResDTO;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.LinkDTO;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
@@ -45,7 +46,7 @@ public class CategoriesResDTO  {
   private String name = null;
   
   
-  private String location = null;
+  private List<LinkDTO> links = new ArrayList<LinkDTO>();
   
   
   private List<CategoryConnectorsResDTO> connectors = new ArrayList<CategoryConnectorsResDTO>();
@@ -78,15 +79,15 @@ public class CategoriesResDTO  {
 
   
   /**
-   * Location to retrieve connector category.
+   * Connectors of the category with minimal attributes.
    **/
-  @ApiModelProperty(value = "Location to retrieve connector category.")
-  @JsonProperty("location")
-  public String getLocation() {
-    return location;
+  @ApiModelProperty(value = "Connectors of the category with minimal attributes.")
+  @JsonProperty("links")
+  public List<LinkDTO> getLinks() {
+    return links;
   }
-  public void setLocation(String location) {
-    this.location = location;
+  public void setLinks(List<LinkDTO> links) {
+    this.links = links;
   }
 
   
@@ -111,7 +112,7 @@ public class CategoriesResDTO  {
     
     sb.append("  id: ").append(id).append("\n");
     sb.append("  name: ").append(name).append("\n");
-    sb.append("  location: ").append(location).append("\n");
+    sb.append("  links: ").append(links).append("\n");
     sb.append("  connectors: ").append(connectors).append("\n");
     sb.append("}\n");
     return sb.toString();

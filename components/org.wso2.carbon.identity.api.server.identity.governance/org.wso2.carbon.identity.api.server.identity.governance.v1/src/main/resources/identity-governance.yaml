@@ -169,10 +169,11 @@ definitions:
         type: string
         description: Connector category name.
         example: "Account Management Policies"
-      location:
-        type: string
-        description: Location to retrieve connector category.
-        example: "https://localhost:9443/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz"
+      links:
+        type: array
+        description: Connectors of the category with minimal attributes.
+        items:
+          $ref: '#/definitions/Link'
       connectors:
         type: array
         description: Connectors of the category with minimal attributes.
@@ -189,10 +190,11 @@ definitions:
         type: string
         description: Connector id.
         example: "c3VzcGVuc2lvbi5ub3RpZmljYXRpb24"
-      location:
-        type: string
-        description: Connector location to retrieve the connector configuration.
-        example: "https://localhost:9443/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz/c3VzcGVuc2lvbi5ub3RpZmljYXRpb24"
+      links:
+        type: array
+        description: Connectors of the category with minimal attributes.
+        items:
+          $ref: '#/definitions/Link'
   #-----------------------------------------------------
   # The Governance Connector Response object
   #-----------------------------------------------------
@@ -288,6 +290,20 @@ definitions:
         type: string
         description: Property value.
         example: "false"
+  #-----------------------------------------------------
+  # Link object
+  #-----------------------------------------------------
+  Link:
+    type: object
+    properties:
+      href:
+        type: string
+        description: Path to the target resource.
+        example: "/t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz"
+      rel:
+        type: string
+        description: Describes how the current context is related to the target resource.
+        example: "connector"
 
   #-----------------------------------------------------
   # The Error  object

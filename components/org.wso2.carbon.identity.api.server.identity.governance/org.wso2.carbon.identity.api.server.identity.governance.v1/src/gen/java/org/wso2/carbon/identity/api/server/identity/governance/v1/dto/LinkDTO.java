@@ -16,10 +16,6 @@
 
 package org.wso2.carbon.identity.api.server.identity.governance.v1.dto;
 
-import io.swagger.annotations.ApiModel;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.LinkDTO;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
@@ -29,45 +25,42 @@ import javax.validation.constraints.Pattern;
 
 
 
-/**
- * Governance connector response with minimal attributes.
- **/
 
 
-@ApiModel(description = "Governance connector response with minimal attributes.")
-public class CategoryConnectorsResDTO  {
+@ApiModel(description = "")
+public class LinkDTO  {
   
   
   
-  private String id = null;
+  private String href = null;
   
   
-  private List<LinkDTO> links = new ArrayList<LinkDTO>();
+  private String rel = null;
 
   
   /**
-   * Connector id.
+   * Path to the target resource.
    **/
-  @ApiModelProperty(value = "Connector id.")
-  @JsonProperty("id")
-  public String getId() {
-    return id;
+  @ApiModelProperty(value = "Path to the target resource.")
+  @JsonProperty("href")
+  public String getHref() {
+    return href;
   }
-  public void setId(String id) {
-    this.id = id;
+  public void setHref(String href) {
+    this.href = href;
   }
 
   
   /**
-   * Connectors of the category with minimal attributes.
+   * Describes how the current context is related to the target resource.
    **/
-  @ApiModelProperty(value = "Connectors of the category with minimal attributes.")
-  @JsonProperty("links")
-  public List<LinkDTO> getLinks() {
-    return links;
+  @ApiModelProperty(value = "Describes how the current context is related to the target resource.")
+  @JsonProperty("rel")
+  public String getRel() {
+    return rel;
   }
-  public void setLinks(List<LinkDTO> links) {
-    this.links = links;
+  public void setRel(String rel) {
+    this.rel = rel;
   }
 
   
@@ -75,10 +68,10 @@ public class CategoryConnectorsResDTO  {
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CategoryConnectorsResDTO {\n");
+    sb.append("class LinkDTO {\n");
     
-    sb.append("  id: ").append(id).append("\n");
-    sb.append("  links: ").append(links).append("\n");
+    sb.append("  href: ").append(href).append("\n");
+    sb.append("  rel: ").append(rel).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

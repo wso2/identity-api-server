@@ -19,9 +19,12 @@ package org.wso2.carbon.identity.api.server.identity.governance.common;
 /**
  * Contains all the identity governance related constants.
  */
-public class GovernanceConstant {
+public class GovernanceConstants {
 
-    public static final String IDENTITY_GOVERNANCE = "IDG-";
+    private static final String IDENTITY_GOVERNANCE = "IDG-";
+    public static final String REL_CATEGORY = "category";
+    public static final String REL_CONNECTOR = "connector";
+    public static final String IDENTITY_GOVERNANCE_PATH_COMPONENT = "/identity-governance";
 
     /**
      * Enum for identity governance related errors in the format of

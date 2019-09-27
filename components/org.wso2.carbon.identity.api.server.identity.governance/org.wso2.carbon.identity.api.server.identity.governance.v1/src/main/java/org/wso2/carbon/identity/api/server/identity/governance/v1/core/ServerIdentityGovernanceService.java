@@ -22,12 +22,13 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstant;
+import org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants;
 import org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceDataHolder;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.CategoriesResDTO;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.CategoryConnectorsResDTO;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorResDTO;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.ConnectorsPatchReqDTO;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.LinkDTO;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.PropertyReqDTO;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.dto.PropertyResDTO;
 import org.wso2.carbon.identity.application.common.model.Property;
@@ -39,16 +40,18 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURI;
-import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstant.ErrorMessage.ERROR_CODE_FILTERING_NOT_IMPLEMENTED;
-import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstant.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
-import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstant.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForBody;
+import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage.ERROR_CODE_FILTERING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.IDENTITY_GOVERNANCE_PATH_COMPONENT;
 
 /**
  * Call internal osgi services to perform identity governance related operations.
@@ -56,7 +59,6 @@ import static org.wso2.carbon.identity.api.server.identity.governance.common.Gov
 public class ServerIdentityGovernanceService {
 
     private static final Log LOG = LogFactory.getLog(ServerIdentityGovernanceService.class);
-    public static final String IDENTITY_GOVERNANCE_PATH_COMPONENT = "/identity-governance";
 
     /**
      * Get all governance connector categories.
@@ -80,8 +82,8 @@ public class ServerIdentityGovernanceService {
             return buildConnectorCategoriesResDTOS(connectorConfigs);
 
         } catch (IdentityGovernanceException e) {
-            GovernanceConstant.ErrorMessage errorEnum =
-                    GovernanceConstant.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CATEGORIES;
+            GovernanceConstants.ErrorMessage errorEnum =
+                    GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CATEGORIES;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
             throw handleException(e, errorEnum, status);
         }
@@ -103,14 +105,14 @@ public class ServerIdentityGovernanceService {
                     identityGovernanceService.getConnectorListWithConfigsByCategory(tenantDomain, category);
 
             if (connectorConfigs.size() == 0) {
-                throw handleNotFoundError(categoryId, GovernanceConstant.ErrorMessage.ERROR_CODE_CATEGORY_NOT_FOUND);
+                throw handleNotFoundError(categoryId, GovernanceConstants.ErrorMessage.ERROR_CODE_CATEGORY_NOT_FOUND);
             }
 
             return buildConnectorsResDTOS(connectorConfigs);
 
         } catch (IdentityGovernanceException e) {
-            GovernanceConstant.ErrorMessage errorEnum =
-                    GovernanceConstant.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CATEGORY;
+            GovernanceConstants.ErrorMessage errorEnum =
+                    GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CATEGORY;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
             throw handleException(e, errorEnum, status);
         }
@@ -132,20 +134,20 @@ public class ServerIdentityGovernanceService {
             ConnectorConfig connectorConfig =
                     identityGovernanceService.getConnectorWithConfigs(tenantDomain, connectorName);
             if (connectorConfig == null) {
-                throw handleNotFoundError(connectorId, GovernanceConstant.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
+                throw handleNotFoundError(connectorId, GovernanceConstants.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
             }
             String categoryIdFound = Base64.getUrlEncoder()
                     .withoutPadding()
                     .encodeToString(connectorConfig.getCategory().getBytes(StandardCharsets.UTF_8));
             if (!categoryId.equals(categoryIdFound)) {
-                throw handleNotFoundError(connectorId, GovernanceConstant.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
+                throw handleNotFoundError(connectorId, GovernanceConstants.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
             }
 
             return buildConnectorResDTO(connectorConfig);
 
         } catch (IdentityGovernanceException e) {
-            GovernanceConstant.ErrorMessage errorEnum =
-                    GovernanceConstant.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CONNECTOR;
+            GovernanceConstants.ErrorMessage errorEnum =
+                    GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CONNECTOR;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
             throw handleException(e, errorEnum, status);
         }
@@ -167,7 +169,7 @@ public class ServerIdentityGovernanceService {
 
             ConnectorResDTO connector = getGovernanceConnector(categoryId, connectorId);
             if (connector == null) {
-                throw handleNotFoundError(connectorId, GovernanceConstant.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
+                throw handleNotFoundError(connectorId, GovernanceConstants.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
             }
 
             Map<String, String> configurationDetails = new HashMap<>();
@@ -177,14 +179,14 @@ public class ServerIdentityGovernanceService {
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
 
         } catch (IdentityGovernanceException e) {
-            GovernanceConstant.ErrorMessage errorEnum =
-                    GovernanceConstant.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONNECTOR_PROPERTY;
+            GovernanceConstants.ErrorMessage errorEnum =
+                    GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONNECTOR_PROPERTY;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
             throw handleException(e, errorEnum, status);
         }
     }
 
-    private APIError handleException(Exception e, GovernanceConstant.ErrorMessage errorEnum, Response.Status status) {
+    private APIError handleException(Exception e, GovernanceConstants.ErrorMessage errorEnum, Response.Status status) {
 
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, e, errorEnum.getDescription());
         return new APIError(status, errorResponse);
@@ -204,9 +206,12 @@ public class ServerIdentityGovernanceService {
                     .encodeToString(category.getKey().getBytes(StandardCharsets.UTF_8));
             categoriesRes.setId(categoryId);
             URI categoryLocation =
-                    buildURI(String.format(V1_API_PATH_COMPONENT + IDENTITY_GOVERNANCE_PATH_COMPONENT + "/%s",
+                    buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDENTITY_GOVERNANCE_PATH_COMPONENT + "/%s",
                             categoryId));
-            categoriesRes.setLocation(categoryLocation.toString());
+            LinkDTO link = new LinkDTO();
+            link.setHref(categoryLocation.toString());
+            link.setRel(GovernanceConstants.REL_CATEGORY);
+            categoriesRes.setLinks(Collections.singletonList(link));
 
             List<CategoryConnectorsResDTO> connectors = buildCategoryConnectorsResDTOS(categoryId, category.getValue());
             categoriesRes.setConnectors(connectors);
@@ -237,9 +242,12 @@ public class ServerIdentityGovernanceService {
                     .encodeToString(connectorConfig.getName().getBytes(StandardCharsets.UTF_8));
             connectorsResDTO.setId(connectorId);
             URI connectorLocation =
-                    buildURI(String.format(V1_API_PATH_COMPONENT + IDENTITY_GOVERNANCE_PATH_COMPONENT + "/%s/%s",
+                    buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDENTITY_GOVERNANCE_PATH_COMPONENT + "/%s/%s",
                             categoryId, connectorId));
-            connectorsResDTO.setLocation(connectorLocation.toString());
+            LinkDTO link = new LinkDTO();
+            link.setHref(connectorLocation.toString());
+            link.setRel(GovernanceConstants.REL_CONNECTOR);
+            connectorsResDTO.setLinks(Collections.singletonList(link));
             connectors.add(connectorsResDTO);
         }
         return connectors;
@@ -271,18 +279,22 @@ public class ServerIdentityGovernanceService {
         return connectorsResDTO;
     }
 
-    private ErrorResponse.Builder getErrorBuilder(GovernanceConstant.ErrorMessage errorMsg, String... data) {
+    private ErrorResponse.Builder getErrorBuilder(GovernanceConstants.ErrorMessage errorMsg, String... data) {
 
         return new ErrorResponse.Builder().withCode(errorMsg.getCode()).withMessage(errorMsg.getMessage())
                 .withDescription(buildErrorDescription(errorMsg, data));
     }
 
-    private String buildErrorDescription(GovernanceConstant.ErrorMessage errorEnum, String... data) {
+    private String buildErrorDescription(GovernanceConstants.ErrorMessage errorEnum, String... data) {
 
         String errorDescription;
 
         if (ArrayUtils.isNotEmpty(data)) {
-            errorDescription = String.format(errorEnum.getDescription(), data);
+            if (data.length == 1) {
+                errorDescription = String.format(errorEnum.getDescription(), (Object) data);
+            } else {
+                errorDescription = String.format(errorEnum.getDescription(), (Object[]) data);
+            }
         } else {
             errorDescription = errorEnum.getDescription();
         }
@@ -293,7 +305,7 @@ public class ServerIdentityGovernanceService {
     private void handleNotImplementedCapabilities(Integer limit, Integer offset, String filter,
                                                   String sort) {
 
-        GovernanceConstant.ErrorMessage errorEnum = null;
+        GovernanceConstants.ErrorMessage errorEnum = null;
 
         if (limit != null) {
             errorEnum = ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
@@ -314,7 +326,7 @@ public class ServerIdentityGovernanceService {
     }
 
     private APIError handleNotFoundError(String resourceId,
-                                         GovernanceConstant.ErrorMessage errorMessage) {
+                                         GovernanceConstants.ErrorMessage errorMessage) {
 
         Response.Status status = Response.Status.NOT_FOUND;
         ErrorResponse errorResponse =
