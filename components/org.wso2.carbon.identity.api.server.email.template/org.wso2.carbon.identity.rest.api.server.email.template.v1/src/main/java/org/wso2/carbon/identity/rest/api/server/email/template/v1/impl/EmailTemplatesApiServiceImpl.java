@@ -25,78 +25,86 @@ import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.CompleteEm
 import java.util.List;
 import javax.ws.rs.core.Response;
 
+/**
+ * Implementation of the Email API Service.
+ */
 public class EmailTemplatesApiServiceImpl extends EmailApiService {
 
     @Autowired
     private ServerEmailTemplatesService emailTemplatesService;
 
     @Override
-    public Response addEmailTemplate(String emailTemplateTypeId, CompleteEmailTemplateRequestDTO type){
+    public Response addEmailTemplate(String emailTemplateTypeId, CompleteEmailTemplateRequestDTO type) {
 
         // do some magic!
         return Response.ok().entity("magic!").build();
     }
 
     @Override
-    public Response addEmailTemplateType(CompleteEmailTemplateTypeDTO type){
+    public Response addEmailTemplateType(CompleteEmailTemplateTypeDTO type) {
 
         // do some magic!
         return Response.ok().entity("magic!").build();
     }
 
     @Override
-    public Response deleteEmailTemplate(String emailTemplateTypeId, String localeCode){
+    public Response deleteEmailTemplate(String emailTemplateTypeId, String localeCode) {
 
         // do some magic!
         return Response.ok().entity("magic!").build();
     }
 
     @Override
-    public Response deleteEmailTemplateType(String emailTemplateTypeId){
+    public Response deleteEmailTemplateType(String emailTemplateTypeId) {
 
         // do some magic!
         return Response.ok().entity("magic!").build();
     }
 
     @Override
-    public Response getAllEmailTemplateTypeLocale(String emailTemplateTypeId, String localeCode, Integer limit, Integer offset, String sort, String sortBy){
+    public Response getAllEmailTemplateTypeLocale(String emailTemplateTypeId, String localeCode, Integer limit,
+                                                  Integer offset, String sort, String sortBy) {
 
         // do some magic!
         return Response.ok().entity("magic!").build();
     }
 
     @Override
-    public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sort, String sortBy){
+    public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sort, String sortBy) {
 
-        return Response.ok().entity(emailTemplatesService.getAllEmailTemplateTypes(limit, offset, sort, sortBy)).build();
+        return Response.ok().entity(emailTemplatesService.getAllEmailTemplateTypes(limit, offset, sort, sortBy)).
+                build();
     }
 
     @Override
-    public Response getEmailTemplateType(String emailTemplateTypeId, Integer limit, Integer offset, String sort, String sortBy){
+    public Response getEmailTemplateType(String emailTemplateTypeId, Integer limit, Integer offset, String sort,
+                                         String sortBy) {
 
         // do some magic!
         return Response.ok().entity("magic!").build();
     }
 
     @Override
-    public Response getEmailTemplateTypeForLocale(String emailTemplateTypeId, Integer limit, Integer offset, String sort, String sortBy){
+    public Response getEmailTemplateTypeForLocale(String emailTemplateTypeId, Integer limit, Integer offset,
+                                                  String sort, String sortBy) {
 
         // do some magic!
         return Response.ok().entity("magic!").build();
     }
 
     @Override
-    public Response updateEmailTemplate(String emailTemplateTypeId, String localeCode, CompleteEmailTemplateRequestDTO templates){
+    public Response updateEmailTemplate(String emailTemplateTypeId, String localeCode,
+                                        CompleteEmailTemplateRequestDTO templates) {
 
         // do some magic!
         return Response.ok().entity("magic!").build();
     }
 
     @Override
-    public Response updateEmailTemplateType(String emailTemplateTypeId, List<CompleteEmailTemplateRequestDTO> templates){
+    public Response updateEmailTemplateType(String emailTemplateTypeId,
+                                            List<CompleteEmailTemplateRequestDTO> templates) {
 
         // do some magic!
         return Response.ok().entity("magic!").build();
     }
-
 }

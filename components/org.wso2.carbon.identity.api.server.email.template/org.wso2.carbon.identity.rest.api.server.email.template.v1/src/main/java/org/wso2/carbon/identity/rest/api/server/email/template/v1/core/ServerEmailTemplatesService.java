@@ -26,7 +26,7 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.email.template.common.Constants;
-import org.wso2.carbon.identity.api.server.email.template.common.Util;
+import org.wso2.carbon.identity.api.server.email.template.common.EmailTemplatesServiceHolder;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.LocaleDTO;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.SimpleEmailTemplateDTO;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.dto.SimpleEmailTemplateTypeDTO;
@@ -65,8 +65,8 @@ public class ServerEmailTemplatesService {
                                                                      String sortBy) {
 
         try {
-            List<EmailTemplate> emailTemplates =
-                    Util.getEmailTemplateManager().getAllEmailTemplates(ContextLoader.getTenantDomainFromContext());
+            List<EmailTemplate> emailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
+                    getAllEmailTemplates(ContextLoader.getTenantDomainFromContext());
             return buildSimpleEmailTemplateTypeDTOList(emailTemplates);
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e,
