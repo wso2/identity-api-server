@@ -34,10 +34,6 @@ public class SimpleEmailTemplateTypeDTO {
     private String id = null;
 
     @Valid 
-    @NotNull(message = "Property name cannot be null.") 
-    private String name = null;
-
-    @Valid 
     @NotNull(message = "Property displayName cannot be null.") 
     private String displayName = null;
 
@@ -59,18 +55,6 @@ public class SimpleEmailTemplateTypeDTO {
     }
     public void setId(String id) {
         this.id = id;
-    }
-
-    /**
-    * Unique name of the email template type.
-    **/
-    @ApiModelProperty(required = true, value = "Unique name of the email template type.")
-    @JsonProperty("name")
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**
@@ -116,7 +100,6 @@ public class SimpleEmailTemplateTypeDTO {
         sb.append("class SimpleEmailTemplateTypeDTO {\n");
         
         sb.append("    id: ").append(id).append("\n");
-        sb.append("    name: ").append(name).append("\n");
         sb.append("    displayName: ").append(displayName).append("\n");
         sb.append("    location: ").append(location).append("\n");
         sb.append("    items: ").append(items).append("\n");

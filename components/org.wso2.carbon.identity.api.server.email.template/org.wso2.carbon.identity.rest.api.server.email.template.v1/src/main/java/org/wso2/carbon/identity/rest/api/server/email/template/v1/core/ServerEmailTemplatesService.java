@@ -50,8 +50,6 @@ public class ServerEmailTemplatesService {
     private static final String PATH_SEPARATOR = "/";
     private static final String LOCALE_CODE_DELIMITER = "_";
 
-    // I18nEmailUtil.getNormalizedName()
-
     /**
      * Return all email template types in the system with limited information of the templates inside.
      *
@@ -92,7 +90,6 @@ public class ServerEmailTemplatesService {
             } else {
                 SimpleEmailTemplateTypeDTO simpleEmailTemplateTypeDTO = new SimpleEmailTemplateTypeDTO();
                 simpleEmailTemplateTypeDTO.setDisplayName(emailTemplate.getTemplateDisplayName());
-                simpleEmailTemplateTypeDTO.setName(emailTemplate.getTemplateType());
                 String templateTypeId = base64URLEncode(emailTemplate.getTemplateType());
                 simpleEmailTemplateTypeDTO.setId(templateTypeId);
                 simpleEmailTemplateTypeDTO.setLocation(EMAIL_TEMPLATES_API_BASE_PATH + PATH_SEPARATOR + templateTypeId);

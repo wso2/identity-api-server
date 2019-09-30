@@ -30,27 +30,12 @@ import javax.validation.constraints.Pattern;
 public class CompleteEmailTemplateTypeDTO {
 
     @Valid 
-    private String name = null;
-
-    @Valid 
     @NotNull(message = "Property displayName cannot be null.") 
     private String displayName = null;
 
     @Valid 
     @NotNull(message = "Property items cannot be null.") 
     private List<CompleteEmailTemplateDTO> items = new ArrayList<CompleteEmailTemplateDTO>();
-
-    /**
-    * Unique name of the email template type.
-    **/
-    @ApiModelProperty(value = "Unique name of the email template type.")
-    @JsonProperty("name")
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
 
     /**
     * Display name of the email template type.
@@ -82,7 +67,6 @@ public class CompleteEmailTemplateTypeDTO {
         StringBuilder sb = new StringBuilder();
         sb.append("class CompleteEmailTemplateTypeDTO {\n");
         
-        sb.append("    name: ").append(name).append("\n");
         sb.append("    displayName: ").append(displayName).append("\n");
         sb.append("    items: ").append(items).append("\n");
         

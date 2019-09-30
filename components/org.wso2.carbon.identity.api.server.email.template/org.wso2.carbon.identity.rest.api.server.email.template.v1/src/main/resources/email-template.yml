@@ -454,10 +454,6 @@ definitions:
         type: string
         example: YWNjb3VudGNvbmZpcm1hdGlvbg
         description: Unique id of the email template type.
-      name:
-        type: string
-        example: AccountConfirmation
-        description: Unique name of the email template type.
       displayName:
         type: string
         example: Account Confirmation Template
@@ -478,10 +474,6 @@ definitions:
       - displayName
       - items
     properties:
-      name:
-        type: string
-        example: AccountConfirmation
-        description: Unique name of the email template type.
       displayName:
         type: string
         example: Account Confirmation Template
@@ -503,10 +495,6 @@ definitions:
         type: string
         example: YWNjb3VudGNvbmZpcm1hdGlvbg
         description: Unique id of the email template type.
-      name:
-        type: string
-        example: AccountConfirmation
-        description: Unique name of the email template type.
       displayName:
         type: string
         example: Account Confirmation Template
@@ -615,7 +603,6 @@ definitions:
       - subject
       - body
       - footer
-      # - location
     properties:
       locale:
         $ref: '#/definitions/Locale'
@@ -635,10 +622,6 @@ definitions:
         type: string
         example: WSO2 Identity Server Team
         description: The footer of the email.
-      # location:
-      #   type: string
-      #   example: /t/{tenant-domain}/api/server/v1/email/templates/YWNjb3VudGNvbmZpcm1hdGlvbg/locale/en_US
-      #   description: Location of the created/updated resource.
 
   Locale:
     type: object

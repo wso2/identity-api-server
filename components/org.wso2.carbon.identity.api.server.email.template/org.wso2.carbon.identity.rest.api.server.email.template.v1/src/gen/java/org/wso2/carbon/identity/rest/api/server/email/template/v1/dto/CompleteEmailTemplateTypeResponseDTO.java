@@ -34,9 +34,6 @@ public class CompleteEmailTemplateTypeResponseDTO {
     private String id = null;
 
     @Valid 
-    private String name = null;
-
-    @Valid 
     @NotNull(message = "Property displayName cannot be null.") 
     private String displayName = null;
 
@@ -54,18 +51,6 @@ public class CompleteEmailTemplateTypeResponseDTO {
     }
     public void setId(String id) {
         this.id = id;
-    }
-
-    /**
-    * Unique name of the email template type.
-    **/
-    @ApiModelProperty(value = "Unique name of the email template type.")
-    @JsonProperty("name")
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**
@@ -99,7 +84,6 @@ public class CompleteEmailTemplateTypeResponseDTO {
         sb.append("class CompleteEmailTemplateTypeResponseDTO {\n");
         
         sb.append("    id: ").append(id).append("\n");
-        sb.append("    name: ").append(name).append("\n");
         sb.append("    displayName: ").append(displayName).append("\n");
         sb.append("    items: ").append(items).append("\n");
         
