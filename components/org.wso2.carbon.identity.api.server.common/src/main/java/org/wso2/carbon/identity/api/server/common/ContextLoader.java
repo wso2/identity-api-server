@@ -69,4 +69,19 @@ public class ContextLoader {
         String url = IdentityUtil.getServerURL(tenantQualifiedRelativePath + endpoint, true, true);
         return URI.create(url);
     }
+
+    /**
+     * Build URI prepending the user API context with to the endpoint.
+     * /t/<tenant-domain>/api/users/<endpoint>
+     *
+     * @param endpoint relative endpoint path.
+     * @return Fully qualified URI.
+     */
+    public static URI buildURIForBody(String endpoint) {
+
+        String tenantQualifiedRelativePath =
+                String.format(TENANT_CONTEXT_PATH_COMPONENT, getTenantDomainFromContext()) + SERVER_API_PATH_COMPONENT;
+        String url = IdentityUtil.getEndpointURIPath(tenantQualifiedRelativePath + endpoint, true, true);
+        return URI.create(url);
+    }
 }
