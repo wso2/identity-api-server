@@ -34,6 +34,7 @@ public class SimpleEmailTemplateTypeDTO {
     private String id = null;
 
     @Valid 
+    @NotNull(message = "Property name cannot be null.") 
     private String name = null;
 
     @Valid 
@@ -41,9 +42,11 @@ public class SimpleEmailTemplateTypeDTO {
     private String displayName = null;
 
     @Valid 
+    @NotNull(message = "Property location cannot be null.") 
     private String location = null;
 
     @Valid 
+    @NotNull(message = "Property items cannot be null.") 
     private List<SimpleEmailTemplateDTO> items = new ArrayList<SimpleEmailTemplateDTO>();
 
     /**
@@ -61,7 +64,7 @@ public class SimpleEmailTemplateTypeDTO {
     /**
     * Unique name of the email template type.
     **/
-    @ApiModelProperty(value = "Unique name of the email template type.")
+    @ApiModelProperty(required = true, value = "Unique name of the email template type.")
     @JsonProperty("name")
     public String getName() {
         return name;
@@ -85,7 +88,7 @@ public class SimpleEmailTemplateTypeDTO {
     /**
     * Location of the created/updated resource.
     **/
-    @ApiModelProperty(value = "Location of the created/updated resource.")
+    @ApiModelProperty(required = true, value = "Location of the created/updated resource.")
     @JsonProperty("location")
     public String getLocation() {
         return location;
@@ -97,7 +100,7 @@ public class SimpleEmailTemplateTypeDTO {
     /**
     * Email templates for the template type.
     **/
-    @ApiModelProperty(value = "Email templates for the template type.")
+    @ApiModelProperty(required = true, value = "Email templates for the template type.")
     @JsonProperty("items")
     public List<SimpleEmailTemplateDTO> getItems() {
         return items;

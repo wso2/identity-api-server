@@ -367,7 +367,6 @@ paths:
         500:
           $ref: '#/responses/ServerError'
 
-
 #-----------------------------------------------------
 # Descriptions of dispatcher responses
 #-----------------------------------------------------
@@ -398,7 +397,6 @@ responses:
       $ref: '#/definitions/Error'
   Deleted:
     description: Item Deleted
-
 
 parameters:
   emailTemplateTypeIdPathParam:
@@ -441,15 +439,16 @@ parameters:
     description: 'Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_'
     type: string
 
-
 definitions:
 
   SimpleEmailTemplateType:
     type: object
     required:
       - id
+      - name
       - displayName
-      - templates
+      - location
+      - items
     properties:
       id:
         type: string
@@ -698,7 +697,6 @@ definitions:
       traceId:
         type: string
         example: "TR0001"
-
 
 securityDefinitions:
   BasicAuth:
