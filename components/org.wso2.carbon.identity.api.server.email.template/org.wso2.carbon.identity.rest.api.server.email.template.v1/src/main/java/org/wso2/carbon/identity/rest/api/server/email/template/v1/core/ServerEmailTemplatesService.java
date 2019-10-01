@@ -92,7 +92,9 @@ public class ServerEmailTemplatesService {
                 simpleEmailTemplateTypeDTO.setDisplayName(emailTemplate.getTemplateDisplayName());
                 String templateTypeId = base64URLEncode(emailTemplate.getTemplateType());
                 simpleEmailTemplateTypeDTO.setId(templateTypeId);
-                simpleEmailTemplateTypeDTO.setLocation(EMAIL_TEMPLATES_API_BASE_PATH + PATH_SEPARATOR + templateTypeId);
+
+                String location = EMAIL_TEMPLATES_API_BASE_PATH + PATH_SEPARATOR + templateTypeId;
+                simpleEmailTemplateTypeDTO.setLocation(ContextLoader.buildURIForBody(location).toString());
 
                 SimpleEmailTemplateDTO simpleEmailTemplateDTO = getSimpleEmailTemplateDTO(emailTemplate);
                 List<SimpleEmailTemplateDTO> emailTemplatesList = new ArrayList<>();
