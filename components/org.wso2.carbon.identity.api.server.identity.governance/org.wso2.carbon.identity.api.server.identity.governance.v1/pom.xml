@@ -15,7 +15,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.identity.governance</artifactId>
@@ -25,8 +26,8 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.api.server.identity.governance.v1</artifactId>
     <packaging>jar</packaging>
-    <name>WSO2 Identity Server - Claim Management Rest API v1</name>
-    <description>WSO2 Identity Server - Claim Management Rest API v1</description>
+    <name>WSO2 Identity Server - Identity Governance Rest API v1</name>
+    <description>WSO2 Identity Server - Identity Governance Rest API v1</description>
 
     <build>
         <plugins>
@@ -39,13 +40,39 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+
 <!--            <plugin>-->
-<!--                <groupId>org.wso2.maven.plugins</groupId>-->
-<!--                <artifactId>swagger2cxf-maven-plugin</artifactId>-->
-<!--                <version>1.0-SNAPSHOT</version>-->
-<!--                <configuration>-->
-<!--                    <inputSpec>${project.basedir}/src/main/resources/identity-governance.yaml</inputSpec>-->
-<!--                </configuration>-->
+<!--                <groupId>org.openapitools</groupId>-->
+<!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->
+<!--                <version>4.1.2</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>generate</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <inputSpec>${project.basedir}/src/main/resources/identity-governance-3.yaml</inputSpec>-->
+<!--                            <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>-->
+<!--                            <configOptions>-->
+<!--                                <sourceFolder>src/gen/java</sourceFolder>-->
+<!--                                <apiPackage>org.wso2.carbon.identity.api.server.identity.governance.v1</apiPackage>-->
+<!--                                <modelPackage>org.wso2.carbon.identity.api.server.identity.governance.v1.model</modelPackage>-->
+<!--                                <packageName>org.wso2.carbon.identity.api.server.identity.governance.v1</packageName>-->
+<!--                                <dateLibrary>java8</dateLibrary>-->
+<!--                                <hideGenerationTimestamp>true</hideGenerationTimestamp>-->
+<!--                            </configOptions>-->
+<!--                            <output>.</output>-->
+<!--                            <skipOverwrite>false</skipOverwrite>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <dependencies>-->
+<!--                    <dependency>-->
+<!--                        <groupId>org.openapitools</groupId>-->
+<!--                        <artifactId>cxf-wso2-openapi-generator</artifactId>-->
+<!--                        <version>1.0.0</version>-->
+<!--                    </dependency>-->
+<!--                </dependencies>-->
 <!--            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -70,6 +97,12 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>cxf-wso2-openapi-generator</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
@@ -144,6 +177,17 @@
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.server.identity.governance.common</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+        <!-- @Nullable annotation -->
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.2</version>
         </dependency>
     </dependencies>
 </project>
