@@ -25,12 +25,29 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.identity.api.server.claim.management</artifactId>
+    <artifactId>org.wso2.carbon.identity.api.server.permission.management</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>org.wso2.carbon.identity.api.server.claim.management.common</module>
-        <module>org.wso2.carbon.identity.rest.api.server.claim.management.v1</module>
+        <module>org.wso2.carbon.identity.api.server.permission.management.v1</module>
+        <module>org.wso2.carbon.identity.api.server.permission.management.common</module>
     </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.user.mgt</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.user.mgt.common</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
