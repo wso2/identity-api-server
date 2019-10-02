@@ -16,6 +16,7 @@ import javax.validation.constraints.*;
 import io.swagger.annotations.*;
 import java.util.Objects;
 
+import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 @ApiModel(description = "Governance connector response.")
@@ -47,6 +48,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(example = "c3VzcGVuc2lvbi5ub3RpZmljYXRpb24", value = "Connector id.")
   @JsonProperty("id")
+@Valid
   public String getId() {
     return id;
   }
@@ -66,6 +68,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(example = "suspension.notification", value = "Connector name.")
   @JsonProperty("name")
+@Valid
   public String getName() {
     return name;
   }
@@ -85,6 +88,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(example = "Account Management Policies", value = "Connector category.")
   @JsonProperty("category")
+@Valid
   public String getCategory() {
     return category;
   }
@@ -104,6 +108,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(example = "Lock Idle Accounts", value = "Connector friendly name.")
   @JsonProperty("friendlyName")
+@Valid
   public String getFriendlyName() {
     return friendlyName;
   }
@@ -123,6 +128,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(example = "0", value = "Connector order.")
   @JsonProperty("order")
+@Valid
   public Integer getOrder() {
     return order;
   }
@@ -142,6 +148,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(example = "DEFAULT", value = "Connector subcategory.")
   @JsonProperty("subCategory")
+@Valid
   public String getSubCategory() {
     return subCategory;
   }
@@ -161,6 +168,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(value = "Define any additional properties if required.")
   @JsonProperty("properties")
+@Valid
   public List<PropertyRes> getProperties() {
     return properties;
   }

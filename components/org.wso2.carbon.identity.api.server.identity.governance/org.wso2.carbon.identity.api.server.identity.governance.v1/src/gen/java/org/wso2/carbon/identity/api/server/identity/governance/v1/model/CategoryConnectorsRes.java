@@ -16,6 +16,7 @@ import javax.validation.constraints.*;
 import io.swagger.annotations.*;
 import java.util.Objects;
 
+import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 @ApiModel(description = "Governance connector response with minimal attributes.")
@@ -37,6 +38,7 @@ public class CategoryConnectorsRes   {
   
   @ApiModelProperty(example = "c3VzcGVuc2lvbi5ub3RpZmljYXRpb24", value = "Connector id.")
   @JsonProperty("id")
+@Valid
   public String getId() {
     return id;
   }
@@ -56,6 +58,7 @@ public class CategoryConnectorsRes   {
   
   @ApiModelProperty(value = "Connectors of the category with minimal attributes.")
   @JsonProperty("links")
+@Valid
   public List<Link> getLinks() {
     return links;
   }

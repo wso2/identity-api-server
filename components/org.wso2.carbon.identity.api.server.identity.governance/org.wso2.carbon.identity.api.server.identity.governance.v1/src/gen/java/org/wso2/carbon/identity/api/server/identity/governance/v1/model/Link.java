@@ -10,6 +10,7 @@ import javax.validation.constraints.*;
 import io.swagger.annotations.*;
 import java.util.Objects;
 
+import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 
@@ -31,6 +32,7 @@ public class Link   {
   
   @ApiModelProperty(example = "/t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz", value = "Path to the target resource.")
   @JsonProperty("href")
+@Valid
   public String getHref() {
     return href;
   }
@@ -50,6 +52,7 @@ public class Link   {
   
   @ApiModelProperty(example = "connector", value = "Describes how the current context is related to the target resource.")
   @JsonProperty("rel")
+@Valid
   public String getRel() {
     return rel;
   }

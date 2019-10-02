@@ -10,6 +10,7 @@ import javax.validation.constraints.*;
 import io.swagger.annotations.*;
 import java.util.Objects;
 
+import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 
@@ -34,7 +35,8 @@ public class Error   {
   
   @ApiModelProperty(example = "AAA-00000", required = true, value = "")
   @JsonProperty("code")
-  @NotNull
+@Valid
+  @NotNull(message = "Property code cannot be null.")
   public String getCode() {
     return code;
   }
@@ -53,7 +55,8 @@ public class Error   {
   
   @ApiModelProperty(example = "Some Error Message", required = true, value = "")
   @JsonProperty("message")
-  @NotNull
+@Valid
+  @NotNull(message = "Property message cannot be null.")
   public String getMessage() {
     return message;
   }
@@ -72,6 +75,7 @@ public class Error   {
   
   @ApiModelProperty(example = "Some Error Description", value = "")
   @JsonProperty("description")
+@Valid
   public String getDescription() {
     return description;
   }
@@ -90,6 +94,7 @@ public class Error   {
   
   @ApiModelProperty(example = "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047", value = "")
   @JsonProperty("traceId")
+@Valid
   public String getTraceId() {
     return traceId;
   }

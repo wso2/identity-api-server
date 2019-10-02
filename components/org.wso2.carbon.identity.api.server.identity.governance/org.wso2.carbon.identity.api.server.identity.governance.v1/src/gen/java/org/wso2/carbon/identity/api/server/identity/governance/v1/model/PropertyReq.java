@@ -13,6 +13,7 @@ import javax.validation.constraints.*;
 import io.swagger.annotations.*;
 import java.util.Objects;
 
+import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 @ApiModel(description = "Governance connector property to patch.")
@@ -34,7 +35,8 @@ public class PropertyReq   {
   
   @ApiModelProperty(example = "suspension.notification.enable", required = true, value = "Property name.")
   @JsonProperty("name")
-  @NotNull
+@Valid
+  @NotNull(message = "Property name cannot be null.")
   public String getName() {
     return name;
   }
@@ -52,8 +54,10 @@ public class PropertyReq   {
   }
 
   
-  @ApiModelProperty(example = "false", value = "Property value.")
+  @ApiModelProperty(example = "false", required = true, value = "Property value.")
   @JsonProperty("value")
+@Valid
+  @NotNull(message = "Property value cannot be null.")
   public String getValue() {
     return value;
   }

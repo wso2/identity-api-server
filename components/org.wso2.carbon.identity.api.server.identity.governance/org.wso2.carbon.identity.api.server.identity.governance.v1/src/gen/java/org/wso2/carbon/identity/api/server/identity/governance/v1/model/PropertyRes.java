@@ -13,6 +13,7 @@ import javax.validation.constraints.*;
 import io.swagger.annotations.*;
 import java.util.Objects;
 
+import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 @ApiModel(description = "Governance connector property.")
@@ -38,6 +39,7 @@ public class PropertyRes   {
   
   @ApiModelProperty(example = "suspension.notification.enable", value = "Property name.")
   @JsonProperty("name")
+@Valid
   public String getName() {
     return name;
   }
@@ -57,6 +59,7 @@ public class PropertyRes   {
   
   @ApiModelProperty(example = "false", value = "Property value.")
   @JsonProperty("value")
+@Valid
   public String getValue() {
     return value;
   }
@@ -76,6 +79,7 @@ public class PropertyRes   {
   
   @ApiModelProperty(example = "Enable", value = "Property display name.")
   @JsonProperty("displayName")
+@Valid
   public String getDisplayName() {
     return displayName;
   }
@@ -95,6 +99,7 @@ public class PropertyRes   {
   
   @ApiModelProperty(example = "Enable account suspend notifications.", value = "Property description.")
   @JsonProperty("description")
+@Valid
   public String getDescription() {
     return description;
   }

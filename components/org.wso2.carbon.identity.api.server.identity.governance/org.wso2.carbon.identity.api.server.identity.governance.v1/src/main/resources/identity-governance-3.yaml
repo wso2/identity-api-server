@@ -136,8 +136,7 @@ paths:
               $ref: '#/components/schemas/ConnectorsPatchReq'
         description: governance-connector to update
 servers:
-  - url: >-
-      https://localhost:9443/t/{tenant-domain}/api/server/v1/
+  - url: https://localhost:9443/t/{tenant-domain}/api/server/v1/
 components:
   parameters:
     limitQueryParam:
@@ -316,6 +315,9 @@ components:
     ConnectorsPatchReq:
       type: object
       description: Governance connector property patch request.
+      required:
+        - operation
+        - properties
       properties:
         operation:
           type: string
@@ -333,6 +335,7 @@ components:
       description: Governance connector property to patch.
       required:
         - name
+        - value
       properties:
         name:
           type: string

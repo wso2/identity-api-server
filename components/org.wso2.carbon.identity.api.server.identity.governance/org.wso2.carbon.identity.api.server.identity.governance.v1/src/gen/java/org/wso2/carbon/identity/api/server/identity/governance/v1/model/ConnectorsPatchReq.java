@@ -16,6 +16,7 @@ import javax.validation.constraints.*;
 import io.swagger.annotations.*;
 import java.util.Objects;
 
+import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 @ApiModel(description = "Governance connector property patch request.")
@@ -56,7 +57,7 @@ public enum OperationEnum {
 
   private OperationEnum operation;
 
-  private List<PropertyReq> properties = null;
+  private List<PropertyReq> properties = new ArrayList<>();
 
 
   /**
@@ -68,8 +69,10 @@ public enum OperationEnum {
   }
 
   
-  @ApiModelProperty(example = "update", value = "Governance connector properties patch operation.")
+  @ApiModelProperty(example = "update", required = true, value = "Governance connector properties patch operation.")
   @JsonProperty("operation")
+@Valid
+  @NotNull(message = "Property operation cannot be null.")
   public OperationEnum getOperation() {
     return operation;
   }
@@ -87,8 +90,10 @@ public enum OperationEnum {
   }
 
   
-  @ApiModelProperty(value = "Governance connector properties to patch.")
+  @ApiModelProperty(required = true, value = "Governance connector properties to patch.")
   @JsonProperty("properties")
+@Valid
+  @NotNull(message = "Property properties cannot be null.")
   public List<PropertyReq> getProperties() {
     return properties;
   }
@@ -97,9 +102,6 @@ public enum OperationEnum {
   }
 
   public ConnectorsPatchReq addPropertiesItem(PropertyReq propertiesItem) {
-    if (this.properties == null) {
-      this.properties = new ArrayList<>();
-    }
     this.properties.add(propertiesItem);
     return this;
   }

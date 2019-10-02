@@ -7,6 +7,7 @@ import org.wso2.carbon.identity.api.server.identity.governance.v1.model.Connecto
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.Error;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.IdentityGovernanceApiService;
 
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -32,7 +33,7 @@ public class IdentityGovernanceApi  {
   @Autowired
   private IdentityGovernanceApiService delegate;
 
-
+    @Valid
     @GET
     @Path("/")
     
@@ -48,10 +49,14 @@ public class IdentityGovernanceApi  {
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class) })
-    public Response getCategories(@ApiParam(value = "maximum number of records to return")  @QueryParam("limit") Integer limit, @ApiParam(value = "number of records to skip for pagination")  @QueryParam("offset") Integer offset, @ApiParam(value = "Condition to filter the retrival of records.")  @QueryParam("filter") String filter, @ApiParam(value = "Define the order how the retrieved records should be sorted.")  @QueryParam("sort") String sort) {
+    public Response getCategories(@Valid
+@ApiParam(value = "maximum number of records to return")  @QueryParam("limit") Integer limit, @Valid
+@ApiParam(value = "number of records to skip for pagination")  @QueryParam("offset") Integer offset, @Valid
+@ApiParam(value = "Condition to filter the retrival of records.")  @QueryParam("filter") String filter, @Valid
+@ApiParam(value = "Define the order how the retrieved records should be sorted.")  @QueryParam("sort") String sort) {
         return delegate.getCategories(limit,  offset,  filter,  sort );
     }
-
+    @Valid
     @GET
     @Path("/{category-id}/{connector-id}")
     
@@ -70,7 +75,7 @@ public class IdentityGovernanceApi  {
     public Response getConnector(@ApiParam(value = "Id of the connector category.",required=true) @PathParam("category-id") String categoryId, @ApiParam(value = "Id of the connector.",required=true) @PathParam("connector-id") String connectorId) {
         return delegate.getConnector(categoryId,  connectorId );
     }
-
+    @Valid
     @GET
     @Path("/{category-id}")
     
@@ -89,7 +94,7 @@ public class IdentityGovernanceApi  {
     public Response getConnectorCategory(@ApiParam(value = "Id of the connector category.",required=true) @PathParam("category-id") String categoryId) {
         return delegate.getConnectorCategory(categoryId );
     }
-
+    @Valid
     @PATCH
     @Path("/{category-id}/{connector-id}")
     @Consumes({ "application/json" })
@@ -106,7 +111,7 @@ public class IdentityGovernanceApi  {
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class) })
-    public Response patchConnector(@ApiParam(value = "Id of the connector category.",required=true) @PathParam("category-id") String categoryId, @ApiParam(value = "Id of the connector.",required=true) @PathParam("connector-id") String connectorId, @ApiParam(value = "governance-connector to update" ) ConnectorsPatchReq connectorsPatchReq) {
+    public Response patchConnector(@ApiParam(value = "Id of the connector category.",required=true) @PathParam("category-id") String categoryId, @ApiParam(value = "Id of the connector.",required=true) @PathParam("connector-id") String connectorId, @ApiParam(value = "governance-connector to update" ) @Valid ConnectorsPatchReq connectorsPatchReq) {
         return delegate.patchConnector(categoryId,  connectorId,  connectorsPatchReq );
     }
 }
