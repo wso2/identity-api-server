@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.Link;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorLink;
 import javax.validation.constraints.*;
 
 /**
@@ -24,7 +24,7 @@ public class CategoryConnectorsRes   {
   
   private String id;
 
-  private List<Link> links = null;
+  private List<ConnectorLink> links = null;
 
 
   /**
@@ -38,7 +38,7 @@ public class CategoryConnectorsRes   {
   
   @ApiModelProperty(example = "c3VzcGVuc2lvbi5ub3RpZmljYXRpb24", value = "Connector id.")
   @JsonProperty("id")
-@Valid
+  @Valid
   public String getId() {
     return id;
   }
@@ -50,7 +50,7 @@ public class CategoryConnectorsRes   {
   /**
    * Connectors of the category with minimal attributes.
    **/
-  public CategoryConnectorsRes links(List<Link> links) {
+  public CategoryConnectorsRes links(List<ConnectorLink> links) {
     this.links = links;
     return this;
   }
@@ -58,15 +58,15 @@ public class CategoryConnectorsRes   {
   
   @ApiModelProperty(value = "Connectors of the category with minimal attributes.")
   @JsonProperty("links")
-@Valid
-  public List<Link> getLinks() {
+  @Valid
+  public List<ConnectorLink> getLinks() {
     return links;
   }
-  public void setLinks(List<Link> links) {
+  public void setLinks(List<ConnectorLink> links) {
     this.links = links;
   }
 
-  public CategoryConnectorsRes addLinksItem(Link linksItem) {
+  public CategoryConnectorsRes addLinksItem(ConnectorLink linksItem) {
     if (this.links == null) {
       this.links = new ArrayList<>();
     }
@@ -85,8 +85,8 @@ public class CategoryConnectorsRes   {
       return false;
     }
     CategoryConnectorsRes categoryConnectorsRes = (CategoryConnectorsRes) o;
-    return Objects.equals(id, categoryConnectorsRes.id) &&
-        Objects.equals(links, categoryConnectorsRes.links);
+    return Objects.equals(this.id, categoryConnectorsRes.id) &&
+        Objects.equals(this.links, categoryConnectorsRes.links);
   }
 
   @Override

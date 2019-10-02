@@ -27,7 +27,7 @@ public class ConnectorsPatchReq   {
 @XmlEnum(String.class)
 public enum OperationEnum {
 
-    @XmlEnumValue("update") UPDATE(String.valueOf("update"));
+    @XmlEnumValue("UPDATE") UPDATE(String.valueOf("UPDATE"));
 
 
     private String value;
@@ -69,9 +69,9 @@ public enum OperationEnum {
   }
 
   
-  @ApiModelProperty(example = "update", required = true, value = "Governance connector properties patch operation.")
+  @ApiModelProperty(example = "UPDATE", required = true, value = "Governance connector properties patch operation.")
   @JsonProperty("operation")
-@Valid
+  @Valid
   @NotNull(message = "Property operation cannot be null.")
   public OperationEnum getOperation() {
     return operation;
@@ -92,7 +92,7 @@ public enum OperationEnum {
   
   @ApiModelProperty(required = true, value = "Governance connector properties to patch.")
   @JsonProperty("properties")
-@Valid
+  @Valid
   @NotNull(message = "Property properties cannot be null.")
   public List<PropertyReq> getProperties() {
     return properties;
@@ -117,8 +117,8 @@ public enum OperationEnum {
       return false;
     }
     ConnectorsPatchReq connectorsPatchReq = (ConnectorsPatchReq) o;
-    return Objects.equals(operation, connectorsPatchReq.operation) &&
-        Objects.equals(properties, connectorsPatchReq.properties);
+    return Objects.equals(this.operation, connectorsPatchReq.operation) &&
+        Objects.equals(this.properties, connectorsPatchReq.properties);
   }
 
   @Override

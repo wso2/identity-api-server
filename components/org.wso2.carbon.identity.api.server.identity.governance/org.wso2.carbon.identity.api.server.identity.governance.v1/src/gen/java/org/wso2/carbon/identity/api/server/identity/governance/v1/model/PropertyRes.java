@@ -39,7 +39,7 @@ public class PropertyRes   {
   
   @ApiModelProperty(example = "suspension.notification.enable", value = "Property name.")
   @JsonProperty("name")
-@Valid
+  @Valid
   public String getName() {
     return name;
   }
@@ -59,7 +59,7 @@ public class PropertyRes   {
   
   @ApiModelProperty(example = "false", value = "Property value.")
   @JsonProperty("value")
-@Valid
+  @Valid
   public String getValue() {
     return value;
   }
@@ -79,7 +79,7 @@ public class PropertyRes   {
   
   @ApiModelProperty(example = "Enable", value = "Property display name.")
   @JsonProperty("displayName")
-@Valid
+  @Valid
   public String getDisplayName() {
     return displayName;
   }
@@ -99,7 +99,7 @@ public class PropertyRes   {
   
   @ApiModelProperty(example = "Enable account suspend notifications.", value = "Property description.")
   @JsonProperty("description")
-@Valid
+  @Valid
   public String getDescription() {
     return description;
   }
@@ -118,10 +118,10 @@ public class PropertyRes   {
       return false;
     }
     PropertyRes propertyRes = (PropertyRes) o;
-    return Objects.equals(name, propertyRes.name) &&
-        Objects.equals(value, propertyRes.value) &&
-        Objects.equals(displayName, propertyRes.displayName) &&
-        Objects.equals(description, propertyRes.description);
+    return Objects.equals(this.name, propertyRes.name) &&
+        Objects.equals(this.value, propertyRes.value) &&
+        Objects.equals(this.displayName, propertyRes.displayName) &&
+        Objects.equals(this.description, propertyRes.description);
   }
 
   @Override

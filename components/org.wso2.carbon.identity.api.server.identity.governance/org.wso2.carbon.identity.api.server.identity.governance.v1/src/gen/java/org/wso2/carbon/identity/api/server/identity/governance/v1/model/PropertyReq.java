@@ -35,7 +35,7 @@ public class PropertyReq   {
   
   @ApiModelProperty(example = "suspension.notification.enable", required = true, value = "Property name.")
   @JsonProperty("name")
-@Valid
+  @Valid
   @NotNull(message = "Property name cannot be null.")
   public String getName() {
     return name;
@@ -56,7 +56,7 @@ public class PropertyReq   {
   
   @ApiModelProperty(example = "false", required = true, value = "Property value.")
   @JsonProperty("value")
-@Valid
+  @Valid
   @NotNull(message = "Property value cannot be null.")
   public String getValue() {
     return value;
@@ -76,8 +76,8 @@ public class PropertyReq   {
       return false;
     }
     PropertyReq propertyReq = (PropertyReq) o;
-    return Objects.equals(name, propertyReq.name) &&
-        Objects.equals(value, propertyReq.value);
+    return Objects.equals(this.name, propertyReq.name) &&
+        Objects.equals(this.value, propertyReq.value);
   }
 
   @Override

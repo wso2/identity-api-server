@@ -18,7 +18,40 @@ public class Link   {
   
   private String href;
 
-  private String rel;
+
+@XmlType(name="RelEnum")
+@XmlEnum(String.class)
+public enum RelEnum {
+
+    @XmlEnumValue("CATEGORY") CATEGORY(String.valueOf("CATEGORY")), @XmlEnumValue("CONNECTOR") CONNECTOR(String.valueOf("CONNECTOR"));
+
+
+    private String value;
+
+    RelEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static RelEnum fromValue(String value) {
+        for (RelEnum b : RelEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+  private RelEnum rel;
 
 
   /**
@@ -30,9 +63,9 @@ public class Link   {
   }
 
   
-  @ApiModelProperty(example = "/t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz", value = "Path to the target resource.")
+  @ApiModelProperty(value = "Path to the target resource.")
   @JsonProperty("href")
-@Valid
+  @Valid
   public String getHref() {
     return href;
   }
@@ -44,19 +77,19 @@ public class Link   {
   /**
    * Describes how the current context is related to the target resource.
    **/
-  public Link rel(String rel) {
+  public Link rel(RelEnum rel) {
     this.rel = rel;
     return this;
   }
 
   
-  @ApiModelProperty(example = "connector", value = "Describes how the current context is related to the target resource.")
+  @ApiModelProperty(value = "Describes how the current context is related to the target resource.")
   @JsonProperty("rel")
-@Valid
-  public String getRel() {
+  @Valid
+  public RelEnum getRel() {
     return rel;
   }
-  public void setRel(String rel) {
+  public void setRel(RelEnum rel) {
     this.rel = rel;
   }
 
@@ -71,8 +104,8 @@ public class Link   {
       return false;
     }
     Link link = (Link) o;
-    return Objects.equals(href, link.href) &&
-        Objects.equals(rel, link.rel);
+    return Objects.equals(this.href, link.href) &&
+        Objects.equals(this.rel, link.rel);
   }
 
   @Override

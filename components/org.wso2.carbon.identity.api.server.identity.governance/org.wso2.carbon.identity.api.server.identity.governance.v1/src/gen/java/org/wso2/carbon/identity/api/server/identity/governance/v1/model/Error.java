@@ -35,7 +35,7 @@ public class Error   {
   
   @ApiModelProperty(example = "AAA-00000", required = true, value = "")
   @JsonProperty("code")
-@Valid
+  @Valid
   @NotNull(message = "Property code cannot be null.")
   public String getCode() {
     return code;
@@ -55,7 +55,7 @@ public class Error   {
   
   @ApiModelProperty(example = "Some Error Message", required = true, value = "")
   @JsonProperty("message")
-@Valid
+  @Valid
   @NotNull(message = "Property message cannot be null.")
   public String getMessage() {
     return message;
@@ -75,7 +75,7 @@ public class Error   {
   
   @ApiModelProperty(example = "Some Error Description", value = "")
   @JsonProperty("description")
-@Valid
+  @Valid
   public String getDescription() {
     return description;
   }
@@ -94,7 +94,7 @@ public class Error   {
   
   @ApiModelProperty(example = "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047", value = "")
   @JsonProperty("traceId")
-@Valid
+  @Valid
   public String getTraceId() {
     return traceId;
   }
@@ -113,10 +113,10 @@ public class Error   {
       return false;
     }
     Error error = (Error) o;
-    return Objects.equals(code, error.code) &&
-        Objects.equals(message, error.message) &&
-        Objects.equals(description, error.description) &&
-        Objects.equals(traceId, error.traceId);
+    return Objects.equals(this.code, error.code) &&
+        Objects.equals(this.message, error.message) &&
+        Objects.equals(this.description, error.description) &&
+        Objects.equals(this.traceId, error.traceId);
   }
 
   @Override

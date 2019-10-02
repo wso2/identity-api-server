@@ -3,7 +3,7 @@ info:
   description: >-
     This is the RESTful API for identity governance configurations in WSO2
     Identity Server
-  version: "1.0.0-oas3"
+  version: "v1"
   title: WSO2 Identity Server - Governance connectors Admin API
   contact:
     name: WSO2 Identity Server
@@ -69,6 +69,32 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/CategoryRes'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  '/identity-governance/{category-id}/connectors':
+    get:
+      tags:
+        - Management
+      summary: Retrieve governance connectors of a category.
+      operationId: getConnectorsOfCategory
+      description: |
+        Retrieve governance connectors of a category.
+
+        <b>Permission required:</b>
+          * /permission/admin/manage
+      parameters:
+        - $ref: '#/components/parameters/categoryIdPathParam'
+      responses:
+        '200':
+          description: Requested governance connector category.
+          content:
+            application/json:
+              schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConnectorRes'
@@ -78,7 +104,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-  '/identity-governance/{category-id}/{connector-id}':
+  '/identity-governance/{category-id}/connectors/{connector-id}':
     get:
       tags:
         - Management
@@ -136,7 +162,8 @@ paths:
               $ref: '#/components/schemas/ConnectorsPatchReq'
         description: governance-connector to update
 servers:
-  - url: https://localhost:9443/t/{tenant-domain}/api/server/v1/
+  - url: >-
+      https://virtserver.swaggerhub.com/Maduranga/wso2_identity_server_governance_admin_api/1.0.0
 components:
   parameters:
     limitQueryParam:
@@ -238,9 +265,9 @@ components:
           example: Account Management Policies
         links:
           type: array
-          description: Connectors of the category with minimal attributes.
+          description: Reference to the category.
           items:
-            $ref: '#/components/schemas/Link'
+            $ref: '#/components/schemas/CategoryLink'
         connectors:
           type: array
           description: Connectors of the category with minimal attributes.
@@ -258,7 +285,20 @@ components:
           type: array
           description: Connectors of the category with minimal attributes.
           items:
-            $ref: '#/components/schemas/Link'
+            $ref: '#/components/schemas/ConnectorLink'
+    CategoryRes:
+      type: object
+      description: Governance connector category response.
+      properties:
+        name:
+          type: string
+          description: Connector category name.
+          example: Account Management Policies
+        connectors:
+          type: array
+          description: Connectors of the category with minimal attributes.
+          items:
+            $ref: '#/components/schemas/ConnectorRes'
     ConnectorRes:
       type: object
       description: Governance connector response.
@@ -323,8 +363,8 @@ components:
           type: string
           description: Governance connector properties patch operation.
           enum:
-            - update
-          example: update
+            - UPDATE
+          example: UPDATE
         properties:
           type: array
           description: Governance connector properties to patch.
@@ -351,12 +391,32 @@ components:
         href:
           type: string
           description: Path to the target resource.
-          example: >-
-            /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz
         rel:
           type: string
+          enum:
+            - CATEGORY
+            - CONNECTOR
           description: Describes how the current context is related to the target resource.
-          example: connector
+    CategoryLink:
+      allOf:
+        - $ref: '#/components/schemas/Link'
+      properties:
+        rel:
+          example:
+            - CATEGORY
+        href:
+          example: >-
+            /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz
+    ConnectorLink:
+      allOf:
+        - $ref: '#/components/schemas/Link'
+      properties:
+        rel:
+          example:
+            - CONNECTOR
+        href:
+          example: >-
+            /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz/connectors/c3VzcGVuc2lvbi5ub3RpZmljYXRpb24
     Error:
       type: object
       required:

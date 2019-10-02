@@ -25,6 +25,12 @@ public class IdentityGovernanceApiServiceImpl implements IdentityGovernanceApiSe
     @Override
     public Response getConnectorCategory(String categoryId) {
 
+        return Response.ok().entity(identityGovernanceService.getGovernanceConnectorCategory(categoryId)).build();
+    }
+
+    @Override
+    public Response getConnectorsOfCategory(String categoryId) {
+
         return Response.ok().entity(identityGovernanceService.getGovernanceConnectorsByCategory(categoryId)).build();
     }
 

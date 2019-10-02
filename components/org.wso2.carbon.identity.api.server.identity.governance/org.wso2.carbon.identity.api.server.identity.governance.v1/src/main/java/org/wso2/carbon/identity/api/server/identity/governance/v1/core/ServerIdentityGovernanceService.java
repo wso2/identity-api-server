@@ -26,6 +26,9 @@ import org.wso2.carbon.identity.api.server.identity.governance.common.Governance
 import org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceDataHolder;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoriesRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryConnectorsRes;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryLink;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryRes;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorLink;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorsPatchReq;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.Link;
@@ -87,6 +90,23 @@ public class ServerIdentityGovernanceService {
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
             throw handleException(e, errorEnum, status);
         }
+    }
+
+    /**
+     * Get governance connector category.
+     *
+     * @param categoryId Governance connector category id.
+     * @return List of governance connectors for the give id.
+     */
+    public CategoryRes getGovernanceConnectorCategory(String categoryId) {
+
+        List<ConnectorRes> connectors = getGovernanceConnectorsByCategory(categoryId);
+        String categoryName = new String(Base64.getUrlDecoder().decode(categoryId), StandardCharsets.UTF_8);
+        CategoryRes category = new CategoryRes();
+        category.setConnectors(connectors);
+        category.setName(categoryName);
+
+        return category;
     }
 
     /**
@@ -208,9 +228,9 @@ public class ServerIdentityGovernanceService {
             URI categoryLocation =
                     buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDENTITY_GOVERNANCE_PATH_COMPONENT + "/%s",
                             categoryId));
-            Link link = new Link();
+            CategoryLink link = new CategoryLink();
             link.setHref(categoryLocation.toString());
-            link.setRel(GovernanceConstants.REL_CATEGORY);
+            link.setRel(Link.RelEnum.CATEGORY);
             categoriesRes.setLinks(Collections.singletonList(link));
 
             List<CategoryConnectorsRes> connectors = buildCategoryConnectorsResDTOS(categoryId, category.getValue());
@@ -232,7 +252,7 @@ public class ServerIdentityGovernanceService {
     }
 
     private List<CategoryConnectorsRes> buildCategoryConnectorsResDTOS(String categoryId,
-                                                                          List<ConnectorConfig> connectorConfigList) {
+                                                                       List<ConnectorConfig> connectorConfigList) {
 
         List<CategoryConnectorsRes> connectors = new ArrayList<>();
         for (ConnectorConfig connectorConfig : connectorConfigList) {
@@ -242,11 +262,12 @@ public class ServerIdentityGovernanceService {
                     .encodeToString(connectorConfig.getName().getBytes(StandardCharsets.UTF_8));
             connectorsResDTO.setId(connectorId);
             URI connectorLocation =
-                    buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDENTITY_GOVERNANCE_PATH_COMPONENT + "/%s/%s",
+                    buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDENTITY_GOVERNANCE_PATH_COMPONENT + "/%s" +
+                                    "/connectors/%s",
                             categoryId, connectorId));
-            Link link = new Link();
+            ConnectorLink link = new ConnectorLink();
             link.setHref(connectorLocation.toString());
-            link.setRel(GovernanceConstants.REL_CONNECTOR);
+            link.setRel(Link.RelEnum.CONNECTOR);
             connectorsResDTO.setLinks(Collections.singletonList(link));
             connectors.add(connectorsResDTO);
         }

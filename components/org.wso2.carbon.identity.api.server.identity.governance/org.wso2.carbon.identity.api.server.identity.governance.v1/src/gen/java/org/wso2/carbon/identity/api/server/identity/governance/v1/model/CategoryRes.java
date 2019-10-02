@@ -6,8 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryConnectorsRes;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryLink;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorRes;
 import javax.validation.constraints.*;
 
 /**
@@ -21,41 +20,17 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 @ApiModel(description = "Governance connector category response.")
-public class CategoriesRes   {
+public class CategoryRes   {
   
-  private String id;
-
   private String name;
 
-  private List<CategoryLink> links = null;
-
-  private List<CategoryConnectorsRes> connectors = null;
-
-
-  /**
-   * Connector category id.
-   **/
-  public CategoriesRes id(String id) {
-    this.id = id;
-    return this;
-  }
-
-  
-  @ApiModelProperty(example = "QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz", value = "Connector category id.")
-  @JsonProperty("id")
-  @Valid
-  public String getId() {
-    return id;
-  }
-  public void setId(String id) {
-    this.id = id;
-  }
+  private List<ConnectorRes> connectors = null;
 
 
   /**
    * Connector category name.
    **/
-  public CategoriesRes name(String name) {
+  public CategoryRes name(String name) {
     this.name = name;
     return this;
   }
@@ -73,37 +48,9 @@ public class CategoriesRes   {
 
 
   /**
-   * Reference to the category.
-   **/
-  public CategoriesRes links(List<CategoryLink> links) {
-    this.links = links;
-    return this;
-  }
-
-  
-  @ApiModelProperty(value = "Reference to the category.")
-  @JsonProperty("links")
-  @Valid
-  public List<CategoryLink> getLinks() {
-    return links;
-  }
-  public void setLinks(List<CategoryLink> links) {
-    this.links = links;
-  }
-
-  public CategoriesRes addLinksItem(CategoryLink linksItem) {
-    if (this.links == null) {
-      this.links = new ArrayList<>();
-    }
-    this.links.add(linksItem);
-    return this;
-  }
-
-
-  /**
    * Connectors of the category with minimal attributes.
    **/
-  public CategoriesRes connectors(List<CategoryConnectorsRes> connectors) {
+  public CategoryRes connectors(List<ConnectorRes> connectors) {
     this.connectors = connectors;
     return this;
   }
@@ -112,14 +59,14 @@ public class CategoriesRes   {
   @ApiModelProperty(value = "Connectors of the category with minimal attributes.")
   @JsonProperty("connectors")
   @Valid
-  public List<CategoryConnectorsRes> getConnectors() {
+  public List<ConnectorRes> getConnectors() {
     return connectors;
   }
-  public void setConnectors(List<CategoryConnectorsRes> connectors) {
+  public void setConnectors(List<ConnectorRes> connectors) {
     this.connectors = connectors;
   }
 
-  public CategoriesRes addConnectorsItem(CategoryConnectorsRes connectorsItem) {
+  public CategoryRes addConnectorsItem(ConnectorRes connectorsItem) {
     if (this.connectors == null) {
       this.connectors = new ArrayList<>();
     }
@@ -137,26 +84,22 @@ public class CategoriesRes   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CategoriesRes categoriesRes = (CategoriesRes) o;
-    return Objects.equals(this.id, categoriesRes.id) &&
-        Objects.equals(this.name, categoriesRes.name) &&
-        Objects.equals(this.links, categoriesRes.links) &&
-        Objects.equals(this.connectors, categoriesRes.connectors);
+    CategoryRes categoryRes = (CategoryRes) o;
+    return Objects.equals(this.name, categoryRes.name) &&
+        Objects.equals(this.connectors, categoryRes.connectors);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, links, connectors);
+    return Objects.hash(name, connectors);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CategoriesRes {\n");
+    sb.append("class CategoryRes {\n");
     
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    links: ").append(toIndentedString(links)).append("\n");
     sb.append("    connectors: ").append(toIndentedString(connectors)).append("\n");
     sb.append("}");
     return sb.toString();

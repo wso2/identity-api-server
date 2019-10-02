@@ -48,7 +48,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(example = "c3VzcGVuc2lvbi5ub3RpZmljYXRpb24", value = "Connector id.")
   @JsonProperty("id")
-@Valid
+  @Valid
   public String getId() {
     return id;
   }
@@ -68,7 +68,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(example = "suspension.notification", value = "Connector name.")
   @JsonProperty("name")
-@Valid
+  @Valid
   public String getName() {
     return name;
   }
@@ -88,7 +88,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(example = "Account Management Policies", value = "Connector category.")
   @JsonProperty("category")
-@Valid
+  @Valid
   public String getCategory() {
     return category;
   }
@@ -108,7 +108,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(example = "Lock Idle Accounts", value = "Connector friendly name.")
   @JsonProperty("friendlyName")
-@Valid
+  @Valid
   public String getFriendlyName() {
     return friendlyName;
   }
@@ -128,7 +128,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(example = "0", value = "Connector order.")
   @JsonProperty("order")
-@Valid
+  @Valid
   public Integer getOrder() {
     return order;
   }
@@ -148,7 +148,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(example = "DEFAULT", value = "Connector subcategory.")
   @JsonProperty("subCategory")
-@Valid
+  @Valid
   public String getSubCategory() {
     return subCategory;
   }
@@ -168,7 +168,7 @@ public class ConnectorRes   {
   
   @ApiModelProperty(value = "Define any additional properties if required.")
   @JsonProperty("properties")
-@Valid
+  @Valid
   public List<PropertyRes> getProperties() {
     return properties;
   }
@@ -195,13 +195,13 @@ public class ConnectorRes   {
       return false;
     }
     ConnectorRes connectorRes = (ConnectorRes) o;
-    return Objects.equals(id, connectorRes.id) &&
-        Objects.equals(name, connectorRes.name) &&
-        Objects.equals(category, connectorRes.category) &&
-        Objects.equals(friendlyName, connectorRes.friendlyName) &&
-        Objects.equals(order, connectorRes.order) &&
-        Objects.equals(subCategory, connectorRes.subCategory) &&
-        Objects.equals(properties, connectorRes.properties);
+    return Objects.equals(this.id, connectorRes.id) &&
+        Objects.equals(this.name, connectorRes.name) &&
+        Objects.equals(this.category, connectorRes.category) &&
+        Objects.equals(this.friendlyName, connectorRes.friendlyName) &&
+        Objects.equals(this.order, connectorRes.order) &&
+        Objects.equals(this.subCategory, connectorRes.subCategory) &&
+        Objects.equals(this.properties, connectorRes.properties);
   }
 
   @Override
