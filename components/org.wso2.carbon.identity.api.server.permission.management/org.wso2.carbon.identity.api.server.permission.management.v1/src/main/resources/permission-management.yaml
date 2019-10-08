@@ -96,3 +96,6 @@ components:
         traceId:
           type: string
           example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
+
+host: is.wso2.com
+basePath: /t/{tenant-domain}/api/server/v1
