@@ -17,25 +17,19 @@
 package org.wso2.carbon.identity.api.server.permission.management.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
 
-
-import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
 
-public class PermissionObject  {
+public class Permission  {
   
     private String displayName;
     private String resourcePath;
 
     /**
     **/
-    public PermissionObject displayName(String displayName) {
+    public Permission displayName(String displayName) {
 
         this.displayName = displayName;
         return this;
@@ -53,7 +47,7 @@ public class PermissionObject  {
 
     /**
     **/
-    public PermissionObject resourcePath(String resourcePath) {
+    public Permission resourcePath(String resourcePath) {
 
         this.resourcePath = resourcePath;
         return this;
@@ -80,9 +74,9 @@ public class PermissionObject  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        PermissionObject permissionObject = (PermissionObject) o;
-        return Objects.equals(this.displayName, permissionObject.displayName) &&
-            Objects.equals(this.resourcePath, permissionObject.resourcePath);
+        Permission permission = (Permission) o;
+        return Objects.equals(this.displayName, permission.displayName) &&
+            Objects.equals(this.resourcePath, permission.resourcePath);
     }
 
     @Override
@@ -94,7 +88,7 @@ public class PermissionObject  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class PermissionObject {\n");
+        sb.append("class Permission {\n");
         
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    resourcePath: ").append(toIndentedString(resourcePath)).append("\n");

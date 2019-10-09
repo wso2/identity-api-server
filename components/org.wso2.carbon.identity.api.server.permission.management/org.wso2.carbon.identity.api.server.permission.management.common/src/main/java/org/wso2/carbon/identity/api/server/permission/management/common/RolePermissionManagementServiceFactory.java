@@ -19,29 +19,27 @@ package org.wso2.carbon.identity.api.server.permission.management.common;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.mgt.RolePermissionManagementService;
-import org.wso2.carbon.user.mgt.RolePermissionManagementServiceImpl;
 
 /**
  * RolePermissionManagementService Factory class.
  */
-public class RolePermissionManagementServiceFactory extends
-        AbstractFactoryBean<RolePermissionManagementServiceImpl> {
+public class RolePermissionManagementServiceFactory extends AbstractFactoryBean<RolePermissionManagementService> {
 
-    private RolePermissionManagementServiceImpl rolePermissionManagementService;
+    private RolePermissionManagementService rolePermissionManagementService;
 
     @Override
-    public Class<RolePermissionManagementServiceImpl> getObjectType() {
+    public Class<RolePermissionManagementService> getObjectType() {
 
-        return RolePermissionManagementServiceImpl.class;
+        return RolePermissionManagementService.class;
     }
 
     @Override
-    protected RolePermissionManagementServiceImpl createInstance() throws Exception {
+    protected RolePermissionManagementService createInstance() throws Exception {
 
         if (this.rolePermissionManagementService != null) {
             return this.rolePermissionManagementService;
         } else {
-            RolePermissionManagementServiceImpl rolePermissionManagementService = (RolePermissionManagementServiceImpl)
+            RolePermissionManagementService rolePermissionManagementService = (RolePermissionManagementService)
                     PrivilegedCarbonContext.getThreadLocalCarbonContext()
                             .getOSGiService(RolePermissionManagementService.class, null);
             if (rolePermissionManagementService != null) {

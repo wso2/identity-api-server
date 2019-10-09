@@ -20,7 +20,7 @@
 
     <bean class="org.wso2.carbon.identity.api.server.permission.management.v1.core.PermissionManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.permission.management.v1.impl.PermissionManagementApiServiceImpl"/>
-    <bean id="rolePermissionManagementServiceImplDataHolderBean" class="org.wso2.carbon.identity.api.server.permission.management.common.RolePermissionManagementServiceImplDataHolder">
+    <bean id="rolePermissionManagementServiceImplDataHolderBean" class="org.wso2.carbon.identity.api.server.permission.management.common.RolePermissionManagementServiceDataHolder">
         <property name="rolePermissionManagementService" ref="rolePermissionManagementServiceFactoryBean"/>
     </bean>
     <bean id="rolePermissionManagementServiceFactoryBean" class="org.wso2.carbon.identity.api.server.permission.management.common.RolePermissionManagementServiceFactory"/>

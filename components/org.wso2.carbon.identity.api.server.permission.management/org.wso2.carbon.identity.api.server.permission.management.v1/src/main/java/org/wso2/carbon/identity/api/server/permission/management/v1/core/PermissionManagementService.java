@@ -23,12 +23,11 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.permission.management.common.Constant;
-import org.wso2.carbon.identity.api.server.permission.management.common.RolePermissionManagementServiceImplDataHolder;
-import org.wso2.carbon.identity.api.server.permission.management.v1.model.PermissionObject;
+import org.wso2.carbon.identity.api.server.permission.management.common.RolePermissionManagementServiceDataHolder;
+import org.wso2.carbon.identity.api.server.permission.management.v1.model.Permission;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.user.mgt.RolePermissionException;
 import org.wso2.carbon.user.mgt.RolePermissionManagementService;
-import org.wso2.carbon.user.mgt.common.Permission;
 
 import javax.ws.rs.core.Response;
 
@@ -38,21 +37,22 @@ import javax.ws.rs.core.Response;
 public class PermissionManagementService {
 
     private static final Log LOG = LogFactory.getLog(PermissionManagementService.class);
+
     /**
      * Get all permissions array.
      *
      * @return PermissionObject[] of permissions.
      */
-    public PermissionObject[] getAllPermissions() {
+    public Permission[] getAllPermissions() {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             RolePermissionManagementService rolePermissionManagementService =
-                    RolePermissionManagementServiceImplDataHolder.getRolePermissionManagementService();
+                    RolePermissionManagementServiceDataHolder.getRolePermissionManagementService();
             return getPermissionObjects(rolePermissionManagementService.getAllPermissions(IdentityTenantUtil
                     .getTenantId(tenantDomain)));
         } catch (RolePermissionException e) {
-            throw  handleException(e);
+            throw handleException(e);
         }
     }
 
@@ -62,11 +62,11 @@ public class PermissionManagementService {
      * @param permissions from backend service.
      * @return PermissionObject[] of permissions.
      */
-    private PermissionObject[] getPermissionObjects(Permission[] permissions) {
+    private Permission[] getPermissionObjects(org.wso2.carbon.user.mgt.common.model.Permission[] permissions) {
 
-        PermissionObject[] outputPermissions = new PermissionObject[permissions.length];
+        Permission[] outputPermissions = new Permission[permissions.length];
         for (int i = 0; i < permissions.length; i++) {
-            PermissionObject permission = new PermissionObject();
+            Permission permission = new Permission();
             permission.setDisplayName(permissions[i].getDisplayName());
             permission.setResourcePath(permissions[i].getResourcePath());
             outputPermissions[i] = permission;
@@ -82,7 +82,6 @@ public class PermissionManagementService {
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
         return new APIError(status, errorResponse);
     }
-
 
     private ErrorResponse.Builder getErrorBuilder(String... data) {
 

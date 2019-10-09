@@ -16,17 +16,20 @@
 
 package org.wso2.carbon.identity.api.server.permission.management.v1;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.permission.management.v1.model.Error;
-import org.wso2.carbon.identity.api.server.permission.management.v1.model.PermissionObject;
-import org.wso2.carbon.identity.api.server.permission.management.v1.PermissionManagementApiService;
+import org.wso2.carbon.identity.api.server.permission.management.v1.model.Permission;
 
 import javax.validation.Valid;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
 
 @Path("/permission-management")
 @Api(description = "The permission-management API")
@@ -41,14 +44,14 @@ public class PermissionManagementApi  {
     @Path("/permissions")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List permissions in the permission tree ", notes = "This API provides the array list of permissions in the UI permission tree. ", response = PermissionObject.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "List permissions in the permission tree ", notes = "This API provides the array list of permissions in the UI permission tree. ", response = Permission.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "permissions" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful Response", response = PermissionObject.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "Successful Response", response = Permission.class, responseContainer = "List"),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)

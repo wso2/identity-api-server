@@ -16,16 +16,14 @@
 
 package org.wso2.carbon.identity.api.server.permission.management.v1.impl;
 
-import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.permission.management.v1.PermissionManagementApiService;
 import org.wso2.carbon.identity.api.server.permission.management.v1.core.PermissionManagementService;
 
-import java.util.Arrays;
 import javax.ws.rs.core.Response;
 
 /**
- * The Permission Management API implementation class.
+ * Permission Management API Service Implementation class.
  */
 public class PermissionManagementApiServiceImpl implements PermissionManagementApiService {
 
@@ -35,7 +33,6 @@ public class PermissionManagementApiServiceImpl implements PermissionManagementA
     @Override
     public Response permissionManagementPermissionsGet() {
 
-        JSONArray permissions = new JSONArray(Arrays.asList(permissionManagementService.getAllPermissions()));
-        return Response.ok().entity(permissions.toString()).build();
+        return Response.ok().entity(permissionManagementService.getAllPermissions()).build();
     }
 }

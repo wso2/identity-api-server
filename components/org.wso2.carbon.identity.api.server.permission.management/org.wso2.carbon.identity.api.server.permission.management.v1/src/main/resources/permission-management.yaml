@@ -71,8 +71,9 @@ components:
     PermissionTreeObject:
       type: array
       items:
-        $ref: '#/components/schemas/permissionObject'
-    permissionObject:
+        $ref: '#/components/schemas/Permission'
+
+    Permission:
       type: object
       properties:
         displayName:
@@ -81,6 +82,7 @@ components:
         resourcePath:
           type: string
           example: /permissions
+
     Error:
       type: object
       properties:
@@ -97,5 +99,4 @@ components:
           type: string
           example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
 
-host: is.wso2.com
-basePath: /t/{tenant-domain}/api/server/v1
+

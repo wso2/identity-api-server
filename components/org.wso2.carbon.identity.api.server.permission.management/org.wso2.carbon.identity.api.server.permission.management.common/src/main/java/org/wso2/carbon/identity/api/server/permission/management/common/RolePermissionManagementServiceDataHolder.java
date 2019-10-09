@@ -18,9 +18,9 @@ package org.wso2.carbon.identity.api.server.permission.management.common;
 import org.wso2.carbon.user.mgt.RolePermissionManagementService;
 
 /**
- * DataHolder class for RolePermissionManagementServiceImpl.
+ * DataHolder class for RolePermissionManagementService.
  */
-public class RolePermissionManagementServiceImplDataHolder {
+public class RolePermissionManagementServiceDataHolder {
 
     private static RolePermissionManagementService rolePermissionManagementService;
 
@@ -40,7 +40,7 @@ public class RolePermissionManagementServiceImplDataHolder {
      */
     public static void setRolePermissionManagementService(RolePermissionManagementService
                                                                   rolePermissionManagementService) {
-        RolePermissionManagementServiceImplDataHolder.rolePermissionManagementService =
+        RolePermissionManagementServiceDataHolder.rolePermissionManagementService =
                 rolePermissionManagementService;
     }
 
