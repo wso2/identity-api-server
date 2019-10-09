@@ -14,20 +14,16 @@ We have done improvements to this plugin so that the stubs can be generated with
 you can define multiple swagger files and deploy them in a single web application. To get the improvements locally, 
 please follow the given steps.
 
-1. Clone the repository [https://github.com/IsuraD/swagger2cxf-maven-plugin](https://github.com/IsuraD/swagger2cxf-maven-plugin)
+1. Clone the repository [https://github.com/madurangasiriwardena/openapi-generator-cxf-wso2](https://github.com/madurangasiriwardena/openapi-generator-cxf-wso2)
 ```
-git clone https://github.com/IsuraD/swagger2cxf-maven-plugin.git
+git clone https://github.com/madurangasiriwardena/openapi-generator-cxf-wso2
 ```
-2. Checkout the branch **swagger_to_jar**
-```
-git checkout swagger_to_jar
-```
-3. Build the plugin 
+2. Build the plugin (master branch)
 ```
 mvn clean install
 ```
 
-Now, the locally built swagger2cxf plugin will be picked from the local .m2 repository when generating the stubs.
+Now, the locally built openapi-generator-cxf plugin will be picked from the local .m2 repository when generating the stubs.
 
 In this repository each server resource type is represented by a unique component. Hence, you need to create a new 
 maven module for the resource type.
@@ -36,8 +32,11 @@ Under this component the implementation of each major version will have a unique
 
 #### Implement a new API with a new swagger definition - version one
 
-1. Include the API swagger definition in the given location of this maven project (identity-api-server). Suggested name 
-for the file name of the API definition is `<resource>.yaml`
+1. Include the API swagger definition (in OpenAPI 3.0) in the given location of this maven project (identity-api-server). 
+The suggested name for the file name of the API definition is `<resource>.yaml`. 
+
+If you are working with Swagger 2.0 still, you have to convert the API definition to OpenAPI 3.0
+
     ```
     +-- identity-api-server
     |   +-- components
@@ -69,31 +68,81 @@ for the file name of the API definition is `<resource>.yaml`
 2. Include the given plugin to the `pom.xml` file of the module `org.wso2.carbon.identity.api.server.<resource>
 .<version>`
     ```
-    <plugin>
-        <groupId>org.wso2.maven.plugins</groupId>
-        <artifactId>swagger2cxf-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <configuration>
-            <inputSpec>${project.basedir}/src/main/resources/<resource>.yaml</inputSpec>
-        </configuration>
-    </plugin>
+  <plugin>
+      <groupId>org.openapitools</groupId>
+      <artifactId>openapi-generator-maven-plugin</artifactId>
+      <version>4.1.2</version>
+      <executions>
+          <execution>
+              <goals>
+                  <goal>generate</goal>
+              </goals>
+              <configuration>
+                  <inputSpec>${project.basedir}/src/main/resources/<resource>.yaml</inputSpec>
+                  <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>
+                  <configOptions>
+                      <sourceFolder>src/gen/java</sourceFolder>
+                      <apiPackage>org.wso2.carbon.identity.api.server.<resource>.<version></apiPackage>
+                      <modelPackage>org.wso2.carbon.identity.api.server.<resource>.<version>.model</modelPackage>
+                      <packageName>org.wso2.carbon.identity.api.server.<resource>.<version></packageName>
+                      <dateLibrary>java8</dateLibrary>
+                      <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                  </configOptions>
+                  <output>.</output>
+                  <skipOverwrite>false</skipOverwrite>
+              </configuration>
+          </execution>
+      </executions>
+      <dependencies>
+          <dependency>
+              <groupId>org.openapitools</groupId>
+              <artifactId>cxf-wso2-openapi-generator</artifactId>
+              <version>1.0.0</version>
+          </dependency>
+      </dependencies>
+  </plugin>
     ```
     For our example: 
     ```
     <plugin>
-        <groupId>org.wso2.maven.plugins</groupId>
-        <artifactId>swagger2cxf-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <configuration>
-            <inputSpec>${project.basedir}/src/main/resources/challenge.yaml</inputSpec>
-        </configuration>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>4.1.2</version>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>generate</goal>
+                </goals>
+                <configuration>
+                    <inputSpec>${project.basedir}/src/main/resources/challenge.yaml</inputSpec>
+                    <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>
+                    <configOptions>
+                        <sourceFolder>src/gen/java</sourceFolder>
+                        <apiPackage>org.wso2.carbon.identity.api.server.challenge.v1</apiPackage>
+                        <modelPackage>org.wso2.carbon.identity.api.server.challenge.v1.model</modelPackage>
+                        <packageName>org.wso2.carbon.identity.api.server.challenge.v1</packageName>
+                        <dateLibrary>java8</dateLibrary>
+                        <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                    </configOptions>
+                    <output>.</output>
+                    <skipOverwrite>false</skipOverwrite>
+                </configuration>
+            </execution>
+        </executions>
+        <dependencies>
+            <dependency>
+                <groupId>org.openapitools</groupId>
+                <artifactId>cxf-wso2-openapi-generator</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+        </dependencies>
     </plugin>
     ```
-3. Run the following command inside the module `org.wso2.carbon.identity.api.server.<resource>.<version>` to generate the stubs
+3. Do a maven build inside the module `org.wso2.carbon.identity.api.server.<resource>.<version>` to generate the stubs
     ```
-    mvn swagger2cxf:generate
+    mvn clean install
     ```
-4. Comment out the plugin added for your API definition before committing to the git.
+4. Comment out the plugin added for your API definition before committing to the git. Because it will regenerate during each build.
 
 
 #### Implement a new version of an existing API - version one+plus
@@ -141,31 +190,81 @@ for the file name of the API definition is *<resource>.yaml*
         |               +-- pom.xml
         |           +-- pom.xml
 2. Include the given plugin to the `pom.xml` file of the module `org.wso2.carbon.identity.api.server.<resource>
-.<version>`
+.<version+1>`
+        ```
+      <plugin>
+          <groupId>org.openapitools</groupId>
+          <artifactId>openapi-generator-maven-plugin</artifactId>
+          <version>4.1.2</version>
+          <executions>
+              <execution>
+                  <goals>
+                      <goal>generate</goal>
+                  </goals>
+                  <configuration>
+                      <inputSpec>${project.basedir}/src/main/resources/<resource>.yaml</inputSpec>
+                      <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>
+                      <configOptions>
+                          <sourceFolder>src/gen/java</sourceFolder>
+                          <apiPackage>org.wso2.carbon.identity.api.server.<resource>.<version+1></apiPackage>
+                          <modelPackage>org.wso2.carbon.identity.api.server.<resource>.<version+1>.model</modelPackage>
+                          <packageName>org.wso2.carbon.identity.api.server.<resource>.<version+1></packageName>
+                          <dateLibrary>java8</dateLibrary>
+                          <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                      </configOptions>
+                      <output>.</output>
+                      <skipOverwrite>false</skipOverwrite>
+                  </configuration>
+              </execution>
+          </executions>
+          <dependencies>
+              <dependency>
+                  <groupId>org.openapitools</groupId>
+                  <artifactId>cxf-wso2-openapi-generator</artifactId>
+                  <version>1.0.0</version>
+              </dependency>
+          </dependencies>
+      </plugin>
+        ```
+        For our example: 
+        ```
+        <plugin>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator-maven-plugin</artifactId>
+            <version>4.1.2</version>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>generate</goal>
+                    </goals>
+                    <configuration>
+                        <inputSpec>${project.basedir}/src/main/resources/challenge.yaml</inputSpec>
+                        <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>
+                        <configOptions>
+                            <sourceFolder>src/gen/java</sourceFolder>
+                            <apiPackage>org.wso2.carbon.identity.api.server.challenge.v2</apiPackage>
+                            <modelPackage>org.wso2.carbon.identity.api.server.challenge.v2.model</modelPackage>
+                            <packageName>org.wso2.carbon.identity.api.server.challenge.v2</packageName>
+                            <dateLibrary>java8</dateLibrary>
+                            <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                        </configOptions>
+                        <output>.</output>
+                        <skipOverwrite>false</skipOverwrite>
+                    </configuration>
+                </execution>
+            </executions>
+            <dependencies>
+                <dependency>
+                    <groupId>org.openapitools</groupId>
+                    <artifactId>cxf-wso2-openapi-generator</artifactId>
+                    <version>1.0.0</version>
+                </dependency>
+            </dependencies>
+        </plugin>
+      ```
+3. Do a maven build inside the module `org.wso2.carbon.identity.api.server.<resource>.<version+1>` to generate the stubs
     ```
-    <plugin>
-        <groupId>org.wso2.maven.plugins</groupId>
-        <artifactId>swagger2cxf-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <configuration>
-            <inputSpec>${project.basedir}/src/main/resources/<resource>.yaml</inputSpec>
-        </configuration>
-    </plugin>
-    ```
-    For our example: 
-    ```
-    <plugin>
-        <groupId>org.wso2.maven.plugins</groupId>
-        <artifactId>swagger2cxf-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <configuration>
-            <inputSpec>${project.basedir}/src/main/resources/challenge.yaml</inputSpec>
-        </configuration>
-    </plugin>
-    ```
-3. Run the following command inside the module `org.wso2.carbon.identity.api.server.<resource>.<version>` to generate the stubs
-    ```
-    mvn swagger2cxf:generate
+    mvn clean install
     ```
 4. Comment out the plugin added for your API definition before committing to the git.
 
@@ -250,4 +349,6 @@ component `org.wso2.carbon.identity.api.server.<resource>.common` for your resou
    
 You may add this common component in both the api version specific components as dependency and reuse.
 
-Refer the sample implementation of [server challenge API here](https://github.com/wso2/identity-api-server/tree/master/components/org.wso2.carbon.identity.api.server.challenge)
+#### How to expose the API in  WSO2 Identity Server
+
+To integrate the API implemented in identity-api-server in a single web app , follow the steps in https://github.com/wso2/identity-rest-dispatcher/blob/master/README.md
