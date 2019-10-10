@@ -162,8 +162,7 @@ paths:
               $ref: '#/components/schemas/ConnectorsPatchReq'
         description: governance-connector to update
 servers:
-  - url: >-
-      https://virtserver.swaggerhub.com/Maduranga/wso2_identity_server_governance_admin_api/1.0.0
+  - url: https://localhost:9443/t/{tenant-domain}/api/server/v1/
 components:
   parameters:
     limitQueryParam:

@@ -98,12 +98,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>cxf-wso2-openapi-generator</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
             <scope>provided</scope>
