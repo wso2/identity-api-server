@@ -22,3 +22,5 @@ hs_err_pid*
 # Ignore everything in this directory
 target
 
+.openapi-generator-ignore
+.openapi-generator/
