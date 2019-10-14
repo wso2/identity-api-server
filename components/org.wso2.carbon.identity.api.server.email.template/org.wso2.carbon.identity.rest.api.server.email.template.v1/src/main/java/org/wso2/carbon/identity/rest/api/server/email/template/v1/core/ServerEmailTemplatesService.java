@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.email.mgt.constants.I18nMgtConstants.ErrorCodes.ERROR_CODE_DELIMITER;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
@@ -108,10 +109,10 @@ public class ServerEmailTemplatesService {
      * @param offset         Offset to be used with the limit parameter. **Not supported at the moment**
      * @param sort           Sort the response in ascending order or descending order. **Not supported at the moment**
      * @param sortBy         Element to sort the responses. **Not supported at the moment**
-     * @return List of templates in the template type identified by the given id, 404 if not found.
+     * @return List of SimpleEmailTemplate objects in the template type identified by the given id, 404 if not found.
      */
-    public List<String> getTemplatesListOfEmailTemplateType(String templateTypeId, Integer limit, Integer offset,
-                                                            String sort, String sortBy) {
+    public List<SimpleEmailTemplate> getTemplatesListOfEmailTemplateType(String templateTypeId, Integer limit,
+                                                                         Integer offset, String sort, String sortBy) {
 
         try {
             List<EmailTemplate> legacyEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
@@ -195,21 +196,24 @@ public class ServerEmailTemplatesService {
      * @param templateTypeId       Email template type to be extracted.
      * @return Extracted locations list in the template type, 404 if not found.
      */
-    private List<String> getTemplatesListOfEmailTemplateType(List<EmailTemplate> legacyEmailTemplates,
+    private List<SimpleEmailTemplate> getTemplatesListOfEmailTemplateType(List<EmailTemplate> legacyEmailTemplates,
                                                              String templateTypeId) {
 
-        List<String> templates = new ArrayList<>();
+        List<SimpleEmailTemplate> simpleEmailTemplates = new ArrayList<>();
         String templateDisplayName = base64DecodeTemplateTypeId(templateTypeId);
         for (EmailTemplate legacyTemplate : legacyEmailTemplates) {
             if (templateDisplayName.equals(legacyTemplate.getTemplateDisplayName())) {
+                SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
                 String templateLocation = getTemplateLocation(templateTypeId, legacyTemplate.getLocale());
-                templates.add(templateLocation);
+                simpleEmailTemplate.setId(legacyTemplate.getLocale());
+                simpleEmailTemplate.setLocation(templateLocation);
+                simpleEmailTemplates.add(simpleEmailTemplate);
             }
         }
-        if (templates.isEmpty()) {
+        if (simpleEmailTemplates.isEmpty()) {
             throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
         }
-        return templates;
+        return simpleEmailTemplates;
     }
 
     private EmailTemplate getMatchingLegacyEmailTemplate(String templateDisplayName,
@@ -342,9 +346,10 @@ public class ServerEmailTemplatesService {
         Response.Status status;
 
         if (exception != null) {
-            if (StringUtils.isNotBlank(exception.getErrorCode()) && Constants.getMappedErrorMessage(
-                    exception.getErrorCode()) != null) {
-                Constants.ErrorMessage errorMessage = Constants.getMappedErrorMessage(exception.getErrorCode());
+            String internalErrorCode = exception.getMessage().split(ERROR_CODE_DELIMITER, 2)[0];
+            if (StringUtils.isNotBlank(internalErrorCode) &&
+                    Constants.getMappedErrorMessage(internalErrorCode) != null) {
+                Constants.ErrorMessage errorMessage = Constants.getMappedErrorMessage(internalErrorCode);
                 errorResponse.setMessage(errorMessage.getMessage());
                 errorResponse.setDescription(errorMessage.getDescription());
                 status = errorMessage.getHttpStatus();

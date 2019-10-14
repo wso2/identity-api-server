@@ -63,7 +63,7 @@ paths:
         * Attribute _**displayName**_ of the template type should be unique.
 
         <b>Permission required:</b>
-        * /permission/admin/manage/identity/emailmgt/view
+        * /permission/admin/manage/identity/emailmgt/create
       requestBody:
         content:
           application/json:
@@ -515,6 +515,7 @@ components:
               type: string
               example: YWNjb3VudGNvbmZpcm1hdGlvbg
               description: Unique id of the email template type.
+        - additionalProperties: false
     EmailTemplate:
       type: object
       required:
@@ -544,12 +545,13 @@ components:
         - $ref: '#/components/schemas/EmailTemplate'
         - required:
             - id
-          properties:
+        - properties:
             id:
               type: string
               example: en_US
               description: >-
                 Unique ID of the email template. This id represents the locale of the email template.
+        - additionalProperties: false
     SimpleEmailTemplate:
       type: object
       required:
