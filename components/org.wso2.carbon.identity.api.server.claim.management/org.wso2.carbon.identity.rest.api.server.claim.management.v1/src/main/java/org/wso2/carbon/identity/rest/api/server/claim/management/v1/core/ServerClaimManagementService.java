@@ -626,7 +626,8 @@ public class ServerClaimManagementService {
 
         localClaimResDTO.setDisplayName(claimProperties.remove(PROP_DISPLAY_NAME));
         localClaimResDTO.setReadOnly(Boolean.valueOf(claimProperties.remove(PROP_READ_ONLY)));
-        localClaimResDTO.setRegEx(claimProperties.remove(PROP_REG_EX));
+        String regEx = claimProperties.remove(PROP_REG_EX);
+        localClaimResDTO.setRegEx(regEx != null ? regEx : "");
         localClaimResDTO.setRequired(Boolean.valueOf(claimProperties.remove(PROP_REQUIRED)));
         localClaimResDTO.setSupportedByDefault(Boolean.valueOf(claimProperties.remove(PROP_SUPPORTED_BY_DEFAULT)));
 
