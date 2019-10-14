@@ -292,7 +292,7 @@ public class ServerIdentityGovernanceService {
             propertyRes.setName(property.getName());
             propertyRes.setValue(property.getValue());
             propertyRes.setDisplayName(property.getDisplayName());
-            propertyRes.setDescription(property.getDescription());
+            propertyRes.setDescription(property.getDescription() != null ? property.getDescription() : "");
             properties.add(propertyRes);
         }
 
