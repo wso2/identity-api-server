@@ -16,7 +16,9 @@
 
 package org.wso2.carbon.identity.rest.api.server.email.template.v1.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.EmailApiService;
+import org.wso2.carbon.identity.rest.api.server.email.template.v1.core.ServerEmailTemplatesService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateType;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateWithID;
 
@@ -28,10 +30,14 @@ import javax.ws.rs.core.Response;
  */
 public class EmailApiServiceImpl implements EmailApiService {
 
+    @Autowired
+    private ServerEmailTemplatesService emailTemplatesService;
+
     @Override
     public Response addEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(emailTemplatesService.addEmailTemplate(templateTypeId, emailTemplateWithID)).
+                build();
     }
 
     @Override
@@ -55,28 +61,32 @@ public class EmailApiServiceImpl implements EmailApiService {
     @Override
     public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sort, String sortBy) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(emailTemplatesService.getAllEmailTemplateTypes(limit, offset, sort, sortBy)).
+                build();
     }
 
     @Override
     public Response getEmailTemplate(String templateTypeId, String templateId, Integer limit, Integer offset,
                                      String sort, String sortBy) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(emailTemplatesService.
+                getEmailTemplate(templateTypeId, templateId, limit, offset, sort, sortBy)).build();
     }
 
     @Override
     public Response getEmailTemplateType(String templateTypeId, Integer limit, Integer offset, String sort,
                                          String sortBy) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(emailTemplatesService.
+                getEmailTemplateType(templateTypeId, limit, offset, sort, sortBy)).build();
     }
 
     @Override
     public Response getTemplatesListOfEmailTemplateType(String templateTypeId, Integer limit, Integer offset,
                                                         String sort, String sortBy) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(emailTemplatesService.
+                getTemplatesListOfEmailTemplateType(templateTypeId, limit, offset, sort, sortBy)).build();
     }
 
     @Override
