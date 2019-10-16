@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
+import static org.wso2.carbon.email.mgt.constants.I18nMgtConstants.ErrorCodes.EMAIL_TEMPLATE_TYPE_ALREADY_EXISTS;
 import static org.wso2.carbon.email.mgt.constants.I18nMgtConstants.ErrorCodes.EMAIL_TEMPLATE_TYPE_NODE_FOUND;
 
 /**
@@ -50,23 +51,30 @@ public class Constants {
         ERROR_RETRIEVING_EMAIL_TEMPLATE("50004", Status.INTERNAL_SERVER_ERROR,
                 "Unable to retrieve the email template.",
                 "Server encountered an error while retrieving the email template " +
-                        "identified by the given template-type-id and the template-id"),
-        ERROR_INVALID_TEMPLATE_TYPE_ID("50005", Status.BAD_REQUEST,
+                        "identified by the given template-type-id and the template-id."),
+        ERROR_ADDING_EMAIL_TEMPLATE_TYPE("50005", Status.INTERNAL_SERVER_ERROR,
+                "Unable to add the email template type.",
+                "Server encountered an error while adding the email template type."),
+        ERROR_ADDING_EMAIL_TEMPLATE("50006", Status.INTERNAL_SERVER_ERROR,
+                "Unable to add the email template.",
+                "Server encountered an error while adding the email template to the system."),
+        ERROR_INVALID_TEMPLATE_TYPE_ID("50007", Status.BAD_REQUEST,
                 "Provided email template-type-id is invalid.",
                 "Server encountered an error while processing the given template-type-id."),
         ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND("500010", Status.NOT_FOUND,
                 "Email Template Type does not exists.",
-                "Specified email template type does not exist in the system, hence unable to proceed."),
+                "Specified email template type does not exist in the system."),
         ERROR_EMAIL_TEMPLATE_NOT_FOUND("500011", Status.NOT_FOUND,
                 "Email Template does not exists.",
-                "Specified email template does not exist in the system, hence unable to proceed."),
+                "Specified email template does not exist in the system."),
         ERROR_EMAIL_TEMPLATE_ALREADY_EXISTS("500012", Status.CONFLICT,
                 "Email Template already exists in the system.",
                 "An email template for the provided template id already exists " +
-                        "in the system, hence unable to proceed."),
-        ERROR_METHOD_NOT_YET_IMPLEMENTED("500013", Status.SERVICE_UNAVAILABLE,
-                "This method is not yet implemented.",
-                "The method you referred is not yet implemented. Will be available in next releases.");
+                        "in the system."),
+        ERROR_EMAIL_TEMPLATE_TYPE_ALREADY_EXISTS("500013", Status.CONFLICT,
+                "Email Template Type already exists in the system.",
+                "An email template type for the provided template display name already exists " +
+                        "in the system.");
 
         private final String message;
         private final Status httpStatus;
@@ -110,6 +118,7 @@ public class Constants {
 
     static {
         ERROR_CODE_MAP.put(EMAIL_TEMPLATE_TYPE_NODE_FOUND, ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
+        ERROR_CODE_MAP.put(EMAIL_TEMPLATE_TYPE_ALREADY_EXISTS, ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_ALREADY_EXISTS);
     }
 
     public static ErrorMessage getMappedErrorMessage(String errorCode) {

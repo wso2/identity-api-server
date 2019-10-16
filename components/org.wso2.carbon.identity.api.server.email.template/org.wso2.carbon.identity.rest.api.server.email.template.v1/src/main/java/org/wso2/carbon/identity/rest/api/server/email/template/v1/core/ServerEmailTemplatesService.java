@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.email.template.common.Constants;
 import org.wso2.carbon.identity.api.server.email.template.common.EmailTemplatesServiceHolder;
+import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateType;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateTypeWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateTypeWithoutTemplates;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateWithID;
@@ -40,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.email.mgt.constants.I18nMgtConstants.ErrorCodes.ERROR_CODE_DELIMITER;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
@@ -150,6 +150,41 @@ public class ServerEmailTemplatesService {
     }
 
     /**
+     * Adds a new email template type to the system. Another template with the same display name should not exists in
+     * the system. 0 or more email templates can be provided.
+     *
+     * @param emailTemplateType  Email template type with or without templates.
+     * @return Object with id and location of the newly created template type.
+     */
+    public EmailTemplateTypeWithoutTemplates addEmailTemplateType(EmailTemplateType emailTemplateType) {
+
+        String templateTypeDisplayName = emailTemplateType.getDisplayName();
+        try {
+            // Add email template type without templates, first.
+            EmailTemplatesServiceHolder.getEmailTemplateManager().addEmailTemplateType(templateTypeDisplayName,
+                    getTenantDomainFromContext());
+
+            // Add email templates if present, to the template type.
+            if (!emailTemplateType.getTemplates().isEmpty()) {
+                for (EmailTemplateWithID emailTemplate : emailTemplateType.getTemplates()) {
+                    addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplate);
+                }
+            }
+
+            // Build a response object and send if everything is successful.
+            EmailTemplateTypeWithoutTemplates response = new EmailTemplateTypeWithoutTemplates();
+            response.setDisplayName(templateTypeDisplayName);
+            String templateTypeId = getEmailTemplateIdFromDisplayName(templateTypeDisplayName);
+            response.setId(templateTypeId);
+            response.setLocation(getTemplateTypeLocation(templateTypeId));
+
+            return response;
+        } catch (I18nEmailMgtException e) {
+            throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_ADDING_EMAIL_TEMPLATE_TYPE);
+        }
+    }
+
+    /**
      * Adds a new email template to the given template type. Template Id should not exists in the system.
      *
      * @param templateTypeId      Template type in which the template should be added.
@@ -159,33 +194,38 @@ public class ServerEmailTemplatesService {
     public SimpleEmailTemplate addEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID) {
 
         String templateDisplayName = base64DecodeTemplateTypeId(templateTypeId);
-        String templateId = emailTemplateWithID.getId();
         try {
-            if (getMatchingLegacyEmailTemplate(templateDisplayName, templateId) == null) {
+            if (getMatchingLegacyEmailTemplate(templateDisplayName, emailTemplateWithID.getId()) == null) {
                 // Email template is new, hence add to the system.
-                EmailTemplate legacyEmailTemplate = new EmailTemplate();
-                legacyEmailTemplate.setTemplateDisplayName(templateDisplayName);
-                legacyEmailTemplate.setTemplateType(I18nEmailUtil.getNormalizedName(templateDisplayName));
-                legacyEmailTemplate.setLocale(templateId);
-                legacyEmailTemplate.setEmailContentType(emailTemplateWithID.getContentType());
-                legacyEmailTemplate.setSubject(emailTemplateWithID.getSubject());
-                legacyEmailTemplate.setBody(emailTemplateWithID.getBody());
-                legacyEmailTemplate.setFooter(emailTemplateWithID.getFooter());
-
-                EmailTemplatesServiceHolder.getEmailTemplateManager().addEmailTemplate(legacyEmailTemplate,
-                        getTenantDomainFromContext());
+                addEmailTemplateToTheSystem(templateDisplayName, emailTemplateWithID);
 
                 // Create and send the location of the created object as the response.
                 SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
-                simpleEmailTemplate.setLocation(getTemplateLocation(templateTypeId, templateId));
-                simpleEmailTemplate.setId(templateId);
+                simpleEmailTemplate.setLocation(getTemplateLocation(templateTypeId, emailTemplateWithID.getId()));
+                simpleEmailTemplate.setId(emailTemplateWithID.getId());
                 return simpleEmailTemplate;
             } else {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_ALREADY_EXISTS);
             }
         } catch (I18nEmailMgtException e) {
-            throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE);
+            throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_ADDING_EMAIL_TEMPLATE);
         }
+    }
+
+    private void addEmailTemplateToTheSystem(String templateDisplayName, EmailTemplateWithID emailTemplateWithID)
+            throws I18nEmailMgtException {
+
+        EmailTemplate legacyEmailTemplate = new EmailTemplate();
+        legacyEmailTemplate.setTemplateDisplayName(templateDisplayName);
+        legacyEmailTemplate.setTemplateType(I18nEmailUtil.getNormalizedName(templateDisplayName));
+        legacyEmailTemplate.setLocale(emailTemplateWithID.getId());
+        legacyEmailTemplate.setEmailContentType(emailTemplateWithID.getContentType());
+        legacyEmailTemplate.setSubject(emailTemplateWithID.getSubject());
+        legacyEmailTemplate.setBody(emailTemplateWithID.getBody());
+        legacyEmailTemplate.setFooter(emailTemplateWithID.getFooter());
+
+        EmailTemplatesServiceHolder.getEmailTemplateManager().addEmailTemplate(legacyEmailTemplate,
+                getTenantDomainFromContext());
     }
 
     /**
@@ -247,7 +287,7 @@ public class ServerEmailTemplatesService {
                 // Set display name.
                 emailTemplateType.setDisplayName(emailTemplate.getTemplateDisplayName());
                 // Set id.
-                String templateTypeId = base64URLEncode(emailTemplate.getTemplateDisplayName());
+                String templateTypeId = getEmailTemplateIdFromDisplayName(emailTemplate.getTemplateDisplayName());
                 emailTemplateType.setId(templateTypeId);
                 // Set location.
                 emailTemplateType.setLocation(getTemplateTypeLocation(templateTypeId));
@@ -331,6 +371,11 @@ public class ServerEmailTemplatesService {
         }
     }
 
+    private String getEmailTemplateIdFromDisplayName(String templateTypeDisplayName) {
+
+        return base64URLEncode(templateTypeDisplayName);
+    }
+
     /**
      * Handle I18nEmailMgtException, i.e. extract error description from the exception and set to the
      * API Error Response, along with an status code to be sent in the response.
@@ -342,19 +387,16 @@ public class ServerEmailTemplatesService {
     private APIError handleI18nEmailMgtException(I18nEmailMgtException exception, Constants.ErrorMessage errorEnum) {
 
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(log, exception, errorEnum.getDescription());
-
         Response.Status status;
 
         if (exception != null) {
-            String internalErrorCode = exception.getMessage().split(ERROR_CODE_DELIMITER, 2)[0];
-            if (StringUtils.isNotBlank(internalErrorCode) &&
-                    Constants.getMappedErrorMessage(internalErrorCode) != null) {
-                Constants.ErrorMessage errorMessage = Constants.getMappedErrorMessage(internalErrorCode);
-                errorResponse.setMessage(errorMessage.getMessage());
-                errorResponse.setDescription(errorMessage.getDescription());
+            if (StringUtils.isNotBlank(exception.getErrorCode()) &&
+                    Constants.getMappedErrorMessage(exception.getErrorCode()) != null) {
+                // More specific error has been found.
+                Constants.ErrorMessage errorMessage = Constants.getMappedErrorMessage(exception.getErrorCode());
+                errorResponse = getErrorBuilder(errorMessage).build(log, exception, errorEnum.getDescription());
                 status = errorMessage.getHttpStatus();
             } else {
-                errorResponse.setDescription(exception.getMessage());
                 status = Response.Status.INTERNAL_SERVER_ERROR;
             }
         } else {

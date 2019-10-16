@@ -43,7 +43,7 @@ public class EmailApiServiceImpl implements EmailApiService {
     @Override
     public Response addEmailTemplateType(EmailTemplateType emailTemplateType) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(emailTemplatesService.addEmailTemplateType(emailTemplateType)).build();
     }
 
     @Override
