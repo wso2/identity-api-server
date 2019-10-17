@@ -50,7 +50,7 @@
 <!--                            <goal>generate</goal>-->
 <!--                        </goals>-->
 <!--                        <configuration>-->
-<!--                            <inputSpec>${project.basedir}/src/main/resources/identity-governance-3.yaml</inputSpec>-->
+<!--                            <inputSpec>${project.basedir}/src/main/resources/identity-governance.yaml</inputSpec>-->
 <!--                            <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>-->
 <!--                            <configOptions>-->
 <!--                                <sourceFolder>src/gen/java</sourceFolder>-->

@@ -262,11 +262,10 @@ components:
           type: string
           description: Connector category name.
           example: Account Management Policies
-        links:
-          type: array
-          description: Reference to the category.
-          items:
-            $ref: '#/components/schemas/CategoryLink'
+        self:
+          type: string
+          description: Path to retrieve the full connector information.
+          example: /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz
         connectors:
           type: array
           description: Connectors of the category with minimal attributes.
@@ -280,11 +279,10 @@ components:
           type: string
           description: Connector id.
           example: c3VzcGVuc2lvbi5ub3RpZmljYXRpb24
-        links:
-          type: array
-          description: Connectors of the category with minimal attributes.
-          items:
-            $ref: '#/components/schemas/ConnectorLink'
+        self:
+          type: string
+          description: Path to retrieve the full connector information.
+          example: /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz/connectors/c3VzcGVuc2lvbi5ub3RpZmljYXRpb24
     CategoryRes:
       type: object
       description: Governance connector category response.
@@ -384,38 +382,6 @@ components:
           type: string
           description: Property value.
           example: 'false'
-    Link:
-      type: object
-      properties:
-        href:
-          type: string
-          description: Path to the target resource.
-        rel:
-          type: string
-          enum:
-            - CATEGORY
-            - CONNECTOR
-          description: Describes how the current context is related to the target resource.
-    CategoryLink:
-      allOf:
-        - $ref: '#/components/schemas/Link'
-      properties:
-        rel:
-          example:
-            - CATEGORY
-        href:
-          example: >-
-            /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz
-    ConnectorLink:
-      allOf:
-        - $ref: '#/components/schemas/Link'
-      properties:
-        rel:
-          example:
-            - CONNECTOR
-        href:
-          example: >-
-            /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz/connectors/c3VzcGVuc2lvbi5ub3RpZmljYXRpb24
     Error:
       type: object
       required:

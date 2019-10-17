@@ -20,9 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorLink;
 import javax.validation.constraints.*;
 
 /**
@@ -37,8 +34,7 @@ import javax.xml.bind.annotation.*;
 public class CategoryConnectorsRes  {
   
     private String id;
-    private List<ConnectorLink> links = null;
-
+    private String self;
 
     /**
     * Connector id.
@@ -60,33 +56,25 @@ public class CategoryConnectorsRes  {
     }
 
     /**
-    * Connectors of the category with minimal attributes.
+    * Path to retrieve the full connector information.
     **/
-    public CategoryConnectorsRes links(List<ConnectorLink> links) {
+    public CategoryConnectorsRes self(String self) {
 
-        this.links = links;
+        this.self = self;
         return this;
     }
     
-    @ApiModelProperty(value = "Connectors of the category with minimal attributes.")
-    @JsonProperty("links")
+    @ApiModelProperty(example = "/t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz/connectors/c3VzcGVuc2lvbi5ub3RpZmljYXRpb24", value = "Path to retrieve the full connector information.")
+    @JsonProperty("self")
     @Valid
-    public List<ConnectorLink> getLinks() {
-        return links;
+    public String getSelf() {
+        return self;
     }
-    public void setLinks(List<ConnectorLink> links) {
-        this.links = links;
-    }
-
-    public CategoryConnectorsRes addLinksItem(ConnectorLink linksItem) {
-        if (this.links == null) {
-            this.links = new ArrayList<>();
-        }
-        this.links.add(linksItem);
-        return this;
+    public void setSelf(String self) {
+        this.self = self;
     }
 
-    
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -99,12 +87,12 @@ public class CategoryConnectorsRes  {
         }
         CategoryConnectorsRes categoryConnectorsRes = (CategoryConnectorsRes) o;
         return Objects.equals(this.id, categoryConnectorsRes.id) &&
-            Objects.equals(this.links, categoryConnectorsRes.links);
+            Objects.equals(this.self, categoryConnectorsRes.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, links);
+        return Objects.hash(id, self);
     }
 
     @Override
@@ -114,7 +102,7 @@ public class CategoryConnectorsRes  {
         sb.append("class CategoryConnectorsRes {\n");
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
-        sb.append("    links: ").append(toIndentedString(links)).append("\n");
+        sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
     }

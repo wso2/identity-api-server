@@ -26,12 +26,9 @@ import org.wso2.carbon.identity.api.server.identity.governance.common.Governance
 import org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceDataHolder;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoriesRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryConnectorsRes;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryLink;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryRes;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorLink;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorsPatchReq;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.Link;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyReq;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyRes;
 import org.wso2.carbon.identity.application.common.model.Property;
@@ -43,7 +40,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -228,10 +224,7 @@ public class ServerIdentityGovernanceService {
             URI categoryLocation =
                     buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDENTITY_GOVERNANCE_PATH_COMPONENT + "/%s",
                             categoryId));
-            CategoryLink link = new CategoryLink();
-            link.setHref(categoryLocation.toString());
-            link.setRel(Link.RelEnum.CATEGORY);
-            categoriesRes.setLinks(Collections.singletonList(link));
+            categoriesRes.setSelf(categoryLocation.toString());
 
             List<CategoryConnectorsRes> connectors = buildCategoryConnectorsResDTOS(categoryId, category.getValue());
             categoriesRes.setConnectors(connectors);
@@ -265,10 +258,7 @@ public class ServerIdentityGovernanceService {
                     buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDENTITY_GOVERNANCE_PATH_COMPONENT + "/%s" +
                                     "/connectors/%s",
                             categoryId, connectorId));
-            ConnectorLink link = new ConnectorLink();
-            link.setHref(connectorLocation.toString());
-            link.setRel(Link.RelEnum.CONNECTOR);
-            connectorsResDTO.setLinks(Collections.singletonList(link));
+            connectorsResDTO.setSelf(connectorLocation.toString());
             connectors.add(connectorsResDTO);
         }
         return connectors;

@@ -23,7 +23,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryConnectorsRes;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryLink;
 import javax.validation.constraints.*;
 
 /**
@@ -39,8 +38,7 @@ public class CategoriesRes  {
   
     private String id;
     private String name;
-    private List<CategoryLink> links = null;
-
+    private String self;
     private List<CategoryConnectorsRes> connectors = null;
 
 
@@ -83,33 +81,25 @@ public class CategoriesRes  {
     }
 
     /**
-    * Reference to the category.
+    * Path to retrieve the full connector information.
     **/
-    public CategoriesRes links(List<CategoryLink> links) {
+    public CategoriesRes self(String self) {
 
-        this.links = links;
+        this.self = self;
         return this;
     }
     
-    @ApiModelProperty(value = "Reference to the category.")
-    @JsonProperty("links")
+    @ApiModelProperty(example = "/t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz", value = "Path to retrieve the full connector information.")
+    @JsonProperty("self")
     @Valid
-    public List<CategoryLink> getLinks() {
-        return links;
+    public String getSelf() {
+        return self;
     }
-    public void setLinks(List<CategoryLink> links) {
-        this.links = links;
-    }
-
-    public CategoriesRes addLinksItem(CategoryLink linksItem) {
-        if (this.links == null) {
-            this.links = new ArrayList<>();
-        }
-        this.links.add(linksItem);
-        return this;
+    public void setSelf(String self) {
+        this.self = self;
     }
 
-        /**
+    /**
     * Connectors of the category with minimal attributes.
     **/
     public CategoriesRes connectors(List<CategoryConnectorsRes> connectors) {
@@ -150,13 +140,13 @@ public class CategoriesRes  {
         CategoriesRes categoriesRes = (CategoriesRes) o;
         return Objects.equals(this.id, categoriesRes.id) &&
             Objects.equals(this.name, categoriesRes.name) &&
-            Objects.equals(this.links, categoriesRes.links) &&
+            Objects.equals(this.self, categoriesRes.self) &&
             Objects.equals(this.connectors, categoriesRes.connectors);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, links, connectors);
+        return Objects.hash(id, name, self, connectors);
     }
 
     @Override
@@ -167,7 +157,7 @@ public class CategoriesRes  {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    links: ").append(toIndentedString(links)).append("\n");
+        sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("    connectors: ").append(toIndentedString(connectors)).append("\n");
         sb.append("}");
         return sb.toString();
