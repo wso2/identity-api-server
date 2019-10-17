@@ -62,20 +62,28 @@ public class Constants {
         ERROR_DELETING_EMAIL_TEMPLATE_TYPE("50007", Status.INTERNAL_SERVER_ERROR,
                 "Unable to delete the email template type.",
                 "Server encountered an error while deleting the email template type."),
-        ERROR_INVALID_TEMPLATE_TYPE_ID("50009", Status.BAD_REQUEST,
+        ERROR_DELETING_EMAIL_TEMPLATE("50008", Status.INTERNAL_SERVER_ERROR,
+                "Unable to delete the email template.",
+                "Server encountered an error while deleting the email template."),
+
+        ERROR_UPDATING_EMAIL_TEMPLATE("500010", Status.INTERNAL_SERVER_ERROR,
+                "Unable to update the email template.",
+                "Server encountered an error while updating the email template."),
+
+        ERROR_INVALID_TEMPLATE_TYPE_ID("500011", Status.BAD_REQUEST,
                 "Provided email template-type-id is invalid.",
                 "Server encountered an error while processing the given template-type-id."),
-        ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND("500010", Status.NOT_FOUND,
+        ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND("500012", Status.NOT_FOUND,
                 "Email Template Type does not exists.",
                 "Specified email template type does not exist in the system."),
-        ERROR_EMAIL_TEMPLATE_NOT_FOUND("500011", Status.NOT_FOUND,
+        ERROR_EMAIL_TEMPLATE_NOT_FOUND("500013", Status.NOT_FOUND,
                 "Email Template does not exists.",
                 "Specified email template does not exist in the system."),
-        ERROR_EMAIL_TEMPLATE_ALREADY_EXISTS("500012", Status.CONFLICT,
+        ERROR_EMAIL_TEMPLATE_ALREADY_EXISTS("500014", Status.CONFLICT,
                 "Email Template already exists in the system.",
                 "An email template for the provided template id already exists " +
                         "in the system."),
-        ERROR_EMAIL_TEMPLATE_TYPE_ALREADY_EXISTS("500013", Status.CONFLICT,
+        ERROR_EMAIL_TEMPLATE_TYPE_ALREADY_EXISTS("500015", Status.CONFLICT,
                 "Email Template Type already exists in the system.",
                 "An email template type for the provided template display name already exists " +
                         "in the system.");

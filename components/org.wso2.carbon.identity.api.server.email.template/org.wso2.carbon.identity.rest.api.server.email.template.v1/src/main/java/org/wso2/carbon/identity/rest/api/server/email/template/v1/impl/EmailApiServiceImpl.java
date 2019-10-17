@@ -112,7 +112,8 @@ public class EmailApiServiceImpl implements EmailApiService {
     public Response updateEmailTemplate(String templateTypeId, String templateId,
                                         EmailTemplateWithID emailTemplateWithID) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        emailTemplatesService.updateEmailTemplate(templateTypeId, templateId, emailTemplateWithID);
+        return Response.ok().build();
     }
 
     @Override
