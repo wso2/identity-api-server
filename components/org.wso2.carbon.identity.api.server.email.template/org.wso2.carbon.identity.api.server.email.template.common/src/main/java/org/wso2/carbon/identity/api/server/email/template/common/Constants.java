@@ -65,11 +65,12 @@ public class Constants {
         ERROR_DELETING_EMAIL_TEMPLATE("50008", Status.INTERNAL_SERVER_ERROR,
                 "Unable to delete the email template.",
                 "Server encountered an error while deleting the email template."),
-
+        ERROR_UPDATING_EMAIL_TEMPLATE_TYPE("50009", Status.INTERNAL_SERVER_ERROR,
+                "Unable to update the email template type.",
+                "Server encountered an error while updating the email template type."),
         ERROR_UPDATING_EMAIL_TEMPLATE("500010", Status.INTERNAL_SERVER_ERROR,
                 "Unable to update the email template.",
                 "Server encountered an error while updating the email template."),
-
         ERROR_INVALID_TEMPLATE_TYPE_ID("500011", Status.BAD_REQUEST,
                 "Provided email template-type-id is invalid.",
                 "Server encountered an error while processing the given template-type-id."),

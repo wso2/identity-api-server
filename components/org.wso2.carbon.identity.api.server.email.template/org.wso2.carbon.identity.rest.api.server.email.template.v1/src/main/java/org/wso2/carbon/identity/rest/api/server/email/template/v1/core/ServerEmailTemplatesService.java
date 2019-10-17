@@ -115,11 +115,11 @@ public class ServerEmailTemplatesService {
     public List<SimpleEmailTemplate> getTemplatesListOfEmailTemplateType(String templateTypeId, Integer limit,
                                                                          Integer offset, String sort, String sortBy) {
 
-        String templateDisplayName = decodeTemplateTypeId(templateTypeId);
+        String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
             boolean isTemplateTypeExists =
                     EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateTypeExists(
-                            templateDisplayName, getTenantDomainFromContext());
+                            templateTypeDisplayName, getTenantDomainFromContext());
             if (isTemplateTypeExists) {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
             }
@@ -146,9 +146,9 @@ public class ServerEmailTemplatesService {
                                                 String sort, String sortBy) {
 
         try {
-            String templateDisplayName = decodeTemplateTypeId(templateTypeId);
+            String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
             EmailTemplate legacyEmailTemplate = EmailTemplatesServiceHolder.getEmailTemplateManager().
-                    getEmailTemplate(templateDisplayName, templateId, getTenantDomainFromContext());
+                    getEmailTemplate(templateTypeDisplayName, templateId, getTenantDomainFromContext());
             // EmailTemplateManager sends the default template if no matching template found. We need to check for
             // the locale specifically.
             if (!legacyEmailTemplate.getLocale().equals(templateId)) {
@@ -206,14 +206,14 @@ public class ServerEmailTemplatesService {
      */
     public SimpleEmailTemplate addEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID) {
 
-        String templateDisplayName = decodeTemplateTypeId(templateTypeId);
+        String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
             boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager()
-                    .isEmailTemplateExists(templateDisplayName, emailTemplateWithID.getId(),
+                    .isEmailTemplateExists(templateTypeDisplayName, emailTemplateWithID.getId(),
                             getTenantDomainFromContext());
             if (!isTemplateExists) {
                 // Email template is new, hence add to the system.
-                addEmailTemplateToTheSystem(templateDisplayName, emailTemplateWithID);
+                addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplateWithID);
 
                 // Create and send the location of the created object as the response.
                 SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
@@ -235,13 +235,13 @@ public class ServerEmailTemplatesService {
      */
     public void deleteEmailTemplateType(String templateTypeId) {
 
-        String templateDisplayName = decodeTemplateTypeId(templateTypeId);
+        String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
             boolean isTemplateTypeExists =
                     EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateTypeExists(
-                            templateDisplayName, getTenantDomainFromContext());
+                            templateTypeDisplayName, getTenantDomainFromContext());
             if (isTemplateTypeExists) {
-                EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplateType(templateDisplayName,
+                EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplateType(templateTypeDisplayName,
                         getTenantDomainFromContext());
             } else {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
@@ -259,12 +259,12 @@ public class ServerEmailTemplatesService {
      */
     public void deleteEmailTemplate(String templateTypeId, String templateId) {
 
-        String templateDisplayName = decodeTemplateTypeId(templateTypeId);
+        String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
             boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateExists(
-                    templateDisplayName, templateId, getTenantDomainFromContext());
+                    templateTypeDisplayName, templateId, getTenantDomainFromContext());
             if (isTemplateExists) {
-                EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplate(templateDisplayName,
+                EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplate(templateTypeDisplayName,
                         templateId, getTenantDomainFromContext());
             } else {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_NOT_FOUND);
@@ -278,18 +278,18 @@ public class ServerEmailTemplatesService {
      * Replace the email template Identified by the template type id and the template id.
      *
      * @param templateTypeId      ID of the email template type.
-     * @param templateId          ID of the email template
+     * @param templateId          ID of the email template.
      * @param emailTemplateWithID Content of the email template to be saved.
      */
     public void updateEmailTemplate(String templateTypeId, String templateId, EmailTemplateWithID emailTemplateWithID) {
 
-        // Check whether the email template exists, first.
-        String templateDisplayName = decodeTemplateTypeId(templateTypeId);
+        String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
+            // Check whether the email template exists, first.
             boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateExists(
-                    templateDisplayName, templateId, getTenantDomainFromContext());
+                    templateTypeDisplayName, templateId, getTenantDomainFromContext());
             if (isTemplateExists) {
-                addEmailTemplateToTheSystem(templateDisplayName, emailTemplateWithID);
+                addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplateWithID);
             } else {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_NOT_FOUND);
             }
@@ -298,12 +298,45 @@ public class ServerEmailTemplatesService {
         }
     }
 
-    private void addEmailTemplateToTheSystem(String templateDisplayName, EmailTemplateWithID emailTemplateWithID)
+    /**
+     * Replace all the email templates of the template type.
+     *
+     * @param templateTypeId ID of the email template type.
+     * @param emailTemplates List of email templates to be replaced by.
+     */
+    public void updateEmailTemplateType(String templateTypeId, List<EmailTemplateWithID> emailTemplates) {
+
+        String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
+        try {
+            // Check whether the email template type exists.
+            boolean isTemplateTypeExists = EmailTemplatesServiceHolder.getEmailTemplateManager().
+                    isEmailTemplateTypeExists(templateTypeDisplayName, getTenantDomainFromContext());
+            if (isTemplateTypeExists) {
+                // Delete all existing templates in the template type
+                EmailTemplateTypeWithID templateType = getEmailTemplateType(templateTypeId, null, null, null, null);
+                for (EmailTemplateWithID template : templateType.getTemplates()) {
+                    deleteEmailTemplate(templateTypeId, template.getId());
+                }
+
+                // Add new email templates.
+                for (EmailTemplateWithID emailTemplate : emailTemplates) {
+                    addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplate);
+                }
+
+            } else {
+                throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
+            }
+        } catch (I18nEmailMgtException e) {
+            throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_UPDATING_EMAIL_TEMPLATE_TYPE);
+        }
+    }
+
+    private void addEmailTemplateToTheSystem(String templateTypeDisplayName, EmailTemplateWithID emailTemplateWithID)
             throws I18nEmailMgtException {
 
         EmailTemplate legacyEmailTemplate = new EmailTemplate();
-        legacyEmailTemplate.setTemplateDisplayName(templateDisplayName);
-        legacyEmailTemplate.setTemplateType(I18nEmailUtil.getNormalizedName(templateDisplayName));
+        legacyEmailTemplate.setTemplateDisplayName(templateTypeDisplayName);
+        legacyEmailTemplate.setTemplateType(I18nEmailUtil.getNormalizedName(templateTypeDisplayName));
         legacyEmailTemplate.setLocale(emailTemplateWithID.getId());
         legacyEmailTemplate.setEmailContentType(emailTemplateWithID.getContentType());
         legacyEmailTemplate.setSubject(emailTemplateWithID.getSubject());
@@ -326,9 +359,9 @@ public class ServerEmailTemplatesService {
                                                              String templateTypeId) {
 
         List<SimpleEmailTemplate> simpleEmailTemplates = new ArrayList<>();
-        String templateDisplayName = decodeTemplateTypeId(templateTypeId);
+        String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         for (EmailTemplate legacyTemplate : legacyEmailTemplates) {
-            if (templateDisplayName.equals(legacyTemplate.getTemplateDisplayName())) {
+            if (templateTypeDisplayName.equals(legacyTemplate.getTemplateDisplayName())) {
                 SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
                 String templateLocation = getTemplateLocation(templateTypeId, legacyTemplate.getLocale());
                 simpleEmailTemplate.setId(legacyTemplate.getLocale());
