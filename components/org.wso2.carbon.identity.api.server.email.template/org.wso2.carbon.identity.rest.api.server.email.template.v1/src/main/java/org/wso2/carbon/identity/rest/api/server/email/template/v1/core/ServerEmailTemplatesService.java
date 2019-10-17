@@ -139,11 +139,16 @@ public class ServerEmailTemplatesService {
 
         try {
             String templateDisplayName = base64DecodeTemplateTypeId(templateTypeId);
-            EmailTemplate legacyEmailTemplate = getMatchingLegacyEmailTemplate(templateDisplayName, templateId);
-            if (legacyEmailTemplate == null) {
+            EmailTemplate legacyEmailTemplate = EmailTemplatesServiceHolder.getEmailTemplateManager().
+                    getEmailTemplate(templateDisplayName, templateId, getTenantDomainFromContext());
+            // EmailTemplateManager sends the default template if no matching template found. We need to check for
+            // the locale specifically.
+            if (!legacyEmailTemplate.getLocale().equals(templateId)) {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_NOT_FOUND);
+            } else {
+                return buildEmailTemplateWithID(legacyEmailTemplate);
             }
-            return buildEmailTemplateWithID(legacyEmailTemplate);
+
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE);
         }
@@ -195,7 +200,10 @@ public class ServerEmailTemplatesService {
 
         String templateDisplayName = base64DecodeTemplateTypeId(templateTypeId);
         try {
-            if (getMatchingLegacyEmailTemplate(templateDisplayName, emailTemplateWithID.getId()) == null) {
+            boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager()
+                    .isEmailTemplateExists(templateDisplayName, emailTemplateWithID.getId(),
+                            getTenantDomainFromContext());
+            if (!isTemplateExists) {
                 // Email template is new, hence add to the system.
                 addEmailTemplateToTheSystem(templateDisplayName, emailTemplateWithID);
 
@@ -254,20 +262,6 @@ public class ServerEmailTemplatesService {
             throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
         }
         return simpleEmailTemplates;
-    }
-
-    private EmailTemplate getMatchingLegacyEmailTemplate(String templateDisplayName,
-                                                         String templateId) throws I18nEmailMgtException {
-
-        EmailTemplate legacyEmailTemplate = EmailTemplatesServiceHolder.getEmailTemplateManager().
-                getEmailTemplate(templateDisplayName, templateId, getTenantDomainFromContext());
-        // EmailTemplateManager sends the default template if no matching template found. We need to filter in
-        // the service layer.
-        if (!legacyEmailTemplate.getLocale().equals(templateId)) {
-            return null;
-        } else {
-            return legacyEmailTemplate;
-        }
     }
 
     /**
