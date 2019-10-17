@@ -74,7 +74,7 @@ paths:
         '201':
           description: Item Created
           headers:
-            Location:
+            self:
               description: Location of the newly created identity provider
               schema:
                 type: string
@@ -478,7 +478,7 @@ components:
       required:
         - id
         - displayName
-        - location
+        - self
       properties:
         id:
           type: string
@@ -488,7 +488,7 @@ components:
           type: string
           example: Account Confirmation
           description: Display name of the email template type.
-        location:
+        self:
           type: string
           example: /t/{tenant-domain}/api/server/v1/email/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg
           description: Location of the created/updated resource.
@@ -545,25 +545,24 @@ components:
         - $ref: '#/components/schemas/EmailTemplate'
         - required:
             - id
-        - properties:
+          properties:
             id:
               type: string
               example: en_US
               description: >-
                 Unique ID of the email template. This id represents the locale of the email template.
-        - additionalProperties: false
     SimpleEmailTemplate:
       type: object
       required:
         - id
-        - location
+        - self
       properties:
         id:
           type: string
           example: en_US
           description: >-
             Unique ID of the email template. This id represents the locale of the email template.
-        location:
+        self:
           type: string
           example: /t/{tenant-domain}/api/server/v1/email/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg/templates/en_US
           description: Location of the created/updated resource.

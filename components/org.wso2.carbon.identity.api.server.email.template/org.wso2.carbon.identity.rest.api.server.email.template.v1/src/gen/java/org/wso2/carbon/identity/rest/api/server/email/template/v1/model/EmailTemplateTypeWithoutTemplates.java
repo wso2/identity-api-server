@@ -32,7 +32,7 @@ public class EmailTemplateTypeWithoutTemplates  {
   
     private String id;
     private String displayName;
-    private String location;
+    private String self;
 
     /**
     * Unique id of the email template type.
@@ -79,22 +79,22 @@ public class EmailTemplateTypeWithoutTemplates  {
     /**
     * Location of the created/updated resource.
     **/
-    public EmailTemplateTypeWithoutTemplates location(String location) {
+    public EmailTemplateTypeWithoutTemplates self(String self) {
 
-        this.location = location;
+        this.self = self;
         return this;
     }
     
     @ApiModelProperty(example = "/t/{tenant-domain}/api/server/v1/email/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg", required = true, value = "Location of the created/updated resource.")
-    @JsonProperty("location")
+    @JsonProperty("self")
     @Valid
-    @NotNull(message = "Property location cannot be null.")
+    @NotNull(message = "Property self cannot be null.")
 
-    public String getLocation() {
-        return location;
+    public String getSelf() {
+        return self;
     }
-    public void setLocation(String location) {
-        this.location = location;
+    public void setSelf(String self) {
+        this.self = self;
     }
 
 
@@ -111,12 +111,12 @@ public class EmailTemplateTypeWithoutTemplates  {
         EmailTemplateTypeWithoutTemplates emailTemplateTypeWithoutTemplates = (EmailTemplateTypeWithoutTemplates) o;
         return Objects.equals(this.id, emailTemplateTypeWithoutTemplates.id) &&
             Objects.equals(this.displayName, emailTemplateTypeWithoutTemplates.displayName) &&
-            Objects.equals(this.location, emailTemplateTypeWithoutTemplates.location);
+            Objects.equals(this.self, emailTemplateTypeWithoutTemplates.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, displayName, location);
+        return Objects.hash(id, displayName, self);
     }
 
     @Override
@@ -127,7 +127,7 @@ public class EmailTemplateTypeWithoutTemplates  {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
-        sb.append("    location: ").append(toIndentedString(location)).append("\n");
+        sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
     }

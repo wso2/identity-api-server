@@ -70,7 +70,7 @@ public class EmailApi  {
     @Path("/template-types")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add a new email template type.", notes = "Adds a new email template type to the system. An email template type can have any number of email templates.  * Attribute _**displayName**_ of the template type should be unique.  <b>Permission required:</b> * /permission/admin/manage/identity/emailmgt/view ", response = EmailTemplateTypeWithoutTemplates.class, authorizations = {
+    @ApiOperation(value = "Add a new email template type.", notes = "Adds a new email template type to the system. An email template type can have any number of email templates.  * Attribute _**displayName**_ of the template type should be unique.  <b>Permission required:</b> * /permission/admin/manage/identity/emailmgt/create ", response = EmailTemplateTypeWithoutTemplates.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -101,7 +101,7 @@ public class EmailApi  {
         })
     }, tags={ "Email Templates", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Item Deleted", response = Void.class),
+        @ApiResponse(code = 204, message = "Item Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
@@ -125,7 +125,7 @@ public class EmailApi  {
         })
     }, tags={ "Email Template Types", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Item Deleted", response = Void.class),
+        @ApiResponse(code = 204, message = "Item Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),

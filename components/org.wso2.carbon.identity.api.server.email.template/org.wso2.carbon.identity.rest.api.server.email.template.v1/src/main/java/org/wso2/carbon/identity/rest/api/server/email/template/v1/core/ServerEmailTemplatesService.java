@@ -120,7 +120,7 @@ public class ServerEmailTemplatesService {
             boolean isTemplateTypeExists =
                     EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateTypeExists(
                             templateTypeDisplayName, getTenantDomainFromContext());
-            if (isTemplateTypeExists) {
+            if (!isTemplateTypeExists) {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
             }
             List<EmailTemplate> legacyEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
@@ -189,7 +189,7 @@ public class ServerEmailTemplatesService {
             response.setDisplayName(templateTypeDisplayName);
             String templateTypeId = getEmailTemplateIdFromDisplayName(templateTypeDisplayName);
             response.setId(templateTypeId);
-            response.setLocation(getTemplateTypeLocation(templateTypeId));
+            response.setSelf(getTemplateTypeLocation(templateTypeId));
 
             return response;
         } catch (I18nEmailMgtException e) {
@@ -217,7 +217,7 @@ public class ServerEmailTemplatesService {
 
                 // Create and send the location of the created object as the response.
                 SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
-                simpleEmailTemplate.setLocation(getTemplateLocation(templateTypeId, emailTemplateWithID.getId()));
+                simpleEmailTemplate.setSelf(getTemplateLocation(templateTypeId, emailTemplateWithID.getId()));
                 simpleEmailTemplate.setId(emailTemplateWithID.getId());
                 return simpleEmailTemplate;
             } else {
@@ -365,7 +365,7 @@ public class ServerEmailTemplatesService {
                 SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
                 String templateLocation = getTemplateLocation(templateTypeId, legacyTemplate.getLocale());
                 simpleEmailTemplate.setId(legacyTemplate.getLocale());
-                simpleEmailTemplate.setLocation(templateLocation);
+                simpleEmailTemplate.setSelf(templateLocation);
                 simpleEmailTemplates.add(simpleEmailTemplate);
             }
         }
@@ -392,7 +392,7 @@ public class ServerEmailTemplatesService {
                 String templateTypeId = getEmailTemplateIdFromDisplayName(emailTemplate.getTemplateDisplayName());
                 emailTemplateType.setId(templateTypeId);
                 // Set location.
-                emailTemplateType.setLocation(getTemplateTypeLocation(templateTypeId));
+                emailTemplateType.setSelf(getTemplateTypeLocation(templateTypeId));
 
                 templateTypeMap.put(emailTemplate.getTemplateType(), emailTemplateType);
             }
