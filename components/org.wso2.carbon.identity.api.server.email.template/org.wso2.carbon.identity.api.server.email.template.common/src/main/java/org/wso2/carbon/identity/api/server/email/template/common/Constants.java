@@ -32,6 +32,7 @@ public class Constants {
     public static final String EMAIL_TEMPLATES_API_BASE_PATH = "/email";
     public static final String EMAIL_TEMPLATE_TYPES_PATH = "/template-types";
     public static final String EMAIL_TEMPLATES_PATH = "/templates";
+    public static final String PATH_SEPARATOR = "/";
 
     private static final Map<String, ErrorMessage> ERROR_CODE_MAP = new HashMap<>();
 
@@ -58,7 +59,10 @@ public class Constants {
         ERROR_ADDING_EMAIL_TEMPLATE("50006", Status.INTERNAL_SERVER_ERROR,
                 "Unable to add the email template.",
                 "Server encountered an error while adding the email template to the system."),
-        ERROR_INVALID_TEMPLATE_TYPE_ID("50007", Status.BAD_REQUEST,
+        ERROR_DELETING_EMAIL_TEMPLATE_TYPE("50007", Status.INTERNAL_SERVER_ERROR,
+                "Unable to delete the email template type.",
+                "Server encountered an error while deleting the email template type."),
+        ERROR_INVALID_TEMPLATE_TYPE_ID("50009", Status.BAD_REQUEST,
                 "Provided email template-type-id is invalid.",
                 "Server encountered an error while processing the given template-type-id."),
         ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND("500010", Status.NOT_FOUND,

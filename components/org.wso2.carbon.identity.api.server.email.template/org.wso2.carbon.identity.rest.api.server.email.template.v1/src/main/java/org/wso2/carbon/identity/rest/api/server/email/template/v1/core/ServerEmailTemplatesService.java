@@ -41,12 +41,14 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.email.template.common.Constants.EMAIL_TEMPLATES_API_BASE_PATH;
 import static org.wso2.carbon.identity.api.server.email.template.common.Constants.EMAIL_TEMPLATES_PATH;
 import static org.wso2.carbon.identity.api.server.email.template.common.Constants.EMAIL_TEMPLATE_TYPES_PATH;
+import static org.wso2.carbon.identity.api.server.email.template.common.Constants.PATH_SEPARATOR;
 
 /**
  * Call internal osgi services to perform email templates related operations.
@@ -56,7 +58,6 @@ import static org.wso2.carbon.identity.api.server.email.template.common.Constant
 public class ServerEmailTemplatesService {
 
     private static final Log log = LogFactory.getLog(ServerEmailTemplatesService.class);
-    private static final String PATH_SEPARATOR = "/";
 
     /**
      * Return all email template types in the system with limited information of the templates inside.
@@ -114,7 +115,14 @@ public class ServerEmailTemplatesService {
     public List<SimpleEmailTemplate> getTemplatesListOfEmailTemplateType(String templateTypeId, Integer limit,
                                                                          Integer offset, String sort, String sortBy) {
 
+        String templateDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
+            boolean isTemplateTypeExists =
+                    EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateTypeExists(
+                            templateDisplayName, getTenantDomainFromContext());
+            if (isTemplateTypeExists) {
+                throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
+            }
             List<EmailTemplate> legacyEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
                     getAllEmailTemplates(getTenantDomainFromContext());
             return getTemplatesListOfEmailTemplateType(legacyEmailTemplates, templateTypeId);
@@ -138,7 +146,7 @@ public class ServerEmailTemplatesService {
                                                 String sort, String sortBy) {
 
         try {
-            String templateDisplayName = base64DecodeTemplateTypeId(templateTypeId);
+            String templateDisplayName = decodeTemplateTypeId(templateTypeId);
             EmailTemplate legacyEmailTemplate = EmailTemplatesServiceHolder.getEmailTemplateManager().
                     getEmailTemplate(templateDisplayName, templateId, getTenantDomainFromContext());
             // EmailTemplateManager sends the default template if no matching template found. We need to check for
@@ -198,7 +206,7 @@ public class ServerEmailTemplatesService {
      */
     public SimpleEmailTemplate addEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID) {
 
-        String templateDisplayName = base64DecodeTemplateTypeId(templateTypeId);
+        String templateDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
             boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager()
                     .isEmailTemplateExists(templateDisplayName, emailTemplateWithID.getId(),
@@ -217,6 +225,52 @@ public class ServerEmailTemplatesService {
             }
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_ADDING_EMAIL_TEMPLATE);
+        }
+    }
+
+    /**
+     * Delete the email template type from the system.
+     *
+     * @param templateTypeId ID of the template type to be deleted.
+     */
+    public void deleteEmailTemplateType(String templateTypeId) {
+
+        String templateDisplayName = decodeTemplateTypeId(templateTypeId);
+        try {
+            boolean isTemplateTypeExists =
+                    EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateTypeExists(
+                            templateDisplayName, getTenantDomainFromContext());
+            if (isTemplateTypeExists) {
+                EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplateType(templateDisplayName,
+                        getTenantDomainFromContext());
+            } else {
+                throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
+            }
+        } catch (I18nEmailMgtException e) {
+            throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_DELETING_EMAIL_TEMPLATE_TYPE);
+        }
+    }
+
+    /**
+     * Delete the email template from the system.
+     *
+     * @param templateTypeId ID of the template type.
+     * @param templateType   ID of the template.
+     */
+    public void deleteEmailTemplate(String templateTypeId, String templateType) {
+
+        String templateDisplayName = decodeTemplateTypeId(templateTypeId);
+        try {
+            boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateExists(
+                    templateDisplayName, templateType, getTenantDomainFromContext());
+            if (isTemplateExists) {
+                EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplate(templateDisplayName,
+                        templateType, getTenantDomainFromContext());
+            } else {
+                throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_NOT_FOUND);
+            }
+        } catch (I18nEmailMgtException e) {
+            throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_DELETING_EMAIL_TEMPLATE_TYPE);
         }
     }
 
@@ -248,7 +302,7 @@ public class ServerEmailTemplatesService {
                                                              String templateTypeId) {
 
         List<SimpleEmailTemplate> simpleEmailTemplates = new ArrayList<>();
-        String templateDisplayName = base64DecodeTemplateTypeId(templateTypeId);
+        String templateDisplayName = decodeTemplateTypeId(templateTypeId);
         for (EmailTemplate legacyTemplate : legacyEmailTemplates) {
             if (templateDisplayName.equals(legacyTemplate.getTemplateDisplayName())) {
                 SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
@@ -257,9 +311,6 @@ public class ServerEmailTemplatesService {
                 simpleEmailTemplate.setLocation(templateLocation);
                 simpleEmailTemplates.add(simpleEmailTemplate);
             }
-        }
-        if (simpleEmailTemplates.isEmpty()) {
-            throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
         }
         return simpleEmailTemplates;
     }
@@ -293,13 +344,14 @@ public class ServerEmailTemplatesService {
         return new ArrayList<>(templateTypeMap.values());
     }
 
-    private String getTemplateTypeLocation(String templateTypeId) {
+    public String getTemplateTypeLocation(String templateTypeId) {
 
-        String location = EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH + PATH_SEPARATOR + templateTypeId;
+        String location = V1_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
+                PATH_SEPARATOR + templateTypeId;
         return ContextLoader.buildURIForBody(location).toString();
     }
 
-    private String getTemplateLocation(String templateTypeId, String templateId) {
+    public String getTemplateLocation(String templateTypeId, String templateId) {
 
         String templateLocation = getTemplateTypeLocation(templateTypeId);
         return templateLocation + EMAIL_TEMPLATES_PATH + PATH_SEPARATOR + templateId;
@@ -317,7 +369,7 @@ public class ServerEmailTemplatesService {
                                                                  String templateTypeId) {
 
         EmailTemplateTypeWithID emailTemplateType = new EmailTemplateTypeWithID();
-        String decodedTemplateTypeId = base64DecodeTemplateTypeId(templateTypeId);
+        String decodedTemplateTypeId = decodeTemplateTypeId(templateTypeId);
         boolean isFirst = true;
         for (EmailTemplate legacyTemplate : legacyEmailTemplates) {
             if (decodedTemplateTypeId.equals(legacyTemplate.getTemplateDisplayName())) {
@@ -353,13 +405,13 @@ public class ServerEmailTemplatesService {
     /**
      * Base64 decode a given encoded template type id, return appropriate error if failed.
      *
-     * @param templateTypeId Encoded template type id.
+     * @param encodedTemplateTypeId Encoded template type id.
      * @return Decoded template type id if possible, API Error otherwise.
      */
-    private String base64DecodeTemplateTypeId(String templateTypeId) {
+    private String decodeTemplateTypeId(String encodedTemplateTypeId) {
 
         try {
-            return base64URLDecode(templateTypeId);
+            return base64URLDecode(encodedTemplateTypeId);
         } catch (Throwable e) {
             throw handleError(Constants.ErrorMessage.ERROR_INVALID_TEMPLATE_TYPE_ID);
         }

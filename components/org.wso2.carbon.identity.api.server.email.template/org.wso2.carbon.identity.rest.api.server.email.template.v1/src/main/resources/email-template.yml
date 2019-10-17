@@ -216,7 +216,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       responses:
-        '200':
+        '204':
           $ref: '#/components/responses/Deleted'
         '400':
           $ref: '#/components/responses/InvalidInput'
@@ -345,7 +345,7 @@ paths:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/templateIdPathParam'
       responses:
-        '200':
+        '204':
           $ref: '#/components/responses/Deleted'
         '400':
           $ref: '#/components/responses/InvalidInput'

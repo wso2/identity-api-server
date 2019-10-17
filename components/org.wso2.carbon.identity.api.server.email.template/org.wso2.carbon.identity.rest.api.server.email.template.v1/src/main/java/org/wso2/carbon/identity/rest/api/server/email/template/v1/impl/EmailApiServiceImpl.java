@@ -20,10 +20,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.EmailApiService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.core.ServerEmailTemplatesService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateType;
+import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateTypeWithoutTemplates;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateWithID;
+import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.SimpleEmailTemplate;
 
+import java.net.URI;
 import java.util.List;
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
+import static org.wso2.carbon.identity.api.server.email.template.common.Constants.EMAIL_TEMPLATES_API_BASE_PATH;
+import static org.wso2.carbon.identity.api.server.email.template.common.Constants.EMAIL_TEMPLATE_TYPES_PATH;
+import static org.wso2.carbon.identity.api.server.email.template.common.Constants.PATH_SEPARATOR;
 
 /**
  * Implementation of the Email Templates API.
@@ -36,26 +45,36 @@ public class EmailApiServiceImpl implements EmailApiService {
     @Override
     public Response addEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID) {
 
-        return Response.ok().entity(emailTemplatesService.addEmailTemplate(templateTypeId, emailTemplateWithID)).
-                build();
+        SimpleEmailTemplate simpleEmailTemplate = emailTemplatesService.addEmailTemplate(templateTypeId,
+                emailTemplateWithID);
+        URI headerLocation = buildURIForHeader(
+                V1_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
+                PATH_SEPARATOR + templateTypeId + PATH_SEPARATOR + simpleEmailTemplate.getId());
+        return Response.created(headerLocation).entity(simpleEmailTemplate).build();
     }
 
     @Override
     public Response addEmailTemplateType(EmailTemplateType emailTemplateType) {
 
-        return Response.ok().entity(emailTemplatesService.addEmailTemplateType(emailTemplateType)).build();
+        EmailTemplateTypeWithoutTemplates templateType = emailTemplatesService.addEmailTemplateType(emailTemplateType);
+        URI headerLocation = buildURIForHeader(
+                V1_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
+                        PATH_SEPARATOR + templateType.getId());
+        return Response.created(headerLocation).entity(templateType).build();
     }
 
     @Override
     public Response deleteEmailTemplate(String templateTypeId, String templateId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        emailTemplatesService.deleteEmailTemplate(templateTypeId, templateId);
+        return Response.noContent().build();
     }
 
     @Override
     public Response deleteEmailTemplateType(String templateTypeId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        emailTemplatesService.deleteEmailTemplateType(templateTypeId);
+        return Response.noContent().build();
     }
 
     @Override
