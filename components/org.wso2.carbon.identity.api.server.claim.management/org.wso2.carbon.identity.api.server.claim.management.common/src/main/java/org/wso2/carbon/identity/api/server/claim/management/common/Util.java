@@ -30,6 +30,7 @@ public class Util {
      *
      * @return ClaimMetadataManagementService
      */
+    @Deprecated
     public static ClaimMetadataManagementService getClaimMetadataManagementService() {
         return (ClaimMetadataManagementService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                 .getOSGiService(ClaimMetadataManagementService.class, null);
@@ -40,6 +41,7 @@ public class Util {
      *
      * @return ClaimMetadataManagementService
      */
+    @Deprecated
     public static RealmService getRealmService() {
         return (RealmService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                 .getOSGiService(RealmService.class, null);

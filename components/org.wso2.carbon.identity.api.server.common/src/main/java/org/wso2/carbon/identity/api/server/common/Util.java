@@ -32,6 +32,7 @@ public class Util {
      *
      * @return ChallengeQuestionManager
      */
+    @Deprecated
     public static ChallengeQuestionManager getChallengeQuestionManager() {
         return (ChallengeQuestionManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                 .getOSGiService(ChallengeQuestionManager.class, null);
@@ -56,7 +57,7 @@ public class Util {
     /**
      * Check whether correlation id present in the log MDC
      *
-     * @return
+     * @return whether the correlation id is present
      */
     public static boolean isCorrelationIDPresent() {
         return MDC.get(Constants.CORRELATION_ID_MDC) != null;
