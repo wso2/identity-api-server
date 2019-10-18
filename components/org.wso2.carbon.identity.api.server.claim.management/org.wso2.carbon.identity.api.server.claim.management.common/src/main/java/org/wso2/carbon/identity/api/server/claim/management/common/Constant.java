@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
  */
 public class Constant {
 
-    public static final String CLAIM_MANAGEMENT_PREFIX = "CMT-";
+    private static final String CLAIM_MANAGEMENT_PREFIX = "CMT-";
     public static final String CMT_PATH_COMPONENT = "/claim-dialects";
     public static final String LOCAL_DIALECT_PATH = "local";
     public static final String LOCAL_DIALECT = "http://wso2.org/claims";

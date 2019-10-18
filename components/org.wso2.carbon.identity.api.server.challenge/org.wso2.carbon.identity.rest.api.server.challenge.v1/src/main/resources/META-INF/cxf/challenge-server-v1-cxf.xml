@@ -18,4 +18,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation=" http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
     <bean class="org.wso2.carbon.identity.rest.api.server.challenge.v1.core.ServerChallengeService"/>
     <bean class="org.wso2.carbon.identity.rest.api.server.challenge.v1.impl.ChallengesApiServiceImpl"/>
+    <bean id="challengeQuestionsHolderBean"
+          class="org.wso2.carbon.identity.api.server.challenge.common.ChallengeQuestionDataHolder">
+        <property name="challengeQuestionManager" ref="challengeQuestionManagerFactoryBean"/>
+    </bean>
+    <bean id="challengeQuestionManagerFactoryBean"
+          class="org.wso2.carbon.identity.api.server.challenge.common.factory.OSGIServiceFactory"/>
 </beans>

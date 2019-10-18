@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.claim.management.common.ClaimManagementDataHolder.getClaimMetadataManagementService;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.CMT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_CLAIMS_NOT_FOUND_FOR_DIALECT;
@@ -90,9 +91,9 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REG_EX;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REQUIRED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_SUPPORTED_BY_DEFAULT;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Util.getClaimMetadataManagementService;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURI;
+
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CONFLICT;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
@@ -129,9 +130,8 @@ public class ServerClaimManagementService {
      * Delete a claim dialect.
      *
      * @param dialectId dialectId.
-     * @return True if delete was successful without any errors.
      */
-    public boolean deleteClaimDialect(String dialectId) {
+    public void deleteClaimDialect(String dialectId) {
 
         try {
             getClaimMetadataManagementService().removeClaimDialect(
@@ -141,7 +141,6 @@ public class ServerClaimManagementService {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_DELETING_DIALECT, dialectId);
         }
 
-        return true;
     }
 
     /**
@@ -263,9 +262,8 @@ public class ServerClaimManagementService {
      * Delete a local claim.
      *
      * @param claimId claimId.
-     * @return True if delete was successful without any errors.
      */
-    public boolean deleteLocalClaim(String claimId) {
+    public void deleteLocalClaim(String claimId) {
 
         try {
             getClaimMetadataManagementService().removeLocalClaim(
@@ -275,7 +273,6 @@ public class ServerClaimManagementService {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_DELETING_LOCAL_CLAIM, claimId);
         }
 
-        return true;
     }
 
     /**
@@ -334,9 +331,8 @@ public class ServerClaimManagementService {
      *
      * @param claimId          claimId.
      * @param localClaimReqDTO localClaimReqDTO.
-     * @return Resource identifier.
      */
-    public String updateLocalClaim(String claimId, LocalClaimReqDTO localClaimReqDTO) {
+    public void updateLocalClaim(String claimId, LocalClaimReqDTO localClaimReqDTO) {
 
         if (!StringUtils.equals(base64DecodeId(claimId), localClaimReqDTO.getClaimURI())) {
             throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_CONFLICT, CONFLICT, base64DecodeId(claimId));
@@ -360,7 +356,7 @@ public class ServerClaimManagementService {
             throw handleException(e, ERROR_CODE_ERROR_ADDING_LOCAL_CLAIM, localClaimReqDTO.getClaimURI());
         }
 
-        return getResourceId(localClaimReqDTO.getClaimURI());
+        getResourceId(localClaimReqDTO.getClaimURI());
     }
 
     /**
@@ -393,9 +389,8 @@ public class ServerClaimManagementService {
      *
      * @param dialectId dialectId.
      * @param claimId   claimId.
-     * @return True if delete was successful without any errors.
      */
-    public boolean deleteExternalClaim(String dialectId, String claimId) {
+    public void deleteExternalClaim(String dialectId, String claimId) {
 
         try {
             getClaimMetadataManagementService().removeExternalClaim(
@@ -406,7 +401,6 @@ public class ServerClaimManagementService {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_DELETING_EXTERNAL_CLAIM, claimId);
         }
 
-        return true;
     }
 
     /**
@@ -477,9 +471,8 @@ public class ServerClaimManagementService {
      * @param dialectId           dialectId.
      * @param claimId             claimId.
      * @param externalClaimReqDTO externalClaimReqDTO.
-     * @return Resource identifier.
      */
-    public String updateExternalClaim(String dialectId, String claimId, ExternalClaimReqDTO externalClaimReqDTO) {
+    public void updateExternalClaim(String dialectId, String claimId, ExternalClaimReqDTO externalClaimReqDTO) {
 
         if (!StringUtils.equals(base64DecodeId(claimId), externalClaimReqDTO.getClaimURI())) {
             throw handleClaimManagementClientError(ERROR_CODE_EXTERNAL_CLAIM_CONFLICT, CONFLICT,
@@ -494,7 +487,7 @@ public class ServerClaimManagementService {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_UPDATING_EXTERNAL_CLAIM, claimId, dialectId);
         }
 
-        return getResourceId(externalClaimReqDTO.getClaimURI());
+        getResourceId(externalClaimReqDTO.getClaimURI());
     }
 
     private ClaimDialect extractDialectFromDialectList(String dialectURI, List<ClaimDialect> dialectList) {
