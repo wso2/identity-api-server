@@ -62,14 +62,14 @@ public class ServerEmailTemplatesService {
     /**
      * Return all email template types in the system with limited information of the templates inside.
      *
-     * @param limit  Limit the number of email template types in the response. **Not supported at the moment**
-     * @param offset Offset to be used with the limit parameter. **Not supported at the moment**
-     * @param sort   Sort the response in ascending order or descending order. **Not supported at the moment**
-     * @param sortBy Element to sort the responses. **Not supported at the moment**
+     * @param limit     Limit the number of email template types in the response. **Not supported at the moment**
+     * @param offset    Offset to be used with the limit parameter. **Not supported at the moment**
+     * @param sortOrder Sort the response in ascending order or descending order. **Not supported at the moment**
+     * @param sortBy    Element to sort the responses. **Not supported at the moment**
      * @return A list of email template types.
      */
-    public List<EmailTemplateTypeWithoutTemplates> getAllEmailTemplateTypes(Integer limit, Integer offset, String sort,
-                                                                            String sortBy) {
+    public List<EmailTemplateTypeWithoutTemplates> getAllEmailTemplateTypes(Integer limit, Integer offset,
+                                                                            String sortOrder, String sortBy) {
 
         try {
             List<EmailTemplate> legacyEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
@@ -86,12 +86,12 @@ public class ServerEmailTemplatesService {
      * @param templateTypeId Email template type id.
      * @param limit          Limit the number of email template types in the response. **Not supported at the moment**
      * @param offset         Offset to be used with the limit parameter. **Not supported at the moment**
-     * @param sort           Sort the response in ascending order or descending order. **Not supported at the moment**
+     * @param sortOrder      Sort the response in ascending order or descending order. **Not supported at the moment**
      * @param sortBy         Element to sort the responses. **Not supported at the moment**
      * @return The email template type identified by the given id, 404 if not found.
      */
     public EmailTemplateTypeWithID getEmailTemplateType(String templateTypeId, Integer limit, Integer offset,
-                                                        String sort, String sortBy) {
+                                                        String sortOrder, String sortBy) {
 
         try {
             List<EmailTemplate> legacyEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
@@ -108,12 +108,13 @@ public class ServerEmailTemplatesService {
      * @param templateTypeId Email template type id.
      * @param limit          Limit the number of email template types in the response. **Not supported at the moment**
      * @param offset         Offset to be used with the limit parameter. **Not supported at the moment**
-     * @param sort           Sort the response in ascending order or descending order. **Not supported at the moment**
+     * @param sortOrder      Sort the response in ascending order or descending order. **Not supported at the moment**
      * @param sortBy         Element to sort the responses. **Not supported at the moment**
      * @return List of SimpleEmailTemplate objects in the template type identified by the given id, 404 if not found.
      */
     public List<SimpleEmailTemplate> getTemplatesListOfEmailTemplateType(String templateTypeId, Integer limit,
-                                                                         Integer offset, String sort, String sortBy) {
+                                                                         Integer offset, String sortOrder,
+                                                                         String sortBy) {
 
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
@@ -138,12 +139,12 @@ public class ServerEmailTemplatesService {
      * @param templateId     Email template id.
      * @param limit          Limit the number of email template types in the response. **Not supported at the moment**
      * @param offset         Offset to be used with the limit parameter. **Not supported at the moment**
-     * @param sort           Sort the response in ascending order or descending order. **Not supported at the moment**
+     * @param sortOrder      Sort the response in ascending order or descending order. **Not supported at the moment**
      * @param sortBy         Element to sort the responses. **Not supported at the moment**
      * @return Email template identified by the given template-type-id and the template-id, 404 if not found.
      */
     public EmailTemplateWithID getEmailTemplate(String templateTypeId, String templateId, Integer limit, Integer offset,
-                                                String sort, String sortBy) {
+                                                String sortOrder, String sortBy) {
 
         try {
             String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
@@ -401,14 +402,14 @@ public class ServerEmailTemplatesService {
         return new ArrayList<>(templateTypeMap.values());
     }
 
-    public String getTemplateTypeLocation(String templateTypeId) {
+    private String getTemplateTypeLocation(String templateTypeId) {
 
         String location = V1_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
                 PATH_SEPARATOR + templateTypeId;
         return ContextLoader.buildURIForBody(location).toString();
     }
 
-    public String getTemplateLocation(String templateTypeId, String templateId) {
+    private String getTemplateLocation(String templateTypeId, String templateId) {
 
         String templateLocation = getTemplateTypeLocation(templateTypeId);
         return templateLocation + EMAIL_TEMPLATES_PATH + PATH_SEPARATOR + templateId;

@@ -78,34 +78,34 @@ public class EmailApiServiceImpl implements EmailApiService {
     }
 
     @Override
-    public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sort, String sortBy) {
+    public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sortOrder, String sortBy) {
 
-        return Response.ok().entity(emailTemplatesService.getAllEmailTemplateTypes(limit, offset, sort, sortBy)).
+        return Response.ok().entity(emailTemplatesService.getAllEmailTemplateTypes(limit, offset, sortOrder, sortBy)).
                 build();
     }
 
     @Override
     public Response getEmailTemplate(String templateTypeId, String templateId, Integer limit, Integer offset,
-                                     String sort, String sortBy) {
+                                     String sortOrder, String sortBy) {
 
         return Response.ok().entity(emailTemplatesService.
-                getEmailTemplate(templateTypeId, templateId, limit, offset, sort, sortBy)).build();
+                getEmailTemplate(templateTypeId, templateId, limit, offset, sortOrder, sortBy)).build();
     }
 
     @Override
-    public Response getEmailTemplateType(String templateTypeId, Integer limit, Integer offset, String sort,
+    public Response getEmailTemplateType(String templateTypeId, Integer limit, Integer offset, String sortOrder,
                                          String sortBy) {
 
         return Response.ok().entity(emailTemplatesService.
-                getEmailTemplateType(templateTypeId, limit, offset, sort, sortBy)).build();
+                getEmailTemplateType(templateTypeId, limit, offset, sortOrder, sortBy)).build();
     }
 
     @Override
     public Response getTemplatesListOfEmailTemplateType(String templateTypeId, Integer limit, Integer offset,
-                                                        String sort, String sortBy) {
+                                                        String sortOrder, String sortBy) {
 
         return Response.ok().entity(emailTemplatesService.
-                getTemplatesListOfEmailTemplateType(templateTypeId, limit, offset, sort, sortBy)).build();
+                getTemplatesListOfEmailTemplateType(templateTypeId, limit, offset, sortOrder, sortBy)).build();
     }
 
     @Override

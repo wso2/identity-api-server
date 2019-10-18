@@ -35,7 +35,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
+        - $ref: '#/components/parameters/sortOrderQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
       responses:
         '200':
@@ -107,7 +107,7 @@ paths:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
+        - $ref: '#/components/parameters/sortOrderQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
       responses:
         '200':
@@ -243,7 +243,7 @@ paths:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
+        - $ref: '#/components/parameters/sortOrderQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
       responses:
         '200':
@@ -280,7 +280,7 @@ paths:
         - $ref: '#/components/parameters/templateIdPathParam'
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
+        - $ref: '#/components/parameters/sortOrderQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
       responses:
         '200':
@@ -399,9 +399,9 @@ components:
         type: integer
         format: int32
         minimum: 0
-    sortQueryParam:
+    sortOrderQueryParam:
       in: query
-      name: sort
+      name: sortOrder
       required: false
       description: >-
         Define the order how the retrieved records should be sorted. _<b>This
