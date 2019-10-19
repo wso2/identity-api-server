@@ -24,7 +24,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.wso2.carbon.identity.server.api</groupId>
     <artifactId>org.wso2.carbon.identity.rest.api.server.workflow.engine.v1</artifactId>
 
     <build>
@@ -32,7 +31,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>

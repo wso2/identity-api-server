@@ -57,7 +57,7 @@ public class ServerChallengeService {
      * @param locale challenge question locale
      * @param offset offset to start listing the challenge questions
      * @param limit  number of challenge questions to list
-     * @return
+     * @return list of challenge questions of the given locale
      */
     public List<ChallengeSetDTO> getChallenges(String locale, Integer offset, Integer limit) {
 
