@@ -76,9 +76,9 @@ public class ServerEmailTemplatesService {
         handleNoteSupportedParameters(limit, offset, sortOrder, sortBy);
 
         try {
-            List<EmailTemplate> legacyEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
+            List<EmailTemplate> internalEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
                     getAllEmailTemplates(getTenantDomainFromContext());
-            return buildEmailTemplateTypeWithoutTemplatesList(legacyEmailTemplates);
+            return buildEmailTemplateTypeWithoutTemplatesList(internalEmailTemplates);
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPES);
         }
@@ -134,9 +134,9 @@ public class ServerEmailTemplatesService {
             if (!isTemplateTypeExists) {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
             }
-            List<EmailTemplate> legacyEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
+            List<EmailTemplate> internalEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
                     getAllEmailTemplates(getTenantDomainFromContext());
-            return getTemplatesListOfEmailTemplateType(legacyEmailTemplates, templateTypeId);
+            return getTemplatesListOfEmailTemplateType(internalEmailTemplates, templateTypeId);
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPE);
         }
@@ -160,14 +160,14 @@ public class ServerEmailTemplatesService {
 
         try {
             String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
-            EmailTemplate legacyEmailTemplate = EmailTemplatesServiceHolder.getEmailTemplateManager().
+            EmailTemplate internalEmailTemplate = EmailTemplatesServiceHolder.getEmailTemplateManager().
                     getEmailTemplate(templateTypeDisplayName, templateId, getTenantDomainFromContext());
             // EmailTemplateManager sends the default template if no matching template found. We need to check for
             // the locale specifically.
-            if (!legacyEmailTemplate.getLocale().equals(templateId)) {
+            if (!internalEmailTemplate.getLocale().equals(templateId)) {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_NOT_FOUND);
             } else {
-                return buildEmailTemplateWithID(legacyEmailTemplate);
+                return buildEmailTemplateWithID(internalEmailTemplate);
             }
 
         } catch (I18nEmailMgtException e) {
@@ -347,37 +347,37 @@ public class ServerEmailTemplatesService {
     private void addEmailTemplateToTheSystem(String templateTypeDisplayName, EmailTemplateWithID emailTemplateWithID)
             throws I18nEmailMgtException {
 
-        EmailTemplate legacyEmailTemplate = new EmailTemplate();
-        legacyEmailTemplate.setTemplateDisplayName(templateTypeDisplayName);
-        legacyEmailTemplate.setTemplateType(I18nEmailUtil.getNormalizedName(templateTypeDisplayName));
-        legacyEmailTemplate.setLocale(emailTemplateWithID.getId());
-        legacyEmailTemplate.setEmailContentType(emailTemplateWithID.getContentType());
-        legacyEmailTemplate.setSubject(emailTemplateWithID.getSubject());
-        legacyEmailTemplate.setBody(emailTemplateWithID.getBody());
-        legacyEmailTemplate.setFooter(emailTemplateWithID.getFooter());
+        EmailTemplate internalEmailTemplate = new EmailTemplate();
+        internalEmailTemplate.setTemplateDisplayName(templateTypeDisplayName);
+        internalEmailTemplate.setTemplateType(I18nEmailUtil.getNormalizedName(templateTypeDisplayName));
+        internalEmailTemplate.setLocale(emailTemplateWithID.getId());
+        internalEmailTemplate.setEmailContentType(emailTemplateWithID.getContentType());
+        internalEmailTemplate.setSubject(emailTemplateWithID.getSubject());
+        internalEmailTemplate.setBody(emailTemplateWithID.getBody());
+        internalEmailTemplate.setFooter(emailTemplateWithID.getFooter());
 
-        EmailTemplatesServiceHolder.getEmailTemplateManager().addEmailTemplate(legacyEmailTemplate,
+        EmailTemplatesServiceHolder.getEmailTemplateManager().addEmailTemplate(internalEmailTemplate,
                 getTenantDomainFromContext());
     }
 
     /**
-     * Iterate through a given legacy email templates list, extract a list of templates in it and build a list of
+     * Iterate through a given internal email templates list, extract a list of templates in it and build a list of
      * locations of those templates.
      *
-     * @param legacyEmailTemplates List of legacy email templates.
+     * @param internalEmailTemplates List of internal email templates.
      * @param templateTypeId       Email template type to be extracted.
      * @return Extracted locations list in the template type, 404 if not found.
      */
-    private List<SimpleEmailTemplate> getTemplatesListOfEmailTemplateType(List<EmailTemplate> legacyEmailTemplates,
+    private List<SimpleEmailTemplate> getTemplatesListOfEmailTemplateType(List<EmailTemplate> internalEmailTemplates,
                                                              String templateTypeId) {
 
         List<SimpleEmailTemplate> simpleEmailTemplates = new ArrayList<>();
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
-        for (EmailTemplate legacyTemplate : legacyEmailTemplates) {
-            if (templateTypeDisplayName.equals(legacyTemplate.getTemplateDisplayName())) {
+        for (EmailTemplate internalTemplate : internalEmailTemplates) {
+            if (templateTypeDisplayName.equals(internalTemplate.getTemplateDisplayName())) {
                 SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
-                String templateLocation = getTemplateLocation(templateTypeId, legacyTemplate.getLocale());
-                simpleEmailTemplate.setId(legacyTemplate.getLocale());
+                String templateLocation = getTemplateLocation(templateTypeId, internalTemplate.getLocale());
+                simpleEmailTemplate.setId(internalTemplate.getLocale());
                 simpleEmailTemplate.setSelf(templateLocation);
                 simpleEmailTemplates.add(simpleEmailTemplate);
             }
@@ -386,7 +386,7 @@ public class ServerEmailTemplatesService {
     }
 
     /**
-     * Create a list EmailTemplateTypeWithoutTemplates objects by reading a legacy EmailTemplate list.
+     * Create a list EmailTemplateTypeWithoutTemplates objects by reading a internal EmailTemplate list.
      *
      * @param internalEmailTemplates List of EmailTemplate objects.
      * @return List of EmailTemplateTypeWithoutTemplates objects.
@@ -428,28 +428,28 @@ public class ServerEmailTemplatesService {
     }
 
     /**
-     * Iterate through a given legacy email templates list and extract a given single email template type with all
+     * Iterate through a given internal email templates list and extract a given single email template type with all
      * of it's templates.
      *
-     * @param legacyEmailTemplates List of legacy email templates.
+     * @param internalEmailTemplates List of internal email templates.
      * @param templateTypeId       Email template type to be extracted.
      * @return Extracted EmailTemplateTypeWithID, 404 if not found.
      */
-    private EmailTemplateTypeWithID getMatchingEmailTemplateType(List<EmailTemplate> legacyEmailTemplates,
+    private EmailTemplateTypeWithID getMatchingEmailTemplateType(List<EmailTemplate> internalEmailTemplates,
                                                                  String templateTypeId) {
 
         EmailTemplateTypeWithID emailTemplateType = new EmailTemplateTypeWithID();
         String decodedTemplateTypeId = decodeTemplateTypeId(templateTypeId);
         boolean isFirst = true;
-        for (EmailTemplate legacyTemplate : legacyEmailTemplates) {
-            if (decodedTemplateTypeId.equals(legacyTemplate.getTemplateDisplayName())) {
+        for (EmailTemplate internalTemplate : internalEmailTemplates) {
+            if (decodedTemplateTypeId.equals(internalTemplate.getTemplateDisplayName())) {
                 if (isFirst) {
                     // Template type details should only be set once.
-                    emailTemplateType.setDisplayName(legacyTemplate.getTemplateDisplayName());
+                    emailTemplateType.setDisplayName(internalTemplate.getTemplateDisplayName());
                     emailTemplateType.setId(templateTypeId);
                     isFirst = false;
                 }
-                emailTemplateType.getTemplates().add(buildEmailTemplateWithID(legacyTemplate));
+                emailTemplateType.getTemplates().add(buildEmailTemplateWithID(internalTemplate));
             }
         }
         if (StringUtils.isBlank(emailTemplateType.getId())) {
@@ -459,16 +459,16 @@ public class ServerEmailTemplatesService {
     }
 
     /**
-     * Convert a legacy email template to a new Email Template object.
+     * Convert a internal email template to a new Email Template object.
      */
-    private EmailTemplateWithID buildEmailTemplateWithID(EmailTemplate legacyTemplate) {
+    private EmailTemplateWithID buildEmailTemplateWithID(EmailTemplate internalTemplate) {
 
         EmailTemplateWithID templateWithID = new EmailTemplateWithID();
-        templateWithID.setId(legacyTemplate.getLocale());
-        templateWithID.setContentType(legacyTemplate.getEmailContentType());
-        templateWithID.setSubject(legacyTemplate.getSubject());
-        templateWithID.setBody(legacyTemplate.getBody());
-        templateWithID.setFooter(legacyTemplate.getFooter());
+        templateWithID.setId(internalTemplate.getLocale());
+        templateWithID.setContentType(internalTemplate.getEmailContentType());
+        templateWithID.setSubject(internalTemplate.getSubject());
+        templateWithID.setBody(internalTemplate.getBody());
+        templateWithID.setFooter(internalTemplate.getFooter());
         return templateWithID;
     }
 
