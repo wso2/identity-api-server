@@ -52,7 +52,7 @@ import static org.wso2.carbon.identity.api.server.email.template.common.Constant
 
 /**
  * Call internal osgi services to perform email templates related operations.
- * <p>
+ *
  * Note: email-template-type-id is created by base64URL encoding the template display name.
  */
 public class ServerEmailTemplatesService {
@@ -70,6 +70,8 @@ public class ServerEmailTemplatesService {
      */
     public List<EmailTemplateTypeWithoutTemplates> getAllEmailTemplateTypes(Integer limit, Integer offset,
                                                                             String sortOrder, String sortBy) {
+
+        handleNoteSupportedParameters(limit, offset, sortOrder, sortBy);
 
         try {
             List<EmailTemplate> legacyEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
@@ -93,10 +95,13 @@ public class ServerEmailTemplatesService {
     public EmailTemplateTypeWithID getEmailTemplateType(String templateTypeId, Integer limit, Integer offset,
                                                         String sortOrder, String sortBy) {
 
+        handleNoteSupportedParameters(limit, offset, sortOrder, sortBy);
+
         try {
-            List<EmailTemplate> legacyEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
+            List<EmailTemplate> internalEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
                     getAllEmailTemplates(getTenantDomainFromContext());
-            return getMatchingEmailTemplateType(legacyEmailTemplates, templateTypeId);
+            // TODO: 2019-10-18 implement backend support
+            return getMatchingEmailTemplateType(internalEmailTemplates, templateTypeId);
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPE);
         }
@@ -116,8 +121,11 @@ public class ServerEmailTemplatesService {
                                                                          Integer offset, String sortOrder,
                                                                          String sortBy) {
 
+        handleNoteSupportedParameters(limit, offset, sortOrder, sortBy);
+
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
+            // TODO: 2019-10-18 can use above method
             boolean isTemplateTypeExists =
                     EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateTypeExists(
                             templateTypeDisplayName, getTenantDomainFromContext());
@@ -145,6 +153,8 @@ public class ServerEmailTemplatesService {
      */
     public EmailTemplateWithID getEmailTemplate(String templateTypeId, String templateId, Integer limit, Integer offset,
                                                 String sortOrder, String sortBy) {
+
+        handleNoteSupportedParameters(limit, offset, sortOrder, sortBy);
 
         try {
             String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
@@ -376,14 +386,14 @@ public class ServerEmailTemplatesService {
     /**
      * Create a list EmailTemplateTypeWithoutTemplates objects by reading a legacy EmailTemplate list.
      *
-     * @param legacyEmailTemplates List of EmailTemplate objects.
+     * @param internalEmailTemplates List of EmailTemplate objects.
      * @return List of EmailTemplateTypeWithoutTemplates objects.
      */
     private List<EmailTemplateTypeWithoutTemplates> buildEmailTemplateTypeWithoutTemplatesList(
-            List<EmailTemplate> legacyEmailTemplates) {
+            List<EmailTemplate> internalEmailTemplates) {
 
         Map<String, EmailTemplateTypeWithoutTemplates> templateTypeMap = new HashMap<>();
-        for (EmailTemplate emailTemplate : legacyEmailTemplates) {
+        for (EmailTemplate emailTemplate : internalEmailTemplates) {
             if (!templateTypeMap.containsKey(emailTemplate.getTemplateType())) {
 
                 EmailTemplateTypeWithoutTemplates emailTemplateType = new EmailTemplateTypeWithoutTemplates();
@@ -480,6 +490,16 @@ public class ServerEmailTemplatesService {
         return base64URLEncode(templateTypeDisplayName);
     }
 
+    private void handleNoteSupportedParameters(Integer limit, Integer offset, String sortOrder, String sortBy) {
+
+        if (limit != null || offset != null) {
+            throw handleError(Constants.ErrorMessage.ERROR_PAGINATION_NOT_SUPPORTED);
+        }
+        if (StringUtils.isNotBlank(sortOrder) || StringUtils.isNotBlank(sortBy)) {
+            throw handleError(Constants.ErrorMessage.ERROR_SORTING_NOT_SUPPORTED);
+        }
+    }
+
     /**
      * Handle I18nEmailMgtException, i.e. extract error description from the exception and set to the
      * API Error Response, along with an status code to be sent in the response.
@@ -503,6 +523,8 @@ public class ServerEmailTemplatesService {
             } else {
                 status = Response.Status.INTERNAL_SERVER_ERROR;
             }
+            // TODO: 2019-10-18 check instance of and return 400 if client exception
+            // TODO: 2019-10-18 no need to check null
         } else {
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }

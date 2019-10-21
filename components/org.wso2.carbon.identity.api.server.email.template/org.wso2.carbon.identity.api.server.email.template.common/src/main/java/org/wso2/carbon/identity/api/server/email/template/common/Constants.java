@@ -82,12 +82,17 @@ public class Constants {
                 "Specified email template does not exist in the system."),
         ERROR_EMAIL_TEMPLATE_ALREADY_EXISTS("500014", Status.CONFLICT,
                 "Email Template already exists in the system.",
-                "An email template for the provided template id already exists " +
-                        "in the system."),
+                "An email template for the provided template id already exists in the system."),
         ERROR_EMAIL_TEMPLATE_TYPE_ALREADY_EXISTS("500015", Status.CONFLICT,
                 "Email Template Type already exists in the system.",
                 "An email template type for the provided template display name already exists " +
-                        "in the system.");
+                        "in the system."),
+        ERROR_PAGINATION_NOT_SUPPORTED("500016", Status.NOT_IMPLEMENTED,
+                "Pagination is not yet supported.",
+                "Please remove 'limit' and 'offset' parameters from the request and try again."),
+        ERROR_SORTING_NOT_SUPPORTED("500017", Status.NOT_IMPLEMENTED,
+                "Sorting is not yet supported.",
+                "Please remove 'sortOrder' and 'sortBy' parameters from the request and try again.");
 
         private final String message;
         private final Status httpStatus;
