@@ -99,11 +99,15 @@ public class ServerEmailTemplatesService {
 
         handleNoteSupportedParameters(limit, offset, sortOrder, sortBy);
 
+        String decodedTemplateTypeId = decodeTemplateTypeId(templateTypeId);
+
         try {
             List<EmailTemplate> internalEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
-                    getAllEmailTemplates(getTenantDomainFromContext());
-            // TODO: 2019-10-18 implement backend support
-            return getMatchingEmailTemplateType(internalEmailTemplates, templateTypeId);
+                    getEmailTemplateType(decodedTemplateTypeId, getTenantDomainFromContext());
+            if (internalEmailTemplates.isEmpty()) {
+                throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
+            }
+            return buildEmailTemplateTypeWithID(internalEmailTemplates, templateTypeId);
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPE);
         }
@@ -127,16 +131,12 @@ public class ServerEmailTemplatesService {
 
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
-            // TODO: 2019-10-18 can use above method
-            boolean isTemplateTypeExists =
-                    EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateTypeExists(
-                            templateTypeDisplayName, getTenantDomainFromContext());
-            if (!isTemplateTypeExists) {
+            List<EmailTemplate> internalEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
+                    getEmailTemplateType(templateTypeDisplayName, getTenantDomainFromContext());
+            if (internalEmailTemplates.isEmpty()) {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
             }
-            List<EmailTemplate> internalEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
-                    getAllEmailTemplates(getTenantDomainFromContext());
-            return getTemplatesListOfEmailTemplateType(internalEmailTemplates, templateTypeId);
+            return buildSimpleEmailTemplatesList(internalEmailTemplates, templateTypeId);
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPE);
         }
@@ -361,32 +361,28 @@ public class ServerEmailTemplatesService {
     }
 
     /**
-     * Iterate through a given internal email templates list, extract a list of templates in it and build a list of
-     * locations of those templates.
+     * Create a list SimpleEmailTemplate objects by reading an internal EmailTemplate list.
      *
      * @param internalEmailTemplates List of internal email templates.
-     * @param templateTypeId       Email template type to be extracted.
-     * @return Extracted locations list in the template type, 404 if not found.
+     * @param templateTypeId         Email template type to be extracted.
+     * @return List of SimpleEmailTemplate objects.
      */
-    private List<SimpleEmailTemplate> getTemplatesListOfEmailTemplateType(List<EmailTemplate> internalEmailTemplates,
-                                                             String templateTypeId) {
+    private List<SimpleEmailTemplate> buildSimpleEmailTemplatesList(List<EmailTemplate> internalEmailTemplates,
+                                                                    String templateTypeId) {
 
         List<SimpleEmailTemplate> simpleEmailTemplates = new ArrayList<>();
-        String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         for (EmailTemplate internalTemplate : internalEmailTemplates) {
-            if (templateTypeDisplayName.equals(internalTemplate.getTemplateDisplayName())) {
-                SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
-                String templateLocation = getTemplateLocation(templateTypeId, internalTemplate.getLocale());
-                simpleEmailTemplate.setId(internalTemplate.getLocale());
-                simpleEmailTemplate.setSelf(templateLocation);
-                simpleEmailTemplates.add(simpleEmailTemplate);
-            }
+            SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
+            String templateLocation = getTemplateLocation(templateTypeId, internalTemplate.getLocale());
+            simpleEmailTemplate.setId(internalTemplate.getLocale());
+            simpleEmailTemplate.setSelf(templateLocation);
+            simpleEmailTemplates.add(simpleEmailTemplate);
         }
         return simpleEmailTemplates;
     }
 
     /**
-     * Create a list EmailTemplateTypeWithoutTemplates objects by reading a internal EmailTemplate list.
+     * Create a list EmailTemplateTypeWithoutTemplates objects by reading an internal EmailTemplate list.
      *
      * @param internalEmailTemplates List of EmailTemplate objects.
      * @return List of EmailTemplateTypeWithoutTemplates objects.
@@ -414,52 +410,32 @@ public class ServerEmailTemplatesService {
         return new ArrayList<>(templateTypeMap.values());
     }
 
-    private String getTemplateTypeLocation(String templateTypeId) {
-
-        String location = V1_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
-                PATH_SEPARATOR + templateTypeId;
-        return ContextLoader.buildURIForBody(location).toString();
-    }
-
-    private String getTemplateLocation(String templateTypeId, String templateId) {
-
-        String templateLocation = getTemplateTypeLocation(templateTypeId);
-        return templateLocation + EMAIL_TEMPLATES_PATH + PATH_SEPARATOR + templateId;
-    }
-
     /**
-     * Iterate through a given internal email templates list and extract a given single email template type with all
-     * of it's templates.
+     * Create an EmailTemplateTypeWithID object by reading an internal EmailTemplate list.
      *
      * @param internalEmailTemplates List of internal email templates.
-     * @param templateTypeId       Email template type to be extracted.
-     * @return Extracted EmailTemplateTypeWithID, 404 if not found.
+     * @param templateTypeId         Email template type to be extracted.
+     * @return Extracted EmailTemplateTypeWithID object.
      */
-    private EmailTemplateTypeWithID getMatchingEmailTemplateType(List<EmailTemplate> internalEmailTemplates,
+    private EmailTemplateTypeWithID buildEmailTemplateTypeWithID(List<EmailTemplate> internalEmailTemplates,
                                                                  String templateTypeId) {
 
         EmailTemplateTypeWithID emailTemplateType = new EmailTemplateTypeWithID();
-        String decodedTemplateTypeId = decodeTemplateTypeId(templateTypeId);
         boolean isFirst = true;
         for (EmailTemplate internalTemplate : internalEmailTemplates) {
-            if (decodedTemplateTypeId.equals(internalTemplate.getTemplateDisplayName())) {
-                if (isFirst) {
-                    // Template type details should only be set once.
-                    emailTemplateType.setDisplayName(internalTemplate.getTemplateDisplayName());
-                    emailTemplateType.setId(templateTypeId);
-                    isFirst = false;
-                }
-                emailTemplateType.getTemplates().add(buildEmailTemplateWithID(internalTemplate));
+            if (isFirst) {
+                // Template type details should only be set once.
+                emailTemplateType.setDisplayName(internalTemplate.getTemplateDisplayName());
+                emailTemplateType.setId(templateTypeId);
+                isFirst = false;
             }
-        }
-        if (StringUtils.isBlank(emailTemplateType.getId())) {
-            throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
+            emailTemplateType.getTemplates().add(buildEmailTemplateWithID(internalTemplate));
         }
         return emailTemplateType;
     }
 
     /**
-     * Convert a internal email template to a new Email Template object.
+     * Convert an internal email template to a new Email Template object.
      */
     private EmailTemplateWithID buildEmailTemplateWithID(EmailTemplate internalTemplate) {
 
@@ -490,6 +466,19 @@ public class ServerEmailTemplatesService {
     private String getEmailTemplateIdFromDisplayName(String templateTypeDisplayName) {
 
         return base64URLEncode(templateTypeDisplayName);
+    }
+
+    private String getTemplateTypeLocation(String templateTypeId) {
+
+        String location = V1_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
+                PATH_SEPARATOR + templateTypeId;
+        return ContextLoader.buildURIForBody(location).toString();
+    }
+
+    private String getTemplateLocation(String templateTypeId, String templateId) {
+
+        String templateLocation = getTemplateTypeLocation(templateTypeId);
+        return templateLocation + EMAIL_TEMPLATES_PATH + PATH_SEPARATOR + templateId;
     }
 
     private void handleNoteSupportedParameters(Integer limit, Integer offset, String sortOrder, String sortBy) {
