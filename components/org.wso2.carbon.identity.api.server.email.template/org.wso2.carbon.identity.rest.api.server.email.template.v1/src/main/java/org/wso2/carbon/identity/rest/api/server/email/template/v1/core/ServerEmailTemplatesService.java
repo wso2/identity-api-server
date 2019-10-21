@@ -21,7 +21,9 @@ package org.wso2.carbon.identity.rest.api.server.email.template.v1.core;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtClientException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
+import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtInternalException;
 import org.wso2.carbon.email.mgt.model.EmailTemplate;
 import org.wso2.carbon.email.mgt.util.I18nEmailUtil;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -513,19 +515,20 @@ public class ServerEmailTemplatesService {
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(log, exception, errorEnum.getDescription());
         Response.Status status;
 
-        if (exception != null) {
-            if (StringUtils.isNotBlank(exception.getErrorCode()) &&
-                    Constants.getMappedErrorMessage(exception.getErrorCode()) != null) {
-                // More specific error has been found.
-                Constants.ErrorMessage errorMessage = Constants.getMappedErrorMessage(exception.getErrorCode());
-                errorResponse = getErrorBuilder(errorMessage).build(log, exception, errorEnum.getDescription());
-                status = errorMessage.getHttpStatus();
-            } else {
-                status = Response.Status.INTERNAL_SERVER_ERROR;
-            }
-            // TODO: 2019-10-18 check instance of and return 400 if client exception
-            // TODO: 2019-10-18 no need to check null
+        if (exception instanceof I18nEmailMgtInternalException &&
+                Constants.getMappedErrorMessage(exception.getErrorCode()) != null) {
+            // Specific error with code is found.
+            Constants.ErrorMessage errorMessage = Constants.getMappedErrorMessage(exception.getErrorCode());
+            errorResponse = getErrorBuilder(errorMessage).build(log, exception, errorEnum.getDescription());
+            status = errorMessage.getHttpStatus();
+
+        } else if (exception instanceof I18nEmailMgtClientException) {
+            // Send client error with original exception message.
+            errorResponse.setDescription(exception.getMessage());
+            status = Response.Status.BAD_REQUEST;
+
         } else {
+            // Server error
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);
