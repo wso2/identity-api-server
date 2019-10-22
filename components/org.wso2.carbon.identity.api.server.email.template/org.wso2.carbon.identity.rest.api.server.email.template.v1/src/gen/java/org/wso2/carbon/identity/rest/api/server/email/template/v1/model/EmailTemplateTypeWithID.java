@@ -44,9 +44,11 @@ public class EmailTemplateTypeWithID extends EmailTemplateType {
         return this;
     }
     
-    @ApiModelProperty(example = "YWNjb3VudGNvbmZpcm1hdGlvbg", value = "Unique id of the email template type.")
+    @ApiModelProperty(example = "YWNjb3VudGNvbmZpcm1hdGlvbg", required = true, value = "Unique id of the email template type.")
     @JsonProperty("id")
     @Valid
+    @NotNull(message = "Property id cannot be null.")
+
     public String getId() {
         return id;
     }

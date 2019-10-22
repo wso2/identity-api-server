@@ -510,12 +510,13 @@ components:
     EmailTemplateTypeWithID:
       allOf:
         - $ref: '#/components/schemas/EmailTemplateType'
-        - properties:
+        - required:
+            - id
+          properties:
             id:
               type: string
               example: YWNjb3VudGNvbmZpcm1hdGlvbg
               description: Unique id of the email template type.
-        - additionalProperties: false
     EmailTemplate:
       type: object
       required:

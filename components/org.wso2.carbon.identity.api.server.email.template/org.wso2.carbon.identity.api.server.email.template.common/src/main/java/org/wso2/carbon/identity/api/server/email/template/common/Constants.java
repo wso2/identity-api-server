@@ -41,7 +41,6 @@ public class Constants {
      */
     public enum ErrorMessage {
 
-        // TODO: 2019-10-07 Double check error codes
         ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPES("50002", Status.INTERNAL_SERVER_ERROR,
                 "Unable to retrieve email template types.",
                 "Server encountered an error while retrieving email template types."),
