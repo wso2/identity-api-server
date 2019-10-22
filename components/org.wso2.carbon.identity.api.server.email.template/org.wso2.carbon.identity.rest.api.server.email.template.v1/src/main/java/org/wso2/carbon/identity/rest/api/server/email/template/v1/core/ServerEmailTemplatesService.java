@@ -256,8 +256,6 @@ public class ServerEmailTemplatesService {
             if (isTemplateTypeExists) {
                 EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplateType(templateTypeDisplayName,
                         getTenantDomainFromContext());
-            } else {
-                throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
             }
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_DELETING_EMAIL_TEMPLATE_TYPE);
@@ -279,8 +277,6 @@ public class ServerEmailTemplatesService {
             if (isTemplateExists) {
                 EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplate(templateTypeDisplayName,
                         templateId, getTenantDomainFromContext());
-            } else {
-                throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_NOT_FOUND);
             }
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_DELETING_EMAIL_TEMPLATE);
