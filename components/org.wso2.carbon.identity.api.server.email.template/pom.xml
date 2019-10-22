@@ -30,8 +30,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>org.wso2.carbon.identity.rest.api.server.email.template.v1</module>
         <module>org.wso2.carbon.identity.api.server.email.template.common</module>
+        <module>org.wso2.carbon.identity.rest.api.server.email.template.v1</module>
     </modules>
 
 </project>
