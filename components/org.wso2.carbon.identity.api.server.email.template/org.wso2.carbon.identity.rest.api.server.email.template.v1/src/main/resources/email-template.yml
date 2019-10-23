@@ -35,7 +35,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
+        - $ref: '#/components/parameters/sortOrderQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
       responses:
         '200':
@@ -63,7 +63,7 @@ paths:
         * Attribute _**displayName**_ of the template type should be unique.
 
         <b>Permission required:</b>
-        * /permission/admin/manage/identity/emailmgt/view
+        * /permission/admin/manage/identity/emailmgt/create
       requestBody:
         content:
           application/json:
@@ -74,7 +74,7 @@ paths:
         '201':
           description: Item Created
           headers:
-            Location:
+            self:
               description: Location of the newly created identity provider
               schema:
                 type: string
@@ -107,7 +107,7 @@ paths:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
+        - $ref: '#/components/parameters/sortOrderQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
       responses:
         '200':
@@ -216,7 +216,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       responses:
-        '200':
+        '204':
           $ref: '#/components/responses/Deleted'
         '400':
           $ref: '#/components/responses/InvalidInput'
@@ -243,7 +243,7 @@ paths:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
+        - $ref: '#/components/parameters/sortOrderQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
       responses:
         '200':
@@ -280,7 +280,7 @@ paths:
         - $ref: '#/components/parameters/templateIdPathParam'
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
+        - $ref: '#/components/parameters/sortOrderQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
       responses:
         '200':
@@ -345,7 +345,7 @@ paths:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/templateIdPathParam'
       responses:
-        '200':
+        '204':
           $ref: '#/components/responses/Deleted'
         '400':
           $ref: '#/components/responses/InvalidInput'
@@ -399,9 +399,9 @@ components:
         type: integer
         format: int32
         minimum: 0
-    sortQueryParam:
+    sortOrderQueryParam:
       in: query
-      name: sort
+      name: sortOrder
       required: false
       description: >-
         Define the order how the retrieved records should be sorted. _<b>This
@@ -478,7 +478,7 @@ components:
       required:
         - id
         - displayName
-        - location
+        - self
       properties:
         id:
           type: string
@@ -488,7 +488,7 @@ components:
           type: string
           example: Account Confirmation
           description: Display name of the email template type.
-        location:
+        self:
           type: string
           example: /t/{tenant-domain}/api/server/v1/email/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg
           description: Location of the created/updated resource.
@@ -510,7 +510,9 @@ components:
     EmailTemplateTypeWithID:
       allOf:
         - $ref: '#/components/schemas/EmailTemplateType'
-        - properties:
+        - required:
+            - id
+          properties:
             id:
               type: string
               example: YWNjb3VudGNvbmZpcm1hdGlvbg
@@ -554,14 +556,14 @@ components:
       type: object
       required:
         - id
-        - location
+        - self
       properties:
         id:
           type: string
           example: en_US
           description: >-
             Unique ID of the email template. This id represents the locale of the email template.
-        location:
+        self:
           type: string
           example: /t/{tenant-domain}/api/server/v1/email/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg/templates/en_US
           description: Location of the created/updated resource.

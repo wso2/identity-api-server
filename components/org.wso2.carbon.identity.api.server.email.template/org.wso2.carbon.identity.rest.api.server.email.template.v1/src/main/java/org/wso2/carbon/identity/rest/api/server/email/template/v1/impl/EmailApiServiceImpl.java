@@ -16,79 +16,110 @@
 
 package org.wso2.carbon.identity.rest.api.server.email.template.v1.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.EmailApiService;
+import org.wso2.carbon.identity.rest.api.server.email.template.v1.core.ServerEmailTemplatesService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateType;
+import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateTypeWithoutTemplates;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateWithID;
+import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.SimpleEmailTemplate;
 
+import java.net.URI;
 import java.util.List;
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURI;
+import static org.wso2.carbon.identity.api.server.email.template.common.Constants.EMAIL_TEMPLATES_API_BASE_PATH;
+import static org.wso2.carbon.identity.api.server.email.template.common.Constants.EMAIL_TEMPLATE_TYPES_PATH;
+import static org.wso2.carbon.identity.api.server.email.template.common.Constants.PATH_SEPARATOR;
 
 /**
  * Implementation of the Email Templates API.
  */
 public class EmailApiServiceImpl implements EmailApiService {
 
+    @Autowired
+    private ServerEmailTemplatesService emailTemplatesService;
+
     @Override
     public Response addEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        SimpleEmailTemplate simpleEmailTemplate = emailTemplatesService.addEmailTemplate(templateTypeId,
+                emailTemplateWithID);
+        URI headerLocation = buildURI(
+                V1_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
+                PATH_SEPARATOR + templateTypeId + PATH_SEPARATOR + simpleEmailTemplate.getId());
+        return Response.created(headerLocation).entity(simpleEmailTemplate).build();
     }
 
     @Override
     public Response addEmailTemplateType(EmailTemplateType emailTemplateType) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        EmailTemplateTypeWithoutTemplates templateType = emailTemplatesService.addEmailTemplateType(emailTemplateType);
+        URI headerLocation = buildURI(
+                V1_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
+                        PATH_SEPARATOR + templateType.getId());
+        return Response.created(headerLocation).entity(templateType).build();
     }
 
     @Override
     public Response deleteEmailTemplate(String templateTypeId, String templateId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        emailTemplatesService.deleteEmailTemplate(templateTypeId, templateId);
+        return Response.noContent().build();
     }
 
     @Override
     public Response deleteEmailTemplateType(String templateTypeId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        emailTemplatesService.deleteEmailTemplateType(templateTypeId);
+        return Response.noContent().build();
     }
 
     @Override
-    public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sort, String sortBy) {
+    public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sortOrder, String sortBy) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(emailTemplatesService.getAllEmailTemplateTypes(limit, offset, sortOrder, sortBy)).
+                build();
     }
 
     @Override
     public Response getEmailTemplate(String templateTypeId, String templateId, Integer limit, Integer offset,
-                                     String sort, String sortBy) {
+                                     String sortOrder, String sortBy) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(emailTemplatesService.
+                getEmailTemplate(templateTypeId, templateId, limit, offset, sortOrder, sortBy)).build();
     }
 
     @Override
-    public Response getEmailTemplateType(String templateTypeId, Integer limit, Integer offset, String sort,
+    public Response getEmailTemplateType(String templateTypeId, Integer limit, Integer offset, String sortOrder,
                                          String sortBy) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(emailTemplatesService.
+                getEmailTemplateType(templateTypeId, limit, offset, sortOrder, sortBy)).build();
     }
 
     @Override
     public Response getTemplatesListOfEmailTemplateType(String templateTypeId, Integer limit, Integer offset,
-                                                        String sort, String sortBy) {
+                                                        String sortOrder, String sortBy) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(emailTemplatesService.
+                getTemplatesListOfEmailTemplateType(templateTypeId, limit, offset, sortOrder, sortBy)).build();
     }
 
     @Override
     public Response updateEmailTemplate(String templateTypeId, String templateId,
                                         EmailTemplateWithID emailTemplateWithID) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        emailTemplatesService.updateEmailTemplate(templateTypeId, templateId, emailTemplateWithID);
+        return Response.ok().build();
     }
 
     @Override
     public Response updateEmailTemplateType(String templateTypeId, List<EmailTemplateWithID> emailTemplateWithID) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        emailTemplatesService.updateEmailTemplateType(templateTypeId, emailTemplateWithID);
+        return Response.ok().build();
     }
 }

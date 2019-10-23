@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.*;
 public class SimpleEmailTemplate  {
   
     private String id;
-    private String location;
+    private String self;
 
     /**
     * Unique ID of the email template. This id represents the locale of the email template.
@@ -57,22 +57,22 @@ public class SimpleEmailTemplate  {
     /**
     * Location of the created/updated resource.
     **/
-    public SimpleEmailTemplate location(String location) {
+    public SimpleEmailTemplate self(String self) {
 
-        this.location = location;
+        this.self = self;
         return this;
     }
     
     @ApiModelProperty(example = "/t/{tenant-domain}/api/server/v1/email/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg/templates/en_US", required = true, value = "Location of the created/updated resource.")
-    @JsonProperty("location")
+    @JsonProperty("self")
     @Valid
-    @NotNull(message = "Property location cannot be null.")
+    @NotNull(message = "Property self cannot be null.")
 
-    public String getLocation() {
-        return location;
+    public String getSelf() {
+        return self;
     }
-    public void setLocation(String location) {
-        this.location = location;
+    public void setSelf(String self) {
+        this.self = self;
     }
 
 
@@ -88,12 +88,12 @@ public class SimpleEmailTemplate  {
         }
         SimpleEmailTemplate simpleEmailTemplate = (SimpleEmailTemplate) o;
         return Objects.equals(this.id, simpleEmailTemplate.id) &&
-            Objects.equals(this.location, simpleEmailTemplate.location);
+            Objects.equals(this.self, simpleEmailTemplate.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, location);
+        return Objects.hash(id, self);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class SimpleEmailTemplate  {
         sb.append("class SimpleEmailTemplate {\n");
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
-        sb.append("    location: ").append(toIndentedString(location)).append("\n");
+        sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
     }

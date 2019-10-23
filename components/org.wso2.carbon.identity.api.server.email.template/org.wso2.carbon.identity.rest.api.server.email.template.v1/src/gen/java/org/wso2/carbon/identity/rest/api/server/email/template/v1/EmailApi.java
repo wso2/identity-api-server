@@ -70,7 +70,7 @@ public class EmailApi  {
     @Path("/template-types")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add a new email template type.", notes = "Adds a new email template type to the system. An email template type can have any number of email templates.  * Attribute _**displayName**_ of the template type should be unique.  <b>Permission required:</b> * /permission/admin/manage/identity/emailmgt/view ", response = EmailTemplateTypeWithoutTemplates.class, authorizations = {
+    @ApiOperation(value = "Add a new email template type.", notes = "Adds a new email template type to the system. An email template type can have any number of email templates.  * Attribute _**displayName**_ of the template type should be unique.  <b>Permission required:</b> * /permission/admin/manage/identity/emailmgt/create ", response = EmailTemplateTypeWithoutTemplates.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -101,7 +101,7 @@ public class EmailApi  {
         })
     }, tags={ "Email Templates", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Item Deleted", response = Void.class),
+        @ApiResponse(code = 204, message = "Item Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
@@ -125,7 +125,7 @@ public class EmailApi  {
         })
     }, tags={ "Email Template Types", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Item Deleted", response = Void.class),
+        @ApiResponse(code = 204, message = "Item Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
@@ -154,9 +154,9 @@ public class EmailApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getAllEmailTemplateTypes(    @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sort") String sort,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
+    public Response getAllEmailTemplateTypes(    @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
 
-        return delegate.getAllEmailTemplateTypes(limit,  offset,  sort,  sortBy );
+        return delegate.getAllEmailTemplateTypes(limit,  offset,  sortOrder,  sortBy );
     }
 
     @Valid
@@ -178,9 +178,9 @@ public class EmailApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getEmailTemplate(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Email template ID. This should be a valid locale.",required=true) @PathParam("template-id") String templateId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sort") String sort,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
+    public Response getEmailTemplate(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Email template ID. This should be a valid locale.",required=true) @PathParam("template-id") String templateId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
 
-        return delegate.getEmailTemplate(templateTypeId,  templateId,  limit,  offset,  sort,  sortBy );
+        return delegate.getEmailTemplate(templateTypeId,  templateId,  limit,  offset,  sortOrder,  sortBy );
     }
 
     @Valid
@@ -202,9 +202,9 @@ public class EmailApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getEmailTemplateType(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sort") String sort,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
+    public Response getEmailTemplateType(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
 
-        return delegate.getEmailTemplateType(templateTypeId,  limit,  offset,  sort,  sortBy );
+        return delegate.getEmailTemplateType(templateTypeId,  limit,  offset,  sortOrder,  sortBy );
     }
 
     @Valid
@@ -226,9 +226,9 @@ public class EmailApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getTemplatesListOfEmailTemplateType(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sort") String sort,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
+    public Response getTemplatesListOfEmailTemplateType(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
 
-        return delegate.getTemplatesListOfEmailTemplateType(templateTypeId,  limit,  offset,  sort,  sortBy );
+        return delegate.getTemplatesListOfEmailTemplateType(templateTypeId,  limit,  offset,  sortOrder,  sortBy );
     }
 
     @Valid

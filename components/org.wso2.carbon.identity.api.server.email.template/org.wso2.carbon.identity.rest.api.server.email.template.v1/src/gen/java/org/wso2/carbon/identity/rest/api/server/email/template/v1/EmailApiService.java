@@ -40,13 +40,13 @@ public interface EmailApiService {
 
       public Response deleteEmailTemplateType(String templateTypeId);
 
-      public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sort, String sortBy);
+      public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sortOrder, String sortBy);
 
-      public Response getEmailTemplate(String templateTypeId, String templateId, Integer limit, Integer offset, String sort, String sortBy);
+      public Response getEmailTemplate(String templateTypeId, String templateId, Integer limit, Integer offset, String sortOrder, String sortBy);
 
-      public Response getEmailTemplateType(String templateTypeId, Integer limit, Integer offset, String sort, String sortBy);
+      public Response getEmailTemplateType(String templateTypeId, Integer limit, Integer offset, String sortOrder, String sortBy);
 
-      public Response getTemplatesListOfEmailTemplateType(String templateTypeId, Integer limit, Integer offset, String sort, String sortBy);
+      public Response getTemplatesListOfEmailTemplateType(String templateTypeId, Integer limit, Integer offset, String sortOrder, String sortBy);
 
       public Response updateEmailTemplate(String templateTypeId, String templateId, EmailTemplateWithID emailTemplateWithID);
 

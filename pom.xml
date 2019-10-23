@@ -263,6 +263,12 @@
                 <scope>provided</scope>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.email.template.common</artifactId>
+                <scope>provided</scope>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -338,7 +344,7 @@
         <maven.findbugsplugin.version>3.0.4</maven.findbugsplugin.version>
         <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
-        <identity.event.handler.version>1.2.8</identity.event.handler.version>
+        <identity.event.handler.version>1.2.9</identity.event.handler.version>
     </properties>
 
     <modules>
