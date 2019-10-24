@@ -23,13 +23,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.api.server.common.error.APIError;
-import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.SERVER_API_PATH_COMPONENT;
