@@ -43,10 +43,6 @@ public class ContextLoader {
 
     private static final Log LOG = LogFactory.getLog(ContextLoader.class);
 
-    private static final String ERROR_CODE = "SE-50001";
-    private static final String ERROR_MESSAGE = "Unexpected Processing Error.";
-    private static final String ERROR_DESCRIPTION = "Server encountered an error while building the resource location.";
-
     /**
      * Retrieves loaded tenant domain from carbon context.
      *
@@ -107,13 +103,9 @@ public class ContextLoader {
                 try {
                     return new URI(ui.getBaseUri().getScheme(), ui.getBaseUri().getAuthority(), url, null, null);
                 } catch (URISyntaxException e) {
-                    LOG.error(ERROR_DESCRIPTION + ": " + e);
-                    ErrorResponse errorResponse = new ErrorResponse.Builder()
-                            .withCode(ERROR_CODE)
-                            .withMessage(ERROR_MESSAGE)
-                            .withDescription(ERROR_DESCRIPTION)
-                            .build();
-                    throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponse);
+                    LOG.error("Server encountered an error while building the location URL with scheme: " +
+                            ui.getBaseUri().getScheme() + ", authority: " + ui.getBaseUri().getAuthority() +
+                            ", url: " + url, e);
                 }
             }
         }
