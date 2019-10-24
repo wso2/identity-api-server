@@ -30,7 +30,7 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.CMT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURI;
+import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
 
 /**
  * Claim management api service implementation.
@@ -146,12 +146,12 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
 
     private URI getResourceLocation(String dialectId) {
 
-        return buildURI(String.format(V1_API_PATH_COMPONENT + CMT_PATH_COMPONENT + "/%s", dialectId));
+        return buildURIForHeader(String.format(V1_API_PATH_COMPONENT + CMT_PATH_COMPONENT + "/%s", dialectId));
     }
 
     private URI getResourceLocation(String dialectId, String claimId) {
 
-        return buildURI(String.format(V1_API_PATH_COMPONENT + CMT_PATH_COMPONENT + "/%s/claims/%s", dialectId,
+        return buildURIForHeader(String.format(V1_API_PATH_COMPONENT + CMT_PATH_COMPONENT + "/%s/claims/%s", dialectId,
                 claimId));
     }
 }

@@ -29,8 +29,9 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURI;
+import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
 import static org.wso2.carbon.identity.api.server.email.template.common.Constants.EMAIL_TEMPLATES_API_BASE_PATH;
+import static org.wso2.carbon.identity.api.server.email.template.common.Constants.EMAIL_TEMPLATES_PATH;
 import static org.wso2.carbon.identity.api.server.email.template.common.Constants.EMAIL_TEMPLATE_TYPES_PATH;
 import static org.wso2.carbon.identity.api.server.email.template.common.Constants.PATH_SEPARATOR;
 
@@ -47,9 +48,9 @@ public class EmailApiServiceImpl implements EmailApiService {
 
         SimpleEmailTemplate simpleEmailTemplate = emailTemplatesService.addEmailTemplate(templateTypeId,
                 emailTemplateWithID);
-        URI headerLocation = buildURI(
+        URI headerLocation = buildURIForHeader(
                 V1_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
-                PATH_SEPARATOR + templateTypeId + PATH_SEPARATOR + simpleEmailTemplate.getId());
+                PATH_SEPARATOR + templateTypeId + EMAIL_TEMPLATES_PATH + PATH_SEPARATOR + simpleEmailTemplate.getId());
         return Response.created(headerLocation).entity(simpleEmailTemplate).build();
     }
 
@@ -57,7 +58,7 @@ public class EmailApiServiceImpl implements EmailApiService {
     public Response addEmailTemplateType(EmailTemplateType emailTemplateType) {
 
         EmailTemplateTypeWithoutTemplates templateType = emailTemplatesService.addEmailTemplateType(emailTemplateType);
-        URI headerLocation = buildURI(
+        URI headerLocation = buildURIForHeader(
                 V1_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
                         PATH_SEPARATOR + templateType.getId());
         return Response.created(headerLocation).entity(templateType).build();
