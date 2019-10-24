@@ -92,7 +92,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REQUIRED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_SUPPORTED_BY_DEFAULT;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURI;
+import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForBody;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CONFLICT;
@@ -556,7 +556,8 @@ public class ServerClaimManagementService {
 
         LinkDTO linkDTO = new LinkDTO();
         linkDTO.setRel(REL_CLAIMS);
-        linkDTO.setHref(buildURI(String.format(V1_API_PATH_COMPONENT + CMT_PATH_COMPONENT + "/%s/claims", dialectId))
+        linkDTO.setHref(buildURIForBody(String.format(V1_API_PATH_COMPONENT +
+                CMT_PATH_COMPONENT + "/%s/claims", dialectId))
                 .toString());
 
         claimDialectResDTO.setLink(linkDTO);

@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.challenge.common.ChallengeConstant.CHALLENGES_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.challenge.common.ChallengeConstant.CHALLENGE_QUESTION_SET_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURI;
+import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
 
 /**
  * API service implementation of server challenge operations.
@@ -29,14 +29,14 @@ public class ChallengesApiServiceImpl extends ChallengesApiService {
         challengeService.patchChallengeSet(challengeSetId, challengeQuestion);
         String challengeQuestionPath = String
                 .format(V1_API_PATH_COMPONENT + CHALLENGE_QUESTION_SET_PATH_COMPONENT, challengeSetId);
-        return Response.created(buildURI(challengeQuestionPath)).build();
+        return Response.created(buildURIForHeader(challengeQuestionPath)).build();
     }
 
     @Override
     public Response addChallenges(List<ChallengeSetDTO> challengeSet) {
 
         challengeService.addChallengeSets(challengeSet);
-        return Response.created(buildURI(V1_API_PATH_COMPONENT + CHALLENGES_PATH_COMPONENT)).build();
+        return Response.created(buildURIForHeader(V1_API_PATH_COMPONENT + CHALLENGES_PATH_COMPONENT)).build();
     }
 
     @Override
