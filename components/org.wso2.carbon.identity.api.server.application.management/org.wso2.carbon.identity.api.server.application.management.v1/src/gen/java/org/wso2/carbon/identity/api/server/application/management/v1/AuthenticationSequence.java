@@ -35,6 +35,8 @@ public class AuthenticationSequence  {
   
     private List<AuthenticationStep> steps = null;
 
+    private List<String> requestPathAuthenticators = null;
+
     private String script;
     private String subjectStepId;
     private String attributeStepId;
@@ -62,6 +64,32 @@ public class AuthenticationSequence  {
             this.steps = new ArrayList<>();
         }
         this.steps.add(stepsItem);
+        return this;
+    }
+
+        /**
+    **/
+    public AuthenticationSequence requestPathAuthenticators(List<String> requestPathAuthenticators) {
+
+        this.requestPathAuthenticators = requestPathAuthenticators;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("requestPathAuthenticators")
+    @Valid
+    public List<String> getRequestPathAuthenticators() {
+        return requestPathAuthenticators;
+    }
+    public void setRequestPathAuthenticators(List<String> requestPathAuthenticators) {
+        this.requestPathAuthenticators = requestPathAuthenticators;
+    }
+
+    public AuthenticationSequence addRequestPathAuthenticatorsItem(String requestPathAuthenticatorsItem) {
+        if (this.requestPathAuthenticators == null) {
+            this.requestPathAuthenticators = new ArrayList<>();
+        }
+        this.requestPathAuthenticators.add(requestPathAuthenticatorsItem);
         return this;
     }
 
@@ -132,6 +160,7 @@ public class AuthenticationSequence  {
         }
         AuthenticationSequence authenticationSequence = (AuthenticationSequence) o;
         return Objects.equals(this.steps, authenticationSequence.steps) &&
+            Objects.equals(this.requestPathAuthenticators, authenticationSequence.requestPathAuthenticators) &&
             Objects.equals(this.script, authenticationSequence.script) &&
             Objects.equals(this.subjectStepId, authenticationSequence.subjectStepId) &&
             Objects.equals(this.attributeStepId, authenticationSequence.attributeStepId);
@@ -139,7 +168,7 @@ public class AuthenticationSequence  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(steps, script, subjectStepId, attributeStepId);
+        return Objects.hash(steps, requestPathAuthenticators, script, subjectStepId, attributeStepId);
     }
 
     @Override
@@ -149,6 +178,7 @@ public class AuthenticationSequence  {
         sb.append("class AuthenticationSequence {\n");
         
         sb.append("    steps: ").append(toIndentedString(steps)).append("\n");
+        sb.append("    requestPathAuthenticators: ").append(toIndentedString(requestPathAuthenticators)).append("\n");
         sb.append("    script: ").append(toIndentedString(script)).append("\n");
         sb.append("    subjectStepId: ").append(toIndentedString(subjectStepId)).append("\n");
         sb.append("    attributeStepId: ").append(toIndentedString(attributeStepId)).append("\n");
