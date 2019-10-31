@@ -27,7 +27,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 /**
  * Converts the backend model ApplicationBasicInfo into the corresponding API model object.
  */
-public class ApplicationBasicInfoToExternalModel implements Function<ApplicationBasicInfo, ApplicationListItem> {
+public class ApplicationBasicInfoToApiModel implements Function<ApplicationBasicInfo, ApplicationListItem> {
 
     @Override
     public ApplicationListItem apply(ApplicationBasicInfo applicationBasicInfo) {

@@ -25,7 +25,7 @@ import java.util.function.Function;
 /**
  * Converts the backend model IdentityProvider into the corresponding API model object.
  */
-public class ProvisioningIdpToExternalModel implements Function<IdentityProvider, OutboundProvisioningConfiguration> {
+public class ProvisioningIdpToApiModel implements Function<IdentityProvider, OutboundProvisioningConfiguration> {
 
     @Override
     public OutboundProvisioningConfiguration apply(IdentityProvider identityProvider) {

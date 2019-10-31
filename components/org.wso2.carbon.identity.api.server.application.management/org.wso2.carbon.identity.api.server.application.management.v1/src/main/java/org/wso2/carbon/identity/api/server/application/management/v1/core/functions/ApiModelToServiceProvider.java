@@ -23,7 +23,7 @@ import java.util.function.Function;
 /**
  * Converts the API model object into a ServiceProvider object.
  */
-public class ExternalModelToApplication implements Function<ApplicationModel, ServiceProvider> {
+public class ApiModelToServiceProvider implements Function<ApplicationModel, ServiceProvider> {
 
     @Override
     public ServiceProvider apply(ApplicationModel applicationModel) {

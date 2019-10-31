@@ -34,7 +34,7 @@ import java.util.function.Function;
 /**
  * Converts the backend model OAuthConsumerAppDTO into the corresponding API model object.
  */
-public class OAuthConsumerAppToExternalModel implements Function<OAuthConsumerAppDTO, OpenIDConnectConfiguration> {
+public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO, OpenIDConnectConfiguration> {
 
     @Override
     public OpenIDConnectConfiguration apply(OAuthConsumerAppDTO oauthAppDTO) {

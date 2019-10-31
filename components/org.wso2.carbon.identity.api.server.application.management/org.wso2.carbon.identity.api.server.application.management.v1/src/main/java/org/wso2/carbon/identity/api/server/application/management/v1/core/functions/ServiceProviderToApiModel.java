@@ -77,9 +77,9 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
 /**
  * Converts the backend model ServiceProvider into the corresponding API model object.
  */
-public class ApplicationToExternalModel implements Function<ServiceProvider, ApplicationModel> {
+public class ServiceProviderToApiModel implements Function<ServiceProvider, ApplicationModel> {
 
-    private static final Log log = LogFactory.getLog(ApplicationToExternalModel.class);
+    private static final Log log = LogFactory.getLog(ServiceProviderToApiModel.class);
 
     @Override
     public ApplicationModel apply(ServiceProvider application) {
@@ -126,20 +126,22 @@ public class ApplicationToExternalModel implements Function<ServiceProvider, App
         }
 
         if (authConfig.getAuthenticationSteps() != null) {
-            Arrays.stream(authConfig.getAuthenticationSteps()).forEach(x -> {
-                authSequence.addStepsItem(buildAuthStep(x));
-                if (x.isSubjectStep()) {
-                    authSequence.setSubjectStepId(String.valueOf(x.getStepOrder()));
+            Arrays.stream(authConfig.getAuthenticationSteps()).forEach(authenticationStep -> {
+                authSequence.addStepsItem(buildAuthStep(authenticationStep));
+                if (authenticationStep.isSubjectStep()) {
+                    authSequence.setSubjectStepId(String.valueOf(authenticationStep.getStepOrder()));
                 }
-                if (x.isAttributeStep()) {
-                    authSequence.setAttributeStepId(String.valueOf(x.getStepOrder()));
+                if (authenticationStep.isAttributeStep()) {
+                    authSequence.setAttributeStepId(String.valueOf(authenticationStep.getStepOrder()));
                 }
             });
         }
 
-        RequestPathAuthenticatorConfig[] requestPathConfig = application.getRequestPathAuthenticatorConfigs();
-        if (requestPathConfig != null) {
-            Arrays.stream(requestPathConfig).forEach(x -> authSequence.addRequestPathAuthenticatorsItem(x.getName()));
+        RequestPathAuthenticatorConfig[] requestPathConfigs = application.getRequestPathAuthenticatorConfigs();
+        if (requestPathConfigs != null) {
+            Arrays.stream(requestPathConfigs)
+                    .forEach(requestPathConfig ->
+                            authSequence.addRequestPathAuthenticatorsItem(requestPathConfig.getName()));
         }
 
         return authSequence;
@@ -158,20 +160,21 @@ public class ApplicationToExternalModel implements Function<ServiceProvider, App
         return defaultSP;
     }
 
-    private AuthenticationStep buildAuthStep(org.wso2.carbon.identity.application.common.model.AuthenticationStep x) {
+    private AuthenticationStep buildAuthStep(org.wso2.carbon.identity.application.common.model.AuthenticationStep
+                                                     authenticationStep) {
 
         AuthenticationStep authStep = new AuthenticationStep();
-        authStep.setId(String.valueOf(x.getStepOrder()));
+        authStep.setId(String.valueOf(authenticationStep.getStepOrder()));
 
-        if (x.getFederatedIdentityProviders() != null) {
-            Arrays.stream(x.getFederatedIdentityProviders()).forEach(y -> authStep.addOptionsItem(
+        if (authenticationStep.getFederatedIdentityProviders() != null) {
+            Arrays.stream(authenticationStep.getFederatedIdentityProviders()).forEach(y -> authStep.addOptionsItem(
                     new Authenticator().idp(y.getIdentityProviderName())
                             .authenticator(y.getDefaultAuthenticatorConfig().getName()))
             );
         }
 
-        if (x.getLocalAuthenticatorConfigs() != null) {
-            Arrays.stream(x.getLocalAuthenticatorConfigs()).forEach(y -> authStep.addOptionsItem(
+        if (authenticationStep.getLocalAuthenticatorConfigs() != null) {
+            Arrays.stream(authenticationStep.getLocalAuthenticatorConfigs()).forEach(y -> authStep.addOptionsItem(
                     new Authenticator().idp(FrameworkConstants.LOCAL_IDP_NAME).authenticator(y.getName()))
             );
         }
@@ -194,9 +197,9 @@ public class ApplicationToExternalModel implements Function<ServiceProvider, App
         if (application.getClaimConfig() != null) {
             if (application.getClaimConfig().getClaimMappings() != null) {
                 return Arrays.stream(application.getClaimConfig().getClaimMappings())
-                        .map(x -> new ClaimMappings()
-                                .applicationClaimUri(x.getRemoteClaim().getClaimUri())
-                                .localClaimUri(x.getLocalClaim().getClaimUri()))
+                        .map(claimMapping -> new ClaimMappings()
+                                .applicationClaimUri(claimMapping.getRemoteClaim().getClaimUri())
+                                .localClaimUri(claimMapping.getLocalClaim().getClaimUri()))
                         .collect(Collectors.toList());
             }
         }
@@ -209,9 +212,9 @@ public class ApplicationToExternalModel implements Function<ServiceProvider, App
             if (application.getClaimConfig().getClaimMappings() != null) {
                 return Arrays.stream(application.getClaimConfig().getClaimMappings())
                         .filter(ClaimMapping::isRequested)
-                        .map(x -> new RequestedClaimConfiguration()
-                                .claimUri(x.getRemoteClaim().getClaimUri())
-                                .mandatory(x.isMandatory()))
+                        .map(claimMapping -> new RequestedClaimConfiguration()
+                                .claimUri(claimMapping.getRemoteClaim().getClaimUri())
+                                .mandatory(claimMapping.isMandatory()))
                         .collect(Collectors.toList());
             }
         }
@@ -279,10 +282,10 @@ public class ApplicationToExternalModel implements Function<ServiceProvider, App
             RoleMapping[] roleMappings = application.getPermissionAndRoleConfig().getRoleMappings();
             if (roleMappings != null) {
                 Arrays.stream(roleMappings)
-                        .forEach(x -> roleConfig.addMappingsItem(
+                        .forEach(roleMapping -> roleConfig.addMappingsItem(
                                 new org.wso2.carbon.identity.api.server.application.management.v1.RoleMapping()
-                                        .applicationRole(x.getRemoteRole())
-                                        .localRole(x.getLocalRole().getLocalRoleName())
+                                        .applicationRole(roleMapping.getRemoteRole())
+                                        .localRole(roleMapping.getLocalRole().getLocalRoleName())
                         ));
             }
         }
@@ -315,7 +318,7 @@ public class ApplicationToExternalModel implements Function<ServiceProvider, App
 
         if (outboundProvisioningConfig.getProvisioningIdentityProviders() != null) {
             return Arrays.stream(outboundProvisioningConfig.getProvisioningIdentityProviders())
-                    .map(new ProvisioningIdpToExternalModel())
+                    .map(new ProvisioningIdpToApiModel())
                     .collect(Collectors.toList());
         }
 
@@ -357,8 +360,9 @@ public class ApplicationToExternalModel implements Function<ServiceProvider, App
         } else {
             // Check whether JWKS URI is configured
             return Arrays.stream(serviceProvider.getSpProperties())
-                    .filter(x -> StringUtils.equals(x.getName(), JWKS_URI_SP_PROPERTY_NAME))
-                    .findAny().map(x -> new Certificate().type(Certificate.TypeEnum.JWKS).value(x.getValue()))
+                    .filter(spProperty -> StringUtils.equals(spProperty.getName(), JWKS_URI_SP_PROPERTY_NAME))
+                    .findAny()
+                    .map(spProperty -> new Certificate().type(Certificate.TypeEnum.JWKS).value(spProperty.getValue()))
                     .orElse(null);
         }
     }
@@ -366,9 +370,9 @@ public class ApplicationToExternalModel implements Function<ServiceProvider, App
     private boolean getSkipConsent(ServiceProvider serviceProvider) {
 
         return Arrays.stream(serviceProvider.getSpProperties())
-                .filter(x -> StringUtils.equals(x.getName(), IdentityConstants.SKIP_CONSENT))
+                .filter(spProperty -> StringUtils.equals(spProperty.getName(), IdentityConstants.SKIP_CONSENT))
                 .findAny()
-                .map(x -> Boolean.parseBoolean(x.getValue()))
+                .map(spProperty -> Boolean.parseBoolean(spProperty.getValue()))
                 .orElse(false);
     }
 
@@ -414,11 +418,11 @@ public class ApplicationToExternalModel implements Function<ServiceProvider, App
 
             // TODO : check whether we need to throw an exception if we can't find a wstrust service
             return Arrays.stream(trustedServices)
-                    .filter(x -> StringUtils.equals(x.getServiceAddress(), audience))
+                    .filter(trustedServiceData -> StringUtils.equals(trustedServiceData.getServiceAddress(), audience))
                     .findAny()
-                    .map(x -> new WSTrustConfiguration()
-                            .audience(x.getServiceAddress())
-                            .certificateAlias(x.getCertAlias()))
+                    .map(trustedServiceData -> new WSTrustConfiguration()
+                            .audience(trustedServiceData.getServiceAddress())
+                            .certificateAlias(trustedServiceData.getCertAlias()))
                     .orElse(new WSTrustConfiguration());
 
         } catch (SecurityConfigException e) {
@@ -436,7 +440,8 @@ public class ApplicationToExternalModel implements Function<ServiceProvider, App
     private String getPassiveSTSWReply(Property[] properties) {
 
         // TODO : null check on property array
-        return Arrays.stream(properties).filter(x -> StringUtils.equals(x.getName(), PassiveSTS.PASSIVE_STS_REPLY_URL))
+        return Arrays.stream(properties)
+                .filter(property -> StringUtils.equals(property.getName(), PassiveSTS.PASSIVE_STS_REPLY_URL))
                 .findAny()
                 .map(Property::getValue).orElse(null);
     }
@@ -447,7 +452,7 @@ public class ApplicationToExternalModel implements Function<ServiceProvider, App
         try {
             OAuthConsumerAppDTO oauthApp =
                     ApplicationManagementServiceHolder.getOAuthAdminService().getOAuthApplicationData(clientId);
-            return new OAuthConsumerAppToExternalModel().apply(oauthApp);
+            return new OAuthConsumerAppToApiModel().apply(oauthApp);
 
         } catch (IdentityOAuthAdminException e) {
             throw handleServerError(e, "Error while retrieving oauth application data for clientId: " + clientId);
@@ -462,7 +467,7 @@ public class ApplicationToExternalModel implements Function<ServiceProvider, App
                     ApplicationManagementServiceHolder.getSamlssoConfigService().getServiceProvider(issuer);
 
             if (serviceProvider != null) {
-                return new SAMLSSOServiceProviderToExternalModel().apply(serviceProvider);
+                return new SAMLSSOServiceProviderToAPIModel().apply(serviceProvider);
             } else {
                 return null;
             }

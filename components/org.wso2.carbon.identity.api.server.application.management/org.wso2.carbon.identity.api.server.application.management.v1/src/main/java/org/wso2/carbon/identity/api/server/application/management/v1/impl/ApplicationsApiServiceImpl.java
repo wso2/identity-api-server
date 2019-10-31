@@ -285,10 +285,4 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
-
-//    private URI getResourceLocation(String resourceId) {
-//
-//        return buildURIForHeader(Constants.V1_API_PATH_COMPONENT + APPLICATION_MANAGEMENT_PATH_COMPONENT
-//                + "/" + resourceId);
-//    }
 }

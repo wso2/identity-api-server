@@ -24,9 +24,9 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.Link;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.ApplicationBasicInfoToExternalModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.ApplicationToExternalModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.ExternalModelToApplication;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.ApiModelToServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.ApplicationBasicInfoToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.ServiceProviderToApiModel;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
@@ -109,7 +109,7 @@ public class ServerApplicationManagementService {
             if (application == null) {
                 throw buildApiError(ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND, applicationId, tenantDomain);
             }
-            return new ApplicationToExternalModel().apply(application);
+            return new ServiceProviderToApiModel().apply(application);
         } catch (IdentityApplicationManagementException e) {
             throw handleServerError(e, "Error while retrieving application with id: " + applicationId);
         }
@@ -129,7 +129,7 @@ public class ServerApplicationManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            ServiceProvider updatedApp = new ExternalModelToApplication().apply(applicationModel);
+            ServiceProvider updatedApp = new ApiModelToServiceProvider().apply(applicationModel);
             getApplicationManagementService().updateApplicationByResourceId(applicationId, tenantDomain, updatedApp);
         } catch (IdentityApplicationManagementException e) {
             throw handleServerError(e, "Error while updating application with id: " + applicationId);
@@ -140,7 +140,7 @@ public class ServerApplicationManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            ServiceProvider application = new ExternalModelToApplication().apply(applicationModel);
+            ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
             return getApplicationManagementService().createApplication(application, tenantDomain);
         } catch (IdentityApplicationManagementException e) {
             throw handleServerError(e, "Error while updating application with name: " + applicationModel.getName());
@@ -168,7 +168,7 @@ public class ServerApplicationManagementService {
     private List<ApplicationListItem> getApplicationListItems(ApplicationBasicInfo[] allApplicationBasicInfo) {
 
         return Arrays.stream(allApplicationBasicInfo)
-                .map(new ApplicationBasicInfoToExternalModel())
+                .map(new ApplicationBasicInfoToApiModel())
                 .collect(Collectors.toList());
     }
 

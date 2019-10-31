@@ -26,7 +26,7 @@ import java.util.function.Function;
 /**
  * Converts the backend model SAMLSSOServiceProviderDTO into the corresponding API model object.
  */
-public class SAMLSSOServiceProviderToExternalModel implements Function<SAMLSSOServiceProviderDTO, SAML2Configuration> {
+public class SAMLSSOServiceProviderToAPIModel implements Function<SAMLSSOServiceProviderDTO, SAML2Configuration> {
 
     private static final String QUALIFIER_ID = ":urn:sp:qualifier:";
 
