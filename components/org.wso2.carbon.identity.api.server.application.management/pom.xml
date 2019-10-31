@@ -31,6 +31,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>org.wso2.carbon.identity.api.server.application.management.common</module>
         <module>org.wso2.carbon.identity.api.server.application.management.v1</module>
     </modules>
 

@@ -33,19 +33,20 @@ import javax.xml.bind.annotation.*;
 public class SAML2Configuration  {
   
     private String issuer;
+    private String serviceProviderQualifier;
     private List<String> assertionConsumerUrls = null;
 
     private String defaultAssertionConsumerUrl;
-    private Boolean enableRequestSigning = true;
+    private Boolean enableRequestSignatureValidation = true;
     private Boolean enableAssertionEncryption = false;
-    private Boolean enableResponseSigning = true;
-    private String serviceProviderQualifier;
+    private String assertionEncryptionAlgroithm;
+    private String keyEncryptionAlgorithm;
     private String nameIdFormat = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
+    private Boolean enableIdpInitiatedSingleSignOn = false;
+    private Boolean enableResponseSigning = true;
     private String requestValidationCertificateAlias;
     private String responseSigningAlgorithm;
     private String responseDigestAlgorithm;
-    private String assertionEncryptionAlgroithm;
-    private String keyEncryptionAlgorithm;
     private Boolean enableSingleLogout = true;
     private String singleLogoutResponseUrl;
     private String singleLogoutRequestUrl;
@@ -83,8 +84,19 @@ public enum SingleLogoutMethodEnum {
 }
 
     private SingleLogoutMethodEnum singleLogoutMethod;
-    private Boolean enableIdpInitiatedSingleSignOn = false;
     private Boolean enableIdpInitiatedSingleLogOut = false;
+    private List<String> idpInitiatedLogoutReturnUrls = null;
+
+    private Boolean enableAttributeProfile = false;
+    private Boolean includedAttributeInResponseAlways = false;
+    private List<String> audiences = null;
+
+    private List<String> recipients = null;
+
+    private Boolean enableAssertionQueryProfile = false;
+    private Boolean enableSAML2ArtifactBinding = false;
+    private Boolean enableSignatureValidationInArtifactBinding = false;
+    private String idPEntityidAlias;
 
     /**
     **/
@@ -102,6 +114,24 @@ public enum SingleLogoutMethodEnum {
     }
     public void setIssuer(String issuer) {
         this.issuer = issuer;
+    }
+
+    /**
+    **/
+    public SAML2Configuration serviceProviderQualifier(String serviceProviderQualifier) {
+
+        this.serviceProviderQualifier = serviceProviderQualifier;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("serviceProviderQualifier")
+    @Valid
+    public String getServiceProviderQualifier() {
+        return serviceProviderQualifier;
+    }
+    public void setServiceProviderQualifier(String serviceProviderQualifier) {
+        this.serviceProviderQualifier = serviceProviderQualifier;
     }
 
     /**
@@ -150,20 +180,20 @@ public enum SingleLogoutMethodEnum {
 
     /**
     **/
-    public SAML2Configuration enableRequestSigning(Boolean enableRequestSigning) {
+    public SAML2Configuration enableRequestSignatureValidation(Boolean enableRequestSignatureValidation) {
 
-        this.enableRequestSigning = enableRequestSigning;
+        this.enableRequestSignatureValidation = enableRequestSignatureValidation;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("enableRequestSigning")
+    @JsonProperty("enableRequestSignatureValidation")
     @Valid
-    public Boolean getEnableRequestSigning() {
-        return enableRequestSigning;
+    public Boolean getEnableRequestSignatureValidation() {
+        return enableRequestSignatureValidation;
     }
-    public void setEnableRequestSigning(Boolean enableRequestSigning) {
-        this.enableRequestSigning = enableRequestSigning;
+    public void setEnableRequestSignatureValidation(Boolean enableRequestSignatureValidation) {
+        this.enableRequestSignatureValidation = enableRequestSignatureValidation;
     }
 
     /**
@@ -186,38 +216,38 @@ public enum SingleLogoutMethodEnum {
 
     /**
     **/
-    public SAML2Configuration enableResponseSigning(Boolean enableResponseSigning) {
+    public SAML2Configuration assertionEncryptionAlgroithm(String assertionEncryptionAlgroithm) {
 
-        this.enableResponseSigning = enableResponseSigning;
+        this.assertionEncryptionAlgroithm = assertionEncryptionAlgroithm;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("enableResponseSigning")
+    @JsonProperty("assertionEncryptionAlgroithm")
     @Valid
-    public Boolean getEnableResponseSigning() {
-        return enableResponseSigning;
+    public String getAssertionEncryptionAlgroithm() {
+        return assertionEncryptionAlgroithm;
     }
-    public void setEnableResponseSigning(Boolean enableResponseSigning) {
-        this.enableResponseSigning = enableResponseSigning;
+    public void setAssertionEncryptionAlgroithm(String assertionEncryptionAlgroithm) {
+        this.assertionEncryptionAlgroithm = assertionEncryptionAlgroithm;
     }
 
     /**
     **/
-    public SAML2Configuration serviceProviderQualifier(String serviceProviderQualifier) {
+    public SAML2Configuration keyEncryptionAlgorithm(String keyEncryptionAlgorithm) {
 
-        this.serviceProviderQualifier = serviceProviderQualifier;
+        this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("serviceProviderQualifier")
+    @JsonProperty("keyEncryptionAlgorithm")
     @Valid
-    public String getServiceProviderQualifier() {
-        return serviceProviderQualifier;
+    public String getKeyEncryptionAlgorithm() {
+        return keyEncryptionAlgorithm;
     }
-    public void setServiceProviderQualifier(String serviceProviderQualifier) {
-        this.serviceProviderQualifier = serviceProviderQualifier;
+    public void setKeyEncryptionAlgorithm(String keyEncryptionAlgorithm) {
+        this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
     }
 
     /**
@@ -236,6 +266,42 @@ public enum SingleLogoutMethodEnum {
     }
     public void setNameIdFormat(String nameIdFormat) {
         this.nameIdFormat = nameIdFormat;
+    }
+
+    /**
+    **/
+    public SAML2Configuration enableIdpInitiatedSingleSignOn(Boolean enableIdpInitiatedSingleSignOn) {
+
+        this.enableIdpInitiatedSingleSignOn = enableIdpInitiatedSingleSignOn;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("enableIdpInitiatedSingleSignOn")
+    @Valid
+    public Boolean getEnableIdpInitiatedSingleSignOn() {
+        return enableIdpInitiatedSingleSignOn;
+    }
+    public void setEnableIdpInitiatedSingleSignOn(Boolean enableIdpInitiatedSingleSignOn) {
+        this.enableIdpInitiatedSingleSignOn = enableIdpInitiatedSingleSignOn;
+    }
+
+    /**
+    **/
+    public SAML2Configuration enableResponseSigning(Boolean enableResponseSigning) {
+
+        this.enableResponseSigning = enableResponseSigning;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("enableResponseSigning")
+    @Valid
+    public Boolean getEnableResponseSigning() {
+        return enableResponseSigning;
+    }
+    public void setEnableResponseSigning(Boolean enableResponseSigning) {
+        this.enableResponseSigning = enableResponseSigning;
     }
 
     /**
@@ -290,42 +356,6 @@ public enum SingleLogoutMethodEnum {
     }
     public void setResponseDigestAlgorithm(String responseDigestAlgorithm) {
         this.responseDigestAlgorithm = responseDigestAlgorithm;
-    }
-
-    /**
-    **/
-    public SAML2Configuration assertionEncryptionAlgroithm(String assertionEncryptionAlgroithm) {
-
-        this.assertionEncryptionAlgroithm = assertionEncryptionAlgroithm;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("assertionEncryptionAlgroithm")
-    @Valid
-    public String getAssertionEncryptionAlgroithm() {
-        return assertionEncryptionAlgroithm;
-    }
-    public void setAssertionEncryptionAlgroithm(String assertionEncryptionAlgroithm) {
-        this.assertionEncryptionAlgroithm = assertionEncryptionAlgroithm;
-    }
-
-    /**
-    **/
-    public SAML2Configuration keyEncryptionAlgorithm(String keyEncryptionAlgorithm) {
-
-        this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("keyEncryptionAlgorithm")
-    @Valid
-    public String getKeyEncryptionAlgorithm() {
-        return keyEncryptionAlgorithm;
-    }
-    public void setKeyEncryptionAlgorithm(String keyEncryptionAlgorithm) {
-        this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
     }
 
     /**
@@ -404,24 +434,6 @@ public enum SingleLogoutMethodEnum {
 
     /**
     **/
-    public SAML2Configuration enableIdpInitiatedSingleSignOn(Boolean enableIdpInitiatedSingleSignOn) {
-
-        this.enableIdpInitiatedSingleSignOn = enableIdpInitiatedSingleSignOn;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("enableIdpInitiatedSingleSignOn")
-    @Valid
-    public Boolean getEnableIdpInitiatedSingleSignOn() {
-        return enableIdpInitiatedSingleSignOn;
-    }
-    public void setEnableIdpInitiatedSingleSignOn(Boolean enableIdpInitiatedSingleSignOn) {
-        this.enableIdpInitiatedSingleSignOn = enableIdpInitiatedSingleSignOn;
-    }
-
-    /**
-    **/
     public SAML2Configuration enableIdpInitiatedSingleLogOut(Boolean enableIdpInitiatedSingleLogOut) {
 
         this.enableIdpInitiatedSingleLogOut = enableIdpInitiatedSingleLogOut;
@@ -438,6 +450,195 @@ public enum SingleLogoutMethodEnum {
         this.enableIdpInitiatedSingleLogOut = enableIdpInitiatedSingleLogOut;
     }
 
+    /**
+    **/
+    public SAML2Configuration idpInitiatedLogoutReturnUrls(List<String> idpInitiatedLogoutReturnUrls) {
+
+        this.idpInitiatedLogoutReturnUrls = idpInitiatedLogoutReturnUrls;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("idpInitiatedLogoutReturnUrls")
+    @Valid
+    public List<String> getIdpInitiatedLogoutReturnUrls() {
+        return idpInitiatedLogoutReturnUrls;
+    }
+    public void setIdpInitiatedLogoutReturnUrls(List<String> idpInitiatedLogoutReturnUrls) {
+        this.idpInitiatedLogoutReturnUrls = idpInitiatedLogoutReturnUrls;
+    }
+
+    public SAML2Configuration addIdpInitiatedLogoutReturnUrlsItem(String idpInitiatedLogoutReturnUrlsItem) {
+        if (this.idpInitiatedLogoutReturnUrls == null) {
+            this.idpInitiatedLogoutReturnUrls = new ArrayList<>();
+        }
+        this.idpInitiatedLogoutReturnUrls.add(idpInitiatedLogoutReturnUrlsItem);
+        return this;
+    }
+
+        /**
+    **/
+    public SAML2Configuration enableAttributeProfile(Boolean enableAttributeProfile) {
+
+        this.enableAttributeProfile = enableAttributeProfile;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("enableAttributeProfile")
+    @Valid
+    public Boolean getEnableAttributeProfile() {
+        return enableAttributeProfile;
+    }
+    public void setEnableAttributeProfile(Boolean enableAttributeProfile) {
+        this.enableAttributeProfile = enableAttributeProfile;
+    }
+
+    /**
+    **/
+    public SAML2Configuration includedAttributeInResponseAlways(Boolean includedAttributeInResponseAlways) {
+
+        this.includedAttributeInResponseAlways = includedAttributeInResponseAlways;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("includedAttributeInResponseAlways")
+    @Valid
+    public Boolean getIncludedAttributeInResponseAlways() {
+        return includedAttributeInResponseAlways;
+    }
+    public void setIncludedAttributeInResponseAlways(Boolean includedAttributeInResponseAlways) {
+        this.includedAttributeInResponseAlways = includedAttributeInResponseAlways;
+    }
+
+    /**
+    * Additional audience values to be added to the SAML Assertions
+    **/
+    public SAML2Configuration audiences(List<String> audiences) {
+
+        this.audiences = audiences;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"https://app.example.com/saml\"]", value = "Additional audience values to be added to the SAML Assertions")
+    @JsonProperty("audiences")
+    @Valid
+    public List<String> getAudiences() {
+        return audiences;
+    }
+    public void setAudiences(List<String> audiences) {
+        this.audiences = audiences;
+    }
+
+    public SAML2Configuration addAudiencesItem(String audiencesItem) {
+        if (this.audiences == null) {
+            this.audiences = new ArrayList<>();
+        }
+        this.audiences.add(audiencesItem);
+        return this;
+    }
+
+        /**
+    * Additional recipient values to be added to the SAML Assertions
+    **/
+    public SAML2Configuration recipients(List<String> recipients) {
+
+        this.recipients = recipients;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"https://app.example.com/saml\"]", value = "Additional recipient values to be added to the SAML Assertions")
+    @JsonProperty("recipients")
+    @Valid
+    public List<String> getRecipients() {
+        return recipients;
+    }
+    public void setRecipients(List<String> recipients) {
+        this.recipients = recipients;
+    }
+
+    public SAML2Configuration addRecipientsItem(String recipientsItem) {
+        if (this.recipients == null) {
+            this.recipients = new ArrayList<>();
+        }
+        this.recipients.add(recipientsItem);
+        return this;
+    }
+
+        /**
+    **/
+    public SAML2Configuration enableAssertionQueryProfile(Boolean enableAssertionQueryProfile) {
+
+        this.enableAssertionQueryProfile = enableAssertionQueryProfile;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("enableAssertionQueryProfile")
+    @Valid
+    public Boolean getEnableAssertionQueryProfile() {
+        return enableAssertionQueryProfile;
+    }
+    public void setEnableAssertionQueryProfile(Boolean enableAssertionQueryProfile) {
+        this.enableAssertionQueryProfile = enableAssertionQueryProfile;
+    }
+
+    /**
+    **/
+    public SAML2Configuration enableSAML2ArtifactBinding(Boolean enableSAML2ArtifactBinding) {
+
+        this.enableSAML2ArtifactBinding = enableSAML2ArtifactBinding;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("enableSAML2ArtifactBinding")
+    @Valid
+    public Boolean getEnableSAML2ArtifactBinding() {
+        return enableSAML2ArtifactBinding;
+    }
+    public void setEnableSAML2ArtifactBinding(Boolean enableSAML2ArtifactBinding) {
+        this.enableSAML2ArtifactBinding = enableSAML2ArtifactBinding;
+    }
+
+    /**
+    **/
+    public SAML2Configuration enableSignatureValidationInArtifactBinding(Boolean enableSignatureValidationInArtifactBinding) {
+
+        this.enableSignatureValidationInArtifactBinding = enableSignatureValidationInArtifactBinding;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("enableSignatureValidationInArtifactBinding")
+    @Valid
+    public Boolean getEnableSignatureValidationInArtifactBinding() {
+        return enableSignatureValidationInArtifactBinding;
+    }
+    public void setEnableSignatureValidationInArtifactBinding(Boolean enableSignatureValidationInArtifactBinding) {
+        this.enableSignatureValidationInArtifactBinding = enableSignatureValidationInArtifactBinding;
+    }
+
+    /**
+    * Default value is the IdP Entity ID value specified in Resident IdP
+    **/
+    public SAML2Configuration idPEntityidAlias(String idPEntityidAlias) {
+
+        this.idPEntityidAlias = idPEntityidAlias;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Default value is the IdP Entity ID value specified in Resident IdP")
+    @JsonProperty("idPEntityidAlias")
+    @Valid
+    public String getIdPEntityidAlias() {
+        return idPEntityidAlias;
+    }
+    public void setIdPEntityidAlias(String idPEntityidAlias) {
+        this.idPEntityidAlias = idPEntityidAlias;
+    }
+
 
 
     @Override
@@ -451,29 +652,38 @@ public enum SingleLogoutMethodEnum {
         }
         SAML2Configuration saML2Configuration = (SAML2Configuration) o;
         return Objects.equals(this.issuer, saML2Configuration.issuer) &&
+            Objects.equals(this.serviceProviderQualifier, saML2Configuration.serviceProviderQualifier) &&
             Objects.equals(this.assertionConsumerUrls, saML2Configuration.assertionConsumerUrls) &&
             Objects.equals(this.defaultAssertionConsumerUrl, saML2Configuration.defaultAssertionConsumerUrl) &&
-            Objects.equals(this.enableRequestSigning, saML2Configuration.enableRequestSigning) &&
+            Objects.equals(this.enableRequestSignatureValidation, saML2Configuration.enableRequestSignatureValidation) &&
             Objects.equals(this.enableAssertionEncryption, saML2Configuration.enableAssertionEncryption) &&
-            Objects.equals(this.enableResponseSigning, saML2Configuration.enableResponseSigning) &&
-            Objects.equals(this.serviceProviderQualifier, saML2Configuration.serviceProviderQualifier) &&
+            Objects.equals(this.assertionEncryptionAlgroithm, saML2Configuration.assertionEncryptionAlgroithm) &&
+            Objects.equals(this.keyEncryptionAlgorithm, saML2Configuration.keyEncryptionAlgorithm) &&
             Objects.equals(this.nameIdFormat, saML2Configuration.nameIdFormat) &&
+            Objects.equals(this.enableIdpInitiatedSingleSignOn, saML2Configuration.enableIdpInitiatedSingleSignOn) &&
+            Objects.equals(this.enableResponseSigning, saML2Configuration.enableResponseSigning) &&
             Objects.equals(this.requestValidationCertificateAlias, saML2Configuration.requestValidationCertificateAlias) &&
             Objects.equals(this.responseSigningAlgorithm, saML2Configuration.responseSigningAlgorithm) &&
             Objects.equals(this.responseDigestAlgorithm, saML2Configuration.responseDigestAlgorithm) &&
-            Objects.equals(this.assertionEncryptionAlgroithm, saML2Configuration.assertionEncryptionAlgroithm) &&
-            Objects.equals(this.keyEncryptionAlgorithm, saML2Configuration.keyEncryptionAlgorithm) &&
             Objects.equals(this.enableSingleLogout, saML2Configuration.enableSingleLogout) &&
             Objects.equals(this.singleLogoutResponseUrl, saML2Configuration.singleLogoutResponseUrl) &&
             Objects.equals(this.singleLogoutRequestUrl, saML2Configuration.singleLogoutRequestUrl) &&
             Objects.equals(this.singleLogoutMethod, saML2Configuration.singleLogoutMethod) &&
-            Objects.equals(this.enableIdpInitiatedSingleSignOn, saML2Configuration.enableIdpInitiatedSingleSignOn) &&
-            Objects.equals(this.enableIdpInitiatedSingleLogOut, saML2Configuration.enableIdpInitiatedSingleLogOut);
+            Objects.equals(this.enableIdpInitiatedSingleLogOut, saML2Configuration.enableIdpInitiatedSingleLogOut) &&
+            Objects.equals(this.idpInitiatedLogoutReturnUrls, saML2Configuration.idpInitiatedLogoutReturnUrls) &&
+            Objects.equals(this.enableAttributeProfile, saML2Configuration.enableAttributeProfile) &&
+            Objects.equals(this.includedAttributeInResponseAlways, saML2Configuration.includedAttributeInResponseAlways) &&
+            Objects.equals(this.audiences, saML2Configuration.audiences) &&
+            Objects.equals(this.recipients, saML2Configuration.recipients) &&
+            Objects.equals(this.enableAssertionQueryProfile, saML2Configuration.enableAssertionQueryProfile) &&
+            Objects.equals(this.enableSAML2ArtifactBinding, saML2Configuration.enableSAML2ArtifactBinding) &&
+            Objects.equals(this.enableSignatureValidationInArtifactBinding, saML2Configuration.enableSignatureValidationInArtifactBinding) &&
+            Objects.equals(this.idPEntityidAlias, saML2Configuration.idPEntityidAlias);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(issuer, assertionConsumerUrls, defaultAssertionConsumerUrl, enableRequestSigning, enableAssertionEncryption, enableResponseSigning, serviceProviderQualifier, nameIdFormat, requestValidationCertificateAlias, responseSigningAlgorithm, responseDigestAlgorithm, assertionEncryptionAlgroithm, keyEncryptionAlgorithm, enableSingleLogout, singleLogoutResponseUrl, singleLogoutRequestUrl, singleLogoutMethod, enableIdpInitiatedSingleSignOn, enableIdpInitiatedSingleLogOut);
+        return Objects.hash(issuer, serviceProviderQualifier, assertionConsumerUrls, defaultAssertionConsumerUrl, enableRequestSignatureValidation, enableAssertionEncryption, assertionEncryptionAlgroithm, keyEncryptionAlgorithm, nameIdFormat, enableIdpInitiatedSingleSignOn, enableResponseSigning, requestValidationCertificateAlias, responseSigningAlgorithm, responseDigestAlgorithm, enableSingleLogout, singleLogoutResponseUrl, singleLogoutRequestUrl, singleLogoutMethod, enableIdpInitiatedSingleLogOut, idpInitiatedLogoutReturnUrls, enableAttributeProfile, includedAttributeInResponseAlways, audiences, recipients, enableAssertionQueryProfile, enableSAML2ArtifactBinding, enableSignatureValidationInArtifactBinding, idPEntityidAlias);
     }
 
     @Override
@@ -483,24 +693,33 @@ public enum SingleLogoutMethodEnum {
         sb.append("class SAML2Configuration {\n");
         
         sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
+        sb.append("    serviceProviderQualifier: ").append(toIndentedString(serviceProviderQualifier)).append("\n");
         sb.append("    assertionConsumerUrls: ").append(toIndentedString(assertionConsumerUrls)).append("\n");
         sb.append("    defaultAssertionConsumerUrl: ").append(toIndentedString(defaultAssertionConsumerUrl)).append("\n");
-        sb.append("    enableRequestSigning: ").append(toIndentedString(enableRequestSigning)).append("\n");
+        sb.append("    enableRequestSignatureValidation: ").append(toIndentedString(enableRequestSignatureValidation)).append("\n");
         sb.append("    enableAssertionEncryption: ").append(toIndentedString(enableAssertionEncryption)).append("\n");
-        sb.append("    enableResponseSigning: ").append(toIndentedString(enableResponseSigning)).append("\n");
-        sb.append("    serviceProviderQualifier: ").append(toIndentedString(serviceProviderQualifier)).append("\n");
+        sb.append("    assertionEncryptionAlgroithm: ").append(toIndentedString(assertionEncryptionAlgroithm)).append("\n");
+        sb.append("    keyEncryptionAlgorithm: ").append(toIndentedString(keyEncryptionAlgorithm)).append("\n");
         sb.append("    nameIdFormat: ").append(toIndentedString(nameIdFormat)).append("\n");
+        sb.append("    enableIdpInitiatedSingleSignOn: ").append(toIndentedString(enableIdpInitiatedSingleSignOn)).append("\n");
+        sb.append("    enableResponseSigning: ").append(toIndentedString(enableResponseSigning)).append("\n");
         sb.append("    requestValidationCertificateAlias: ").append(toIndentedString(requestValidationCertificateAlias)).append("\n");
         sb.append("    responseSigningAlgorithm: ").append(toIndentedString(responseSigningAlgorithm)).append("\n");
         sb.append("    responseDigestAlgorithm: ").append(toIndentedString(responseDigestAlgorithm)).append("\n");
-        sb.append("    assertionEncryptionAlgroithm: ").append(toIndentedString(assertionEncryptionAlgroithm)).append("\n");
-        sb.append("    keyEncryptionAlgorithm: ").append(toIndentedString(keyEncryptionAlgorithm)).append("\n");
         sb.append("    enableSingleLogout: ").append(toIndentedString(enableSingleLogout)).append("\n");
         sb.append("    singleLogoutResponseUrl: ").append(toIndentedString(singleLogoutResponseUrl)).append("\n");
         sb.append("    singleLogoutRequestUrl: ").append(toIndentedString(singleLogoutRequestUrl)).append("\n");
         sb.append("    singleLogoutMethod: ").append(toIndentedString(singleLogoutMethod)).append("\n");
-        sb.append("    enableIdpInitiatedSingleSignOn: ").append(toIndentedString(enableIdpInitiatedSingleSignOn)).append("\n");
         sb.append("    enableIdpInitiatedSingleLogOut: ").append(toIndentedString(enableIdpInitiatedSingleLogOut)).append("\n");
+        sb.append("    idpInitiatedLogoutReturnUrls: ").append(toIndentedString(idpInitiatedLogoutReturnUrls)).append("\n");
+        sb.append("    enableAttributeProfile: ").append(toIndentedString(enableAttributeProfile)).append("\n");
+        sb.append("    includedAttributeInResponseAlways: ").append(toIndentedString(includedAttributeInResponseAlways)).append("\n");
+        sb.append("    audiences: ").append(toIndentedString(audiences)).append("\n");
+        sb.append("    recipients: ").append(toIndentedString(recipients)).append("\n");
+        sb.append("    enableAssertionQueryProfile: ").append(toIndentedString(enableAssertionQueryProfile)).append("\n");
+        sb.append("    enableSAML2ArtifactBinding: ").append(toIndentedString(enableSAML2ArtifactBinding)).append("\n");
+        sb.append("    enableSignatureValidationInArtifactBinding: ").append(toIndentedString(enableSignatureValidationInArtifactBinding)).append("\n");
+        sb.append("    idPEntityidAlias: ").append(toIndentedString(idPEntityidAlias)).append("\n");
         sb.append("}");
         return sb.toString();
     }

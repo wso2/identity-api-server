@@ -9,7 +9,7 @@
 #ApiClient.cs
 
 # Uncomment this line if you want to override the impl classes.
-#**/impl/*
+**/impl/*
 
 # You can recursively match patterns against a directory, file or extension with a double asterisk (**):
 #foo/**/qux

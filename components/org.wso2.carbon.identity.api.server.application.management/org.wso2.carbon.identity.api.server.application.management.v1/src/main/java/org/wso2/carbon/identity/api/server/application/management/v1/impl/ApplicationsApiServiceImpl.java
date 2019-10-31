@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
@@ -28,13 +29,33 @@ import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsC
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 
 import javax.ws.rs.core.Response;
 
 /**
- * API service implementation of server application management operations.
+ * Implementation of ApplicationsApiService.
  */
 public class ApplicationsApiServiceImpl implements ApplicationsApiService {
+
+    @Autowired
+    private ServerApplicationManagementService applicationManagementService;
+
+    @Override
+    public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
+                                       String requiredAttributes) {
+
+        return Response.ok()
+                .entity(applicationManagementService
+                        .getAllApplications(limit, offset, filter, sortOrder, sortBy, requiredAttributes))
+                .build();
+    }
+
+    @Override
+    public Response getApplication(String applicationId) {
+
+        return Response.ok().entity(applicationManagementService.getApplication(applicationId)).build();
+    }
 
     @Override
     public Response createApplication(ApplicationModel applicationModel, String template) {
@@ -43,13 +64,20 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response deleteAdvancedConfigurations(String applicationId) {
+    public Response deleteApplication(String applicationId) {
+
+        applicationManagementService.deleteApplication(applicationId);
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response updateApplication(String applicationId, ApplicationModel applicationModel) {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
 
     @Override
-    public Response deleteApplication(String applicationId) {
+    public Response deleteAdvancedConfigurations(String applicationId) {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
@@ -110,19 +138,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Override
     public Response getAdvancedConfigurations(String applicationId) {
-
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
-    }
-
-    @Override
-    public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
-                                       String attributes) {
-
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
-    }
-
-    @Override
-    public Response getApplication(String applicationId) {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
@@ -207,12 +222,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response updateApplication(String applicationId, ApplicationModel applicationModel) {
-
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
-    }
-
-    @Override
     public Response updateAuthenticationSequence(String applicationId, AuthenticationSequence authenticationSequence) {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
@@ -225,7 +234,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response updateCustomInboundConfiguration(String applicationId, String inboundProtocolId,
+    public Response updateCustomInboundConfiguration(String applicationId,
+                                                     String inboundProtocolId,
                                                      CustomInboundProtocolConfiguration customInboundProtocolConfig) {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();

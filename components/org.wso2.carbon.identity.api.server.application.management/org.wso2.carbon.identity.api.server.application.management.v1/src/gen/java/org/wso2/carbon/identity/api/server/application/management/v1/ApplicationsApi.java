@@ -122,7 +122,7 @@ public class ApplicationsApi  {
 
     @Valid
     @DELETE
-    @Path("/{applicationId}/authentication-sequences")
+    @Path("/{applicationId}/authentication-sequence")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete authentication sequence of an application by id ", notes = "This API provides the capability to delete the authentication sequence an application by id. ", response = Void.class, authorizations = {
@@ -170,7 +170,7 @@ public class ApplicationsApi  {
 
     @Valid
     @DELETE
-    @Path("/{applicationId}/auth-protocols/{inboundProtocolId}")
+    @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete Custom Inbound authentication protocol parameters of an application. ", notes = "This API provides the capability to delete Custom Inbound authentication protocol of an application. ", response = Void.class, authorizations = {
@@ -194,7 +194,7 @@ public class ApplicationsApi  {
 
     @Valid
     @DELETE
-    @Path("/{applicationId}/auth-protocols/")
+    @Path("/{applicationId}/inbound-protocols/")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete inbound protocol configurations of an application. ", notes = "This API provides the capability to delete inbound protocol configurations of an application. ", response = Void.class, authorizations = {
@@ -218,7 +218,7 @@ public class ApplicationsApi  {
 
     @Valid
     @DELETE
-    @Path("/{applicationId}/auth-protocols/oidc")
+    @Path("/{applicationId}/inbound-protocols/oidc")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete OIDC authentication protocol parameters of an application. ", notes = "This API provides the capability to delete OIDC authentication protocol parameters of an application. ", response = Void.class, authorizations = {
@@ -242,7 +242,7 @@ public class ApplicationsApi  {
 
     @Valid
     @DELETE
-    @Path("/{applicationId}/auth-protocols/saml")
+    @Path("/{applicationId}/inbound-protocols/saml")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete SAML2 authentication protocol parameters of an application. ", notes = "This API provides the capability to delete SAML2 authentication protocol parameters of an application. ", response = Void.class, authorizations = {
@@ -266,7 +266,7 @@ public class ApplicationsApi  {
 
     @Valid
     @DELETE
-    @Path("/{applicationId}/auth-protocols/passive-sts")
+    @Path("/{applicationId}/inbound-protocols/passive-sts")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete Passive STS authentication protocol parameters of an application. ", notes = "This API provides the capability to delete Passive STS authentication protocol parameters of an application. ", response = Void.class, authorizations = {
@@ -314,7 +314,7 @@ public class ApplicationsApi  {
 
     @Valid
     @DELETE
-    @Path("/{applicationId}/auth-protocols/ws-trust")
+    @Path("/{applicationId}/inbound-protocols/ws-trust")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete WS Trust authentication protocol parameters of an application. ", notes = "This API provides the capability to delete WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
@@ -377,9 +377,10 @@ public class ApplicationsApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getAllApplications(    @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently supports only filtering based on the 'name' attribute.  /applications?filter=name+eq+user_portal /applications?filter=name+co+prod ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _This parameter is not supported yet._ ", allowableValues="ascending, descending")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _This parameter is not supported yet._ ")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Specifies the required parameters in the response _This parameter is not supported yet_ ")  @QueryParam("attributes") String attributes) {
+    public Response getAllApplications(    @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently supports only filtering based on the 'name' attribute.  /applications?filter=name+eq+user_portal /applications?filter=name+co+prod ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _This parameter is not supported yet._ ", allowableValues="ASC, DESC")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _This parameter is not supported yet._ ")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Specifies the required parameters in the response _This parameter is not supported yet_ ")  @QueryParam("attributes") String attributes) {
 
         return delegate.getAllApplications(limit,  offset,  filter,  sortOrder,  sortBy,  attributes );
     }
@@ -410,7 +411,7 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/{applicationId}/authentication-sequences")
+    @Path("/{applicationId}/authentication-sequence")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrive authentication sequence of application by id ", notes = "This API provides the capability to retrive authentication sequence of an application by id. ", response = AuthenticationSequence.class, authorizations = {
@@ -458,7 +459,7 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/{applicationId}/auth-protocols/{inboundProtocolId}")
+    @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve Custom Inbound authentication protocol parameters of an application. ", notes = "This API provides the capability to retrieve Custom Inbound authentication protocol parameters of an application. ", response = CustomInboundProtocolConfiguration.class, authorizations = {
@@ -482,7 +483,7 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/{applicationId}/auth-protocols/")
+    @Path("/{applicationId}/inbound-protocols/")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve inbound protocol configurations of an application. ", notes = "This API provides the capability to retrive authentication protocol configurations of an application. ", response = InboundProtocols.class, authorizations = {
@@ -505,7 +506,7 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/{applicationId}/auth-protocols/oidc")
+    @Path("/{applicationId}/inbound-protocols/oidc")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve OIDC authentication protocol parameters of an application. ", notes = "This API provides the capability to retrieve OIDC authentication protocol parameters of an application. ", response = OpenIDConnectConfiguration.class, authorizations = {
@@ -529,7 +530,7 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/{applicationId}/auth-protocols/saml")
+    @Path("/{applicationId}/inbound-protocols/saml")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve SAML2 authentication protocol parameters of an application. ", notes = "This API provides the capability to retrive SAML2 authentication protocol parameters of an application. ", response = SAML2Configuration.class, authorizations = {
@@ -552,7 +553,7 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/{applicationId}/auth-protocols/passive-sts")
+    @Path("/{applicationId}/inbound-protocols/passive-sts")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve Passive STS authentication protocol parameters of an application. ", notes = "This API provides the capability to retrieve Passive STS authentication protocol parameters of an application. ", response = PassiveStsConfiguration.class, authorizations = {
@@ -624,7 +625,7 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/{applicationId}/auth-protocols/ws-trust")
+    @Path("/{applicationId}/inbound-protocols/ws-trust")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve WS Trust authentication protocol parameters of an application. ", notes = "This API provides the capability to retrieve Passive STS authentication protocol parameters of an application. ", response = WSTrustConfiguration.class, authorizations = {
@@ -648,7 +649,7 @@ public class ApplicationsApi  {
 
     @Valid
     @POST
-    @Path("/{applicationId}/auth-protocols/oidc/regenerate-secret")
+    @Path("/{applicationId}/inbound-protocols/oidc/regenerate-secret")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Regenerate the OAuth2/OIDC client secret. ", notes = "This API provides regenerate the OAuth2/OIDC client secret. ", response = OpenIDConnectConfiguration.class, authorizations = {
@@ -672,7 +673,7 @@ public class ApplicationsApi  {
 
     @Valid
     @POST
-    @Path("/{applicationId}/auth-protocols/oidc/revoke")
+    @Path("/{applicationId}/inbound-protocols/oidc/revoke")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Revoke the OAuth2/OIDC client configuration of an application. ", notes = "This API provides revoke the OAuth2/OIDC client configuration of an application. ", response = Void.class, authorizations = {
@@ -745,7 +746,7 @@ public class ApplicationsApi  {
 
     @Valid
     @PUT
-    @Path("/{applicationId}/authentication-sequences")
+    @Path("/{applicationId}/authentication-sequence")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update the the authentication sequence of an application by id ", notes = "This API provides the capability to update the authentication sequence of an application by id. ", response = Void.class, authorizations = {
@@ -795,7 +796,7 @@ public class ApplicationsApi  {
 
     @Valid
     @PUT
-    @Path("/{applicationId}/auth-protocols/{inboundProtocolId}")
+    @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update WS Trust authentication protocol parameters of an application. ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
@@ -821,7 +822,7 @@ public class ApplicationsApi  {
 
     @Valid
     @PUT
-    @Path("/{applicationId}/auth-protocols/")
+    @Path("/{applicationId}/inbound-protocols/")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update inbound protocol configurations of an application. ", notes = "This API provides the capability to update inbound protocol configurations of an application. ", response = Void.class, authorizations = {
@@ -847,7 +848,7 @@ public class ApplicationsApi  {
 
     @Valid
     @PUT
-    @Path("/{applicationId}/auth-protocols/oidc")
+    @Path("/{applicationId}/inbound-protocols/oidc")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update OIDC authentication protocol parameters of an application. ", notes = "This API provides the capability to store OIDC authentication protocol parameters of an application. ", response = Void.class, authorizations = {
@@ -873,7 +874,7 @@ public class ApplicationsApi  {
 
     @Valid
     @PUT
-    @Path("/{applicationId}/auth-protocols/saml")
+    @Path("/{applicationId}/inbound-protocols/saml")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update SAML2 authentication protocol parameters of an application. ", notes = "This API provides the capability to store SAML2 authentication protocol parameters of an application. ", response = Void.class, authorizations = {
@@ -899,7 +900,7 @@ public class ApplicationsApi  {
 
     @Valid
     @PUT
-    @Path("/{applicationId}/auth-protocols/passive-sts")
+    @Path("/{applicationId}/inbound-protocols/passive-sts")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update Passive STS authentication protocol parameters of an application. ", notes = "This API provides the capability to store passive STS authentication protocol parameters of an application. ", response = Void.class, authorizations = {
@@ -976,7 +977,7 @@ public class ApplicationsApi  {
 
     @Valid
     @PUT
-    @Path("/{applicationId}/auth-protocols/ws-trust")
+    @Path("/{applicationId}/inbound-protocols/ws-trust")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update WS Trust authentication protocol parameters of an application. ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
