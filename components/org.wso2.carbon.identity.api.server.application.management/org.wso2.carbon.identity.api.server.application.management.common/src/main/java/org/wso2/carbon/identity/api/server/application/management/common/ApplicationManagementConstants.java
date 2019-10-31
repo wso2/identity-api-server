@@ -51,10 +51,10 @@ public class ApplicationManagementConstants {
                 Response.Status.BAD_REQUEST,
                 "Invalid format user for filtering.",
                 "Filter needs to be in the format <attribute>+<operation>+<value>. Eg: name+eq+john"),
-        ERROR_CODE_UNSUPPORTED_FILTER_OPERATION("55004",
+        ERROR_CODE_INVALID_FILTER_OPERATION("55004",
                 Response.Status.BAD_REQUEST,
-                "Attempted filtering operation is not supported.",
-                "Attempted filtering operation '%s' is not supported. " +
+                "Attempted filtering operation is not invalid.",
+                "Attempted filtering operation '%s' is invalid. " +
                         "Please use one of the supported filtering operations such as 'eq', 'co', 'sw' or 'ew'."),
         ERROR_CODE_APPLICATION_NOT_FOUND("50005",
                 Response.Status.NOT_FOUND,

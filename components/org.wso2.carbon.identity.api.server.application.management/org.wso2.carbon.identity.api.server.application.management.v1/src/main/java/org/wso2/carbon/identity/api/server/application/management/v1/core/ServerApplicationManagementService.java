@@ -214,7 +214,7 @@ public class ServerApplicationManagementService {
                 formattedFilter = "*" + searchValue + "*";
                 break;
             default:
-                throw buildApiError(ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_OPERATION, searchOperation);
+                throw buildApiError(ErrorMessage.ERROR_CODE_INVALID_FILTER_OPERATION, searchOperation);
         }
 
         return formattedFilter;
