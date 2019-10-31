@@ -18,6 +18,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.impl;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
@@ -34,8 +35,11 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.Server
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.Constants;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URI;
 import javax.ws.rs.core.Response;
 
@@ -71,7 +75,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response createApplication(ApplicationModel applicationModel, String template) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        ApplicationModel createdApp = applicationManagementService.createApplication(applicationModel);
+        return Response.created(getResourceLocation(createdApp.getId())).entity(createdApp).build();
     }
 
     @Override
@@ -84,7 +89,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response updateApplication(String applicationId, ApplicationModel applicationModel) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        applicationManagementService.updateApplication(applicationId, applicationModel);
+        return Response.noContent().build();
     }
 
     @Override
@@ -167,19 +173,34 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response getAdvancedConfigurations(String applicationId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        ApplicationModel application = applicationManagementService.getApplication(applicationId);
+        if (application.getAdvancedConfigurations() == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            return Response.ok(application.getAdvancedConfigurations()).build();
+        }
     }
 
     @Override
     public Response getAuthenticationSequence(String applicationId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        ApplicationModel application = applicationManagementService.getApplication(applicationId);
+        if (application.getAuthenticationSequence() == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            return Response.ok(application.getAuthenticationSequence()).build();
+        }
     }
 
     @Override
     public Response getClaimConfiguration(String applicationId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        ApplicationModel application = applicationManagementService.getApplication(applicationId);
+        if (application.getClaimConfiguration() == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            return Response.ok(application.getClaimConfiguration()).build();
+        }
     }
 
     @Override
@@ -191,31 +212,59 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response getInboundAuthenticationConfigurations(String applicationId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        ApplicationModel application = applicationManagementService.getApplication(applicationId);
+        if (application.getInboundProtocolConfiguration() == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            return Response.ok(application.getInboundProtocolConfiguration()).build();
+        }
     }
 
     @Override
     public Response getInboundOAuthConfiguration(String applicationId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        ApplicationModel application = applicationManagementService.getApplication(applicationId);
+        if (application.getInboundProtocolConfiguration() == null ||
+                application.getInboundProtocolConfiguration().getOidc() != null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            return Response.ok(application.getInboundProtocolConfiguration().getOidc()).build();
+        }
     }
 
     @Override
     public Response getInboundSAMLConfiguration(String applicationId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        ApplicationModel application = applicationManagementService.getApplication(applicationId);
+        if (application.getInboundProtocolConfiguration() == null ||
+                application.getInboundProtocolConfiguration().getSaml() != null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            return Response.ok(application.getInboundProtocolConfiguration().getSaml()).build();
+        }
     }
 
     @Override
     public Response getPassiveStsConfiguration(String applicationId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        ApplicationModel application = applicationManagementService.getApplication(applicationId);
+        if (application.getInboundProtocolConfiguration() == null ||
+                application.getInboundProtocolConfiguration().getPassiveSts() != null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            return Response.ok(application.getInboundProtocolConfiguration().getPassiveSts()).build();
+        }
     }
 
     @Override
     public Response getProvisioningConfiguration(String applicationId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        ApplicationModel application = applicationManagementService.getApplication(applicationId);
+        if (application.getProvisioningConfigurations() == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            return Response.ok(application.getProvisioningConfigurations()).build();
+        }
     }
 
     @Override
@@ -227,7 +276,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response getWSTrustConfiguration(String applicationId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        ApplicationModel application = applicationManagementService.getApplication(applicationId);
+        if (application.getInboundProtocolConfiguration() == null ||
+                application.getInboundProtocolConfiguration().getWsTrust() != null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            return Response.ok(application.getInboundProtocolConfiguration().getWsTrust()).build();
+        }
     }
 
     @Override
@@ -312,6 +367,12 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response updateWSTrustConfiguration(String applicationId, WSTrustConfiguration wsTrustConfiguration) {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    private URI getResourceLocation(String resourceId) {
+
+        return ContextLoader.buildURIForHeader(Constants.V1_API_PATH_COMPONENT +
+                ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT + "/" + resourceId);
     }
 
     @Override

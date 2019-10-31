@@ -34,7 +34,7 @@ public class SAML2ServiceProvider  {
   
     private String issuer;
     private String serviceProviderQualifier;
-    private List<String> assertionConsumerUrls = null;
+    private List<String> assertionConsumerUrls = new ArrayList<>();
 
     private String defaultAssertionConsumerUrl;
     private Boolean enableRequestSignatureValidation = true;
@@ -106,9 +106,11 @@ public enum SingleLogoutMethodEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("issuer")
     @Valid
+    @NotNull(message = "Property issuer cannot be null.")
+
     public String getIssuer() {
         return issuer;
     }
@@ -142,9 +144,11 @@ public enum SingleLogoutMethodEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("assertionConsumerUrls")
     @Valid
+    @NotNull(message = "Property assertionConsumerUrls cannot be null.")
+
     public List<String> getAssertionConsumerUrls() {
         return assertionConsumerUrls;
     }
@@ -153,9 +157,6 @@ public enum SingleLogoutMethodEnum {
     }
 
     public SAML2ServiceProvider addAssertionConsumerUrlsItem(String assertionConsumerUrlsItem) {
-        if (this.assertionConsumerUrls == null) {
-            this.assertionConsumerUrls = new ArrayList<>();
-        }
         this.assertionConsumerUrls.add(assertionConsumerUrlsItem);
         return this;
     }

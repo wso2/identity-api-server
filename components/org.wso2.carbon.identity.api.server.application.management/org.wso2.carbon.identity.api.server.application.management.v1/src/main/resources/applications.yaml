@@ -3432,6 +3432,9 @@ components:
 
     SAML2ServiceProvider:
       type: object
+      required:
+        - issuer
+        - assertionConsumerUrls
       properties:
         issuer:
           type: string
@@ -3441,14 +3444,13 @@ components:
           type: array
           items:
             type: string
+            minimum: 1
         defaultAssertionConsumerUrl:
           type: string
-
 
         enableRequestSignatureValidation:
           type: boolean
           default: true
-
 
         enableAssertionEncryption:
           type: boolean
@@ -3578,6 +3580,8 @@ components:
 
     OpenIDConnectConfiguration:
       type: object
+      required:
+        - grantTypes
       properties:
         clientId:
           type: string
@@ -3597,6 +3601,7 @@ components:
             - password
           items:
             type: string
+            minimum : 1
         callbackURLs:
           type: array
           description: Authorized redirect URIs
@@ -3640,9 +3645,6 @@ components:
             - RoleBasedScopeValidator
           items:
             type: string
-      required:
-        - grantTypes
-        - version
     OAuth2PKCEConfiguration:
       type: object
       properties:
@@ -3777,8 +3779,8 @@ components:
         properties:
           type: array
           items:
-            $ref: '#/components/schemas/Property'
-    Property:
+            $ref: '#/components/schemas/PropertyModel'
+    PropertyModel:
       type: object
       properties:
         key:
@@ -3799,7 +3801,7 @@ components:
         steps:
           type: array
           items:
-            $ref: '#/components/schemas/AuthenticationStep'
+            $ref: '#/components/schemas/AuthenticationStepModel'
         requestPathAuthenticators:
           type: array
           items:
@@ -3815,7 +3817,7 @@ components:
           default: 1
           example: 1
 
-    AuthenticationStep:
+    AuthenticationStepModel:
       type: object
       required:
         - id

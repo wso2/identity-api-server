@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.Property;
+import org.wso2.carbon.identity.api.server.application.management.v1.PropertyModel;
 import javax.validation.constraints.*;
 
 
@@ -35,7 +35,7 @@ public class CustomInboundProtocolConfiguration  {
   
     private String name;
     private String inboundKey;
-    private List<Property> properties = null;
+    private List<PropertyModel> properties = null;
 
 
     /**
@@ -80,7 +80,7 @@ public class CustomInboundProtocolConfiguration  {
 
     /**
     **/
-    public CustomInboundProtocolConfiguration properties(List<Property> properties) {
+    public CustomInboundProtocolConfiguration properties(List<PropertyModel> properties) {
 
         this.properties = properties;
         return this;
@@ -89,14 +89,14 @@ public class CustomInboundProtocolConfiguration  {
     @ApiModelProperty(value = "")
     @JsonProperty("properties")
     @Valid
-    public List<Property> getProperties() {
+    public List<PropertyModel> getProperties() {
         return properties;
     }
-    public void setProperties(List<Property> properties) {
+    public void setProperties(List<PropertyModel> properties) {
         this.properties = properties;
     }
 
-    public CustomInboundProtocolConfiguration addPropertiesItem(Property propertiesItem) {
+    public CustomInboundProtocolConfiguration addPropertiesItem(PropertyModel propertiesItem) {
         if (this.properties == null) {
             this.properties = new ArrayList<>();
         }

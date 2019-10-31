@@ -85,10 +85,9 @@ public class ServerApplicationManagementService {
 
         // Format the filter to a value that can be interpreted by the backend.
         String formattedFilter = buildFilter(filter);
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        String username = ContextLoader.getUsernameFromContext();
         try {
-            String username = ContextLoader.getUsernameFromContext();
-            String tenantDomain = ContextLoader.getTenantDomainFromContext();
-
             int totalResultsFromFiltering = getApplicationManagementService()
                     .getCountOfApplications(tenantDomain, username, formattedFilter);
 
@@ -104,7 +103,8 @@ public class ServerApplicationManagementService {
                     .links(buildLinks(limit, offset, filter, totalResultsFromFiltering));
 
         } catch (IdentityApplicationManagementException e) {
-            throw handleServerError(e, "Error while retrieving application basic info.");
+            String msg = "Error while listing application basic information in tenantDomain: " + tenantDomain;
+            throw handleIdentityApplicationManagementException(e, msg);
         }
     }
 
@@ -119,7 +119,8 @@ public class ServerApplicationManagementService {
             }
             return new ServiceProviderToApiModel().apply(application);
         } catch (IdentityApplicationManagementException e) {
-            throw handleServerError(e, "Error while retrieving application with id: " + applicationId);
+            String msg = "Error while retrieving application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
         }
     }
 
@@ -139,7 +140,7 @@ public class ServerApplicationManagementService {
         } catch (IdentityApplicationManagementClientException e) {
             throw handleClientError(e, ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND);
         } catch (IdentityApplicationManagementException e) {
-            throw handleServerError(e, "Error while retrieving application with id: " + applicationId);
+            throw buildServerError(e, "Error while retrieving application with id: " + applicationId);
         }
     }
 
@@ -171,7 +172,7 @@ public class ServerApplicationManagementService {
             }
         } catch (IOException | IdentityApplicationManagementException e) {
             // TODO: 2019-11-08 need to handle client error once Framework changes are merged.
-            throw handleServerError(e, "Error while importing application from XML file.");
+            throw buildServerError(e, "Error while importing application from XML file.");
         } finally {
             IOUtils.closeQuietly(fileInputStream);
         }
@@ -184,7 +185,8 @@ public class ServerApplicationManagementService {
         try {
             getApplicationManagementService().deleteApplicationByResourceId(applicationId, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
-            throw handleServerError(e, "Error while deleting application with id: " + applicationId);
+            String msg = "Error while deleting application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
         }
     }
 
@@ -197,8 +199,10 @@ public class ServerApplicationManagementService {
             getApplicationManagementService()
                     .updateApplicationByResourceId(applicationId, updatedApp, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
-            throw handleServerError(e, "Error while updating application with id: " + applicationId);
+            String msg = "Error while updating application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
         }
+
     }
 
     public ApplicationModel createApplication(ApplicationModel applicationModel) {
@@ -207,13 +211,25 @@ public class ServerApplicationManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
+
             ServiceProvider createdApp = getApplicationManagementService()
                     .createApplication(application, tenantDomain, username);
             return new ServiceProviderToApiModel().apply(createdApp);
         } catch (IdentityApplicationManagementException e) {
-            throw handleServerError(e, "Error while updating application with name: " +
-                    applicationModel.getName());
+            String msg = "Error while creating application with name '%s' in tenantDomain: %s.";
+            msg = String.format(msg, applicationModel.getName(), tenantDomain);
+
+            throw handleIdentityApplicationManagementException(e, msg);
         }
+    }
+
+    private APIError handleIdentityApplicationManagementException(IdentityApplicationManagementException e,
+                                                                  String msg) {
+
+        if (e instanceof IdentityApplicationManagementClientException) {
+            throw buildClientError(e, msg);
+        }
+        throw buildServerError(e, msg);
     }
 
     private List<Link> buildLinks(int limit, int currentOffset, String filter, int totalResultsFromSearch) {
@@ -222,25 +238,31 @@ public class ServerApplicationManagementService {
         return new ArrayList<>();
     }
 
-    private APIError handleClientError(Exception e, ErrorMessage errorEnum) {
-
-        ErrorResponse errorResponse = new ErrorResponse.Builder()
-                .withCode(errorEnum.getCode())
-                .withDescription(e.getMessage())
-                .withMessage(errorEnum.getMessage())
-                .build(LOG, errorEnum.getDescription());
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
-    }
-
-    private APIError handleServerError(Exception e, String message) {
+    private APIError buildServerError(IdentityApplicationManagementException e, String message) {
 
         ErrorResponse.Builder builder = new ErrorResponse.Builder();
 
         ErrorResponse errorResponse = builder
-                .withMessage(e.getMessage())
+                .withCode(e.getErrorCode())
+                .withMessage(message)
+                .withDescription(e.getMessage())
                 .build(LOG, e, message);
 
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError buildClientError(IdentityApplicationManagementException e, String message) {
+
+        ErrorResponse.Builder builder = new ErrorResponse.Builder();
+
+        ErrorResponse errorResponse = builder
+                .withCode(e.getErrorCode())
+                .withMessage(message)
+                .withDescription(e.getMessage())
+                .build(LOG, e.getMessage());
+
+        Response.Status status = Response.Status.BAD_REQUEST;
         return new APIError(status, errorResponse);
     }
 

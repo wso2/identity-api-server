@@ -22,16 +22,18 @@ import org.wso2.carbon.identity.api.server.application.management.common.Applica
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
-import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationStep;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationStepModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.Authenticator;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
+import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundSCIMProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OutboundProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.PropertyModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
@@ -43,6 +45,7 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
+import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
@@ -68,6 +71,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
@@ -84,7 +88,6 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     @Override
     public ApplicationModel apply(ServiceProvider application) {
 
-        // TODO: if local do not fill claim mappings.
         if (isResidentSp(application)) {
             return new ApplicationModel()
                     .id(application.getApplicationResourceId())
@@ -115,12 +118,18 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         LocalAndOutboundAuthenticationConfig authConfig = application.getLocalAndOutBoundAuthenticationConfig();
 
+        AuthenticationSequence.TypeEnum authenticationType;
         if (authConfig == null || ApplicationConstants.AUTH_TYPE_DEFAULT.equals(authConfig.getAuthenticationType())) {
             ServiceProvider defaultSP = getDefaultServiceProvider();
             authConfig = defaultSP.getLocalAndOutBoundAuthenticationConfig();
+            authenticationType = AuthenticationSequence.TypeEnum.DEFAULT;
+        } else {
+            // This means a user defined authentication sequence.
+            authenticationType = AuthenticationSequence.TypeEnum.USER_DEFINED;
         }
 
         AuthenticationSequence authSequence = new AuthenticationSequence();
+        authSequence.setType(authenticationType);
         if (authConfig.getAuthenticationScriptConfig() != null) {
             authSequence.script(authConfig.getAuthenticationScriptConfig().getContent());
         }
@@ -135,13 +144,22 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     authSequence.setAttributeStepId(authenticationStep.getStepOrder());
                 }
             });
+
+            if (authSequence.getSubjectStepId() == null) {
+                // Set first step as default subject step.
+                authSequence.setSubjectStepId(1);
+            }
+
+            if (authSequence.getAttributeStepId() == null) {
+                // Set first step as default attribute step.
+                authSequence.setAttributeStepId(1);
+            }
         }
 
         RequestPathAuthenticatorConfig[] requestPathConfigs = application.getRequestPathAuthenticatorConfigs();
         if (requestPathConfigs != null) {
-            Arrays.stream(requestPathConfigs)
-                    .forEach(requestPathConfig ->
-                            authSequence.addRequestPathAuthenticatorsItem(requestPathConfig.getName()));
+            Arrays.stream(requestPathConfigs).forEach(requestPathConfig ->
+                    authSequence.addRequestPathAuthenticatorsItem(requestPathConfig.getName()));
         }
 
         return authSequence;
@@ -160,10 +178,9 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return defaultSP;
     }
 
-    private AuthenticationStep buildAuthStep(org.wso2.carbon.identity.application.common.model.AuthenticationStep
-                                                     authenticationStep) {
+    private AuthenticationStepModel buildAuthStep(AuthenticationStep authenticationStep) {
 
-        AuthenticationStep authStep = new AuthenticationStep();
+        AuthenticationStepModel authStep = new AuthenticationStepModel();
         authStep.setId(authenticationStep.getStepOrder());
 
         if (authenticationStep.getFederatedIdentityProviders() != null) {
@@ -297,7 +314,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         ProvisioningConfiguration config = new ProvisioningConfiguration();
 
-        if (application.getInboundAuthenticationConfig() != null) {
+        if (application.getInboundProvisioningConfig() != null) {
             config.inboundProvisioning(buildInboundProvisioningConfig(application.getInboundProvisioningConfig()));
         }
 
@@ -399,14 +416,38 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     case StandardInboundProtocols.WS_TRUST:
                         inboundProtocols.setWsTrust(buildWsTrustConfiguration(inboundAuth));
                         break;
-                    default:
+                    case IdentityApplicationConstants.Authenticator.OpenID.NAME:
+                        // We ignore openid now as we do not support it anymore.
                         break;
-
+                    default:
+                        // TODO: Validate the inbound before adding..
+                        inboundProtocols.addCustomItem(buildCustomInboundConfig(inboundAuth));
+                        break;
                 }
             }
         }
 
         return inboundProtocols;
+    }
+
+    private CustomInboundProtocolConfiguration buildCustomInboundConfig(InboundAuthenticationRequestConfig inbound) {
+
+        // TODO: add friendly name
+        return new CustomInboundProtocolConfiguration()
+                .name(inbound.getInboundAuthType())
+                .inboundKey(inbound.getInboundAuthKey())
+                .properties(
+                        Optional.ofNullable(inbound.getProperties())
+                                .map(inboundProperties -> Arrays.stream(inboundProperties)
+                                        .map(this::buildPropertyModel
+                                        ).collect(Collectors.toList()))
+                                .orElse(Collections.emptyList()));
+
+    }
+
+    private PropertyModel buildPropertyModel(Property inboundProperty) {
+
+        return new PropertyModel().key(inboundProperty.getName()).value(inboundProperty.getValue());
     }
 
     private WSTrustConfiguration buildWsTrustConfiguration(InboundAuthenticationRequestConfig inboundAuth) {
