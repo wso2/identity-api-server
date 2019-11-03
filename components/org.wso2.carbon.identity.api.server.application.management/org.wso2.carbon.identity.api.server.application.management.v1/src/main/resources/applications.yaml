@@ -2618,6 +2618,235 @@ paths:
       x-wso2-response: |
         "HTTP/1.1 200 Ok"
 
+
+  '/applications/meta/inbound-protocols':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrive the list of inbound authentication protocols available.
+      description: >
+        This API provides the capability to retrieve the list of inbound authentication protocols available.
+        If the query parameter 'customOnly' is set to true, only custom inbound protocols will be listed.
+      operationId: getInboundProtocols
+      parameters:
+        - $ref: '#/components/parameters/inboundProtocolsCustomOnly'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthProtocols'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-wso2-request: ''
+      x-wso2-response: |
+        "HTTP/1.1 200 Ok"
+  '/applications/meta/inbound-protocols/saml':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrive all the metadata related to the auth protocol SAML
+      description: >
+        This API provides the capability to retrieve all the metadata related to the auth protocol SAML.
+      operationId: getSAMLMetadata
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SAMLMetaData'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-wso2-request: ''
+      x-wso2-response: |
+        "HTTP/1.1 200 Ok"
+  '/applications/meta/inbound-protocols/oidc':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrive all the metadata related to the authentication protocol OAuth / OIDC
+      description: >
+        This API provides the capability to retrieve all the metadata related to the authentication
+         protocol OAuth / OIDC.
+      operationId: getOIDCMetadata
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OIDCMetaData'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-wso2-request: ''
+      x-wso2-response: |
+        "HTTP/1.1 200 Ok"
+  '/applications/meta/inbound-protocols/ws-trust':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrive all the metadata related to the auth protocol WS_Trust
+      description: >
+        This API provides the capability to retrieve all the metadata related to the auth protocol WS_Trust.
+      operationId: getWSTrustMetadata
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WSTrustMetaData'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-wso2-request: ''
+      x-wso2-response: |
+        "HTTP/1.1 200 Ok"
+  '/applications/meta/inbound-protocols/{inboundProtocolId}':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrive all the metadata related to the custom auth protocol identified by the inboundProtocolId
+      description: >
+        This API provides the capability to retrieve all the metadata related to the custom auth protocol
+        identified by the inboundProtocolId.
+      operationId: getCustomProtocolMetadata
+      parameters:
+        - name: inboundProtocolId
+          in: path
+          description: Inbound Authentication Protocol ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomInboundProtocolMetaData'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-wso2-request: ''
+      x-wso2-response: |
+        "HTTP/1.1 200 Ok"
+
 servers:
   - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
@@ -2687,6 +2916,15 @@ components:
         _This parameter is not supported yet_
       schema:
         type: string
+    inboundProtocolsCustomOnly:
+      in: query
+      name: customOnly
+      required: false
+      description: |
+        Send only the custom inbound protocols.
+      schema:
+        type: boolean
+        example: true
   securitySchemes:
     BasicAuth:
       type: http
@@ -3401,6 +3639,124 @@ components:
           type: string
           example: basic
 
+    AuthProtocols:
+      type: array
+      items:
+        $ref: '#/components/schemas/AuthProtocolMetadata'
+      example:
+        - name: "saml"
+          displayName: "SAML2 Web SSO Configuration"
+    AuthProtocolMetadata:
+      type: object
+      properties:
+        name:
+          type: string
+        displayName:
+          type: string
+    MetadataProperty:
+      type: object
+      properties:
+        options:
+          type: array
+          items:
+            type: string
+          example:
+            - 'Option 1'
+            - 'Option 2'
+        defaultValue:
+          type: string
+          example: 'Option 1'
+    SAMLMetaData:
+      type: object
+      properties:
+        defaultNameIdFormat:
+          type: string
+          example: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+        certificateAlias:
+          $ref: '#/components/schemas/MetadataProperty'
+        responseSigningAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        responseDigestAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        assertionEncryptionAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        keyEncryptionAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+    OIDCMetaData:
+      type: object
+      properties:
+        allowedGrantTypes:
+          $ref: '#/components/schemas/MetadataProperty'
+        defaultUserAccessTokenExpiryTime:
+          type: string
+          example: '3600'
+        defaultApplicationAccessTokenExpiryTime:
+          type: string
+          example: '3600'
+        defaultRefreshTokenExpiryTime:
+          type: string
+          example: '86400'
+        defaultIdTokenExpiryTime:
+          type: string
+          example: '3600'
+        idTokenEncryptionAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        idTokenEncryptionMethod:
+          $ref: '#/components/schemas/MetadataProperty'
+        scopeValidators:
+          $ref: '#/components/schemas/MetadataProperty'
+        accessTokenType:
+          $ref: '#/components/schemas/MetadataProperty'
+    WSTrustMetaData:
+      type: object
+      properties:
+        certificateAlias:
+          $ref: '#/components/schemas/MetadataProperty'
+    CustomInboundProtocolMetaData:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'My Custom Protocol'
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomInboundProtocolProperty'
+    CustomInboundProtocolProperty:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'Encryption Algorithm'
+        type:
+          type: string
+          enum:
+            - STRING
+            - BOOLEAN
+            - INTEGER
+          example: STRING
+        required:
+          type: boolean
+          example: true
+        availableValues:
+          type: array
+          items:
+            type: string
+            example:
+              - 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p'
+              - 'http://www.w3.org/2001/04/xmlenc#rsa-1_5'
+        defaultValue:
+          type: string
+          example: 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p'
+        validationRegex:
+          type: string
+          example: '^[a-b][A-B]*'
+        displayOrder:
+          type: integer
+          example: 1
+        isConfidential:
+          type: boolean
+          default: false
     Error:
       type: object
       properties:
