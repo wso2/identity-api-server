@@ -20,17 +20,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
+import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
 
 import javax.validation.Valid;
@@ -483,6 +488,29 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/meta/inbound-protocols/{inboundProtocolId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrive all the metadata related to the custom auth protocol identified by the inboundProtocolId ", notes = "This API provides the capability to retrieve all the metadata related to the custom auth protocol identified by the inboundProtocolId. ", response = CustomInboundProtocolMetaData.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = CustomInboundProtocolMetaData.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getCustomProtocolMetadata(@ApiParam(value = "Inbound Authentication Protocol ID",required=true) @PathParam("inboundProtocolId") String inboundProtocolId) {
+
+        return delegate.getCustomProtocolMetadata(inboundProtocolId );
+    }
+
+    @Valid
+    @GET
     @Path("/{applicationId}/inbound-protocols/")
     
     @Produces({ "application/json" })
@@ -530,6 +558,29 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/meta/inbound-protocols")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrive the list of inbound authentication protocols available. ", notes = "This API provides the capability to retrieve the list of inbound authentication protocols available. If the query parameter 'customOnly' is set to true, only custom inbound protocols will be listed. ", response = AuthProtocolMetadata.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = AuthProtocolMetadata.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getInboundProtocols(    @Valid@ApiParam(value = "Send only the custom inbound protocols. ")  @QueryParam("customOnly") Boolean customOnly) {
+
+        return delegate.getInboundProtocols(customOnly );
+    }
+
+    @Valid
+    @GET
     @Path("/{applicationId}/inbound-protocols/saml")
     
     @Produces({ "application/json" })
@@ -549,6 +600,29 @@ public class ApplicationsApi  {
     public Response getInboundSAMLConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getInboundSAMLConfiguration(applicationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/meta/inbound-protocols/oidc")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrive all the metadata related to the authentication protocol OAuth / OIDC ", notes = "This API provides the capability to retrieve all the metadata related to the authentication  protocol OAuth / OIDC. ", response = OIDCMetaData.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = OIDCMetaData.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getOIDCMetadata() {
+
+        return delegate.getOIDCMetadata();
     }
 
     @Valid
@@ -625,6 +699,29 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/meta/inbound-protocols/saml")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrive all the metadata related to the auth protocol SAML ", notes = "This API provides the capability to retrieve all the metadata related to the auth protocol SAML. ", response = SAMLMetaData.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = SAMLMetaData.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getSAMLMetadata() {
+
+        return delegate.getSAMLMetadata();
+    }
+
+    @Valid
+    @GET
     @Path("/{applicationId}/inbound-protocols/ws-trust")
     
     @Produces({ "application/json" })
@@ -645,6 +742,29 @@ public class ApplicationsApi  {
     public Response getWSTrustConfiguration(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getWSTrustConfiguration(applicationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/meta/inbound-protocols/ws-trust")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrive all the metadata related to the auth protocol WS_Trust ", notes = "This API provides the capability to retrieve all the metadata related to the auth protocol WS_Trust. ", response = WSTrustMetaData.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = WSTrustMetaData.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getWSTrustMetadata() {
+
+        return delegate.getWSTrustMetadata();
     }
 
     @Valid

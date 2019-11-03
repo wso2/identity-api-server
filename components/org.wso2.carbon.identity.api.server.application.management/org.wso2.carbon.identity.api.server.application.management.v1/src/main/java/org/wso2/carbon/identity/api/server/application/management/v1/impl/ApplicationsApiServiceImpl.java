@@ -285,4 +285,34 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
+
+    @Override
+    public Response getInboundProtocols(Boolean customOnly) {
+
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    @Override
+    public Response getCustomProtocolMetadata(String inboundProtocolId) {
+
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    @Override
+    public Response getOIDCMetadata() {
+
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    @Override
+    public Response getSAMLMetadata() {
+
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    @Override
+    public Response getWSTrustMetadata() {
+
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
 }

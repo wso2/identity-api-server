@@ -23,17 +23,22 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
+import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import javax.ws.rs.core.Response;
 
 
@@ -75,11 +80,17 @@ public interface ApplicationsApiService {
 
       public Response getCustomInboundConfiguration(String applicationId, String inboundProtocolId);
 
+      public Response getCustomProtocolMetadata(String inboundProtocolId);
+
       public Response getInboundAuthenticationConfigurations(String applicationId);
 
       public Response getInboundOAuthConfiguration(String applicationId);
 
+      public Response getInboundProtocols(Boolean customOnly);
+
       public Response getInboundSAMLConfiguration(String applicationId);
+
+      public Response getOIDCMetadata();
 
       public Response getPassiveStsConfiguration(String applicationId);
 
@@ -87,7 +98,11 @@ public interface ApplicationsApiService {
 
       public Response getResidentApplication();
 
+      public Response getSAMLMetadata();
+
       public Response getWSTrustConfiguration(String applicationId);
+
+      public Response getWSTrustMetadata();
 
       public Response regenerateOAuthApplicationSecret(String applicationId);
 
