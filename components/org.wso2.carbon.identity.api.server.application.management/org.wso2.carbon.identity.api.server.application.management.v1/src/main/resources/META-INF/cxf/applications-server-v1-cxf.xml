@@ -19,6 +19,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService"/>
+    <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService"/>
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.impl.ApplicationsApiServiceImpl"/>
 
     <bean id="applicationManagementServiceHolderBean"

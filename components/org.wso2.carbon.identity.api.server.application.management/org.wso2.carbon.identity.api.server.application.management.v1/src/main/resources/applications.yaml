@@ -2637,7 +2637,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthProtocols'
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuthProtocolMetadata'
+                example:
+                  - name: "saml"
+                    displayName: "SAML2 Web SSO Configuration"
         '401':
           description: Unauthorized
           content:
@@ -3639,13 +3644,6 @@ components:
           type: string
           example: basic
 
-    AuthProtocols:
-      type: array
-      items:
-        $ref: '#/components/schemas/AuthProtocolMetadata'
-      example:
-        - name: "saml"
-          displayName: "SAML2 Web SSO Configuration"
     AuthProtocolMetadata:
       type: object
       properties:
