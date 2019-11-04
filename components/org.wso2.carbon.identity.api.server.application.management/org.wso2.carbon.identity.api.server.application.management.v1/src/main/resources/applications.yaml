@@ -3713,7 +3713,7 @@ components:
     CustomInboundProtocolMetaData:
       type: object
       properties:
-        name:
+        displayName:
           type: string
           example: 'My Custom Protocol'
         properties:
@@ -3724,6 +3724,9 @@ components:
       type: object
       properties:
         name:
+          type: string
+          example: 'encryptionAlgorithm'
+        displayName:
           type: string
           example: 'Encryption Algorithm'
         type:

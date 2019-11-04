@@ -60,7 +60,9 @@ public class ApplicationManagementConstants {
                 Response.Status.NOT_FOUND,
                 "Application not found.",
                 "Application cannot be found for the provided id: %s in the tenantDomain: %s."),
-
+        ERROR_INBOUND_PROTOCOL_NOT_FOUND("50006", Response.Status.NOT_FOUND,
+                "Inbound protocol not found.",
+                "Inbound protocol cannot be found for the provided id."),
         // Server Errors.
         ERROR_CODE_SORTING_NOT_IMPLEMENTED("55001",
                 Response.Status.NOT_IMPLEMENTED,

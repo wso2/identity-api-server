@@ -33,6 +33,7 @@ import javax.xml.bind.annotation.*;
 public class CustomInboundProtocolProperty  {
   
     private String name;
+    private String displayName;
 
 @XmlType(name="TypeEnum")
 @XmlEnum(String.class)
@@ -83,7 +84,7 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "Encryption Algorithm", value = "")
+    @ApiModelProperty(example = "encryptionAlgorithm", value = "")
     @JsonProperty("name")
     @Valid
     public String getName() {
@@ -91,6 +92,24 @@ public enum TypeEnum {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+    **/
+    public CustomInboundProtocolProperty displayName(String displayName) {
+
+        this.displayName = displayName;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Encryption Algorithm", value = "")
+    @JsonProperty("displayName")
+    @Valid
+    public String getDisplayName() {
+        return displayName;
+    }
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     /**
@@ -240,6 +259,7 @@ public enum TypeEnum {
         }
         CustomInboundProtocolProperty customInboundProtocolProperty = (CustomInboundProtocolProperty) o;
         return Objects.equals(this.name, customInboundProtocolProperty.name) &&
+            Objects.equals(this.displayName, customInboundProtocolProperty.displayName) &&
             Objects.equals(this.type, customInboundProtocolProperty.type) &&
             Objects.equals(this.required, customInboundProtocolProperty.required) &&
             Objects.equals(this.availableValues, customInboundProtocolProperty.availableValues) &&
@@ -251,7 +271,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, required, availableValues, defaultValue, validationRegex, displayOrder, isConfidential);
+        return Objects.hash(name, displayName, type, required, availableValues, defaultValue, validationRegex, displayOrder, isConfidential);
     }
 
     @Override
@@ -261,6 +281,7 @@ public enum TypeEnum {
         sb.append("class CustomInboundProtocolProperty {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    required: ").append(toIndentedString(required)).append("\n");
         sb.append("    availableValues: ").append(toIndentedString(availableValues)).append("\n");

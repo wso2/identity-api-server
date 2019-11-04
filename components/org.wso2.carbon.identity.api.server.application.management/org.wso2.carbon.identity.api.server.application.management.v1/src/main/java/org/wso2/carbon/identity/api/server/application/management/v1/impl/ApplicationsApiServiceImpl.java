@@ -299,7 +299,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response getCustomProtocolMetadata(String inboundProtocolId) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(applicationMetadataService.getCustomProtocolMetadata(inboundProtocolId)).build();
     }
 
     @Override

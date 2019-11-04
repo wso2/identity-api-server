@@ -33,26 +33,26 @@ import javax.xml.bind.annotation.*;
 
 public class CustomInboundProtocolMetaData  {
   
-    private String name;
+    private String displayName;
     private List<CustomInboundProtocolProperty> properties = null;
 
 
     /**
     **/
-    public CustomInboundProtocolMetaData name(String name) {
+    public CustomInboundProtocolMetaData displayName(String displayName) {
 
-        this.name = name;
+        this.displayName = displayName;
         return this;
     }
     
     @ApiModelProperty(example = "My Custom Protocol", value = "")
-    @JsonProperty("name")
+    @JsonProperty("displayName")
     @Valid
-    public String getName() {
-        return name;
+    public String getDisplayName() {
+        return displayName;
     }
-    public void setName(String name) {
-        this.name = name;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     /**
@@ -93,13 +93,13 @@ public class CustomInboundProtocolMetaData  {
             return false;
         }
         CustomInboundProtocolMetaData customInboundProtocolMetaData = (CustomInboundProtocolMetaData) o;
-        return Objects.equals(this.name, customInboundProtocolMetaData.name) &&
+        return Objects.equals(this.displayName, customInboundProtocolMetaData.displayName) &&
             Objects.equals(this.properties, customInboundProtocolMetaData.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, properties);
+        return Objects.hash(displayName, properties);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class CustomInboundProtocolMetaData  {
         StringBuilder sb = new StringBuilder();
         sb.append("class CustomInboundProtocolMetaData {\n");
         
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
