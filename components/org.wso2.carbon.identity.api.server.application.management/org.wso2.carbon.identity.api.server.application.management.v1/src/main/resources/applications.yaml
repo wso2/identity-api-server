@@ -2930,6 +2930,7 @@ components:
       schema:
         type: boolean
         example: true
+        default: false
   securitySchemes:
     BasicAuth:
       type: http

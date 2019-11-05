@@ -574,7 +574,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getInboundProtocols(    @Valid@ApiParam(value = "Send only the custom inbound protocols. ")  @QueryParam("customOnly") Boolean customOnly) {
+    public Response getInboundProtocols(    @Valid@ApiParam(value = "Send only the custom inbound protocols. ", defaultValue="false") @DefaultValue("false")  @QueryParam("customOnly") Boolean customOnly) {
 
         return delegate.getInboundProtocols(customOnly );
     }

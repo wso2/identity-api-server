@@ -17,6 +17,7 @@ package org.wso2.carbon.identity.api.server.application.management.common;
 
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
+import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
 
@@ -32,6 +33,8 @@ public class ApplicationManagementServiceHolder {
     private static STSAdminServiceInterface stsAdminService;
 
     private static SAMLSSOConfigServiceImpl samlssoConfigService;
+
+    private static OAuthServerConfiguration oAuthServerConfiguration;
 
     public static ApplicationManagementService getApplicationManagementService() {
 
@@ -71,5 +74,15 @@ public class ApplicationManagementServiceHolder {
     public static void setSamlssoConfigService(SAMLSSOConfigServiceImpl samlssoConfigService) {
 
         ApplicationManagementServiceHolder.samlssoConfigService = samlssoConfigService;
+    }
+
+    public static OAuthServerConfiguration getoAuthServerConfiguration() {
+
+        return oAuthServerConfiguration;
+    }
+
+    public static void setoAuthServerConfiguration(OAuthServerConfiguration oAuthServerConfiguration) {
+
+        ApplicationManagementServiceHolder.oAuthServerConfiguration = oAuthServerConfiguration;
     }
 }

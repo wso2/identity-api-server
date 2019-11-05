@@ -305,7 +305,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response getOIDCMetadata() {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(applicationMetadataService.getOIDCMetadata()).build();
     }
 
     @Override

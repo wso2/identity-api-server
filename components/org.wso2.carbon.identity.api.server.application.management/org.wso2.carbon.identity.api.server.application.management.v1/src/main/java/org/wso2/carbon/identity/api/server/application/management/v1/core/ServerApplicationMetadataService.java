@@ -26,18 +26,24 @@ import org.wso2.carbon.identity.api.server.application.management.common.Applica
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.MetadataProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.mgt.AbstractInboundAuthenticatorConfig;
+import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
+import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.getOAuthGrantTypeNames;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 
 /**
@@ -57,31 +63,25 @@ public class ServerApplicationMetadataService {
 
         for (Map.Entry<String, AbstractInboundAuthenticatorConfig> entry : allCustomAuthenticators
                 .entrySet()) {
-            AuthProtocolMetadata protocol = new AuthProtocolMetadata();
-            protocol.setName(entry.getValue().getName());
-            protocol.setDisplayName(entry.getValue().getFriendlyName());
+            AuthProtocolMetadata protocol = new AuthProtocolMetadata()
+                    .name(entry.getValue().getName())
+                    .displayName(entry.getValue().getFriendlyName());
             authProtocolMetadataList.add(protocol);
         }
 
         if (customOnly == null || !customOnly) {
             // Add default inbound protocols
-            authProtocolMetadataList.add(getInboundProtocolMetadata("saml", "SAML2 Web SSO Configuration"));
-            authProtocolMetadataList.add(getInboundProtocolMetadata("oidc", "OAuth/OpenID Connect Configuration"));
-            authProtocolMetadataList.add(getInboundProtocolMetadata("ws-federation",
-                    "WS-Federation (Passive) Configuration"));
-            authProtocolMetadataList.add(getInboundProtocolMetadata("ws-trust",
-                    "WS-Trust Security Token Service Configuration"));
+            authProtocolMetadataList.add(new AuthProtocolMetadata().name("saml")
+                    .displayName("SAML2 Web SSO Configuration"));
+            authProtocolMetadataList.add(new AuthProtocolMetadata().name("oidc")
+                    .displayName("OAuth/OpenID Connect Configuration"));
+            authProtocolMetadataList.add(new AuthProtocolMetadata().name("ws-federation")
+                    .displayName("WS-Federation (Passive) Configuration"));
+            authProtocolMetadataList.add(new AuthProtocolMetadata().name("ws-trust")
+                    .displayName("WS-Trust Security Token Service Configuration"));
         }
 
         return authProtocolMetadataList;
-    }
-
-    private AuthProtocolMetadata getInboundProtocolMetadata(String name, String displayName) {
-
-        AuthProtocolMetadata metadata = new AuthProtocolMetadata();
-        metadata.setName(name);
-        metadata.setDisplayName(displayName);
-        return metadata;
     }
 
     public CustomInboundProtocolMetaData getCustomProtocolMetadata(String inboundProtocolId) {
@@ -94,13 +94,9 @@ public class ServerApplicationMetadataService {
         for (Map.Entry<String, AbstractInboundAuthenticatorConfig> entry : allCustomAuthenticators
                 .entrySet()) {
             if (entry.getValue().getName().equals(protocolName)) {
-                CustomInboundProtocolMetaData metaData = new CustomInboundProtocolMetaData();
-                metaData.setDisplayName(entry.getValue().getFriendlyName());
-
-                // set properties
-                metaData.setProperties(getCustomInboundProtocolProperties(
-                        entry.getValue().getConfigurationProperties()));
-                return metaData;
+                return new CustomInboundProtocolMetaData()
+                        .displayName(entry.getValue().getFriendlyName())
+                        .properties(getCustomInboundProtocolProperties(entry.getValue().getConfigurationProperties()));
             }
         }
 
@@ -144,9 +140,58 @@ public class ServerApplicationMetadataService {
         return protocolProperties;
     }
 
-    public Response getOIDCMetadata() {
+    public OIDCMetaData getOIDCMetadata() {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        OIDCMetaData oidcMetaData = new OIDCMetaData();
+        OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
+        
+        List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
+        List<String> supportedGrantTypeNames = new ArrayList<>();
+        // Iterate through the standard grant type names and add matching elements.
+        for (String grantType: getOAuthGrantTypeNames().keySet()) {
+            if (supportedGrantTypes.contains(grantType)) {
+                supportedGrantTypeNames.add(getOAuthGrantTypeNames().get(grantType));
+                supportedGrantTypes.remove(grantType);
+            }
+        }
+        // Add any left grant types to the list.
+        supportedGrantTypeNames.addAll(supportedGrantTypes);
+        // Set extracted grant types.
+        oidcMetaData.setAllowedGrantTypes(
+                new MetadataProperty()
+                        .defaultValue(null)
+                        .options(supportedGrantTypeNames));
+
+        oidcMetaData.setDefaultUserAccessTokenExpiryTime(
+                String.valueOf(oAuthAdminService.getTokenExpiryTimes().getUserAccessTokenExpiryTime()));
+        oidcMetaData.defaultApplicationAccessTokenExpiryTime(
+                String.valueOf(oAuthAdminService.getTokenExpiryTimes().getApplicationAccessTokenExpiryTime()));
+        oidcMetaData.defaultRefreshTokenExpiryTime(
+                String.valueOf(oAuthAdminService.getTokenExpiryTimes().getRefreshTokenExpiryTime()));
+        oidcMetaData.defaultIdTokenExpiryTime(
+                String.valueOf(oAuthAdminService.getTokenExpiryTimes().getIdTokenExpiryTime()));
+
+        OAuthIDTokenAlgorithmDTO idTokenAlgorithmDTO = oAuthAdminService.getSupportedIDTokenAlgorithms();
+        oidcMetaData.setIdTokenEncryptionAlgorithm(
+                new MetadataProperty()
+                .defaultValue(idTokenAlgorithmDTO.getDefaultIdTokenEncryptionAlgorithm())
+                .options(idTokenAlgorithmDTO.getSupportedIdTokenEncryptionAlgorithms()));
+        oidcMetaData.idTokenEncryptionMethod(
+                new MetadataProperty()
+                        .defaultValue(idTokenAlgorithmDTO.getDefaultIdTokenEncryptionMethod())
+                        .options(idTokenAlgorithmDTO.getSupportedIdTokenEncryptionMethods()));
+
+        oidcMetaData.setScopeValidators(
+                new MetadataProperty()
+                        .defaultValue(null)
+                        .options(Arrays.asList(oAuthAdminService.getAllowedScopeValidators())));
+
+        oidcMetaData.accessTokenType(
+                new MetadataProperty()
+                        .defaultValue(oAuthAdminService.getDefaultTokenType())
+                        .options(oAuthAdminService.getSupportedTokenTypes()));
+
+        return oidcMetaData;
     }
 
     public Response getSAMLMetadata() {

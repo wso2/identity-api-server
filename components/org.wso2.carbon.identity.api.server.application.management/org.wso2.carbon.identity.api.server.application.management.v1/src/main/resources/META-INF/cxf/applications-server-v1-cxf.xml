@@ -39,7 +39,6 @@
         <property name="samlssoConfigService" ref="samlSsoConfigServiceFactoryBean"/>
     </bean>
 
-
     <bean id="applicationManagementServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.ApplicationManagementOSGiServiceFactory"/>
     <bean id="oauthAdminServiceFactoryBean"
