@@ -117,9 +117,10 @@ public class ServerApplicationManagementService {
 
     public void deleteApplication(String applicationId) {
 
+        String username = ContextLoader.getUsernameFromContext();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            getApplicationManagementService().deleteApplicationByResourceId(applicationId, tenantDomain);
+            getApplicationManagementService().deleteApplicationByResourceId(applicationId, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
             throw handleServerError(e, "Error while deleting application with id: " + applicationId);
         }
@@ -127,23 +128,30 @@ public class ServerApplicationManagementService {
 
     public void updateApplication(String applicationId, ApplicationModel applicationModel) {
 
+        String username = ContextLoader.getUsernameFromContext();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             ServiceProvider updatedApp = new ApiModelToServiceProvider().apply(applicationModel);
-            getApplicationManagementService().updateApplicationByResourceId(applicationId, tenantDomain, updatedApp);
+            getApplicationManagementService()
+                    .updateApplicationByResourceId(applicationId, updatedApp, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
             throw handleServerError(e, "Error while updating application with id: " + applicationId);
         }
     }
 
-    public String createApplication(ApplicationModel applicationModel) {
+    public ApplicationModel createApplication(ApplicationModel applicationModel) {
 
+        String username = ContextLoader.getUsernameFromContext();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
-            return getApplicationManagementService().createApplication(application, tenantDomain);
+
+            ServiceProvider createdApp = getApplicationManagementService()
+                    .createApplication(application, tenantDomain, username);
+            return new ServiceProviderToApiModel().apply(createdApp);
         } catch (IdentityApplicationManagementException e) {
-            throw handleServerError(e, "Error while updating application with name: " + applicationModel.getName());
+            throw handleServerError(e, "Error while updating application with name: " +
+                    applicationModel.getName());
         }
     }
 
