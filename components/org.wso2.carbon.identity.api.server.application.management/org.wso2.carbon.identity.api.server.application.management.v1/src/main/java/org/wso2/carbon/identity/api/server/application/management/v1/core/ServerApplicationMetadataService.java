@@ -28,12 +28,15 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.MetadataProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.mgt.AbstractInboundAuthenticatorConfig;
+import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
+import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +46,9 @@ import java.util.Locale;
 import java.util.Map;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_CERTIFICATE_ALIAS;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_NAME_ID_FORMAT;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_WHILE_RETRIEVING_SAML_METADATA;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.getOAuthGrantTypeNames;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 
@@ -194,14 +200,59 @@ public class ServerApplicationMetadataService {
         return oidcMetaData;
     }
 
-    public Response getSAMLMetadata() {
+    public SAMLMetaData getSAMLMetadata() {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        SAMLMetaData samlMetaData = new SAMLMetaData();
+        SAMLSSOConfigServiceImpl samlSSOConfigService = ApplicationManagementServiceHolder.getSamlssoConfigService();
+
+        samlMetaData.setDefaultNameIdFormat(DEFAULT_NAME_ID_FORMAT);
+
+        try {
+            samlMetaData.setCertificateAlias(new MetadataProperty()
+                    .defaultValue(DEFAULT_CERTIFICATE_ALIAS)
+                    .options(Arrays.asList(samlSSOConfigService.getCertAliasOfPrimaryKeyStore())));
+        } catch (IdentityException e) {
+            throw handleException(e, ERROR_WHILE_RETRIEVING_SAML_METADATA);
+        }
+
+        samlMetaData.setResponseSigningAlgorithm(new MetadataProperty()
+                .defaultValue(samlSSOConfigService.getSigningAlgorithmUriByConfig())
+                .options(Arrays.asList(samlSSOConfigService.getSigningAlgorithmUris())));
+
+        samlMetaData.setResponseDigestAlgorithm(new MetadataProperty()
+                .defaultValue(samlSSOConfigService.getDigestAlgorithmURIByConfig())
+                .options(Arrays.asList(samlSSOConfigService.getDigestAlgorithmURIs())));
+
+        samlMetaData.setAssertionEncryptionAlgorithm(new MetadataProperty()
+                .defaultValue(samlSSOConfigService.getAssertionEncryptionAlgorithmURIByConfig())
+                .options(Arrays.asList(samlSSOConfigService.getAssertionEncryptionAlgorithmURIs())));
+
+        samlMetaData.setKeyEncryptionAlgorithm(new MetadataProperty()
+                .defaultValue(samlSSOConfigService.getKeyEncryptionAlgorithmURIByConfig())
+                .options(Arrays.asList(samlSSOConfigService.getKeyEncryptionAlgorithmURIs())));
+
+        return samlMetaData;
     }
 
     public Response getWSTrustMetadata() {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    /**
+     * If the passed exception has an error message, set it to the description of the API error response.
+     *
+     * @param e         Exception caught.
+     * @param errorEnum Specific error enum.
+     * @return APIError with exception error message if present.
+     */
+    private APIError handleException(Exception e, ApplicationManagementConstants.ErrorMessage errorEnum) {
+
+        ErrorResponse errorResponse = buildErrorResponse(errorEnum);
+        if (StringUtils.isNotBlank(e.getMessage())) {
+            errorResponse.setDescription(e.getMessage());
+        }
+        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
     }
 
     private APIError buildApiError(ApplicationManagementConstants.ErrorMessage errorEnum) {

@@ -311,7 +311,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response getSAMLMetadata() {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(applicationMetadataService.getSAMLMetadata()).build();
     }
 
     @Override

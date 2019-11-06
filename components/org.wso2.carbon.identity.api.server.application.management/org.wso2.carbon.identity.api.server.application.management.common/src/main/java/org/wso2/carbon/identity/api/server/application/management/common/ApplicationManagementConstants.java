@@ -36,6 +36,8 @@ public class ApplicationManagementConstants {
     private static final String APPLICATION_MANAGEMENT_PREFIX = "APP-";
     public static final String APPLICATION_MANAGEMENT_PATH_COMPONENT = "/applications";
     private static final Map<String, String> OAUTH_GRANT_TYPE_NAMES = new LinkedHashMap<>();
+    public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
+    public static final String DEFAULT_CERTIFICATE_ALIAS = "wso2carbon";
 
     /**
      * Enums for error messages.
@@ -76,7 +78,10 @@ public class ApplicationManagementConstants {
         ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED("55002",
                 Response.Status.NOT_IMPLEMENTED,
                 "Attribute filtering not supported.",
-                "Attribute filtering capability is not supported in this version of the API.");
+                "Attribute filtering capability is not supported in this version of the API."),
+        ERROR_WHILE_RETRIEVING_SAML_METADATA("55003", Response.Status.INTERNAL_SERVER_ERROR,
+                "Error occurred while retrieving SAML Metadata.",
+                "Unexpected error occurred while retrieving SAML Metadata.");
 
         private final String code;
         private Response.Status httpStatusCode;
