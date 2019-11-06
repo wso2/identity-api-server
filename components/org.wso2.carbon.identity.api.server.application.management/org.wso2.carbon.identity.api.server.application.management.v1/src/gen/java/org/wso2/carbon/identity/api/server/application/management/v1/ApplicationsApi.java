@@ -17,6 +17,7 @@
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
@@ -339,6 +340,29 @@ public class ApplicationsApi  {
     public Response deleteWSTrustConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.deleteWSTrustConfiguration(applicationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/meta/adaptive-auth-templates")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrive the sample adaptive authentication templates. ", notes = "This API provides the capability to retrieve the sample adaptive authentication templates. ", response = AdaptiveAuthTemplates.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = AdaptiveAuthTemplates.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getAdaptiveAuthTemplates() {
+
+        return delegate.getAdaptiveAuthTemplates();
     }
 
     @Valid

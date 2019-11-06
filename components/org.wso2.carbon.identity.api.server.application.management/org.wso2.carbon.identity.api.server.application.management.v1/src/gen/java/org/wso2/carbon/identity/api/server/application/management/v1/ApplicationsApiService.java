@@ -20,6 +20,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
@@ -67,6 +68,8 @@ public interface ApplicationsApiService {
       public Response deleteProvisioningConfiguration(String applicationId);
 
       public Response deleteWSTrustConfiguration(String applicationId);
+
+      public Response getAdaptiveAuthTemplates();
 
       public Response getAdvancedConfigurations(String applicationId);
 

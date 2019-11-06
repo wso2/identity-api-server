@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolProperty;
@@ -281,6 +282,14 @@ public class ServerApplicationMetadataService {
             protocolProperties.add(protocolProperty);
         }
         return protocolProperties;
+    }
+
+    public AdaptiveAuthTemplates getAdaptiveAuthTemplates() {
+
+        AdaptiveAuthTemplates adaptiveAuthTemplates = new AdaptiveAuthTemplates();
+        adaptiveAuthTemplates.setTemplatesJSON(
+                ApplicationManagementServiceHolder.getApplicationManagementService().getAuthenticationTemplatesJSON());
+        return adaptiveAuthTemplates;
     }
 
     /**

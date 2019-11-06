@@ -319,4 +319,10 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
         return Response.ok().entity(applicationMetadataService.getWSTrustMetadata()).build();
     }
+
+    @Override
+    public Response getAdaptiveAuthTemplates() {
+
+        return Response.ok().entity(applicationMetadataService.getAdaptiveAuthTemplates()).build();
+    }
 }

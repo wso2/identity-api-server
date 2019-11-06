@@ -2851,6 +2851,49 @@ paths:
       x-wso2-request: ''
       x-wso2-response: |
         "HTTP/1.1 200 Ok"
+  '/applications/meta/adaptive-auth-templates':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrive the sample adaptive authentication templates.
+      description: >
+        This API provides the capability to retrieve the sample adaptive authentication templates.
+      operationId: getAdaptiveAuthTemplates
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdaptiveAuthTemplates'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-wso2-request: ''
+      x-wso2-response: |
+        "HTTP/1.1 200 Ok"
 
 servers:
   - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
@@ -3391,7 +3434,7 @@ components:
             #       enum:
             #         - backchannel
             #         - frontchannel_http_redirect
-            #         - frontchannel_http_post
+          #         - frontchannel_http_post
           #       default: backchannel
 
 
@@ -3759,6 +3802,14 @@ components:
         isConfidential:
           type: boolean
           default: false
+
+    AdaptiveAuthTemplates:
+      type: object
+      properties:
+        templatesJSON:
+          type: string
+          example: 'Adaptive Auth Templates JSON'
+
     Error:
       type: object
       properties:
