@@ -60,6 +60,13 @@ public class ServerApplicationMetadataService {
 
     private static final Log LOG = LogFactory.getLog(ServerApplicationMetadataService.class);
 
+    /**
+     * Return a list of all available inbound protocols. If the customOnly parameter set to True, will return only the
+     * custom protocols.
+     *
+     * @param customOnly Set to True to get only custom protocols. Default value: False.
+     * @return The list of inbound protocols.
+     */
     public List<AuthProtocolMetadata> getInboundProtocols(Boolean customOnly) {
 
         List<AuthProtocolMetadata> authProtocolMetadataList = new ArrayList<>();
@@ -91,116 +98,11 @@ public class ServerApplicationMetadataService {
         return authProtocolMetadataList;
     }
 
-    public CustomInboundProtocolMetaData getCustomProtocolMetadata(String inboundProtocolId) {
-
-        String protocolName = base64URLDecode(inboundProtocolId);
-        Map<String, AbstractInboundAuthenticatorConfig> allCustomAuthenticators =
-                ApplicationManagementServiceHolder.getApplicationManagementService().getAllInboundAuthenticatorConfig();
-
-        // Loop through all custom inbound protocols and match the name.
-        for (Map.Entry<String, AbstractInboundAuthenticatorConfig> entry : allCustomAuthenticators
-                .entrySet()) {
-            if (entry.getValue().getName().equals(protocolName)) {
-                return new CustomInboundProtocolMetaData()
-                        .displayName(entry.getValue().getFriendlyName())
-                        .properties(getCustomInboundProtocolProperties(entry.getValue().getConfigurationProperties()));
-            }
-        }
-
-        // Throw 404 error if the protocol not found
-        throw buildApiError(ApplicationManagementConstants.ErrorMessage.ERROR_INBOUND_PROTOCOL_NOT_FOUND);
-    }
-
-    private List<CustomInboundProtocolProperty> getCustomInboundProtocolProperties(Property[] properties) {
-
-        List<CustomInboundProtocolProperty> protocolProperties = new ArrayList<>();
-        for (Property property : properties) {
-            CustomInboundProtocolProperty protocolProperty = new CustomInboundProtocolProperty();
-
-            if (StringUtils.isNotBlank(property.getName())) {
-                protocolProperty.setName(property.getName());
-            }
-            if (StringUtils.isNotBlank(property.getDisplayName())) {
-                protocolProperty.setDisplayName(property.getDisplayName());
-            }
-            if (StringUtils.isNotBlank(property.getType())) {
-                protocolProperty.setType(CustomInboundProtocolProperty.TypeEnum.valueOf(
-                        property.getType().toUpperCase(Locale.ENGLISH)));
-            } else {
-                protocolProperty.setType(CustomInboundProtocolProperty.TypeEnum.STRING);
-            }
-            protocolProperty.setRequired(property.isRequired());
-            if (property.getOptions() != null) {
-                protocolProperty.setAvailableValues(Arrays.asList(property.getOptions()));
-            }
-            if (StringUtils.isNotBlank(property.getDefaultValue())) {
-                protocolProperty.setDefaultValue(property.getDefaultValue());
-            }
-            if (StringUtils.isNotBlank(property.getRegex())) {
-                protocolProperty.setValidationRegex(property.getRegex());
-            }
-            protocolProperty.setDisplayOrder(property.getDisplayOrder());
-            protocolProperty.setIsConfidential(property.isConfidential());
-
-            protocolProperties.add(protocolProperty);
-        }
-        return protocolProperties;
-    }
-
-    public OIDCMetaData getOIDCMetadata() {
-
-        OIDCMetaData oidcMetaData = new OIDCMetaData();
-        OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
-        
-        List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
-        List<String> supportedGrantTypeNames = new ArrayList<>();
-        // Iterate through the standard grant type names and add matching elements.
-        for (String grantType: getOAuthGrantTypeNames().keySet()) {
-            if (supportedGrantTypes.contains(grantType)) {
-                supportedGrantTypeNames.add(getOAuthGrantTypeNames().get(grantType));
-                supportedGrantTypes.remove(grantType);
-            }
-        }
-        // Add any left grant types to the list.
-        supportedGrantTypeNames.addAll(supportedGrantTypes);
-        // Set extracted grant types.
-        oidcMetaData.setAllowedGrantTypes(
-                new MetadataProperty()
-                        .defaultValue(null)
-                        .options(supportedGrantTypeNames));
-
-        oidcMetaData.setDefaultUserAccessTokenExpiryTime(
-                String.valueOf(oAuthAdminService.getTokenExpiryTimes().getUserAccessTokenExpiryTime()));
-        oidcMetaData.defaultApplicationAccessTokenExpiryTime(
-                String.valueOf(oAuthAdminService.getTokenExpiryTimes().getApplicationAccessTokenExpiryTime()));
-        oidcMetaData.defaultRefreshTokenExpiryTime(
-                String.valueOf(oAuthAdminService.getTokenExpiryTimes().getRefreshTokenExpiryTime()));
-        oidcMetaData.defaultIdTokenExpiryTime(
-                String.valueOf(oAuthAdminService.getTokenExpiryTimes().getIdTokenExpiryTime()));
-
-        OAuthIDTokenAlgorithmDTO idTokenAlgorithmDTO = oAuthAdminService.getSupportedIDTokenAlgorithms();
-        oidcMetaData.setIdTokenEncryptionAlgorithm(
-                new MetadataProperty()
-                .defaultValue(idTokenAlgorithmDTO.getDefaultIdTokenEncryptionAlgorithm())
-                .options(idTokenAlgorithmDTO.getSupportedIdTokenEncryptionAlgorithms()));
-        oidcMetaData.idTokenEncryptionMethod(
-                new MetadataProperty()
-                        .defaultValue(idTokenAlgorithmDTO.getDefaultIdTokenEncryptionMethod())
-                        .options(idTokenAlgorithmDTO.getSupportedIdTokenEncryptionMethods()));
-
-        oidcMetaData.setScopeValidators(
-                new MetadataProperty()
-                        .defaultValue(null)
-                        .options(Arrays.asList(oAuthAdminService.getAllowedScopeValidators())));
-
-        oidcMetaData.accessTokenType(
-                new MetadataProperty()
-                        .defaultValue(oAuthAdminService.getDefaultTokenType())
-                        .options(oAuthAdminService.getSupportedTokenTypes()));
-
-        return oidcMetaData;
-    }
-
+    /**
+     * Pull SAML metadata from the SAMLSSOConfigServiceImpl and return.
+     *
+     * @return Populated SAMLMetaData object.
+     */
     public SAMLMetaData getSAMLMetadata() {
 
         SAMLMetaData samlMetaData = new SAMLMetaData();
@@ -235,6 +137,70 @@ public class ServerApplicationMetadataService {
         return samlMetaData;
     }
 
+    /**
+     * Pull OAuth/OIDC Metadata from OAuthAdminServiceImpl and return.
+     *
+     * @return Populated OIDCMetadata object.
+     */
+    public OIDCMetaData getOIDCMetadata() {
+
+        OIDCMetaData oidcMetaData = new OIDCMetaData();
+        OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
+
+        List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
+        List<String> supportedGrantTypeNames = new ArrayList<>();
+        // Iterate through the standard grant type names and add matching elements.
+        for (String grantType: getOAuthGrantTypeNames().keySet()) {
+            if (supportedGrantTypes.contains(grantType)) {
+                supportedGrantTypeNames.add(getOAuthGrantTypeNames().get(grantType));
+                supportedGrantTypes.remove(grantType);
+            }
+        }
+        // Add any left grant types to the list.
+        supportedGrantTypeNames.addAll(supportedGrantTypes);
+        // Set extracted grant types.
+        oidcMetaData.setAllowedGrantTypes(
+                new MetadataProperty()
+                        .defaultValue(null)
+                        .options(supportedGrantTypeNames));
+
+        oidcMetaData.setDefaultUserAccessTokenExpiryTime(
+                String.valueOf(oAuthAdminService.getTokenExpiryTimes().getUserAccessTokenExpiryTime()));
+        oidcMetaData.defaultApplicationAccessTokenExpiryTime(
+                String.valueOf(oAuthAdminService.getTokenExpiryTimes().getApplicationAccessTokenExpiryTime()));
+        oidcMetaData.defaultRefreshTokenExpiryTime(
+                String.valueOf(oAuthAdminService.getTokenExpiryTimes().getRefreshTokenExpiryTime()));
+        oidcMetaData.defaultIdTokenExpiryTime(
+                String.valueOf(oAuthAdminService.getTokenExpiryTimes().getIdTokenExpiryTime()));
+
+        OAuthIDTokenAlgorithmDTO idTokenAlgorithmDTO = oAuthAdminService.getSupportedIDTokenAlgorithms();
+        oidcMetaData.setIdTokenEncryptionAlgorithm(
+                new MetadataProperty()
+                        .defaultValue(idTokenAlgorithmDTO.getDefaultIdTokenEncryptionAlgorithm())
+                        .options(idTokenAlgorithmDTO.getSupportedIdTokenEncryptionAlgorithms()));
+        oidcMetaData.idTokenEncryptionMethod(
+                new MetadataProperty()
+                        .defaultValue(idTokenAlgorithmDTO.getDefaultIdTokenEncryptionMethod())
+                        .options(idTokenAlgorithmDTO.getSupportedIdTokenEncryptionMethods()));
+
+        oidcMetaData.setScopeValidators(
+                new MetadataProperty()
+                        .defaultValue(null)
+                        .options(Arrays.asList(oAuthAdminService.getAllowedScopeValidators())));
+
+        oidcMetaData.accessTokenType(
+                new MetadataProperty()
+                        .defaultValue(oAuthAdminService.getDefaultTokenType())
+                        .options(oAuthAdminService.getSupportedTokenTypes()));
+
+        return oidcMetaData;
+    }
+
+    /**
+     * Pull WS Trust metadata from STSAdminServiceInterface and return.
+     *
+     * @return Populated WSTrustMetadata object.
+     */
     public WSTrustMetaData getWSTrustMetadata() {
 
         WSTrustMetaData wsTrustMetaData = new WSTrustMetaData();
@@ -247,6 +213,74 @@ public class ServerApplicationMetadataService {
             throw handleException(e, ERROR_WHILE_RETRIEVING_SAML_METADATA);
         }
         return wsTrustMetaData;
+    }
+
+    /**
+     * Pull property metadata of the custom inbound protocol that matches to the protocol name.
+     *
+     * @param inboundProtocolId Base64URL encoded protocol name.
+     * @return Populated CustomInboundProtocolMetaData object.
+     */
+    public CustomInboundProtocolMetaData getCustomProtocolMetadata(String inboundProtocolId) {
+
+        String protocolName = base64URLDecode(inboundProtocolId);
+        Map<String, AbstractInboundAuthenticatorConfig> allCustomAuthenticators =
+                ApplicationManagementServiceHolder.getApplicationManagementService().getAllInboundAuthenticatorConfig();
+
+        // Loop through all custom inbound protocols and match the name.
+        for (Map.Entry<String, AbstractInboundAuthenticatorConfig> entry : allCustomAuthenticators
+                .entrySet()) {
+            if (entry.getValue().getName().equals(protocolName)) {
+                return new CustomInboundProtocolMetaData()
+                        .displayName(entry.getValue().getFriendlyName())
+                        .properties(getCustomInboundProtocolProperties(entry.getValue().getConfigurationProperties()));
+            }
+        }
+
+        // Throw 404 error if the protocol not found
+        throw buildApiError(ApplicationManagementConstants.ErrorMessage.ERROR_INBOUND_PROTOCOL_NOT_FOUND);
+    }
+
+    /**
+     * Loop through all protocol properties and create a list of CustomInboundProtocolProperty objects.
+     *
+     * @param properties Custom inbound protocol properties.
+     * @return Populated property list.
+     */
+    private List<CustomInboundProtocolProperty> getCustomInboundProtocolProperties(Property[] properties) {
+
+        List<CustomInboundProtocolProperty> protocolProperties = new ArrayList<>();
+        for (Property property : properties) {
+            CustomInboundProtocolProperty protocolProperty = new CustomInboundProtocolProperty();
+
+            if (StringUtils.isNotBlank(property.getName())) {
+                protocolProperty.setName(property.getName());
+            }
+            if (StringUtils.isNotBlank(property.getDisplayName())) {
+                protocolProperty.setDisplayName(property.getDisplayName());
+            }
+            if (StringUtils.isNotBlank(property.getType())) {
+                protocolProperty.setType(CustomInboundProtocolProperty.TypeEnum.valueOf(
+                        property.getType().toUpperCase(Locale.ENGLISH)));
+            } else {
+                protocolProperty.setType(CustomInboundProtocolProperty.TypeEnum.STRING);
+            }
+            protocolProperty.setRequired(property.isRequired());
+            if (property.getOptions() != null) {
+                protocolProperty.setAvailableValues(Arrays.asList(property.getOptions()));
+            }
+            if (StringUtils.isNotBlank(property.getDefaultValue())) {
+                protocolProperty.setDefaultValue(property.getDefaultValue());
+            }
+            if (StringUtils.isNotBlank(property.getRegex())) {
+                protocolProperty.setValidationRegex(property.getRegex());
+            }
+            protocolProperty.setDisplayOrder(property.getDisplayOrder());
+            protocolProperty.setIsConfidential(property.isConfidential());
+
+            protocolProperties.add(protocolProperty);
+        }
+        return protocolProperties;
     }
 
     /**
