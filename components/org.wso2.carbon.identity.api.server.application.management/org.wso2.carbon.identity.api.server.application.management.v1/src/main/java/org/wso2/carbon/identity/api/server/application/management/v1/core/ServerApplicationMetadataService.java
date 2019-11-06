@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.MetadataProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
+import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.application.common.model.Property;
@@ -37,6 +38,7 @@ import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
+import org.wso2.carbon.security.SecurityConfigException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +46,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_CERTIFICATE_ALIAS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_NAME_ID_FORMAT;
@@ -234,9 +235,18 @@ public class ServerApplicationMetadataService {
         return samlMetaData;
     }
 
-    public Response getWSTrustMetadata() {
+    public WSTrustMetaData getWSTrustMetadata() {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        WSTrustMetaData wsTrustMetaData = new WSTrustMetaData();
+        try {
+            wsTrustMetaData.setCertificateAlias(new MetadataProperty()
+                    .defaultValue(null)
+                    .options(Arrays.asList(
+                            ApplicationManagementServiceHolder.getStsAdminService().getCertAliasOfPrimaryKeyStore())));
+        } catch (SecurityConfigException e) {
+            throw handleException(e, ERROR_WHILE_RETRIEVING_SAML_METADATA);
+        }
+        return wsTrustMetaData;
     }
 
     /**

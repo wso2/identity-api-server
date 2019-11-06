@@ -81,7 +81,10 @@ public class ApplicationManagementConstants {
                 "Attribute filtering capability is not supported in this version of the API."),
         ERROR_WHILE_RETRIEVING_SAML_METADATA("55003", Response.Status.INTERNAL_SERVER_ERROR,
                 "Error occurred while retrieving SAML Metadata.",
-                "Unexpected error occurred while retrieving SAML Metadata.");
+                "Unexpected error occurred while retrieving SAML Metadata."),
+        ERROR_WHILE_RETRIEVING_WS_TRUST_METADATA("55004", Response.Status.INTERNAL_SERVER_ERROR,
+                "Error occurred while retrieving WS Trust Metadata.",
+                "Unexpected error occurred while retrieving WS Trust Metadata.");
 
         private final String code;
         private Response.Status httpStatusCode;

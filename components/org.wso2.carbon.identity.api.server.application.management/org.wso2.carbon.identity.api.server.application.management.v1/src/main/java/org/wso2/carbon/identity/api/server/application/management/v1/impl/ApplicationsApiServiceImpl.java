@@ -317,6 +317,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response getWSTrustMetadata() {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(applicationMetadataService.getWSTrustMetadata()).build();
     }
 }
