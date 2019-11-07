@@ -186,9 +186,9 @@
                 <version>${jackson-jaxrs-json-provider.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>${commons.lang3.version}</version>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commons.beanutils.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.governance</groupId>
@@ -423,7 +423,7 @@
         <identity.event.handler.version>1.2.9</identity.event.handler.version>
         <identity.inbound.oauth2.version>6.2.29</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.6.15</identity.inbound.saml2.version>
-        <commons.lang3.version>3.4</commons.lang3.version>
+        <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
     </properties>
 
