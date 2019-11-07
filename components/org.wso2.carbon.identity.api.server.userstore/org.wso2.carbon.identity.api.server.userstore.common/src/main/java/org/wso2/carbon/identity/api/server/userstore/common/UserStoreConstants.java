@@ -21,11 +21,11 @@ package org.wso2.carbon.identity.api.server.userstore.common;
 public class UserStoreConstants {
 
     private static final String SECONDARY_USER_STORE_PREFIX = "SUS-";
-    public static final String OPERATION_REPLACE = "REPLACE";
     public static final String USER_STORE_PATH_COMPONENT = "/userstores";
-    public static final String USER_STORE_DESCRIPTION = "description";
-    public static final String USER_STORE_CLASS_NAME = "className";
-    public static final String USER_STORE_DOMAIN_NAME = "domainName";
+    public static final String USER_STORE_DESCRIPTION = "/description";
+    public static final String USER_STORE_CLASS_NAME = "/className";
+    public static final String USER_STORE_DOMAIN_NAME = "/domainName";
+    public static final String USER_STORE_PROPERTIES = "/properties/";
 
     /**
      * Enum for user store related errors in the format of
@@ -65,9 +65,9 @@ public class UserStoreConstants {
         ERROR_CODE_RETRIEVING_USER_STORE_TYPE("50010",
                 "Unable to retrieve the user store implementations",
                 "Server Encountered an error while retrieving the user store types."),
-        ERROR_CODE_INVALID_INPUT("50011",
-                "Invalid Input",
-                "Provided Input is not valid.");
+        ERROR_CODE_INVALID_INPUT("50011", "Invalid Input", "Provided Input is not valid."),
+        ERROR_CODE_NOT_FOUND("50012", "Resource not found.",
+                "Unable to find a required resource for this request");
 
         private final String code;
         private final String message;

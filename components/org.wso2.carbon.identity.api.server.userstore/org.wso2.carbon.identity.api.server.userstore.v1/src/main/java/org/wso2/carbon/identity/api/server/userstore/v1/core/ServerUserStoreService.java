@@ -202,6 +202,9 @@ public class ServerUserStoreService {
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         try {
             UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
+            if (userStoreDTOS == null) {
+                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
+            }
             return buildUserStoreListResponse(userStoreDTOS);
 
         } catch (IdentityUserStoreMgtException e) {
@@ -225,6 +228,10 @@ public class ServerUserStoreService {
         try {
             if (isUserStoreDomainIdFound(base64DecodeId(domainId))) {
                 UserStoreDTO userStoreDTO = userStoreConfigService.getUserStore(base64DecodeId(domainId));
+                if (userStoreDTO == null) {
+                    throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.
+                            ERROR_CODE_NOT_FOUND);
+                }
                 UserStoreConfigurationsRes userStoreConfigurations = new UserStoreConfigurationsRes();
                 userStoreConfigurations.setClassName(userStoreDTO.getClassName());
                 userStoreConfigurations.setDescription(userStoreDTO.getDescription());
@@ -256,7 +263,7 @@ public class ServerUserStoreService {
      *
      * @param typeId the user store type id.
      * @param limit  items per page.
-     * @param offset to specify the results starting from this index + 1.
+     * @param offset to specify the offset param.
      * @param filter to specify the filtering capabilities.
      * @param sort   to specify the sorting order.
      * @return MetaUserStoreType.
@@ -270,6 +277,9 @@ public class ServerUserStoreService {
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         try {
             UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
+            if (userStoreDTOS == null) {
+                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
+            }
             List<UserStoreDTO> userStoresByTypeNameList = new ArrayList<>();
             for (UserStoreDTO userStoreDTO : userStoreDTOS) {
                 if (Objects.equals(getUserStoreType(base64DecodeId(typeId)), userStoreDTO.getClassName())) {
@@ -328,7 +338,8 @@ public class ServerUserStoreService {
         }
         for (PatchDocument patch : patchDocument) {
             //Only the Replace operation supported with PATCH request
-            if (UserStoreConstants.OPERATION_REPLACE.equals(patch.getOperation().toString())) {
+            PatchDocument.OperationEnum operation = patch.getOperation();
+            if (operation == PatchDocument.OperationEnum.REPLACE) {
                 return performPatchReplace(domainId, patch.getPath(), patch.getValue());
             }
         }
@@ -348,8 +359,11 @@ public class ServerUserStoreService {
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         try {
             UserStoreDTO userStoreDTO = userStoreConfigService.getUserStore(base64DecodeId(domainId));
+            if (userStoreDTO == null) {
+                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
+            }
             PropertyDTO[] propertyDTOS = userStoreDTO.getProperties();
-            if (path.startsWith("/properties/")) {
+            if (path.startsWith(UserStoreConstants.USER_STORE_PROPERTIES)) {
                 String[] propertiesList = path.split("/");
                 for (PropertyDTO propertyDTO : propertyDTOS) {
                     if (propertiesList[2].equals(propertyDTO.getName())) {
@@ -358,8 +372,7 @@ public class ServerUserStoreService {
                 }
                 return buildResponseForPatchReplace(userStoreDTO, propertyDTOS);
             } else {
-                String[] propertiesList = path.split("/");
-                switch (propertiesList[1]) {
+                switch (path) {
                     case UserStoreConstants.USER_STORE_DESCRIPTION:
                         userStoreDTO.setDescription(value);
                         break;
@@ -695,23 +708,52 @@ public class ServerUserStoreService {
         return userStoreDTO;
     }
 
+    /**
+     * Handle exceptions generated in API.
+     *
+     * @param e         Exception.
+     * @param errorEnum Error Message information.
+     * @param status    Error status code.
+     * @return APIError.
+     */
     private APIError handleException(Exception e, UserStoreConstants.ErrorMessage errorEnum, Response.Status status) {
 
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, e, errorEnum.getDescription());
         return new APIError(status, errorResponse);
     }
 
+    /**
+     * Handle exceptions generated in API.
+     *
+     * @param status HTTP Status.
+     * @param error  Error Message information.
+     * @return APIError.
+     */
     private APIError handleException(Response.Status status, UserStoreConstants.ErrorMessage error) {
 
         return new APIError(status, getErrorBuilder(error).build());
     }
 
+    /**
+     * Return error builder.
+     *
+     * @param errorMsg Error Message information.
+     * @param data     Error data.
+     * @return ErrorResponse.Builder.
+     */
     private ErrorResponse.Builder getErrorBuilder(UserStoreConstants.ErrorMessage errorMsg, String... data) {
 
         return new ErrorResponse.Builder().withCode(errorMsg.getCode()).withMessage(errorMsg.getMessage())
                 .withDescription(buildErrorDescription(errorMsg, data));
     }
 
+    /**
+     * To build error description.
+     *
+     * @param errorEnum Error Message information.
+     * @param data      Error data.
+     * @return ErrorDescription.
+     */
     private String buildErrorDescription(UserStoreConstants.ErrorMessage errorEnum, String... data) {
 
         String errorDescription;
@@ -728,6 +770,12 @@ public class ServerUserStoreService {
         return errorDescription;
     }
 
+    /**
+     * To handle the error responses when the required resource not found.
+     *
+     * @param resourceId the resource id
+     * @return APIError
+     */
     private APIError handleNotFoundError(String resourceId) {
 
         Response.Status status = Response.Status.NOT_FOUND;
@@ -738,6 +786,14 @@ public class ServerUserStoreService {
         return new APIError(status, errorResponse);
     }
 
+    /**
+     * To return error responses for the input params for the get request which are not yet supported by the server.
+     *
+     * @param limit  items per page.
+     * @param offset to specify the offset param.
+     * @param filter to specify the filtering capabilities.
+     * @param sort   to specify the sorting order.
+     */
     private void handleNotImplementedBehaviour(Integer limit, Integer offset, String filter, String sort) {
 
         UserStoreConstants.ErrorMessage errorEnum = null;
