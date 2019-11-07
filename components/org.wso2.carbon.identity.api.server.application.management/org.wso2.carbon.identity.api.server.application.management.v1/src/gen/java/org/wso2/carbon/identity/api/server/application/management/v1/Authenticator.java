@@ -41,9 +41,11 @@ public class Authenticator  {
         return this;
     }
     
-    @ApiModelProperty(example = "LOCAL", value = "")
+    @ApiModelProperty(example = "LOCAL", required = true, value = "")
     @JsonProperty("idp")
     @Valid
+    @NotNull(message = "Property idp cannot be null.")
+
     public String getIdp() {
         return idp;
     }
@@ -59,9 +61,11 @@ public class Authenticator  {
         return this;
     }
     
-    @ApiModelProperty(example = "basic", value = "")
+    @ApiModelProperty(example = "basic", required = true, value = "")
     @JsonProperty("authenticator")
     @Valid
+    @NotNull(message = "Property authenticator cannot be null.")
+
     public String getAuthenticator() {
         return authenticator;
     }
