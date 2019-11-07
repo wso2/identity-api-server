@@ -2633,7 +2633,8 @@ components:
         Maximum number of records to return.
       schema:
         type: integer
-        format: int32
+        minimum: 1
+        default: 30
     offsetQueryParam:
       in: query
       name: offset
@@ -2642,13 +2643,13 @@ components:
         Number of records to skip for pagination.
       schema:
         type: integer
-        format: int32
+        minimum: 0
     filterQueryParam:
       in: query
       name: filter
       required: false
       description: |
-        Condition to filter the retrival of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently supports only filtering based on the 'name' attribute.
+        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently supports only filtering based on the 'name' attribute.
 
         /applications?filter=name+eq+user_portal
         /applications?filter=name+co+prod
@@ -3394,23 +3395,34 @@ components:
         script:
           type: string
         subjectStepId:
-          type: string
-          example: step1
+          type: integer
+          default: 1
+          example: 1
         attributeStepId:
-          type: string
-          example: step1
+          type: integer
+          default: 1
+          example: 1
+
     AuthenticationStep:
       type: object
+      required:
+        - id
+        - options
       properties:
         id:
-          type: string
-          example: step1
+          type: integer
+          minimum: 1
+          example: 1
         options:
           type: array
           items:
             $ref: '#/components/schemas/Authenticator'
+          minItems: 1
     Authenticator:
       type: object
+      required:
+        - idp
+        - authenticator
       properties:
         idp:
           type: string

@@ -129,10 +129,10 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             Arrays.stream(authConfig.getAuthenticationSteps()).forEach(authenticationStep -> {
                 authSequence.addStepsItem(buildAuthStep(authenticationStep));
                 if (authenticationStep.isSubjectStep()) {
-                    authSequence.setSubjectStepId(String.valueOf(authenticationStep.getStepOrder()));
+                    authSequence.setSubjectStepId(authenticationStep.getStepOrder());
                 }
                 if (authenticationStep.isAttributeStep()) {
-                    authSequence.setAttributeStepId(String.valueOf(authenticationStep.getStepOrder()));
+                    authSequence.setAttributeStepId(authenticationStep.getStepOrder());
                 }
             });
         }
@@ -164,7 +164,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                                                      authenticationStep) {
 
         AuthenticationStep authStep = new AuthenticationStep();
-        authStep.setId(String.valueOf(authenticationStep.getStepOrder()));
+        authStep.setId(authenticationStep.getStepOrder());
 
         if (authenticationStep.getFederatedIdentityProviders() != null) {
             Arrays.stream(authenticationStep.getFederatedIdentityProviders()).forEach(y -> authStep.addOptionsItem(
