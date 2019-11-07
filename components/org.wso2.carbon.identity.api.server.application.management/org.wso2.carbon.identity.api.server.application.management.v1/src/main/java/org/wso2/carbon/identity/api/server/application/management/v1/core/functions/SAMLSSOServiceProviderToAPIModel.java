@@ -17,6 +17,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.sso.saml.common.SAMLSSOProviderConstants;
 import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
 
@@ -33,44 +34,47 @@ public class SAMLSSOServiceProviderToAPIModel implements Function<SAMLSSOService
     @Override
     public SAML2Configuration apply(SAMLSSOServiceProviderDTO dto) {
 
-        return new SAML2Configuration()
-                .issuer(getIssuerWithoutQualifier(dto))
-                .serviceProviderQualifier(dto.getIssuerQualifier())
-                .defaultAssertionConsumerUrl(dto.getDefaultAssertionConsumerUrl())
-                .assertionConsumerUrls(Arrays.asList(dto.getAssertionConsumerUrls()))
+        return new SAML2Configuration().serviceProvider(
+                new SAML2ServiceProvider()
+                        .issuer(getIssuerWithoutQualifier(dto))
+                        .serviceProviderQualifier(dto.getIssuerQualifier())
+                        .defaultAssertionConsumerUrl(dto.getDefaultAssertionConsumerUrl())
+                        .assertionConsumerUrls(Arrays.asList(dto.getAssertionConsumerUrls()))
 
-                .nameIdFormat(dto.getNameIDFormat())
-                .requestValidationCertificateAlias(dto.getCertAlias())
+                        .nameIdFormat(dto.getNameIDFormat())
+                        .requestValidationCertificateAlias(dto.getCertAlias())
 
-                .responseSigningAlgorithm(dto.getSigningAlgorithmURI())
-                .responseDigestAlgorithm(dto.getDigestAlgorithmURI())
-                .assertionEncryptionAlgroithm(dto.getAssertionEncryptionAlgorithmURI())
-                .keyEncryptionAlgorithm(dto.getKeyEncryptionAlgorithmURI())
+                        .responseSigningAlgorithm(dto.getSigningAlgorithmURI())
+                        .responseDigestAlgorithm(dto.getDigestAlgorithmURI())
+                        .assertionEncryptionAlgroithm(dto.getAssertionEncryptionAlgorithmURI())
+                        .keyEncryptionAlgorithm(dto.getKeyEncryptionAlgorithmURI())
 
-                .enableResponseSigning(dto.isDoSignResponse())
-                .enableRequestSignatureValidation(dto.isDoValidateSignatureInRequests())
-                .enableAssertionEncryption(dto.isDoEnableEncryptedAssertion())
+                        .enableResponseSigning(dto.isDoSignResponse())
+                        .enableRequestSignatureValidation(dto.isDoValidateSignatureInRequests())
+                        .enableAssertionEncryption(dto.isDoEnableEncryptedAssertion())
 
-                .enableRequestSignatureValidation(dto.isDoSingleLogout())
-                .singleLogoutResponseUrl(dto.getSloResponseURL())
-                .singleLogoutRequestUrl(dto.getSloRequestURL())
-                .singleLogoutMethod(getSingleLogoutMethod(dto))
+                        .enableRequestSignatureValidation(dto.isDoSingleLogout())
+                        .singleLogoutResponseUrl(dto.getSloResponseURL())
+                        .singleLogoutRequestUrl(dto.getSloRequestURL())
+                        .singleLogoutMethod(getSingleLogoutMethod(dto))
 
-                .enableAttributeProfile(dto.isEnableAttributeProfile())
-                .includedAttributeInResponseAlways(dto.isEnableAttributesByDefault())
+                        .enableAttributeProfile(dto.isEnableAttributeProfile())
+                        .includedAttributeInResponseAlways(dto.isEnableAttributesByDefault())
 
-                .audiences(Arrays.asList(dto.getRequestedAudiences()))
-                .recipients(Arrays.asList(dto.getRequestedRecipients()))
+                        .audiences(Arrays.asList(dto.getRequestedAudiences()))
+                        .recipients(Arrays.asList(dto.getRequestedRecipients()))
 
-                .enableIdpInitiatedSingleSignOn(dto.isIdPInitSSOEnabled())
-                .enableIdpInitiatedSingleLogOut(dto.isIdPInitSLOEnabled())
-                .idpInitiatedLogoutReturnUrls(Arrays.asList(dto.getIdpInitSLOReturnToURLs()))
+                        .enableIdpInitiatedSingleSignOn(dto.isIdPInitSSOEnabled())
+                        .enableIdpInitiatedSingleLogOut(dto.isIdPInitSLOEnabled())
+                        .idpInitiatedLogoutReturnUrls(Arrays.asList(dto.getIdpInitSLOReturnToURLs()))
 
-                .enableAssertionQueryProfile(dto.isAssertionQueryRequestProfileEnabled())
-                .enableSAML2ArtifactBinding(dto.isEnableSAML2ArtifactBinding())
-                .enableSignatureValidationInArtifactBinding(dto.isDoValidateSignatureInArtifactResolve())
+                        .enableAssertionQueryProfile(dto.isAssertionQueryRequestProfileEnabled())
+                        .enableSAML2ArtifactBinding(dto.isEnableSAML2ArtifactBinding())
+                        .enableSignatureValidationInArtifactBinding(dto.isDoValidateSignatureInArtifactResolve())
 
-                .idPEntityidAlias(dto.getIdpEntityIDAlias());
+                        .idPEntityidAlias(dto.getIdpEntityIDAlias()
+                        )
+        );
     }
 
     private String getIssuerWithoutQualifier(SAMLSSOServiceProviderDTO dto) {
@@ -78,17 +82,17 @@ public class SAMLSSOServiceProviderToAPIModel implements Function<SAMLSSOService
         return StringUtils.substringBefore(dto.getIssuer(), QUALIFIER_ID);
     }
 
-    private SAML2Configuration.SingleLogoutMethodEnum getSingleLogoutMethod(SAMLSSOServiceProviderDTO dto) {
+    private SAML2ServiceProvider.SingleLogoutMethodEnum getSingleLogoutMethod(SAMLSSOServiceProviderDTO dto) {
 
         if (dto.isDoFrontChannelLogout()) {
             if (StringUtils.equals(dto.getFrontChannelLogoutBinding(), SAMLSSOProviderConstants.HTTP_POST_BINDING)) {
-                return SAML2Configuration.SingleLogoutMethodEnum.FRONTCHANNEL_HTTP_POST;
+                return SAML2ServiceProvider.SingleLogoutMethodEnum.FRONTCHANNEL_HTTP_POST;
             } else {
-                return SAML2Configuration.SingleLogoutMethodEnum.FRONTCHANNEL_HTTP_REDIRECT;
+                return SAML2ServiceProvider.SingleLogoutMethodEnum.FRONTCHANNEL_HTTP_REDIRECT;
             }
 
         } else {
-            return SAML2Configuration.SingleLogoutMethodEnum.BACKCHANNEL;
+            return SAML2ServiceProvider.SingleLogoutMethodEnum.BACKCHANNEL;
         }
     }
 }
