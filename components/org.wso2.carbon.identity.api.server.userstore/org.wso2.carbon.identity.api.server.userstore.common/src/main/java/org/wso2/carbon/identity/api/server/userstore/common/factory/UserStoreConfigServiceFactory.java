@@ -22,7 +22,7 @@ import org.wso2.carbon.identity.user.store.configuration.UserStoreConfigService;
 
 /**
  * Factory Beans serves as a factory for creating other beans within the IOC container. This factory bean is used to
- * instantiate the UserStoreDAO type of object inside the container.
+ * instantiate the UserStoreConfigService type of object inside the container.
  */
 public class UserStoreConfigServiceFactory extends AbstractFactoryBean<UserStoreConfigService> {
 
@@ -44,10 +44,9 @@ public class UserStoreConfigServiceFactory extends AbstractFactoryBean<UserStore
             if (userStoreConfigService != null) {
                 this.userStoreConfigService = userStoreConfigService;
             } else {
-                throw new Exception("Unable to retrieve AbstractUserStoreDAOFactory service.");
+                throw new Exception("Unable to retrieve UserStoreConfig Service.");
             }
         }
         return this.userStoreConfigService;
     }
-
 }

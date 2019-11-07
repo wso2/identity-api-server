@@ -99,10 +99,9 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
         UserStoreResponse response = serverUserStoreService.patchUserStore(userstoreDomainId, patchDocument);
         if (!response.getName().equals(serverUserStoreService.base64DecodeId(userstoreDomainId))) {
             return Response.ok().location(getResourceLocation(serverUserStoreService.
-                    base64EncodeId(response.getName()))).entity(serverUserStoreService.patchUserStore(userstoreDomainId,
-                    patchDocument)).build();
+                    base64EncodeId(response.getName()))).entity(response).build();
         }
-        return Response.ok().entity(serverUserStoreService.patchUserStore(userstoreDomainId, patchDocument)).build();
+        return Response.ok().entity(response).build();
     }
 
     @Override

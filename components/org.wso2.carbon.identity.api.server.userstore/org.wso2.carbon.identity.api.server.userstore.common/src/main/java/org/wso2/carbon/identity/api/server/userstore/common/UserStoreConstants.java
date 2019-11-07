@@ -20,11 +20,12 @@ package org.wso2.carbon.identity.api.server.userstore.common;
  */
 public class UserStoreConstants {
 
-    private static final String SECONDARY_USERSTORE_PREFIX = "SUS-";
+    private static final String SECONDARY_USER_STORE_PREFIX = "SUS-";
     public static final String OPERATION_REPLACE = "REPLACE";
-    public static final String OPERATION_ADD = "ADD";
     public static final String USER_STORE_PATH_COMPONENT = "/userstores";
-
+    public static final String USER_STORE_DESCRIPTION = "description";
+    public static final String USER_STORE_CLASS_NAME = "className";
+    public static final String USER_STORE_DOMAIN_NAME = "domainName";
 
     /**
      * Enum for user store related errors in the format of
@@ -58,13 +59,15 @@ public class UserStoreConstants {
         ERROR_CODE_DOMAIN_ID_NOT_FOUND("50008",
                 "Resource not found.",
                 "Unable to find any user store's id with the provided identifier %s."),
-        ERROR_CODE_DATASOURCE_CONNECTION("500011",
+        ERROR_CODE_DATASOURCE_CONNECTION("50009",
                 "Unable to check RDBMS connection Health",
                 "Server Encountered an error while checking the data source connection."),
-        ERROR_CODE_RETRIEVING_USER_STORE_TYPE("500012",
+        ERROR_CODE_RETRIEVING_USER_STORE_TYPE("50010",
                 "Unable to retrieve the user store implementations",
-                "Server Encountered an error while retrieving the implementations."),
-        ;
+                "Server Encountered an error while retrieving the user store types."),
+        ERROR_CODE_INVALID_INPUT("50011",
+                "Invalid Input",
+                "Provided Input is not valid.");
 
         private final String code;
         private final String message;
@@ -77,7 +80,7 @@ public class UserStoreConstants {
         }
 
         public String getCode() {
-            return SECONDARY_USERSTORE_PREFIX + code;
+            return SECONDARY_USER_STORE_PREFIX + code;
         }
 
         public String getMessage() {
@@ -93,5 +96,4 @@ public class UserStoreConstants {
             return code + " | " + message;
         }
     }
-
 }

@@ -20,6 +20,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConfigServiceHolder;
@@ -59,6 +60,8 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+
 /**
  * Call internal osgi services to perform user store related operations.
  */
@@ -75,8 +78,7 @@ public class ServerUserStoreService {
     public UserStoreResponse addUserStore(UserStoreReq userStoreReq) {
 
         try {
-            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.
-                    getUserStoreConfigService();
+            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
             userStoreConfigService.addUserStore(createUserStoreDTO(userStoreReq));
             UserStoreResponse userStoreResponseDTO = new UserStoreResponse();
             userStoreResponseDTO.setId((base64EncodeId(userStoreReq.getName())));
@@ -96,7 +98,7 @@ public class ServerUserStoreService {
     }
 
     /**
-     * Delete a userStore by its domainId
+     * Delete a userStore by its domainId.
      *
      * @param userstoreDomainId base64 encoded url value of userStore domain Id.
      */
@@ -111,7 +113,6 @@ public class ServerUserStoreService {
             } else {
                 throw handleNotFoundError(userstoreDomainId);
             }
-
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_USER_STORE;
@@ -127,7 +128,6 @@ public class ServerUserStoreService {
      * @param userStorePutReq {@link UserStorePutReq} to edit.
      * @return UserStoreResponse.
      */
-
     public UserStoreResponse editUserStore(String domainId, UserStorePutReq userStorePutReq) {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.
@@ -161,7 +161,6 @@ public class ServerUserStoreService {
      *
      * @return List<AvailableUserStoreClassesRes>.
      */
-
     public List<AvailableUserStoreClassesRes> getAvailableUserStoreTypes() {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.
@@ -196,10 +195,10 @@ public class ServerUserStoreService {
      * @param sort   to specify the sorting order.
      * @return List<UserStoreListResponse>.
      */
-
     public List<UserStoreListResponse> getUserStoreList(Integer limit, Integer offset, String filter, String sort) {
 
         handleNotImplementedBehaviour(limit, offset, filter, sort);
+
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         try {
             UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
@@ -219,7 +218,6 @@ public class ServerUserStoreService {
      * @param domainId the user store domain id.
      * @return UserStoreConfigurationsRes.
      */
-
     public UserStoreConfigurationsRes getUserStoreByDomainId(String domainId) {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
@@ -286,9 +284,7 @@ public class ServerUserStoreService {
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
             throw handleException(e, errorEnum, status);
         }
-
     }
-
 
     /**
      * Check the connection heath for JDBC userstores.
@@ -296,7 +292,6 @@ public class ServerUserStoreService {
      * @param rdBMSConnectionReq {@link RDBMSConnectionReq}.
      * @return ConnectionEstablishedResponse.
      */
-
     public ConnectionEstablishedResponse testRDBMSConnection(RDBMSConnectionReq rdBMSConnectionReq) {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
@@ -320,17 +315,19 @@ public class ServerUserStoreService {
     }
 
     /**
-     * To make a partial update or update the specific property of the user store config
+     * To make a partial update or update the specific property of the user store config.
      *
      * @param domainId      user store domain id
      * @param patchDocument patch request
      * @return UserStoreResponse
      */
     public UserStoreResponse patchUserStore(String domainId, List<PatchDocument> patchDocument) {
+
         if (!isUserStoreDomainIdFound(base64DecodeId(domainId))) {
             throw handleNotFoundError(domainId);
         }
         for (PatchDocument patch : patchDocument) {
+            //Only the Replace operation supported with PATCH request
             if (UserStoreConstants.OPERATION_REPLACE.equals(patch.getOperation().toString())) {
                 return performPatchReplace(domainId, patch.getPath(), patch.getValue());
             }
@@ -347,6 +344,7 @@ public class ServerUserStoreService {
      * @return UserStoreResponse
      */
     private UserStoreResponse performPatchReplace(String domainId, String path, String value) {
+
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         try {
             UserStoreDTO userStoreDTO = userStoreConfigService.getUserStore(base64DecodeId(domainId));
@@ -362,17 +360,18 @@ public class ServerUserStoreService {
             } else {
                 String[] propertiesList = path.split("/");
                 switch (propertiesList[1]) {
-                    case "description":
+                    case UserStoreConstants.USER_STORE_DESCRIPTION:
                         userStoreDTO.setDescription(value);
                         break;
-                    case "domainName":
+                    case UserStoreConstants.USER_STORE_DOMAIN_NAME:
                         userStoreDTO.setDomainId(value);
                         break;
-                    case "className":
+                    case UserStoreConstants.USER_STORE_CLASS_NAME:
                         userStoreDTO.setClassName(getUserStoreType(value));
                         break;
                     default:
-                        break;
+                        throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT);
                 }
                 return buildResponseForPatchReplace(userStoreDTO, propertyDTOS);
             }
@@ -409,7 +408,6 @@ public class ServerUserStoreService {
      * @param userStorePutReq {@link UserStorePutReq} to update.
      * @return List<AddUserStorePropertiesRes>.
      */
-
     private List<AddUserStorePropertiesRes> buildUserStorePropertiesRes(UserStoreReq userStoreReq,
                                                                         UserStorePutReq userStorePutReq) {
 
@@ -437,7 +435,6 @@ public class ServerUserStoreService {
      * @param domainId the user store domain id.
      * @return true if the domain id exist in the list otherwise false.
      */
-
     private boolean isUserStoreDomainIdFound(String domainId) {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
@@ -458,7 +455,7 @@ public class ServerUserStoreService {
     }
 
     /**
-     * To construct properties list for patch request
+     * To construct properties list for patch request.
      *
      * @param propertyDTOS array of {@link PropertyDTO}
      * @return List<AddUserStorePropertiesRes>
@@ -481,7 +478,6 @@ public class ServerUserStoreService {
      * @param userStoreReq {@link UserStoreReq}.
      * @return UserStoreDTO.
      */
-
     private UserStoreDTO createUserStoreDTO(UserStoreReq userStoreReq) {
 
         UserStoreDTO userStoreDTO = new UserStoreDTO();
@@ -498,7 +494,6 @@ public class ServerUserStoreService {
      * @param userStoreDTOS array of UserStoreDTO object.
      * @return List<UserStoreListResponse>.
      */
-
     private List<UserStoreListResponse> buildUserStoreListResponse(UserStoreDTO[] userStoreDTOS) {
 
         List<UserStoreListResponse> userStoreListResponseToAdd = new ArrayList<>();
@@ -507,7 +502,9 @@ public class ServerUserStoreService {
             userStoreList.setDescription(jsonObject.getDescription());
             userStoreList.setName(jsonObject.getDomainId());
             userStoreList.setId(base64EncodeId(jsonObject.getDomainId()));
-            userStoreList.setSelf("userstores/" + base64EncodeId(jsonObject.getDomainId()));
+            userStoreList.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
+                            UserStoreConstants.USER_STORE_PATH_COMPONENT + "/%s",
+                    base64EncodeId(jsonObject.getDomainId()))).toString());
             userStoreListResponseToAdd.add(userStoreList);
         }
         return userStoreListResponseToAdd;
@@ -520,7 +517,6 @@ public class ServerUserStoreService {
      * @param typeId        the type id of the user store.
      * @return MetaUserStoreType.
      */
-
     private List<MetaUserStoreType> buildUserStoreMetaResponse(List<UserStoreDTO> userStoreDTOS, String typeId) {
 
         List<MetaUserStoreType> metaUserStoreTypes = new ArrayList<>();
@@ -549,7 +545,6 @@ public class ServerUserStoreService {
      * @param properties array of user store properties.
      * @return List<PropertiesRes>.
      */
-
     private List<PropertiesRes> buildPropertiesRes(Property[] properties) {
 
         List<PropertiesRes> propertiesToAdd = new ArrayList<>();
@@ -561,10 +556,8 @@ public class ServerUserStoreService {
             propertiesRes.setDescription(property.getDescription());
             propertiesToAdd.add(propertiesRes);
         }
-
         return propertiesToAdd;
     }
-
 
     /**
      * Retrieve the className for a given type.
@@ -572,8 +565,8 @@ public class ServerUserStoreService {
      * @param typeName user store type name.
      * @return user store class name.
      */
-
     private String getUserStoreType(String typeName) {
+
         HashMap<String, String> userStoreMap = getHashMap();
         for (Map.Entry<String, String> stringEntry : userStoreMap.entrySet()) {
             LOG.info(((Map.Entry) stringEntry).getKey() + " = " + ((Map.Entry) stringEntry).getValue());
@@ -590,8 +583,8 @@ public class ServerUserStoreService {
      * @param className user store class name.
      * @return user store type name.
      */
-
     private String getUserStoreTypeName(String className) {
+
         HashMap<String, String> userStoreMap = getHashMap();
         for (Map.Entry<String, String> stringEntry : userStoreMap.entrySet()) {
             LOG.info(((Map.Entry) stringEntry).getKey() + " = " + ((Map.Entry) stringEntry).getValue());
@@ -607,8 +600,8 @@ public class ServerUserStoreService {
      *
      * @return HashMap.
      */
-
     private HashMap<String, String> getHashMap() {
+
         String[] classNames = UserStoreManagerRegistry.getUserStoreManagerClasses().toArray
                 (new String[UserStoreManagerRegistry.getUserStoreManagerClasses().size()]);
         HashMap<String, String> userStoreMap = new HashMap<>();
@@ -625,7 +618,6 @@ public class ServerUserStoreService {
      * @param id domain name.
      * @return encoded string value.
      */
-
     public String base64EncodeId(String id) {
 
         return Base64.getUrlEncoder().withoutPadding().encodeToString(id.getBytes(StandardCharsets.UTF_8));
@@ -637,7 +629,6 @@ public class ServerUserStoreService {
      * @param id domain name.
      * @return decoded string value.
      */
-
     public String base64DecodeId(String id) {
 
         return new String(Base64.getUrlDecoder().decode(id), StandardCharsets.UTF_8);
@@ -649,7 +640,6 @@ public class ServerUserStoreService {
      * @param userStorePutReq {@link UserStorePutReq}.
      * @return PropertyDTO[].
      */
-
     private PropertyDTO[] createPutPropertyListDTO(UserStorePutReq userStorePutReq, String domainName) {
 
         List<org.wso2.carbon.identity.api.server.userstore.v1.model.Property> values = userStorePutReq.getProperties();
@@ -674,7 +664,6 @@ public class ServerUserStoreService {
      * @param userStoreReq {@link UserStoreReq}.
      * @return PropertyDTO[].
      */
-
     private PropertyDTO[] createPropertyListDTO(UserStoreReq userStoreReq) {
 
         List<org.wso2.carbon.identity.api.server.userstore.v1.model.Property> values = userStoreReq.getProperties();
@@ -696,7 +685,6 @@ public class ServerUserStoreService {
      * @param userStorePutReq {@link UserStorePutReq}.
      * @return UserStoreDTO.
      */
-
     private UserStoreDTO createUserStorePutDTO(UserStorePutReq userStorePutReq) {
 
         UserStoreDTO userStoreDTO = new UserStoreDTO();
@@ -711,6 +699,11 @@ public class ServerUserStoreService {
 
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, e, errorEnum.getDescription());
         return new APIError(status, errorResponse);
+    }
+
+    private APIError handleException(Response.Status status, UserStoreConstants.ErrorMessage error) {
+
+        return new APIError(status, getErrorBuilder(error).build());
     }
 
     private ErrorResponse.Builder getErrorBuilder(UserStoreConstants.ErrorMessage errorMsg, String... data) {
