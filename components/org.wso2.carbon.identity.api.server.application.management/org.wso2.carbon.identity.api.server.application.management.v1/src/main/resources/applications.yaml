@@ -703,6 +703,11 @@ paths:
       description: >
         This API provides the capability to store SAML2 authentication protocol
         parameters of an application.
+
+        - There are three methods to create/update SAML2 authentication protocol configuration.
+            1. Metadata File (Need to send Base64 encoded content of the metadata file.)
+            2. Metadata URL.
+            3. Manual configuration.
       parameters:
         - name: applicationId
           in: path
@@ -2618,14 +2623,6 @@ paths:
       x-wso2-response: |
         "HTTP/1.1 200 Ok"
 
-servers:
-  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
-    variables:
-      tenant-domain:
-        default: "carbon.super"
-      server-url:
-        default: "localhost:9443"
-
 components:
   parameters:
     limitQueryParam:
@@ -2769,6 +2766,7 @@ components:
         name:
           type: string
           example: pickup
+          pattern: '^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$'
         description:
           type: string
           example: This is the configuration for Pickup application.
@@ -3008,6 +3006,20 @@ components:
     SAML2Configuration:
       type: object
       properties:
+        metadataFile:
+          type: string
+          example: 'Base64 encoded metadata file content'
+          writeOnly: true
+        metadataURL:
+          type: string
+          example: 'https://example.com/samlsso/meta'
+          writeOnly: true
+        serviceProvider:
+          $ref: '#/components/schemas/SAML2ServiceProvider'
+
+    SAML2ServiceProvider:
+      type: object
+      properties:
         issuer:
           type: string
         serviceProviderQualifier:
@@ -3146,8 +3158,8 @@ components:
             #       type: string
             #       enum:
             #         - backchannel
-            #         - frontchannel_http_redirect
-            #         - frontchannel_http_post
+          #         - frontchannel_http_redirect
+          #         - frontchannel_http_post
           #       default: backchannel
 
 
@@ -3365,6 +3377,12 @@ components:
     AuthenticationSequence:
       type: object
       properties:
+        type:
+          type: string
+          enum:
+            - DEFAULT
+            - USER_DEFINED
+          default: DEFAULT
         steps:
           type: array
           items:
@@ -3416,3 +3434,11 @@ components:
         traceId:
           type: string
           example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
+
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      tenant-domain:
+        default: "carbon.super"
+      server-url:
+        default: "localhost:9443"
