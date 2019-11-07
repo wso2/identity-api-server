@@ -1,3 +1,19 @@
+/*
+* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
 package org.wso2.carbon.identity.api.server.idp.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,104 +28,104 @@ import javax.validation.constraints.*;
 
 import io.swagger.annotations.*;
 import java.util.Objects;
-
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-
-public class OutboundProvisioningRequest   {
+public class OutboundProvisioningRequest  {
   
-  private String defaultConnectorId;
-
-  private List<OutboundConnector> connectors = null;
-
-
-  /**
-   **/
-  public OutboundProvisioningRequest defaultConnectorId(String defaultConnectorId) {
-    this.defaultConnectorId = defaultConnectorId;
-    return this;
-  }
-
-  
-  @ApiModelProperty(example = "U0NJTQ==", required = true, value = "")
-  @JsonProperty("defaultConnectorId")
-  @Valid
-  @NotNull(message = "Property defaultConnectorId cannot be null.")
-  public String getDefaultConnectorId() {
-    return defaultConnectorId;
-  }
-  public void setDefaultConnectorId(String defaultConnectorId) {
-    this.defaultConnectorId = defaultConnectorId;
-  }
+    private String defaultConnectorId;
+    private List<OutboundConnector> connectors = null;
 
 
-  /**
-   **/
-  public OutboundProvisioningRequest connectors(List<OutboundConnector> connectors) {
-    this.connectors = connectors;
-    return this;
-  }
+    /**
+    **/
+    public OutboundProvisioningRequest defaultConnectorId(String defaultConnectorId) {
 
-  
-  @ApiModelProperty(value = "")
-  @JsonProperty("connectors")
-  @Valid
-  public List<OutboundConnector> getConnectors() {
-    return connectors;
-  }
-  public void setConnectors(List<OutboundConnector> connectors) {
-    this.connectors = connectors;
-  }
-
-  public OutboundProvisioningRequest addConnectorsItem(OutboundConnector connectorsItem) {
-    if (this.connectors == null) {
-      this.connectors = new ArrayList<>();
+        this.defaultConnectorId = defaultConnectorId;
+        return this;
     }
-    this.connectors.add(connectorsItem);
-    return this;
-  }
-
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    OutboundProvisioningRequest outboundProvisioningRequest = (OutboundProvisioningRequest) o;
-    return Objects.equals(this.defaultConnectorId, outboundProvisioningRequest.defaultConnectorId) &&
-        Objects.equals(this.connectors, outboundProvisioningRequest.connectors);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(defaultConnectorId, connectors);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class OutboundProvisioningRequest {\n");
     
-    sb.append("    defaultConnectorId: ").append(toIndentedString(defaultConnectorId)).append("\n");
-    sb.append("    connectors: ").append(toIndentedString(connectors)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
+    @ApiModelProperty(example = "U0NJTQ", required = true, value = "")
+    @JsonProperty("defaultConnectorId")
+    @Valid
+    @NotNull(message = "Property defaultConnectorId cannot be null.")
 
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
+    public String getDefaultConnectorId() {
+        return defaultConnectorId;
     }
-    return o.toString().replace("\n", "\n    ");
-  }
+    public void setDefaultConnectorId(String defaultConnectorId) {
+        this.defaultConnectorId = defaultConnectorId;
+    }
+
+    /**
+    **/
+    public OutboundProvisioningRequest connectors(List<OutboundConnector> connectors) {
+
+        this.connectors = connectors;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("connectors")
+    @Valid
+    public List<OutboundConnector> getConnectors() {
+        return connectors;
+    }
+    public void setConnectors(List<OutboundConnector> connectors) {
+        this.connectors = connectors;
+    }
+
+    public OutboundProvisioningRequest addConnectorsItem(OutboundConnector connectorsItem) {
+        if (this.connectors == null) {
+            this.connectors = new ArrayList<>();
+        }
+        this.connectors.add(connectorsItem);
+        return this;
+    }
+
+    
+
+    @Override
+    public boolean equals(java.lang.Object o) {
+
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        OutboundProvisioningRequest outboundProvisioningRequest = (OutboundProvisioningRequest) o;
+        return Objects.equals(this.defaultConnectorId, outboundProvisioningRequest.defaultConnectorId) &&
+            Objects.equals(this.connectors, outboundProvisioningRequest.connectors);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(defaultConnectorId, connectors);
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("class OutboundProvisioningRequest {\n");
+        
+        sb.append("    defaultConnectorId: ").append(toIndentedString(defaultConnectorId)).append("\n");
+        sb.append("    connectors: ").append(toIndentedString(connectors)).append("\n");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    /**
+    * Convert the given object to string with each line indented by 4 spaces
+    * (except the first line).
+    */
+    private String toIndentedString(java.lang.Object o) {
+
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n");
+    }
 }
 

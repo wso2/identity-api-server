@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.idp.v1.IdentityProvidersApiService;
 import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementService;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
@@ -28,18 +29,19 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPUTReque
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnectorPUTRequest;
-import org.wso2.carbon.identity.api.server.idp.v1.model.PatchDocument;
+import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
 
-import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
+import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURI;
-import static org.wso2.carbon.identity.api.server.idp.common.Constant.IDP_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_PATH_COMPONENT;
 
-
+/**
+ * Implementation of the Identity Provider Rest API.
+ */
 public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiService {
 
     @Autowired
@@ -49,7 +51,8 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     public Response addIDP(IdentityProviderPOSTRequest identityProviderPOSTRequest) {
 
         IdentityProviderResponse idPResponse = idpManagementService.addIDP(identityProviderPOSTRequest);
-        URI location = buildURI(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT + "/" + idPResponse.getId());
+        URI location =
+                ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT + "/" + idPResponse.getId());
         return Response.created(location).entity(idPResponse).build();
     }
 
@@ -157,10 +160,9 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     }
 
     @Override
-    public Response patchIDP(String identityProviderId, List<PatchDocument> patchDocument) {
+    public Response patchIDP(String identityProviderId, List<Patch> patchRequest) {
 
-        idpManagementService.patchIDP(identityProviderId, patchDocument);
-        return Response.ok().build();
+        return Response.ok().entity(idpManagementService.patchIDP(identityProviderId, patchRequest)).build();
     }
 
     @Override

@@ -425,10 +425,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdentityProviderGetResponse'
+                $ref: '#/components/schemas/IdentityProviderResponse'
             application/xml:
               schema:
-                $ref: '#/components/schemas/IdentityProviderGetResponse'
+                $ref: '#/components/schemas/IdentityProviderResponse'
         '400':
           description: Bad Request
           content:
@@ -777,94 +777,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    # post:
-    #   tags:
-    #     - Federated Authenticators
-    #   summary: |
-    #     Add a new federated authenticator
-    #   description: >
-    #     This API provides the capability to add a new federated authenticator to
-    #     an existing identity provider identified by its id
-    #   operationId: addFederatedAuthenticator
-    #   parameters:
-    #     - name: identity-provider-id
-    #       in: path
-    #       description: Id of the identity provider
-    #       required: true
-    #       schema:
-    #         type: string
-    #   responses:
-    #     '201':
-    #       description: Successful response
-    #       headers:
-    #         Location:
-    #           description: >-
-    #             Location of the newly created federated authenticator.
-    #             Authenticator id is generated as the value of
-    #             base-64-url-encode(federated-authenticator-name)
-    #           schema:
-    #             type: string
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/FederatedAuthenticator'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/FederatedAuthenticator'
-    #     '400':
-    #       description: Bad Request
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '401':
-    #       description: Unauthorized
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '403':
-    #       description: Forbidden
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '409':
-    #       description: Conflict
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '500':
-    #       description: Server Error
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #   x-wso2-request: ''
-    #   x-wso2-response: ''
-    #   requestBody:
-    #     content:
-    #       application/json:
-    #         schema:
-    #           $ref: '#/components/schemas/FederatedAuthenticator'
-    #     description: This represents the federated authenticator config to be created
-    #     required: true
   '/identity-providers/{identity-provider-id}/federated-authenticators/{federated-authenticator-id}':
     get:
       tags:
@@ -963,10 +875,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FederatedAuthenticatorResponse'
+                $ref: '#/components/schemas/FederatedAuthenticator'
             application/xml:
               schema:
-                $ref: '#/components/schemas/FederatedAuthenticatorResponse'
+                $ref: '#/components/schemas/FederatedAuthenticator'
         '400':
           description: Bad Request
           content:
@@ -1025,81 +937,6 @@ paths:
               $ref: '#/components/schemas/FederatedAuthenticatorPUTRequest'
         description: This represents the federated authenticator to be updated
         required: true
-    # delete:
-    #   tags:
-    #     - Federated Authenticators
-    #   summary: >
-    #     Delete a federated authenticator of an identity provider by specifying
-    #     authenticator id
-    #   description: >
-    #     This API provides the capability to delete an identity provider's
-    #     federated authenticator config by specifying the authenticator id
-    #   operationId: deleteFederatedAuthenticator
-    #   parameters:
-    #     - name: identity-provider-id
-    #       in: path
-    #       description: Id of the identity provider
-    #       required: true
-    #       schema:
-    #         type: string
-    #     - name: federated-authenticator-id
-    #       in: path
-    #       description: Id of the federated authenticator
-    #       required: true
-    #       schema:
-    #         type: string
-    #     - $ref: '#/components/parameters/forceQueryParam'
-    #   responses:
-    #     '204':
-    #       description: Successfully Deleted
-    #     '400':
-    #       description: Bad Request
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '401':
-    #       description: Unauthorized
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '403':
-    #       description: Forbidden
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '404':
-    #       description: Not Found
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '500':
-    #       description: Server Error
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #   x-wso2-request: ''
-    #   x-wso2-response: |
-    #     "HTTP/1.1 200 Ok"
   '/identity-providers/{identity-provider-id}/provisioning':
     get:
       tags:
@@ -1211,95 +1048,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    # post:
-    #   tags:
-    #     - Provisioning
-    #   summary: |
-    #     Add a new outbound provisioning connector
-    #   description: >
-    #     This API provides the capability to add a new outbound provisioning
-    #     connector to an existing existing identity provider
-    #   operationId: addOutboundConnector
-    #   parameters:
-    #     - name: identity-provider-id
-    #       in: path
-    #       description: Id of the identity provider
-    #       required: true
-    #       schema:
-    #         type: string
-    #   responses:
-    #     '201':
-    #       description: Successful response
-    #       headers:
-    #         Location:
-    #           description: >-
-    #             Location of the newly created outbound provisioning connector of
-    #             the identity provider. Provisioning connector id is generated as
-    #             the value of
-    #             base-64-url-encode(outbound-provisioning-connector-name)
-    #           schema:
-    #             type: string
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/OutboundProvisioningResponse'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/OutboundProvisioningResponse'
-    #     '400':
-    #       description: Bad Request
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '401':
-    #       description: Unauthorized
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '403':
-    #       description: Forbidden
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '409':
-    #       description: Conflict
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '500':
-    #       description: Server Error
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #   x-wso2-request: ''
-    #   x-wso2-response: ''
-    #   requestBody:
-    #     content:
-    #       application/json:
-    #         schema:
-    #           $ref: '#/components/schemas/OutboundConnector'
-    #     description: This represents the outbound provisioning connector to be created
-    #     required: true
   '/identity-providers/{identity-provider-id}/provisioning/outbound-connectors/{outbound-provisioning-connector-id}':
     get:
       tags:
@@ -1398,10 +1146,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OutboundConnectorResponse'
+                $ref: '#/components/schemas/OutboundConnector'
             application/xml:
               schema:
-                $ref: '#/components/schemas/OutboundConnectorResponse'
+                $ref: '#/components/schemas/OutboundConnector'
         '400':
           description: Bad Request
           content:
@@ -1460,81 +1208,6 @@ paths:
               $ref: '#/components/schemas/OutboundConnectorPUTRequest'
         description: This represents the outbound provisioning connector to be updated
         required: true
-    # delete:
-    #   tags:
-    #     - Provisioning
-    #   summary: |
-    #     Delete an outbound provisioning connector of an identity provider
-    #   description: >
-    #     This API provides the capability to delete an outbound provisioning
-    #     connector of an identity provider by specifying the provisioning
-    #     connector id
-    #   operationId: deleteOutboundConnector
-    #   parameters:
-    #     - name: identity-provider-id
-    #       in: path
-    #       description: Id of the identity provider
-    #       required: true
-    #       schema:
-    #         type: string
-    #     - name: outbound-provisioning-connector-id
-    #       in: path
-    #       description: Id of the outbound provisioning connector
-    #       required: true
-    #       schema:
-    #         type: string
-    #     - $ref: '#/components/parameters/forceQueryParam'
-    #   responses:
-    #     '204':
-    #       description: Successfully Deleted
-    #     '400':
-    #       description: Bad Request
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '401':
-    #       description: Unauthorized
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '403':
-    #       description: Forbidden
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '404':
-    #       description: Not Found
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '500':
-    #       description: Server Error
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #         application/xml:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #   x-wso2-request: ''
-    #   x-wso2-response: |
-    #     "HTTP/1.1 200 Ok"
   '/identity-providers/{identity-provider-id}/claims':
     get:
       tags:
@@ -2185,9 +1858,9 @@ components:
     PatchRequest:
       type: array
       items:
-        $ref: '#/components/schemas/PatchDocument'
-    PatchDocument:
-      description: A JSONPatch document as defined by RFC 6902. Patch operation is supported only for rool level attributes of an Identity Provider.
+        $ref: '#/components/schemas/Patch'
+    Patch:
+      description: A JSONPatch as defined by RFC 6902. Patch operation is supported only for rool level attributes of an Identity Provider.
       required:
         - operation
         - path
@@ -2196,6 +1869,8 @@ components:
           type: string
           description: The operation to be performed
           enum:
+            - ADD
+            - REMOVE
             - REPLACE
           example: REPLACE
         path:
@@ -2272,10 +1947,6 @@ components:
           $ref: '#/components/schemas/FederatedAuthenticatorRequest'
         provisioning:
           $ref: '#/components/schemas/ProvisioningRequest'
-        properties:
-          type: array
-          items:
-            $ref: '#/components/schemas/Property'
     IdentityProviderPUTRequest:
       allOf:
         - $ref: '#/components/schemas/IdentityProviderPOSTRequest'
@@ -2288,16 +1959,6 @@ components:
               example: false
               description: Whether identity provider is enabled or not
     IdentityProviderResponse:
-      allOf:
-        - $ref: '#/components/schemas/IdentityProviderGetResponse'
-        - required:
-            - name
-          properties:
-            self:
-              type: string
-              readOnly: true
-              example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000
-    IdentityProviderGetResponse:
       type: object
       properties:
         id:
@@ -2337,10 +1998,6 @@ components:
           $ref: '#/components/schemas/FederatedAuthenticatorListResponse'
         provisioning:
           $ref: '#/components/schemas/ProvisioningResponse'
-        properties:
-          type: array
-          items:
-            $ref: '#/components/schemas/Property'
     IdentityProviderListResponse:
       type: object
       properties:
@@ -2365,12 +2022,6 @@ components:
                 },  {
                     "href": "identity-provider?offset=30&limit=10",
                     "rel": "previous",
-                },  {
-                    "href": "identity-provider?offset=0&limit=10",
-                    "rel": "first",
-                },  {
-                    "href": "identity-provider?offset=100&limit=10",
-                    "rel": "last",
                 }
             ]
         identityProviders:
@@ -2396,7 +2047,7 @@ components:
         image:
           type: string
           example: "google-logo-url"
-        identityProvider:
+        self:
           type: string
           example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000
     MetaFederatedAuthenticatorListItem:
@@ -2408,7 +2059,7 @@ components:
         name:
           type: string
           example: SAML2Authenticator
-        metaAuthenticator:
+        self:
           type: string
           example: /t/carbon.super/api/server/v1/identity-providers/meta/federated-authenticators/U0FNTFNTT0F1dGhlbnRpY2F0b3I
     MetaFederatedAuthenticator:
@@ -2466,16 +2117,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Property'
-    FederatedAuthenticatorResponse:
-      allOf:
-        - $ref: '#/components/schemas/FederatedAuthenticator'
-        - required:
-            - authenticatorId
-          properties:
-            self:
-              type: string
-              example: api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000/federated-authenticators/U0FNTDJBdXRoZW50aWNhdG9y
-              readOnly: false
     FederatedAuthenticatorPUTRequest:
       type: object
       properties:
@@ -2495,10 +2136,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Property'
-        self:
-          type: string
-          readOnly: true
-          example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000/federated-authenticators/U0FNTDJBdXRoZW50aWNhdG9y
     FederatedAuthenticatorListResponse:
       type: object
       properties:
@@ -2522,12 +2159,7 @@ components:
           type: boolean
           default: false
           example: true
-        # links:
-        #   type: array
-        #   items:
-        #     $ref: '#/components/schemas/LinkHref'
-        #   example: [{'href':'t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000/federated-authenticators/U0FNTDJBdXRoZW50aWNhdG9y'}]
-        authenticator:
+        self:
           type: string
           example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000/federated-authenticators/U0FNTDJBdXRoZW50aWNhdG9y
     MetaOutboundConnectorListItem:
@@ -2539,7 +2171,7 @@ components:
         name:
           type: string
           example: SCIM
-        metaConnector:
+        self:
           type: string
           example: /t/carbon.super/api/server/v1/identity-providers/meta/outbound-provisioning-connectos/U0NJTQ
     MetaOutboundConnector:
@@ -2578,23 +2210,6 @@ components:
           $ref: '#/components/schemas/JustInTimeProvisioning'
         outboundConnectors:
           $ref: '#/components/schemas/OutboundConnectorListResponse'
-    # ProvisioningGetResponse:
-    #   type: object
-    #   properties:
-    #     jit:
-    #       $ref: '#/components/schemas/JustInTimeProvisioningConfig'
-    #     outbound:
-    #       $ref: '#/components/schemas/OutboundConnectorListResponse'
-    # OutboundProvisioningGetResponse:
-    #   type: object
-    #   properties:
-    #     defaultConnectorId:
-    #       type: string
-    #       example: U0NJTQ==
-    #     connectors:
-    #       type: array
-    #       items:
-    #         $ref: '#/components/schemas/OutboundConnectorListItem'
     OutboundProvisioningRequest:
       type: object
       required:
@@ -2602,7 +2217,7 @@ components:
       properties:
         defaultConnectorId:
           type: string
-          example: U0NJTQ==
+          example: U0NJTQ
         connectors:
           type: array
           items:
@@ -2658,20 +2273,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Property'
-        self:
-          type: string
-          readOnly: true
-          example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000/provisioning/outbound-connectors/U0NJTQ
-    OutboundConnectorResponse:
-      allOf:
-        - $ref: '#/components/schemas/OutboundConnector'
-        - required:
-            - connectorId
-          properties:
-            self:
-              type: string
-              example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000/provisioning/outbound-connectors/U0NJTQ
-              readOnly: true
     OutboundConnectorListResponse:
       type: object
       properties:
@@ -2687,7 +2288,7 @@ components:
       properties:
         connectorId:
           type: string
-          example: U0NJTQ==
+          example: U0NJTQ
         name:
           type: string
           example: SCIM
@@ -2696,7 +2297,7 @@ components:
           type: boolean
           default: false
           example: true
-        connector:
+        self:
           type: string
           example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000/provisioning/outbound-connectors/U0NJTQ
     Roles:
@@ -2753,21 +2354,18 @@ components:
           example: country
         localClaim:
           $ref: '#/components/schemas/Claim'
-        # defaultValue:
-        #   type: string
-        #   example: Sri Lanka
     Claim:
       type: object
       required:
-        - id
+        - uri
       properties:
         id:
           type: string
-          example: aHR0cDovL3dzbzIub3JnL2NsYWltcy91c2VybmFtZQ==
+          example: aHR0cDovL3dzbzIub3JnL2NsYWltcy91c2VybmFtZQ
+          readOnly: true
         uri:
           type: string
           example: 'http://wso2.org/claims/username'
-          readOnly: true
         displayName:
           type: string
           example: Username
@@ -2796,11 +2394,13 @@ components:
     ConnectedApps:
       type: array
       items:
-        type: object
-        properties:
-          appId:
-            type: string
-            example: app-id
-          connectedApp:
-            type: string
-            example: connected-app-url
+        $ref: '#/components/schemas/ConnectedApp'
+    ConnectedApp:
+      type: object
+      properties:
+        appId:
+          type: string
+          example: app-id
+        connectedApp:
+          type: string
+          example: connected-app-url

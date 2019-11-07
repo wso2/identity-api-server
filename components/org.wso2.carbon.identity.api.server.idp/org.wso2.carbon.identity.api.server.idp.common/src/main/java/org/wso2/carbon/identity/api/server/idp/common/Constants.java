@@ -19,8 +19,7 @@ package org.wso2.carbon.identity.api.server.idp.common;
 /**
  * Identity Provider Management constant class.
  */
-// TODO: 11/4/19 constants 
-public class Constant {
+public class Constants {
 
     public static final String IDP_MANAGEMENT_PREFIX = "IDP-";
     public static final String IDP_PATH_COMPONENT = "/identity-providers";
@@ -30,12 +29,7 @@ public class Constant {
     public static final String SELECT_MODE_METADATA = "Metadata File Configuration";
 
     // IdP property keys.
-    public static final String PROP_DESCRIPTION = "Description";
     public static final String PROP_DISPLAY_NAME = "DisplayName";
-    public static final String PROP_DISPLAY_ORDER = "DisplayOrder";
-    public static final String PROP_READ_ONLY = "ReadOnly";
-    public static final String PROP_REG_EX = "Regex";
-    public static final String PROP_REQUIRED = "Required";
 
     // Patch operation paths.
     public static final String NAME_PATH = "/name";
@@ -45,7 +39,6 @@ public class Constant {
     public static final String IS_ENABLED_PATH = "/isEnabled";
     public static final String IS_FEDERATION_HUB_PATH = "/isFederationHub";
     public static final String HOME_REALM_PATH = "/homeRealmIdentifier";
-    public static final String PROPERTIES_PATH = "/properties";
 
     /**
      * Enum for error messages.
@@ -132,9 +125,7 @@ public class Constant {
                 "Unable to find any claims matching the provided claim dialect identifier %s."),
         ERROR_CODE_CONNECTOR_NOT_FOUND_FOR_IDP("42023", "Resource not found.", "Unable to find a resource matching " +
                 "the provided federated authenticator identifier %s of identity " +
-                        "provider identifier %s."),
-        ERROR_CODE_IDP_CONFLICT("42001", "Unable to create/update identity provider.", "Existing identity provider " +
-                "with identifier %s cannot be changed."),
+                "provider identifier %s."),
         ERROR_CODE_PAGINATION_NOT_IMPLEMENTED("52038",
                 "Pagination not supported.",
                 "Pagination capabilities are not supported in this version of the API."),

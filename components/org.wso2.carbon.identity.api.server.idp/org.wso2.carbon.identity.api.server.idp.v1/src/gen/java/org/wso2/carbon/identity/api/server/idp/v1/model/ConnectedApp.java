@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.idp.v1.model.Claim;
 import javax.validation.constraints.*;
 
 
@@ -29,45 +28,45 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class ClaimMapping  {
+public class ConnectedApp  {
   
-    private String idpClaim;
-    private Claim localClaim;
+    private String appId;
+    private String connectedApp;
 
     /**
     **/
-    public ClaimMapping idpClaim(String idpClaim) {
+    public ConnectedApp appId(String appId) {
 
-        this.idpClaim = idpClaim;
+        this.appId = appId;
         return this;
     }
     
-    @ApiModelProperty(example = "country", value = "")
-    @JsonProperty("idpClaim")
+    @ApiModelProperty(example = "app-id", value = "")
+    @JsonProperty("appId")
     @Valid
-    public String getIdpClaim() {
-        return idpClaim;
+    public String getAppId() {
+        return appId;
     }
-    public void setIdpClaim(String idpClaim) {
-        this.idpClaim = idpClaim;
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     /**
     **/
-    public ClaimMapping localClaim(Claim localClaim) {
+    public ConnectedApp connectedApp(String connectedApp) {
 
-        this.localClaim = localClaim;
+        this.connectedApp = connectedApp;
         return this;
     }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("localClaim")
+    @ApiModelProperty(example = "connected-app-url", value = "")
+    @JsonProperty("connectedApp")
     @Valid
-    public Claim getLocalClaim() {
-        return localClaim;
+    public String getConnectedApp() {
+        return connectedApp;
     }
-    public void setLocalClaim(Claim localClaim) {
-        this.localClaim = localClaim;
+    public void setConnectedApp(String connectedApp) {
+        this.connectedApp = connectedApp;
     }
 
 
@@ -81,24 +80,24 @@ public class ClaimMapping  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ClaimMapping claimMapping = (ClaimMapping) o;
-        return Objects.equals(this.idpClaim, claimMapping.idpClaim) &&
-            Objects.equals(this.localClaim, claimMapping.localClaim);
+        ConnectedApp connectedApp = (ConnectedApp) o;
+        return Objects.equals(this.appId, connectedApp.appId) &&
+            Objects.equals(this.connectedApp, connectedApp.connectedApp);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idpClaim, localClaim);
+        return Objects.hash(appId, connectedApp);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ClaimMapping {\n");
+        sb.append("class ConnectedApp {\n");
         
-        sb.append("    idpClaim: ").append(toIndentedString(idpClaim)).append("\n");
-        sb.append("    localClaim: ").append(toIndentedString(localClaim)).append("\n");
+        sb.append("    appId: ").append(toIndentedString(appId)).append("\n");
+        sb.append("    connectedApp: ").append(toIndentedString(connectedApp)).append("\n");
         sb.append("}");
         return sb.toString();
     }
