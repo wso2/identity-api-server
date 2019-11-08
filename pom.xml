@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.36-SNAPSHOT</version>
+    <version>1.0.41-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -198,6 +198,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.workflow.impl.bps</groupId>
+                <artifactId>org.wso2.carbon.identity.workflow.impl</artifactId>
+                <version>${identity.workflow.impl.bps.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.core</artifactId>
                 <version>${carbon.identity.framework.version}</version>
@@ -222,10 +228,40 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.identity.workflow.impl.bps</groupId>
-                <artifactId>org.wso2.carbon.identity.workflow.impl</artifactId>
-                <version>${identity.workflow.impl.bps.version}</version>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.application.mgt</artifactId>
+                <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.ws.rs</groupId>
+                        <artifactId>jsr311-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.application.common</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.ws.rs</groupId>
+                        <artifactId>jsr311-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.base</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.ws.rs</groupId>
+                        <artifactId>jsr311-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -271,14 +307,37 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.keystore.common</artifactId>
+                <artifactId>org.wso2.carbon.identity.api.server.application.management.common</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
+                <artifactId>org.wso2.carbon.identity.oauth</artifactId>
                 <scope>provided</scope>
+                <version>${identity.inbound.oauth2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.security.mgt</artifactId>
                 <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.application.authentication.framework</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.inbound.auth.saml2</groupId>
+                <artifactId>org.wso2.carbon.identity.sso.saml</artifactId>
+                <version>${identity.inbound.saml2.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.keystore.common</artifactId>
+                <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>
@@ -352,11 +411,14 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.3.15</identity.governance.version>
-        <carbon.identity.framework.version>5.14.101</carbon.identity.framework.version>
+        <carbon.identity.framework.version>5.14.130</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.4</maven.findbugsplugin.version>
         <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.2.9</identity.event.handler.version>
+        <identity.inbound.oauth2.version>6.2.29</identity.inbound.oauth2.version>
+        <identity.inbound.saml2.version>5.6.15</identity.inbound.saml2.version>
+        <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
     </properties>
 
     <modules>
@@ -367,6 +429,7 @@
         <module>components/org.wso2.carbon.identity.api.server.workflow.engine</module>
         <module>components/org.wso2.carbon.identity.api.server.permission.management</module>
         <module>components/org.wso2.carbon.identity.api.server.email.template</module>
+        <module>components/org.wso2.carbon.identity.api.server.application.management</module>
         <module>components/org.wso2.carbon.identity.api.server.keystore</module>
     </modules>
 
