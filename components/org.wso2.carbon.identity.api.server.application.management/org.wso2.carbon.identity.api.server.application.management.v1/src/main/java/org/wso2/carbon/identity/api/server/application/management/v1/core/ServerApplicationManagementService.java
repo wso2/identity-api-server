@@ -145,7 +145,6 @@ public class ServerApplicationManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
-
             ServiceProvider createdApp = getApplicationManagementService()
                     .createApplication(application, tenantDomain, username);
             return new ServiceProviderToApiModel().apply(createdApp);

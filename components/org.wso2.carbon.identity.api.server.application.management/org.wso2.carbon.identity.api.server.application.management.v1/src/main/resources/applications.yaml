@@ -703,6 +703,11 @@ paths:
       description: >
         This API provides the capability to store SAML2 authentication protocol
         parameters of an application.
+
+        - There are three methods to create/update SAML2 authentication protocol configuration.
+            1. Metadata File (Need to send Base64 encoded content of the metadata file.)
+            2. Metadata URL.
+            3. Manual configuration.
       parameters:
         - name: applicationId
           in: path
@@ -2618,7 +2623,6 @@ paths:
       x-wso2-response: |
         "HTTP/1.1 200 Ok"
 
-
   '/applications/meta/inbound-protocols':
     get:
       tags:
@@ -2895,14 +2899,6 @@ paths:
       x-wso2-response: |
         "HTTP/1.1 200 Ok"
 
-servers:
-  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
-    variables:
-      tenant-domain:
-        default: "carbon.super"
-      server-url:
-        default: "localhost:9443"
-
 components:
   parameters:
     limitQueryParam:
@@ -2913,7 +2909,8 @@ components:
         Maximum number of records to return.
       schema:
         type: integer
-        format: int32
+        minimum: 1
+        default: 30
     offsetQueryParam:
       in: query
       name: offset
@@ -2922,13 +2919,13 @@ components:
         Number of records to skip for pagination.
       schema:
         type: integer
-        format: int32
+        minimum: 0
     filterQueryParam:
       in: query
       name: filter
       required: false
       description: |
-        Condition to filter the retrival of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently supports only filtering based on the 'name' attribute.
+        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently supports only filtering based on the 'name' attribute.
 
         /applications?filter=name+eq+user_portal
         /applications?filter=name+co+prod
@@ -3056,6 +3053,7 @@ components:
         name:
           type: string
           example: pickup
+          pattern: '^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$'
         description:
           type: string
           example: This is the configuration for Pickup application.
@@ -3293,6 +3291,20 @@ components:
           example: 'http://wso2.org/claims/givenname'
 
     SAML2Configuration:
+      type: object
+      properties:
+        metadataFile:
+          type: string
+          example: 'Base64 encoded metadata file content'
+          writeOnly: true
+        metadataURL:
+          type: string
+          example: 'https://example.com/samlsso/meta'
+          writeOnly: true
+        serviceProvider:
+          $ref: '#/components/schemas/SAML2ServiceProvider'
+
+    SAML2ServiceProvider:
       type: object
       properties:
         issuer:
@@ -3652,6 +3664,12 @@ components:
     AuthenticationSequence:
       type: object
       properties:
+        type:
+          type: string
+          enum:
+            - DEFAULT
+            - USER_DEFINED
+          default: DEFAULT
         steps:
           type: array
           items:
@@ -3663,23 +3681,34 @@ components:
         script:
           type: string
         subjectStepId:
-          type: string
-          example: step1
+          type: integer
+          default: 1
+          example: 1
         attributeStepId:
-          type: string
-          example: step1
+          type: integer
+          default: 1
+          example: 1
+
     AuthenticationStep:
       type: object
+      required:
+        - id
+        - options
       properties:
         id:
-          type: string
-          example: step1
+          type: integer
+          minimum: 1
+          example: 1
         options:
           type: array
           items:
             $ref: '#/components/schemas/Authenticator'
+          minItems: 1
     Authenticator:
       type: object
+      required:
+        - idp
+        - authenticator
       properties:
         idp:
           type: string
@@ -3825,3 +3854,11 @@ components:
         traceId:
           type: string
           example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
+
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      tenant-domain:
+        default: "carbon.super"
+      server-url:
+        default: "localhost:9443"

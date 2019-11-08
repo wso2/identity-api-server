@@ -76,7 +76,7 @@ public class ApplicationModel  {
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
-
+ @Pattern(regexp="^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$")
     public String getName() {
         return name;
     }

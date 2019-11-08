@@ -33,13 +33,65 @@ import javax.xml.bind.annotation.*;
 
 public class AuthenticationSequence  {
   
+
+@XmlType(name="TypeEnum")
+@XmlEnum(String.class)
+public enum TypeEnum {
+
+    @XmlEnumValue("DEFAULT") DEFAULT(String.valueOf("DEFAULT")), @XmlEnumValue("USER_DEFINED") USER_DEFINED(String.valueOf("USER_DEFINED"));
+
+
+    private String value;
+
+    TypeEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static TypeEnum fromValue(String value) {
+        for (TypeEnum b : TypeEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private TypeEnum type = TypeEnum.DEFAULT;
     private List<AuthenticationStep> steps = null;
 
     private List<String> requestPathAuthenticators = null;
 
     private String script;
-    private String subjectStepId;
-    private String attributeStepId;
+    private Integer subjectStepId = 1;
+    private Integer attributeStepId = 1;
+
+    /**
+    **/
+    public AuthenticationSequence type(TypeEnum type) {
+
+        this.type = type;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("type")
+    @Valid
+    public TypeEnum getType() {
+        return type;
+    }
+    public void setType(TypeEnum type) {
+        this.type = type;
+    }
 
     /**
     **/
@@ -113,37 +165,37 @@ public class AuthenticationSequence  {
 
     /**
     **/
-    public AuthenticationSequence subjectStepId(String subjectStepId) {
+    public AuthenticationSequence subjectStepId(Integer subjectStepId) {
 
         this.subjectStepId = subjectStepId;
         return this;
     }
     
-    @ApiModelProperty(example = "step1", value = "")
+    @ApiModelProperty(example = "1", value = "")
     @JsonProperty("subjectStepId")
     @Valid
-    public String getSubjectStepId() {
+    public Integer getSubjectStepId() {
         return subjectStepId;
     }
-    public void setSubjectStepId(String subjectStepId) {
+    public void setSubjectStepId(Integer subjectStepId) {
         this.subjectStepId = subjectStepId;
     }
 
     /**
     **/
-    public AuthenticationSequence attributeStepId(String attributeStepId) {
+    public AuthenticationSequence attributeStepId(Integer attributeStepId) {
 
         this.attributeStepId = attributeStepId;
         return this;
     }
     
-    @ApiModelProperty(example = "step1", value = "")
+    @ApiModelProperty(example = "1", value = "")
     @JsonProperty("attributeStepId")
     @Valid
-    public String getAttributeStepId() {
+    public Integer getAttributeStepId() {
         return attributeStepId;
     }
-    public void setAttributeStepId(String attributeStepId) {
+    public void setAttributeStepId(Integer attributeStepId) {
         this.attributeStepId = attributeStepId;
     }
 
@@ -159,7 +211,8 @@ public class AuthenticationSequence  {
             return false;
         }
         AuthenticationSequence authenticationSequence = (AuthenticationSequence) o;
-        return Objects.equals(this.steps, authenticationSequence.steps) &&
+        return Objects.equals(this.type, authenticationSequence.type) &&
+            Objects.equals(this.steps, authenticationSequence.steps) &&
             Objects.equals(this.requestPathAuthenticators, authenticationSequence.requestPathAuthenticators) &&
             Objects.equals(this.script, authenticationSequence.script) &&
             Objects.equals(this.subjectStepId, authenticationSequence.subjectStepId) &&
@@ -168,7 +221,7 @@ public class AuthenticationSequence  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(steps, requestPathAuthenticators, script, subjectStepId, attributeStepId);
+        return Objects.hash(type, steps, requestPathAuthenticators, script, subjectStepId, attributeStepId);
     }
 
     @Override
@@ -177,6 +230,7 @@ public class AuthenticationSequence  {
         StringBuilder sb = new StringBuilder();
         sb.append("class AuthenticationSequence {\n");
         
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    steps: ").append(toIndentedString(steps)).append("\n");
         sb.append("    requestPathAuthenticators: ").append(toIndentedString(requestPathAuthenticators)).append("\n");
         sb.append("    script: ").append(toIndentedString(script)).append("\n");

@@ -33,25 +33,28 @@ import javax.xml.bind.annotation.*;
 
 public class AuthenticationStep  {
   
-    private String id;
-    private List<Authenticator> options = null;
+    private Integer id;
+    private List<Authenticator> options = new ArrayList<>();
 
 
     /**
+    * minimum: 1
     **/
-    public AuthenticationStep id(String id) {
+    public AuthenticationStep id(Integer id) {
 
         this.id = id;
         return this;
     }
     
-    @ApiModelProperty(example = "step1", value = "")
+    @ApiModelProperty(example = "1", required = true, value = "")
     @JsonProperty("id")
     @Valid
-    public String getId() {
+    @NotNull(message = "Property id cannot be null.")
+ @Min(1)
+    public Integer getId() {
         return id;
     }
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -63,9 +66,11 @@ public class AuthenticationStep  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("options")
     @Valid
+    @NotNull(message = "Property options cannot be null.")
+ @Size(min=1)
     public List<Authenticator> getOptions() {
         return options;
     }
@@ -74,9 +79,6 @@ public class AuthenticationStep  {
     }
 
     public AuthenticationStep addOptionsItem(Authenticator optionsItem) {
-        if (this.options == null) {
-            this.options = new ArrayList<>();
-        }
         this.options.add(optionsItem);
         return this;
     }
