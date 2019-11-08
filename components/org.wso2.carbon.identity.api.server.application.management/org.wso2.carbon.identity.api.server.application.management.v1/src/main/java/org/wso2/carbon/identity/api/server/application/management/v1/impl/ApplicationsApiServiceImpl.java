@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.impl;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
@@ -31,6 +32,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Config
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 
+import java.io.InputStream;
 import javax.ws.rs.core.Response;
 
 /**
@@ -132,6 +134,18 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Override
     public Response deleteWSTrustConfiguration(String applicationId) {
+
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    @Override
+    public Response exportApplication(String applicationId, Boolean exportSecrets) {
+
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    @Override
+    public Response importApplication(InputStream fileInputStream, Attachment fileDetail) {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
