@@ -21,7 +21,6 @@ import org.wso2.carbon.identity.api.server.userstore.v1.UserstoresApiService;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStorePutReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
 
@@ -44,9 +43,8 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     @Override
     public Response addUserStore(UserStoreReq userStoreReq) {
 
-        String id = serverUserStoreService.base64EncodeId(userStoreReq.getName());
-        return Response.created(getResourceLocation(id)).entity(serverUserStoreService.
-                addUserStore(userStoreReq)).build();
+        UserStoreResponse response = serverUserStoreService.addUserStore(userStoreReq);
+        return Response.created(getResourceLocation(response.getId())).entity(response).build();
     }
 
     @Override
@@ -54,17 +52,6 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
 
         serverUserStoreService.deleteUserStore(userstoreDomainId);
         return Response.noContent().build();
-    }
-
-    @Override
-    public Response editUserStore(String userstoreDomainId, UserStorePutReq userStorePutReq) {
-
-        UserStoreResponse response = serverUserStoreService.editUserStore(userstoreDomainId, userStorePutReq);
-        if (!response.getName().equals(serverUserStoreService.base64DecodeId(userstoreDomainId))) {
-            return Response.ok().location(getResourceLocation(serverUserStoreService.
-                    base64EncodeId(response.getName()))).entity(response).build();
-        }
-        return Response.ok().entity(response).build();
     }
 
     @Override
@@ -96,18 +83,19 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     @Override
     public Response patchUserStore(String userstoreDomainId, List<PatchDocument> patchDocument) {
 
-        UserStoreResponse response = serverUserStoreService.patchUserStore(userstoreDomainId, patchDocument);
-        if (!response.getName().equals(serverUserStoreService.base64DecodeId(userstoreDomainId))) {
-            return Response.ok().location(getResourceLocation(serverUserStoreService.
-                    base64EncodeId(response.getName()))).entity(response).build();
-        }
-        return Response.ok().entity(response).build();
+        return Response.ok().entity(serverUserStoreService.patchUserStore(userstoreDomainId, patchDocument)).build();
     }
 
     @Override
     public Response testRDBMSConnection(RDBMSConnectionReq rdBMSConnectionReq) {
 
         return Response.ok().entity(serverUserStoreService.testRDBMSConnection(rdBMSConnectionReq)).build();
+    }
+
+    @Override
+    public Response updateUserStore(String userstoreDomainId, UserStoreReq userStoreReq) {
+
+        return Response.ok().entity(serverUserStoreService.editUserStore(userstoreDomainId, userStoreReq)).build();
     }
 
     private URI getResourceLocation(String id) {

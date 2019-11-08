@@ -21,7 +21,7 @@
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.userstore</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.0.38-SNAPSHOT</version>
+        <version>1.0.41-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.api.server.userstore.v1</artifactId>
@@ -41,37 +41,37 @@
             </plugin>
 
             <!--<plugin>-->
-            <!--<groupId>org.openapitools</groupId>-->
-            <!--<artifactId>openapi-generator-maven-plugin</artifactId>-->
-            <!--<version>4.1.2</version>-->
-            <!--<executions>-->
-            <!--<execution>-->
-            <!--<goals>-->
-            <!--<goal>generate</goal>-->
-            <!--</goals>-->
-            <!--<configuration>-->
-            <!--<inputSpec>${project.basedir}/src/main/resources/userstore.yaml</inputSpec>-->
-            <!--<generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>-->
-            <!--<configOptions>-->
-            <!--<sourceFolder>src/gen/java</sourceFolder>-->
-            <!--<apiPackage>org.wso2.carbon.identity.api.server.userstore.v1</apiPackage>-->
-            <!--<modelPackage>org.wso2.carbon.identity.api.server.userstore.v1.model</modelPackage>-->
-            <!--<packageName>org.wso2.carbon.identity.api.server.userstore.v1</packageName>-->
-            <!--<dateLibrary>java8</dateLibrary>-->
-            <!--<hideGenerationTimestamp>true</hideGenerationTimestamp>-->
-            <!--</configOptions>-->
-            <!--<output>.</output>-->
-            <!--<skipOverwrite>false</skipOverwrite>-->
-            <!--</configuration>-->
-            <!--</execution>-->
-            <!--</executions>-->
-            <!--<dependencies>-->
-            <!--<dependency>-->
-            <!--<groupId>org.openapitools</groupId>-->
-            <!--<artifactId>cxf-wso2-openapi-generator</artifactId>-->
-            <!--<version>1.0.0</version>-->
-            <!--</dependency>-->
-            <!--</dependencies>-->
+                <!--<groupId>org.openapitools</groupId>-->
+                <!--<artifactId>openapi-generator-maven-plugin</artifactId>-->
+                <!--<version>4.1.2</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<goals>-->
+                            <!--<goal>generate</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<inputSpec>${project.basedir}/src/main/resources/userstore.yaml</inputSpec>-->
+                            <!--<generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>-->
+                            <!--<configOptions>-->
+                                <!--<sourceFolder>src/gen/java</sourceFolder>-->
+                                <!--<apiPackage>org.wso2.carbon.identity.api.server.userstore.v1</apiPackage>-->
+                                <!--<modelPackage>org.wso2.carbon.identity.api.server.userstore.v1.model</modelPackage>-->
+                                <!--<packageName>org.wso2.carbon.identity.api.server.userstore.v1</packageName>-->
+                                <!--<dateLibrary>java8</dateLibrary>-->
+                                <!--<hideGenerationTimestamp>true</hideGenerationTimestamp>-->
+                            <!--</configOptions>-->
+                            <!--<output>.</output>-->
+                            <!--<skipOverwrite>false</skipOverwrite>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--<dependencies>-->
+                    <!--<dependency>-->
+                        <!--<groupId>org.openapitools</groupId>-->
+                        <!--<artifactId>cxf-wso2-openapi-generator</artifactId>-->
+                        <!--<version>1.0.0</version>-->
+                    <!--</dependency>-->
+                <!--</dependencies>-->
             <!--</plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

@@ -67,7 +67,9 @@ public class UserStoreConstants {
                 "Server Encountered an error while retrieving the user store types."),
         ERROR_CODE_INVALID_INPUT("50011", "Invalid Input", "Provided Input is not valid."),
         ERROR_CODE_NOT_FOUND("50012", "Resource not found.",
-                "Unable to find a required resource for this request");
+                "Unable to find a required resource for this request"),
+        ERROR_CODE_ERROR_RETRIEVING_USER_STORE_BY_DOMAIN_ID("50013", "Unable to get the user store by its domain id.",
+                "Server Encountered an error while retrieving the user store by its domain id");
 
         private final String code;
         private final String message;

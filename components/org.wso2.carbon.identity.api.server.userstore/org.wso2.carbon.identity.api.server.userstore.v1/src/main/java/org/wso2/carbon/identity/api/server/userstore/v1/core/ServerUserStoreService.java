@@ -36,7 +36,6 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConfigurationsRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStorePropertiesRes;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStorePutReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
 
@@ -44,7 +43,6 @@ import org.wso2.carbon.identity.user.store.configuration.UserStoreConfigService;
 import org.wso2.carbon.identity.user.store.configuration.dto.PropertyDTO;
 import org.wso2.carbon.identity.user.store.configuration.dto.UserStoreDTO;
 import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreMgtException;
-import org.wso2.carbon.identity.user.store.configuration.utils.UserStoreConfigurationConstant;
 import org.wso2.carbon.user.api.Properties;
 import org.wso2.carbon.user.api.Property;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
@@ -80,15 +78,7 @@ public class ServerUserStoreService {
         try {
             UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
             userStoreConfigService.addUserStore(createUserStoreDTO(userStoreReq));
-            UserStoreResponse userStoreResponseDTO = new UserStoreResponse();
-            userStoreResponseDTO.setId((base64EncodeId(userStoreReq.getName())));
-            userStoreResponseDTO.setName(userStoreReq.getName());
-            userStoreResponseDTO.setTypeId(userStoreReq.getTypeId());
-            userStoreResponseDTO.setTypeName(base64DecodeId(userStoreReq.getTypeId()));
-            userStoreResponseDTO.setDescription(userStoreReq.getDescription());
-            userStoreResponseDTO.setProperties(buildUserStorePropertiesRes(userStoreReq, null));
-
-            return userStoreResponseDTO;
+            return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_USER_STORE;
@@ -105,14 +95,9 @@ public class ServerUserStoreService {
     public void deleteUserStore(String userstoreDomainId) {
 
         try {
-            if (isUserStoreDomainIdFound(base64DecodeId(userstoreDomainId))) {
-                UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.
-                        getUserStoreConfigService();
-
-                userStoreConfigService.deleteUserStore(base64DecodeId(userstoreDomainId));
-            } else {
-                throw handleNotFoundError(userstoreDomainId);
-            }
+            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.
+                    getUserStoreConfigService();
+            userStoreConfigService.deleteUserStore(base64URLDecodeId(userstoreDomainId));
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_USER_STORE;
@@ -124,30 +109,19 @@ public class ServerUserStoreService {
     /**
      * Update the user store by its domain Id.
      *
-     * @param domainId        the domain name to be replaced
-     * @param userStorePutReq {@link UserStorePutReq} to edit.
+     * @param domainId     the domain name to be replaced
+     * @param userStoreReq {@link UserStoreReq} to edit.
      * @return UserStoreResponse.
      */
-    public UserStoreResponse editUserStore(String domainId, UserStorePutReq userStorePutReq) {
+    public UserStoreResponse editUserStore(String domainId, UserStoreReq userStoreReq) {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.
                 getUserStoreConfigService();
+        //domainName and typeName are not allowed to edit.
         try {
-            if (isUserStoreDomainIdFound(base64DecodeId(domainId))) {
-                userStoreConfigService.updateUserStoreByDomainName(base64DecodeId(domainId),
-                        createUserStorePutDTO(userStorePutReq));
-                UserStoreResponse userStoreResponseDTO = new UserStoreResponse();
-                userStoreResponseDTO.setId((base64EncodeId(userStorePutReq.getName())));
-                userStoreResponseDTO.setName(userStorePutReq.getName());
-                userStoreResponseDTO.setTypeId(base64EncodeId(userStorePutReq.getTypeName()));
-                userStoreResponseDTO.setTypeName(userStorePutReq.getTypeName());
-                userStoreResponseDTO.setDescription(userStorePutReq.getDescription());
-                userStoreResponseDTO.setProperties(buildUserStorePropertiesRes(null, userStorePutReq));
-
-                return userStoreResponseDTO;
-            } else {
-                throw handleNotFoundError(domainId);
-            }
+            userStoreConfigService.updateUserStoreByDomainName(base64URLDecodeId(domainId),
+                    createUserStoreDTO(userStoreReq));
+            return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_USER_STORE;
@@ -165,7 +139,7 @@ public class ServerUserStoreService {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.
                 getUserStoreConfigService();
-        Set<String> classNames = null;
+        Set<String> classNames;
         try {
             classNames = userStoreConfigService.getAvailableUserStoreClasses();
             List<AvailableUserStoreClassesRes> propertiesToAdd = new ArrayList<>();
@@ -173,7 +147,7 @@ public class ServerUserStoreService {
                 AvailableUserStoreClassesRes availableUserStoreClassesResDTO = new AvailableUserStoreClassesRes();
                 availableUserStoreClassesResDTO.setClassName(className);
                 availableUserStoreClassesResDTO.setTypeName(getUserStoreTypeName(className));
-                availableUserStoreClassesResDTO.setTypeId(base64EncodeId(Objects.
+                availableUserStoreClassesResDTO.setTypeId(base64URLEncodeId(Objects.
                         requireNonNull(getUserStoreTypeName(className))));
                 propertiesToAdd.add(availableUserStoreClassesResDTO);
             }
@@ -226,34 +200,32 @@ public class ServerUserStoreService {
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         List<AddUserStorePropertiesRes> propertiesTobeAdd = new ArrayList<>();
         try {
-            if (isUserStoreDomainIdFound(base64DecodeId(domainId))) {
-                UserStoreDTO userStoreDTO = userStoreConfigService.getUserStore(base64DecodeId(domainId));
-                if (userStoreDTO == null) {
-                    throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.
-                            ERROR_CODE_NOT_FOUND);
-                }
-                UserStoreConfigurationsRes userStoreConfigurations = new UserStoreConfigurationsRes();
-                userStoreConfigurations.setClassName(userStoreDTO.getClassName());
-                userStoreConfigurations.setDescription(userStoreDTO.getDescription());
-                userStoreConfigurations.setName(userStoreDTO.getDomainId());
-                userStoreConfigurations.setTypeId(base64EncodeId(getUserStoreTypeName(userStoreDTO.getClassName())));
-                userStoreConfigurations.setTypeName(getUserStoreTypeName(userStoreDTO.getClassName()));
-                PropertyDTO[] dtoProperties = userStoreDTO.getProperties();
-                for (PropertyDTO propertyDTO : dtoProperties) {
-                    AddUserStorePropertiesRes userStorePropertiesRes = new AddUserStorePropertiesRes();
-                    userStorePropertiesRes.setName(propertyDTO.getName());
-                    userStorePropertiesRes.setValue(propertyDTO.getValue());
-                    propertiesTobeAdd.add(userStorePropertiesRes);
-                }
-                userStoreConfigurations.setProperties(propertiesTobeAdd);
-                return userStoreConfigurations;
-            } else {
-                throw handleNotFoundError(domainId);
+            UserStoreDTO userStoreDTO = userStoreConfigService.getUserStore(base64URLDecodeId(domainId));
+            if (userStoreDTO == null) {
+                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.
+                        ERROR_CODE_NOT_FOUND);
             }
+            UserStoreConfigurationsRes userStoreConfigurations = new UserStoreConfigurationsRes();
+            userStoreConfigurations.setClassName(userStoreDTO.getClassName());
+            userStoreConfigurations.setDescription(userStoreDTO.getDescription());
+            userStoreConfigurations.setName(userStoreDTO.getDomainId());
+            userStoreConfigurations.setTypeId(base64URLEncodeId(Objects.requireNonNull
+                    (getUserStoreTypeName(userStoreDTO.getClassName()))));
+            userStoreConfigurations.setTypeName(getUserStoreTypeName(userStoreDTO.getClassName()));
+            PropertyDTO[] dtoProperties = userStoreDTO.getProperties();
+            for (PropertyDTO propertyDTO : dtoProperties) {
+                AddUserStorePropertiesRes userStorePropertiesRes = new AddUserStorePropertiesRes();
+                userStorePropertiesRes.setName(propertyDTO.getName());
+                userStorePropertiesRes.setValue(propertyDTO.getValue());
+                propertiesTobeAdd.add(userStorePropertiesRes);
+            }
+            userStoreConfigurations.setProperties(propertiesTobeAdd);
+            return userStoreConfigurations;
+
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
-                    UserStoreConstants.ErrorMessage.ERROR_CODE_DOMAIN_ID_NOT_FOUND;
-            Response.Status status = Response.Status.NOT_FOUND;
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_USER_STORE_BY_DOMAIN_ID;
+            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
             throw handleException(e, errorEnum, status);
         }
     }
@@ -282,7 +254,7 @@ public class ServerUserStoreService {
             }
             List<UserStoreDTO> userStoresByTypeNameList = new ArrayList<>();
             for (UserStoreDTO userStoreDTO : userStoreDTOS) {
-                if (Objects.equals(getUserStoreType(base64DecodeId(typeId)), userStoreDTO.getClassName())) {
+                if (Objects.equals(getUserStoreType(base64URLDecodeId(typeId)), userStoreDTO.getClassName())) {
                     userStoresByTypeNameList.add(userStoreDTO);
                 }
             }
@@ -306,7 +278,7 @@ public class ServerUserStoreService {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         ConnectionEstablishedResponse connectionEstablishedResponse = new ConnectionEstablishedResponse();
-        boolean isConnectionEstablished = false;
+        boolean isConnectionEstablished;
         connectionEstablishedResponse.setConnection(false);
         try {
             isConnectionEstablished = userStoreConfigService.testRDBMSConnection("",
@@ -333,9 +305,6 @@ public class ServerUserStoreService {
      */
     public UserStoreResponse patchUserStore(String domainId, List<PatchDocument> patchDocument) {
 
-        if (!isUserStoreDomainIdFound(base64DecodeId(domainId))) {
-            throw handleNotFoundError(domainId);
-        }
         for (PatchDocument patch : patchDocument) {
             //Only the Replace operation supported with PATCH request
             PatchDocument.OperationEnum operation = patch.getOperation();
@@ -358,7 +327,7 @@ public class ServerUserStoreService {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         try {
-            UserStoreDTO userStoreDTO = userStoreConfigService.getUserStore(base64DecodeId(domainId));
+            UserStoreDTO userStoreDTO = userStoreConfigService.getUserStore(base64URLDecodeId(domainId));
             if (userStoreDTO == null) {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
             }
@@ -371,22 +340,12 @@ public class ServerUserStoreService {
                     }
                 }
                 return buildResponseForPatchReplace(userStoreDTO, propertyDTOS);
-            } else {
-                switch (path) {
-                    case UserStoreConstants.USER_STORE_DESCRIPTION:
-                        userStoreDTO.setDescription(value);
-                        break;
-                    case UserStoreConstants.USER_STORE_DOMAIN_NAME:
-                        userStoreDTO.setDomainId(value);
-                        break;
-                    case UserStoreConstants.USER_STORE_CLASS_NAME:
-                        userStoreDTO.setClassName(getUserStoreType(value));
-                        break;
-                    default:
-                        throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
-                                .ERROR_CODE_INVALID_INPUT);
-                }
+            } else if (path.equals(UserStoreConstants.USER_STORE_DESCRIPTION)) {
+                userStoreDTO.setDescription(value);
                 return buildResponseForPatchReplace(userStoreDTO, propertyDTOS);
+            } else {
+                throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
+                        .ERROR_CODE_INVALID_INPUT);
             }
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
@@ -404,10 +363,12 @@ public class ServerUserStoreService {
      * @return UserStoreResponse.
      */
     private UserStoreResponse buildResponseForPatchReplace(UserStoreDTO userStoreDTO, PropertyDTO[] propertyDTOS) {
+
         UserStoreResponse userStoreResponseDTO = new UserStoreResponse();
-        userStoreResponseDTO.setId((base64EncodeId(userStoreDTO.getDomainId())));
+        userStoreResponseDTO.setId((base64URLEncodeId(userStoreDTO.getDomainId())));
         userStoreResponseDTO.setName(userStoreDTO.getDomainId());
-        userStoreResponseDTO.setTypeId(base64EncodeId(getUserStoreTypeName(userStoreDTO.getClassName())));
+        userStoreResponseDTO.setTypeId(base64URLEncodeId(Objects.requireNonNull(getUserStoreTypeName
+                (userStoreDTO.getClassName()))));
         userStoreResponseDTO.setTypeName(getUserStoreTypeName(userStoreDTO.getClassName()));
         userStoreResponseDTO.setDescription(userStoreDTO.getDescription());
         userStoreResponseDTO.setProperties(patchUserStoreProperties(propertyDTOS));
@@ -417,19 +378,12 @@ public class ServerUserStoreService {
     /**
      * Build user store properties response of created or updated user store.
      *
-     * @param userStoreReq    {@link UserStoreReq} to insert.
-     * @param userStorePutReq {@link UserStorePutReq} to update.
+     * @param userStoreReq {@link UserStoreReq} to insert.
      * @return List<AddUserStorePropertiesRes>.
      */
-    private List<AddUserStorePropertiesRes> buildUserStorePropertiesRes(UserStoreReq userStoreReq,
-                                                                        UserStorePutReq userStorePutReq) {
+    private List<AddUserStorePropertiesRes> buildUserStorePropertiesRes(UserStoreReq userStoreReq) {
 
-        List<org.wso2.carbon.identity.api.server.userstore.v1.model.Property> values;
-        if (userStoreReq != null) {
-            values = userStoreReq.getProperties();
-        } else {
-            values = userStorePutReq.getProperties();
-        }
+        List<org.wso2.carbon.identity.api.server.userstore.v1.model.Property> values = userStoreReq.getProperties();
         List<AddUserStorePropertiesRes> propertiesToAdd = new ArrayList<>();
 
         for (org.wso2.carbon.identity.api.server.userstore.v1.model.Property value : values) {
@@ -438,33 +392,7 @@ public class ServerUserStoreService {
             addUserStorePropertiesRes.setValue(value.getValue());
             propertiesToAdd.add(addUserStorePropertiesRes);
         }
-
         return propertiesToAdd;
-    }
-
-    /**
-     * To check whether the provided user store domain id is exist or not.
-     *
-     * @param domainId the user store domain id.
-     * @return true if the domain id exist in the list otherwise false.
-     */
-    private boolean isUserStoreDomainIdFound(String domainId) {
-
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
-        try {
-            UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
-            for (UserStoreDTO userStoreDTO : userStoreDTOS) {
-                if (userStoreDTO.getDomainId().equals(domainId)) {
-                    return true;
-                }
-            }
-        } catch (IdentityUserStoreMgtException e) {
-            UserStoreConstants.ErrorMessage errorEnum =
-                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_USER_STORE;
-            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-            throw handleException(e, errorEnum, status);
-        }
-        return false;
     }
 
     /**
@@ -495,7 +423,7 @@ public class ServerUserStoreService {
 
         UserStoreDTO userStoreDTO = new UserStoreDTO();
         userStoreDTO.setDomainId(userStoreReq.getName());
-        userStoreDTO.setClassName(getUserStoreType(base64DecodeId(userStoreReq.getTypeId())));
+        userStoreDTO.setClassName(getUserStoreType(base64URLDecodeId(userStoreReq.getTypeId())));
         userStoreDTO.setDescription(userStoreReq.getDescription());
         userStoreDTO.setProperties(createPropertyListDTO(userStoreReq));
         return userStoreDTO;
@@ -514,10 +442,10 @@ public class ServerUserStoreService {
             UserStoreListResponse userStoreList = new UserStoreListResponse();
             userStoreList.setDescription(jsonObject.getDescription());
             userStoreList.setName(jsonObject.getDomainId());
-            userStoreList.setId(base64EncodeId(jsonObject.getDomainId()));
+            userStoreList.setId(base64URLEncodeId(jsonObject.getDomainId()));
             userStoreList.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
                             UserStoreConstants.USER_STORE_PATH_COMPONENT + "/%s",
-                    base64EncodeId(jsonObject.getDomainId()))).toString());
+                    base64URLEncodeId(jsonObject.getDomainId()))).toString());
             userStoreListResponseToAdd.add(userStoreList);
         }
         return userStoreListResponseToAdd;
@@ -544,8 +472,8 @@ public class ServerUserStoreService {
             metaUserStore.setTypeId(typeId);
             metaUserStore.setName(userStoreDTO.getDomainId());
             metaUserStore.setDescription(userStoreDTO.getDescription());
-            metaUserStore.setTypeName(base64DecodeId(typeId));
-            metaUserStore.setClassName(getUserStoreType(base64DecodeId(typeId)));
+            metaUserStore.setTypeName(base64URLDecodeId(typeId));
+            metaUserStore.setClassName(getUserStoreType(base64URLDecodeId(typeId)));
             metaUserStoreTypes.add(metaUserStore);
 
         }
@@ -615,8 +543,7 @@ public class ServerUserStoreService {
      */
     private HashMap<String, String> getHashMap() {
 
-        String[] classNames = UserStoreManagerRegistry.getUserStoreManagerClasses().toArray
-                (new String[UserStoreManagerRegistry.getUserStoreManagerClasses().size()]);
+        Set<String> classNames = UserStoreManagerRegistry.getUserStoreManagerClasses();
         HashMap<String, String> userStoreMap = new HashMap<>();
 
         for (String className : classNames) {
@@ -631,7 +558,7 @@ public class ServerUserStoreService {
      * @param id domain name.
      * @return encoded string value.
      */
-    public String base64EncodeId(String id) {
+    private String base64URLEncodeId(String id) {
 
         return Base64.getUrlEncoder().withoutPadding().encodeToString(id.getBytes(StandardCharsets.UTF_8));
     }
@@ -642,33 +569,9 @@ public class ServerUserStoreService {
      * @param id domain name.
      * @return decoded string value.
      */
-    public String base64DecodeId(String id) {
+    private String base64URLDecodeId(String id) {
 
         return new String(Base64.getUrlDecoder().decode(id), StandardCharsets.UTF_8);
-    }
-
-    /**
-     * Construct PropertyDTO array for PUT request.
-     *
-     * @param userStorePutReq {@link UserStorePutReq}.
-     * @return PropertyDTO[].
-     */
-    private PropertyDTO[] createPutPropertyListDTO(UserStorePutReq userStorePutReq, String domainName) {
-
-        List<org.wso2.carbon.identity.api.server.userstore.v1.model.Property> values = userStorePutReq.getProperties();
-        ArrayList<PropertyDTO> propertiesToAdd = new ArrayList<>();
-
-        for (org.wso2.carbon.identity.api.server.userstore.v1.model.Property value : values) {
-            PropertyDTO propertyDTO = new PropertyDTO();
-            propertyDTO.setName(value.getName());
-            propertyDTO.setValue(value.getValue());
-            propertiesToAdd.add(propertyDTO);
-        }
-        PropertyDTO propertyDTO = new PropertyDTO();
-        propertyDTO.setName(UserStoreConfigurationConstant.UNIQUE_ID_CONSTANT);
-        propertyDTO.setValue(base64EncodeId(domainName));
-        propertiesToAdd.add(propertyDTO);
-        return propertiesToAdd.toArray(new PropertyDTO[propertiesToAdd.size()]);
     }
 
     /**
@@ -689,23 +592,25 @@ public class ServerUserStoreService {
             propertiesToAdd.add(propertyDTO);
         }
 
-        return propertiesToAdd.toArray(new PropertyDTO[propertiesToAdd.size()]);
+        return propertiesToAdd.toArray(new PropertyDTO[0]);
     }
 
     /**
-     * To create UserStoreDTO object for the put request.
+     * To create UserStoreResponse object for the put request.
      *
-     * @param userStorePutReq {@link UserStorePutReq}.
-     * @return UserStoreDTO.
+     * @param userStoreReq {@link UserStoreReq}.
+     * @return UserStoreResponse.
      */
-    private UserStoreDTO createUserStorePutDTO(UserStorePutReq userStorePutReq) {
+    private UserStoreResponse buildUserStoreResponseDTO(UserStoreReq userStoreReq) {
 
-        UserStoreDTO userStoreDTO = new UserStoreDTO();
-        userStoreDTO.setDomainId(userStorePutReq.getName());
-        userStoreDTO.setClassName(getUserStoreType(userStorePutReq.getTypeName()));
-        userStoreDTO.setDescription(userStorePutReq.getDescription());
-        userStoreDTO.setProperties(createPutPropertyListDTO(userStorePutReq, userStorePutReq.getName()));
-        return userStoreDTO;
+        UserStoreResponse userStoreResponseDTO = new UserStoreResponse();
+        userStoreResponseDTO.setId((base64URLEncodeId(userStoreReq.getName())));
+        userStoreResponseDTO.setName(userStoreReq.getName());
+        userStoreResponseDTO.setTypeId(userStoreReq.getTypeId());
+        userStoreResponseDTO.setTypeName(base64URLDecodeId(userStoreReq.getTypeId()));
+        userStoreResponseDTO.setDescription(userStoreReq.getDescription());
+        userStoreResponseDTO.setProperties(buildUserStorePropertiesRes(userStoreReq));
+        return userStoreResponseDTO;
     }
 
     /**
@@ -768,22 +673,6 @@ public class ServerUserStoreService {
             errorDescription = errorEnum.getDescription();
         }
         return errorDescription;
-    }
-
-    /**
-     * To handle the error responses when the required resource not found.
-     *
-     * @param resourceId the resource id
-     * @return APIError
-     */
-    private APIError handleNotFoundError(String resourceId) {
-
-        Response.Status status = Response.Status.NOT_FOUND;
-        ErrorResponse errorResponse =
-                getErrorBuilder(UserStoreConstants.ErrorMessage.ERROR_CODE_DOMAIN_ID_NOT_FOUND, resourceId)
-                        .build(LOG, UserStoreConstants.ErrorMessage.ERROR_CODE_DOMAIN_ID_NOT_FOUND.getDescription());
-
-        return new APIError(status, errorResponse);
     }
 
     /**

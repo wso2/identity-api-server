@@ -26,7 +26,6 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConfigurationsRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStorePutReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.UserstoresApiService;
@@ -91,30 +90,6 @@ public class UserstoresApi  {
     public Response deleteUserStore(@ApiParam(value = "The unique name of the user store domain",required=true) @PathParam("userstore-domain-id") String userstoreDomainId) {
 
         return delegate.deleteUserStore(userstoreDomainId );
-    }
-
-    @Valid
-    @PUT
-    @Path("/{userstore-domain-id}")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update a user store by its domain id.", notes = "This API provides the capability to edit a user store based on its domain id.   <b>Permission required:</b>   *_/permission/admin ", response = UserStoreResponse.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "User Store", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response.", response = UserStoreResponse.class),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
-        @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response editUserStore(@ApiParam(value = "Current domain id of the user store",required=true) @PathParam("userstore-domain-id") String userstoreDomainId, @ApiParam(value = "The secondary user store values which are need to be edited of the given domain id." ) @Valid UserStorePutReq userStorePutReq) {
-
-        return delegate.editUserStore(userstoreDomainId,  userStorePutReq );
     }
 
     @Valid
@@ -241,7 +216,7 @@ public class UserstoresApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "User Store" })
+    }, tags={ "User Store", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = ConnectionEstablishedResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
@@ -251,6 +226,30 @@ public class UserstoresApi  {
     public Response testRDBMSConnection(@ApiParam(value = "RDBMS connection properties used to connect to the datasource used by a JDBC user store manager." ) @Valid RDBMSConnectionReq rdBMSConnectionReq) {
 
         return delegate.testRDBMSConnection(rdBMSConnectionReq );
+    }
+
+    @Valid
+    @PUT
+    @Path("/{userstore-domain-id}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update a user store by its domain id.", notes = "This API provides the capability to edit a user store based on its domain id.   <b>Permission required:</b>   *_/permission/admin ", response = UserStoreResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "User Store" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response.", response = UserStoreResponse.class),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response updateUserStore(@ApiParam(value = "Current domain id of the user store",required=true) @PathParam("userstore-domain-id") String userstoreDomainId, @ApiParam(value = "The secondary user store values which are need to be edited of the given domain id." ) @Valid UserStoreReq userStoreReq) {
+
+        return delegate.updateUserStore(userstoreDomainId,  userStoreReq );
     }
 
 }

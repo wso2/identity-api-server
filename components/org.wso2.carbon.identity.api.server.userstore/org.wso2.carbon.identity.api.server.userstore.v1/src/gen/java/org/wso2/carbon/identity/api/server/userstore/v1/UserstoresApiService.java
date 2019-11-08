@@ -29,7 +29,6 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConfigurationsRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStorePutReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
 import javax.ws.rs.core.Response;
@@ -40,8 +39,6 @@ public interface UserstoresApiService {
       public Response addUserStore(UserStoreReq userStoreReq);
 
       public Response deleteUserStore(String userstoreDomainId);
-
-      public Response editUserStore(String userstoreDomainId, UserStorePutReq userStorePutReq);
 
       public Response getAvailableUserStoreTypes();
 
@@ -54,4 +51,6 @@ public interface UserstoresApiService {
       public Response patchUserStore(String userstoreDomainId, List<PatchDocument> patchDocument);
 
       public Response testRDBMSConnection(RDBMSConnectionReq rdBMSConnectionReq);
+
+      public Response updateUserStore(String userstoreDomainId, UserStoreReq userStoreReq);
 }

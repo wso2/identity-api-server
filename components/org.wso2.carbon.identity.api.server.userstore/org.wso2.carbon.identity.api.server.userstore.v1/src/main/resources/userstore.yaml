@@ -145,7 +145,7 @@ paths:
       tags:
         - User Store
       summary: Update a user store by its domain id.
-      operationId: editUserStore
+      operationId: updateUserStore
       description: >
         This API provides the capability to edit a user store based on its
         domain id.
@@ -181,7 +181,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserStorePutReq'
+              $ref: '#/components/schemas/UserStoreReq'
               # But not allowing to change the typeName and name in the PUT request.
         description: >-
           The secondary user store values which are need to be edited of the
@@ -459,28 +459,6 @@ components:
             connection password etc.
           items:
             $ref: '#/components/schemas/Property'
-    UserStorePutReq:
-      type: object
-      properties:
-        typeName:
-          type: string
-          description: The name of the user store manager class type.
-          example: JDBCUserStoreManager
-        description:
-          type: string
-          description: Description of the user store.
-          example: Some description about the user store.
-        name:
-          type: string
-          description: This is a unique name that identifies the user store.
-          example: JDBC-SECONDARY
-        properties:
-          type: array
-          description: >-
-            Various properties related to the user store such as connection URL,
-            connection password etc.
-          items:
-            $ref: '#/components/schemas/Property'
     PatchRequest:
       type: array
       items:
@@ -704,11 +682,3 @@ components:
         description:
           type: string
           example: Description of the property
-
-            # propertyType:
-            #  type: string
-            # enum:
-            #  - MANDATORY
-            # - OPTIONAL
-          #- ADVANCED
-          # example: MANDATORY
