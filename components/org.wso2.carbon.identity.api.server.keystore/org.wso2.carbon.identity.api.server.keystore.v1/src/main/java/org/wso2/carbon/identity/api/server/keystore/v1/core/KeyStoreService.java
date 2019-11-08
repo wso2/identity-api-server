@@ -18,6 +18,7 @@ package org.wso2.carbon.identity.api.server.keystore.v1.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.keystore.common.KeyStoreConstants;
@@ -67,8 +68,9 @@ public class KeyStoreService {
     public List<CertificatesResponse> listCertificateAliases(String filter) {
 
         List<String> aliasList;
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            aliasList = getKeyStoreManager().getKeyStoreCertificateAliases(filter);
+            aliasList = getKeyStoreManager().getKeyStoreCertificateAliases(tenantDomain, filter);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Server encountered an error while retrieving the list of certificates " +
                     "from keystore.");
@@ -86,8 +88,9 @@ public class KeyStoreService {
     public File getCertificate(String alias, boolean encodeCert) {
 
         X509Certificate certificate;
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            certificate = getKeyStoreManager().getKeyStoreCertificate(alias);
+            certificate = getKeyStoreManager().getKeyStoreCertificate(tenantDomain, alias);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Server encountered an error while retrieving the certificate with alias: "
                     + alias + " from keystore");
@@ -108,8 +111,9 @@ public class KeyStoreService {
      */
     public URI uploadCertificate(String alias, String certificate) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            getKeyStoreManager().addCertificate(alias, certificate);
+            getKeyStoreManager().addCertificate(tenantDomain, alias, certificate);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Server encountered an error while importing the certificate with alias: "
                     + alias + " to the keystore.");
@@ -126,8 +130,9 @@ public class KeyStoreService {
      */
     public void deleteCertificate(String alias) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            getKeyStoreManager().deleteCertificate(alias);
+            getKeyStoreManager().deleteCertificate(tenantDomain, alias);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Server encountered an error while removing the certificate with alias: "
                     + alias + " from the keystore.");
@@ -143,8 +148,9 @@ public class KeyStoreService {
     public List<CertificatesResponse> listClientCertificateAliases(String filter) {
 
         List<String> aliasList;
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            aliasList = getKeyStoreManager().getClientCertificateAliases(filter);
+            aliasList = getKeyStoreManager().getClientCertificateAliases(tenantDomain, filter);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Server encountered an error while retrieving the list of certificates " +
                     "from client truststore.");
@@ -162,8 +168,9 @@ public class KeyStoreService {
     public File getClientCertificate(String alias, boolean encodeCert) {
 
         X509Certificate certificate;
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            certificate = getKeyStoreManager().getClientCertificate(alias);
+            certificate = getKeyStoreManager().getClientCertificate(tenantDomain, alias);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Server encountered an error while retrieving the certificate with alias: "
                     + alias + " from client truststore.");
@@ -185,8 +192,9 @@ public class KeyStoreService {
     public File getPublicCertificate(boolean encodeCert) {
 
         Map<String, X509Certificate> certificateData;
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            certificateData = getKeyStoreManager().getPublicCertificate();
+            certificateData = getKeyStoreManager().getPublicCertificate(tenantDomain);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Server encountered an error while retrieving the public certificate from " +
                     "from keystore.");
@@ -218,7 +226,7 @@ public class KeyStoreService {
             String certificateEndPoint =
                     String.format(V1_API_PATH_COMPONENT + KEYSTORES_API_PATH_COMPONENT +
                             componentPath, alias);
-            certificatesResponse.setCertificate(buildURIForHeader(certificateEndPoint).toString());
+            certificatesResponse.setCertificate(buildURIForHeader(certificateEndPoint));
             certificatesResponses.add(certificatesResponse);
         }
         return certificatesResponses;

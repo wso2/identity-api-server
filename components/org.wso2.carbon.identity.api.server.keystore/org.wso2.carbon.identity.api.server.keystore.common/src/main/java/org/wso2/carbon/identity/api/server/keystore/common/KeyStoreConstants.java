@@ -29,9 +29,9 @@ public class KeyStoreConstants {
      */
     public enum ErrorMessage {
 
-        ERROR_CODE_INVALID_ALIAS("KSS-51001", "There exists no certificate with alias: %s."),
-        ERROR_CODE_FILE_WRITE("KSS-51002", "Unable to create file: %s"),
-        ERROR_CODE_ENCODE_CERTIFICATE("KSS-51003", "Unable to encode the certificate.");
+        ERROR_CODE_INVALID_ALIAS("KSS-60010", "There exists no certificate with alias: %s."),
+        ERROR_CODE_FILE_WRITE("KSS-65010", "Unable to create file: %s"),
+        ERROR_CODE_ENCODE_CERTIFICATE("KSS-65011", "Unable to encode the certificate.");
 
         private final String code;
         private final String message;
