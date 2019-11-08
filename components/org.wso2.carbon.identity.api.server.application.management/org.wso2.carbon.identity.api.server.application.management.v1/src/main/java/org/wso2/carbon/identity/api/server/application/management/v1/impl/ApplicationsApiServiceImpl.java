@@ -141,7 +141,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response exportApplication(String applicationId, Boolean exportSecrets) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(
+                applicationManagementService.exportApplication(applicationId, exportSecrets)).build();
     }
 
     @Override

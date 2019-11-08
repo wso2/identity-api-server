@@ -18,6 +18,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListItem;
@@ -35,6 +36,7 @@ import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -110,6 +112,31 @@ public class ServerApplicationManagementService {
                 throw buildApiError(ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND, applicationId, tenantDomain);
             }
             return new ServiceProviderToApiModel().apply(application);
+        } catch (IdentityApplicationManagementException e) {
+            throw handleServerError(e, "Error while retrieving application with id: " + applicationId);
+        }
+    }
+
+    /**
+     * Export an application identified by the applicationId, as an XML string.
+     *
+     * @param applicationId ID of the application to be exported.
+     * @param exportSecrets If True, all hashed or encrypted secrets will also be exported.
+     * @return XML string of the application.
+     */
+    public String exportApplication(String applicationId, Boolean exportSecrets) {
+
+        try {
+            // Pull application using the ID to get the App name
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            ApplicationBasicInfo application =
+                    getApplicationManagementService().getApplicationBasicInfoByResourceId(applicationId, tenantDomain);
+            if (application == null) {
+                throw buildApiError(ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND, applicationId, tenantDomain);
+            }
+            String appName = application.getApplicationName();
+            // Pass app name and get the XML output
+            return getApplicationManagementService().exportSPApplication(appName, exportSecrets, tenantDomain);
         } catch (IdentityApplicationManagementException e) {
             throw handleServerError(e, "Error while retrieving application with id: " + applicationId);
         }
