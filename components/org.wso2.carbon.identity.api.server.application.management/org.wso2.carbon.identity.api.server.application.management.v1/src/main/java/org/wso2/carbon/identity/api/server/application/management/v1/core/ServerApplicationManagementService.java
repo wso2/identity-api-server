@@ -32,6 +32,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
 import org.wso2.carbon.identity.application.common.model.ImportResponse;
@@ -132,16 +133,11 @@ public class ServerApplicationManagementService {
     public String exportApplication(String applicationId, Boolean exportSecrets) {
 
         try {
-            // Pull application using the ID to get the App name
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            ApplicationBasicInfo application =
-                    getApplicationManagementService().getApplicationBasicInfoByResourceId(applicationId, tenantDomain);
-            if (application == null) {
-                throw buildApiError(ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND, applicationId, tenantDomain);
-            }
-            String appName = application.getApplicationName();
-            // Pass app name and get the XML output
-            return getApplicationManagementService().exportSPApplication(appName, exportSecrets, tenantDomain);
+            return getApplicationManagementService().exportSPApplicationFromAppID(
+                    applicationId, exportSecrets, tenantDomain);
+        } catch (IdentityApplicationManagementClientException e) {
+            throw handleClientError(e, ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND);
         } catch (IdentityApplicationManagementException e) {
             throw handleServerError(e, "Error while retrieving application with id: " + applicationId);
         }
@@ -214,6 +210,16 @@ public class ServerApplicationManagementService {
 
         // TODO: prev and next
         return new ArrayList<>();
+    }
+
+    private APIError handleClientError(Exception e, ErrorMessage errorEnum) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorEnum.getCode())
+                .withDescription(e.getMessage())
+                .withMessage(errorEnum.getMessage())
+                .build(LOG, errorEnum.getDescription());
+        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
     }
 
     private APIError handleServerError(Exception e, String message) {
