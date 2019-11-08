@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,10 +34,14 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
+import org.wso2.carbon.identity.application.common.model.ImportResponse;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -139,6 +144,31 @@ public class ServerApplicationManagementService {
             return getApplicationManagementService().exportSPApplication(appName, exportSecrets, tenantDomain);
         } catch (IdentityApplicationManagementException e) {
             throw handleServerError(e, "Error while retrieving application with id: " + applicationId);
+        }
+    }
+
+    public ApplicationModel importApplication(InputStream fileInputStream, Attachment fileDetail) {
+
+        try {
+            SpFileContent spFileContent = new SpFileContent();
+            spFileContent.setContent(IOUtils.toString(fileInputStream, StandardCharsets.UTF_8.name()));
+            spFileContent.setFileName(fileDetail.getDataHandler().getName());
+
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            String username = ContextLoader.getUsernameFromContext();
+            ImportResponse importResponse = getApplicationManagementService().importSPApplication(
+                    spFileContent, tenantDomain, username, false);
+            if (importResponse.getResponseCode() == ImportResponse.CREATED) {
+                ServiceProvider application =
+                        getApplicationManagementService().getApplicationExcludingFileBasedSPs(
+                                importResponse.getApplicationName(), tenantDomain);
+                return new ServiceProviderToApiModel().apply(application);
+            } else {
+                throw buildApiError(ErrorMessage.ERROR_IMPORTING_APPLICATION);
+            }
+        } catch (IOException | IdentityApplicationManagementException e) {
+            // TODO: 2019-11-08 need to handle client error once Framework changes are merged.
+            throw handleServerError(e, "Error while importing application from XML file.");
         }
     }
 

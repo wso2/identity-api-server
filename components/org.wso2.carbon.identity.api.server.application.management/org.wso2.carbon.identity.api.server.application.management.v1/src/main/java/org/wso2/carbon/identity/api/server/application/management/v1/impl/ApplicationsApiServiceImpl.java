@@ -31,9 +31,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Provisionin
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
+import org.wso2.carbon.identity.api.server.common.Constants;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
 import java.io.InputStream;
+import java.net.URI;
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 
 /**
  * Implementation of ApplicationsApiService.
@@ -148,7 +153,11 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response importApplication(InputStream fileInputStream, Attachment fileDetail) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        ApplicationModel applicationModel = applicationManagementService.importApplication(fileInputStream, fileDetail);
+        URI location = ContextLoader.buildURIForHeader(
+                Constants.V1_API_PATH_COMPONENT + APPLICATION_MANAGEMENT_PATH_COMPONENT + "/" +
+                        applicationModel.getId());
+        return Response.created(location).entity(applicationModel).build();
     }
 
     @Override
