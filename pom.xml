@@ -269,6 +269,18 @@
                 <scope>provided</scope>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.keystore.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.security.mgt</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -355,6 +367,7 @@
         <module>components/org.wso2.carbon.identity.api.server.workflow.engine</module>
         <module>components/org.wso2.carbon.identity.api.server.permission.management</module>
         <module>components/org.wso2.carbon.identity.api.server.email.template</module>
+        <module>components/org.wso2.carbon.identity.api.server.keystore</module>
     </modules>
 
 </project>
