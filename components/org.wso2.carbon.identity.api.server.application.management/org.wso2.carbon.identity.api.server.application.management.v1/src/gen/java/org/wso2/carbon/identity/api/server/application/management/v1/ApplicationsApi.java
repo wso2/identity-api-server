@@ -22,12 +22,10 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
-import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
-import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
-import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
@@ -85,30 +83,6 @@ public class ApplicationsApi  {
 
     @Valid
     @DELETE
-    @Path("/{applicationId}/advanced-configs")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Delete advanced configurations of an application by id ", notes = "This API provides the capability to delete advanced configurations an application by id. ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Advanced Configs", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response deleteAdvancedConfigurations(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
-
-        return delegate.deleteAdvancedConfigurations(applicationId );
-    }
-
-    @Valid
-    @DELETE
     @Path("/{applicationId}")
     
     @Produces({ "application/json" })
@@ -133,54 +107,6 @@ public class ApplicationsApi  {
 
     @Valid
     @DELETE
-    @Path("/{applicationId}/authentication-sequence")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Delete authentication sequence of an application by id ", notes = "This API provides the capability to delete the authentication sequence an application by id. ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Authentication Sequence", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response deleteAuthenticationSequence(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
-
-        return delegate.deleteAuthenticationSequence(applicationId );
-    }
-
-    @Valid
-    @DELETE
-    @Path("/{applicationId}/claims")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Delete claim configuration of an application by id ", notes = "This API provides the capability to delete an application by id. ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Claims", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response deleteClaimConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
-
-        return delegate.deleteClaimConfiguration(applicationId );
-    }
-
-    @Valid
-    @DELETE
     @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     
     @Produces({ "application/json" })
@@ -201,30 +127,6 @@ public class ApplicationsApi  {
     public Response deleteCustomInboundConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Inbound Authentication Protocol ID",required=true) @PathParam("inboundProtocolId") String inboundProtocolId) {
 
         return delegate.deleteCustomInboundConfiguration(applicationId,  inboundProtocolId );
-    }
-
-    @Valid
-    @DELETE
-    @Path("/{applicationId}/inbound-protocols/")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Delete inbound protocol configurations of an application. ", notes = "This API provides the capability to delete inbound protocol configurations of an application. ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Inbound Protocols", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Delete successful", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response deleteInboundAuthenticationConfigurations(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
-
-        return delegate.deleteInboundAuthenticationConfigurations(applicationId );
     }
 
     @Valid
@@ -301,30 +203,6 @@ public class ApplicationsApi  {
 
     @Valid
     @DELETE
-    @Path("/{applicationId}/provisioning-configs")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Delete provisioning configurations of an application by id ", notes = "This API provides the capability to delete provisioning configurations an application by id. ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Provisioning Configs", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response deleteProvisioningConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
-
-        return delegate.deleteProvisioningConfiguration(applicationId );
-    }
-
-    @Valid
-    @DELETE
     @Path("/{applicationId}/inbound-protocols/ws-trust")
     
     @Produces({ "application/json" })
@@ -396,30 +274,6 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/{applicationId}/advanced-configs")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve advanced configurations of an application by id ", notes = "This API provides the capability to retrieve the advanced configurations of an application by id. ", response = AdvancedApplicationConfiguration.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Advanced Configs", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = AdvancedApplicationConfiguration.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response getAdvancedConfigurations(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
-
-        return delegate.getAdvancedConfigurations(applicationId );
-    }
-
-    @Valid
-    @GET
     
     
     @Produces({ "application/json" })
@@ -465,54 +319,6 @@ public class ApplicationsApi  {
     public Response getApplication(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getApplication(applicationId );
-    }
-
-    @Valid
-    @GET
-    @Path("/{applicationId}/authentication-sequence")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve authentication sequence of application by id ", notes = "This API provides the capability to retrieve authentication sequence of an application by id. ", response = AuthenticationSequence.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Authentication Sequence", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = AuthenticationSequence.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response getAuthenticationSequence(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
-
-        return delegate.getAuthenticationSequence(applicationId );
-    }
-
-    @Valid
-    @GET
-    @Path("/{applicationId}/claims")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve claim configuration application by id ", notes = "This API provides the capability to retrieve the application claim configuration by id. ", response = ClaimConfiguration.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Claims", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ClaimConfiguration.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response getClaimConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
-
-        return delegate.getClaimConfiguration(applicationId );
     }
 
     @Valid
@@ -704,30 +510,6 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/{applicationId}/provisioning-configs")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve provisioning configurations of application by id ", notes = "This API provides the capability to retrieve the provisioning configurations of an application by id. ", response = ProvisioningConfiguration.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Provisioning Configs", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ProvisioningConfiguration.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response getProvisioningConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
-
-        return delegate.getProvisioningConfiguration(applicationId );
-    }
-
-    @Valid
-    @GET
     @Path("/resident")
     
     @Produces({ "application/json" })
@@ -845,6 +627,29 @@ public class ApplicationsApi  {
     }
 
     @Valid
+    @PATCH
+    @Path("/{applicationId}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Partially update an application by id ", notes = "This API provides the capability to partially update an application by id. ", response = ApplicationModel.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Applications", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully Updated", response = ApplicationModel.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchApplication(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the application details to be updated." ,required=true) @Valid ApplicationPatchModel applicationPatchModel) {
+
+        return delegate.patchApplication(applicationId,  applicationPatchModel );
+    }
+
+    @Valid
     @POST
     @Path("/{applicationId}/inbound-protocols/oidc/regenerate-secret")
     
@@ -866,129 +671,6 @@ public class ApplicationsApi  {
     public Response regenerateOAuthApplicationSecret(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.regenerateOAuthApplicationSecret(applicationId );
-    }
-
-    @Valid
-    @POST
-    @Path("/{applicationId}/inbound-protocols/oidc/revoke")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Revoke the OAuth2/OIDC client configuration of an application. ", notes = "This API provides revoke the OAuth2/OIDC client configuration of an application. ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Inbound Protocols - OAuth / OIDC", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response revokeOAuthApplication(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
-
-        return delegate.revokeOAuthApplication(applicationId );
-    }
-
-    @Valid
-    @PUT
-    @Path("/{applicationId}/advanced-configs")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update the the advanced configurations of an application by id ", notes = "This API provides the capability to update the advanced configurations of an application by id. ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Advanced Configs", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful", response = Void.class),
-        @ApiResponse(code = 201, message = "Successful response.", response = AdvancedApplicationConfiguration.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response updateAdvancedConfigurations(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents advanced configurations of the application to be updated." ,required=true) @Valid AdvancedApplicationConfiguration advancedApplicationConfiguration) {
-
-        return delegate.updateAdvancedConfigurations(applicationId,  advancedApplicationConfiguration );
-    }
-
-    @Valid
-    @PUT
-    @Path("/{applicationId}")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update an application by id ", notes = "This API provides the capability to update an application. ", response = ApplicationModel.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Applications", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response.", response = ApplicationModel.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response updateApplication(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the application to be updated." ,required=true) @Valid ApplicationModel applicationModel) {
-
-        return delegate.updateApplication(applicationId,  applicationModel );
-    }
-
-    @Valid
-    @PUT
-    @Path("/{applicationId}/authentication-sequence")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update the the authentication sequence of an application by id ", notes = "This API provides the capability to update the authentication sequence of an application by id. ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Authentication Sequence", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful", response = Void.class),
-        @ApiResponse(code = 201, message = "Successful response.", response = AuthenticationSequence.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response updateAuthenticationSequence(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents provisioning configurations of the application to be updated." ,required=true) @Valid AuthenticationSequence authenticationSequence) {
-
-        return delegate.updateAuthenticationSequence(applicationId,  authenticationSequence );
-    }
-
-    @Valid
-    @PUT
-    @Path("/{applicationId}/claims")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update the claim configuration of an application by id ", notes = "This API provides the capability to update claim configuration of an application. ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Claims", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful", response = Void.class),
-        @ApiResponse(code = 201, message = "Successful response.", response = ClaimConfiguration.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response updateClaimConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the application to be updated." ,required=true) @Valid ClaimConfiguration claimConfiguration) {
-
-        return delegate.updateClaimConfiguration(applicationId,  claimConfiguration );
     }
 
     @Valid
@@ -1015,32 +697,6 @@ public class ApplicationsApi  {
     public Response updateCustomInboundConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Inbound Authentication Protocol ID",required=true) @PathParam("inboundProtocolId") String inboundProtocolId, @ApiParam(value = "This represents the Custom Inbound authentication protocol parameters of an application." ,required=true) @Valid CustomInboundProtocolConfiguration customInboundProtocolConfiguration) {
 
         return delegate.updateCustomInboundConfiguration(applicationId,  inboundProtocolId,  customInboundProtocolConfiguration );
-    }
-
-    @Valid
-    @PUT
-    @Path("/{applicationId}/inbound-protocols/")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update inbound protocol configurations of an application. ", notes = "This API provides the capability to update inbound protocol configurations of an application. ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Inbound Protocols", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful", response = Void.class),
-        @ApiResponse(code = 201, message = "Successful response.", response = InboundProtocols.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response updateInboundAuthenticationConfigurations(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the inbound protocol configurations of the application." ,required=true) @Valid InboundProtocols inboundProtocols) {
-
-        return delegate.updateInboundAuthenticationConfigurations(applicationId,  inboundProtocols );
     }
 
     @Valid
@@ -1119,31 +775,6 @@ public class ApplicationsApi  {
     public Response updatePassiveStsConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the Passive STS authentication protocol parameters of an application." ,required=true) @Valid PassiveStsConfiguration passiveStsConfiguration) {
 
         return delegate.updatePassiveStsConfiguration(applicationId,  passiveStsConfiguration );
-    }
-
-    @Valid
-    @PUT
-    @Path("/{applicationId}/provisioning-configs")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update the the provisioning configurations of an application by id ", notes = "This API provides the capability to update the provisioning configurations of an application by id. ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Provisioning Configs", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful", response = Void.class),
-        @ApiResponse(code = 201, message = "Successful response.", response = ProvisioningConfiguration.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response updateProvisioningConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents provisioning configurations of the application to be updated." ,required=true) @Valid ProvisioningConfiguration provisioningConfiguration) {
-
-        return delegate.updateProvisioningConfiguration(applicationId,  provisioningConfiguration );
     }
 
     @Valid

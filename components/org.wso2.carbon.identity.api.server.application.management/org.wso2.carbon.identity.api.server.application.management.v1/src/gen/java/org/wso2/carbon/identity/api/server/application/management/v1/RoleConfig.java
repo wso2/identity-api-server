@@ -35,7 +35,7 @@ public class RoleConfig  {
   
     private List<RoleMapping> mappings = null;
 
-    private Boolean includeUserDomain;
+    private Boolean includeUserDomain = true;
     private String claimId;
 
     /**

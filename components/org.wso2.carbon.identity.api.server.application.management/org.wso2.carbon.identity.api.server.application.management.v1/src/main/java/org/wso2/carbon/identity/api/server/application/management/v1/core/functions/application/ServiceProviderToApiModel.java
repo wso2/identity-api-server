@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -27,56 +27,31 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Authenticat
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
-import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
-import org.wso2.carbon.identity.api.server.application.management.v1.InboundSCIMProvisioningConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.OutboundProvisioningConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.PropertyModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
-import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfig;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
-import org.wso2.carbon.identity.api.server.common.error.APIError;
-import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
-import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
-import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
-import org.wso2.carbon.identity.application.common.model.InboundProvisioningConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
-import org.wso2.carbon.identity.application.common.model.OutboundProvisioningConfig;
-import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
-import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.PassiveSTS;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
-import org.wso2.carbon.identity.base.IdentityConstants;
-import org.wso2.carbon.identity.base.IdentityException;
-import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
-import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
-import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
-import org.wso2.carbon.security.SecurityConfigException;
-import org.wso2.carbon.security.sts.service.util.TrustedServiceData;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.Response;
-
-import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.JWKS_URI_SP_PROPERTY_NAME;
 
 /**
  * Converts the backend model ServiceProvider into the corresponding API model object.
@@ -173,7 +148,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .getServiceProvider(IdentityApplicationConstants.DEFAULT_SP_CONFIG,
                             MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
         } catch (IdentityApplicationManagementException e) {
-            throw handleServerError(e, "Error while loading default SP configurations.");
+            throw Utils.buildServerErrorResponse(e, "Error while loading default SP configurations.");
         }
         return defaultSP;
     }
@@ -312,47 +287,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
     private ProvisioningConfiguration buildProvisioningConfiguration(ServiceProvider application) {
 
-        ProvisioningConfiguration config = new ProvisioningConfiguration();
-
-        if (application.getInboundProvisioningConfig() != null) {
-            config.inboundProvisioning(buildInboundProvisioningConfig(application.getInboundProvisioningConfig()));
-        }
-
-        if (application.getOutboundProvisioningConfig() != null) {
-            List<OutboundProvisioningConfiguration> provisioningIdps =
-                    buildOutboundProvisioningConfig(application.getOutboundProvisioningConfig());
-
-            if (provisioningIdps != null && !provisioningIdps.isEmpty()) {
-                config.outboundProvisioningIdps(provisioningIdps);
-            }
-        }
-
-        return config;
-    }
-
-    private List<OutboundProvisioningConfiguration> buildOutboundProvisioningConfig(
-            OutboundProvisioningConfig outboundProvisioningConfig) {
-
-        if (outboundProvisioningConfig.getProvisioningIdentityProviders() != null) {
-            return Arrays.stream(outboundProvisioningConfig.getProvisioningIdentityProviders())
-                    .map(new ProvisioningIdpToApiModel())
-                    .collect(Collectors.toList());
-        }
-
-        return null;
-    }
-
-    private InboundSCIMProvisioningConfiguration buildInboundProvisioningConfig(
-            InboundProvisioningConfig inboundProvisioningConfig) {
-
-        if (inboundProvisioningConfig.isDumbMode()) {
-            return new InboundSCIMProvisioningConfiguration().proxyMode(true);
-        } else if (StringUtils.isNotBlank(inboundProvisioningConfig.getProvisioningUserStore())) {
-            return new InboundSCIMProvisioningConfiguration()
-                    .provisioningUserstoreDomain(inboundProvisioningConfig.getProvisioningUserStore());
-        }
-
-        return null;
+        return new BuildProvisioningConfiguration().apply(application);
     }
 
     private AdvancedApplicationConfiguration buildAdvancedAppConfiguration(ServiceProvider serviceProvider) {
@@ -366,164 +301,24 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .saas(serviceProvider.isSaasApp())
                 .enableAuthorization(authConfig.isEnableAuthorization())
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
-                .skipConsent(getSkipConsent(serviceProvider))
+                .skipConsent(authConfig.isSkipConsent())
                 .certificate(getCertificate(serviceProvider));
     }
 
     private Certificate getCertificate(ServiceProvider serviceProvider) {
 
+        Certificate certificate = new Certificate();
         if (StringUtils.isNotBlank(serviceProvider.getCertificateContent())) {
-            return new Certificate().type(Certificate.TypeEnum.PEM).value(serviceProvider.getCertificateContent());
-        } else {
-            // Check whether JWKS URI is configured
-            return Arrays.stream(serviceProvider.getSpProperties())
-                    .filter(spProperty -> StringUtils.equals(spProperty.getName(), JWKS_URI_SP_PROPERTY_NAME))
-                    .findAny()
-                    .map(spProperty -> new Certificate().type(Certificate.TypeEnum.JWKS).value(spProperty.getValue()))
-                    .orElse(null);
+            certificate.type(Certificate.TypeEnum.PEM).value(serviceProvider.getCertificateContent());
+        } else if (StringUtils.isNotBlank(serviceProvider.getJwksUri())) {
+            certificate.type(Certificate.TypeEnum.JWKS).value(serviceProvider.getJwksUri());
         }
-    }
 
-    private boolean getSkipConsent(ServiceProvider serviceProvider) {
-
-        return Arrays.stream(serviceProvider.getSpProperties())
-                .filter(spProperty -> StringUtils.equals(spProperty.getName(), IdentityConstants.SKIP_CONSENT))
-                .findAny()
-                .map(spProperty -> Boolean.parseBoolean(spProperty.getValue()))
-                .orElse(false);
+        return certificate;
     }
 
     private InboundProtocols buildInboundProtocols(InboundAuthenticationConfig inboundAuthenticationConfig) {
 
-        InboundProtocols inboundProtocols = new InboundProtocols();
-
-        InboundAuthenticationRequestConfig[] inboundAuthConfigs =
-                inboundAuthenticationConfig.getInboundAuthenticationRequestConfigs();
-
-        if (inboundAuthConfigs != null) {
-            for (InboundAuthenticationRequestConfig inboundAuth : inboundAuthConfigs) {
-
-                switch (inboundAuth.getInboundAuthType()) {
-                    case StandardInboundProtocols.SAML2:
-                        inboundProtocols.setSaml(buildSaml2Configuration(inboundAuth));
-                        break;
-                    case StandardInboundProtocols.OAUTH2:
-                        inboundProtocols.setOidc(buildOpenIdConnectConfiguration(inboundAuth));
-                        break;
-                    case StandardInboundProtocols.PASSIVE_STS:
-                        inboundProtocols.setPassiveSts(buildPassiveSTSConfiguration(inboundAuth));
-                        break;
-                    case StandardInboundProtocols.WS_TRUST:
-                        inboundProtocols.setWsTrust(buildWsTrustConfiguration(inboundAuth));
-                        break;
-                    case IdentityApplicationConstants.Authenticator.OpenID.NAME:
-                        // We ignore openid now as we do not support it anymore.
-                        break;
-                    default:
-                        // TODO: Validate the inbound before adding..
-                        inboundProtocols.addCustomItem(buildCustomInboundConfig(inboundAuth));
-                        break;
-                }
-            }
-        }
-
-        return inboundProtocols;
-    }
-
-    private CustomInboundProtocolConfiguration buildCustomInboundConfig(InboundAuthenticationRequestConfig inbound) {
-
-        // TODO: add friendly name
-        return new CustomInboundProtocolConfiguration()
-                .name(inbound.getInboundAuthType())
-                .inboundKey(inbound.getInboundAuthKey())
-                .properties(
-                        Optional.ofNullable(inbound.getProperties())
-                                .map(inboundProperties -> Arrays.stream(inboundProperties)
-                                        .map(this::buildPropertyModel
-                                        ).collect(Collectors.toList()))
-                                .orElse(Collections.emptyList()));
-
-    }
-
-    private PropertyModel buildPropertyModel(Property inboundProperty) {
-
-        return new PropertyModel().key(inboundProperty.getName()).value(inboundProperty.getValue());
-    }
-
-    private WSTrustConfiguration buildWsTrustConfiguration(InboundAuthenticationRequestConfig inboundAuth) {
-
-        String audience = inboundAuth.getInboundAuthKey();
-        try {
-            TrustedServiceData[] trustedServices =
-                    ApplicationManagementServiceHolder.getStsAdminService().getTrustedServices();
-
-            // TODO : check whether we need to throw an exception if we can't find a wstrust service
-            return Arrays.stream(trustedServices)
-                    .filter(trustedServiceData -> StringUtils.equals(trustedServiceData.getServiceAddress(), audience))
-                    .findAny()
-                    .map(trustedServiceData -> new WSTrustConfiguration()
-                            .audience(trustedServiceData.getServiceAddress())
-                            .certificateAlias(trustedServiceData.getCertAlias()))
-                    .orElse(new WSTrustConfiguration());
-
-        } catch (SecurityConfigException e) {
-            throw handleServerError(e, "Error while retrieving wsTrust configuration for audience: " + audience);
-        }
-    }
-
-    private PassiveStsConfiguration buildPassiveSTSConfiguration(InboundAuthenticationRequestConfig inboundAuth) {
-
-        return new PassiveStsConfiguration()
-                .realm(inboundAuth.getInboundAuthKey())
-                .replyTo(getPassiveSTSWReply(inboundAuth.getProperties()));
-    }
-
-    private String getPassiveSTSWReply(Property[] properties) {
-
-        // TODO : null check on property array
-        return Arrays.stream(properties)
-                .filter(property -> StringUtils.equals(property.getName(), PassiveSTS.PASSIVE_STS_REPLY_URL))
-                .findAny()
-                .map(Property::getValue).orElse(null);
-    }
-
-    private OpenIDConnectConfiguration buildOpenIdConnectConfiguration(InboundAuthenticationRequestConfig inboundAuth) {
-
-        String clientId = inboundAuth.getInboundAuthKey();
-        try {
-            OAuthConsumerAppDTO oauthApp =
-                    ApplicationManagementServiceHolder.getOAuthAdminService().getOAuthApplicationData(clientId);
-            return new OAuthConsumerAppToApiModel().apply(oauthApp);
-
-        } catch (IdentityOAuthAdminException e) {
-            throw handleServerError(e, "Error while retrieving oauth application data for clientId: " + clientId);
-        }
-    }
-
-    private SAML2Configuration buildSaml2Configuration(InboundAuthenticationRequestConfig inboundAuth) {
-
-        String issuer = inboundAuth.getInboundAuthKey();
-        try {
-            SAMLSSOServiceProviderDTO serviceProvider =
-                    ApplicationManagementServiceHolder.getSamlssoConfigService().getServiceProvider(issuer);
-
-            if (serviceProvider != null) {
-                return new SAMLSSOServiceProviderToAPIModel().apply(serviceProvider);
-            } else {
-                return null;
-            }
-        } catch (IdentityException e) {
-            throw handleServerError(e, "Error while retrieving service provider data for issuer: " + issuer);
-        }
-    }
-
-    private APIError handleServerError(Exception e, String message) {
-
-        // TODO handle errors properly.
-        ErrorResponse.Builder builder = new ErrorResponse.Builder();
-        ErrorResponse errorResponse = builder.build(log, e, message);
-
-        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-        return new APIError(status, errorResponse);
+        return new InboundAuthenticationConfigToApiModel().apply(inboundAuthenticationConfig);
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.saml;
 
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
@@ -31,7 +31,7 @@ public class ApiModelToSAMLSSOServiceProvider implements Function<SAML2ServicePr
         SAMLSSOServiceProviderDTO serviceProviderDTO = new SAMLSSOServiceProviderDTO();
         serviceProviderDTO.setIssuer(sp.getIssuer());
         serviceProviderDTO.setIssuerQualifier(sp.getServiceProviderQualifier());
-        serviceProviderDTO.setAssertionConsumerUrls(sp.getAssertionConsumerUrls().toArray(new String[0]));
+        serviceProviderDTO.setAssertionConsumerUrls(getAssertionConsumerUrls(sp));
         serviceProviderDTO.setDefaultAssertionConsumerUrl(getDefaultAssertionConsumerUrl(sp));
 
         serviceProviderDTO.setDoValidateSignatureInRequests(sp.getEnableRequestSignatureValidation());
@@ -57,6 +57,11 @@ public class ApiModelToSAMLSSOServiceProvider implements Function<SAML2ServicePr
         // TODO fill the rest.
 
         return serviceProviderDTO;
+    }
+
+    private String[] getAssertionConsumerUrls(SAML2ServiceProvider sp) {
+
+        return sp.getAssertionConsumerUrls().toArray(new String[0]);
     }
 
     private boolean isFrontChannelLogoutEnabled(SAML2ServiceProvider sp) {

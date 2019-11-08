@@ -20,6 +20,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.Authenticator;
 import javax.validation.constraints.*;
 
 
@@ -28,49 +31,59 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class RequestedClaimConfiguration  {
+public class AuthenticationStepModel  {
   
-    private String claimUri;
-    private Boolean mandatory = false;
+    private Integer id;
+    private List<Authenticator> options = new ArrayList<>();
+
 
     /**
-    * User claims that need to be sent back to the application. If the claim mappings are local, use local claim uris. If the custom claim mappings are configured, use the mapped applicationClaimUri
+    * minimum: 1
     **/
-    public RequestedClaimConfiguration claimUri(String claimUri) {
+    public AuthenticationStepModel id(Integer id) {
 
-        this.claimUri = claimUri;
+        this.id = id;
         return this;
     }
     
-    @ApiModelProperty(example = "http://wso2.org/claims/givenname", value = "User claims that need to be sent back to the application. If the claim mappings are local, use local claim uris. If the custom claim mappings are configured, use the mapped applicationClaimUri")
-    @JsonProperty("claimUri")
+    @ApiModelProperty(example = "1", required = true, value = "")
+    @JsonProperty("id")
     @Valid
-    public String getClaimUri() {
-        return claimUri;
+    @NotNull(message = "Property id cannot be null.")
+ @Min(1)
+    public Integer getId() {
+        return id;
     }
-    public void setClaimUri(String claimUri) {
-        this.claimUri = claimUri;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     /**
     **/
-    public RequestedClaimConfiguration mandatory(Boolean mandatory) {
+    public AuthenticationStepModel options(List<Authenticator> options) {
 
-        this.mandatory = mandatory;
+        this.options = options;
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "")
-    @JsonProperty("mandatory")
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("options")
     @Valid
-    public Boolean getMandatory() {
-        return mandatory;
+    @NotNull(message = "Property options cannot be null.")
+ @Size(min=1)
+    public List<Authenticator> getOptions() {
+        return options;
     }
-    public void setMandatory(Boolean mandatory) {
-        this.mandatory = mandatory;
+    public void setOptions(List<Authenticator> options) {
+        this.options = options;
     }
 
+    public AuthenticationStepModel addOptionsItem(Authenticator optionsItem) {
+        this.options.add(optionsItem);
+        return this;
+    }
 
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -81,24 +94,24 @@ public class RequestedClaimConfiguration  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RequestedClaimConfiguration requestedClaimConfiguration = (RequestedClaimConfiguration) o;
-        return Objects.equals(this.claimUri, requestedClaimConfiguration.claimUri) &&
-            Objects.equals(this.mandatory, requestedClaimConfiguration.mandatory);
+        AuthenticationStepModel authenticationStepModel = (AuthenticationStepModel) o;
+        return Objects.equals(this.id, authenticationStepModel.id) &&
+            Objects.equals(this.options, authenticationStepModel.options);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(claimUri, mandatory);
+        return Objects.hash(id, options);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class RequestedClaimConfiguration {\n");
+        sb.append("class AuthenticationStepModel {\n");
         
-        sb.append("    claimUri: ").append(toIndentedString(claimUri)).append("\n");
-        sb.append("    mandatory: ").append(toIndentedString(mandatory)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    options: ").append(toIndentedString(options)).append("\n");
         sb.append("}");
         return sb.toString();
     }

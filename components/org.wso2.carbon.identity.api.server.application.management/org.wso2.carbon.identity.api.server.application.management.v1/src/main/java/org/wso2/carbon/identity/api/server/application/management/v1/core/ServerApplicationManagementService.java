@@ -15,7 +15,9 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,27 +27,53 @@ import org.wso2.carbon.identity.api.server.application.management.common.Applica
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
 import org.wso2.carbon.identity.api.server.application.management.v1.Link;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.ApiModelToServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.ApplicationBasicInfoToApiModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.ServiceProviderToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.DeepCopyServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToCustomInbound;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationBasicInfoToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.InboundAuthenticationConfigToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.PatchServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.oauth2.OAuthConsumerAppToApiModel;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
 import org.wso2.carbon.identity.application.common.model.ImportResponse;
+import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
+import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
+import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
+import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
@@ -78,7 +106,6 @@ public class ServerApplicationManagementService {
 
         handleNotImplementedCapabilities(sortBy, sortOrder, requiredAttributes);
 
-        // TODO: define default limit at swagger
         // TODO: define a default pagination max limit for identity data..
         limit = (limit != null && limit > 0 && limit <= DEFAULT_LIMIT_MAX) ? limit : DEFAULT_LIMIT;
         offset = (offset != null && offset > 0) ? offset : 0;
@@ -110,18 +137,8 @@ public class ServerApplicationManagementService {
 
     public ApplicationModel getApplication(String applicationId) {
 
-        try {
-            String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            ServiceProvider application =
-                    getApplicationManagementService().getApplicationByResourceId(applicationId, tenantDomain);
-            if (application == null) {
-                throw buildApiError(ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND, applicationId, tenantDomain);
-            }
-            return new ServiceProviderToApiModel().apply(application);
-        } catch (IdentityApplicationManagementException e) {
-            String msg = "Error while retrieving application with id: " + applicationId;
-            throw handleIdentityApplicationManagementException(e, msg);
-        }
+        ServiceProvider application = getServiceProvider(applicationId);
+        return new ServiceProviderToApiModel().apply(application);
     }
 
     /**
@@ -138,7 +155,7 @@ public class ServerApplicationManagementService {
             return getApplicationManagementService().exportSPApplicationFromAppID(
                     applicationId, exportSecrets, tenantDomain);
         } catch (IdentityApplicationManagementClientException e) {
-            throw handleClientError(e, ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND);
+            throw buildClientError(e, ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND);
         } catch (IdentityApplicationManagementException e) {
             throw buildServerError(e, "Error while retrieving application with id: " + applicationId);
         }
@@ -170,9 +187,10 @@ public class ServerApplicationManagementService {
             } else {
                 throw buildApiError(ErrorMessage.ERROR_IMPORTING_APPLICATION);
             }
-        } catch (IOException | IdentityApplicationManagementException e) {
-            // TODO: 2019-11-08 need to handle client error once Framework changes are merged.
-            throw buildServerError(e, "Error while importing application from XML file.");
+        } catch (IOException e) {
+            throw handleServerError(e, "Error while importing application from XML file.");
+        } catch (IdentityApplicationManagementException e) {
+            throw handleIdentityApplicationManagementException(e, "Error while importing application from XML file.");
         } finally {
             IOUtils.closeQuietly(fileInputStream);
         }
@@ -190,37 +208,201 @@ public class ServerApplicationManagementService {
         }
     }
 
-    public void updateApplication(String applicationId, ApplicationModel applicationModel) {
-
-        String username = ContextLoader.getUsernameFromContext();
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        try {
-            ServiceProvider updatedApp = new ApiModelToServiceProvider().apply(applicationModel);
-            getApplicationManagementService()
-                    .updateApplicationByResourceId(applicationId, updatedApp, tenantDomain, username);
-        } catch (IdentityApplicationManagementException e) {
-            String msg = "Error while updating application with id: " + applicationId;
-            throw handleIdentityApplicationManagementException(e, msg);
-        }
-
-    }
-
     public ApplicationModel createApplication(ApplicationModel applicationModel) {
 
         String username = ContextLoader.getUsernameFromContext();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        try {
-            ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
 
+        ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
+        try {
             ServiceProvider createdApp = getApplicationManagementService()
                     .createApplication(application, tenantDomain, username);
             return new ServiceProviderToApiModel().apply(createdApp);
         } catch (IdentityApplicationManagementException e) {
+            Utils.rollbackInbounds(getInboundAuthenticationRequestConfigs(application));
             String msg = "Error while creating application with name '%s' in tenantDomain: %s.";
             msg = String.format(msg, applicationModel.getName(), tenantDomain);
-
             throw handleIdentityApplicationManagementException(e, msg);
         }
+    }
+
+    public ResidentApplication getResidentApplication() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            ServiceProvider application =
+                    getApplicationManagementService().getServiceProvider(ApplicationConstants.LOCAL_SP, tenantDomain);
+            if (application == null) {
+                throw Utils.buildServerErrorResponse("Resident application cannot be found for tenantDomain: " +
+                        tenantDomain);
+            }
+
+            ProvisioningConfiguration provisioningConfig = new BuildProvisioningConfiguration().apply(application);
+            return new ResidentApplication().provisioningConfigurations(provisioningConfig);
+
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error while retrieving resident application of tenantDomain: " + tenantDomain;
+            throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+
+    public void deleteOAuthInbound(String applicationId) {
+
+        deleteInbound(applicationId, FrameworkConstants.StandardInboundProtocols.OAUTH2);
+    }
+
+    public void deleteSAMLInbound(String applicationId) {
+
+        deleteInbound(applicationId, FrameworkConstants.StandardInboundProtocols.SAML2);
+    }
+
+    public void deletePassiveStsInbound(String applicationId) {
+
+        deleteInbound(applicationId, FrameworkConstants.StandardInboundProtocols.PASSIVE_STS);
+    }
+
+    public void deleteWSTrustInbound(String applicationId) {
+
+        deleteInbound(applicationId, FrameworkConstants.StandardInboundProtocols.WS_TRUST);
+    }
+
+    public void deleteCustomInbound(String applicationId, String customInboundType) {
+
+        deleteInbound(applicationId, customInboundType);
+    }
+
+    public OpenIDConnectConfiguration getInboundOAuthConfiguration(String applicationId) {
+
+        return getInboundProtocols(applicationId).getOidc();
+    }
+
+    public SAML2ServiceProvider getInboundSAMLConfiguration(String applicationId) {
+
+        SAML2Configuration saml2Config = getInboundProtocols(applicationId).getSaml();
+        return saml2Config != null ? saml2Config.getServiceProvider() : null;
+    }
+
+    public PassiveStsConfiguration getPassiveStsConfiguration(String applicationId) {
+
+        return getInboundProtocols(applicationId).getPassiveSts();
+    }
+
+    public WSTrustConfiguration getWSTrustConfiguration(String applicationId) {
+
+        return getInboundProtocols(applicationId).getWsTrust();
+    }
+
+    public CustomInboundProtocolConfiguration getCustomInboundConfiguration(String applicationId,
+                                                                            String inboundProtocolId) {
+
+        List<CustomInboundProtocolConfiguration> custom = getInboundProtocols(applicationId).getCustom();
+        if (CollectionUtils.isNotEmpty(custom)) {
+            return custom.stream()
+                    .filter(inbound -> StringUtils.equals(inbound.getName(), inboundProtocolId))
+                    .findAny()
+                    .orElse(null);
+        }
+        return null;
+    }
+
+    public OpenIDConnectConfiguration regenerateOAuthApplicationSecret(String applicationId) {
+
+        OpenIDConnectConfiguration inboundOAuthConfiguration = getInboundOAuthConfiguration(applicationId);
+        if (inboundOAuthConfiguration == null) {
+            // TODO: improve error code.
+            throw buildClientError(ErrorMessage.ERROR_INBOUND_PROTOCOL_NOT_FOUND);
+        } else {
+            String clientId = inboundOAuthConfiguration.getClientId();
+            try {
+                OAuthConsumerAppDTO oAuthConsumerAppDTO = ApplicationManagementServiceHolder.getOAuthAdminService()
+                        .updateAndRetrieveOauthSecretKey(clientId);
+                return new OAuthConsumerAppToApiModel().apply(oAuthConsumerAppDTO);
+            } catch (IdentityOAuthAdminException e) {
+                throw Utils.buildServerErrorResponse(e, "Error while regenerating client secret of oauth application.");
+            }
+        }
+    }
+
+    public void updateCustomInbound(String applicationId,
+                                    String inboundType,
+                                    CustomInboundProtocolConfiguration customInboundModel) {
+
+        ServiceProvider app = getClonedServiceProvider(applicationId);
+        InboundAuthenticationRequestConfig customInbound = new ApiModelToCustomInbound().apply(customInboundModel);
+
+        InboundAuthenticationConfig inboundAuthenticationConfig = app.getInboundAuthenticationConfig();
+        if (app.getInboundAuthenticationConfig() == null) {
+            inboundAuthenticationConfig = new InboundAuthenticationConfig();
+        }
+
+        updateCustomInbound(inboundType, customInbound, inboundAuthenticationConfig);
+        app.setInboundAuthenticationConfig(inboundAuthenticationConfig);
+
+        try {
+            String username = ContextLoader.getUsernameFromContext();
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+
+            getApplicationManagementService().updateApplicationByResourceId(applicationId, app, tenantDomain, username);
+        } catch (IdentityApplicationManagementException e) {
+            throw handleIdentityApplicationManagementException(e, "Error while updating inbound type: " + inboundType);
+        }
+    }
+
+    private void deleteInbound(String applicationId, String inboundType) {
+
+        ServiceProvider serviceProvider = getClonedServiceProvider(applicationId);
+        InboundAuthenticationConfig inboundAuthConfig = serviceProvider.getInboundAuthenticationConfig();
+
+        if (ArrayUtils.isNotEmpty(inboundAuthConfig.getInboundAuthenticationRequestConfigs())) {
+            // Remove the delete inbound configuration.
+            InboundAuthenticationRequestConfig[] filteredInbounds =
+                    Arrays.stream(inboundAuthConfig.getInboundAuthenticationRequestConfigs())
+                            .filter(inbound -> !StringUtils.equals(inboundType, inbound.getInboundAuthType()))
+                            .toArray(InboundAuthenticationRequestConfig[]::new);
+
+            serviceProvider.getInboundAuthenticationConfig().setInboundAuthenticationRequestConfigs(filteredInbounds);
+
+            try {
+                String tenantDomain = ContextLoader.getTenantDomainFromContext();
+                String username = ContextLoader.getUsernameFromContext();
+
+                ApplicationManagementServiceHolder.getApplicationManagementService()
+                        .updateApplicationByResourceId(applicationId, serviceProvider, tenantDomain, username);
+            } catch (IdentityApplicationManagementException e) {
+                String msg = "Error while deleting inbound type: " + inboundType + ".";
+                throw handleIdentityApplicationManagementException(e, msg);
+            }
+        }
+    }
+
+    private ServiceProvider getClonedServiceProvider(String applicationId) {
+
+        ServiceProvider originalSp = getServiceProvider(applicationId);
+        return new DeepCopyServiceProvider().apply(originalSp);
+    }
+
+    private ServiceProvider getServiceProvider(String applicationId) {
+
+        ServiceProvider application;
+        try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            application = getApplicationManagementService().getApplicationByResourceId(applicationId, tenantDomain);
+            if (application == null) {
+                throw buildApiError(ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND, applicationId, tenantDomain);
+            }
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error while retrieving application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
+        }
+        return application;
+    }
+
+    private List<InboundAuthenticationRequestConfig> getInboundAuthenticationRequestConfigs(ServiceProvider app) {
+
+        if (app.getInboundAuthenticationConfig() != null) {
+            return Arrays.asList(app.getInboundAuthenticationConfig().getInboundAuthenticationRequestConfigs());
+        }
+        return Collections.emptyList();
     }
 
     private APIError handleIdentityApplicationManagementException(IdentityApplicationManagementException e,
@@ -252,6 +434,18 @@ public class ServerApplicationManagementService {
         return new APIError(status, errorResponse);
     }
 
+    private APIError handleServerError(Exception e, String message) {
+
+        ErrorResponse.Builder builder = new ErrorResponse.Builder();
+
+        ErrorResponse errorResponse = builder
+                .withMessage(e.getMessage())
+                .build(LOG, e, message);
+
+        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+        return new APIError(status, errorResponse);
+    }
+
     private APIError buildClientError(IdentityApplicationManagementException e, String message) {
 
         ErrorResponse.Builder builder = new ErrorResponse.Builder();
@@ -264,6 +458,25 @@ public class ServerApplicationManagementService {
 
         Response.Status status = Response.Status.BAD_REQUEST;
         return new APIError(status, errorResponse);
+    }
+
+    private APIError buildClientError(Exception e, ErrorMessage errorEnum) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorEnum.getCode())
+                .withDescription(e.getMessage())
+                .withMessage(errorEnum.getMessage())
+                .build(LOG, errorEnum.getDescription());
+        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
+    }
+
+    private APIError buildClientError(ErrorMessage errorEnum) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorEnum.getCode())
+                .withMessage(errorEnum.getMessage())
+                .build(LOG, errorEnum.getDescription());
+        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
     }
 
     private List<ApplicationListItem> getApplicationListItems(ApplicationBasicInfo[] allApplicationBasicInfo) {
@@ -370,6 +583,54 @@ public class ServerApplicationManagementService {
             return String.format(description, formatData);
         } else {
             return description;
+        }
+    }
+
+    private InboundProtocols getInboundProtocols(String applicationId) {
+
+        ServiceProvider serviceProvider = getServiceProvider(applicationId);
+        return new InboundAuthenticationConfigToApiModel().apply(serviceProvider.getInboundAuthenticationConfig());
+    }
+
+    private void updateCustomInbound(String inboundProtocolId,
+                                     InboundAuthenticationRequestConfig customInbound,
+                                     InboundAuthenticationConfig inboundAuthenticationConfig) {
+
+        if (ArrayUtils.isEmpty(inboundAuthenticationConfig.getInboundAuthenticationRequestConfigs())) {
+
+            InboundAuthenticationRequestConfig[] inboundAuthenticationRequestConfigs = {customInbound};
+            inboundAuthenticationConfig.setInboundAuthenticationRequestConfigs(inboundAuthenticationRequestConfigs);
+        } else {
+            // Create a inbound type - inbound map
+            Map<String, InboundAuthenticationRequestConfig> inboundMap =
+                    Arrays.stream(inboundAuthenticationConfig.getInboundAuthenticationRequestConfigs())
+                            .collect(Collectors.toMap(InboundAuthenticationRequestConfig::getInboundAuthType,
+                                    Function.identity()));
+            // Upsert the custom inbound.
+            inboundMap.put(inboundProtocolId, customInbound);
+
+            InboundAuthenticationRequestConfig[] updatedInboundAuthConfigs =
+                    inboundMap.values().toArray(new InboundAuthenticationRequestConfig[0]);
+            inboundAuthenticationConfig.setInboundAuthenticationRequestConfigs(updatedInboundAuthConfigs);
+        }
+    }
+
+    public ApplicationModel patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
+
+        ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
+        new PatchServiceProvider().accept(appToUpdate, applicationPatchModel);
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        String username = ContextLoader.getUsernameFromContext();
+        try {
+            getApplicationManagementService()
+                    .updateApplicationByResourceId(applicationId, appToUpdate, tenantDomain, username);
+
+            ServiceProvider updatedApp =
+                    getApplicationManagementService().getApplicationByResourceId(applicationId, tenantDomain);
+            return new ServiceProviderToApiModel().apply(updatedApp);
+        } catch (IdentityApplicationManagementException e) {
+            throw handleIdentityApplicationManagementException(e, "Error while patching application: " + applicationId);
         }
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.saml;
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
@@ -40,6 +40,8 @@ public class SAMLSSOServiceProviderToAPIModel implements Function<SAMLSSOService
                         .serviceProviderQualifier(dto.getIssuerQualifier())
                         .defaultAssertionConsumerUrl(dto.getDefaultAssertionConsumerUrl())
                         .assertionConsumerUrls(Arrays.asList(dto.getAssertionConsumerUrls()))
+
+                        .attributeConsumingServiceIndex(dto.getAttributeConsumingServiceIndex())
 
                         .nameIdFormat(dto.getNameIDFormat())
                         .requestValidationCertificateAlias(dto.getCertAlias())

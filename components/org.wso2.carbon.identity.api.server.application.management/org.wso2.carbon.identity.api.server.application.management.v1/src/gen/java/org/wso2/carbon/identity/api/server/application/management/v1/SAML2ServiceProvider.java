@@ -37,6 +37,7 @@ public class SAML2ServiceProvider  {
     private List<String> assertionConsumerUrls = new ArrayList<>();
 
     private String defaultAssertionConsumerUrl;
+    private String attributeConsumingServiceIndex;
     private Boolean enableRequestSignatureValidation = true;
     private Boolean enableAssertionEncryption = false;
     private String assertionEncryptionAlgroithm;
@@ -148,7 +149,7 @@ public enum SingleLogoutMethodEnum {
     @JsonProperty("assertionConsumerUrls")
     @Valid
     @NotNull(message = "Property assertionConsumerUrls cannot be null.")
-
+ @Size(min=1)
     public List<String> getAssertionConsumerUrls() {
         return assertionConsumerUrls;
     }
@@ -177,6 +178,24 @@ public enum SingleLogoutMethodEnum {
     }
     public void setDefaultAssertionConsumerUrl(String defaultAssertionConsumerUrl) {
         this.defaultAssertionConsumerUrl = defaultAssertionConsumerUrl;
+    }
+
+    /**
+    **/
+    public SAML2ServiceProvider attributeConsumingServiceIndex(String attributeConsumingServiceIndex) {
+
+        this.attributeConsumingServiceIndex = attributeConsumingServiceIndex;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("attributeConsumingServiceIndex")
+    @Valid
+    public String getAttributeConsumingServiceIndex() {
+        return attributeConsumingServiceIndex;
+    }
+    public void setAttributeConsumingServiceIndex(String attributeConsumingServiceIndex) {
+        this.attributeConsumingServiceIndex = attributeConsumingServiceIndex;
     }
 
     /**
@@ -656,6 +675,7 @@ public enum SingleLogoutMethodEnum {
             Objects.equals(this.serviceProviderQualifier, saML2ServiceProvider.serviceProviderQualifier) &&
             Objects.equals(this.assertionConsumerUrls, saML2ServiceProvider.assertionConsumerUrls) &&
             Objects.equals(this.defaultAssertionConsumerUrl, saML2ServiceProvider.defaultAssertionConsumerUrl) &&
+            Objects.equals(this.attributeConsumingServiceIndex, saML2ServiceProvider.attributeConsumingServiceIndex) &&
             Objects.equals(this.enableRequestSignatureValidation, saML2ServiceProvider.enableRequestSignatureValidation) &&
             Objects.equals(this.enableAssertionEncryption, saML2ServiceProvider.enableAssertionEncryption) &&
             Objects.equals(this.assertionEncryptionAlgroithm, saML2ServiceProvider.assertionEncryptionAlgroithm) &&
@@ -684,7 +704,7 @@ public enum SingleLogoutMethodEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(issuer, serviceProviderQualifier, assertionConsumerUrls, defaultAssertionConsumerUrl, enableRequestSignatureValidation, enableAssertionEncryption, assertionEncryptionAlgroithm, keyEncryptionAlgorithm, nameIdFormat, enableIdpInitiatedSingleSignOn, enableResponseSigning, requestValidationCertificateAlias, responseSigningAlgorithm, responseDigestAlgorithm, enableSingleLogout, singleLogoutResponseUrl, singleLogoutRequestUrl, singleLogoutMethod, enableIdpInitiatedSingleLogOut, idpInitiatedLogoutReturnUrls, enableAttributeProfile, includedAttributeInResponseAlways, audiences, recipients, enableAssertionQueryProfile, enableSAML2ArtifactBinding, enableSignatureValidationInArtifactBinding, idPEntityidAlias);
+        return Objects.hash(issuer, serviceProviderQualifier, assertionConsumerUrls, defaultAssertionConsumerUrl, attributeConsumingServiceIndex, enableRequestSignatureValidation, enableAssertionEncryption, assertionEncryptionAlgroithm, keyEncryptionAlgorithm, nameIdFormat, enableIdpInitiatedSingleSignOn, enableResponseSigning, requestValidationCertificateAlias, responseSigningAlgorithm, responseDigestAlgorithm, enableSingleLogout, singleLogoutResponseUrl, singleLogoutRequestUrl, singleLogoutMethod, enableIdpInitiatedSingleLogOut, idpInitiatedLogoutReturnUrls, enableAttributeProfile, includedAttributeInResponseAlways, audiences, recipients, enableAssertionQueryProfile, enableSAML2ArtifactBinding, enableSignatureValidationInArtifactBinding, idPEntityidAlias);
     }
 
     @Override
@@ -697,6 +717,7 @@ public enum SingleLogoutMethodEnum {
         sb.append("    serviceProviderQualifier: ").append(toIndentedString(serviceProviderQualifier)).append("\n");
         sb.append("    assertionConsumerUrls: ").append(toIndentedString(assertionConsumerUrls)).append("\n");
         sb.append("    defaultAssertionConsumerUrl: ").append(toIndentedString(defaultAssertionConsumerUrl)).append("\n");
+        sb.append("    attributeConsumingServiceIndex: ").append(toIndentedString(attributeConsumingServiceIndex)).append("\n");
         sb.append("    enableRequestSignatureValidation: ").append(toIndentedString(enableRequestSignatureValidation)).append("\n");
         sb.append("    enableAssertionEncryption: ").append(toIndentedString(enableAssertionEncryption)).append("\n");
         sb.append("    assertionEncryptionAlgroithm: ").append(toIndentedString(assertionEncryptionAlgroithm)).append("\n");

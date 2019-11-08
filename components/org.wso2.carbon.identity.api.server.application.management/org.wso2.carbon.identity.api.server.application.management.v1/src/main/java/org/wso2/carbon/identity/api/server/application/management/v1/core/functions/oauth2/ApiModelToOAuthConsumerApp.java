@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.oauth2;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -23,12 +23,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.OAuth2PKCEC
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCLogoutConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RefreshTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 /**
@@ -41,6 +43,7 @@ public class ApiModelToOAuthConsumerApp implements Function<OpenIDConnectConfigu
 
         OAuthConsumerAppDTO consumerAppDTO = new OAuthConsumerAppDTO();
 
+        consumerAppDTO.setApplicationName(UUID.randomUUID().toString());
         consumerAppDTO.setOauthConsumerKey(oidcModel.getClientId());
         consumerAppDTO.setOauthConsumerSecret(oidcModel.getClientSecret());
 
@@ -49,7 +52,7 @@ public class ApiModelToOAuthConsumerApp implements Function<OpenIDConnectConfigu
         consumerAppDTO.setOAuthVersion(OAuthConstants.OAuthVersions.VERSION_2);
         consumerAppDTO.setUsername(ContextLoader.getUsernameFromContext());
 
-        consumerAppDTO.setGrantTypes(StringUtils.join(oidcModel.getGrantTypes(), " "));
+        consumerAppDTO.setGrantTypes(getGrantTypes(oidcModel));
         consumerAppDTO.setScopeValidators(getScopeValidators(oidcModel));
 
         consumerAppDTO.setBypassClientCredentials(oidcModel.getPublicClient());
@@ -65,15 +68,31 @@ public class ApiModelToOAuthConsumerApp implements Function<OpenIDConnectConfigu
         return consumerAppDTO;
     }
 
+    private String getGrantTypes(OpenIDConnectConfiguration oidcModel) {
+
+        if (CollectionUtils.isEmpty(oidcModel.getGrantTypes())) {
+            return null;
+        } else {
+            return StringUtils.join(oidcModel.getGrantTypes(), " ");
+        }
+    }
+
     private void updateOidcLogoutConfiguration(OAuthConsumerAppDTO consumerAppDTO, OIDCLogoutConfiguration logout) {
 
+        if (logout != null) {
+            consumerAppDTO.setBackChannelLogoutUrl(logout.getBackChannelLogoutUrl());
+            consumerAppDTO.setFrontchannelLogoutUrl(logout.getFrontChannelLogoutUrl());
+        }
     }
 
     private void updateIdTokenConfiguration(OAuthConsumerAppDTO consumerAppDTO, IdTokenConfiguration idToken) {
 
         if (idToken != null) {
             consumerAppDTO.setIdTokenExpiryTime(idToken.getExpiryInSeconds());
-//            consumerAppDTO.setAudiences(Optional.o);
+            consumerAppDTO.setAudiences(Optional.ofNullable(idToken.getAudience())
+                    .map(audiences -> audiences.toArray(new String[0]))
+                    .orElse(new String[0])
+            );
         }
     }
 
