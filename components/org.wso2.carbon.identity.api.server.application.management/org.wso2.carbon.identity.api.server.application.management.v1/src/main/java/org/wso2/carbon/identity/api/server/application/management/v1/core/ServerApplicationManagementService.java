@@ -143,6 +143,13 @@ public class ServerApplicationManagementService {
         }
     }
 
+    /**
+     * Create a new application by importing an XML configuration file.
+     *
+     * @param fileInputStream File to be imported as an input stream.
+     * @param fileDetail      File details.
+     * @return An application model of the created application.
+     */
     public ApplicationModel importApplication(InputStream fileInputStream, Attachment fileDetail) {
 
         try {
@@ -165,6 +172,8 @@ public class ServerApplicationManagementService {
         } catch (IOException | IdentityApplicationManagementException e) {
             // TODO: 2019-11-08 need to handle client error once Framework changes are merged.
             throw handleServerError(e, "Error while importing application from XML file.");
+        } finally {
+            IOUtils.closeQuietly(fileInputStream);
         }
     }
 
