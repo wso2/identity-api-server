@@ -17,6 +17,10 @@
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
@@ -24,6 +28,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Authenticat
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
+import java.io.File;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
@@ -338,6 +343,30 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/{applicationId}/export")
+    
+    @Produces({ "application/octet-stream", "application/json" })
+    @ApiOperation(value = "Export an application as an XML file. ", notes = "This API provides the capability to retrive the application as an XML file. ", response = Object.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Applications", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = Object.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response exportApplication(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId,     @Valid@ApiParam(value = "Specifies whether to export secrets when exporting an application. ", defaultValue="false") @DefaultValue("false")  @QueryParam("exportSecrets") Boolean exportSecrets) {
+
+        return delegate.exportApplication(applicationId,  exportSecrets );
+    }
+
+    @Valid
+    @GET
     @Path("/{applicationId}/advanced-configs")
     
     @Produces({ "application/json" })
@@ -645,6 +674,30 @@ public class ApplicationsApi  {
     public Response getWSTrustConfiguration(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getWSTrustConfiguration(applicationId );
+    }
+
+    @Valid
+    @POST
+    @Path("/import")
+    @Consumes({ "multipart/form-data" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Import an application from file. ", notes = "This API provides the capability to store the application information, provided as a file. ", response = ApplicationModel.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Applications", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Successfully created.", response = ApplicationModel.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response importApplication( @Multipart(value = "file", required = false) InputStream fileInputStream, @Multipart(value = "file" , required = false) Attachment fileDetail) {
+
+        return delegate.importApplication(fileInputStream, fileDetail );
     }
 
     @Valid

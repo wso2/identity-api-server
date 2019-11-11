@@ -60,6 +60,9 @@ public class ApplicationManagementConstants {
                 Response.Status.NOT_FOUND,
                 "Application not found.",
                 "Application cannot be found for the provided id: %s in the tenantDomain: %s."),
+        ERROR_IMPORTING_APPLICATION("50006", Response.Status.INTERNAL_SERVER_ERROR,
+                "Importing application failed.",
+                "Unexpected error occurred while importing the application from file."),
 
         // Server Errors.
         ERROR_CODE_SORTING_NOT_IMPLEMENTED("55001",

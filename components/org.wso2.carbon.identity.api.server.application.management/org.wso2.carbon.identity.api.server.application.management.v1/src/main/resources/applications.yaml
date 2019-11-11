@@ -146,7 +146,70 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
+  /applications/import:
+    post:
+      tags:
+        - Applications
+      summary: |
+        Import an application from file.
+      operationId: importApplication
+      description: >
+        This API provides the capability to store the application information,
+        provided as a file.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: file to upload
+        description: This represents the application to be created.
+        required: true
+      responses:
+        '201':
+          description: Successfully created.
+          headers:
+            Location:
+              description: Location of the newly created application.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   '/applications/{applicationId}':
     get:
       tags:
@@ -340,6 +403,60 @@ paths:
       x-wso2-request: ''
       x-wso2-response: |
         "HTTP/1.1 200 Ok"
+  /applications/{applicationId}/export:
+    get:
+      tags:
+        - Applications
+      operationId: exportApplication
+      summary: |
+        Export an application as an XML file.
+      description: |
+        This API provides the capability to retrive the application as an XML file.
+      parameters:
+        - name: applicationId
+          in: path
+          description: Id of the application.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/exportSecretsQueryParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                example: 'Sample application configuration xml as a string'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /applications/resident:
     get:
       tags:
@@ -2685,6 +2802,15 @@ components:
         _This parameter is not supported yet_
       schema:
         type: string
+    exportSecretsQueryParam:
+      in: query
+      name: exportSecrets
+      required: false
+      description: |
+        Specifies whether to export secrets when exporting an application.
+      schema:
+        type: boolean
+        default: false
   securitySchemes:
     BasicAuth:
       type: http
