@@ -15,9 +15,11 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListItem;
@@ -30,11 +32,17 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
+import org.wso2.carbon.identity.application.common.model.ImportResponse;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -115,6 +123,60 @@ public class ServerApplicationManagementService {
         }
     }
 
+    /**
+     * Export an application identified by the applicationId, as an XML string.
+     *
+     * @param applicationId ID of the application to be exported.
+     * @param exportSecrets If True, all hashed or encrypted secrets will also be exported.
+     * @return XML string of the application.
+     */
+    public String exportApplication(String applicationId, Boolean exportSecrets) {
+
+        try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            return getApplicationManagementService().exportSPApplicationFromAppID(
+                    applicationId, exportSecrets, tenantDomain);
+        } catch (IdentityApplicationManagementClientException e) {
+            throw handleClientError(e, ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND);
+        } catch (IdentityApplicationManagementException e) {
+            throw handleServerError(e, "Error while retrieving application with id: " + applicationId);
+        }
+    }
+
+    /**
+     * Create a new application by importing an XML configuration file.
+     *
+     * @param fileInputStream File to be imported as an input stream.
+     * @param fileDetail      File details.
+     * @return An application model of the created application.
+     */
+    public ApplicationModel importApplication(InputStream fileInputStream, Attachment fileDetail) {
+
+        try {
+            SpFileContent spFileContent = new SpFileContent();
+            spFileContent.setContent(IOUtils.toString(fileInputStream, StandardCharsets.UTF_8.name()));
+            spFileContent.setFileName(fileDetail.getDataHandler().getName());
+
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            String username = ContextLoader.getUsernameFromContext();
+            ImportResponse importResponse = getApplicationManagementService().importSPApplication(
+                    spFileContent, tenantDomain, username, false);
+            if (importResponse.getResponseCode() == ImportResponse.CREATED) {
+                ServiceProvider application =
+                        getApplicationManagementService().getApplicationExcludingFileBasedSPs(
+                                importResponse.getApplicationName(), tenantDomain);
+                return new ServiceProviderToApiModel().apply(application);
+            } else {
+                throw buildApiError(ErrorMessage.ERROR_IMPORTING_APPLICATION);
+            }
+        } catch (IOException | IdentityApplicationManagementException e) {
+            // TODO: 2019-11-08 need to handle client error once Framework changes are merged.
+            throw handleServerError(e, "Error while importing application from XML file.");
+        } finally {
+            IOUtils.closeQuietly(fileInputStream);
+        }
+    }
+
     public void deleteApplication(String applicationId) {
 
         String username = ContextLoader.getUsernameFromContext();
@@ -149,7 +211,8 @@ public class ServerApplicationManagementService {
                     .createApplication(application, tenantDomain, username);
             return new ServiceProviderToApiModel().apply(createdApp);
         } catch (IdentityApplicationManagementException e) {
-            throw handleServerError(e, "Error while updating application with name: " + applicationModel.getName());
+            throw handleServerError(e, "Error while updating application with name: " +
+                    applicationModel.getName());
         }
     }
 
@@ -157,6 +220,16 @@ public class ServerApplicationManagementService {
 
         // TODO: prev and next
         return new ArrayList<>();
+    }
+
+    private APIError handleClientError(Exception e, ErrorMessage errorEnum) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorEnum.getCode())
+                .withDescription(e.getMessage())
+                .withMessage(errorEnum.getMessage())
+                .build(LOG, errorEnum.getDescription());
+        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
     }
 
     private APIError handleServerError(Exception e, String message) {
