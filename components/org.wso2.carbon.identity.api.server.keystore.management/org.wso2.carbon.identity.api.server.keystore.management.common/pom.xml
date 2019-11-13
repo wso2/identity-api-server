@@ -21,12 +21,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
-        <artifactId>org.wso2.carbon.identity.api.server.keystore</artifactId>
+        <artifactId>org.wso2.carbon.identity.api.server.keystore.management</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.0.41-SNAPSHOT</version>
+        <version>1.0.42-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.identity.api.server.keystore.common</artifactId>
+    <artifactId>org.wso2.carbon.identity.api.server.keystore.management.common</artifactId>
     <packaging>jar</packaging>
     <name>WSO2 Identity Server - Common Keystore Rest API v1</name>
     <description>WSO2 Identity Server - Common Keystore Rest API v1</description>

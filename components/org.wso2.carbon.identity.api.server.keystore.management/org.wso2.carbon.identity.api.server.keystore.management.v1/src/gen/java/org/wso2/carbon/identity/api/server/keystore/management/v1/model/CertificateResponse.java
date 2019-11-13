@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package org.wso2.carbon.identity.api.server.keystore.v1.model;
+package org.wso2.carbon.identity.api.server.keystore.management.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -29,14 +29,14 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class CertificatesResponse  {
+public class CertificateResponse  {
   
     private String alias;
     private URI certificate;
 
     /**
     **/
-    public CertificatesResponse alias(String alias) {
+    public CertificateResponse alias(String alias) {
 
         this.alias = alias;
         return this;
@@ -56,7 +56,7 @@ public class CertificatesResponse  {
 
     /**
     **/
-    public CertificatesResponse certificate(URI certificate) {
+    public CertificateResponse certificate(URI certificate) {
 
         this.certificate = certificate;
         return this;
@@ -85,9 +85,9 @@ public class CertificatesResponse  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        CertificatesResponse certificatesResponse = (CertificatesResponse) o;
-        return Objects.equals(this.alias, certificatesResponse.alias) &&
-            Objects.equals(this.certificate, certificatesResponse.certificate);
+        CertificateResponse certificateResponse = (CertificateResponse) o;
+        return Objects.equals(this.alias, certificateResponse.alias) &&
+            Objects.equals(this.certificate, certificateResponse.certificate);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class CertificatesResponse  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class CertificatesResponse {\n");
+        sb.append("class CertificateResponse {\n");
         
         sb.append("    alias: ").append(toIndentedString(alias)).append("\n");
         sb.append("    certificate: ").append(toIndentedString(certificate)).append("\n");

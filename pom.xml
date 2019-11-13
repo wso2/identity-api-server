@@ -348,7 +348,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.keystore.common</artifactId>
+                <artifactId>org.wso2.carbon.identity.api.server.keystore.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>

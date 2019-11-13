@@ -14,13 +14,13 @@
 * limitations under the License.
 */
 
-package org.wso2.carbon.identity.api.server.keystore.v1.impl;
+package org.wso2.carbon.identity.api.server.keystore.management.v1.impl;
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.base.MultitenantConstants;
-import org.wso2.carbon.identity.api.server.keystore.v1.KeystoresApiService;
-import org.wso2.carbon.identity.api.server.keystore.v1.core.KeyStoreService;
-import org.wso2.carbon.identity.api.server.keystore.v1.model.CertificateRequest;
+import org.wso2.carbon.identity.api.server.keystore.management.v1.KeystoresApiService;
+import org.wso2.carbon.identity.api.server.keystore.management.v1.core.KeyStoreService;
+import org.wso2.carbon.identity.api.server.keystore.management.v1.model.CertificateRequest;
 
 import java.net.URI;
 import javax.ws.rs.core.NewCookie;

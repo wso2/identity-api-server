@@ -14,14 +14,14 @@
 * limitations under the License.
 */
 
-package org.wso2.carbon.identity.api.server.keystore.v1;
+package org.wso2.carbon.identity.api.server.keystore.management.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.wso2.carbon.identity.api.server.keystore.v1.model.CertificateRequest;
-import org.wso2.carbon.identity.api.server.keystore.v1.model.CertificatesResponse;
-import org.wso2.carbon.identity.api.server.keystore.v1.model.ErrorResponse;
+import org.wso2.carbon.identity.api.server.keystore.management.v1.model.CertificateRequest;
+import org.wso2.carbon.identity.api.server.keystore.management.v1.model.CertificateResponse;
+import org.wso2.carbon.identity.api.server.keystore.management.v1.model.ErrorResponse;
 import java.io.File;
-import org.wso2.carbon.identity.api.server.keystore.v1.KeystoresApiService;
+import org.wso2.carbon.identity.api.server.keystore.management.v1.KeystoresApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -91,14 +91,14 @@ public class KeystoresApi  {
     @Path("/certs")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "retrieves the list of certificate aliases", notes = "This REST API can be used to get the certificate aliases from the keystore", response = CertificatesResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "retrieves the list of certificate aliases", notes = "This REST API can be used to get the certificate aliases from the keystore", response = CertificateResponse.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Certificates", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK.", response = CertificatesResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "OK.", response = CertificateResponse.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request.", response = ErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = ErrorResponse.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = ErrorResponse.class),
@@ -139,14 +139,14 @@ public class KeystoresApi  {
     @Path("/client-certs")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "retrieves the list of certificate aliases from the client truststore", notes = "This REST API can be used to get the list of certificate aliases from the client truststore", response = CertificatesResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "retrieves the list of certificate aliases from the client truststore", notes = "This REST API can be used to get the list of certificate aliases from the client truststore", response = CertificateResponse.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Certificates", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK.", response = CertificatesResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "OK.", response = CertificateResponse.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request.", response = ErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = ErrorResponse.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = ErrorResponse.class),

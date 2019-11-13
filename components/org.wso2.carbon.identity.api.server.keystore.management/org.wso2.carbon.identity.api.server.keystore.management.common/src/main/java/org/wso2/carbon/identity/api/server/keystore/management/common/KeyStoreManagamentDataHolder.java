@@ -1,4 +1,4 @@
-package org.wso2.carbon.identity.api.server.keystore.common;
+package org.wso2.carbon.identity.api.server.keystore.management.common;
 
 import org.wso2.carbon.security.keystore.KeyStoreManagementService;
 

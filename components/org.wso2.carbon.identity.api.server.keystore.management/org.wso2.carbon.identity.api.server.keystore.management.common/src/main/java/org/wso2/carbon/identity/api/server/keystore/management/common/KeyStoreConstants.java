@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.keystore.common;
+package org.wso2.carbon.identity.api.server.keystore.management.common;
 
 /**
  * Contains all the Keystore Management Service related constants.
@@ -24,6 +24,10 @@ public class KeyStoreConstants {
     public static final String CERTIFICATE_PATH_COMPONENT = "/certs" + "/%s";
     public static final String CLIENT_CERTIFICATE_PATH_COMPONENT = "/client-certs" + "/%s";
 
+    public static final String CERTIFICATE_FILE_EXTENSION = ".cer";
+    public static final String CERTIFICATE_TEMPORARY_DIRECTORY_PATH = "tmp/certs";
+    public static final String PATH_SEPERATOR = "/";
+
     /**
      * Enum for Keystore management service related errors.
      */
@@ -31,7 +35,7 @@ public class KeyStoreConstants {
 
         ERROR_CODE_INVALID_ALIAS("KSS-60010", "There exists no certificate with alias: %s."),
         ERROR_CODE_FILE_WRITE("KSS-65010", "Unable to create file: %s"),
-        ERROR_CODE_ENCODE_CERTIFICATE("KSS-65011", "Unable to encode the certificate.");
+        ERROR_CODE_ENCODE_CERTIFICATE("KSS-65011", "Unable to encode the certificate with alias: %s.");
 
         private final String code;
         private final String message;

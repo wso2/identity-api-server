@@ -14,10 +14,10 @@
 * limitations under the License.
 */
 
-package org.wso2.carbon.identity.api.server.keystore.v1.factories;
+package org.wso2.carbon.identity.api.server.keystore.management.v1.factories;
 
-import org.wso2.carbon.identity.api.server.keystore.v1.KeystoresApiService;
-import org.wso2.carbon.identity.api.server.keystore.v1.impl.KeystoresApiServiceImpl;
+import org.wso2.carbon.identity.api.server.keystore.management.v1.KeystoresApiService;
+import org.wso2.carbon.identity.api.server.keystore.management.v1.impl.KeystoresApiServiceImpl;
 
 public class KeystoresApiServiceFactory {
 

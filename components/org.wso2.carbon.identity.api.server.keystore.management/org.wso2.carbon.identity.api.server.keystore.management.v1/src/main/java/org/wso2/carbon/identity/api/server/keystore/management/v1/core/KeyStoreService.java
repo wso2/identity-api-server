@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.identity.api.server.keystore.v1.core;
+package org.wso2.carbon.identity.api.server.keystore.management.v1.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.keystore.common.KeyStoreConstants;
-import org.wso2.carbon.identity.api.server.keystore.v1.model.CertificatesResponse;
+import org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants;
+import org.wso2.carbon.identity.api.server.keystore.management.v1.model.CertificateResponse;
 import org.wso2.carbon.security.keystore.KeyStoreManagementException;
 import org.wso2.carbon.security.keystore.KeyStoreManagementServerException;
 
@@ -44,13 +45,16 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
-import static org.wso2.carbon.identity.api.server.keystore.common.KeyStoreConstants.CERTIFICATE_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.keystore.common.KeyStoreConstants.CLIENT_CERTIFICATE_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.keystore.common.KeyStoreConstants.ErrorMessage.ERROR_CODE_ENCODE_CERTIFICATE;
-import static org.wso2.carbon.identity.api.server.keystore.common.KeyStoreConstants.ErrorMessage.ERROR_CODE_FILE_WRITE;
-import static org.wso2.carbon.identity.api.server.keystore.common.KeyStoreConstants.ErrorMessage.ERROR_CODE_INVALID_ALIAS;
-import static org.wso2.carbon.identity.api.server.keystore.common.KeyStoreConstants.KEYSTORES_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.keystore.common.KeyStoreManagamentDataHolder.getKeyStoreManager;
+import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.CERTIFICATE_FILE_EXTENSION;
+import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.CERTIFICATE_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.CERTIFICATE_TEMPORARY_DIRECTORY_PATH;
+import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.CLIENT_CERTIFICATE_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.ErrorMessage.ERROR_CODE_ENCODE_CERTIFICATE;
+import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.ErrorMessage.ERROR_CODE_FILE_WRITE;
+import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.ErrorMessage.ERROR_CODE_INVALID_ALIAS;
+import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.KEYSTORES_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.PATH_SEPERATOR;
+import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreManagamentDataHolder.getKeyStoreManager;
 
 /**
  * Keystore service APIs are processed in this class.
@@ -63,9 +67,9 @@ public class KeyStoreService {
      * Retrieves the list of certificates from the keystore.
      *
      * @param filter used to filter the result.
-     * @return {@link List} of {@link CertificatesResponse}
+     * @return {@link List} of {@link CertificateResponse}
      */
-    public List<CertificatesResponse> listCertificateAliases(String filter) {
+    public List<CertificateResponse> listCertificateAliases(String filter) {
 
         List<String> aliasList;
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -143,9 +147,9 @@ public class KeyStoreService {
      * Retrieves the list of certificate aliases from the client truststore.
      *
      * @param filter used to filter the result.
-     * @return {@link List} of {@link CertificatesResponse}
+     * @return {@link List} of {@link CertificateResponse}
      */
-    public List<CertificatesResponse> listClientCertificateAliases(String filter) {
+    public List<CertificateResponse> listClientCertificateAliases(String filter) {
 
         List<String> aliasList;
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -210,9 +214,9 @@ public class KeyStoreService {
         return generateCertificateFile(alias, certificate, encodeCert);
     }
 
-    private List<CertificatesResponse> generateCertificateResponseList(List<String> aliasList, boolean isClientCert) {
+    private List<CertificateResponse> generateCertificateResponseList(List<String> aliasList, boolean isClientCert) {
 
-        List<CertificatesResponse> certificatesResponses = new ArrayList<>();
+        List<CertificateResponse> certificatesResponses = new ArrayList<>();
         String componentPath;
         if (!isClientCert) {
             componentPath = CERTIFICATE_PATH_COMPONENT;
@@ -221,7 +225,7 @@ public class KeyStoreService {
         }
 
         for (String alias : aliasList) {
-            CertificatesResponse certificatesResponse = new CertificatesResponse();
+            CertificateResponse certificatesResponse = new CertificateResponse();
             certificatesResponse.setAlias(alias);
             String certificateEndPoint =
                     String.format(V1_API_PATH_COMPONENT + KEYSTORES_API_PATH_COMPONENT +
@@ -239,29 +243,35 @@ public class KeyStoreService {
             try {
                 certificateContent = Base64.getEncoder().encodeToString(certificate.getEncoded());
             } catch (CertificateEncodingException e) {
-                throw handleException(ERROR_CODE_ENCODE_CERTIFICATE, e, Response.Status.INTERNAL_SERVER_ERROR);
+                throw handleException(ERROR_CODE_ENCODE_CERTIFICATE, alias, e, Response.Status.INTERNAL_SERVER_ERROR);
             }
         } else {
             certificateContent = certificate.toString();
         }
 
-        String filename = alias + ".cer";
-        File file = new File(filename);
+        String fileName = alias + CERTIFICATE_FILE_EXTENSION;
+        File certsDirectory = new File(CERTIFICATE_TEMPORARY_DIRECTORY_PATH).getAbsoluteFile();
+        if (certsDirectory.mkdirs()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(certsDirectory.toString() + " has been created.");
+            }
+        }
+        File certificateFile = new File(CERTIFICATE_TEMPORARY_DIRECTORY_PATH + PATH_SEPERATOR + fileName)
+                .getAbsoluteFile();
         try {
-            if (file.createNewFile()) {
+            if (certificateFile.createNewFile()) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("A file has been created with name: " + filename);
+                    LOG.debug("A file has been created with name: " + fileName);
                 }
             }
-            try (Writer fileWriter = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+            try (Writer fileWriter = new OutputStreamWriter(new FileOutputStream(certificateFile),
+                    StandardCharsets.UTF_8)) {
                 fileWriter.write(certificateContent);
             }
         } catch (IOException e) {
-            throw handleException(ERROR_CODE_FILE_WRITE, e, Response.Status.INTERNAL_SERVER_ERROR);
-        } finally {
-            file.deleteOnExit();
+            throw handleException(ERROR_CODE_FILE_WRITE, fileName, e, Response.Status.INTERNAL_SERVER_ERROR);
         }
-        return file;
+        return certificateFile;
     }
 
     private APIError handleException(KeyStoreManagementException e, String description) {
@@ -278,10 +288,11 @@ public class KeyStoreService {
         return new APIError(status, errorResponse);
     }
 
-    private APIError handleException(KeyStoreConstants.ErrorMessage errorMessage, Exception e, Response.Status status) {
+    private APIError handleException(KeyStoreConstants.ErrorMessage errorMessage, String data, Exception e,
+                                     Response.Status status) {
 
         ErrorResponse.Builder builder = new ErrorResponse.Builder().withCode(errorMessage.getCode())
-                .withMessage(errorMessage.getMessage()).withDescription(e.getMessage());
+                .withMessage(includeData(errorMessage.getMessage(), data)).withDescription(e.getMessage());
         ErrorResponse errorResponse = builder.build(LOG, e, e.getMessage());
         return new APIError(status, errorResponse);
     }
@@ -293,5 +304,13 @@ public class KeyStoreService {
                 .withMessage(errorMessage.getMessage()).withDescription(description);
         ErrorResponse errorResponse = builder.build();
         return new APIError(status, errorResponse);
+    }
+
+    private static String includeData(String message, String data) {
+
+        if (StringUtils.isNotBlank(data)) {
+            message = String.format(message, data);
+        }
+        return message;
     }
 }
