@@ -101,7 +101,7 @@ public class KeyStoreService {
         }
 
         if (certificate == null) {
-            throw handleException(ERROR_CODE_INVALID_ALIAS, "Couldn't find a certificate with alias: " + alias +
+            throw handleException(ERROR_CODE_INVALID_ALIAS, alias, "Couldn't find a certificate with alias: " + alias +
                     " from the keystore.", Response.Status.BAD_REQUEST);
         }
         return generateCertificateFile(alias, certificate, encodeCert);
@@ -181,7 +181,7 @@ public class KeyStoreService {
         }
 
         if (certificate == null) {
-            throw handleException(ERROR_CODE_INVALID_ALIAS, "Couldn't find a certificate with alias: " + alias +
+            throw handleException(ERROR_CODE_INVALID_ALIAS, alias, "Couldn't find a certificate with alias: " + alias +
                     " from the keystore.", Response.Status.BAD_REQUEST);
         }
         return generateCertificateFile(alias, certificate, encodeCert);
@@ -292,21 +292,21 @@ public class KeyStoreService {
                                      Response.Status status) {
 
         ErrorResponse.Builder builder = new ErrorResponse.Builder().withCode(errorMessage.getCode())
-                .withMessage(includeData(errorMessage.getMessage(), data)).withDescription(e.getMessage());
+                .withMessage(generateErrorMessage(errorMessage.getMessage(), data)).withDescription(e.getMessage());
         ErrorResponse errorResponse = builder.build(LOG, e, e.getMessage());
         return new APIError(status, errorResponse);
     }
 
-    private APIError handleException(KeyStoreConstants.ErrorMessage errorMessage, String description,
+    private APIError handleException(KeyStoreConstants.ErrorMessage errorMessage, String data, String description,
                                      Response.Status status) {
 
         ErrorResponse.Builder builder = new ErrorResponse.Builder().withCode(errorMessage.getCode())
-                .withMessage(errorMessage.getMessage()).withDescription(description);
+                .withMessage(generateErrorMessage(errorMessage.getMessage(), data)).withDescription(description);
         ErrorResponse errorResponse = builder.build();
         return new APIError(status, errorResponse);
     }
 
-    private static String includeData(String message, String data) {
+    private static String generateErrorMessage(String message, String data) {
 
         if (StringUtils.isNotBlank(data)) {
             message = String.format(message, data);
