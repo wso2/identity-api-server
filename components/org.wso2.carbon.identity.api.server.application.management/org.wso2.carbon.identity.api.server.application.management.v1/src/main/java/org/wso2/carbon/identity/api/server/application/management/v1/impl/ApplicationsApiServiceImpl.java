@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Provisionin
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
@@ -47,6 +48,9 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Autowired
     private ServerApplicationManagementService applicationManagementService;
+
+    @Autowired
+    private ServerApplicationMetadataService applicationMetadataService;
 
     @Override
     public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
@@ -308,5 +312,41 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response updateWSTrustConfiguration(String applicationId, WSTrustConfiguration wsTrustConfiguration) {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    @Override
+    public Response getInboundProtocols(Boolean customOnly) {
+
+        return Response.ok().entity(applicationMetadataService.getInboundProtocols(customOnly)).build();
+    }
+
+    @Override
+    public Response getCustomProtocolMetadata(String inboundProtocolId) {
+
+        return Response.ok().entity(applicationMetadataService.getCustomProtocolMetadata(inboundProtocolId)).build();
+    }
+
+    @Override
+    public Response getOIDCMetadata() {
+
+        return Response.ok().entity(applicationMetadataService.getOIDCMetadata()).build();
+    }
+
+    @Override
+    public Response getSAMLMetadata() {
+
+        return Response.ok().entity(applicationMetadataService.getSAMLMetadata()).build();
+    }
+
+    @Override
+    public Response getWSTrustMetadata() {
+
+        return Response.ok().entity(applicationMetadataService.getWSTrustMetadata()).build();
+    }
+
+    @Override
+    public Response getAdaptiveAuthTemplates() {
+
+        return Response.ok().entity(applicationMetadataService.getAdaptiveAuthTemplates()).build();
     }
 }

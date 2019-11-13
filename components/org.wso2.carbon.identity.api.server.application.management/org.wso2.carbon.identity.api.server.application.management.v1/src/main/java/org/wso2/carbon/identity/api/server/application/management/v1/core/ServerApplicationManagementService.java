@@ -211,7 +211,8 @@ public class ServerApplicationManagementService {
                     .createApplication(application, tenantDomain, username);
             return new ServiceProviderToApiModel().apply(createdApp);
         } catch (IdentityApplicationManagementException e) {
-            throw handleServerError(e, "Error while updating application with name: " + applicationModel.getName());
+            throw handleServerError(e, "Error while updating application with name: " +
+                    applicationModel.getName());
         }
     }
 

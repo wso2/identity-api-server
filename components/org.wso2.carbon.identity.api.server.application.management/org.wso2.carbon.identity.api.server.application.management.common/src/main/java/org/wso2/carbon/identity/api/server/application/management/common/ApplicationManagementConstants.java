@@ -15,7 +15,11 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.common;
 
+import org.wso2.carbon.identity.oauth.common.GrantType;
+import org.wso2.carbon.identity.oauth.common.OAuthConstants;
+
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.ws.rs.core.Response;
@@ -31,6 +35,9 @@ public class ApplicationManagementConstants {
 
     private static final String APPLICATION_MANAGEMENT_PREFIX = "APP-";
     public static final String APPLICATION_MANAGEMENT_PATH_COMPONENT = "/applications";
+    private static final Map<String, String> OAUTH_GRANT_TYPE_NAMES = new LinkedHashMap<>();
+    public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
+    public static final String DEFAULT_CERTIFICATE_ALIAS = "wso2carbon";
 
     /**
      * Enums for error messages.
@@ -60,10 +67,12 @@ public class ApplicationManagementConstants {
                 Response.Status.NOT_FOUND,
                 "Application not found.",
                 "Application cannot be found for the provided id: %s in the tenantDomain: %s."),
-        ERROR_IMPORTING_APPLICATION("50006", Response.Status.INTERNAL_SERVER_ERROR,
+        ERROR_INBOUND_PROTOCOL_NOT_FOUND("50006", Response.Status.NOT_FOUND,
+                "Inbound protocol not found.",
+                "Inbound protocol cannot be found for the provided id."),
+        ERROR_IMPORTING_APPLICATION("50007", Response.Status.INTERNAL_SERVER_ERROR,
                 "Importing application failed.",
                 "Unexpected error occurred while importing the application from file."),
-
         // Server Errors.
         ERROR_CODE_SORTING_NOT_IMPLEMENTED("55001",
                 Response.Status.NOT_IMPLEMENTED,
@@ -72,7 +81,13 @@ public class ApplicationManagementConstants {
         ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED("55002",
                 Response.Status.NOT_IMPLEMENTED,
                 "Attribute filtering not supported.",
-                "Attribute filtering capability is not supported in this version of the API.");
+                "Attribute filtering capability is not supported in this version of the API."),
+        ERROR_WHILE_RETRIEVING_SAML_METADATA("55003", Response.Status.INTERNAL_SERVER_ERROR,
+                "Error occurred while retrieving SAML Metadata.",
+                "Unexpected error occurred while retrieving SAML Metadata."),
+        ERROR_WHILE_RETRIEVING_WS_TRUST_METADATA("55004", Response.Status.INTERNAL_SERVER_ERROR,
+                "Error occurred while retrieving WS Trust Metadata.",
+                "Unexpected error occurred while retrieving WS Trust Metadata.");
 
         private final String code;
         private Response.Status httpStatusCode;
@@ -139,5 +154,20 @@ public class ApplicationManagementConstants {
 
             return code + " | " + message;
         }
+    }
+
+    static {
+        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.AUTHORIZATION_CODE, "Code");
+        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.IMPLICIT, "Implicit");
+        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.PASSWORD, "Password");
+        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.CLIENT_CREDENTIALS, "Client Credential");
+        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.REFRESH_TOKEN, "Refresh Token");
+        OAUTH_GRANT_TYPE_NAMES.put("urn:ietf:params:oauth:grant-type:saml1-bearer", "SAML1");
+        OAUTH_GRANT_TYPE_NAMES.put(GrantType.SAML20_BEARER.toString(), "SAML2");
+        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.IWA_NTLM, "IWA-NTLM");
+    }
+
+    public static Map<String, String> getOAuthGrantTypeNames() {
+        return OAUTH_GRANT_TYPE_NAMES;
     }
 }
