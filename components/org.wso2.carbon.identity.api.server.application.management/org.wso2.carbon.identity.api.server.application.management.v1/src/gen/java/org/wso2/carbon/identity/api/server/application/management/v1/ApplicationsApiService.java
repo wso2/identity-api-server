@@ -20,6 +20,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
@@ -30,6 +31,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfig
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
+import java.io.File;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
@@ -69,6 +71,8 @@ public interface ApplicationsApiService {
 
       public Response deleteWSTrustConfiguration(String applicationId);
 
+      public Response exportApplication(String applicationId, Boolean exportSecrets);
+
       public Response getAdaptiveAuthTemplates();
 
       public Response getAdvancedConfigurations(String applicationId);
@@ -106,6 +110,8 @@ public interface ApplicationsApiService {
       public Response getWSTrustConfiguration(String applicationId);
 
       public Response getWSTrustMetadata();
+
+      public Response importApplication(InputStream fileInputStream, Attachment fileDetail);
 
       public Response regenerateOAuthApplicationSecret(String applicationId);
 

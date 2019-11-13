@@ -26,7 +26,7 @@ paths:
       summary: |
         List applications
       description: |
-        This API provides the capability to retrive the list of applications.
+        This API provides the capability to retrieve the list of applications.
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
@@ -146,16 +146,79 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
+  /applications/import:
+    post:
+      tags:
+        - Applications
+      summary: |
+        Import an application from file.
+      operationId: importApplication
+      description: >
+        This API provides the capability to store the application information,
+        provided as a file.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: file to upload
+        description: This represents the application to be created.
+        required: true
+      responses:
+        '201':
+          description: Successfully created.
+          headers:
+            Location:
+              description: Location of the newly created application.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   '/applications/{applicationId}':
     get:
       tags:
         - Applications
       summary: |
-        Retrive application by id
+        Retrieve application by id
       operationId: getApplication
       description: >
-        This API provides the capability to retrive the application information
+        This API provides the capability to retrieve the application information
         by id.
       parameters:
         - name: applicationId
@@ -340,6 +403,60 @@ paths:
       x-wso2-request: ''
       x-wso2-response: |
         "HTTP/1.1 200 Ok"
+  /applications/{applicationId}/export:
+    get:
+      tags:
+        - Applications
+      operationId: exportApplication
+      summary: |
+        Export an application as an XML file.
+      description: |
+        This API provides the capability to retrieve the application as an XML file.
+      parameters:
+        - name: applicationId
+          in: path
+          description: Id of the application.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/exportSecretsQueryParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                example: 'Sample application configuration xml as a string'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /applications/resident:
     get:
       tags:
@@ -348,7 +465,7 @@ paths:
         Get Resident Service Provider Information.
       operationId: getResidentApplication
       description: |
-        This API provides the capability to retrive the resident SP information.
+        This API provides the capability to retrieve the resident SP information.
       responses:
         '200':
           description: OK
@@ -470,7 +587,7 @@ paths:
         Retrieve inbound protocol configurations of an application.
       operationId: getInboundAuthenticationConfigurations
       description: >
-        This API provides the capability to retrive authentication protocol
+        This API provides the capability to retrieve authentication protocol
         configurations of an application.
       parameters:
         - name: applicationId
@@ -651,7 +768,7 @@ paths:
         Retrieve SAML2 authentication protocol parameters of an application.
       operationId: getInboundSAMLConfiguration
       description: >
-        This API provides the capability to retrive SAML2 authentication
+        This API provides the capability to retrieve SAML2 authentication
         protocol parameters of an application.
       parameters:
         - name: applicationId
@@ -1898,9 +2015,9 @@ paths:
       tags:
         - Claims
       summary: |
-        Retrive claim configuration application by id
+        Retrieve claim configuration application by id
       description: >
-        This API provides the capability to retrive the application claim
+        This API provides the capability to retrieve the application claim
         configuration by id.
       operationId: getClaimConfiguration
       parameters:
@@ -2078,9 +2195,9 @@ paths:
       tags:
         - Advanced Configs
       summary: |
-        Retrive advanced configurations of an application by id
+        Retrieve advanced configurations of an application by id
       description: >
-        This API provides the capability to retrive the advanced configurations
+        This API provides the capability to retrieve the advanced configurations
         of an application by id.
       operationId: getAdvancedConfigurations
       parameters:
@@ -2261,9 +2378,9 @@ paths:
       tags:
         - Provisioning Configs
       summary: |
-        Retrive provisioning configurations of application by id
+        Retrieve provisioning configurations of application by id
       description: >
-        This API provides the capability to retrive the provisioning
+        This API provides the capability to retrieve the provisioning
         configurations of an application by id.
       operationId: getProvisioningConfiguration
       parameters:
@@ -2444,9 +2561,9 @@ paths:
       tags:
         - Authentication Sequence
       summary: |
-        Retrive authentication sequence of application by id
+        Retrieve authentication sequence of application by id
       description: >
-        This API provides the capability to retrive authentication sequence of
+        This API provides the capability to retrieve authentication sequence of
         an application by id.
       operationId: getAuthenticationSequence
       parameters:
@@ -2628,7 +2745,7 @@ paths:
       tags:
         - Application Metadata
       summary: |
-        Retrive the list of inbound authentication protocols available.
+        Retrieve the list of inbound authentication protocols available.
       description: >
         This API provides the capability to retrieve the list of inbound authentication protocols available.
         If the query parameter 'customOnly' is set to true, only custom inbound protocols will be listed.
@@ -2679,7 +2796,7 @@ paths:
       tags:
         - Application Metadata
       summary: |
-        Retrive all the metadata related to the auth protocol SAML
+        Retrieve all the metadata related to the auth protocol SAML
       description: >
         This API provides the capability to retrieve all the metadata related to the auth protocol SAML.
       operationId: getSAMLMetadata
@@ -2722,7 +2839,7 @@ paths:
       tags:
         - Application Metadata
       summary: |
-        Retrive all the metadata related to the authentication protocol OAuth / OIDC
+        Retrieve all the metadata related to the authentication protocol OAuth / OIDC
       description: >
         This API provides the capability to retrieve all the metadata related to the authentication
          protocol OAuth / OIDC.
@@ -2766,7 +2883,7 @@ paths:
       tags:
         - Application Metadata
       summary: |
-        Retrive all the metadata related to the auth protocol WS_Trust
+        Retrieve all the metadata related to the auth protocol WS_Trust
       description: >
         This API provides the capability to retrieve all the metadata related to the auth protocol WS_Trust.
       operationId: getWSTrustMetadata
@@ -2809,7 +2926,7 @@ paths:
       tags:
         - Application Metadata
       summary: |
-        Retrive all the metadata related to the custom auth protocol identified by the inboundProtocolId
+        Retrieve all the metadata related to the custom auth protocol identified by the inboundProtocolId
       description: >
         This API provides the capability to retrieve all the metadata related to the custom auth protocol
         identified by the inboundProtocolId.
@@ -2860,7 +2977,7 @@ paths:
       tags:
         - Application Metadata
       summary: |
-        Retrive the sample adaptive authentication templates.
+        Retrieve the sample adaptive authentication templates.
       description: >
         This API provides the capability to retrieve the sample adaptive authentication templates.
       operationId: getAdaptiveAuthTemplates
@@ -2961,6 +3078,15 @@ components:
         _This parameter is not supported yet_
       schema:
         type: string
+    exportSecretsQueryParam:
+      in: query
+      name: exportSecrets
+      required: false
+      description: |
+        Specifies whether to export secrets when exporting an application.
+      schema:
+        type: boolean
+        default: false
     inboundProtocolsCustomOnly:
       in: query
       name: customOnly

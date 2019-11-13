@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.41-SNAPSHOT</version>
+    <version>1.0.43-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -334,6 +334,18 @@
                 <version>${identity.inbound.saml2.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.user.store.configuration</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.userstore.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -405,7 +417,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.3.15</identity.governance.version>
-        <carbon.identity.framework.version>5.14.131</carbon.identity.framework.version>
+        <carbon.identity.framework.version>5.14.139</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.4</maven.findbugsplugin.version>
         <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
@@ -424,6 +436,7 @@
         <module>components/org.wso2.carbon.identity.api.server.permission.management</module>
         <module>components/org.wso2.carbon.identity.api.server.email.template</module>
         <module>components/org.wso2.carbon.identity.api.server.application.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.userstore</module>
     </modules>
 
 </project>

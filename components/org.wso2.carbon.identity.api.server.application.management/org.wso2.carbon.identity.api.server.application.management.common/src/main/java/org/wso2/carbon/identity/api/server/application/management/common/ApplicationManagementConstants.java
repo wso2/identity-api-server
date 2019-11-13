@@ -70,6 +70,9 @@ public class ApplicationManagementConstants {
         ERROR_INBOUND_PROTOCOL_NOT_FOUND("50006", Response.Status.NOT_FOUND,
                 "Inbound protocol not found.",
                 "Inbound protocol cannot be found for the provided id."),
+        ERROR_IMPORTING_APPLICATION("50007", Response.Status.INTERNAL_SERVER_ERROR,
+                "Importing application failed.",
+                "Unexpected error occurred while importing the application from file."),
         // Server Errors.
         ERROR_CODE_SORTING_NOT_IMPLEMENTED("55001",
                 Response.Status.NOT_IMPLEMENTED,
