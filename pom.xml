@@ -346,6 +346,12 @@
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.keystore.management.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -437,6 +443,7 @@
         <module>components/org.wso2.carbon.identity.api.server.email.template</module>
         <module>components/org.wso2.carbon.identity.api.server.application.management</module>
         <module>components/org.wso2.carbon.identity.api.server.userstore</module>
+        <module>components/org.wso2.carbon.identity.api.server.keystore.management</module>
     </modules>
 
 </project>
