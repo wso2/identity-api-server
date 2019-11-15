@@ -53,6 +53,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.rollbackInbounds;
+
 /**
  * Updates the inbound authentication protocols defined by the API model in the Service Provider model.
  */
@@ -80,7 +82,7 @@ public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, I
             }
         } catch (APIError error) {
             // TODO: a log here.
-            Utils.rollbackInbounds(inbounds);
+            rollbackInbounds(inbounds);
             throw error;
         }
 
@@ -131,19 +133,19 @@ public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, I
 
     private InboundAuthenticationRequestConfig getSAMLInbound(SAML2Configuration saml) {
 
-        SAML2ServiceProvider saml2SpModel = saml.getServiceProvider();
+        SAML2ServiceProvider samlManualConfiguration = saml.getManualConfiguration();
 
         String issuer;
         if (saml.getMetadataFile() != null) {
             issuer = createSAMLSpWithMetadataFile(saml.getMetadataFile());
         } else if (saml.getMetadataURL() != null) {
             issuer = createSAMLSpWithMetadataUrl(saml.getMetadataURL());
-        } else if (saml2SpModel != null) {
-            issuer = createSAMLSpWithManualConfiguration(saml2SpModel);
+        } else if (samlManualConfiguration != null) {
+            issuer = createSAMLSpWithManualConfiguration(samlManualConfiguration);
         } else {
             // TODO error code.
             throw Utils.buildClientError("Invalid SAML2 Configuration. One of metadataFile, metaDataUrl or " +
-                    "serviceProvider inline configuration needs to be present.");
+                    "serviceProvider manual configuration needs to be present.");
         }
 
         InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();

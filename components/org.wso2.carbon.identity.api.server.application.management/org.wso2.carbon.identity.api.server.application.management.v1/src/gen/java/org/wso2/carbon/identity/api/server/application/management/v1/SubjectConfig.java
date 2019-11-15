@@ -31,9 +31,9 @@ import javax.xml.bind.annotation.*;
 public class SubjectConfig  {
   
     private String claimId;
-    private Boolean includeUserDomain = false;
-    private Boolean includeTenantDomain = false;
-    private Boolean useMappedLocalSubject = false;
+    private Boolean includeUserDomain;
+    private Boolean includeTenantDomain;
+    private Boolean useMappedLocalSubject;
 
     /**
     **/

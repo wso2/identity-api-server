@@ -20,25 +20,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationStepModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.Authenticator;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
-import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
+import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundsToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
-import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
@@ -56,32 +56,37 @@ import java.util.stream.Collectors;
 /**
  * Converts the backend model ServiceProvider into the corresponding API model object.
  */
-public class ServiceProviderToApiModel implements Function<ServiceProvider, ApplicationModel> {
+public class ServiceProviderToApiModel implements Function<ServiceProvider, ApplicationResponseModel> {
 
     private static final Log log = LogFactory.getLog(ServiceProviderToApiModel.class);
 
     @Override
-    public ApplicationModel apply(ServiceProvider application) {
+    public ApplicationResponseModel apply(ServiceProvider application) {
 
         if (isResidentSp(application)) {
-            return new ApplicationModel()
+            return new ApplicationResponseModel()
                     .id(application.getApplicationResourceId())
                     .name(application.getApplicationName())
                     .description(application.getDescription())
                     .provisioningConfigurations(buildProvisioningConfiguration(application));
         } else {
-            return new ApplicationModel()
+            return new ApplicationResponseModel()
                     .id(application.getApplicationResourceId())
                     .name(application.getApplicationName())
                     .description(application.getDescription())
                     .imageUrl(application.getImageUrl())
                     .loginUrl(application.getLoginUrl())
                     .claimConfiguration(buildClaimConfiguration(application))
-                    .inboundProtocolConfiguration(buildInboundProtocols(application.getInboundAuthenticationConfig()))
+                    .inboundProtocols(buildInboundProtocols(application))
                     .advancedConfigurations(buildAdvancedAppConfiguration(application))
                     .provisioningConfigurations(buildProvisioningConfiguration(application))
                     .authenticationSequence(buildAuthenticationSequence(application));
         }
+    }
+
+    private List<InboundProtocolListItem> buildInboundProtocols(ServiceProvider application) {
+
+        return new InboundsToApiModel().apply(application);
     }
 
     private boolean isResidentSp(ServiceProvider application) {
@@ -317,8 +322,4 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return certificate;
     }
 
-    private InboundProtocols buildInboundProtocols(InboundAuthenticationConfig inboundAuthenticationConfig) {
-
-        return new InboundAuthenticationConfigToApiModel().apply(inboundAuthenticationConfig);
-    }
 }

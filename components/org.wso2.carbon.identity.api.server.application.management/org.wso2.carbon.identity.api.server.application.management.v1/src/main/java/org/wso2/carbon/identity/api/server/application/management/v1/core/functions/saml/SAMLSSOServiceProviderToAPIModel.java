@@ -16,7 +16,6 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.saml;
 
 import org.apache.commons.lang.StringUtils;
-import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.sso.saml.common.SAMLSSOProviderConstants;
 import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
@@ -27,56 +26,55 @@ import java.util.function.Function;
 /**
  * Converts the backend model SAMLSSOServiceProviderDTO into the corresponding API model object.
  */
-public class SAMLSSOServiceProviderToAPIModel implements Function<SAMLSSOServiceProviderDTO, SAML2Configuration> {
+public class SAMLSSOServiceProviderToAPIModel implements Function<SAMLSSOServiceProviderDTO, SAML2ServiceProvider> {
 
     private static final String QUALIFIER_ID = ":urn:sp:qualifier:";
 
     @Override
-    public SAML2Configuration apply(SAMLSSOServiceProviderDTO dto) {
+    public SAML2ServiceProvider apply(SAMLSSOServiceProviderDTO dto) {
 
-        return new SAML2Configuration().serviceProvider(
-                new SAML2ServiceProvider()
-                        .issuer(getIssuerWithoutQualifier(dto))
-                        .serviceProviderQualifier(dto.getIssuerQualifier())
-                        .defaultAssertionConsumerUrl(dto.getDefaultAssertionConsumerUrl())
-                        .assertionConsumerUrls(Arrays.asList(dto.getAssertionConsumerUrls()))
+        return new SAML2ServiceProvider()
+                .issuer(getIssuerWithoutQualifier(dto))
+                .serviceProviderQualifier(dto.getIssuerQualifier())
+                .defaultAssertionConsumerUrl(dto.getDefaultAssertionConsumerUrl())
+                .assertionConsumerUrls(Arrays.asList(dto.getAssertionConsumerUrls()))
 
-                        .attributeConsumingServiceIndex(dto.getAttributeConsumingServiceIndex())
+                .attributeConsumingServiceIndex(dto.getAttributeConsumingServiceIndex())
 
-                        .nameIdFormat(dto.getNameIDFormat())
-                        .requestValidationCertificateAlias(dto.getCertAlias())
+                .nameIdFormat(dto.getNameIDFormat())
+                .requestValidationCertificateAlias(dto.getCertAlias())
 
-                        .responseSigningAlgorithm(dto.getSigningAlgorithmURI())
-                        .responseDigestAlgorithm(dto.getDigestAlgorithmURI())
-                        .assertionEncryptionAlgroithm(dto.getAssertionEncryptionAlgorithmURI())
-                        .keyEncryptionAlgorithm(dto.getKeyEncryptionAlgorithmURI())
+                .responseSigningAlgorithm(dto.getSigningAlgorithmURI())
+                .responseDigestAlgorithm(dto.getDigestAlgorithmURI())
+                .assertionEncryptionAlgroithm(dto.getAssertionEncryptionAlgorithmURI())
+                .keyEncryptionAlgorithm(dto.getKeyEncryptionAlgorithmURI())
 
-                        .enableResponseSigning(dto.isDoSignResponse())
-                        .enableRequestSignatureValidation(dto.isDoValidateSignatureInRequests())
-                        .enableAssertionEncryption(dto.isDoEnableEncryptedAssertion())
+                .enableResponseSigning(dto.isDoSignResponse())
+                .enableRequestSignatureValidation(dto.isDoValidateSignatureInRequests())
+                .enableAssertionEncryption(dto.isDoEnableEncryptedAssertion())
 
-                        .enableRequestSignatureValidation(dto.isDoSingleLogout())
-                        .singleLogoutResponseUrl(dto.getSloResponseURL())
-                        .singleLogoutRequestUrl(dto.getSloRequestURL())
-                        .singleLogoutMethod(getSingleLogoutMethod(dto))
+                .enableRequestSignatureValidation(dto.isDoSingleLogout())
+                .singleLogoutResponseUrl(dto.getSloResponseURL())
+                .singleLogoutRequestUrl(dto.getSloRequestURL())
+                .singleLogoutMethod(getSingleLogoutMethod(dto))
 
-                        .enableAttributeProfile(dto.isEnableAttributeProfile())
-                        .includedAttributeInResponseAlways(dto.isEnableAttributesByDefault())
+                .enableAttributeProfile(dto.isEnableAttributeProfile())
+                .includedAttributeInResponseAlways(dto.isEnableAttributesByDefault())
 
-                        .audiences(Arrays.asList(dto.getRequestedAudiences()))
-                        .recipients(Arrays.asList(dto.getRequestedRecipients()))
+                .audiences(Arrays.asList(dto.getRequestedAudiences()))
+                .recipients(Arrays.asList(dto.getRequestedRecipients()))
 
-                        .enableIdpInitiatedSingleSignOn(dto.isIdPInitSSOEnabled())
-                        .enableIdpInitiatedSingleLogOut(dto.isIdPInitSLOEnabled())
-                        .idpInitiatedLogoutReturnUrls(Arrays.asList(dto.getIdpInitSLOReturnToURLs()))
+                .enableIdpInitiatedSingleSignOn(dto.isIdPInitSSOEnabled())
+                .enableIdpInitiatedSingleLogOut(dto.isIdPInitSLOEnabled())
+                .idpInitiatedLogoutReturnUrls(Arrays.asList(dto.getIdpInitSLOReturnToURLs()))
 
-                        .enableAssertionQueryProfile(dto.isAssertionQueryRequestProfileEnabled())
-                        .enableSAML2ArtifactBinding(dto.isEnableSAML2ArtifactBinding())
-                        .enableSignatureValidationInArtifactBinding(dto.isDoValidateSignatureInArtifactResolve())
+                .enableAssertionQueryProfile(dto.isAssertionQueryRequestProfileEnabled())
+                .enableSAML2ArtifactBinding(dto.isEnableSAML2ArtifactBinding())
+                .enableSignatureValidationInArtifactBinding(dto.isDoValidateSignatureInArtifactResolve())
 
-                        .idPEntityidAlias(dto.getIdpEntityIDAlias()
-                        )
-        );
+                .idPEntityidAlias(dto.getIdpEntityIDAlias()
+
+                );
     }
 
     private String getIssuerWithoutQualifier(SAMLSSOServiceProviderDTO dto) {

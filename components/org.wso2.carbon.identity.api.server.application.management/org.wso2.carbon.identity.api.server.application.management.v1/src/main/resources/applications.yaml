@@ -101,7 +101,7 @@ paths:
               $ref: '#/components/schemas/ApplicationModel'
           application/xml:
             schema:
-              $ref: '#/components/schemas/ApplicationModel'
+              $ref: '#/components/schemas/ApplicationResponseModel'
         description: This represents the application to be created.
         required: true
       responses:
@@ -233,10 +233,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationModel'
+                $ref: '#/components/schemas/ApplicationResponseModel'
             application/xml:
               schema:
-                $ref: '#/components/schemas/ApplicationModel'
+                $ref: '#/components/schemas/ApplicationResponseModel'
         '400':
           description: Bad Request
           content:
@@ -385,7 +385,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationModel'
+                $ref: '#/components/schemas/ApplicationResponseModel'
         '400':
           description: Bad Request
           content:
@@ -841,7 +841,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SAML2Configuration'
+                $ref: '#/components/schemas/SAML2ServiceProvider'
         '400':
           description: Bad Request
           content:
@@ -893,6 +893,10 @@ paths:
       responses:
         '200':
           description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SAML2ServiceProvider'
         '201':
           description: Successful response.
           headers:
@@ -903,7 +907,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SAML2Configuration'
+                $ref: '#/components/schemas/SAML2ServiceProvider'
         '400':
           description: Bad Request
           content:
@@ -3270,6 +3274,39 @@ components:
         provisioningConfigurations:
           $ref: '#/components/schemas/ProvisioningConfiguration'
 
+    ApplicationResponseModel:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: string
+          example: "394b8adcce24c64a8a09a0d80abf8c337bd253de"
+          readOnly: true
+        name:
+          type: string
+          example: pickup
+          pattern: '^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$'
+        description:
+          type: string
+          example: This is the configuration for Pickup application.
+        imageUrl:
+          type: string
+          example: 'https://example.com/logo/my-logo.png'
+        loginUrl:
+          type: string
+          example: 'https://example.com/login'
+        claimConfiguration:
+          $ref: '#/components/schemas/ClaimConfiguration'
+        inboundProtocols:
+          $ref: '#/components/schemas/InboundProtocolsListResponse'
+        authenticationSequence:
+          $ref: '#/components/schemas/AuthenticationSequence'
+        advancedConfigurations:
+          $ref: '#/components/schemas/AdvancedApplicationConfiguration'
+        provisioningConfigurations:
+          $ref: '#/components/schemas/ProvisioningConfiguration'
+
     ApplicationPatchModel:
       type: object
       properties:
@@ -3401,6 +3438,30 @@ components:
           items:
             $ref: '#/components/schemas/CustomInboundProtocolConfiguration'
 
+
+    InboundProtocolsListResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/InboundProtocolListItem'
+
+    InboundProtocolListItem:
+      type: object
+      required:
+        - type
+        - name
+        - self
+      properties:
+        type:
+          type: string
+          example: "samlsso"
+        name:
+          type: string
+          example: "SAML2 Inbound"
+        self:
+          type: string
+          example: "/t/carbon.super/api/server/v1/applications/29048810-1447-4ea0-a348-30d15ab65fa3/inbound-protocols/saml"
+
+
             # InboundProtocol:
             #   oneOf:
             #     - $ref: '#/components/schemas/SAML2Configuration'
@@ -3426,7 +3487,7 @@ components:
             #   custom:
             #     type: array
             #     items:
-            #       $ref: '#/components/schemas/CustomInboundProtocolConfiguration'
+          #       $ref: '#/components/schemas/CustomInboundProtocolConfiguration'
 
 
     ClaimConfiguration:
@@ -3459,15 +3520,12 @@ components:
           example: 'http://wso2.org/claims/emailaddress'
         includeUserDomain:
           type: boolean
-          default: false
           example: false
         includeTenantDomain:
           type: boolean
-          default: false
           example: false
         useMappedLocalSubject:
           type: boolean
-          default: false
           example: false
     RoleConfig:
       type: object
@@ -3478,7 +3536,6 @@ components:
             $ref: '#/components/schemas/RoleMapping'
         includeUserDomain:
           type: boolean
-          default: true
           example: true
         claimId:
           type: string
@@ -3504,7 +3561,6 @@ components:
             mappings are configured, use the mapped applicationClaimUri
         mandatory:
           type: boolean
-          default: false
           example: false
     ClaimMappings:
       type: object
@@ -3527,7 +3583,7 @@ components:
           type: string
           example: 'https://example.com/samlsso/meta'
           writeOnly: true
-        serviceProvider:
+        manualConfiguration:
           $ref: '#/components/schemas/SAML2ServiceProvider'
 
     SAML2ServiceProvider:

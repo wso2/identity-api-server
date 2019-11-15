@@ -44,11 +44,6 @@ public class Utils {
 
     private static final Log log = LogFactory.getLog(Utils.class);
 
-    public static boolean getBooleanValue(Boolean aBoolean) {
-
-        return aBoolean != null && aBoolean;
-    }
-
     public static void setIfNotNull(String value, Consumer<String> consumer) {
 
         if (value != null) {

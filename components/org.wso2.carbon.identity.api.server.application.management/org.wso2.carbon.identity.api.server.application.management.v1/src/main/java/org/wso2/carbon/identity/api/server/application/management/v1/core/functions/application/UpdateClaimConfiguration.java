@@ -92,7 +92,7 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
                                     ClaimMapping claimMapping = claimMappings.get(requestedClaim.getClaimUri());
                                     if (claimMapping != null) {
                                         claimMapping.setRequested(true);
-                                        claimMapping.setMandatory(requestedClaim.getMandatory());
+                                        setIfNotNull(requestedClaim.getMandatory(), claimMapping::setMandatory);
                                     }
                                 });
                             }

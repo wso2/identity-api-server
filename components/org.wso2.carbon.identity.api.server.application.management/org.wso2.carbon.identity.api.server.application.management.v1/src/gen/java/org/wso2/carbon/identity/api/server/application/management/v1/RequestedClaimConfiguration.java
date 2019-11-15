@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.*;
 public class RequestedClaimConfiguration  {
   
     private String claimUri;
-    private Boolean mandatory = false;
+    private Boolean mandatory;
 
     /**
     * User claims that need to be sent back to the application. If the claim mappings are local, use local claim uris. If the custom claim mappings are configured, use the mapped applicationClaimUri

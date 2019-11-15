@@ -35,6 +35,12 @@ public class ApplicationManagementConstants {
 
     private static final String APPLICATION_MANAGEMENT_PREFIX = "APP-";
     public static final String APPLICATION_MANAGEMENT_PATH_COMPONENT = "/applications";
+    public static final String INBOUND_PROTOCOLS_PATH_COMPONENT = "/inbound-protocols";
+    public static final String INBOUND_PROTOCOL_OAUTH2_PATH_COMPONENT = "/oidc";
+    public static final String INBOUND_PROTOCOL_SAML_PATH_COMPONENT = "/saml";
+    public static final String INBOUND_PROTOCOL_PASSIVE_STS_PATH_COMPONENT = "/passive-sts";
+    public static final String INBOUND_PROTOCOL_WS_TRUST_PATH_COMPONENT = "/ws-trust";
+
     private static final Map<String, String> OAUTH_GRANT_TYPE_NAMES = new LinkedHashMap<>();
     public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
     public static final String DEFAULT_CERTIFICATE_ALIAS = "wso2carbon";

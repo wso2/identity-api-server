@@ -22,8 +22,10 @@ import org.wso2.carbon.identity.api.server.application.management.common.Applica
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
@@ -38,6 +40,7 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
 import javax.ws.rs.core.Response;
 
 /**
@@ -69,7 +72,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response createApplication(ApplicationModel applicationModel, String template) {
 
-        ApplicationModel createdApp = applicationManagementService.createApplication(applicationModel, template);
+        ApplicationResponseModel createdApp =
+                applicationManagementService.createApplication(applicationModel, template);
         return Response.created(getResourceLocation(createdApp.getId())).entity(createdApp).build();
     }
 
@@ -83,7 +87,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
-        ApplicationModel applicationModel =
+        ApplicationResponseModel applicationModel =
                 applicationManagementService.patchApplication(applicationId, applicationPatchModel);
         return Response.ok(applicationModel).build();
     }
@@ -191,7 +195,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response importApplication(InputStream fileInputStream, Attachment fileDetail) {
 
-        ApplicationModel applicationModel = applicationManagementService.importApplication(fileInputStream, fileDetail);
+        ApplicationResponseModel applicationModel =
+                applicationManagementService.importApplication(fileInputStream, fileDetail);
         URI location = getResourceLocation(applicationModel.getId());
         return Response.created(location).entity(applicationModel).build();
     }
@@ -199,13 +204,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response getInboundAuthenticationConfigurations(String applicationId) {
 
-        // TODO : rewrite this to avoid inbound creation with multiple calls to admin services.
-        ApplicationModel application = applicationManagementService.getApplication(applicationId);
-        if (application.getInboundProtocolConfiguration() == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        } else {
-            return Response.ok(application.getInboundProtocolConfiguration()).build();
-        }
+        List<InboundProtocolListItem> inbounds = applicationManagementService.getInboundProtocols(applicationId);
+        return Response.ok(inbounds).build();
     }
 
     @Override
@@ -222,7 +222,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                 applicationManagementService.regenerateOAuthApplicationSecret(applicationId);
         return Response.ok(openIDConnectConfiguration).build();
     }
-
 
     @Override
     public Response updateCustomInboundConfiguration(String applicationId,

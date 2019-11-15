@@ -15,7 +15,6 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -28,23 +27,24 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
+import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.Link;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
-import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToCustomInbound;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationBasicInfoToApiModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.InboundAuthenticationConfigToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.PatchServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundsToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.oauth2.OAuthConsumerAppToApiModel;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -134,7 +134,7 @@ public class ServerApplicationManagementService {
         }
     }
 
-    public ApplicationModel getApplication(String applicationId) {
+    public ApplicationResponseModel getApplication(String applicationId) {
 
         ServiceProvider application = getServiceProvider(applicationId);
         return new ServiceProviderToApiModel().apply(application);
@@ -167,7 +167,7 @@ public class ServerApplicationManagementService {
      * @param fileDetail      File details.
      * @return An application model of the created application.
      */
-    public ApplicationModel importApplication(InputStream fileInputStream, Attachment fileDetail) {
+    public ApplicationResponseModel importApplication(InputStream fileInputStream, Attachment fileDetail) {
 
         try {
             SpFileContent spFileContent = new SpFileContent();
@@ -207,7 +207,7 @@ public class ServerApplicationManagementService {
         }
     }
 
-    public ApplicationModel createApplication(ApplicationModel applicationModel, String template) {
+    public ApplicationResponseModel createApplication(ApplicationModel applicationModel, String template) {
 
         if (StringUtils.isNotBlank(template)) {
             throw buildApiError(Response.Status.NOT_IMPLEMENTED, "Application creation with templates not supported.");
@@ -229,7 +229,8 @@ public class ServerApplicationManagementService {
         }
     }
 
-    public ApplicationModel patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
+    public ApplicationResponseModel patchApplication(String applicationId,
+                                                     ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
         Utils.updateApplication(appToUpdate, applicationPatchModel, new PatchServiceProvider());
@@ -295,36 +296,33 @@ public class ServerApplicationManagementService {
 
     public OpenIDConnectConfiguration getInboundOAuthConfiguration(String applicationId) {
 
-        return getInboundProtocols(applicationId).getOidc();
+        ServiceProvider serviceProvider = getServiceProvider(applicationId);
+        return InboundUtils.getOAuthInbound(serviceProvider);
     }
 
     public SAML2ServiceProvider getInboundSAMLConfiguration(String applicationId) {
 
-        SAML2Configuration saml2Config = getInboundProtocols(applicationId).getSaml();
-        return saml2Config != null ? saml2Config.getServiceProvider() : null;
+        ServiceProvider serviceProvider = getServiceProvider(applicationId);
+        return InboundUtils.getSAMLInbound(serviceProvider);
     }
 
     public PassiveStsConfiguration getPassiveStsConfiguration(String applicationId) {
 
-        return getInboundProtocols(applicationId).getPassiveSts();
+        ServiceProvider serviceProvider = getServiceProvider(applicationId);
+        return InboundUtils.getPassiveSTSInbound(serviceProvider);
     }
 
     public WSTrustConfiguration getWSTrustConfiguration(String applicationId) {
 
-        return getInboundProtocols(applicationId).getWsTrust();
+        ServiceProvider serviceProvider = getServiceProvider(applicationId);
+        return InboundUtils.getWSTrustInbound(serviceProvider);
     }
 
     public CustomInboundProtocolConfiguration getCustomInboundConfiguration(String applicationId,
-                                                                            String inboundProtocolId) {
+                                                                            String inboundType) {
 
-        List<CustomInboundProtocolConfiguration> custom = getInboundProtocols(applicationId).getCustom();
-        if (CollectionUtils.isNotEmpty(custom)) {
-            return custom.stream()
-                    .filter(inbound -> StringUtils.equals(inbound.getName(), inboundProtocolId))
-                    .findAny()
-                    .orElse(null);
-        }
-        return null;
+        ServiceProvider serviceProvider = getServiceProvider(applicationId);
+        return InboundUtils.getCustomInbound(serviceProvider, inboundType);
     }
 
     public OpenIDConnectConfiguration regenerateOAuthApplicationSecret(String applicationId) {
@@ -576,10 +574,10 @@ public class ServerApplicationManagementService {
         }
     }
 
-    private InboundProtocols getInboundProtocols(String applicationId) {
+    public List<InboundProtocolListItem> getInboundProtocols(String applicationId) {
 
         ServiceProvider serviceProvider = getServiceProvider(applicationId);
-        return new InboundAuthenticationConfigToApiModel().apply(serviceProvider.getInboundAuthenticationConfig());
+        return new InboundsToApiModel().apply(serviceProvider);
     }
 
     private void updateCustomInbound(String inboundProtocolId,
