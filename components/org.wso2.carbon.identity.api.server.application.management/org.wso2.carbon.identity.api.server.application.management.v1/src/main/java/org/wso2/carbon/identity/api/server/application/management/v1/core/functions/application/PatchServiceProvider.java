@@ -22,17 +22,15 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfig
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
-import java.util.function.BiConsumer;
-
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
 /**
  * Partially update the provided application based on patch request.
  */
-public class PatchServiceProvider implements BiConsumer<ServiceProvider, ApplicationPatchModel> {
+public class PatchServiceProvider implements UpdateFunction<ServiceProvider, ApplicationPatchModel> {
 
     @Override
-    public void accept(ServiceProvider serviceProvider, ApplicationPatchModel applicationPatchModel) {
+    public void update(ServiceProvider serviceProvider, ApplicationPatchModel applicationPatchModel) {
 
         setIfNotNull(applicationPatchModel.getName(), serviceProvider::setApplicationName);
         setIfNotNull(applicationPatchModel.getDescription(), serviceProvider::setDescription);
@@ -47,31 +45,31 @@ public class PatchServiceProvider implements BiConsumer<ServiceProvider, Applica
 
     private void updateClaimConfiguration(ServiceProvider serviceProvider, ClaimConfiguration claimConfiguration) {
 
-        update(serviceProvider, claimConfiguration, new PatchClaimConfiguration());
+        update(serviceProvider, claimConfiguration, new UpdateClaimConfiguration());
     }
 
     private void updateAuthenticationSequence(AuthenticationSequence authenticationSequence,
                                               ServiceProvider serviceProvider) {
 
-        update(serviceProvider, authenticationSequence, new PatchAuthenticationSequence());
+        update(serviceProvider, authenticationSequence, new UpdateAuthenticationSequence());
     }
 
     private void updateAdvancedConfiguration(ServiceProvider serviceProvider,
                                              AdvancedApplicationConfiguration advancedConfigurations) {
 
-        update(serviceProvider, advancedConfigurations, new PatchAdvancedConfigurations());
+        update(serviceProvider, advancedConfigurations, new UpdateAdvancedConfigurations());
     }
 
     private void updateProvisioningConfiguration(ProvisioningConfiguration provisioningConfigurations,
                                                  ServiceProvider serviceProvider) {
 
-        update(serviceProvider, provisioningConfigurations, new PatchProvisioningConfiguration());
+        update(serviceProvider, provisioningConfigurations, new UpdateProvisioningConfiguration());
     }
 
-    private <T> void update(ServiceProvider application, T t, BiConsumer<ServiceProvider, T> function) {
+    private <T> void update(ServiceProvider application, T t, UpdateFunction<ServiceProvider, T> function) {
 
         if (t != null) {
-            function.accept(application, t);
+            function.update(application, t);
         }
     }
 }

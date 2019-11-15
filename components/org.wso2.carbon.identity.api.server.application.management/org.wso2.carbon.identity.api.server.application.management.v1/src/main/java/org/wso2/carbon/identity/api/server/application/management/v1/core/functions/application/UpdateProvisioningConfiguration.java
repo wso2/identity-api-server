@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.wso2.carbon.identity.api.server.application.management.v1.InboundSCIMProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OutboundProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
@@ -24,41 +25,49 @@ import org.wso2.carbon.identity.application.common.model.OutboundProvisioningCon
 import org.wso2.carbon.identity.application.common.model.ProvisioningConnectorConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
-import java.util.Optional;
-import java.util.function.BiConsumer;
+import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
 /**
  * Updates the provisioning configurations defined by the API model in the Service Provider model.
  */
-public class PatchProvisioningConfiguration implements BiConsumer<ServiceProvider, ProvisioningConfiguration> {
+public class UpdateProvisioningConfiguration implements UpdateFunction<ServiceProvider, ProvisioningConfiguration> {
 
     @Override
-    public void accept(ServiceProvider application, ProvisioningConfiguration provisioningConfigApiModel) {
+    public void update(ServiceProvider application, ProvisioningConfiguration provisioningConfigApiModel) {
 
         if (provisioningConfigApiModel != null) {
-            Optional.ofNullable(provisioningConfigApiModel.getInboundProvisioning())
-                    .ifPresent(config -> {
-                        InboundProvisioningConfig inboundProvisioningConfig = getInboundProvisioningConfig(application);
-                        setIfNotNull(config.getProxyMode(), inboundProvisioningConfig::setDumbMode);
-                        inboundProvisioningConfig.setProvisioningUserStore(config.getProvisioningUserstoreDomain());
+            InboundSCIMProvisioningConfiguration inboundProvisioningModel =
+                    provisioningConfigApiModel.getInboundProvisioning();
 
-                        application.setInboundProvisioningConfig(inboundProvisioningConfig);
-                    });
+            if (inboundProvisioningModel != null) {
+                InboundProvisioningConfig inboundProvisioningConfig = getInboundProvisioningConfig(application);
+                setIfNotNull(inboundProvisioningModel.getProxyMode(), inboundProvisioningConfig::setDumbMode);
+                setIfNotNull(inboundProvisioningModel.getProvisioningUserstoreDomain(),
+                        inboundProvisioningConfig::setProvisioningUserStore);
+                application.setInboundProvisioningConfig(inboundProvisioningConfig);
+            }
 
-            Optional.ofNullable(provisioningConfigApiModel.getOutboundProvisioningIdps())
-                    .ifPresent(idps -> {
-                        OutboundProvisioningConfig outboundProvisioningConfig = getOutboundProvisionConfig(application);
-                        IdentityProvider[] identityProviders =
-                                idps.stream()
-                                        .map(this::getProvisioningIdentityProvider)
-                                        .toArray(IdentityProvider[]::new);
-                        outboundProvisioningConfig.setProvisioningIdentityProviders(identityProviders);
+            List<OutboundProvisioningConfiguration> outboundProvisioningIdps =
+                    provisioningConfigApiModel.getOutboundProvisioningIdps();
 
-                        application.setOutboundProvisioningConfig(outboundProvisioningConfig);
-                    });
+            if (outboundProvisioningIdps != null) {
+
+                OutboundProvisioningConfig outboundProvisioningConfig = getOutboundProvisionConfig(application);
+                IdentityProvider[] identityProviders = getProvisioningIdps(outboundProvisioningIdps);
+                outboundProvisioningConfig.setProvisioningIdentityProviders(identityProviders);
+
+                application.setOutboundProvisioningConfig(outboundProvisioningConfig);
+            }
         }
+    }
+
+    private IdentityProvider[] getProvisioningIdps(List<OutboundProvisioningConfiguration> provisioningIdps) {
+
+        return provisioningIdps.stream()
+                .map(this::getProvisioningIdentityProvider)
+                .toArray(IdentityProvider[]::new);
     }
 
     private IdentityProvider getProvisioningIdentityProvider(OutboundProvisioningConfiguration config) {
@@ -84,7 +93,7 @@ public class PatchProvisioningConfiguration implements BiConsumer<ServiceProvide
     private InboundProvisioningConfig getInboundProvisioningConfig(ServiceProvider application) {
 
         if (application.getInboundProvisioningConfig() == null) {
-            return new InboundProvisioningConfig();
+            application.setInboundProvisioningConfig(new InboundProvisioningConfig());
         }
         return application.getInboundProvisioningConfig();
     }
@@ -92,7 +101,7 @@ public class PatchProvisioningConfiguration implements BiConsumer<ServiceProvide
     private OutboundProvisioningConfig getOutboundProvisionConfig(ServiceProvider application) {
 
         if (application.getOutboundProvisioningConfig() == null) {
-            return new OutboundProvisioningConfig();
+            application.setOutboundProvisioningConfig(new OutboundProvisioningConfig());
         }
         return application.getOutboundProvisioningConfig();
     }

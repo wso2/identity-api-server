@@ -33,6 +33,7 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.Property;
+import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
@@ -51,18 +52,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.function.Function;
 
 /**
- * Converts InboundProtocols API model object to InboundAuthenticationConfig object.
+ * Updates the inbound authentication protocols defined by the API model in the Service Provider model.
  */
-public class ApiModelToInboundAuthenticatorConfig implements Function<InboundProtocols, InboundAuthenticationConfig> {
+public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, InboundProtocols> {
 
     private static final int CONNECTION_TIMEOUT_IN_SECONDS = 5;
     private static final int READ_TIMEOUT_IN_SECONDS = 10;
 
     @Override
-    public InboundAuthenticationConfig apply(InboundProtocols inboundProtocols) {
+    public void update(ServiceProvider application, InboundProtocols inboundProtocols) {
 
         List<InboundAuthenticationRequestConfig> inbounds = new ArrayList<>();
 
@@ -100,7 +100,8 @@ public class ApiModelToInboundAuthenticatorConfig implements Function<InboundPro
         inboundAuthConfig.setInboundAuthenticationRequestConfigs(
                 inbounds.toArray(new InboundAuthenticationRequestConfig[0])
         );
-        return inboundAuthConfig;
+
+        application.setInboundAuthenticationConfig(inboundAuthConfig);
     }
 
     private InboundAuthenticationRequestConfig buildCustomInbound(CustomInboundProtocolConfiguration inboundModel) {

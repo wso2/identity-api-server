@@ -69,7 +69,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response createApplication(ApplicationModel applicationModel, String template) {
 
-        ApplicationModel createdApp = applicationManagementService.createApplication(applicationModel);
+        ApplicationModel createdApp = applicationManagementService.createApplication(applicationModel, template);
         return Response.created(getResourceLocation(createdApp.getId())).entity(createdApp).build();
     }
 

@@ -31,17 +31,16 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
 /**
  * Updates the claim configurations defined by the API model in the Service Provider model.
  */
-public class PatchClaimConfiguration implements BiConsumer<ServiceProvider, ClaimConfiguration> {
+public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider, ClaimConfiguration> {
 
     @Override
-    public void accept(ServiceProvider application, ClaimConfiguration claimApiModel) {
+    public void update(ServiceProvider application, ClaimConfiguration claimApiModel) {
 
         if (claimApiModel != null) {
             ClaimConfig claimConfigs = getClaimConfig(application);

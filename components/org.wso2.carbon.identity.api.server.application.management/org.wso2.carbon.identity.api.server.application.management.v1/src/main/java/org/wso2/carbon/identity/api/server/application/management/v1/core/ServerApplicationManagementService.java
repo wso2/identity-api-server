@@ -38,7 +38,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApp
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.DeepCopyServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToCustomInbound;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
@@ -208,7 +207,11 @@ public class ServerApplicationManagementService {
         }
     }
 
-    public ApplicationModel createApplication(ApplicationModel applicationModel) {
+    public ApplicationModel createApplication(ApplicationModel applicationModel, String template) {
+
+        if (StringUtils.isNotBlank(template)) {
+            throw buildApiError(Response.Status.NOT_IMPLEMENTED, "Application creation with templates not supported.");
+        }
 
         String username = ContextLoader.getUsernameFromContext();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -223,6 +226,25 @@ public class ServerApplicationManagementService {
             String msg = "Error while creating application with name '%s' in tenantDomain: %s.";
             msg = String.format(msg, applicationModel.getName(), tenantDomain);
             throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+
+    public ApplicationModel patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
+
+        ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
+        Utils.updateApplication(appToUpdate, applicationPatchModel, new PatchServiceProvider());
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        String username = ContextLoader.getUsernameFromContext();
+        try {
+            getApplicationManagementService()
+                    .updateApplicationByResourceId(applicationId, appToUpdate, tenantDomain, username);
+
+            ServiceProvider updatedApp =
+                    getApplicationManagementService().getApplicationByResourceId(applicationId, tenantDomain);
+            return new ServiceProviderToApiModel().apply(updatedApp);
+        } catch (IdentityApplicationManagementException e) {
+            throw handleIdentityApplicationManagementException(e, "Error while patching application: " + applicationId);
         }
     }
 
@@ -378,7 +400,7 @@ public class ServerApplicationManagementService {
     private ServiceProvider getClonedServiceProvider(String applicationId) {
 
         ServiceProvider originalSp = getServiceProvider(applicationId);
-        return new DeepCopyServiceProvider().apply(originalSp);
+        return Utils.deepCopyApplication(originalSp);
     }
 
     private ServiceProvider getServiceProvider(String applicationId) {
@@ -554,38 +576,6 @@ public class ServerApplicationManagementService {
         }
     }
 
-    private APIError buildApiError(ErrorMessage errorEnum) {
-
-        ErrorResponse errorResponse = buildErrorResponse(errorEnum);
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
-    }
-
-    private APIError buildApiError(ErrorMessage errorEnum,
-                                   String... errorContextData) {
-
-        ErrorResponse errorResponse = buildErrorResponse(errorEnum, errorContextData);
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
-    }
-
-    private ErrorResponse buildErrorResponse(ErrorMessage errorEnum,
-                                             String... errorContextData) {
-
-        return new ErrorResponse.Builder()
-                .withCode(errorEnum.getCode())
-                .withDescription(buildFormattedDescription(errorEnum.getDescription(), errorContextData))
-                .withMessage(errorEnum.getMessage())
-                .build(LOG, errorEnum.getDescription());
-    }
-
-    private String buildFormattedDescription(String description, String... formatData) {
-
-        if (formatData != null) {
-            return String.format(description, formatData);
-        } else {
-            return description;
-        }
-    }
-
     private InboundProtocols getInboundProtocols(String applicationId) {
 
         ServiceProvider serviceProvider = getServiceProvider(applicationId);
@@ -615,22 +605,41 @@ public class ServerApplicationManagementService {
         }
     }
 
-    public ApplicationModel patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
+    private APIError buildApiError(Response.Status statusCode, String message) {
 
-        ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
-        new PatchServiceProvider().accept(appToUpdate, applicationPatchModel);
+        ErrorResponse errorResponse = new ErrorResponse.Builder().withMessage(message).build();
+        return new APIError(statusCode, errorResponse);
+    }
 
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        String username = ContextLoader.getUsernameFromContext();
-        try {
-            getApplicationManagementService()
-                    .updateApplicationByResourceId(applicationId, appToUpdate, tenantDomain, username);
+    private APIError buildApiError(ErrorMessage errorEnum) {
 
-            ServiceProvider updatedApp =
-                    getApplicationManagementService().getApplicationByResourceId(applicationId, tenantDomain);
-            return new ServiceProviderToApiModel().apply(updatedApp);
-        } catch (IdentityApplicationManagementException e) {
-            throw handleIdentityApplicationManagementException(e, "Error while patching application: " + applicationId);
+        ErrorResponse errorResponse = buildErrorResponse(errorEnum);
+        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
+    }
+
+    private APIError buildApiError(ErrorMessage errorEnum,
+                                   String... errorContextData) {
+
+        ErrorResponse errorResponse = buildErrorResponse(errorEnum, errorContextData);
+        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
+    }
+
+    private ErrorResponse buildErrorResponse(ErrorMessage errorEnum,
+                                             String... errorContextData) {
+
+        return new ErrorResponse.Builder()
+                .withCode(errorEnum.getCode())
+                .withDescription(buildFormattedDescription(errorEnum.getDescription(), errorContextData))
+                .withMessage(errorEnum.getMessage())
+                .build(LOG, errorEnum.getDescription());
+    }
+
+    private String buildFormattedDescription(String description, String... formatData) {
+
+        if (formatData != null) {
+            return String.format(description, formatData);
+        } else {
+            return description;
         }
     }
 }

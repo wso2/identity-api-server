@@ -3308,7 +3308,6 @@ components:
           $ref: '#/components/schemas/InboundSCIMProvisioningConfiguration'
         outboundProvisioningIdps:
           type: array
-          default: []
           items:
             $ref: '#/components/schemas/OutboundProvisioningConfiguration'
     InboundSCIMProvisioningConfiguration:
@@ -3399,7 +3398,6 @@ components:
           $ref: '#/components/schemas/WSTrustConfiguration'
         custom:
           type: array
-          default: []
           items:
             $ref: '#/components/schemas/CustomInboundProtocolConfiguration'
 
@@ -3476,7 +3474,6 @@ components:
       properties:
         mappings:
           type: array
-          default: []
           items:
             $ref: '#/components/schemas/RoleMapping'
         includeUserDomain:
@@ -3605,7 +3602,6 @@ components:
           default: false
         idpInitiatedLogoutReturnUrls:
           type: array
-          default: []
           items:
             type: string
 
@@ -3618,7 +3614,6 @@ components:
 
         audiences:
           type: array
-          default: []
           description: Additional audience values to be added to the SAML Assertions
           example:
             - 'https://app.example.com/saml'
@@ -3627,7 +3622,6 @@ components:
 
         recipients:
           type: array
-          default: []
           description: Additional recipient values to be added to the SAML Assertions
           example:
             - 'https://app.example.com/saml'
@@ -3703,7 +3697,6 @@ components:
           default: ACTIVE
         grantTypes:
           type: array
-
           example:
             - authorization_code
             - password
@@ -3713,7 +3706,6 @@ components:
         callbackURLs:
           type: array
           description: Authorized redirect URIs
-          default: []
           example:
             - 'https://app.example.com/callback1'
             - 'https://app.example.com/callback2'
@@ -3721,7 +3713,6 @@ components:
             type: string
         allowedOrigins:
           type: array
-          default: []
           description: Authorized JavaScript origins
           example:
             - 'https://app.example.com/js'
@@ -3750,7 +3741,6 @@ components:
           example: false
         scopeValidators:
           type: array
-          default: []
           example:
             - XACMLScopeValidator
             - RoleBasedScopeValidator
@@ -3799,7 +3789,6 @@ components:
           example: 3600
         audience:
           type: array
-          default: []
           example:
             - 'http://idp.xyz.com'
             - 'http://idp.abc.com'
@@ -3899,7 +3888,6 @@ components:
           example: custom-wso2-inbound-id
         properties:
           type: array
-          default: []
           items:
             $ref: '#/components/schemas/PropertyModel'
     PropertyModel:
@@ -3929,7 +3917,6 @@ components:
             $ref: '#/components/schemas/AuthenticationStepModel'
         requestPathAuthenticators:
           type: array
-          default: []
           items:
             type: string
         script:

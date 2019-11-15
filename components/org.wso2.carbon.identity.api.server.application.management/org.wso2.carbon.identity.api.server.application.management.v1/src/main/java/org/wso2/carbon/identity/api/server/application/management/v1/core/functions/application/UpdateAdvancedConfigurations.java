@@ -17,34 +17,40 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
-
-import java.util.function.BiConsumer;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
 /**
  * Updates the advanced application configurations defined by the API model in the Service Provider model.
  */
-public class PatchAdvancedConfigurations implements BiConsumer<ServiceProvider, AdvancedApplicationConfiguration> {
+public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvider, AdvancedApplicationConfiguration> {
 
     @Override
-    public void accept(ServiceProvider serviceProvider,
+    public void update(ServiceProvider serviceProvider,
                        AdvancedApplicationConfiguration advancedConfigurations) {
 
         if (advancedConfigurations != null) {
-            Utils.setIfNotNull(advancedConfigurations.getSaas(), serviceProvider::setSaasApp);
+            setIfNotNull(advancedConfigurations.getSaas(), serviceProvider::setSaasApp);
 
-            LocalAndOutboundAuthenticationConfig config = serviceProvider.getLocalAndOutBoundAuthenticationConfig();
-            Utils.setIfNotNull(advancedConfigurations.getSkipConsent(), config::setSkipConsent);
-            Utils.setIfNotNull(advancedConfigurations.getReturnAuthenticatedIdpList(),
+            LocalAndOutboundAuthenticationConfig config = getLocalAndOutboundConfig(serviceProvider);
+            setIfNotNull(advancedConfigurations.getSkipConsent(), config::setSkipConsent);
+            setIfNotNull(advancedConfigurations.getReturnAuthenticatedIdpList(),
                     config::setAlwaysSendBackAuthenticatedListOfIdPs);
-            Utils.setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
+            setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
 
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
         }
+    }
+
+    private LocalAndOutboundAuthenticationConfig getLocalAndOutboundConfig(ServiceProvider application) {
+
+        if (application.getLocalAndOutBoundAuthenticationConfig() == null) {
+            application.setLocalAndOutBoundAuthenticationConfig(new LocalAndOutboundAuthenticationConfig());
+        }
+
+        return application.getLocalAndOutBoundAuthenticationConfig();
     }
 
     private void updateCertificate(Certificate certificate, ServiceProvider serviceProvider) {

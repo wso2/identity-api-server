@@ -18,14 +18,21 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateFunction;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
+import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
 import org.wso2.carbon.security.SecurityConfigException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.function.Consumer;
 import javax.ws.rs.core.Response;
@@ -54,6 +61,35 @@ public class Utils {
         if (value != null) {
             consumer.accept(value);
         }
+    }
+
+    public static <T> void updateApplication(ServiceProvider application,
+                                             T configsToUpdate,
+                                             UpdateFunction<ServiceProvider, T> function) {
+
+        if (configsToUpdate != null) {
+            function.update(application, configsToUpdate);
+        }
+    }
+
+    public static ServiceProvider deepCopyApplication(ServiceProvider application) {
+
+        ObjectOutputStream objOutPutStream;
+        ObjectInputStream objInputStream;
+        ServiceProvider newObject;
+        try {
+            ByteArrayOutputStream byteArrayOutPutStream = new ByteArrayOutputStream();
+            objOutPutStream = new ObjectOutputStream(byteArrayOutPutStream);
+            objOutPutStream.writeObject(application);
+
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutPutStream.toByteArray());
+            objInputStream = new ObjectInputStream(byteArrayInputStream);
+            newObject = (ServiceProvider) objInputStream.readObject();
+
+        } catch (ClassNotFoundException | IOException e) {
+            throw buildServerErrorResponse(e, "Error deep cloning application object.");
+        }
+        return newObject;
     }
 
     public static APIError buildClientError(String message) {

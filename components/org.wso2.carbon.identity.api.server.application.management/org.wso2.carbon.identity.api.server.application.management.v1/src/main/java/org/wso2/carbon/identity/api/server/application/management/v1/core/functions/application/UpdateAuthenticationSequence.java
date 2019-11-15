@@ -36,15 +36,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 
 /**
  * Updates the authentication configuration defined by the API model in the Service Provider model.
  */
-public class PatchAuthenticationSequence implements BiConsumer<ServiceProvider, AuthenticationSequence> {
+public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvider, AuthenticationSequence> {
 
     @Override
-    public void accept(ServiceProvider application, AuthenticationSequence authSequenceApiModel) {
+    public void update(ServiceProvider application, AuthenticationSequence authSequenceApiModel) {
 
         if (authSequenceApiModel != null) {
             updateRequestPathAuthenticatorConfigs(authSequenceApiModel, application);
