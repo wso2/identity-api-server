@@ -36,6 +36,7 @@ public class FederatedAuthenticatorPUTRequest  {
     private String authenticatorId;
     private String name;
     private Boolean isEnabled = false;
+    private Boolean isDefault = false;
     private List<Property> properties = null;
 
 
@@ -95,6 +96,24 @@ public class FederatedAuthenticatorPUTRequest  {
 
     /**
     **/
+    public FederatedAuthenticatorPUTRequest isDefault(Boolean isDefault) {
+
+        this.isDefault = isDefault;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("isDefault")
+    @Valid
+    public Boolean getIsDefault() {
+        return isDefault;
+    }
+    public void setIsDefault(Boolean isDefault) {
+        this.isDefault = isDefault;
+    }
+
+    /**
+    **/
     public FederatedAuthenticatorPUTRequest properties(List<Property> properties) {
 
         this.properties = properties;
@@ -134,12 +153,13 @@ public class FederatedAuthenticatorPUTRequest  {
         return Objects.equals(this.authenticatorId, federatedAuthenticatorPUTRequest.authenticatorId) &&
             Objects.equals(this.name, federatedAuthenticatorPUTRequest.name) &&
             Objects.equals(this.isEnabled, federatedAuthenticatorPUTRequest.isEnabled) &&
+            Objects.equals(this.isDefault, federatedAuthenticatorPUTRequest.isDefault) &&
             Objects.equals(this.properties, federatedAuthenticatorPUTRequest.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, isEnabled, properties);
+        return Objects.hash(authenticatorId, name, isEnabled, isDefault, properties);
     }
 
     @Override
@@ -151,6 +171,7 @@ public class FederatedAuthenticatorPUTRequest  {
         sb.append("    authenticatorId: ").append(toIndentedString(authenticatorId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    isDefault: ").append(toIndentedString(isDefault)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();

@@ -36,6 +36,7 @@ public class OutboundConnectorPUTRequest  {
     private String connectorId;
     private String name;
     private Boolean isEnabled = false;
+    private Boolean isDefault = false;
     private Boolean blockingEnabled = false;
     private Boolean rulesEnabled = false;
     private List<Property> properties = null;
@@ -93,6 +94,24 @@ public class OutboundConnectorPUTRequest  {
     }
     public void setIsEnabled(Boolean isEnabled) {
         this.isEnabled = isEnabled;
+    }
+
+    /**
+    **/
+    public OutboundConnectorPUTRequest isDefault(Boolean isDefault) {
+
+        this.isDefault = isDefault;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("isDefault")
+    @Valid
+    public Boolean getIsDefault() {
+        return isDefault;
+    }
+    public void setIsDefault(Boolean isDefault) {
+        this.isDefault = isDefault;
     }
 
     /**
@@ -172,6 +191,7 @@ public class OutboundConnectorPUTRequest  {
         return Objects.equals(this.connectorId, outboundConnectorPUTRequest.connectorId) &&
             Objects.equals(this.name, outboundConnectorPUTRequest.name) &&
             Objects.equals(this.isEnabled, outboundConnectorPUTRequest.isEnabled) &&
+            Objects.equals(this.isDefault, outboundConnectorPUTRequest.isDefault) &&
             Objects.equals(this.blockingEnabled, outboundConnectorPUTRequest.blockingEnabled) &&
             Objects.equals(this.rulesEnabled, outboundConnectorPUTRequest.rulesEnabled) &&
             Objects.equals(this.properties, outboundConnectorPUTRequest.properties);
@@ -179,7 +199,7 @@ public class OutboundConnectorPUTRequest  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(connectorId, name, isEnabled, blockingEnabled, rulesEnabled, properties);
+        return Objects.hash(connectorId, name, isEnabled, isDefault, blockingEnabled, rulesEnabled, properties);
     }
 
     @Override
@@ -191,6 +211,7 @@ public class OutboundConnectorPUTRequest  {
         sb.append("    connectorId: ").append(toIndentedString(connectorId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    isDefault: ").append(toIndentedString(isDefault)).append("\n");
         sb.append("    blockingEnabled: ").append(toIndentedString(blockingEnabled)).append("\n");
         sb.append("    rulesEnabled: ").append(toIndentedString(rulesEnabled)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");

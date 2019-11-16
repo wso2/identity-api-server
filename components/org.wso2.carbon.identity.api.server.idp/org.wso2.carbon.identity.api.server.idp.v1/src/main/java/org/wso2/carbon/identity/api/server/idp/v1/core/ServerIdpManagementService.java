@@ -40,7 +40,6 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRe
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListItem;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
-import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import org.wso2.carbon.identity.api.server.idp.v1.model.MetaFederatedAuthenticator;
@@ -162,31 +161,6 @@ public class ServerIdpManagementService {
             return createIDPResponse(identityProvider);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP, idpId);
-        }
-    }
-
-    /**
-     * Update an identity provider.
-     *
-     * @param identityProviderPUTRequest identityProviderPUTRequest.
-     * @return IdentityProviderResponse.
-     */
-    public IdentityProviderResponse updateIDP(String identityProviderId, IdentityProviderPUTRequest
-            identityProviderPUTRequest) {
-
-        IdentityProvider identityProvider;
-        try {
-            identityProvider =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(identityProviderId,
-                            createIDP(identityProviderPUTRequest),
-                            ContextLoader.getTenantDomainFromContext());
-            if (identityProvider == null) {
-                throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
-                        identityProviderId);
-            }
-            return createIDPResponse(identityProvider);
-        } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, identityProviderId);
         }
     }
 
@@ -458,7 +432,7 @@ public class ServerIdpManagementService {
             if (fedAuthConfigs != null) {
                 for (FederatedAuthenticatorConfig config : fedAuthConfigs) {
                     if (StringUtils.equals(config.getName(), base64URLDecode(authenticatorId))) {
-                        return createFederatedAuthenticator(authenticatorId, config);
+                        return createFederatedAuthenticator(authenticatorId, idp);
                     }
                 }
             }
@@ -496,7 +470,8 @@ public class ServerIdpManagementService {
             // Create new FederatedAuthenticatorConfig to store the federated authenticator information.
             FederatedAuthenticatorConfig authConfig = createFederatedAuthenticatorConfig(federatedAuthenticatorId,
                     authenticator);
-            FederatedAuthenticatorConfig[] fedAuthConfigs = idp.getFederatedAuthenticatorConfigs();
+            FederatedAuthenticatorConfig[] fedAuthConfigs = createFederatedAuthenticatorArrayClone
+                    (federatedAuthenticatorId, idp.getFederatedAuthenticatorConfigs());
             int configPos = getExistingAuthConfigPosition(fedAuthConfigs, federatedAuthenticatorId);
             // If configPos != -1, modify the existing authenticatorConfig of IDP.
             if (configPos != -1) {
@@ -504,8 +479,7 @@ public class ServerIdpManagementService {
             } else {
                 // If configPos is -1 add new authenticator to the list.
                 if (isAuthenticatorValid(federatedAuthenticatorId)) {
-                    List<FederatedAuthenticatorConfig> authConfigList = new ArrayList<>(fedAuthConfigs != null ?
-                            Arrays.asList(fedAuthConfigs) : new ArrayList<>());
+                    List<FederatedAuthenticatorConfig> authConfigList = new ArrayList<>(Arrays.asList(fedAuthConfigs));
                     authConfigList.add(authConfig);
                     fedAuthConfigs = authConfigList.toArray(new FederatedAuthenticatorConfig[0]);
                 } else {
@@ -515,14 +489,17 @@ public class ServerIdpManagementService {
             }
             idpToUpdate.setFederatedAuthenticatorConfigs(fedAuthConfigs);
 
-            // If no default authenticator has been set previously, mark this as default.
-            if (idpToUpdate.getDefaultAuthenticatorConfig() == null) {
+            if (authenticator.getIsDefault()) {
                 idpToUpdate.setDefaultAuthenticatorConfig(authConfig);
+            } else if (idpToUpdate.getDefaultAuthenticatorConfig() != null && idpToUpdate
+                    .getDefaultAuthenticatorConfig().getName().equals(authConfig.getName())) {
+                idpToUpdate.setDefaultAuthenticatorConfig(null);
             }
-            IdentityProviderServiceHolder.getIdentityProviderManager()
+
+            IdentityProvider updatedIdP = IdentityProviderServiceHolder.getIdentityProviderManager()
                     .updateIdPByResourceId(idpId, idpToUpdate, ContextLoader
                             .getTenantDomainFromContext());
-            return createFederatedAuthenticator(federatedAuthenticatorId, authConfig);
+            return createFederatedAuthenticator(federatedAuthenticatorId, updatedIdP);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_AUTHENTICATOR,
                     federatedAuthenticatorId);
@@ -590,7 +567,7 @@ public class ServerIdpManagementService {
             if (connectorConfigs != null) {
                 for (ProvisioningConnectorConfig config : connectorConfigs) {
                     if (StringUtils.equals(config.getName(), base64URLDecode(connectorId))) {
-                        return createOutboundConnector(connectorId, config);
+                        return createOutboundConnector(connectorId, idp);
                     }
                 }
             }
@@ -625,15 +602,16 @@ public class ServerIdpManagementService {
             ProvisioningConnectorConfig connectorConfig = createProvisioningConnectorConfig(connectorId,
                     outboundConnector);
 
-            ProvisioningConnectorConfig[] provConnectorConfigs = idp.getProvisioningConnectorConfigs();
+            ProvisioningConnectorConfig[] provConnectorConfigs = createProvisioningConnectorArrayClone(connectorId, idp
+                    .getProvisioningConnectorConfigs());
             int configPos = getExistingProvConfigPosition(provConnectorConfigs, connectorId);
             if (configPos != -1) {
                 provConnectorConfigs[configPos] = connectorConfig;
             } else {
                 // if configPos is -1 add new authenticator to the list.
                 if (isConnectorValid(connectorId)) {
-                    List<ProvisioningConnectorConfig> connectorConfigsList = new ArrayList<>(provConnectorConfigs !=
-                            null ? Arrays.asList(provConnectorConfigs) : new ArrayList<>());
+                    List<ProvisioningConnectorConfig> connectorConfigsList = new ArrayList<>(
+                            Arrays.asList(provConnectorConfigs));
                     connectorConfigsList.add(connectorConfig);
                     provConnectorConfigs = connectorConfigsList.toArray(new ProvisioningConnectorConfig[0]);
                 } else {
@@ -643,15 +621,17 @@ public class ServerIdpManagementService {
             }
             idpToUpdate.setProvisioningConnectorConfigs(provConnectorConfigs);
 
-            // If no default provisioning connector has been set previously, mark this as default.
-            if (idpToUpdate.getDefaultProvisioningConnectorConfig() == null) {
+            if (outboundConnector.getIsDefault()) {
                 idpToUpdate.setDefaultProvisioningConnectorConfig(connectorConfig);
+            } else if (idpToUpdate.getDefaultProvisioningConnectorConfig() != null && idpToUpdate
+                    .getDefaultProvisioningConnectorConfig().getName().equals(connectorConfig.getName())) {
+                idpToUpdate.setDefaultProvisioningConnectorConfig(null);
             }
 
-            IdentityProviderServiceHolder.getIdentityProviderManager()
+            IdentityProvider updatedIdP = IdentityProviderServiceHolder.getIdentityProviderManager()
                     .updateIdPByResourceId(idpId, idpToUpdate, ContextLoader
                             .getTenantDomainFromContext());
-            return createOutboundConnector(connectorId, connectorConfig);
+            return createOutboundConnector(connectorId, updatedIdP);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_CONNECTOR, connectorId);
         }
@@ -1513,6 +1493,53 @@ public class ServerIdpManagementService {
     }
 
     /**
+     * Creates a clone of IDP's federated authenticator list to be modified during PUT request.
+     *
+     * @param authenticatorId Federated authenticator resource ID.
+     * @param configs         IDP's authenticator configs.
+     * @return Clone of authenticator config array.
+     */
+    private FederatedAuthenticatorConfig[] createFederatedAuthenticatorArrayClone(String authenticatorId,
+                                                                                  FederatedAuthenticatorConfig[]
+                                                                                          configs) {
+
+        List<FederatedAuthenticatorConfig> cloneList = new ArrayList<>();
+        try {
+            for (FederatedAuthenticatorConfig config : configs) {
+                cloneList.add((FederatedAuthenticatorConfig) BeanUtils.cloneBean(config));
+            }
+            return cloneList.toArray(new FederatedAuthenticatorConfig[0]);
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException
+                e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_UPDATING_IDP_AUTHENTICATOR, authenticatorId);
+        }
+    }
+
+    /**
+     * Creates a clone of IDP's provisioning connector config list to be modified during PUT request.
+     *
+     * @param connectorId Provisioning connector resource ID.
+     * @param configs     IDP's provisioning connector configs.
+     * @return Clone of connector config array.
+     */
+    private ProvisioningConnectorConfig[] createProvisioningConnectorArrayClone(String connectorId,
+                                                                                ProvisioningConnectorConfig[] configs) {
+
+        List<ProvisioningConnectorConfig> cloneList = new ArrayList<>();
+        try {
+            for (ProvisioningConnectorConfig config : configs) {
+                cloneList.add((ProvisioningConnectorConfig) BeanUtils.cloneBean(config));
+            }
+            return cloneList.toArray(new ProvisioningConnectorConfig[0]);
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException
+                e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_UPDATING_IDP_CONNECTOR, connectorId);
+        }
+    }
+
+    /**
      * Return the position indicator of an outbound connector from the configured list of provisioning connector
      * configs of an IDP.
      *
@@ -1716,31 +1743,67 @@ public class ServerIdpManagementService {
     /**
      * Create API Federated Authenticator model using internal FederatedAuthenticatorConfig.
      *
-     * @param authenticatorId Federated Authenticator ID.
-     * @param config          Federated Authenticator Config.
+     * @param authenticatorId  Federated Authenticator ID.
+     * @param identityProvider Identity Provider information.
      * @return FederatedAuthenticator.
      */
-    private FederatedAuthenticator createFederatedAuthenticator(String authenticatorId, FederatedAuthenticatorConfig
-            config) {
+    private FederatedAuthenticator createFederatedAuthenticator(String authenticatorId,
+                                                                IdentityProvider identityProvider) {
 
+        FederatedAuthenticatorConfig[] authConfigs = identityProvider.getFederatedAuthenticatorConfigs();
+        if (ArrayUtils.isEmpty(authConfigs)) {
+            return null;
+        }
+        FederatedAuthenticatorConfig config = null;
+        boolean isDefaultAuthenticator = false;
+        String authenticatorName = base64URLDecode(authenticatorId);
+        for (FederatedAuthenticatorConfig authConfig : authConfigs) {
+            if (StringUtils.equals(authConfig.getName(), authenticatorName)) {
+                config = authConfig;
+            }
+        }
+        if (identityProvider.getDefaultAuthenticatorConfig() != null && StringUtils.equals(identityProvider
+                .getDefaultAuthenticatorConfig().getName(), authenticatorName)) {
+            isDefaultAuthenticator = true;
+        }
         FederatedAuthenticator federatedAuthenticator = new FederatedAuthenticator();
-        federatedAuthenticator.setAuthenticatorId(authenticatorId);
-        federatedAuthenticator.setName(config.getName());
-        federatedAuthenticator.setIsEnabled(config.isEnabled());
-        List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties =
-                Arrays.stream(config.getProperties()).map(propertyToExternal).collect(Collectors.toList());
-        federatedAuthenticator.setProperties(properties);
+        if (config != null) {
+            federatedAuthenticator.setAuthenticatorId(authenticatorId);
+            federatedAuthenticator.setName(config.getName());
+            federatedAuthenticator.setIsEnabled(config.isEnabled());
+            federatedAuthenticator.setIsDefault(isDefaultAuthenticator);
+            List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties =
+                    Arrays.stream(config.getProperties()).map(propertyToExternal).collect(Collectors.toList());
+            federatedAuthenticator.setProperties(properties);
+        }
         return federatedAuthenticator;
     }
 
     /**
      * Create external OutboundConnector from Provisioning Config.
      *
-     * @param connectorId Outbound provisioning connector resource ID.
-     * @param config      Internal provisioning connector config.
+     * @param connectorId      Outbound provisioning connector resource ID.
+     * @param identityProvider Identity Provider information.
      * @return External outbound connector.
      */
-    private OutboundConnector createOutboundConnector(String connectorId, ProvisioningConnectorConfig config) {
+    private OutboundConnector createOutboundConnector(String connectorId, IdentityProvider identityProvider) {
+
+        ProvisioningConnectorConfig[] connectorConfigs = identityProvider.getProvisioningConnectorConfigs();
+        if (ArrayUtils.isEmpty(connectorConfigs)) {
+            return null;
+        }
+        ProvisioningConnectorConfig config = null;
+        boolean isDefaultConnector = false;
+        String connectorName = base64URLDecode(connectorId);
+        for (ProvisioningConnectorConfig connectorConfig : connectorConfigs) {
+            if (StringUtils.equals(connectorConfig.getName(), connectorName)) {
+                config = connectorConfig;
+            }
+        }
+        if (identityProvider.getDefaultProvisioningConnectorConfig() != null && StringUtils.equals(identityProvider
+                .getDefaultProvisioningConnectorConfig().getName(), connectorName)) {
+            isDefaultConnector = true;
+        }
 
         OutboundConnector outboundConnector = null;
         if (config != null) {
@@ -1748,6 +1811,7 @@ public class ServerIdpManagementService {
             outboundConnector.setConnectorId(connectorId);
             outboundConnector.setName(config.getName());
             outboundConnector.setIsEnabled(config.isEnabled());
+            outboundConnector.setIsDefault(isDefaultConnector);
             outboundConnector.setBlockingEnabled(config.isBlocking());
             outboundConnector.setRulesEnabled(config.isRulesEnabled());
             List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties =

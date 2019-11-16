@@ -28,7 +28,6 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorLi
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
-import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import java.util.List;
@@ -86,8 +85,6 @@ public interface IdentityProvidersApiService {
       public Response updateClaimConfig(String identityProviderId, Claims claims);
 
       public Response updateFederatedAuthenticator(String identityProviderId, String federatedAuthenticatorId, FederatedAuthenticatorPUTRequest federatedAuthenticatorPUTRequest);
-
-      public Response updateIDP(String identityProviderId, IdentityProviderPUTRequest identityProviderPUTRequest);
 
       public Response updateJITConfig(String identityProviderId, JustInTimeProvisioning justInTimeProvisioning);
 

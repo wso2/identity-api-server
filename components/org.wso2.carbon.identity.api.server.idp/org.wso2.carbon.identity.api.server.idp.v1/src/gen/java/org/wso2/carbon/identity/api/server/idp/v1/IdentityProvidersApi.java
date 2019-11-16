@@ -25,7 +25,6 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorLi
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
-import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import java.util.List;
@@ -535,30 +534,6 @@ public class IdentityProvidersApi  {
     public Response updateFederatedAuthenticator(@ApiParam(value = "Id of the Identity Provider",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "Id of the federated authenticator",required=true) @PathParam("federated-authenticator-id") String federatedAuthenticatorId, @ApiParam(value = "This represents the federated authenticator to be updated" ,required=true) @Valid FederatedAuthenticatorPUTRequest federatedAuthenticatorPUTRequest) {
 
         return delegate.updateFederatedAuthenticator(identityProviderId,  federatedAuthenticatorId,  federatedAuthenticatorPUTRequest );
-    }
-
-    @Valid
-    @PUT
-    @Path("/{identity-provider-id}")
-    @Consumes({ "application/json", "application/xml" })
-    @Produces({ "application/json", "application/xml" })
-    @ApiOperation(value = "Update an identity provider by identity provider's id ", notes = "This API provides the capability to update an identity provider by giving its id ", response = IdentityProviderResponse.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Identity Providers", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response", response = IdentityProviderResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response updateIDP(@ApiParam(value = "Id of the Identity Provider",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the identity provider data to be updated" ,required=true) @Valid IdentityProviderPUTRequest identityProviderPUTRequest) {
-
-        return delegate.updateIDP(identityProviderId,  identityProviderPUTRequest );
     }
 
     @Valid

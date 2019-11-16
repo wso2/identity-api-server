@@ -36,6 +36,7 @@ public class FederatedAuthenticator  {
     private String authenticatorId;
     private String name;
     private Boolean isEnabled = false;
+    private Boolean isDefault = false;
     private List<Property> properties = null;
 
 
@@ -97,6 +98,24 @@ public class FederatedAuthenticator  {
 
     /**
     **/
+    public FederatedAuthenticator isDefault(Boolean isDefault) {
+
+        this.isDefault = isDefault;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("isDefault")
+    @Valid
+    public Boolean getIsDefault() {
+        return isDefault;
+    }
+    public void setIsDefault(Boolean isDefault) {
+        this.isDefault = isDefault;
+    }
+
+    /**
+    **/
     public FederatedAuthenticator properties(List<Property> properties) {
 
         this.properties = properties;
@@ -136,12 +155,13 @@ public class FederatedAuthenticator  {
         return Objects.equals(this.authenticatorId, federatedAuthenticator.authenticatorId) &&
             Objects.equals(this.name, federatedAuthenticator.name) &&
             Objects.equals(this.isEnabled, federatedAuthenticator.isEnabled) &&
+            Objects.equals(this.isDefault, federatedAuthenticator.isDefault) &&
             Objects.equals(this.properties, federatedAuthenticator.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, isEnabled, properties);
+        return Objects.hash(authenticatorId, name, isEnabled, isDefault, properties);
     }
 
     @Override
@@ -153,6 +173,7 @@ public class FederatedAuthenticator  {
         sb.append("    authenticatorId: ").append(toIndentedString(authenticatorId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    isDefault: ").append(toIndentedString(isDefault)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();

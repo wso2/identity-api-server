@@ -36,6 +36,7 @@ public class OutboundConnector  {
     private String connectorId;
     private String name;
     private Boolean isEnabled = false;
+    private Boolean isDefault = false;
     private Boolean blockingEnabled = false;
     private Boolean rulesEnabled = false;
     private List<Property> properties = null;
@@ -95,6 +96,24 @@ public class OutboundConnector  {
     }
     public void setIsEnabled(Boolean isEnabled) {
         this.isEnabled = isEnabled;
+    }
+
+    /**
+    **/
+    public OutboundConnector isDefault(Boolean isDefault) {
+
+        this.isDefault = isDefault;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("isDefault")
+    @Valid
+    public Boolean getIsDefault() {
+        return isDefault;
+    }
+    public void setIsDefault(Boolean isDefault) {
+        this.isDefault = isDefault;
     }
 
     /**
@@ -174,6 +193,7 @@ public class OutboundConnector  {
         return Objects.equals(this.connectorId, outboundConnector.connectorId) &&
             Objects.equals(this.name, outboundConnector.name) &&
             Objects.equals(this.isEnabled, outboundConnector.isEnabled) &&
+            Objects.equals(this.isDefault, outboundConnector.isDefault) &&
             Objects.equals(this.blockingEnabled, outboundConnector.blockingEnabled) &&
             Objects.equals(this.rulesEnabled, outboundConnector.rulesEnabled) &&
             Objects.equals(this.properties, outboundConnector.properties);
@@ -181,7 +201,7 @@ public class OutboundConnector  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(connectorId, name, isEnabled, blockingEnabled, rulesEnabled, properties);
+        return Objects.hash(connectorId, name, isEnabled, isDefault, blockingEnabled, rulesEnabled, properties);
     }
 
     @Override
@@ -193,6 +213,7 @@ public class OutboundConnector  {
         sb.append("    connectorId: ").append(toIndentedString(connectorId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    isDefault: ").append(toIndentedString(isDefault)).append("\n");
         sb.append("    blockingEnabled: ").append(toIndentedString(blockingEnabled)).append("\n");
         sb.append("    rulesEnabled: ").append(toIndentedString(rulesEnabled)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");

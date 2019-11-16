@@ -477,95 +477,6 @@ paths:
       x-wso2-request: ''
       x-wso2-response: |
         "HTTP/1.1 200 Ok"
-    put:
-      tags:
-        - Identity Providers
-      summary: |
-        Update an identity provider by identity provider's id
-      description: >
-        This API provides the capability to update an identity provider by
-        giving its id
-      operationId: updateIDP
-      parameters:
-        - name: identity-provider-id
-          in: path
-          description: Id of the Identity Provider
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful response
-          headers:
-            Location:
-              description: Location of the updated identity provider
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IdentityProviderResponse'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/IdentityProviderResponse'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/IdentityProviderPUTRequest'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/IdentityProviderPUTRequest'
-        description: This represents the identity provider data to be updated
-        required: true
     patch:
       tags:
         - Identity Providers
@@ -1947,17 +1858,6 @@ components:
           $ref: '#/components/schemas/FederatedAuthenticatorRequest'
         provisioning:
           $ref: '#/components/schemas/ProvisioningRequest'
-    IdentityProviderPUTRequest:
-      allOf:
-        - $ref: '#/components/schemas/IdentityProviderPOSTRequest'
-        - required:
-            - name
-          properties:
-            isEnabled:
-              type: boolean
-              default: true
-              example: false
-              description: Whether identity provider is enabled or not
     IdentityProviderResponse:
       type: object
       properties:
@@ -2113,6 +2013,9 @@ components:
           type: boolean
           default: false
           example: true
+        isDefault:
+          type: boolean
+          default: false
         properties:
           type: array
           items:
@@ -2132,6 +2035,10 @@ components:
           type: boolean
           default: false
           example: true
+        isDefault:
+          type: boolean
+          default: false
+          example: false
         properties:
           type: array
           items:
@@ -2238,6 +2145,9 @@ components:
           type: boolean
           default: false
           example: true
+        isDefault:
+          type: boolean
+          default: false
         blockingEnabled:
           type: boolean
           default: false
@@ -2263,6 +2173,9 @@ components:
           type: boolean
           default: false
           example: true
+        isDefault:
+          type: boolean
+          default: false
         blockingEnabled:
           type: boolean
           default: false

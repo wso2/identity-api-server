@@ -25,7 +25,6 @@ import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementServic
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
-import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnectorPUTRequest;
@@ -178,13 +177,6 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
 
         return Response.ok().entity(idpManagementService.updateFederatedAuthenticator(identityProviderId,
                 federatedAuthenticatorId, federatedAuthenticatorPUTRequest))
-                .build();
-    }
-
-    @Override
-    public Response updateIDP(String identityProviderId, IdentityProviderPUTRequest identityProviderPUTRequest) {
-
-        return Response.ok().entity(idpManagementService.updateIDP(identityProviderId, identityProviderPUTRequest))
                 .build();
     }
 
