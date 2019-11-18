@@ -72,9 +72,7 @@ public class SAMLSSOServiceProviderToAPIModel implements Function<SAMLSSOService
                 .enableSAML2ArtifactBinding(dto.isEnableSAML2ArtifactBinding())
                 .enableSignatureValidationInArtifactBinding(dto.isDoValidateSignatureInArtifactResolve())
 
-                .idPEntityidAlias(dto.getIdpEntityIDAlias()
-
-                );
+                .idPEntityidAlias(dto.getIdpEntityIDAlias());
     }
 
     private String getIssuerWithoutQualifier(SAMLSSOServiceProviderDTO dto) {

@@ -23,8 +23,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsC
 import org.wso2.carbon.identity.api.server.application.management.v1.PropertyModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.oauth2.OAuthConsumerAppToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.saml.SAMLSSOServiceProviderToAPIModel;
+import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.Property;
@@ -38,9 +40,9 @@ import org.wso2.carbon.security.sts.service.util.TrustedServiceData;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -55,8 +57,6 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
  * Utility functions related to application inbound protocols.
  */
 public class InboundUtils {
-
-    private static final Set<String> standardInbounds = new HashSet<>();
 
     public static OpenIDConnectConfiguration getOAuthInbound(ServiceProvider application) {
 
@@ -186,5 +186,110 @@ public class InboundUtils {
                 .key(inboundProperty.getName())
                 .value(inboundProperty.getValue())
                 .friendlyName(inboundProperty.getDisplayName());
+    }
+
+    public static String getInboundAuthKey(ServiceProvider application,
+                                           String inboundType) {
+
+        InboundAuthenticationConfig inboundAuthConfig = application.getInboundAuthenticationConfig();
+        if (inboundAuthConfig != null) {
+            InboundAuthenticationRequestConfig[] inbounds = inboundAuthConfig.getInboundAuthenticationRequestConfigs();
+            if (inbounds != null) {
+                return Arrays.stream(inbounds)
+                        .filter(inbound -> inboundType.equals(inbound.getInboundAuthType()))
+                        .findAny()
+                        .map(InboundAuthenticationRequestConfig::getInboundAuthKey)
+                        .orElse(null);
+            }
+        }
+
+        return null;
+    }
+
+    public static void rollbackInbounds(List<InboundAuthenticationRequestConfig> currentlyAddedInbounds) {
+
+        for (InboundAuthenticationRequestConfig inbound : currentlyAddedInbounds) {
+            switch (inbound.getInboundAuthType()) {
+                case FrameworkConstants.StandardInboundProtocols.SAML2:
+                    rollbackSAMLServiceProvider(inbound);
+                    break;
+                case FrameworkConstants.StandardInboundProtocols.OAUTH2:
+                    rollbackOAuth2ConsumerApp(inbound);
+                    break;
+                case FrameworkConstants.StandardInboundProtocols.WS_TRUST:
+                    rollbackWsTrustService(inbound);
+                    break;
+                default:
+                    // No rollbacks required for other inbounds.
+                    break;
+            }
+        }
+    }
+
+    private static void rollbackWsTrustService(InboundAuthenticationRequestConfig inbound) {
+
+        try {
+            String trustedServiceAudience = inbound.getInboundAuthKey();
+            ApplicationManagementServiceHolder.getStsAdminService().removeTrustedService(trustedServiceAudience);
+        } catch (SecurityConfigException e) {
+            throw Utils.buildServerErrorResponse(e, "Error while trying to rollback wsTrust configuration. "
+                    + e.getMessage());
+        }
+    }
+
+    private static void rollbackOAuth2ConsumerApp(InboundAuthenticationRequestConfig inbound) {
+
+        try {
+            String consumerKey = inbound.getInboundAuthKey();
+            ApplicationManagementServiceHolder.getOAuthAdminService().removeOAuthApplicationData(consumerKey);
+        } catch (IdentityOAuthAdminException e) {
+            throw Utils.buildServerErrorResponse(e, "Error while trying to rollback OAuth2/OpenIDConnect " +
+                    "configuration." + e.getMessage());
+        }
+    }
+
+    private static void rollbackSAMLServiceProvider(InboundAuthenticationRequestConfig inbound) {
+
+        try {
+            String issuer = inbound.getInboundAuthKey();
+            ApplicationManagementServiceHolder.getSamlssoConfigService().removeServiceProvider(issuer);
+        } catch (IdentityException e) {
+            throw Utils.buildServerErrorResponse(e, "Error while trying to rollback SAML2 configuration."
+                    + e.getMessage());
+        }
+    }
+
+    public static void updateOrInsertInbound(ServiceProvider application,
+                                             String inboundType,
+                                             InboundAuthenticationRequestConfig newInbound) {
+
+        InboundAuthenticationConfig inboundAuthConfig = application.getInboundAuthenticationConfig();
+        if (inboundAuthConfig != null) {
+
+            InboundAuthenticationRequestConfig[] inbounds = inboundAuthConfig.getInboundAuthenticationRequestConfigs();
+            if (inbounds != null) {
+                Map<String, InboundAuthenticationRequestConfig> inboundAuthConfigs =
+                        Arrays.stream(inbounds).collect(
+                                Collectors.toMap(InboundAuthenticationRequestConfig::getInboundAuthType,
+                                        Function.identity()));
+
+                inboundAuthConfigs.put(inboundType, newInbound);
+                inboundAuthConfig.setInboundAuthenticationRequestConfigs(
+                        inboundAuthConfigs.values().toArray(new InboundAuthenticationRequestConfig[0]));
+            } else {
+                addNewInboundToSp(application, newInbound);
+            }
+        } else {
+            // Create new inbound auth config.
+            addNewInboundToSp(application, newInbound);
+        }
+    }
+
+    private static void addNewInboundToSp(ServiceProvider application, InboundAuthenticationRequestConfig newInbound) {
+
+        InboundAuthenticationConfig inboundAuth = new InboundAuthenticationConfig();
+        inboundAuth.setInboundAuthenticationRequestConfigs(new InboundAuthenticationRequestConfig[]{newInbound});
+
+        application.setInboundAuthenticationConfig(inboundAuth);
     }
 }

@@ -144,8 +144,8 @@ public class ApiModelToOAuthConsumerApp implements Function<OpenIDConnectConfigu
         if (CollectionUtils.isNotEmpty(callbackURLs)) {
             // We can't support multiple callback URLs at the moment. So we need to send a server error.
             if (callbackURLs.size() > 1) {
-                // TODO: fix this to return a server
-                throw Utils.buildNotImplementedErrorResponse("Multiple callbacks are not supported yet.");
+                throw Utils.buildNotImplementedErrorResponse("Multiple callbacks for OAuth2 are not supported yet. " +
+                        "Please use regex to define multiple callbacks.");
             } else if (callbackURLs.size() == 1) {
                 return callbackURLs.get(0);
             } else {

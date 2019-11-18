@@ -226,30 +226,38 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response updateCustomInboundConfiguration(String applicationId,
                                                      String inboundProtocolId,
-                                                     CustomInboundProtocolConfiguration customInboundProtocolConfig) {
+                                                     CustomInboundProtocolConfiguration customInboundModel) {
 
-        applicationManagementService.updateCustomInbound(applicationId, inboundProtocolId, customInboundProtocolConfig);
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        CustomInboundProtocolConfiguration updatedCustomInbound =
+                applicationManagementService.updateCustomInbound(applicationId, inboundProtocolId, customInboundModel);
+
+        return Response.ok(updatedCustomInbound).build();
     }
 
     @Override
     public Response updateInboundOAuthConfiguration(String applicationId,
                                                     OpenIDConnectConfiguration openIDConnectConfiguration) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        OpenIDConnectConfiguration updatedOIDCConfig =
+                applicationManagementService.putInboundOAuthConfiguration(applicationId, openIDConnectConfiguration);
+        return Response.ok(updatedOIDCConfig).build();
     }
 
     @Override
-    public Response updateInboundSAMLConfiguration(String applicationId, SAML2Configuration saML2Configuration) {
+    public Response updateInboundSAMLConfiguration(String applicationId, SAML2Configuration saml2Configuration) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        SAML2ServiceProvider saml2ServiceProvider =
+                applicationManagementService.putInboundSAMLConfiguration(applicationId, saml2Configuration);
+        return Response.ok(saml2ServiceProvider).build();
     }
 
     @Override
     public Response updatePassiveStsConfiguration(String applicationId,
                                                   PassiveStsConfiguration passiveStsConfiguration) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        PassiveStsConfiguration updatedPassiveSTSConfig =
+                applicationManagementService.putInboundPassiveSTSConfiguration(applicationId, passiveStsConfiguration);
+        return Response.ok(updatedPassiveSTSConfig).build();
     }
 
     @Override
@@ -261,7 +269,9 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response updateWSTrustConfiguration(String applicationId, WSTrustConfiguration wsTrustConfiguration) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        WSTrustConfiguration updatedWSTrustConfig =
+                applicationManagementService.putInboundWSTrustConfiguration(applicationId, wsTrustConfiguration);
+        return Response.ok(updatedWSTrustConfig).build();
     }
 
     @Override
