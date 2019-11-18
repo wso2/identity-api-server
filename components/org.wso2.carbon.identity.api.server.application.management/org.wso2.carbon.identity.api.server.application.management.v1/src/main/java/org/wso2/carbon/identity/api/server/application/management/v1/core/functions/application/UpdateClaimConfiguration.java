@@ -15,9 +15,9 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
+import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
@@ -29,9 +29,9 @@ import org.wso2.carbon.identity.application.common.model.PermissionsAndRoleConfi
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
@@ -68,29 +68,23 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
 
     private ClaimMapping[] getClaimMappings(ClaimConfiguration claimConfig) {
 
-        if (CollectionUtils.isEmpty(claimConfig.getClaimMappings())) {
+        if (claimConfig.getClaimMappings() == null) {
             return Optional.ofNullable(claimConfig.getRequestedClaims())
                     .map(requestedClaims ->
                             requestedClaims.stream()
-                                    .map(claim -> ClaimMapping.build(claim.getClaimUri(), claim.getClaimUri(), null,
-                                            claim.getMandatory()))
-                                    .toArray(ClaimMapping[]::new))
+                                    .map(this::buildRequestClaimMapping).toArray(ClaimMapping[]::new))
                     .orElse(new ClaimMapping[0]);
 
         } else {
-            Map<String, ClaimMapping> claimMappings = new HashMap<>();
 
-            // First add the claim mappings.
-            Optional.ofNullable(claimConfig.getClaimMappings())
-                    .ifPresent(mappings -> mappings.forEach(mapping ->
-                            claimMappings.put(mapping.getApplicationClaimUri(),
-                                    buildClaimMapping(mapping))));
+            Map<String, ClaimMapping> claimMappings = claimConfig.getClaimMappings().stream()
+                    .collect(Collectors.toMap(ClaimMappings::getApplicationClaim, this::buildClaimMapping));
 
             // Set the request/mandatory claims from the defined claim mappings.
             Optional.ofNullable(claimConfig.getRequestedClaims())
                     .ifPresent(requestClaims -> {
                                 requestClaims.forEach(requestedClaim -> {
-                                    ClaimMapping claimMapping = claimMappings.get(requestedClaim.getClaimUri());
+                                    ClaimMapping claimMapping = claimMappings.get(getClaimUri(requestedClaim));
                                     if (claimMapping != null) {
                                         claimMapping.setRequested(true);
                                         setIfNotNull(requestedClaim.getMandatory(), claimMapping::setMandatory);
@@ -103,16 +97,34 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
         }
     }
 
+    private String getClaimUri(RequestedClaimConfiguration requestedClaim) {
+
+        // Request claim config cannot have a null claim object.
+        return requestedClaim.getClaim().getUri();
+    }
+
+    private ClaimMapping buildRequestClaimMapping(RequestedClaimConfiguration requestedClaimConfiguration) {
+
+        String claimUri = getClaimUri(requestedClaimConfiguration);
+        ClaimMapping claimMapping = ClaimMapping.build(claimUri, claimUri, null, true);
+        // Set whether claim is mandatory.
+        setIfNotNull(requestedClaimConfiguration.getMandatory(), claimMapping::setMandatory);
+
+        return claimMapping;
+    }
+
     private ClaimMapping buildClaimMapping(ClaimMappings mapping) {
 
-        return ClaimMapping.build(mapping.getApplicationClaimUri(), mapping.getLocalClaimUri(), null, false);
+        return ClaimMapping.build(mapping.getApplicationClaim(), mapping.getLocalClaim().getUri(), null, false);
     }
 
     private void updateSubjectClaimConfigs(SubjectConfig subject, ServiceProvider application) {
 
         if (subject != null) {
             ClaimConfig claimConfig = getClaimConfig(application);
-            setIfNotNull(subject.getClaimId(), claimConfig::setUserClaimURI);
+            if (subject.getClaim() != null) {
+                setIfNotNull(subject.getClaim().getUri(), claimConfig::setUserClaimURI);
+            }
             setIfNotNull(subject.getUseMappedLocalSubject(), claimConfig::setAlwaysSendMappedLocalSubjectId);
 
             LocalAndOutboundAuthenticationConfig authConfig = getLocalAndOutboundConfig(application);
@@ -125,7 +137,10 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
 
         if (roleApiModel != null) {
             ClaimConfig claimConfig = getClaimConfig(application);
-            claimConfig.setRoleClaimURI(roleApiModel.getClaimId());
+
+            if (roleApiModel.getClaim() != null) {
+                claimConfig.setRoleClaimURI(roleApiModel.getClaim().getUri());
+            }
 
             PermissionsAndRoleConfig permissionAndRoleConfig = getPermissionAndRoleConfig(application);
             permissionAndRoleConfig.setRoleMappings(getRoleMappings(roleApiModel));

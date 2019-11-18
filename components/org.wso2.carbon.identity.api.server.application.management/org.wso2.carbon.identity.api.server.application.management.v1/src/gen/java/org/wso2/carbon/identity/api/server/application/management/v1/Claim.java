@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.application.management.v1.Claim;
 import javax.validation.constraints.*;
 
 
@@ -29,50 +28,66 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class ClaimMappings  {
+public class Claim  {
   
-    private String applicationClaim;
-    private Claim localClaim;
+    private String id;
+    private String uri;
+    private String displayName;
 
     /**
-    * Claim URI recieved by the application
     **/
-    public ClaimMappings applicationClaim(String applicationClaim) {
+    public Claim id(String id) {
 
-        this.applicationClaim = applicationClaim;
+        this.id = id;
         return this;
     }
     
-    @ApiModelProperty(example = "firstname", required = true, value = "Claim URI recieved by the application")
-    @JsonProperty("applicationClaim")
+    @ApiModelProperty(example = "aHR0cDovL3dzbzIub3JnL2NsYWltcy91c2VybmFtZQ", value = "")
+    @JsonProperty("id")
     @Valid
-    @NotNull(message = "Property applicationClaim cannot be null.")
-
-    public String getApplicationClaim() {
-        return applicationClaim;
+    public String getId() {
+        return id;
     }
-    public void setApplicationClaim(String applicationClaim) {
-        this.applicationClaim = applicationClaim;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
     **/
-    public ClaimMappings localClaim(Claim localClaim) {
+    public Claim uri(String uri) {
 
-        this.localClaim = localClaim;
+        this.uri = uri;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("localClaim")
+    @ApiModelProperty(example = "http://wso2.org/claims/username", required = true, value = "")
+    @JsonProperty("uri")
     @Valid
-    @NotNull(message = "Property localClaim cannot be null.")
+    @NotNull(message = "Property uri cannot be null.")
 
-    public Claim getLocalClaim() {
-        return localClaim;
+    public String getUri() {
+        return uri;
     }
-    public void setLocalClaim(Claim localClaim) {
-        this.localClaim = localClaim;
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    /**
+    **/
+    public Claim displayName(String displayName) {
+
+        this.displayName = displayName;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Username", value = "")
+    @JsonProperty("displayName")
+    @Valid
+    public String getDisplayName() {
+        return displayName;
+    }
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
 
@@ -86,24 +101,26 @@ public class ClaimMappings  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ClaimMappings claimMappings = (ClaimMappings) o;
-        return Objects.equals(this.applicationClaim, claimMappings.applicationClaim) &&
-            Objects.equals(this.localClaim, claimMappings.localClaim);
+        Claim claim = (Claim) o;
+        return Objects.equals(this.id, claim.id) &&
+            Objects.equals(this.uri, claim.uri) &&
+            Objects.equals(this.displayName, claim.displayName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(applicationClaim, localClaim);
+        return Objects.hash(id, uri, displayName);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ClaimMappings {\n");
+        sb.append("class Claim {\n");
         
-        sb.append("    applicationClaim: ").append(toIndentedString(applicationClaim)).append("\n");
-        sb.append("    localClaim: ").append(toIndentedString(localClaim)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
+        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("}");
         return sb.toString();
     }

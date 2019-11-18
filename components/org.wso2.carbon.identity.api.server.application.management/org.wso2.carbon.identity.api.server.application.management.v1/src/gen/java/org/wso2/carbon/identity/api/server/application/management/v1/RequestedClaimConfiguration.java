@@ -20,36 +20,41 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.Claim;
 import javax.validation.constraints.*;
 
+/**
+ * User claims that need to be sent back to the application. If the claim mappings are local, use local claim URIs. If the custom claim mappings are configured, use the mapped application claim URI
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
+@ApiModel(description = "User claims that need to be sent back to the application. If the claim mappings are local, use local claim URIs. If the custom claim mappings are configured, use the mapped application claim URI")
 public class RequestedClaimConfiguration  {
   
-    private String claimUri;
+    private Claim claim;
     private Boolean mandatory;
 
     /**
-    * User claims that need to be sent back to the application. If the claim mappings are local, use local claim uris. If the custom claim mappings are configured, use the mapped applicationClaimUri
     **/
-    public RequestedClaimConfiguration claimUri(String claimUri) {
+    public RequestedClaimConfiguration claim(Claim claim) {
 
-        this.claimUri = claimUri;
+        this.claim = claim;
         return this;
     }
     
-    @ApiModelProperty(example = "http://wso2.org/claims/givenname", value = "User claims that need to be sent back to the application. If the claim mappings are local, use local claim uris. If the custom claim mappings are configured, use the mapped applicationClaimUri")
-    @JsonProperty("claimUri")
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("claim")
     @Valid
-    public String getClaimUri() {
-        return claimUri;
+    @NotNull(message = "Property claim cannot be null.")
+
+    public Claim getClaim() {
+        return claim;
     }
-    public void setClaimUri(String claimUri) {
-        this.claimUri = claimUri;
+    public void setClaim(Claim claim) {
+        this.claim = claim;
     }
 
     /**
@@ -82,13 +87,13 @@ public class RequestedClaimConfiguration  {
             return false;
         }
         RequestedClaimConfiguration requestedClaimConfiguration = (RequestedClaimConfiguration) o;
-        return Objects.equals(this.claimUri, requestedClaimConfiguration.claimUri) &&
+        return Objects.equals(this.claim, requestedClaimConfiguration.claim) &&
             Objects.equals(this.mandatory, requestedClaimConfiguration.mandatory);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(claimUri, mandatory);
+        return Objects.hash(claim, mandatory);
     }
 
     @Override
@@ -97,7 +102,7 @@ public class RequestedClaimConfiguration  {
         StringBuilder sb = new StringBuilder();
         sb.append("class RequestedClaimConfiguration {\n");
         
-        sb.append("    claimUri: ").append(toIndentedString(claimUri)).append("\n");
+        sb.append("    claim: ").append(toIndentedString(claim)).append("\n");
         sb.append("    mandatory: ").append(toIndentedString(mandatory)).append("\n");
         sb.append("}");
         return sb.toString();

@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Authenticat
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationStepModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.Authenticator;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
+import org.wso2.carbon.identity.api.server.application.management.v1.Claim;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
@@ -195,8 +196,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             if (application.getClaimConfig().getClaimMappings() != null) {
                 return Arrays.stream(application.getClaimConfig().getClaimMappings())
                         .map(claimMapping -> new ClaimMappings()
-                                .applicationClaimUri(claimMapping.getRemoteClaim().getClaimUri())
-                                .localClaimUri(claimMapping.getLocalClaim().getClaimUri()))
+                                .applicationClaim(claimMapping.getRemoteClaim().getClaimUri())
+                                .localClaim(buildClaimModel(claimMapping.getLocalClaim().getClaimUri())))
                         .collect(Collectors.toList());
             }
         }
@@ -210,7 +211,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 return Arrays.stream(application.getClaimConfig().getClaimMappings())
                         .filter(ClaimMapping::isRequested)
                         .map(claimMapping -> new RequestedClaimConfiguration()
-                                .claimUri(claimMapping.getRemoteClaim().getClaimUri())
+                                .claim(buildClaimModel(claimMapping.getRemoteClaim().getClaimUri()))
                                 .mandatory(claimMapping.isMandatory()))
                         .collect(Collectors.toList());
             }
@@ -234,9 +235,9 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
             if (StringUtils.isBlank(localAndOutboundAuthConfig.getSubjectClaimUri())
                     && isLocalClaimDialectUsedBySp(application)) {
-                subjectConfig.setClaimId(FrameworkConstants.USERNAME_CLAIM);
+                subjectConfig.claim(buildClaimModel(FrameworkConstants.USERNAME_CLAIM));
             } else {
-                subjectConfig.setClaimId(localAndOutboundAuthConfig.getSubjectClaimUri());
+                subjectConfig.claim(buildClaimModel(localAndOutboundAuthConfig.getSubjectClaimUri()));
             }
         }
 
@@ -267,7 +268,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             if (StringUtils.isBlank(roleClaimId) && application.getClaimConfig().isLocalClaimDialect()) {
                 roleClaimId = FrameworkConstants.LOCAL_ROLE_CLAIM_URI;
             }
-            roleConfig.setClaimId(roleClaimId);
+            roleConfig.claim(buildClaimModel(roleClaimId));
         }
 
         if (application.getLocalAndOutBoundAuthenticationConfig() != null) {
@@ -322,4 +323,9 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return certificate;
     }
 
+    private Claim buildClaimModel(String claimUri) {
+
+        // TODO: will claim id and display name.
+        return new Claim().uri(claimUri);
+    }
 }

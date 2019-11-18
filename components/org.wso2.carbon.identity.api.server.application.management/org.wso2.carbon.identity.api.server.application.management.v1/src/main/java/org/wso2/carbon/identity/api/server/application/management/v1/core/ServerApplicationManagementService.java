@@ -228,7 +228,7 @@ public class ServerApplicationManagementService {
     public ApplicationResponseModel patchApplication(String applicationId,
                                                      ApplicationPatchModel applicationPatchModel) {
 
-        ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
+        ServiceProvider appToUpdate = copyServiceProvider(applicationId);
         Utils.updateApplication(appToUpdate, applicationPatchModel, new PatchServiceProvider());
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -270,10 +270,11 @@ public class ServerApplicationManagementService {
             ServiceProvider application = getResidentSp(tenantDomain);
 
             String residentSpResourceId = application.getApplicationResourceId();
-            ServiceProvider applicationToUpdate = getClonedServiceProvider(residentSpResourceId);
+            ServiceProvider applicationToUpdate = copyServiceProvider(residentSpResourceId);
 
             // Add provisioning configs to resident SP.
             Utils.updateApplication(applicationToUpdate, provisioningConfig, new UpdateProvisioningConfiguration());
+
             updateServiceProvider(residentSpResourceId, applicationToUpdate);
             return getResidentApplication(tenantDomain);
         } catch (IdentityApplicationManagementException e) {
@@ -332,33 +333,34 @@ public class ServerApplicationManagementService {
 
     public OpenIDConnectConfiguration getInboundOAuthConfiguration(String applicationId) {
 
-        ServiceProvider serviceProvider = getServiceProvider(applicationId);
-        return InboundUtils.getOAuthInbound(serviceProvider);
+        return getInbound(applicationId, InboundUtils::getOAuthInbound);
     }
 
     public SAML2ServiceProvider getInboundSAMLConfiguration(String applicationId) {
 
-        ServiceProvider serviceProvider = getServiceProvider(applicationId);
-        return InboundUtils.getSAMLInbound(serviceProvider);
+        return getInbound(applicationId, InboundUtils::getSAMLInbound);
     }
 
     public PassiveStsConfiguration getPassiveStsConfiguration(String applicationId) {
 
-        ServiceProvider serviceProvider = getServiceProvider(applicationId);
-        return InboundUtils.getPassiveSTSInbound(serviceProvider);
+        return getInbound(applicationId, InboundUtils::getPassiveSTSInbound);
     }
 
     public WSTrustConfiguration getWSTrustConfiguration(String applicationId) {
 
-        ServiceProvider serviceProvider = getServiceProvider(applicationId);
-        return InboundUtils.getWSTrustInbound(serviceProvider);
+        return getInbound(applicationId, InboundUtils::getWSTrustInbound);
     }
 
     public CustomInboundProtocolConfiguration getCustomInboundConfiguration(String applicationId,
                                                                             String inboundType) {
 
+        return getInbound(applicationId, application -> InboundUtils.getCustomInbound(application, inboundType));
+    }
+
+    private <T> T getInbound(String applicationId, Function<ServiceProvider, T> getInboundFunction) {
+
         ServiceProvider serviceProvider = getServiceProvider(applicationId);
-        return InboundUtils.getCustomInbound(serviceProvider, inboundType);
+        return getInboundFunction.apply(serviceProvider);
     }
 
     public OpenIDConnectConfiguration regenerateOAuthApplicationSecret(String applicationId) {
@@ -381,7 +383,7 @@ public class ServerApplicationManagementService {
 
     private void deleteInbound(String applicationId, String inboundType) {
 
-        ServiceProvider serviceProvider = getClonedServiceProvider(applicationId);
+        ServiceProvider serviceProvider = copyServiceProvider(applicationId);
         InboundAuthenticationConfig inboundAuthConfig = serviceProvider.getInboundAuthenticationConfig();
 
         if (ArrayUtils.isNotEmpty(inboundAuthConfig.getInboundAuthenticationRequestConfigs())) {
@@ -406,7 +408,7 @@ public class ServerApplicationManagementService {
         }
     }
 
-    private ServiceProvider getClonedServiceProvider(String applicationId) {
+    private ServiceProvider copyServiceProvider(String applicationId) {
 
         ServiceProvider originalSp = getServiceProvider(applicationId);
         return Utils.deepCopyApplication(originalSp);
@@ -452,7 +454,7 @@ public class ServerApplicationManagementService {
     private String buildFilter(String filter) {
 
         if (StringUtils.isNotBlank(filter)) {
-            String[] filterArgs = filter.split(" ");
+            String[] filterArgs = filter.split("\\s+");
             if (filterArgs.length == 3) {
                 String searchField = filterArgs[0];
                 if (SEARCH_SUPPORTED_FIELDS.contains(searchField)) {
@@ -555,7 +557,7 @@ public class ServerApplicationManagementService {
                                 Function<ServiceProvider, T> getInboundDetailsFunction,
                                 R inboundConfiguration) {
 
-        ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
+        ServiceProvider appToUpdate = copyServiceProvider(applicationId);
         // Update the service provider with the inbound configuration.
         updateInboundFunction.accept(appToUpdate, inboundConfiguration);
         // Do the service provider update.

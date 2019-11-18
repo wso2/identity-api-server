@@ -3497,7 +3497,6 @@ components:
           type: string
           enum:
             - CUSTOM
-            - EXTERNAL
             - LOCAL
           default: LOCAL
         claimMappings:
@@ -3515,9 +3514,8 @@ components:
     SubjectConfig:
       type: object
       properties:
-        claimId:
-          type: string
-          example: 'http://wso2.org/claims/emailaddress'
+        claim:
+          $ref: '#/components/schemas/Claim'
         includeUserDomain:
           type: boolean
           example: false
@@ -3537,9 +3535,8 @@ components:
         includeUserDomain:
           type: boolean
           example: true
-        claimId:
-          type: string
-          example: 'http://wso2.org/claims/groups'
+        claim:
+          $ref: '#/components/schemas/Claim'
     RoleMapping:
       type: object
       properties:
@@ -3551,26 +3548,46 @@ components:
           example: Administrator
     RequestedClaimConfiguration:
       type: object
+      required:
+        - claim
+      description: >-
+        User claims that need to be sent back to the application. If the
+        claim mappings are local, use local claim URIs. If the custom claim
+        mappings are configured, use the mapped application claim URI
       properties:
-        claimUri:
-          type: string
-          example: 'http://wso2.org/claims/givenname'
-          description: >-
-            User claims that need to be sent back to the application. If the
-            claim mappings are local, use local claim uris. If the custom claim
-            mappings are configured, use the mapped applicationClaimUri
+        claim:
+          $ref: '#/components/schemas/Claim'
         mandatory:
           type: boolean
           example: false
     ClaimMappings:
       type: object
+      required:
+        - applicationClaim
+        - localClaim
       properties:
-        applicationClaimUri:
+        applicationClaim:
           type: string
+          description: "Claim URI recieved by the application"
           example: firstname
-        localClaimUri:
+        localClaim:
+          $ref: '#/components/schemas/Claim'
+    Claim:
+      type: object
+      required:
+        - uri
+      properties:
+        id:
           type: string
-          example: 'http://wso2.org/claims/givenname'
+          example: aHR0cDovL3dzbzIub3JnL2NsYWltcy91c2VybmFtZQ
+          readOnly: true
+        uri:
+          type: string
+          example: 'http://wso2.org/claims/username'
+        displayName:
+          type: string
+          example: Username
+          readOnly: true
 
     SAML2Configuration:
       type: object
