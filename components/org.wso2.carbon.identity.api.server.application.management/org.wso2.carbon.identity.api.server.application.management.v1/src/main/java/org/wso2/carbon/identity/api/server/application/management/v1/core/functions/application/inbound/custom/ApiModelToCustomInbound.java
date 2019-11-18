@@ -13,49 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom;
 
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PropertyModel;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.Property;
-import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
- * Helper class for custom inbound management.
+ * Converts CustomInboundProtocolConfiguration api model to a InboundAuthenticationRequestConfig object.
  */
-public class CustomInboundUtils {
+public class ApiModelToCustomInbound implements
+        Function<CustomInboundProtocolConfiguration, InboundAuthenticationRequestConfig> {
 
-    public static void putCustomInbound(ServiceProvider application,
-                                        CustomInboundProtocolConfiguration inboundModel) {
-
-        String inboundType = inboundModel.getName();
-        InboundAuthenticationRequestConfig customInbound = createCustomInbound(inboundModel);
-        InboundUtils.updateOrInsertInbound(application, inboundType, customInbound);
-
-    }
-
-    public static InboundAuthenticationRequestConfig createCustomInbound(CustomInboundProtocolConfiguration custom) {
+    @Override
+    public InboundAuthenticationRequestConfig apply(CustomInboundProtocolConfiguration customInbound) {
 
         InboundAuthenticationRequestConfig inboundRequestConfig = new InboundAuthenticationRequestConfig();
-        inboundRequestConfig.setInboundAuthType(custom.getName());
-        inboundRequestConfig.setInboundAuthKey(custom.getInboundKey());
-        inboundRequestConfig.setProperties(getProperties(custom));
-
+        inboundRequestConfig.setInboundAuthType(customInbound.getName());
+        inboundRequestConfig.setInboundAuthKey(customInbound.getInboundKey());
+        inboundRequestConfig.setProperties(getProperties(customInbound));
         return inboundRequestConfig;
     }
 
-    private static Property[] getProperties(CustomInboundProtocolConfiguration inboundConfigModel) {
+    private Property[] getProperties(CustomInboundProtocolConfiguration inboundConfigModel) {
 
         return Optional.of(inboundConfigModel.getProperties())
-                .map(modelProperties ->
-                        modelProperties.stream().map(CustomInboundUtils::buildProperty).toArray(Property[]::new))
+                .map(modelProperties -> modelProperties.stream().map(this::buildProperty).toArray(Property[]::new))
                 .orElse(new Property[0]);
     }
 
-    private static Property buildProperty(PropertyModel modelProperty) {
+    private Property buildProperty(PropertyModel modelProperty) {
 
         Property property = new Property();
         property.setName(modelProperty.getKey());

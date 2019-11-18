@@ -17,7 +17,6 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateFunction;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;

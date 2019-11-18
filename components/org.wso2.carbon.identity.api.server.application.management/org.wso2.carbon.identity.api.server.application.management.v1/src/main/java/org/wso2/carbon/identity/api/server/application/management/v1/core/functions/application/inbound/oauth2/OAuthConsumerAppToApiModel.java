@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.oauth2;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2;
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;

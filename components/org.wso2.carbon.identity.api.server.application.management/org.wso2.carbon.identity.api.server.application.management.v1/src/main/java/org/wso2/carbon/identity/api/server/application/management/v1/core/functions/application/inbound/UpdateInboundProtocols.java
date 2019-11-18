@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound;
 
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
@@ -21,11 +21,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConne
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.CustomInboundUtils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.OAuthInboundUtils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundUtils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.SAMLInboundUtils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundUtils;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundUtils;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundUtils;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundUtils;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
@@ -42,9 +41,6 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
  * Updates the inbound authentication protocols defined by the API model in the Service Provider model.
  */
 public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, InboundProtocols> {
-
-    private static final int CONNECTION_TIMEOUT_IN_SECONDS = 5;
-    private static final int READ_TIMEOUT_IN_SECONDS = 10;
 
     @Override
     public void update(ServiceProvider application, InboundProtocols inboundProtocols) {

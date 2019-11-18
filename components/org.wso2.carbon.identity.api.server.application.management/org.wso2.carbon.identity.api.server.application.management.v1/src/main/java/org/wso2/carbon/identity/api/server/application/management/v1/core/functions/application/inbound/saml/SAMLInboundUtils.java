@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.saml.ApiModelToSAMLSSOServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.saml.SAMLSSOServiceProviderToAPIModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;

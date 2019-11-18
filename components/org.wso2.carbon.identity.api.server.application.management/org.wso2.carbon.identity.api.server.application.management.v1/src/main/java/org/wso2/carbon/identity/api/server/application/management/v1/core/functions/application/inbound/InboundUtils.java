@@ -24,8 +24,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.PropertyMod
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.oauth2.OAuthConsumerAppToApiModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.saml.SAMLSSOServiceProviderToAPIModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthConsumerAppToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLSSOServiceProviderToAPIModel;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;

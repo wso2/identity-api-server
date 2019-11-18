@@ -19,6 +19,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationStepModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;

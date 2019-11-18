@@ -17,6 +17,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 

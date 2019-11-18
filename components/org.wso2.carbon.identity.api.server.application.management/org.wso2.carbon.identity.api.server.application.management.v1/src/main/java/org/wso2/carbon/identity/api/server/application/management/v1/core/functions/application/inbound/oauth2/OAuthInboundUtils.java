@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2;
 
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.oauth2.ApiModelToOAuthConsumerApp;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;

@@ -20,6 +20,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfig
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfig;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.application.common.model.ClaimConfig;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;

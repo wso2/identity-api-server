@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning;
 
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundSCIMProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OutboundProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.InboundProvisioningConfig;
 import org.wso2.carbon.identity.application.common.model.JustInTimeProvisioningConfig;
