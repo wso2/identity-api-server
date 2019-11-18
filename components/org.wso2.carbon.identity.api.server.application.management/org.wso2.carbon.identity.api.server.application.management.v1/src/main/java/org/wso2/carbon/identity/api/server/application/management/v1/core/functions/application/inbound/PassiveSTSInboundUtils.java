@@ -15,12 +15,17 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
+
+import java.util.Arrays;
+
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.PassiveSTS.PASSIVE_STS_REPLY_URL;
 
 /**
  * Helper functions for Passive STS inbound management.
@@ -46,5 +51,18 @@ public class PassiveSTSInboundUtils {
 
         passiveStsInbound.setProperties(new Property[]{passiveStsReplyUrl});
         return passiveStsInbound;
+    }
+
+    public static PassiveStsConfiguration getPassiveSTSConfiguration(InboundAuthenticationRequestConfig inboundAuth) {
+
+        // TODO : null check on property array
+        String replyTo = Arrays.stream(inboundAuth.getProperties())
+                .filter(property -> StringUtils.equals(property.getName(), PASSIVE_STS_REPLY_URL))
+                .findAny()
+                .map(Property::getValue).orElse(null);
+
+        return new PassiveStsConfiguration()
+                .realm(inboundAuth.getInboundAuthKey())
+                .replyTo(replyTo);
     }
 }

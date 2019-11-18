@@ -34,7 +34,7 @@ public class ApiModelToCustomInbound implements
 
         InboundAuthenticationRequestConfig inboundRequestConfig = new InboundAuthenticationRequestConfig();
         inboundRequestConfig.setInboundAuthType(customInbound.getName());
-        inboundRequestConfig.setInboundAuthKey(customInbound.getInboundKey());
+        inboundRequestConfig.setInboundConfigType(customInbound.getConfigName());
         inboundRequestConfig.setProperties(getProperties(customInbound));
         return inboundRequestConfig;
     }

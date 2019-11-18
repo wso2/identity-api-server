@@ -22,7 +22,10 @@ import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRe
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Helper class for custom inbound management.
@@ -42,7 +45,7 @@ public class CustomInboundUtils {
 
         InboundAuthenticationRequestConfig inboundRequestConfig = new InboundAuthenticationRequestConfig();
         inboundRequestConfig.setInboundAuthType(custom.getName());
-        inboundRequestConfig.setInboundAuthKey(custom.getInboundKey());
+        inboundRequestConfig.setInboundConfigType(custom.getConfigName());
         inboundRequestConfig.setProperties(getProperties(custom));
 
         return inboundRequestConfig;
@@ -62,5 +65,26 @@ public class CustomInboundUtils {
         property.setName(modelProperty.getKey());
         property.setValue(modelProperty.getValue());
         return property;
+    }
+
+    public static CustomInboundProtocolConfiguration getCustomInbound(InboundAuthenticationRequestConfig inbound) {
+
+        return new CustomInboundProtocolConfiguration()
+                .name(inbound.getInboundAuthType())
+                .configName(inbound.getInboundConfigType())
+                .properties(
+                        Optional.ofNullable(inbound.getProperties())
+                                .map(inboundProperties -> Arrays.stream(inboundProperties)
+                                        .map(CustomInboundUtils::buildPropertyModel).collect(Collectors.toList())
+                                ).orElse(Collections.emptyList())
+                );
+    }
+
+    private static PropertyModel buildPropertyModel(Property inboundProperty) {
+
+        return new PropertyModel()
+                .key(inboundProperty.getName())
+                .value(inboundProperty.getValue())
+                .friendlyName(inboundProperty.getDisplayName());
     }
 }

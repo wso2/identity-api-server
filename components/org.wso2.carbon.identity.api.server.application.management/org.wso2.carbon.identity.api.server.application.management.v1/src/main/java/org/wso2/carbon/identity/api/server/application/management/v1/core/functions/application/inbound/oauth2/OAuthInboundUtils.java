@@ -86,6 +86,31 @@ public class OAuthInboundUtils {
         }
     }
 
+    public static OpenIDConnectConfiguration getOAuthConfiguration(InboundAuthenticationRequestConfig inboundAuth) {
+
+        String clientId = inboundAuth.getInboundAuthKey();
+        try {
+            OAuthConsumerAppDTO oauthApp =
+                    ApplicationManagementServiceHolder.getOAuthAdminService().getOAuthApplicationData(clientId);
+            return new OAuthConsumerAppToApiModel().apply(oauthApp);
+
+        } catch (IdentityOAuthAdminException e) {
+
+            throw buildServerErrorResponse(e, "Error while retrieving oauth application for clientId: " + clientId);
+        }
+    }
+
+    public static void deleteOAuthInbound(InboundAuthenticationRequestConfig inbound) {
+
+        try {
+            String consumerKey = inbound.getInboundAuthKey();
+            ApplicationManagementServiceHolder.getOAuthAdminService().removeOAuthApplicationData(consumerKey);
+        } catch (IdentityOAuthAdminException e) {
+            throw Utils.buildServerErrorResponse(e, "Error while trying to rollback OAuth2/OpenIDConnect " +
+                    "configuration." + e.getMessage());
+        }
+    }
+
     public static OpenIDConnectConfiguration regenerateClientSecret(String clientId) {
 
         try {

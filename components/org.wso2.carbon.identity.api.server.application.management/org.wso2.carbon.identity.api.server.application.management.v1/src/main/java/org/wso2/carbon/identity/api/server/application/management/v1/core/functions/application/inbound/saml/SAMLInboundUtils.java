@@ -17,6 +17,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
@@ -95,6 +96,34 @@ public class SAMLInboundUtils {
         }
 
         return issuer;
+    }
+
+    public static SAML2ServiceProvider getSAML2ServiceProvider(InboundAuthenticationRequestConfig inboundAuth) {
+
+        String issuer = inboundAuth.getInboundAuthKey();
+        try {
+            SAMLSSOServiceProviderDTO serviceProvider =
+                    ApplicationManagementServiceHolder.getSamlssoConfigService().getServiceProvider(issuer);
+
+            if (serviceProvider != null) {
+                return new SAMLSSOServiceProviderToAPIModel().apply(serviceProvider);
+            } else {
+                return null;
+            }
+        } catch (IdentityException e) {
+            throw buildServerErrorResponse(e, "Error while retrieving service provider data for issuer: " + issuer);
+        }
+    }
+
+    public static void deleteSAMLServiceProvider(InboundAuthenticationRequestConfig inbound) {
+
+        try {
+            String issuer = inbound.getInboundAuthKey();
+            ApplicationManagementServiceHolder.getSamlssoConfigService().removeServiceProvider(issuer);
+        } catch (IdentityException e) {
+            throw Utils.buildServerErrorResponse(e, "Error while trying to rollback SAML2 configuration."
+                    + e.getMessage());
+        }
     }
 
     private static String createSAMLSpWithManualConfiguration(SAML2ServiceProvider saml2SpModel) {

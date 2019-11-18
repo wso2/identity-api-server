@@ -3951,14 +3951,14 @@ components:
       type: object
       required:
         - name
-        - inboundKey
+        - configName
       properties:
         name:
           type: string
-          example: custom-wso2-inbound
-        inboundKey:
+          example: cas
+        configName:
           type: string
-          example: custom-wso2-inbound-id
+          example: cas
         properties:
           type: array
           items:

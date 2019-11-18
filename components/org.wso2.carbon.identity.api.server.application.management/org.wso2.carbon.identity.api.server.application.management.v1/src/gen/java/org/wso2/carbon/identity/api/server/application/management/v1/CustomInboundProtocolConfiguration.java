@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.*;
 public class CustomInboundProtocolConfiguration  {
   
     private String name;
-    private String inboundKey;
+    private String configName;
     private List<PropertyModel> properties = null;
 
 
@@ -46,7 +46,7 @@ public class CustomInboundProtocolConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "custom-wso2-inbound", required = true, value = "")
+    @ApiModelProperty(example = "cas", required = true, value = "")
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
@@ -60,22 +60,22 @@ public class CustomInboundProtocolConfiguration  {
 
     /**
     **/
-    public CustomInboundProtocolConfiguration inboundKey(String inboundKey) {
+    public CustomInboundProtocolConfiguration configName(String configName) {
 
-        this.inboundKey = inboundKey;
+        this.configName = configName;
         return this;
     }
     
-    @ApiModelProperty(example = "custom-wso2-inbound-id", required = true, value = "")
-    @JsonProperty("inboundKey")
+    @ApiModelProperty(example = "cas", required = true, value = "")
+    @JsonProperty("configName")
     @Valid
-    @NotNull(message = "Property inboundKey cannot be null.")
+    @NotNull(message = "Property configName cannot be null.")
 
-    public String getInboundKey() {
-        return inboundKey;
+    public String getConfigName() {
+        return configName;
     }
-    public void setInboundKey(String inboundKey) {
-        this.inboundKey = inboundKey;
+    public void setConfigName(String configName) {
+        this.configName = configName;
     }
 
     /**
@@ -117,13 +117,13 @@ public class CustomInboundProtocolConfiguration  {
         }
         CustomInboundProtocolConfiguration customInboundProtocolConfiguration = (CustomInboundProtocolConfiguration) o;
         return Objects.equals(this.name, customInboundProtocolConfiguration.name) &&
-            Objects.equals(this.inboundKey, customInboundProtocolConfiguration.inboundKey) &&
+            Objects.equals(this.configName, customInboundProtocolConfiguration.configName) &&
             Objects.equals(this.properties, customInboundProtocolConfiguration.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, inboundKey, properties);
+        return Objects.hash(name, configName, properties);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class CustomInboundProtocolConfiguration  {
         sb.append("class CustomInboundProtocolConfiguration {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    inboundKey: ").append(toIndentedString(inboundKey)).append("\n");
+        sb.append("    configName: ").append(toIndentedString(configName)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
