@@ -216,6 +216,14 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response updateResidentApplication(ProvisioningConfiguration provisioningConfiguration) {
+
+        ResidentApplication residentApplication =
+                applicationManagementService.updateResidentApplication(provisioningConfiguration);
+        return Response.ok(residentApplication).build();
+    }
+
+    @Override
     public Response regenerateOAuthApplicationSecret(String applicationId) {
 
         OpenIDConnectConfiguration openIDConnectConfiguration =
@@ -258,12 +266,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         PassiveStsConfiguration updatedPassiveSTSConfig =
                 applicationManagementService.putInboundPassiveSTSConfiguration(applicationId, passiveStsConfiguration);
         return Response.ok(updatedPassiveSTSConfig).build();
-    }
-
-    @Override
-    public Response updateResidentApplication(ProvisioningConfiguration provisioningConfiguration) {
-
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
 
     @Override

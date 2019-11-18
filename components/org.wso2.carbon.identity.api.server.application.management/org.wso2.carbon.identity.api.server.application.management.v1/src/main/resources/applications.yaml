@@ -3350,7 +3350,7 @@ components:
     InboundSCIMProvisioningConfiguration:
       type: object
       properties:
-        proxy-mode:
+        proxyMode:
           type: boolean
           example: false
         provisioningUserstoreDomain:

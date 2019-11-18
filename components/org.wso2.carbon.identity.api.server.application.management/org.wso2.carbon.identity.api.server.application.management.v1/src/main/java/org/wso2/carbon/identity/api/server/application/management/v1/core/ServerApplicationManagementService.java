@@ -43,6 +43,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationBasicInfoToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.PatchServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.CustomInboundUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundsToApiModel;
@@ -100,7 +101,7 @@ public class ServerApplicationManagementService {
     private static final String FILTER_CONTAINS = "co";
 
     // TODO: should we read this from somewhere...
-    private static final int DEFAULT_LIMIT = 20;
+    private static final int DEFAULT_LIMIT = 30;
     private static final int DEFAULT_LIMIT_MAX = 50;
 
     static {
@@ -202,18 +203,6 @@ public class ServerApplicationManagementService {
         }
     }
 
-    public void deleteApplication(String applicationId) {
-
-        String username = ContextLoader.getUsernameFromContext();
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        try {
-            getApplicationManagementService().deleteApplicationByResourceId(applicationId, tenantDomain, username);
-        } catch (IdentityApplicationManagementException e) {
-            String msg = "Error while deleting application with id: " + applicationId;
-            throw handleIdentityApplicationManagementException(e, msg);
-        }
-    }
-
     public ApplicationResponseModel createApplication(ApplicationModel applicationModel, String template) {
 
         if (StringUtils.isNotBlank(template)) {
@@ -256,20 +245,60 @@ public class ServerApplicationManagementService {
         }
     }
 
+    public void deleteApplication(String applicationId) {
+
+        String username = ContextLoader.getUsernameFromContext();
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            getApplicationManagementService().deleteApplicationByResourceId(applicationId, tenantDomain, username);
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error while deleting application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+
     public ResidentApplication getResidentApplication() {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        try {
-            ServiceProvider application =
-                    getApplicationManagementService().getServiceProvider(ApplicationConstants.LOCAL_SP, tenantDomain);
-            if (application == null) {
-                throw Utils.buildServerErrorResponse("Resident application cannot be found for tenantDomain: " +
-                        tenantDomain);
-            }
+        return getResidentApplication(tenantDomain);
+    }
 
+    public ResidentApplication updateResidentApplication(ProvisioningConfiguration provisioningConfig) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            ServiceProvider application = getResidentSp(tenantDomain);
+
+            String residentSpResourceId = application.getApplicationResourceId();
+            ServiceProvider applicationToUpdate = getClonedServiceProvider(residentSpResourceId);
+
+            // Add provisioning configs to resident SP.
+            Utils.updateApplication(applicationToUpdate, provisioningConfig, new UpdateProvisioningConfiguration());
+            updateServiceProvider(residentSpResourceId, applicationToUpdate);
+            return getResidentApplication(tenantDomain);
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error while retrieving resident application of tenantDomain: " + tenantDomain;
+            throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+
+    private ServiceProvider getResidentSp(String tenantDomain) throws IdentityApplicationManagementException {
+
+        ServiceProvider application =
+                getApplicationManagementService().getServiceProvider(ApplicationConstants.LOCAL_SP, tenantDomain);
+        if (application == null) {
+            throw Utils.buildServerErrorResponse("Resident application cannot be found for tenantDomain: " +
+                    tenantDomain);
+        }
+        return application;
+    }
+
+    private ResidentApplication getResidentApplication(String tenantDomain) {
+
+        try {
+            ServiceProvider application = getResidentSp(tenantDomain);
             ProvisioningConfiguration provisioningConfig = new BuildProvisioningConfiguration().apply(application);
             return new ResidentApplication().provisioningConfigurations(provisioningConfig);
-
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error while retrieving resident application of tenantDomain: " + tenantDomain;
             throw handleIdentityApplicationManagementException(e, msg);
@@ -407,78 +436,10 @@ public class ServerApplicationManagementService {
         return Collections.emptyList();
     }
 
-    private APIError handleIdentityApplicationManagementException(IdentityApplicationManagementException e,
-                                                                  String msg) {
-
-        if (e instanceof IdentityApplicationManagementClientException) {
-            throw buildClientError(e, msg);
-        }
-        throw buildServerError(e, msg);
-    }
-
     private List<Link> buildLinks(int limit, int currentOffset, String filter, int totalResultsFromSearch) {
 
         // TODO: prev and next
         return new ArrayList<>();
-    }
-
-    private APIError buildServerError(IdentityApplicationManagementException e, String message) {
-
-        ErrorResponse.Builder builder = new ErrorResponse.Builder();
-
-        ErrorResponse errorResponse = builder
-                .withCode(e.getErrorCode())
-                .withMessage(message)
-                .withDescription(e.getMessage())
-                .build(LOG, e, message);
-
-        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-        return new APIError(status, errorResponse);
-    }
-
-    private APIError handleServerError(Exception e, String message) {
-
-        ErrorResponse.Builder builder = new ErrorResponse.Builder();
-
-        ErrorResponse errorResponse = builder
-                .withMessage(e.getMessage())
-                .build(LOG, e, message);
-
-        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-        return new APIError(status, errorResponse);
-    }
-
-    private APIError buildClientError(IdentityApplicationManagementException e, String message) {
-
-        ErrorResponse.Builder builder = new ErrorResponse.Builder();
-
-        ErrorResponse errorResponse = builder
-                .withCode(e.getErrorCode())
-                .withMessage(message)
-                .withDescription(e.getMessage())
-                .build(LOG, e.getMessage());
-
-        Response.Status status = Response.Status.BAD_REQUEST;
-        return new APIError(status, errorResponse);
-    }
-
-    private APIError buildClientError(Exception e, ErrorMessage errorEnum) {
-
-        ErrorResponse errorResponse = new ErrorResponse.Builder()
-                .withCode(errorEnum.getCode())
-                .withDescription(e.getMessage())
-                .withMessage(errorEnum.getMessage())
-                .build(LOG, errorEnum.getDescription());
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
-    }
-
-    private APIError buildClientError(ErrorMessage errorEnum) {
-
-        ErrorResponse errorResponse = new ErrorResponse.Builder()
-                .withCode(errorEnum.getCode())
-                .withMessage(errorEnum.getMessage())
-                .build(LOG, errorEnum.getDescription());
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
     }
 
     private List<ApplicationListItem> getApplicationListItems(ApplicationBasicInfo[] allApplicationBasicInfo) {
@@ -536,68 +497,10 @@ public class ServerApplicationManagementService {
         return formattedFilter;
     }
 
-    private ApplicationManagementService getApplicationManagementService() {
-
-        return ApplicationManagementServiceHolder.getApplicationManagementService();
-    }
-
-    private void handleNotImplementedCapabilities(String sortOrder, String sortBy, String requiredAttributes) {
-
-        ErrorMessage errorEnum = null;
-
-        if (sortBy != null || sortOrder != null) {
-            errorEnum = ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
-        } else if (requiredAttributes != null) {
-            errorEnum = ErrorMessage.ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
-        }
-
-        if (errorEnum != null) {
-            throw buildApiError(errorEnum);
-        }
-    }
-
     public List<InboundProtocolListItem> getInboundProtocols(String applicationId) {
 
         ServiceProvider serviceProvider = getServiceProvider(applicationId);
         return new InboundsToApiModel().apply(serviceProvider);
-    }
-
-    private APIError buildApiError(Response.Status statusCode, String message) {
-
-        ErrorResponse errorResponse = new ErrorResponse.Builder().withMessage(message).build();
-        return new APIError(statusCode, errorResponse);
-    }
-
-    private APIError buildApiError(ErrorMessage errorEnum) {
-
-        ErrorResponse errorResponse = buildErrorResponse(errorEnum);
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
-    }
-
-    private APIError buildApiError(ErrorMessage errorEnum,
-                                   String... errorContextData) {
-
-        ErrorResponse errorResponse = buildErrorResponse(errorEnum, errorContextData);
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
-    }
-
-    private ErrorResponse buildErrorResponse(ErrorMessage errorEnum,
-                                             String... errorContextData) {
-
-        return new ErrorResponse.Builder()
-                .withCode(errorEnum.getCode())
-                .withDescription(buildFormattedDescription(errorEnum.getDescription(), errorContextData))
-                .withMessage(errorEnum.getMessage())
-                .build(LOG, errorEnum.getDescription());
-    }
-
-    private String buildFormattedDescription(String description, String... formatData) {
-
-        if (formatData != null) {
-            return String.format(description, formatData);
-        } else {
-            return description;
-        }
     }
 
     public OpenIDConnectConfiguration putInboundOAuthConfiguration(String applicationId,
@@ -674,5 +577,131 @@ public class ServerApplicationManagementService {
         } catch (IdentityApplicationManagementException e) {
             throw handleIdentityApplicationManagementException(e, "Error while updating application.");
         }
+    }
+
+    private APIError buildApiError(Response.Status statusCode, String message) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder().withMessage(message).build();
+        return new APIError(statusCode, errorResponse);
+    }
+
+    private APIError buildApiError(ErrorMessage errorEnum) {
+
+        ErrorResponse errorResponse = buildErrorResponse(errorEnum);
+        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
+    }
+
+    private APIError buildApiError(ErrorMessage errorEnum,
+                                   String... errorContextData) {
+
+        ErrorResponse errorResponse = buildErrorResponse(errorEnum, errorContextData);
+        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
+    }
+
+    private ErrorResponse buildErrorResponse(ErrorMessage errorEnum,
+                                             String... errorContextData) {
+
+        return new ErrorResponse.Builder()
+                .withCode(errorEnum.getCode())
+                .withDescription(buildFormattedDescription(errorEnum.getDescription(), errorContextData))
+                .withMessage(errorEnum.getMessage())
+                .build(LOG, errorEnum.getDescription());
+    }
+
+    private String buildFormattedDescription(String description, String... formatData) {
+
+        if (formatData != null) {
+            return String.format(description, formatData);
+        } else {
+            return description;
+        }
+    }
+
+    private void handleNotImplementedCapabilities(String sortOrder, String sortBy, String requiredAttributes) {
+
+        ErrorMessage errorEnum = null;
+
+        if (sortBy != null || sortOrder != null) {
+            errorEnum = ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
+        } else if (requiredAttributes != null) {
+            errorEnum = ErrorMessage.ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
+        }
+
+        if (errorEnum != null) {
+            throw buildApiError(errorEnum);
+        }
+    }
+
+    private ApplicationManagementService getApplicationManagementService() {
+
+        return ApplicationManagementServiceHolder.getApplicationManagementService();
+    }
+
+    private APIError buildServerError(IdentityApplicationManagementException e, String message) {
+
+        ErrorResponse.Builder builder = new ErrorResponse.Builder();
+
+        ErrorResponse errorResponse = builder
+                .withCode(e.getErrorCode())
+                .withMessage(message)
+                .withDescription(e.getMessage())
+                .build(LOG, e, message);
+
+        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleServerError(Exception e, String message) {
+
+        ErrorResponse.Builder builder = new ErrorResponse.Builder();
+
+        ErrorResponse errorResponse = builder
+                .withMessage(e.getMessage())
+                .build(LOG, e, message);
+
+        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError buildClientError(IdentityApplicationManagementException e, String message) {
+
+        ErrorResponse.Builder builder = new ErrorResponse.Builder();
+
+        ErrorResponse errorResponse = builder
+                .withCode(e.getErrorCode())
+                .withMessage(message)
+                .withDescription(e.getMessage())
+                .build(LOG, e.getMessage());
+
+        Response.Status status = Response.Status.BAD_REQUEST;
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError buildClientError(Exception e, ErrorMessage errorEnum) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorEnum.getCode())
+                .withDescription(e.getMessage())
+                .withMessage(errorEnum.getMessage())
+                .build(LOG, errorEnum.getDescription());
+        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
+    }
+
+    private APIError buildClientError(ErrorMessage errorEnum) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorEnum.getCode())
+                .withMessage(errorEnum.getMessage())
+                .build(LOG, errorEnum.getDescription());
+        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
+    }
+
+    private APIError handleIdentityApplicationManagementException(IdentityApplicationManagementException e,
+                                                                  String msg) {
+
+        if (e instanceof IdentityApplicationManagementClientException) {
+            throw buildClientError(e, msg);
+        }
+        throw buildServerError(e, msg);
     }
 }

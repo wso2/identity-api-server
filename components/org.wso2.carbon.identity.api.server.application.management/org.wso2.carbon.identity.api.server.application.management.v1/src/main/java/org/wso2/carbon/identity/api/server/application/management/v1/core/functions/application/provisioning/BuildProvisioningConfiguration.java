@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.application.common.model.ProvisioningConnectorCo
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -48,10 +49,7 @@ public class BuildProvisioningConfiguration implements Function<ServiceProvider,
         if (application.getOutboundProvisioningConfig() != null) {
             List<OutboundProvisioningConfiguration> provisioningIdps =
                     buildOutboundProvisioningConfig(application.getOutboundProvisioningConfig());
-
-            if (provisioningIdps != null && !provisioningIdps.isEmpty()) {
-                config.outboundProvisioningIdps(provisioningIdps);
-            }
+            config.outboundProvisioningIdps(provisioningIdps);
         }
 
         return config;
@@ -66,7 +64,7 @@ public class BuildProvisioningConfiguration implements Function<ServiceProvider,
                     .collect(Collectors.toList());
         }
 
-        return null;
+        return Collections.emptyList();
     }
 
     private OutboundProvisioningConfiguration getOutboundProvisioningConfiguration(IdentityProvider identityProvider) {
