@@ -17,6 +17,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
@@ -84,4 +85,17 @@ public class OAuthInboundUtils {
                     "Error creating OAuth2/OpenIDConnect configuration. " + e.getMessage());
         }
     }
+
+    public static OpenIDConnectConfiguration regenerateClientSecret(String clientId) {
+
+        try {
+            OAuthConsumerAppDTO oAuthConsumerAppDTO = ApplicationManagementServiceHolder.getOAuthAdminService()
+                    .updateAndRetrieveOauthSecretKey(clientId);
+            return new OAuthConsumerAppToApiModel().apply(oAuthConsumerAppDTO);
+        } catch (IdentityOAuthAdminException e) {
+            throw Utils.buildServerErrorResponse(e, "Error while regenerating client secret of oauth application.");
+        }
+    }
+
+    // TODO: Updating a state of an OAuth application needs to be implemented.
 }

@@ -48,7 +48,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundUtils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthConsumerAppToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
@@ -67,8 +66,6 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
-import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
-import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,6 +79,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.updateApplication;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.rollbackInbounds;
 
 /**
@@ -122,7 +120,7 @@ public class ServerApplicationManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         String username = ContextLoader.getUsernameFromContext();
         try {
-            int totalResultsFromFiltering = getApplicationManagementService()
+            int totalResults = getApplicationManagementService()
                     .getCountOfApplications(tenantDomain, username, formattedFilter);
 
             ApplicationBasicInfo[] filteredAppList = getApplicationManagementService()
@@ -130,11 +128,11 @@ public class ServerApplicationManagementService {
             int resultsInCurrentPage = filteredAppList.length;
 
             return new ApplicationListResponse()
-                    .totalResults(totalResultsFromFiltering)
+                    .totalResults(totalResults)
                     .startIndex(offset)
                     .count(resultsInCurrentPage)
                     .applications(getApplicationListItems(filteredAppList))
-                    .links(buildLinks(limit, offset, filter, totalResultsFromFiltering));
+                    .links(buildLinks(limit, offset, filter, totalResults));
 
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error while listing application basic information in tenantDomain: " + tenantDomain;
@@ -228,12 +226,12 @@ public class ServerApplicationManagementService {
     public ApplicationResponseModel patchApplication(String applicationId,
                                                      ApplicationPatchModel applicationPatchModel) {
 
-        ServiceProvider appToUpdate = copyServiceProvider(applicationId);
-        Utils.updateApplication(appToUpdate, applicationPatchModel, new PatchServiceProvider());
+        ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
+        updateApplication(appToUpdate, applicationPatchModel, new PatchServiceProvider());
 
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        String username = ContextLoader.getUsernameFromContext();
         try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            String username = ContextLoader.getUsernameFromContext();
             getApplicationManagementService()
                     .updateApplicationByResourceId(applicationId, appToUpdate, tenantDomain, username);
 
@@ -270,10 +268,10 @@ public class ServerApplicationManagementService {
             ServiceProvider application = getResidentSp(tenantDomain);
 
             String residentSpResourceId = application.getApplicationResourceId();
-            ServiceProvider applicationToUpdate = copyServiceProvider(residentSpResourceId);
+            ServiceProvider applicationToUpdate = getClonedServiceProvider(residentSpResourceId);
 
             // Add provisioning configs to resident SP.
-            Utils.updateApplication(applicationToUpdate, provisioningConfig, new UpdateProvisioningConfiguration());
+            updateApplication(applicationToUpdate, provisioningConfig, new UpdateProvisioningConfiguration());
 
             updateServiceProvider(residentSpResourceId, applicationToUpdate);
             return getResidentApplication(tenantDomain);
@@ -351,10 +349,51 @@ public class ServerApplicationManagementService {
         return getInbound(applicationId, InboundUtils::getWSTrustInbound);
     }
 
-    public CustomInboundProtocolConfiguration getCustomInboundConfiguration(String applicationId,
-                                                                            String inboundType) {
+    public CustomInboundProtocolConfiguration getCustomInboundConfiguration(String applicationId, String inboundType) {
 
         return getInbound(applicationId, application -> InboundUtils.getCustomInbound(application, inboundType));
+    }
+
+    public List<InboundProtocolListItem> getInboundProtocols(String applicationId) {
+
+        ServiceProvider serviceProvider = getServiceProvider(applicationId);
+        return new InboundsToApiModel().apply(serviceProvider);
+    }
+
+    public OpenIDConnectConfiguration putInboundOAuthConfiguration(String applicationId,
+                                                                   OpenIDConnectConfiguration oidcConfigModel) {
+
+        return putInbound(applicationId, OAuthInboundUtils::putOAuthInbound, InboundUtils::getOAuthInbound,
+                oidcConfigModel);
+    }
+
+    public SAML2ServiceProvider putInboundSAMLConfiguration(String applicationId,
+                                                            SAML2Configuration saml2Configuration) {
+
+        return putInbound(applicationId, SAMLInboundUtils::putSAMLInbound, InboundUtils::getSAMLInbound,
+                saml2Configuration);
+    }
+
+    public PassiveStsConfiguration putInboundPassiveSTSConfiguration(String applicationId,
+                                                                     PassiveStsConfiguration passiveStsConfiguration) {
+
+        return putInbound(applicationId, PassiveSTSInboundUtils::putPassiveSTSInbound,
+                InboundUtils::getPassiveSTSInbound, passiveStsConfiguration);
+    }
+
+    public WSTrustConfiguration putInboundWSTrustConfiguration(String applicationId,
+                                                               WSTrustConfiguration wsTrustConfiguration) {
+
+        return putInbound(applicationId, WSTrustInboundUtils::putWSTrustConfiguration,
+                InboundUtils::getWSTrustInbound, wsTrustConfiguration);
+    }
+
+    public CustomInboundProtocolConfiguration updateCustomInbound(String applicationId,
+                                                                  String inboundType,
+                                                                  CustomInboundProtocolConfiguration customInbound) {
+
+        return putInbound(applicationId, CustomInboundUtils::putCustomInbound,
+                (application) -> InboundUtils.getCustomInbound(application, inboundType), customInbound);
     }
 
     private <T> T getInbound(String applicationId, Function<ServiceProvider, T> getInboundFunction) {
@@ -371,44 +410,28 @@ public class ServerApplicationManagementService {
             throw buildClientError(ErrorMessage.ERROR_INBOUND_PROTOCOL_NOT_FOUND);
         } else {
             String clientId = inboundOAuthConfiguration.getClientId();
-            try {
-                OAuthConsumerAppDTO oAuthConsumerAppDTO = ApplicationManagementServiceHolder.getOAuthAdminService()
-                        .updateAndRetrieveOauthSecretKey(clientId);
-                return new OAuthConsumerAppToApiModel().apply(oAuthConsumerAppDTO);
-            } catch (IdentityOAuthAdminException e) {
-                throw Utils.buildServerErrorResponse(e, "Error while regenerating client secret of oauth application.");
-            }
+            return OAuthInboundUtils.regenerateClientSecret(clientId);
         }
     }
 
     private void deleteInbound(String applicationId, String inboundType) {
 
-        ServiceProvider serviceProvider = copyServiceProvider(applicationId);
-        InboundAuthenticationConfig inboundAuthConfig = serviceProvider.getInboundAuthenticationConfig();
+        ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
+        InboundAuthenticationConfig inboundAuthConfig = appToUpdate.getInboundAuthenticationConfig();
 
         if (ArrayUtils.isNotEmpty(inboundAuthConfig.getInboundAuthenticationRequestConfigs())) {
-            // Remove the delete inbound configuration.
+            // Remove the deleted inbound type.
             InboundAuthenticationRequestConfig[] filteredInbounds =
                     Arrays.stream(inboundAuthConfig.getInboundAuthenticationRequestConfigs())
                             .filter(inbound -> !StringUtils.equals(inboundType, inbound.getInboundAuthType()))
                             .toArray(InboundAuthenticationRequestConfig[]::new);
 
-            serviceProvider.getInboundAuthenticationConfig().setInboundAuthenticationRequestConfigs(filteredInbounds);
-
-            try {
-                String tenantDomain = ContextLoader.getTenantDomainFromContext();
-                String username = ContextLoader.getUsernameFromContext();
-
-                ApplicationManagementServiceHolder.getApplicationManagementService()
-                        .updateApplicationByResourceId(applicationId, serviceProvider, tenantDomain, username);
-            } catch (IdentityApplicationManagementException e) {
-                String msg = "Error while deleting inbound type: " + inboundType + ".";
-                throw handleIdentityApplicationManagementException(e, msg);
-            }
+            appToUpdate.getInboundAuthenticationConfig().setInboundAuthenticationRequestConfigs(filteredInbounds);
+            updateServiceProvider(applicationId, appToUpdate);
         }
     }
 
-    private ServiceProvider copyServiceProvider(String applicationId) {
+    private ServiceProvider getClonedServiceProvider(String applicationId) {
 
         ServiceProvider originalSp = getServiceProvider(applicationId);
         return Utils.deepCopyApplication(originalSp);
@@ -499,48 +522,6 @@ public class ServerApplicationManagementService {
         return formattedFilter;
     }
 
-    public List<InboundProtocolListItem> getInboundProtocols(String applicationId) {
-
-        ServiceProvider serviceProvider = getServiceProvider(applicationId);
-        return new InboundsToApiModel().apply(serviceProvider);
-    }
-
-    public OpenIDConnectConfiguration putInboundOAuthConfiguration(String applicationId,
-                                                                   OpenIDConnectConfiguration oidcConfigModel) {
-
-        return putInbound(applicationId, OAuthInboundUtils::putOAuthInbound, InboundUtils::getOAuthInbound,
-                oidcConfigModel);
-    }
-
-    public SAML2ServiceProvider putInboundSAMLConfiguration(String applicationId,
-                                                            SAML2Configuration saml2Configuration) {
-
-        return putInbound(applicationId, SAMLInboundUtils::putSAMLInbound, InboundUtils::getSAMLInbound,
-                saml2Configuration);
-    }
-
-    public PassiveStsConfiguration putInboundPassiveSTSConfiguration(String applicationId,
-                                                                     PassiveStsConfiguration passiveStsConfiguration) {
-
-        return putInbound(applicationId, PassiveSTSInboundUtils::putPassiveSTSInbound,
-                InboundUtils::getPassiveSTSInbound, passiveStsConfiguration);
-    }
-
-    public WSTrustConfiguration putInboundWSTrustConfiguration(String applicationId,
-                                                               WSTrustConfiguration wsTrustConfiguration) {
-
-        return putInbound(applicationId, WSTrustInboundUtils::putWSTrustConfiguration,
-                InboundUtils::getWSTrustInbound, wsTrustConfiguration);
-    }
-
-    public CustomInboundProtocolConfiguration updateCustomInbound(String applicationId,
-                                                                  String inboundType,
-                                                                  CustomInboundProtocolConfiguration customInbound) {
-
-        return putInbound(applicationId, CustomInboundUtils::putCustomInbound,
-                (application) -> InboundUtils.getCustomInbound(application, inboundType), customInbound);
-    }
-
     /**
      * Create or replace the provided inbound configuration.
      *
@@ -557,7 +538,7 @@ public class ServerApplicationManagementService {
                                 Function<ServiceProvider, T> getInboundDetailsFunction,
                                 R inboundConfiguration) {
 
-        ServiceProvider appToUpdate = copyServiceProvider(applicationId);
+        ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
         // Update the service provider with the inbound configuration.
         updateInboundFunction.accept(appToUpdate, inboundConfiguration);
         // Do the service provider update.
