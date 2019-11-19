@@ -32,13 +32,14 @@ import javax.xml.bind.annotation.*;
 public class AdvancedApplicationConfiguration  {
   
     private Boolean saas;
+    private Boolean discoverableByEndUsers;
     private Certificate certificate;
     private Boolean skipConsent;
     private Boolean returnAuthenticatedIdpList;
     private Boolean enableAuthorization;
 
     /**
-    * Decide whether this application is allowed to be accessed across tenants.
+    * Decides whether the application is allowed to be accessed across tenants.
     **/
     public AdvancedApplicationConfiguration saas(Boolean saas) {
 
@@ -46,7 +47,7 @@ public class AdvancedApplicationConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Decide whether this application is allowed to be accessed across tenants.")
+    @ApiModelProperty(example = "false", value = "Decides whether the application is allowed to be accessed across tenants.")
     @JsonProperty("saas")
     @Valid
     public Boolean getSaas() {
@@ -54,6 +55,25 @@ public class AdvancedApplicationConfiguration  {
     }
     public void setSaas(Boolean saas) {
         this.saas = saas;
+    }
+
+    /**
+    * Decides whether the application is visible for end users.
+    **/
+    public AdvancedApplicationConfiguration discoverableByEndUsers(Boolean discoverableByEndUsers) {
+
+        this.discoverableByEndUsers = discoverableByEndUsers;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Decides whether the application is visible for end users.")
+    @JsonProperty("discoverableByEndUsers")
+    @Valid
+    public Boolean getDiscoverableByEndUsers() {
+        return discoverableByEndUsers;
+    }
+    public void setDiscoverableByEndUsers(Boolean discoverableByEndUsers) {
+        this.discoverableByEndUsers = discoverableByEndUsers;
     }
 
     /**
@@ -75,6 +95,7 @@ public class AdvancedApplicationConfiguration  {
     }
 
     /**
+    * Decides whether user consent needs to be skipped during login flows.
     **/
     public AdvancedApplicationConfiguration skipConsent(Boolean skipConsent) {
 
@@ -82,7 +103,7 @@ public class AdvancedApplicationConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "")
+    @ApiModelProperty(example = "false", value = "Decides whether user consent needs to be skipped during login flows.")
     @JsonProperty("skipConsent")
     @Valid
     public Boolean getSkipConsent() {
@@ -93,7 +114,7 @@ public class AdvancedApplicationConfiguration  {
     }
 
     /**
-    * Decide whether authenticated identity provider list needs to returned in the authentication response.
+    * Decides whether the list of authenticated identity providers need to returned in the authentication response.
     **/
     public AdvancedApplicationConfiguration returnAuthenticatedIdpList(Boolean returnAuthenticatedIdpList) {
 
@@ -101,7 +122,7 @@ public class AdvancedApplicationConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Decide whether authenticated identity provider list needs to returned in the authentication response.")
+    @ApiModelProperty(example = "false", value = "Decides whether the list of authenticated identity providers need to returned in the authentication response.")
     @JsonProperty("returnAuthenticatedIdpList")
     @Valid
     public Boolean getReturnAuthenticatedIdpList() {
@@ -112,6 +133,7 @@ public class AdvancedApplicationConfiguration  {
     }
 
     /**
+    * Decides whether authorization policies needs to be engaged during authentication flows.
     **/
     public AdvancedApplicationConfiguration enableAuthorization(Boolean enableAuthorization) {
 
@@ -119,7 +141,7 @@ public class AdvancedApplicationConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "true", value = "")
+    @ApiModelProperty(example = "true", value = "Decides whether authorization policies needs to be engaged during authentication flows.")
     @JsonProperty("enableAuthorization")
     @Valid
     public Boolean getEnableAuthorization() {
@@ -142,6 +164,7 @@ public class AdvancedApplicationConfiguration  {
         }
         AdvancedApplicationConfiguration advancedApplicationConfiguration = (AdvancedApplicationConfiguration) o;
         return Objects.equals(this.saas, advancedApplicationConfiguration.saas) &&
+            Objects.equals(this.discoverableByEndUsers, advancedApplicationConfiguration.discoverableByEndUsers) &&
             Objects.equals(this.certificate, advancedApplicationConfiguration.certificate) &&
             Objects.equals(this.skipConsent, advancedApplicationConfiguration.skipConsent) &&
             Objects.equals(this.returnAuthenticatedIdpList, advancedApplicationConfiguration.returnAuthenticatedIdpList) &&
@@ -150,7 +173,7 @@ public class AdvancedApplicationConfiguration  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, certificate, skipConsent, returnAuthenticatedIdpList, enableAuthorization);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipConsent, returnAuthenticatedIdpList, enableAuthorization);
     }
 
     @Override
@@ -160,6 +183,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("class AdvancedApplicationConfiguration {\n");
         
         sb.append("    saas: ").append(toIndentedString(saas)).append("\n");
+        sb.append("    discoverableByEndUsers: ").append(toIndentedString(discoverableByEndUsers)).append("\n");
         sb.append("    certificate: ").append(toIndentedString(certificate)).append("\n");
         sb.append("    skipConsent: ").append(toIndentedString(skipConsent)).append("\n");
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");

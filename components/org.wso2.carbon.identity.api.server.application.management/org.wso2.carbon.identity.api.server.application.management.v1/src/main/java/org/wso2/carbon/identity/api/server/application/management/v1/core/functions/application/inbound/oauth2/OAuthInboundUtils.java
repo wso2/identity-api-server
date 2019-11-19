@@ -41,14 +41,12 @@ public class OAuthInboundUtils {
         String updatedClientId;
         try {
             if (currentClientId != null) {
-                if (oidcConfigModel.getClientId() == null || oidcConfigModel.getClientSecret() == null) {
-                    // Get the current clientId and secret since they are not specified in the request.
-                    OAuthConsumerAppDTO oauthApp = ApplicationManagementServiceHolder.getOAuthAdminService()
-                            .getOAuthApplicationData(currentClientId);
+                // Get the current clientId and secret since they are not specified in the request.
+                OAuthConsumerAppDTO oauthApp = ApplicationManagementServiceHolder.getOAuthAdminService()
+                        .getOAuthApplicationData(currentClientId);
 
-                    oidcConfigModel.setClientId(oauthApp.getOauthConsumerKey());
-                    oidcConfigModel.setClientSecret(oauthApp.getOauthConsumerSecret());
-                }
+                oidcConfigModel.setClientId(oauthApp.getOauthConsumerKey());
+                oidcConfigModel.setClientSecret(oauthApp.getOauthConsumerSecret());
 
                 OAuthConsumerAppDTO appToUpdate = new ApiModelToOAuthConsumerApp().apply(oidcConfigModel);
                 updatedClientId = appToUpdate.getOauthConsumerKey();

@@ -34,6 +34,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
 
         if (advancedConfigurations != null) {
             setIfNotNull(advancedConfigurations.getSaas(), serviceProvider::setSaasApp);
+            setIfNotNull(advancedConfigurations.getDiscoverableByEndUsers(), serviceProvider::setDiscoverable);
 
             LocalAndOutboundAuthenticationConfig config = getLocalAndOutboundConfig(serviceProvider);
             setIfNotNull(advancedConfigurations.getSkipConsent(), config::setSkipConsent);

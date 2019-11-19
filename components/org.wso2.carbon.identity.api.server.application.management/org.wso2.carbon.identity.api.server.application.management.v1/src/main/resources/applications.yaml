@@ -3396,21 +3396,29 @@ components:
         saas:
           type: boolean
           example: false
-          description: Decide whether this application is allowed to be accessed across tenants.
+          description: Decides whether the application is allowed to be accessed across tenants.
+        discoverableByEndUsers:
+          type: boolean
+          example: false
+          description: Decides whether the application is visible for end users.
         certificate:
           $ref: '#/components/schemas/Certificate'
         skipConsent:
           type: boolean
           example: false
+          description: Decides whether user consent needs to be skipped during login flows.
         returnAuthenticatedIdpList:
           type: boolean
           example: false
-          description: Decide whether authenticated identity provider list needs to returned in the authentication response.
+          description: Decides whether the list of authenticated identity providers need to returned in the authentication response.
         enableAuthorization:
           type: boolean
+          description: Decides whether authorization policies needs to be engaged during authentication flows.
           example: true
     Certificate:
       type: object
+      required:
+        - type
       properties:
         type:
           type: string
@@ -3461,35 +3469,6 @@ components:
           type: string
           example: "/t/carbon.super/api/server/v1/applications/29048810-1447-4ea0-a348-30d15ab65fa3/inbound-protocols/saml"
 
-
-            # InboundProtocol:
-            #   oneOf:
-            #     - $ref: '#/components/schemas/SAML2Configuration'
-            #     - $ref: '#/components/schemas/OpenIDConnectConfiguration'
-            #     - $ref: '#/components/schemas/PassiveStsConfiguration'
-            #     - $ref: '#/components/schemas/WSTrustConfiguration'
-            #     - $ref: '#/components/schemas/CustomInboundProtocolConfiguration'
-            #   discriminator:
-            #     propertyName: inboundType
-
-            # type: object
-            # properties:
-            #   saml:
-            #     $ref: '#/components/schemas/SAML2Configuration'
-            #   oidc:
-            #     $ref: '#/components/schemas/OpenIDConnectConfiguration'
-            #   passiveSts:
-            #     $ref: '#/components/schemas/PassiveStsConfiguration'
-            #   wsTrust:
-            #     $ref: '#/components/schemas/WSTrustConfiguration'
-            #   # kerberosKDC:
-            #   #   $ref: '#/components/schemas/KerberosKDCParameters'
-            #   custom:
-            #     type: array
-            #     items:
-          #       $ref: '#/components/schemas/CustomInboundProtocolConfiguration'
-
-
     ClaimConfiguration:
       type: object
       properties:
@@ -3539,6 +3518,9 @@ components:
           $ref: '#/components/schemas/Claim'
     RoleMapping:
       type: object
+      required:
+        - localRole
+        - applicationRole
       properties:
         localRole:
           type: string

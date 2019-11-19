@@ -305,6 +305,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         return new AdvancedApplicationConfiguration()
                 .saas(serviceProvider.isSaasApp())
+                .discoverableByEndUsers(serviceProvider.isDiscoverable())
                 .enableAuthorization(authConfig.isEnableAuthorization())
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
                 .skipConsent(authConfig.isSkipConsent())

@@ -351,6 +351,7 @@ public class ServerApplicationManagementService {
 
     public CustomInboundProtocolConfiguration getCustomInboundConfiguration(String applicationId, String inboundType) {
 
+        // TODO: validate inbound type;
         return getInbound(applicationId, application -> InboundUtils.getCustomInbound(application, inboundType));
     }
 
