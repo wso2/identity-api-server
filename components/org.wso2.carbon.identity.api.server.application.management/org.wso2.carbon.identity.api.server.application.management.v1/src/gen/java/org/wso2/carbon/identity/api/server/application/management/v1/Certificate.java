@@ -74,11 +74,9 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("type")
     @Valid
-    @NotNull(message = "Property type cannot be null.")
-
     public TypeEnum getType() {
         return type;
     }

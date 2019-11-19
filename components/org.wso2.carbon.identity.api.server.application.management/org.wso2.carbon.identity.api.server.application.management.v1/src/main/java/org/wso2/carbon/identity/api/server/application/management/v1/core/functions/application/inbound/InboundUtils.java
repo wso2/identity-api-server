@@ -44,6 +44,10 @@ import static org.wso2.carbon.identity.application.authentication.framework.util
  */
 public class InboundUtils {
 
+    private InboundUtils() {
+
+    }
+
     public static OpenIDConnectConfiguration getOAuthInbound(ServiceProvider application) {
 
         return getInboundConfiguration(application, OAUTH2, OAuthInboundUtils::getOAuthConfiguration);

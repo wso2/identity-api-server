@@ -1306,9 +1306,69 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
+                # '/applications/{applicationId}/inbound-protocols/oidc/state':
+                # patch:
+                #   tags:
+                #     - Inbound Protocols - OAuth / OIDC
+                #   summary: |
+                #     Update the OAuth2/OIDC client state.
+                #   description: |
+                #     This API provides the capability to update the state of the OAuth client.
+                #   operationId: updateOAuthApplicationState
+                #   parameters:
+                #     - name: applicationId
+                #       in: path
+                #       description: Id of the application
+                #       required: true
+                #       schema:
+                #         type: string
+                #   requestBody:
+                #     content:
+                #       application/json:
+                #         schema:
+                #           $ref: '#/components/schemas/OAuthApplicationState'
+                #     description: >-
+                #       This represents the OIDC client state of an application.
+                #     required: true
+                #   responses:
+                #     '200':
+                #       description: OK
+                #       content:
+                #         application/json:
+                #           schema:
+                #             $ref: '#/components/schemas/OpenIDConnectConfiguration'
+                #     '400':
+                #       description: Bad Request
+                #       content:
+                #         application/json:
+                #           schema:
+                #             $ref: '#/components/schemas/Error'
+                #     '401':
+                #       description: Unauthorized
+                #       content:
+                #         application/json:
+                #           schema:
+                #             $ref: '#/components/schemas/Error'
+                #     '403':
+                #       description: Forbidden
+                #       content:
+                #         application/json:
+                #           schema:
+                #             $ref: '#/components/schemas/Error'
+                #     '404':
+                #       description: Not Found
+                #       content:
+                #         application/json:
+                #           schema:
+                #             $ref: '#/components/schemas/Error'
+                #     '500':
+                #       description: Server Error
+                #       content:
+                #         application/json:
+                #           schema:
+                #             $ref: '#/components/schemas/Error'
+
   '/applications/{applicationId}/inbound-protocols/passive-sts':
     get:
       tags:
@@ -3417,8 +3477,6 @@ components:
           example: true
     Certificate:
       type: object
-      required:
-        - type
       properties:
         type:
           type: string

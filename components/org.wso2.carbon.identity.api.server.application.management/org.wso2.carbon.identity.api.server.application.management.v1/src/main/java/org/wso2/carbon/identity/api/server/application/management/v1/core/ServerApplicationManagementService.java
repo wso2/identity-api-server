@@ -79,6 +79,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedErrorResponse;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerErrorResponse;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.updateApplication;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.rollbackInbounds;
 
@@ -109,7 +111,7 @@ public class ServerApplicationManagementService {
     public ApplicationListResponse getAllApplications(Integer limit, Integer offset, String filter, String sortOrder,
                                                       String sortBy, String requiredAttributes) {
 
-        handleNotImplementedCapabilities(sortBy, sortOrder, requiredAttributes);
+        handleNotImplementedCapabilities(sortOrder, sortBy, requiredAttributes);
 
         // TODO: define a default pagination max limit for identity data..
         limit = (limit != null && limit > 0 && limit <= DEFAULT_LIMIT_MAX) ? limit : DEFAULT_LIMIT;
@@ -193,7 +195,7 @@ public class ServerApplicationManagementService {
                 throw buildApiError(ErrorMessage.ERROR_IMPORTING_APPLICATION);
             }
         } catch (IOException e) {
-            throw handleServerError(e, "Error while importing application from XML file.");
+            throw buildServerErrorResponse(e, "Error while importing application from XML file.");
         } catch (IdentityApplicationManagementException e) {
             throw handleIdentityApplicationManagementException(e, "Error while importing application from XML file.");
         } finally {
@@ -204,7 +206,7 @@ public class ServerApplicationManagementService {
     public ApplicationResponseModel createApplication(ApplicationModel applicationModel, String template) {
 
         if (StringUtils.isNotBlank(template)) {
-            throw buildApiError(Response.Status.NOT_IMPLEMENTED, "Application creation with templates not supported.");
+            throw buildNotImplementedErrorResponse("Application creation with templates not supported.");
         }
 
         String username = ContextLoader.getUsernameFromContext();
@@ -286,7 +288,7 @@ public class ServerApplicationManagementService {
         ServiceProvider application =
                 getApplicationManagementService().getServiceProvider(ApplicationConstants.LOCAL_SP, tenantDomain);
         if (application == null) {
-            throw Utils.buildServerErrorResponse("Resident application cannot be found for tenantDomain: " +
+            throw buildServerErrorResponse("Resident application cannot be found for tenantDomain: " +
                     tenantDomain);
         }
         return application;
@@ -394,7 +396,7 @@ public class ServerApplicationManagementService {
                                                                   CustomInboundProtocolConfiguration customInbound) {
 
         return putInbound(applicationId, CustomInboundUtils::putCustomInbound,
-                (application) -> InboundUtils.getCustomInbound(application, inboundType), customInbound);
+                application -> InboundUtils.getCustomInbound(application, inboundType), customInbound);
     }
 
     private <T> T getInbound(String applicationId, Function<ServiceProvider, T> getInboundFunction) {
@@ -563,12 +565,6 @@ public class ServerApplicationManagementService {
         }
     }
 
-    private APIError buildApiError(Response.Status statusCode, String message) {
-
-        ErrorResponse errorResponse = new ErrorResponse.Builder().withMessage(message).build();
-        return new APIError(statusCode, errorResponse);
-    }
-
     private APIError buildApiError(ErrorMessage errorEnum) {
 
         ErrorResponse errorResponse = buildErrorResponse(errorEnum);
@@ -629,18 +625,6 @@ public class ServerApplicationManagementService {
                 .withCode(e.getErrorCode())
                 .withMessage(message)
                 .withDescription(e.getMessage())
-                .build(LOG, e, message);
-
-        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-        return new APIError(status, errorResponse);
-    }
-
-    private APIError handleServerError(Exception e, String message) {
-
-        ErrorResponse.Builder builder = new ErrorResponse.Builder();
-
-        ErrorResponse errorResponse = builder
-                .withMessage(e.getMessage())
                 .build(LOG, e, message);
 
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;

@@ -110,7 +110,7 @@ public class ApiModelToOAuthConsumerApp implements Function<OpenIDConnectConfigu
     private void updateAllowedOrigins(OAuthConsumerAppDTO consumerAppDTO, List<String> allowedOrigins) {
 
         if (CollectionUtils.isNotEmpty(allowedOrigins)) {
-            throw Utils.buildNotImplementedErrorResponse("Allowed origins are not supported yet.");
+            throw Utils.buildNotImplementedErrorResponse("Allowed origins are not supported for OAuth apps yet.");
         }
     }
 

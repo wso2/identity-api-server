@@ -19,12 +19,15 @@ import org.wso2.carbon.identity.api.server.application.management.common.Applica
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
+import org.wso2.carbon.identity.oauth.IdentityOAuthClientException;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildClientError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerErrorResponse;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.updateOrInsertInbound;
 
@@ -65,10 +68,17 @@ public class OAuthInboundUtils {
             updateOrInsertInbound(application, StandardInboundProtocols.OAUTH2, oidcInbound);
 
         } catch (IdentityOAuthAdminException e) {
-            String applicationId = application.getApplicationResourceId();
-            throw buildServerErrorResponse(e,
-                    "Error while creating/updating OAuth inbound of application: " + applicationId);
+            throw handleOAuthException(e);
         }
+    }
+
+    private static APIError handleOAuthException(IdentityOAuthAdminException e) {
+
+        String message = "Error while Creating/Updating OAuth2/OpenIDConnect configuration. " + e.getMessage();
+        if (e instanceof IdentityOAuthClientException) {
+            return buildClientError(message);
+        }
+        return buildServerErrorResponse(e, message);
     }
 
     public static OAuthConsumerAppDTO createOAuthInbound(OpenIDConnectConfiguration oidcModel) {
@@ -79,8 +89,7 @@ public class OAuthInboundUtils {
             return ApplicationManagementServiceHolder.getOAuthAdminService()
                     .registerAndRetrieveOAuthApplicationData(consumerApp);
         } catch (IdentityOAuthAdminException e) {
-            throw buildServerErrorResponse(e,
-                    "Error creating OAuth2/OpenIDConnect configuration. " + e.getMessage());
+            throw handleOAuthException(e);
         }
     }
 

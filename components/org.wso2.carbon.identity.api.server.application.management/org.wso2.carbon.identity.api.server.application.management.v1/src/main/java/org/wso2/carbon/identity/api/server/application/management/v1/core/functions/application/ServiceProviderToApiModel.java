@@ -99,14 +99,11 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         LocalAndOutboundAuthenticationConfig authConfig = application.getLocalAndOutBoundAuthenticationConfig();
 
-        AuthenticationSequence.TypeEnum authenticationType;
-        if (authConfig == null || ApplicationConstants.AUTH_TYPE_DEFAULT.equals(authConfig.getAuthenticationType())) {
+        AuthenticationSequence.TypeEnum authenticationType = getAuthenticationType(authConfig);
+        if (authenticationType == AuthenticationSequence.TypeEnum.DEFAULT) {
+            // If this is the default sequence we need to set the default tenant authentication sequence.
             ServiceProvider defaultSP = getDefaultServiceProvider();
             authConfig = defaultSP.getLocalAndOutBoundAuthenticationConfig();
-            authenticationType = AuthenticationSequence.TypeEnum.DEFAULT;
-        } else {
-            // This means a user defined authentication sequence.
-            authenticationType = AuthenticationSequence.TypeEnum.USER_DEFINED;
         }
 
         AuthenticationSequence authSequence = new AuthenticationSequence();
@@ -144,6 +141,18 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         }
 
         return authSequence;
+    }
+
+    private AuthenticationSequence.TypeEnum getAuthenticationType(LocalAndOutboundAuthenticationConfig authConfig) {
+
+        AuthenticationSequence.TypeEnum authenticationType;
+        if (authConfig == null || ApplicationConstants.AUTH_TYPE_DEFAULT.equals(authConfig.getAuthenticationType())) {
+            authenticationType = AuthenticationSequence.TypeEnum.DEFAULT;
+        } else {
+            // This means a user defined authentication sequence.
+            authenticationType = AuthenticationSequence.TypeEnum.USER_DEFINED;
+        }
+        return authenticationType;
     }
 
     private ServiceProvider getDefaultServiceProvider() {
@@ -314,14 +323,13 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
     private Certificate getCertificate(ServiceProvider serviceProvider) {
 
-        Certificate certificate = new Certificate();
         if (StringUtils.isNotBlank(serviceProvider.getCertificateContent())) {
-            certificate.type(Certificate.TypeEnum.PEM).value(serviceProvider.getCertificateContent());
+            return new Certificate().type(Certificate.TypeEnum.PEM).value(serviceProvider.getCertificateContent());
         } else if (StringUtils.isNotBlank(serviceProvider.getJwksUri())) {
-            certificate.type(Certificate.TypeEnum.JWKS).value(serviceProvider.getJwksUri());
+            return new Certificate().type(Certificate.TypeEnum.JWKS).value(serviceProvider.getJwksUri());
         }
 
-        return certificate;
+        return null;
     }
 
     private Claim buildClaimModel(String claimUri) {
