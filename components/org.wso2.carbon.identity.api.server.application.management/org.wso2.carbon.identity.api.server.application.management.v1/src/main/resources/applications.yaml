@@ -26,7 +26,7 @@ paths:
       summary: |
         List applications
       description: |
-        This API provides the capability to retrive the list of applications.
+        This API provides the capability to retrieve the list of applications.
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
@@ -146,16 +146,79 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
+  /applications/import:
+    post:
+      tags:
+        - Applications
+      summary: |
+        Import an application from file.
+      operationId: importApplication
+      description: >
+        This API provides the capability to store the application information,
+        provided as a file.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: file to upload
+        description: This represents the application to be created.
+        required: true
+      responses:
+        '201':
+          description: Successfully created.
+          headers:
+            Location:
+              description: Location of the newly created application.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationModel'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   '/applications/{applicationId}':
     get:
       tags:
         - Applications
       summary: |
-        Retrive application by id
+        Retrieve application by id
       operationId: getApplication
       description: >
-        This API provides the capability to retrive the application information
+        This API provides the capability to retrieve the application information
         by id.
       parameters:
         - name: applicationId
@@ -340,6 +403,60 @@ paths:
       x-wso2-request: ''
       x-wso2-response: |
         "HTTP/1.1 200 Ok"
+  /applications/{applicationId}/export:
+    get:
+      tags:
+        - Applications
+      operationId: exportApplication
+      summary: |
+        Export an application as an XML file.
+      description: |
+        This API provides the capability to retrieve the application as an XML file.
+      parameters:
+        - name: applicationId
+          in: path
+          description: Id of the application.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/exportSecretsQueryParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                example: 'Sample application configuration xml as a string'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /applications/resident:
     get:
       tags:
@@ -348,7 +465,7 @@ paths:
         Get Resident Service Provider Information.
       operationId: getResidentApplication
       description: |
-        This API provides the capability to retrive the resident SP information.
+        This API provides the capability to retrieve the resident SP information.
       responses:
         '200':
           description: OK
@@ -470,7 +587,7 @@ paths:
         Retrieve inbound protocol configurations of an application.
       operationId: getInboundAuthenticationConfigurations
       description: >
-        This API provides the capability to retrive authentication protocol
+        This API provides the capability to retrieve authentication protocol
         configurations of an application.
       parameters:
         - name: applicationId
@@ -651,7 +768,7 @@ paths:
         Retrieve SAML2 authentication protocol parameters of an application.
       operationId: getInboundSAMLConfiguration
       description: >
-        This API provides the capability to retrive SAML2 authentication
+        This API provides the capability to retrieve SAML2 authentication
         protocol parameters of an application.
       parameters:
         - name: applicationId
@@ -1898,9 +2015,9 @@ paths:
       tags:
         - Claims
       summary: |
-        Retrive claim configuration application by id
+        Retrieve claim configuration application by id
       description: >
-        This API provides the capability to retrive the application claim
+        This API provides the capability to retrieve the application claim
         configuration by id.
       operationId: getClaimConfiguration
       parameters:
@@ -2078,9 +2195,9 @@ paths:
       tags:
         - Advanced Configs
       summary: |
-        Retrive advanced configurations of an application by id
+        Retrieve advanced configurations of an application by id
       description: >
-        This API provides the capability to retrive the advanced configurations
+        This API provides the capability to retrieve the advanced configurations
         of an application by id.
       operationId: getAdvancedConfigurations
       parameters:
@@ -2261,9 +2378,9 @@ paths:
       tags:
         - Provisioning Configs
       summary: |
-        Retrive provisioning configurations of application by id
+        Retrieve provisioning configurations of application by id
       description: >
-        This API provides the capability to retrive the provisioning
+        This API provides the capability to retrieve the provisioning
         configurations of an application by id.
       operationId: getProvisioningConfiguration
       parameters:
@@ -2444,9 +2561,9 @@ paths:
       tags:
         - Authentication Sequence
       summary: |
-        Retrive authentication sequence of application by id
+        Retrieve authentication sequence of application by id
       description: >
-        This API provides the capability to retrive authentication sequence of
+        This API provides the capability to retrieve authentication sequence of
         an application by id.
       operationId: getAuthenticationSequence
       parameters:
@@ -2623,6 +2740,282 @@ paths:
       x-wso2-response: |
         "HTTP/1.1 200 Ok"
 
+  '/applications/meta/inbound-protocols':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrieve the list of inbound authentication protocols available.
+      description: >
+        This API provides the capability to retrieve the list of inbound authentication protocols available.
+        If the query parameter 'customOnly' is set to true, only custom inbound protocols will be listed.
+      operationId: getInboundProtocols
+      parameters:
+        - $ref: '#/components/parameters/inboundProtocolsCustomOnly'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuthProtocolMetadata'
+                example:
+                  - name: "saml"
+                    displayName: "SAML2 Web SSO Configuration"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-wso2-request: ''
+      x-wso2-response: |
+        "HTTP/1.1 200 Ok"
+  '/applications/meta/inbound-protocols/saml':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrieve all the metadata related to the auth protocol SAML
+      description: >
+        This API provides the capability to retrieve all the metadata related to the auth protocol SAML.
+      operationId: getSAMLMetadata
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SAMLMetaData'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-wso2-request: ''
+      x-wso2-response: |
+        "HTTP/1.1 200 Ok"
+  '/applications/meta/inbound-protocols/oidc':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrieve all the metadata related to the authentication protocol OAuth / OIDC
+      description: >
+        This API provides the capability to retrieve all the metadata related to the authentication
+         protocol OAuth / OIDC.
+      operationId: getOIDCMetadata
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OIDCMetaData'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-wso2-request: ''
+      x-wso2-response: |
+        "HTTP/1.1 200 Ok"
+  '/applications/meta/inbound-protocols/ws-trust':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrieve all the metadata related to the auth protocol WS_Trust
+      description: >
+        This API provides the capability to retrieve all the metadata related to the auth protocol WS_Trust.
+      operationId: getWSTrustMetadata
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WSTrustMetaData'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-wso2-request: ''
+      x-wso2-response: |
+        "HTTP/1.1 200 Ok"
+  '/applications/meta/inbound-protocols/{inboundProtocolId}':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrieve all the metadata related to the custom auth protocol identified by the inboundProtocolId
+      description: >
+        This API provides the capability to retrieve all the metadata related to the custom auth protocol
+        identified by the inboundProtocolId.
+      operationId: getCustomProtocolMetadata
+      parameters:
+        - name: inboundProtocolId
+          in: path
+          description: Inbound Authentication Protocol ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomInboundProtocolMetaData'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-wso2-request: ''
+      x-wso2-response: |
+        "HTTP/1.1 200 Ok"
+  '/applications/meta/adaptive-auth-templates':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Retrieve the sample adaptive authentication templates.
+      description: >
+        This API provides the capability to retrieve the sample adaptive authentication templates.
+      operationId: getAdaptiveAuthTemplates
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdaptiveAuthTemplates'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-wso2-request: ''
+      x-wso2-response: |
+        "HTTP/1.1 200 Ok"
+
 components:
   parameters:
     limitQueryParam:
@@ -2633,7 +3026,8 @@ components:
         Maximum number of records to return.
       schema:
         type: integer
-        format: int32
+        minimum: 1
+        default: 30
     offsetQueryParam:
       in: query
       name: offset
@@ -2642,13 +3036,13 @@ components:
         Number of records to skip for pagination.
       schema:
         type: integer
-        format: int32
+        minimum: 0
     filterQueryParam:
       in: query
       name: filter
       required: false
       description: |
-        Condition to filter the retrival of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently supports only filtering based on the 'name' attribute.
+        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently supports only filtering based on the 'name' attribute.
 
         /applications?filter=name+eq+user_portal
         /applications?filter=name+co+prod
@@ -2684,6 +3078,25 @@ components:
         _This parameter is not supported yet_
       schema:
         type: string
+    exportSecretsQueryParam:
+      in: query
+      name: exportSecrets
+      required: false
+      description: |
+        Specifies whether to export secrets when exporting an application.
+      schema:
+        type: boolean
+        default: false
+    inboundProtocolsCustomOnly:
+      in: query
+      name: customOnly
+      required: false
+      description: |
+        Send only the custom inbound protocols.
+      schema:
+        type: boolean
+        example: true
+        default: false
   securitySchemes:
     BasicAuth:
       type: http
@@ -3158,7 +3571,7 @@ components:
             #       type: string
             #       enum:
             #         - backchannel
-          #         - frontchannel_http_redirect
+            #         - frontchannel_http_redirect
           #         - frontchannel_http_post
           #       default: backchannel
 
@@ -3394,23 +3807,34 @@ components:
         script:
           type: string
         subjectStepId:
-          type: string
-          example: step1
+          type: integer
+          default: 1
+          example: 1
         attributeStepId:
-          type: string
-          example: step1
+          type: integer
+          default: 1
+          example: 1
+
     AuthenticationStep:
       type: object
+      required:
+        - id
+        - options
       properties:
         id:
-          type: string
-          example: step1
+          type: integer
+          minimum: 1
+          example: 1
         options:
           type: array
           items:
             $ref: '#/components/schemas/Authenticator'
+          minItems: 1
     Authenticator:
       type: object
+      required:
+        - idp
+        - authenticator
       properties:
         idp:
           type: string
@@ -3418,6 +3842,128 @@ components:
         authenticator:
           type: string
           example: basic
+
+    AuthProtocolMetadata:
+      type: object
+      properties:
+        name:
+          type: string
+        displayName:
+          type: string
+    MetadataProperty:
+      type: object
+      properties:
+        options:
+          type: array
+          items:
+            type: string
+          example:
+            - 'Option 1'
+            - 'Option 2'
+        defaultValue:
+          type: string
+          example: 'Option 1'
+    SAMLMetaData:
+      type: object
+      properties:
+        defaultNameIdFormat:
+          type: string
+          example: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+        certificateAlias:
+          $ref: '#/components/schemas/MetadataProperty'
+        responseSigningAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        responseDigestAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        assertionEncryptionAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        keyEncryptionAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+    OIDCMetaData:
+      type: object
+      properties:
+        allowedGrantTypes:
+          $ref: '#/components/schemas/MetadataProperty'
+        defaultUserAccessTokenExpiryTime:
+          type: string
+          example: '3600'
+        defaultApplicationAccessTokenExpiryTime:
+          type: string
+          example: '3600'
+        defaultRefreshTokenExpiryTime:
+          type: string
+          example: '86400'
+        defaultIdTokenExpiryTime:
+          type: string
+          example: '3600'
+        idTokenEncryptionAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        idTokenEncryptionMethod:
+          $ref: '#/components/schemas/MetadataProperty'
+        scopeValidators:
+          $ref: '#/components/schemas/MetadataProperty'
+        accessTokenType:
+          $ref: '#/components/schemas/MetadataProperty'
+    WSTrustMetaData:
+      type: object
+      properties:
+        certificateAlias:
+          $ref: '#/components/schemas/MetadataProperty'
+    CustomInboundProtocolMetaData:
+      type: object
+      properties:
+        displayName:
+          type: string
+          example: 'My Custom Protocol'
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomInboundProtocolProperty'
+    CustomInboundProtocolProperty:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'encryptionAlgorithm'
+        displayName:
+          type: string
+          example: 'Encryption Algorithm'
+        type:
+          type: string
+          enum:
+            - STRING
+            - BOOLEAN
+            - INTEGER
+          example: STRING
+        required:
+          type: boolean
+          example: true
+        availableValues:
+          type: array
+          items:
+            type: string
+            example:
+              - 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p'
+              - 'http://www.w3.org/2001/04/xmlenc#rsa-1_5'
+        defaultValue:
+          type: string
+          example: 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p'
+        validationRegex:
+          type: string
+          example: '^[a-b][A-B]*'
+        displayOrder:
+          type: integer
+          example: 1
+        isConfidential:
+          type: boolean
+          default: false
+
+    AdaptiveAuthTemplates:
+      type: object
+      properties:
+        templatesJSON:
+          type: string
+          example: 'Adaptive Auth Templates JSON'
 
     Error:
       type: object

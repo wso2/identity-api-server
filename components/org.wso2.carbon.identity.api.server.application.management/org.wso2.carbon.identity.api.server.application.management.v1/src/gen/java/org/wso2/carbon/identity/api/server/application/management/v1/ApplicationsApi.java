@@ -17,20 +17,31 @@
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+
+import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
+import java.io.File;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
+import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
 
 import javax.validation.Valid;
@@ -338,10 +349,57 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/{applicationId}/export")
+    
+    @Produces({ "application/octet-stream", "application/json" })
+    @ApiOperation(value = "Export an application as an XML file. ", notes = "This API provides the capability to retrieve the application as an XML file. ", response = Object.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Applications", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = Object.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response exportApplication(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId,     @Valid@ApiParam(value = "Specifies whether to export secrets when exporting an application. ", defaultValue="false") @DefaultValue("false")  @QueryParam("exportSecrets") Boolean exportSecrets) {
+
+        return delegate.exportApplication(applicationId,  exportSecrets );
+    }
+
+    @Valid
+    @GET
+    @Path("/meta/adaptive-auth-templates")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the sample adaptive authentication templates. ", notes = "This API provides the capability to retrieve the sample adaptive authentication templates. ", response = AdaptiveAuthTemplates.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = AdaptiveAuthTemplates.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getAdaptiveAuthTemplates() {
+
+        return delegate.getAdaptiveAuthTemplates();
+    }
+
+    @Valid
+    @GET
     @Path("/{applicationId}/advanced-configs")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrive advanced configurations of an application by id ", notes = "This API provides the capability to retrive the advanced configurations of an application by id. ", response = AdvancedApplicationConfiguration.class, authorizations = {
+    @ApiOperation(value = "Retrieve advanced configurations of an application by id ", notes = "This API provides the capability to retrieve the advanced configurations of an application by id. ", response = AdvancedApplicationConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -365,7 +423,7 @@ public class ApplicationsApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List applications ", notes = "This API provides the capability to retrive the list of applications. ", response = ApplicationListResponse.class, authorizations = {
+    @ApiOperation(value = "List applications ", notes = "This API provides the capability to retrieve the list of applications. ", response = ApplicationListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -380,7 +438,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getAllApplications(    @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently supports only filtering based on the 'name' attribute.  /applications?filter=name+eq+user_portal /applications?filter=name+co+prod ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _This parameter is not supported yet._ ", allowableValues="ASC, DESC")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _This parameter is not supported yet._ ")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Specifies the required parameters in the response _This parameter is not supported yet_ ")  @QueryParam("attributes") String attributes) {
+    public Response getAllApplications(    @Valid @Min(1)@ApiParam(value = "Maximum number of records to return. ", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently supports only filtering based on the 'name' attribute.  /applications?filter=name+eq+user_portal /applications?filter=name+co+prod ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _This parameter is not supported yet._ ", allowableValues="ASC, DESC")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _This parameter is not supported yet._ ")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Specifies the required parameters in the response _This parameter is not supported yet_ ")  @QueryParam("attributes") String attributes) {
 
         return delegate.getAllApplications(limit,  offset,  filter,  sortOrder,  sortBy,  attributes );
     }
@@ -390,7 +448,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}")
     
     @Produces({ "application/json", "application/xml" })
-    @ApiOperation(value = "Retrive application by id ", notes = "This API provides the capability to retrive the application information by id. ", response = ApplicationModel.class, authorizations = {
+    @ApiOperation(value = "Retrieve application by id ", notes = "This API provides the capability to retrieve the application information by id. ", response = ApplicationModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -414,7 +472,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/authentication-sequence")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrive authentication sequence of application by id ", notes = "This API provides the capability to retrive authentication sequence of an application by id. ", response = AuthenticationSequence.class, authorizations = {
+    @ApiOperation(value = "Retrieve authentication sequence of application by id ", notes = "This API provides the capability to retrieve authentication sequence of an application by id. ", response = AuthenticationSequence.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -438,7 +496,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/claims")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrive claim configuration application by id ", notes = "This API provides the capability to retrive the application claim configuration by id. ", response = ClaimConfiguration.class, authorizations = {
+    @ApiOperation(value = "Retrieve claim configuration application by id ", notes = "This API provides the capability to retrieve the application claim configuration by id. ", response = ClaimConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -483,10 +541,33 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/meta/inbound-protocols/{inboundProtocolId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve all the metadata related to the custom auth protocol identified by the inboundProtocolId ", notes = "This API provides the capability to retrieve all the metadata related to the custom auth protocol identified by the inboundProtocolId. ", response = CustomInboundProtocolMetaData.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = CustomInboundProtocolMetaData.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getCustomProtocolMetadata(@ApiParam(value = "Inbound Authentication Protocol ID",required=true) @PathParam("inboundProtocolId") String inboundProtocolId) {
+
+        return delegate.getCustomProtocolMetadata(inboundProtocolId );
+    }
+
+    @Valid
+    @GET
     @Path("/{applicationId}/inbound-protocols/")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve inbound protocol configurations of an application. ", notes = "This API provides the capability to retrive authentication protocol configurations of an application. ", response = InboundProtocols.class, authorizations = {
+    @ApiOperation(value = "Retrieve inbound protocol configurations of an application. ", notes = "This API provides the capability to retrieve authentication protocol configurations of an application. ", response = InboundProtocols.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -530,10 +611,33 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/meta/inbound-protocols")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the list of inbound authentication protocols available. ", notes = "This API provides the capability to retrieve the list of inbound authentication protocols available. If the query parameter 'customOnly' is set to true, only custom inbound protocols will be listed. ", response = AuthProtocolMetadata.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = AuthProtocolMetadata.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getInboundProtocols(    @Valid@ApiParam(value = "Send only the custom inbound protocols. ", defaultValue="false") @DefaultValue("false")  @QueryParam("customOnly") Boolean customOnly) {
+
+        return delegate.getInboundProtocols(customOnly );
+    }
+
+    @Valid
+    @GET
     @Path("/{applicationId}/inbound-protocols/saml")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve SAML2 authentication protocol parameters of an application. ", notes = "This API provides the capability to retrive SAML2 authentication protocol parameters of an application. ", response = SAML2Configuration.class, authorizations = {
+    @ApiOperation(value = "Retrieve SAML2 authentication protocol parameters of an application. ", notes = "This API provides the capability to retrieve SAML2 authentication protocol parameters of an application. ", response = SAML2Configuration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -549,6 +653,29 @@ public class ApplicationsApi  {
     public Response getInboundSAMLConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getInboundSAMLConfiguration(applicationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/meta/inbound-protocols/oidc")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve all the metadata related to the authentication protocol OAuth / OIDC ", notes = "This API provides the capability to retrieve all the metadata related to the authentication  protocol OAuth / OIDC. ", response = OIDCMetaData.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = OIDCMetaData.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getOIDCMetadata() {
+
+        return delegate.getOIDCMetadata();
     }
 
     @Valid
@@ -580,7 +707,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/provisioning-configs")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrive provisioning configurations of application by id ", notes = "This API provides the capability to retrive the provisioning configurations of an application by id. ", response = ProvisioningConfiguration.class, authorizations = {
+    @ApiOperation(value = "Retrieve provisioning configurations of application by id ", notes = "This API provides the capability to retrieve the provisioning configurations of an application by id. ", response = ProvisioningConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -604,7 +731,7 @@ public class ApplicationsApi  {
     @Path("/resident")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get Resident Service Provider Information. ", notes = "This API provides the capability to retrive the resident SP information. ", response = ResidentApplication.class, authorizations = {
+    @ApiOperation(value = "Get Resident Service Provider Information. ", notes = "This API provides the capability to retrieve the resident SP information. ", response = ResidentApplication.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -621,6 +748,29 @@ public class ApplicationsApi  {
     public Response getResidentApplication() {
 
         return delegate.getResidentApplication();
+    }
+
+    @Valid
+    @GET
+    @Path("/meta/inbound-protocols/saml")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve all the metadata related to the auth protocol SAML ", notes = "This API provides the capability to retrieve all the metadata related to the auth protocol SAML. ", response = SAMLMetaData.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = SAMLMetaData.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getSAMLMetadata() {
+
+        return delegate.getSAMLMetadata();
     }
 
     @Valid
@@ -645,6 +795,53 @@ public class ApplicationsApi  {
     public Response getWSTrustConfiguration(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getWSTrustConfiguration(applicationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/meta/inbound-protocols/ws-trust")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve all the metadata related to the auth protocol WS_Trust ", notes = "This API provides the capability to retrieve all the metadata related to the auth protocol WS_Trust. ", response = WSTrustMetaData.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = WSTrustMetaData.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getWSTrustMetadata() {
+
+        return delegate.getWSTrustMetadata();
+    }
+
+    @Valid
+    @POST
+    @Path("/import")
+    @Consumes({ "multipart/form-data" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Import an application from file. ", notes = "This API provides the capability to store the application information, provided as a file. ", response = ApplicationModel.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Applications", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Successfully created.", response = ApplicationModel.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response importApplication( @Multipart(value = "file", required = false) InputStream fileInputStream, @Multipart(value = "file" , required = false) Attachment fileDetail) {
+
+        return delegate.importApplication(fileInputStream, fileDetail );
     }
 
     @Valid

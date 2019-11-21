@@ -72,8 +72,8 @@ public enum TypeEnum {
     private List<String> requestPathAuthenticators = null;
 
     private String script;
-    private String subjectStepId;
-    private String attributeStepId;
+    private Integer subjectStepId = 1;
+    private Integer attributeStepId = 1;
 
     /**
     **/
@@ -165,37 +165,37 @@ public enum TypeEnum {
 
     /**
     **/
-    public AuthenticationSequence subjectStepId(String subjectStepId) {
+    public AuthenticationSequence subjectStepId(Integer subjectStepId) {
 
         this.subjectStepId = subjectStepId;
         return this;
     }
     
-    @ApiModelProperty(example = "step1", value = "")
+    @ApiModelProperty(example = "1", value = "")
     @JsonProperty("subjectStepId")
     @Valid
-    public String getSubjectStepId() {
+    public Integer getSubjectStepId() {
         return subjectStepId;
     }
-    public void setSubjectStepId(String subjectStepId) {
+    public void setSubjectStepId(Integer subjectStepId) {
         this.subjectStepId = subjectStepId;
     }
 
     /**
     **/
-    public AuthenticationSequence attributeStepId(String attributeStepId) {
+    public AuthenticationSequence attributeStepId(Integer attributeStepId) {
 
         this.attributeStepId = attributeStepId;
         return this;
     }
     
-    @ApiModelProperty(example = "step1", value = "")
+    @ApiModelProperty(example = "1", value = "")
     @JsonProperty("attributeStepId")
     @Valid
-    public String getAttributeStepId() {
+    public Integer getAttributeStepId() {
         return attributeStepId;
     }
-    public void setAttributeStepId(String attributeStepId) {
+    public void setAttributeStepId(Integer attributeStepId) {
         this.attributeStepId = attributeStepId;
     }
 
