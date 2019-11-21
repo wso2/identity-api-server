@@ -56,7 +56,7 @@ public class SAML2ServiceProvider  {
 @XmlEnum(String.class)
 public enum SingleLogoutMethodEnum {
 
-    @XmlEnumValue("backchannel") BACKCHANNEL(String.valueOf("backchannel")), @XmlEnumValue("frontchannel_http_redirect") FRONTCHANNEL_HTTP_REDIRECT(String.valueOf("frontchannel_http_redirect")), @XmlEnumValue("frontchannel_http_post") FRONTCHANNEL_HTTP_POST(String.valueOf("frontchannel_http_post"));
+    @XmlEnumValue("BACKCHANNEL") BACKCHANNEL(String.valueOf("BACKCHANNEL")), @XmlEnumValue("FRONTCHANNEL_HTTP_REDIRECT") FRONTCHANNEL_HTTP_REDIRECT(String.valueOf("FRONTCHANNEL_HTTP_REDIRECT")), @XmlEnumValue("FRONTCHANNEL_HTTP_POST") FRONTCHANNEL_HTTP_POST(String.valueOf("FRONTCHANNEL_HTTP_POST"));
 
 
     private String value;

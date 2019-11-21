@@ -17,7 +17,6 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
@@ -27,17 +26,20 @@ import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
 import org.wso2.carbon.identity.oauth.IdentityOAuthClientException;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildClientError;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerErrorResponse;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.updateOrInsertInbound;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerError;
 
 /**
  * Helper functions for OAuth inbound management.
  */
 public class OAuthInboundUtils {
 
-    public static void putOAuthInbound(ServiceProvider application,
-                                       OpenIDConnectConfiguration oidcConfigModel) {
+    private OAuthInboundUtils() {
+
+    }
+
+    public static InboundAuthenticationRequestConfig putOAuthInbound(ServiceProvider application,
+                                                                     OpenIDConnectConfiguration oidcConfigModel) {
 
         // First we identify whether this is a insert or update.
         String currentClientId = InboundUtils.getInboundAuthKey(application, StandardInboundProtocols.OAUTH2);
@@ -65,7 +67,9 @@ public class OAuthInboundUtils {
             InboundAuthenticationRequestConfig oidcInbound = new InboundAuthenticationRequestConfig();
             oidcInbound.setInboundAuthType(StandardInboundProtocols.OAUTH2);
             oidcInbound.setInboundAuthKey(updatedClientId);
-            updateOrInsertInbound(application, StandardInboundProtocols.OAUTH2, oidcInbound);
+
+            return oidcInbound;
+            // updateOrInsertInbound(application, StandardInboundProtocols.OAUTH2, oidcInbound);
 
         } catch (IdentityOAuthAdminException e) {
             throw handleOAuthException(e);
@@ -76,9 +80,9 @@ public class OAuthInboundUtils {
 
         String message = "Error while Creating/Updating OAuth2/OpenIDConnect configuration. " + e.getMessage();
         if (e instanceof IdentityOAuthClientException) {
-            return buildClientError(message);
+            return buildBadRequestError(message);
         }
-        return buildServerErrorResponse(e, message);
+        return buildServerError(message, e);
     }
 
     public static OAuthConsumerAppDTO createOAuthInbound(OpenIDConnectConfiguration oidcModel) {
@@ -103,7 +107,7 @@ public class OAuthInboundUtils {
 
         } catch (IdentityOAuthAdminException e) {
 
-            throw buildServerErrorResponse(e, "Error while retrieving oauth application for clientId: " + clientId);
+            throw buildServerError("Error while retrieving oauth application for clientId: " + clientId, e);
         }
     }
 
@@ -113,8 +117,8 @@ public class OAuthInboundUtils {
             String consumerKey = inbound.getInboundAuthKey();
             ApplicationManagementServiceHolder.getOAuthAdminService().removeOAuthApplicationData(consumerKey);
         } catch (IdentityOAuthAdminException e) {
-            throw Utils.buildServerErrorResponse(e, "Error while trying to rollback OAuth2/OpenIDConnect " +
-                    "configuration." + e.getMessage());
+            throw buildServerError("Error while trying to rollback OAuth2/OpenIDConnect " +
+                    "configuration." + e.getMessage(), e);
         }
     }
 
@@ -125,7 +129,7 @@ public class OAuthInboundUtils {
                     .updateAndRetrieveOauthSecretKey(clientId);
             return new OAuthConsumerAppToApiModel().apply(oAuthConsumerAppDTO);
         } catch (IdentityOAuthAdminException e) {
-            throw Utils.buildServerErrorResponse(e, "Error while regenerating client secret of oauth application.");
+            throw buildServerError("Error while regenerating client secret of oauth application.", e);
         }
     }
 

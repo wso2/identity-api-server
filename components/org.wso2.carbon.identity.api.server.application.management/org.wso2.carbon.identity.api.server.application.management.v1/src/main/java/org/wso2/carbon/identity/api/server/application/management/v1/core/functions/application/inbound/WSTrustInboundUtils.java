@@ -18,8 +18,6 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
-import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.security.SecurityConfigException;
@@ -27,38 +25,48 @@ import org.wso2.carbon.security.sts.service.util.TrustedServiceData;
 
 import java.util.Arrays;
 
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerErrorResponse;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerError;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.WS_TRUST;
 
 /**
  * Helper functions for WSTrust inbound management.
  */
 public class WSTrustInboundUtils {
 
-    public static void putWSTrustConfiguration(ServiceProvider application,
-                                               WSTrustConfiguration wsTrustConfiguration) {
+    private WSTrustInboundUtils() {
 
-        String inboundAuthKey = InboundUtils.getInboundAuthKey(application, StandardInboundProtocols.WS_TRUST);
+    }
+
+    public static InboundAuthenticationRequestConfig putWSTrustConfiguration(ServiceProvider application,
+                                                                             WSTrustConfiguration wsTrustModel) {
+
+        String inboundAuthKey = InboundUtils.getInboundAuthKey(application, WS_TRUST);
         try {
             if (inboundAuthKey != null) {
                 ApplicationManagementServiceHolder.getStsAdminService().removeTrustedService(inboundAuthKey);
             }
 
-            addWSTrustInbound(wsTrustConfiguration);
+            return createWsTrustInbound(wsTrustModel);
         } catch (SecurityConfigException e) {
             String applicationId = application.getApplicationResourceId();
-            throw buildServerErrorResponse(e,
-                    "Error while creating/updating WSTrust inbound of application: " + applicationId);
+            throw buildServerError("Error while creating/updating WSTrust inbound of application: " + applicationId, e);
         }
     }
 
-    public static void addWSTrustInbound(WSTrustConfiguration wsTrustConfiguration) {
+    public static InboundAuthenticationRequestConfig createWsTrustInbound(WSTrustConfiguration wsTrustConfiguration) {
 
         try {
             ApplicationManagementServiceHolder.getStsAdminService()
                     .addTrustedService(wsTrustConfiguration.getAudience(), wsTrustConfiguration.getCertificateAlias());
+
+            InboundAuthenticationRequestConfig wsTrustInbound = new InboundAuthenticationRequestConfig();
+            wsTrustInbound.setInboundAuthType(WS_TRUST);
+            wsTrustInbound.setInboundAuthKey(wsTrustConfiguration.getAudience());
+            return wsTrustInbound;
+
         } catch (SecurityConfigException e) {
             // Error while adding WS Trust, we can't continue
-            throw Utils.buildServerErrorResponse(e, "Error while adding WS-Trust configuration. " + e.getMessage());
+            throw buildServerError("Error while adding WS-Trust configuration. " + e.getMessage(), e);
         }
     }
 
@@ -69,7 +77,6 @@ public class WSTrustInboundUtils {
             TrustedServiceData[] trustedServices =
                     ApplicationManagementServiceHolder.getStsAdminService().getTrustedServices();
 
-            // TODO : check whether we need to throw an exception if we can't find a wstrust service
             return Arrays.stream(trustedServices)
                     .filter(trustedServiceData -> StringUtils.equals(trustedServiceData.getServiceAddress(), audience))
                     .findAny()
@@ -79,7 +86,7 @@ public class WSTrustInboundUtils {
                     .orElse(null);
 
         } catch (SecurityConfigException e) {
-            throw buildServerErrorResponse(e, "Error while retrieving wsTrust configuration for audience: " + audience);
+            throw buildServerError("Error while retrieving wsTrust configuration for audience: " + audience, e);
         }
     }
 
@@ -89,8 +96,7 @@ public class WSTrustInboundUtils {
             String trustedServiceAudience = inbound.getInboundAuthKey();
             ApplicationManagementServiceHolder.getStsAdminService().removeTrustedService(trustedServiceAudience);
         } catch (SecurityConfigException e) {
-            throw Utils.buildServerErrorResponse(e, "Error while trying to rollback wsTrust configuration. "
-                    + e.getMessage());
+            throw buildServerError("Error while trying to rollback wsTrust configuration. " + e.getMessage(), e);
         }
     }
 }

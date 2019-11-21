@@ -32,11 +32,14 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
  */
 public class PassiveSTSInboundUtils {
 
-    public static void putPassiveSTSInbound(ServiceProvider application,
-                                            PassiveStsConfiguration passiveStsConfiguration) {
+    private PassiveSTSInboundUtils() {
 
-        InboundAuthenticationRequestConfig passiveSTSInbound = createPassiveSTSInboundConfig(passiveStsConfiguration);
-        InboundUtils.updateOrInsertInbound(application, StandardInboundProtocols.PASSIVE_STS, passiveSTSInbound);
+    }
+
+    public static InboundAuthenticationRequestConfig putPassiveSTSInbound(ServiceProvider application,
+                                                                          PassiveStsConfiguration passiveSTSConfig) {
+
+        return createPassiveSTSInboundConfig(passiveSTSConfig);
     }
 
     public static InboundAuthenticationRequestConfig createPassiveSTSInboundConfig(PassiveStsConfiguration config) {
@@ -61,8 +64,6 @@ public class PassiveSTSInboundUtils {
                 .findAny()
                 .map(Property::getValue).orElse(null);
 
-        return new PassiveStsConfiguration()
-                .realm(inboundAuth.getInboundAuthKey())
-                .replyTo(replyTo);
+        return new PassiveStsConfiguration().realm(inboundAuth.getInboundAuthKey()).replyTo(replyTo);
     }
 }

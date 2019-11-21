@@ -98,7 +98,7 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
     private AuthenticationStep[] getAuthenticationSteps(AuthenticationSequence authSequenceApiModel) {
 
         if (CollectionUtils.isEmpty(authSequenceApiModel.getSteps())) {
-            throw Utils.buildClientError("Authentication steps cannot be empty for user defined " +
+            throw Utils.buildBadRequestError("Authentication steps cannot be empty for user defined " +
                     "authentication type: " + AuthenticationSequence.TypeEnum.USER_DEFINED);
         }
 
@@ -113,7 +113,7 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
         if (numSteps != sortedStepModelList.get(numSteps - 1).getId()) {
             // This means the steps are not consecutive. ie. For steps to be consecutive the largest id needs
             // to be equal to number of steps.
-            throw Utils.buildClientError("Step ids need to be consecutive in the authentication sequence steps.");
+            throw Utils.buildBadRequestError("Step ids need to be consecutive in the authentication sequence steps.");
         }
 
         int subjectStepId = getSubjectStepId(authSequenceApiModel.getSubjectStepId(), numSteps);
@@ -145,7 +145,7 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
         AuthenticationStep authenticationStep = new AuthenticationStep();
         // iteration the options, divide in to federated and local and add the configs
         if (CollectionUtils.isEmpty(stepModel.getOptions())) {
-            throw Utils.buildClientError("Authentication Step options cannot be empty.");
+            throw Utils.buildBadRequestError("Authentication Step options cannot be empty.");
         }
 
         List<LocalAuthenticatorConfig> localAuthOptions = new ArrayList<>();

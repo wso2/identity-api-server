@@ -680,14 +680,14 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update WS Trust authentication protocol parameters of an application. ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update WS Trust authentication protocol parameters of an application. ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. ", response = CustomInboundProtocolConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Inbound Protocols - Custom", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful", response = Void.class),
+        @ApiResponse(code = 200, message = "Successful", response = CustomInboundProtocolConfiguration.class),
         @ApiResponse(code = 201, message = "Successful response.", response = CustomInboundProtocolConfiguration.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
@@ -706,14 +706,14 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update OIDC authentication protocol parameters of an application. ", notes = "This API provides the capability to store OIDC authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update OIDC authentication protocol parameters of an application. ", notes = "This API provides the capability to store OIDC authentication protocol parameters of an application. ", response = OpenIDConnectConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Inbound Protocols - OAuth / OIDC", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful", response = Void.class),
+        @ApiResponse(code = 200, message = "Successful", response = OpenIDConnectConfiguration.class),
         @ApiResponse(code = 201, message = "Successful response.", response = OpenIDConnectConfiguration.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
@@ -758,14 +758,14 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/passive-sts")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update Passive STS authentication protocol parameters of an application. ", notes = "This API provides the capability to store passive STS authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update Passive STS authentication protocol parameters of an application. ", notes = "This API provides the capability to store passive STS authentication protocol parameters of an application. ", response = PassiveStsConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Inbound Protocols - Passive STS", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful", response = Void.class),
+        @ApiResponse(code = 200, message = "Successful", response = PassiveStsConfiguration.class),
         @ApiResponse(code = 201, message = "Successful response.", response = PassiveStsConfiguration.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
@@ -810,14 +810,14 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/ws-trust")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update WS Trust authentication protocol parameters of an application. ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update WS Trust authentication protocol parameters of an application. ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. ", response = WSTrustConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Inbound Protocols - WS Trust" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful", response = Void.class),
+        @ApiResponse(code = 200, message = "Successful", response = WSTrustConfiguration.class),
         @ApiResponse(code = 201, message = "Successful response.", response = WSTrustConfiguration.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),

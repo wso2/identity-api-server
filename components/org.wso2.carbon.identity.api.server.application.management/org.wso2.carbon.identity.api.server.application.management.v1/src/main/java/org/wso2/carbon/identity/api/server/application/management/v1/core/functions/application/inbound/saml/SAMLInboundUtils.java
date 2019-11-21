@@ -17,16 +17,20 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
+import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2ClientException;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2SSOException;
 import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 
@@ -40,19 +44,23 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder.getSamlssoConfigService;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildApiError;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerErrorResponse;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.updateOrInsertInbound;
 
 /**
  * Helper functions for SAML inbound management.
  */
 public class SAMLInboundUtils {
 
-    private static final int CONNECTION_TIMEOUT_IN_SECONDS = 5;
-    private static final int READ_TIMEOUT_IN_SECONDS = 10;
+    private SAMLInboundUtils() {
 
-    public static SAML2ServiceProvider putSAMLInbound(ServiceProvider application,
-                                                      SAML2Configuration saml2Configuration) {
+    }
+
+    private static final int CONNECTION_TIMEOUT_IN_SECONDS = 10;
+    private static final int READ_TIMEOUT_IN_SECONDS = 20;
+
+    private static final Log log = LogFactory.getLog(SAMLInboundUtils.class);
+
+    public static InboundAuthenticationRequestConfig putSAMLInbound(ServiceProvider application,
+                                                                    SAML2Configuration saml2Configuration) {
 
         // First we identify whether this is a insert or update.
         String currentIssuer = InboundUtils.getInboundAuthKey(application, StandardInboundProtocols.SAML2);
@@ -67,14 +75,10 @@ public class SAMLInboundUtils {
             InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
             samlInbound.setInboundAuthType(StandardInboundProtocols.SAML2);
             samlInbound.setInboundAuthKey(createdIssuer);
-            updateOrInsertInbound(application, StandardInboundProtocols.SAML2, samlInbound);
 
-            SAMLSSOServiceProviderDTO serviceProvider = getSamlssoConfigService().getServiceProvider(createdIssuer);
-            return new SAMLSSOServiceProviderToAPIModel().apply(serviceProvider);
+            return samlInbound;
         } catch (IdentityException e) {
-            String applicationId = application.getApplicationResourceId();
-            throw buildServerErrorResponse(e,
-                    "Error while creating/updating SAML inbound of application: " + applicationId);
+            throw handleException(e);
         }
     }
 
@@ -90,8 +94,7 @@ public class SAMLInboundUtils {
         } else if (samlManualConfiguration != null) {
             issuer = createSAMLSpWithManualConfiguration(samlManualConfiguration);
         } else {
-            // TODO error code.
-            throw Utils.buildClientError("Invalid SAML2 Configuration. One of metadataFile, metaDataUrl or " +
+            throw Utils.buildBadRequestError("Invalid SAML2 Configuration. One of metadataFile, metaDataUrl or " +
                     "serviceProvider manual configuration needs to be present.");
         }
 
@@ -111,7 +114,7 @@ public class SAMLInboundUtils {
                 return null;
             }
         } catch (IdentityException e) {
-            throw buildServerErrorResponse(e, "Error while retrieving service provider data for issuer: " + issuer);
+            throw buildServerError("Error while retrieving service provider data for issuer: " + issuer, e);
         }
     }
 
@@ -121,8 +124,7 @@ public class SAMLInboundUtils {
             String issuer = inbound.getInboundAuthKey();
             ApplicationManagementServiceHolder.getSamlssoConfigService().removeServiceProvider(issuer);
         } catch (IdentityException e) {
-            throw Utils.buildServerErrorResponse(e, "Error while trying to rollback SAML2 configuration."
-                    + e.getMessage());
+            throw buildServerError("Error while trying to rollback SAML2 configuration. " + e.getMessage(), e);
         }
     }
 
@@ -141,8 +143,7 @@ public class SAMLInboundUtils {
                         String.format(msg, samlSp.getIssuer(), samlSp.getIssuerQualifier()));
             }
         } catch (IdentityException e) {
-            throw Utils.buildServerErrorResponse(e, "Error adding SAML config with issuer: " +
-                    saml2SpModel.getIssuer() + ". " + e.getMessage());
+            throw handleException(e);
         }
     }
 
@@ -154,8 +155,7 @@ public class SAMLInboundUtils {
 
             return createSAMLSpWithMetadataContent(base64DecodedMetadata);
         } catch (IdentitySAML2SSOException e) {
-            throw Utils.buildServerErrorResponse(e, "Error adding SAML configuration using metadata file. " +
-                    e.getMessage());
+            throw handleException(e);
         }
     }
 
@@ -174,8 +174,7 @@ public class SAMLInboundUtils {
                     getSamlssoConfigService().uploadRPServiceProvider(metadataFileContent);
             return serviceProviderDTO.getIssuer();
         } catch (IdentitySAML2SSOException e) {
-            throw Utils.buildServerErrorResponse(e, "Error adding SAML configuration using metadata file. " +
-                    e.getMessage());
+            throw handleException(e);
         }
     }
 
@@ -190,7 +189,7 @@ public class SAMLInboundUtils {
             in = con.getInputStream();
             return IOUtils.toString(in);
         } catch (IOException e) {
-            throw Utils.buildServerErrorResponse(e, "Error while fetching SAML metadata from URL: " + metadataUrl);
+            throw Utils.buildServerError("Error while fetching SAML metadata from URL: " + metadataUrl, e);
         } finally {
             IOUtils.closeQuietly(in);
         }
@@ -203,5 +202,31 @@ public class SAMLInboundUtils {
         } else {
             return samlSp.getIssuer();
         }
+    }
+
+    private static APIError handleException(IdentityException e) {
+
+        String msg = "Error while creating/updating SAML inbound of application.";
+        if (e instanceof IdentitySAML2ClientException) {
+            return buildBadRequestError(msg, e);
+        } else {
+            return buildServerError(msg, e);
+        }
+    }
+
+    private static APIError buildBadRequestError(String message, IdentityException ex) {
+
+        String errorCode = ex.getErrorCode();
+        String errorDescription = ex.getMessage();
+
+        return Utils.buildClientError(errorCode, message, errorDescription);
+    }
+
+    private static APIError buildServerError(String message, IdentityException e) {
+
+        String errorCode = e.getErrorCode();
+        String errorDescription = e.getMessage();
+
+        return Utils.buildServerError(errorCode, message, errorDescription, e);
     }
 }

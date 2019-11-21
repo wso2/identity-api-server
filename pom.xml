@@ -445,8 +445,8 @@
         <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.2.9</identity.event.handler.version>
-        <identity.inbound.oauth2.version>6.2.53-SNAPSHOT</identity.inbound.oauth2.version>
-        <identity.inbound.saml2.version>5.6.15</identity.inbound.saml2.version>
+        <identity.inbound.oauth2.version>6.2.58</identity.inbound.oauth2.version>
+        <identity.inbound.saml2.version>5.7.4</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
     </properties>

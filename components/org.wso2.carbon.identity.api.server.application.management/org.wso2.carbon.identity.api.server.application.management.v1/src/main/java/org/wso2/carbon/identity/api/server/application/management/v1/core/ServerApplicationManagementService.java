@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListItem;
@@ -28,6 +29,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.Link;
@@ -54,7 +56,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
-import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
@@ -66,6 +67,7 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,22 +76,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedErrorResponse;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerErrorResponse;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.updateApplication;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.getInboundAuthKey;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.rollbackInbound;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.rollbackInbounds;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.updateOrInsertInbound;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.INVALID_REQUEST;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
 
 /**
  * Calls internal osgi services to perform server application management related operations.
  */
 public class ServerApplicationManagementService {
 
-    private static final Log LOG = LogFactory.getLog(ServerApplicationManagementService.class);
+    private static final Log log = LogFactory.getLog(ServerApplicationManagementService.class);
 
     private static final List<String> SEARCH_SUPPORTED_FIELDS = new ArrayList<>();
     private static final String APP_NAME = "name";
@@ -99,23 +104,22 @@ public class ServerApplicationManagementService {
     private static final String FILTER_ENDS_WITH = "ew";
     private static final String FILTER_EQUALS = "eq";
     private static final String FILTER_CONTAINS = "co";
-
-    // TODO: should we read this from somewhere...
-    private static final int DEFAULT_LIMIT = 30;
-    private static final int DEFAULT_LIMIT_MAX = 50;
+    private static final int DEFAULT_OFFSET = 0;
 
     static {
         SEARCH_SUPPORTED_FIELDS.add(APP_NAME);
     }
+
+    @Autowired
+    private ServerApplicationMetadataService applicationMetadataService;
 
     public ApplicationListResponse getAllApplications(Integer limit, Integer offset, String filter, String sortOrder,
                                                       String sortBy, String requiredAttributes) {
 
         handleNotImplementedCapabilities(sortOrder, sortBy, requiredAttributes);
 
-        // TODO: define a default pagination max limit for identity data..
-        limit = (limit != null && limit > 0 && limit <= DEFAULT_LIMIT_MAX) ? limit : DEFAULT_LIMIT;
-        offset = (offset != null && offset > 0) ? offset : 0;
+        limit = validateAndGetLimit(limit);
+        offset = validateAndGetOffset(offset);
 
         // Format the filter to a value that can be interpreted by the backend.
         String formattedFilter = buildFilter(filter);
@@ -137,8 +141,27 @@ public class ServerApplicationManagementService {
                     .links(buildLinks(limit, offset, filter, totalResults));
 
         } catch (IdentityApplicationManagementException e) {
-            String msg = "Error while listing application basic information in tenantDomain: " + tenantDomain;
+            String msg = "Error listing applications of tenantDomain: " + tenantDomain;
             throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+
+    private int validateAndGetOffset(Integer offset) {
+
+        if (offset != null && offset >= 0) {
+            return offset;
+        } else {
+            return DEFAULT_OFFSET;
+        }
+    }
+
+    private int validateAndGetLimit(Integer limit) {
+
+        final int maximumItemPerPage = IdentityUtil.getMaximumItemPerPage();
+        if (limit != null && limit > 0 && limit <= maximumItemPerPage) {
+            return limit;
+        } else {
+            return IdentityUtil.getDefaultItemsPerPage();
         }
     }
 
@@ -161,10 +184,9 @@ public class ServerApplicationManagementService {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             return getApplicationManagementService().exportSPApplicationFromAppID(
                     applicationId, exportSecrets, tenantDomain);
-        } catch (IdentityApplicationManagementClientException e) {
-            throw buildClientError(e, ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND);
         } catch (IdentityApplicationManagementException e) {
-            throw buildServerError(e, "Error while retrieving application with id: " + applicationId);
+            String msg = "Error exporting application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
         }
     }
 
@@ -192,12 +214,12 @@ public class ServerApplicationManagementService {
                                 importResponse.getApplicationName(), tenantDomain);
                 return new ServiceProviderToApiModel().apply(application);
             } else {
-                throw buildApiError(ErrorMessage.ERROR_IMPORTING_APPLICATION);
+                throw Utils.buildServerError("Error importing application from XML file.");
             }
         } catch (IOException e) {
-            throw buildServerErrorResponse(e, "Error while importing application from XML file.");
+            throw Utils.buildServerError("Error importing application from XML file.", e);
         } catch (IdentityApplicationManagementException e) {
-            throw handleIdentityApplicationManagementException(e, "Error while importing application from XML file.");
+            throw handleIdentityApplicationManagementException(e, "Error importing application from XML file.");
         } finally {
             IOUtils.closeQuietly(fileInputStream);
         }
@@ -206,7 +228,7 @@ public class ServerApplicationManagementService {
     public ApplicationResponseModel createApplication(ApplicationModel applicationModel, String template) {
 
         if (StringUtils.isNotBlank(template)) {
-            throw buildNotImplementedErrorResponse("Application creation with templates not supported.");
+            throw buildNotImplementedError("Application creation with templates not supported.");
         }
 
         String username = ContextLoader.getUsernameFromContext();
@@ -218,9 +240,12 @@ public class ServerApplicationManagementService {
                     .createApplication(application, tenantDomain, username);
             return new ServiceProviderToApiModel().apply(createdApp);
         } catch (IdentityApplicationManagementException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error while creating application. Rolling back possibly created inbound config data.");
+            }
             rollbackInbounds(getInboundAuthenticationRequestConfigs(application));
-            String msg = "Error while creating application with name '%s' in tenantDomain: %s.";
-            msg = String.format(msg, applicationModel.getName(), tenantDomain);
+
+            String msg = "Error creating application.";
             throw handleIdentityApplicationManagementException(e, msg);
         }
     }
@@ -241,7 +266,8 @@ public class ServerApplicationManagementService {
                     getApplicationManagementService().getApplicationByResourceId(applicationId, tenantDomain);
             return new ServiceProviderToApiModel().apply(updatedApp);
         } catch (IdentityApplicationManagementException e) {
-            throw handleIdentityApplicationManagementException(e, "Error while patching application: " + applicationId);
+            String msg = "Error patching application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
         }
     }
 
@@ -252,7 +278,7 @@ public class ServerApplicationManagementService {
         try {
             getApplicationManagementService().deleteApplicationByResourceId(applicationId, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
-            String msg = "Error while deleting application with id: " + applicationId;
+            String msg = "Error deleting application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
         }
     }
@@ -278,7 +304,7 @@ public class ServerApplicationManagementService {
             updateServiceProvider(residentSpResourceId, applicationToUpdate);
             return getResidentApplication(tenantDomain);
         } catch (IdentityApplicationManagementException e) {
-            String msg = "Error while retrieving resident application of tenantDomain: " + tenantDomain;
+            String msg = "Error updating resident application of tenantDomain: " + tenantDomain;
             throw handleIdentityApplicationManagementException(e, msg);
         }
     }
@@ -288,8 +314,7 @@ public class ServerApplicationManagementService {
         ServiceProvider application =
                 getApplicationManagementService().getServiceProvider(ApplicationConstants.LOCAL_SP, tenantDomain);
         if (application == null) {
-            throw buildServerErrorResponse("Resident application cannot be found for tenantDomain: " +
-                    tenantDomain);
+            throw Utils.buildServerError("Resident application cannot be found for tenantDomain: " + tenantDomain);
         }
         return application;
     }
@@ -301,7 +326,7 @@ public class ServerApplicationManagementService {
             ProvisioningConfiguration provisioningConfig = new BuildProvisioningConfiguration().apply(application);
             return new ResidentApplication().provisioningConfigurations(provisioningConfig);
         } catch (IdentityApplicationManagementException e) {
-            String msg = "Error while retrieving resident application of tenantDomain: " + tenantDomain;
+            String msg = "Error retrieving resident application of tenantDomain: " + tenantDomain;
             throw handleIdentityApplicationManagementException(e, msg);
         }
     }
@@ -353,8 +378,18 @@ public class ServerApplicationManagementService {
 
     public CustomInboundProtocolConfiguration getCustomInboundConfiguration(String applicationId, String inboundType) {
 
-        // TODO: validate inbound type;
+        if (!isValidCustomInboundType(inboundType)) {
+            throw Utils.buildBadRequestError("Unknown inbound type: " + inboundType);
+        }
+
         return getInbound(applicationId, application -> InboundUtils.getCustomInbound(application, inboundType));
+    }
+
+    private boolean isValidCustomInboundType(String inboundType) {
+
+        List<AuthProtocolMetadata> inboundProtocols = applicationMetadataService.getInboundProtocols(true);
+        return inboundProtocols.stream()
+                .anyMatch(metadata -> StringUtils.equals(metadata.getName(), inboundType));
     }
 
     public List<InboundProtocolListItem> getInboundProtocols(String applicationId) {
@@ -366,37 +401,39 @@ public class ServerApplicationManagementService {
     public OpenIDConnectConfiguration putInboundOAuthConfiguration(String applicationId,
                                                                    OpenIDConnectConfiguration oidcConfigModel) {
 
-        return putInbound(applicationId, OAuthInboundUtils::putOAuthInbound, InboundUtils::getOAuthInbound,
-                oidcConfigModel);
+        return putInbound(applicationId, oidcConfigModel, OAuthInboundUtils::putOAuthInbound,
+                InboundUtils::getOAuthInbound
+        );
     }
 
     public SAML2ServiceProvider putInboundSAMLConfiguration(String applicationId,
                                                             SAML2Configuration saml2Configuration) {
 
-        return putInbound(applicationId, SAMLInboundUtils::putSAMLInbound, InboundUtils::getSAMLInbound,
-                saml2Configuration);
+        return putInbound(applicationId, saml2Configuration, SAMLInboundUtils::putSAMLInbound,
+                InboundUtils::getSAMLInbound
+        );
     }
 
     public PassiveStsConfiguration putInboundPassiveSTSConfiguration(String applicationId,
                                                                      PassiveStsConfiguration passiveStsConfiguration) {
 
-        return putInbound(applicationId, PassiveSTSInboundUtils::putPassiveSTSInbound,
-                InboundUtils::getPassiveSTSInbound, passiveStsConfiguration);
+        return putInbound(applicationId, passiveStsConfiguration, PassiveSTSInboundUtils::putPassiveSTSInbound,
+                InboundUtils::getPassiveSTSInbound);
     }
 
     public WSTrustConfiguration putInboundWSTrustConfiguration(String applicationId,
                                                                WSTrustConfiguration wsTrustConfiguration) {
 
-        return putInbound(applicationId, WSTrustInboundUtils::putWSTrustConfiguration,
-                InboundUtils::getWSTrustInbound, wsTrustConfiguration);
+        return putInbound(applicationId, wsTrustConfiguration, WSTrustInboundUtils::putWSTrustConfiguration,
+                InboundUtils::getWSTrustInbound);
     }
 
     public CustomInboundProtocolConfiguration updateCustomInbound(String applicationId,
                                                                   String inboundType,
                                                                   CustomInboundProtocolConfiguration customInbound) {
 
-        return putInbound(applicationId, CustomInboundUtils::putCustomInbound,
-                application -> InboundUtils.getCustomInbound(application, inboundType), customInbound);
+        return putInbound(applicationId, customInbound, CustomInboundUtils::putCustomInbound,
+                application -> InboundUtils.getCustomInbound(application, inboundType));
     }
 
     private <T> T getInbound(String applicationId, Function<ServiceProvider, T> getInboundFunction) {
@@ -409,8 +446,7 @@ public class ServerApplicationManagementService {
 
         OpenIDConnectConfiguration inboundOAuthConfiguration = getInboundOAuthConfiguration(applicationId);
         if (inboundOAuthConfiguration == null) {
-            // TODO: improve error code.
-            throw buildClientError(ErrorMessage.ERROR_INBOUND_PROTOCOL_NOT_FOUND);
+            throw buildClientError(ErrorMessage.INBOUND_NOT_CONFIGURED, StandardInboundProtocols.OAUTH2, applicationId);
         } else {
             String clientId = inboundOAuthConfiguration.getClientId();
             return OAuthInboundUtils.regenerateClientSecret(clientId);
@@ -447,10 +483,10 @@ public class ServerApplicationManagementService {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             application = getApplicationManagementService().getApplicationByResourceId(applicationId, tenantDomain);
             if (application == null) {
-                throw buildApiError(ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND, applicationId, tenantDomain);
+                throw buildClientError(ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND, applicationId, tenantDomain);
             }
         } catch (IdentityApplicationManagementException e) {
-            String msg = "Error while retrieving application with id: " + applicationId;
+            String msg = "Error retrieving application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
         }
         return application;
@@ -458,7 +494,8 @@ public class ServerApplicationManagementService {
 
     private List<InboundAuthenticationRequestConfig> getInboundAuthenticationRequestConfigs(ServiceProvider app) {
 
-        if (app.getInboundAuthenticationConfig() != null) {
+        if (app.getInboundAuthenticationConfig() != null &&
+                app.getInboundAuthenticationConfig().getInboundAuthenticationRequestConfigs() != null) {
             return Arrays.asList(app.getInboundAuthenticationConfig().getInboundAuthenticationRequestConfigs());
         }
         return Collections.emptyList();
@@ -488,11 +525,11 @@ public class ServerApplicationManagementService {
                     String searchValue = filterArgs[2];
                     return generateFilterStringForBackend(searchField, searchOperation, searchValue);
                 } else {
-                    throw buildApiError(ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE, searchField);
+                    throw buildClientError(ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE, searchField);
                 }
 
             } else {
-                throw buildApiError(ErrorMessage.ERROR_CODE_INVALID_FILTER_FORMAT);
+                throw buildClientError(ErrorMessage.ERROR_CODE_INVALID_FILTER_FORMAT);
             }
         } else {
             return null;
@@ -503,7 +540,6 @@ public class ServerApplicationManagementService {
 
         // We do not have support for searching any fields other than the name. Therefore we simply format the search
         // value based on the search operation.
-        // TODO: input validation for search value.
         String formattedFilter;
         switch (searchOperation) {
             case FILTER_STARTS_WITH:
@@ -519,7 +555,7 @@ public class ServerApplicationManagementService {
                 formattedFilter = "*" + searchValue + "*";
                 break;
             default:
-                throw buildApiError(ErrorMessage.ERROR_CODE_INVALID_FILTER_OPERATION, searchOperation);
+                throw buildClientError(ErrorMessage.ERROR_CODE_INVALID_FILTER_OPERATION, searchOperation);
         }
 
         return formattedFilter;
@@ -528,28 +564,66 @@ public class ServerApplicationManagementService {
     /**
      * Create or replace the provided inbound configuration.
      *
-     * @param applicationId
-     * @param updateInboundFunction
-     * @param getInboundDetailsFunction
-     * @param inboundConfiguration
-     * @param <T>                       Inbound creation/update API model
-     * @param <R>                       Inbound API model
+     * @param <T>               Inbound creation/update API model
+     * @param <R>               Inbound API model
+     * @param applicationId     Unique id of the app
+     * @param inboundApiModel   Inbound API model to be created or replaced
+     * @param getUpdatedInbound A function that takes the inbound API model and application as input and provides
+     *                          updated inbound details.
+     * @param getInboundDetails A function that extracts inbound details from an updated ServiceProvider and
+     *                          converts to API model.
      * @return Updated inbound details in the form of it's API model.
      */
     private <T, R> T putInbound(String applicationId,
-                                BiConsumer<ServiceProvider, R> updateInboundFunction,
-                                Function<ServiceProvider, T> getInboundDetailsFunction,
-                                R inboundConfiguration) {
+                                R inboundApiModel,
+                                BiFunction<ServiceProvider, R, InboundAuthenticationRequestConfig> getUpdatedInbound,
+                                Function<ServiceProvider, T> getInboundDetails) {
 
+        // We need a cloned copy of the Service Provider so that we changes we do not make cache dirty.
         ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
         // Update the service provider with the inbound configuration.
-        updateInboundFunction.accept(appToUpdate, inboundConfiguration);
-        // Do the service provider update.
-        updateServiceProvider(applicationId, appToUpdate);
+        InboundAuthenticationRequestConfig updatedInbound = getUpdatedInbound.apply(appToUpdate, inboundApiModel);
+        // Add the updated inbound details
+        updateOrInsertInbound(appToUpdate, updatedInbound);
+
+        try {
+            // Do the service provider update.
+            updateServiceProvider(applicationId, appToUpdate);
+        } catch (APIError error) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error while updating application: " + applicationId + ". Attempting to rollback possible " +
+                        "inbound configurations created before the update.");
+            }
+            doRollback(applicationId, updatedInbound);
+            throw error;
+        }
 
         ServiceProvider updatedApplication = getServiceProvider(applicationId);
         // Return the inbound details from updated service provider.
-        return getInboundDetailsFunction.apply(updatedApplication);
+        T updateInboundDetails = getInboundDetails.apply(updatedApplication);
+
+        if (updateInboundDetails == null) {
+            throw Utils.buildServerError("Error while retrieving updated inbound information.");
+        }
+
+        return updateInboundDetails;
+    }
+
+    private void doRollback(String applicationId, InboundAuthenticationRequestConfig updatedInbound) {
+
+        ServiceProvider serviceProvider = getServiceProvider(applicationId);
+        // Current inbound key. This will give us an idea whether updatedInbound was added or updated.
+        String inboundAuthKey = getInboundAuthKey(serviceProvider, updatedInbound.getInboundAuthType());
+        if (inboundAuthKey == null) {
+            // This means the application did not have any associated inbound before. So the updated inbound
+            // could have been created before the update. Attempt to rollback by creating any inbound configs created.
+            if (log.isDebugEnabled()) {
+                String inboundType = updatedInbound.getInboundAuthType();
+                log.debug("Removing inbound data related to inbound type: " + inboundType + " of application: "
+                        + applicationId + " as part of rollback.");
+            }
+            rollbackInbound(updatedInbound);
+        }
     }
 
     private void updateServiceProvider(String applicationId, ServiceProvider updatedApplication) {
@@ -561,46 +635,14 @@ public class ServerApplicationManagementService {
             getApplicationManagementService().updateApplicationByResourceId(
                     applicationId, updatedApplication, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
-            throw handleIdentityApplicationManagementException(e, "Error while updating application.");
-        }
-    }
-
-    private APIError buildApiError(ErrorMessage errorEnum) {
-
-        ErrorResponse errorResponse = buildErrorResponse(errorEnum);
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
-    }
-
-    private APIError buildApiError(ErrorMessage errorEnum,
-                                   String... errorContextData) {
-
-        ErrorResponse errorResponse = buildErrorResponse(errorEnum, errorContextData);
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
-    }
-
-    private ErrorResponse buildErrorResponse(ErrorMessage errorEnum,
-                                             String... errorContextData) {
-
-        return new ErrorResponse.Builder()
-                .withCode(errorEnum.getCode())
-                .withDescription(buildFormattedDescription(errorEnum.getDescription(), errorContextData))
-                .withMessage(errorEnum.getMessage())
-                .build(LOG, errorEnum.getDescription());
-    }
-
-    private String buildFormattedDescription(String description, String... formatData) {
-
-        if (formatData != null) {
-            return String.format(description, formatData);
-        } else {
-            return description;
+            String msg = "Error updating application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
         }
     }
 
     private void handleNotImplementedCapabilities(String sortOrder, String sortBy, String requiredAttributes) {
 
         ErrorMessage errorEnum = null;
-
         if (sortBy != null || sortOrder != null) {
             errorEnum = ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
         } else if (requiredAttributes != null) {
@@ -608,60 +650,13 @@ public class ServerApplicationManagementService {
         }
 
         if (errorEnum != null) {
-            throw buildApiError(errorEnum);
+            throw buildClientError(errorEnum);
         }
     }
 
     private ApplicationManagementService getApplicationManagementService() {
 
         return ApplicationManagementServiceHolder.getApplicationManagementService();
-    }
-
-    private APIError buildServerError(IdentityApplicationManagementException e, String message) {
-
-        ErrorResponse.Builder builder = new ErrorResponse.Builder();
-
-        ErrorResponse errorResponse = builder
-                .withCode(e.getErrorCode())
-                .withMessage(message)
-                .withDescription(e.getMessage())
-                .build(LOG, e, message);
-
-        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-        return new APIError(status, errorResponse);
-    }
-
-    private APIError buildClientError(IdentityApplicationManagementException e, String message) {
-
-        ErrorResponse.Builder builder = new ErrorResponse.Builder();
-
-        ErrorResponse errorResponse = builder
-                .withCode(e.getErrorCode())
-                .withMessage(message)
-                .withDescription(e.getMessage())
-                .build(LOG, e.getMessage());
-
-        Response.Status status = Response.Status.BAD_REQUEST;
-        return new APIError(status, errorResponse);
-    }
-
-    private APIError buildClientError(Exception e, ErrorMessage errorEnum) {
-
-        ErrorResponse errorResponse = new ErrorResponse.Builder()
-                .withCode(errorEnum.getCode())
-                .withDescription(e.getMessage())
-                .withMessage(errorEnum.getMessage())
-                .build(LOG, errorEnum.getDescription());
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
-    }
-
-    private APIError buildClientError(ErrorMessage errorEnum) {
-
-        ErrorResponse errorResponse = new ErrorResponse.Builder()
-                .withCode(errorEnum.getCode())
-                .withMessage(errorEnum.getMessage())
-                .build(LOG, errorEnum.getDescription());
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
     }
 
     private APIError handleIdentityApplicationManagementException(IdentityApplicationManagementException e,
@@ -671,5 +666,37 @@ public class ServerApplicationManagementService {
             throw buildClientError(e, msg);
         }
         throw buildServerError(e, msg);
+    }
+
+    private APIError buildServerError(IdentityApplicationManagementException e, String message) {
+
+        String errorCode = getErrorCode(e, UNEXPECTED_SERVER_ERROR.getCode());
+        return Utils.buildServerError(errorCode, message, e.getMessage(), e);
+    }
+
+    private APIError buildClientError(IdentityApplicationManagementException e, String message) {
+
+        String errorCode = getErrorCode(e, INVALID_REQUEST.getCode());
+        return Utils.buildClientError(errorCode, message, e.getMessage());
+    }
+
+    private String getErrorCode(IdentityApplicationManagementException e, String defaultErrorCode) {
+
+        return e.getErrorCode() != null ? e.getErrorCode() : defaultErrorCode;
+    }
+
+    private APIError buildClientError(ErrorMessage errorEnum, String... args) {
+
+        String description = buildFormattedDescription(errorEnum.getDescription(), args);
+        return Utils.buildClientError(errorEnum.getCode(), errorEnum.getMessage(), description);
+    }
+
+    private String buildFormattedDescription(String description, String... formatData) {
+
+        if (formatData != null) {
+            return String.format(description, formatData);
+        } else {
+            return description;
+        }
     }
 }

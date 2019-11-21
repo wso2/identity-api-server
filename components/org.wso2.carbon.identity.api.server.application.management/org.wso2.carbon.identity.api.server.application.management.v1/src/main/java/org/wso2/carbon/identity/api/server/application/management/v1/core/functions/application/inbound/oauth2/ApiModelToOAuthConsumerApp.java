@@ -110,7 +110,7 @@ public class ApiModelToOAuthConsumerApp implements Function<OpenIDConnectConfigu
     private void updateAllowedOrigins(OAuthConsumerAppDTO consumerAppDTO, List<String> allowedOrigins) {
 
         if (CollectionUtils.isNotEmpty(allowedOrigins)) {
-            throw Utils.buildNotImplementedErrorResponse("Allowed origins are not supported for OAuth apps yet.");
+            throw Utils.buildNotImplementedError("Allowed origins are not supported for OAuth apps yet.");
         }
     }
 
@@ -144,7 +144,7 @@ public class ApiModelToOAuthConsumerApp implements Function<OpenIDConnectConfigu
         if (CollectionUtils.isNotEmpty(callbackURLs)) {
             // We can't support multiple callback URLs at the moment. So we need to send a server error.
             if (callbackURLs.size() > 1) {
-                throw Utils.buildNotImplementedErrorResponse("Multiple callbacks for OAuth2 are not supported yet. " +
+                throw Utils.buildNotImplementedError("Multiple callbacks for OAuth2 are not supported yet. " +
                         "Please use regex to define multiple callbacks.");
             } else if (callbackURLs.size() == 1) {
                 return callbackURLs.get(0);

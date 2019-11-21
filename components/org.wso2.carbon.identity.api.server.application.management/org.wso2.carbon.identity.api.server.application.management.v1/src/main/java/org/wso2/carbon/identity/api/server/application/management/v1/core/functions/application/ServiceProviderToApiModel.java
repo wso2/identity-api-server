@@ -163,7 +163,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .getServiceProvider(IdentityApplicationConstants.DEFAULT_SP_CONFIG,
                             MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
         } catch (IdentityApplicationManagementException e) {
-            throw Utils.buildServerErrorResponse(e, "Error while loading default SP configurations.");
+            throw Utils.buildServerError("Error while loading default SP configurations.", e);
         }
         return defaultSP;
     }

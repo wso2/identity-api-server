@@ -1082,6 +1082,10 @@ paths:
       responses:
         '200':
           description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenIDConnectConfiguration'
         '201':
           description: Successful response.
           headers:
@@ -1446,6 +1450,10 @@ paths:
       responses:
         '200':
           description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PassiveStsConfiguration'
         '201':
           description: Successful response.
           headers:
@@ -1635,6 +1643,10 @@ paths:
       responses:
         '200':
           description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WSTrustConfiguration'
         '201':
           description: Successful response.
           headers:
@@ -2019,6 +2031,10 @@ paths:
       responses:
         '200':
           description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomInboundProtocolConfiguration'
         '201':
           description: Successful response.
           headers:
@@ -3707,9 +3723,9 @@ components:
         singleLogoutMethod:
           type: string
           enum:
-            - backchannel
-            - frontchannel_http_redirect
-            - frontchannel_http_post
+            - BACKCHANNEL
+            - FRONTCHANNEL_HTTP_REDIRECT
+            - FRONTCHANNEL_HTTP_POST
         enableIdpInitiatedSingleLogOut:
           type: boolean
           default: false
@@ -3791,6 +3807,11 @@ components:
           #         - frontchannel_http_redirect
           #         - frontchannel_http_post
           #       default: backchannel
+    OAuthApplicationState:
+      type: string
+      enum:
+        - ACTIVE
+        - REVOKED
 
     OpenIDConnectConfiguration:
       type: object

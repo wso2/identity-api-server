@@ -93,8 +93,8 @@ public class InboundsToApiModel implements Function<ServiceProvider, List<Inboun
                 try {
                     inboundPathComponent = "/" + URLEncoder.encode(inboundAuthType, StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
-                    throw Utils.buildServerErrorResponse(e, "Error while building inbound protocol for " +
-                            "inboundType: " + inboundAuthType);
+                    throw Utils.buildServerError("Error while building inbound protocol for " +
+                            "inboundType: " + inboundAuthType, e);
                 }
                 break;
         }

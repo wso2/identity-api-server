@@ -120,11 +120,6 @@ public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, I
 
     private InboundAuthenticationRequestConfig getWsTrustInbound(WSTrustConfiguration wsTrust) {
 
-        WSTrustInboundUtils.addWSTrustInbound(wsTrust);
-
-        InboundAuthenticationRequestConfig wsTrustInbound = new InboundAuthenticationRequestConfig();
-        wsTrustInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.WS_TRUST);
-        wsTrustInbound.setInboundAuthKey(wsTrust.getAudience());
-        return wsTrustInbound;
+        return WSTrustInboundUtils.createWsTrustInbound(wsTrust);
     }
 }

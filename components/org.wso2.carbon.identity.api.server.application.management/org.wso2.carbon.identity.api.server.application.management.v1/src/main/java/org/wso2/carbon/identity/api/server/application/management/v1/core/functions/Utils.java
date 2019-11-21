@@ -29,12 +29,19 @@ import java.io.ObjectOutputStream;
 import java.util.function.Consumer;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.INVALID_REQUEST;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
+
 /**
  * Utility functions.
  */
 public class Utils {
 
     private static final Log log = LogFactory.getLog(Utils.class);
+
+    private Utils() {
+
+    }
 
     public static void setIfNotNull(String value, Consumer<String> consumer) {
 
@@ -74,40 +81,30 @@ public class Utils {
             newObject = (ServiceProvider) objInputStream.readObject();
 
         } catch (ClassNotFoundException | IOException e) {
-            throw buildServerErrorResponse(e, "Error deep cloning application object.");
+            throw buildServerError("Error deep cloning application object.", e);
         }
         return newObject;
     }
 
-    public static APIError buildClientError(String message) {
+    public static APIError buildBadRequestError(String description) {
 
-        // TODO handle errors properly.
-        ErrorResponse.Builder builder = new ErrorResponse.Builder();
-        ErrorResponse errorResponse = builder
-                .withMessage("Invalid Request.")
-                .withDescription(message)
-                .build(log, message);
+        String errorCode = INVALID_REQUEST.getCode();
+        String errorMessage = "Invalid Request.";
 
-        Response.Status status = Response.Status.BAD_REQUEST;
-        return new APIError(status, errorResponse);
+        return buildClientError(errorCode, errorMessage, description);
     }
 
-    public static APIError buildServerErrorResponse(Exception e, String message) {
+    public static APIError buildServerError(String errorDescription, Exception e) {
 
-        // TODO handle errors properly.
-        ErrorResponse.Builder builder = new ErrorResponse.Builder();
-        ErrorResponse errorResponse = builder
-                .withMessage("Server error while trying the attempted operation.")
-                .withDescription(message)
-                .build(log, e, message);
+        String errorCode = UNEXPECTED_SERVER_ERROR.getCode();
+        String errorMessage = "Server error while performing the attempted operation.";
 
-        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-        return new APIError(status, errorResponse);
+        return buildServerError(errorCode, errorMessage, errorDescription, e);
     }
 
-    public static APIError buildServerErrorResponse(String message) {
+    public static APIError buildServerError(String message) {
 
-        return buildServerErrorResponse(null, message);
+        return buildServerError(message, null);
     }
 
     public static APIError buildApiError(Response.Status statusCode, String message) {
@@ -116,9 +113,8 @@ public class Utils {
         return new APIError(statusCode, errorResponse);
     }
 
-    public static APIError buildNotImplementedErrorResponse(String message) {
+    public static APIError buildNotImplementedError(String message) {
 
-        // TODO handle errors properly.
         ErrorResponse.Builder builder = new ErrorResponse.Builder();
         ErrorResponse errorResponse = builder
                 .withMessage("Server error while trying the attempted operation.")
@@ -126,6 +122,30 @@ public class Utils {
                 .build(log, message);
 
         Response.Status status = Response.Status.NOT_IMPLEMENTED;
+        return new APIError(status, errorResponse);
+    }
+
+    public static APIError buildServerError(String errorCode, String message, String description, Exception e) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorCode)
+                .withMessage(message)
+                .withDescription(description)
+                .build(log, e, description);
+
+        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+        return new APIError(status, errorResponse);
+    }
+
+    public static APIError buildClientError(String errorCode, String message, String description) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorCode)
+                .withMessage(message)
+                .withDescription(description)
+                .build(log, description);
+
+        Response.Status status = Response.Status.BAD_REQUEST;
         return new APIError(status, errorResponse);
     }
 }

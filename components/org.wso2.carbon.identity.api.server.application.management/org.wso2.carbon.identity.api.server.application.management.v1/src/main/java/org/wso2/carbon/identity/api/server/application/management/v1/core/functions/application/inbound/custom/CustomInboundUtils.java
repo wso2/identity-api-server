@@ -17,7 +17,6 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PropertyModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
@@ -32,13 +31,14 @@ import java.util.stream.Collectors;
  */
 public class CustomInboundUtils {
 
-    public static void putCustomInbound(ServiceProvider application,
-                                        CustomInboundProtocolConfiguration inboundModel) {
+    private CustomInboundUtils() {
 
-        String inboundType = inboundModel.getName();
-        InboundAuthenticationRequestConfig customInbound = createCustomInbound(inboundModel);
-        InboundUtils.updateOrInsertInbound(application, inboundType, customInbound);
+    }
 
+    public static InboundAuthenticationRequestConfig putCustomInbound(ServiceProvider application,
+                                                                      CustomInboundProtocolConfiguration inboundModel) {
+
+        return createCustomInbound(inboundModel);
     }
 
     public static InboundAuthenticationRequestConfig createCustomInbound(CustomInboundProtocolConfiguration custom) {

@@ -18,10 +18,8 @@ package org.wso2.carbon.identity.api.server.application.management.common;
 import org.wso2.carbon.identity.oauth.common.GrantType;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 import javax.ws.rs.core.Response;
 
 /**
@@ -79,6 +77,11 @@ public class ApplicationManagementConstants {
         ERROR_IMPORTING_APPLICATION("50007", Response.Status.INTERNAL_SERVER_ERROR,
                 "Importing application failed.",
                 "Unexpected error occurred while importing the application from file."),
+
+        INBOUND_NOT_CONFIGURED("60501", Response.Status.NOT_FOUND,
+                "Inbound protocol not configured.",
+                "Inbound protocol: %s not configured for application id: %s."),
+
         // Server Errors.
         ERROR_CODE_SORTING_NOT_IMPLEMENTED("55001",
                 Response.Status.NOT_IMPLEMENTED,
@@ -93,22 +96,16 @@ public class ApplicationManagementConstants {
                 "Unexpected error occurred while retrieving SAML Metadata."),
         ERROR_WHILE_RETRIEVING_WS_TRUST_METADATA("55004", Response.Status.INTERNAL_SERVER_ERROR,
                 "Error occurred while retrieving WS Trust Metadata.",
-                "Unexpected error occurred while retrieving WS Trust Metadata.");
+                "Unexpected error occurred while retrieving WS Trust Metadata."),
+
+        APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED("65500", Response.Status.NOT_IMPLEMENTED,
+                "Unsupported Operation.",
+                "Application creation with templates is not supported in this version of the API.");
 
         private final String code;
         private Response.Status httpStatusCode;
         private final String message;
         private final String description;
-
-        private static final Map<String, ErrorMessage> messageIndex = new HashMap<>(ErrorMessage.values().length);
-        static final String BUNDLE = "ServerClientErrorMappings";
-        static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE);
-
-        static {
-            for (ErrorMessage em : ErrorMessage.values()) {
-                messageIndex.put(em.code, em);
-            }
-        }
 
         ErrorMessage(String code, Response.Status statusCode, String message, String description) {
 
@@ -138,23 +135,6 @@ public class ApplicationManagementConstants {
             return httpStatusCode;
         }
 
-        /**
-         * Get the proper error message mapped to the server side error.
-         *
-         * @param serverCode Error code from the server.
-         * @return Error message.
-         */
-        public static ErrorMessage getMappedErrorMessage(String serverCode) {
-
-            try {
-                String errorCode = resourceBundle.getString(serverCode);
-                return messageIndex.get(errorCode);
-            } catch (Throwable e) {
-                // Ignore if error mapping has invalid input.
-            }
-            return ErrorMessage.ERROR_CODE_INVALID_INPUT;
-        }
-
         @Override
         public String toString() {
 
@@ -174,6 +154,7 @@ public class ApplicationManagementConstants {
     }
 
     public static Map<String, String> getOAuthGrantTypeNames() {
+
         return OAUTH_GRANT_TYPE_NAMES;
     }
 }

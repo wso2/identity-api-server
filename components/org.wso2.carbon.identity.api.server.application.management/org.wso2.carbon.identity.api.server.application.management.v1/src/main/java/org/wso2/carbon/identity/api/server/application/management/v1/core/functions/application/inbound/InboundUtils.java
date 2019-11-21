@@ -113,25 +113,29 @@ public class InboundUtils {
     public static void rollbackInbounds(List<InboundAuthenticationRequestConfig> currentlyAddedInbounds) {
 
         for (InboundAuthenticationRequestConfig inbound : currentlyAddedInbounds) {
-            switch (inbound.getInboundAuthType()) {
-                case FrameworkConstants.StandardInboundProtocols.SAML2:
-                    SAMLInboundUtils.deleteSAMLServiceProvider(inbound);
-                    break;
-                case FrameworkConstants.StandardInboundProtocols.OAUTH2:
-                    OAuthInboundUtils.deleteOAuthInbound(inbound);
-                    break;
-                case FrameworkConstants.StandardInboundProtocols.WS_TRUST:
-                    WSTrustInboundUtils.deleteWSTrustConfiguration(inbound);
-                    break;
-                default:
-                    // No rollbacks required for other inbounds.
-                    break;
-            }
+            rollbackInbound(inbound);
+        }
+    }
+
+    public static void rollbackInbound(InboundAuthenticationRequestConfig inbound) {
+
+        switch (inbound.getInboundAuthType()) {
+            case FrameworkConstants.StandardInboundProtocols.SAML2:
+                SAMLInboundUtils.deleteSAMLServiceProvider(inbound);
+                break;
+            case FrameworkConstants.StandardInboundProtocols.OAUTH2:
+                OAuthInboundUtils.deleteOAuthInbound(inbound);
+                break;
+            case FrameworkConstants.StandardInboundProtocols.WS_TRUST:
+                WSTrustInboundUtils.deleteWSTrustConfiguration(inbound);
+                break;
+            default:
+                // No rollbacks required for other inbounds.
+                break;
         }
     }
 
     public static void updateOrInsertInbound(ServiceProvider application,
-                                             String inboundType,
                                              InboundAuthenticationRequestConfig newInbound) {
 
         InboundAuthenticationConfig inboundAuthConfig = application.getInboundAuthenticationConfig();
@@ -144,7 +148,7 @@ public class InboundUtils {
                                 Collectors.toMap(InboundAuthenticationRequestConfig::getInboundAuthType,
                                         Function.identity()));
 
-                inboundAuthConfigs.put(inboundType, newInbound);
+                inboundAuthConfigs.put(newInbound.getInboundAuthType(), newInbound);
                 inboundAuthConfig.setInboundAuthenticationRequestConfigs(
                         inboundAuthConfigs.values().toArray(new InboundAuthenticationRequestConfig[0]));
             } else {
