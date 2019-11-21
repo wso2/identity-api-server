@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
@@ -117,10 +118,11 @@ public class ServerUserStoreService {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.
                 getUserStoreConfigService();
-        //domainName and typeName are not allowed to edit.
+        //domainName and typeName are not allowed to edit. iF domain name wanted to update then use
+        // userStoreConfigService.updateUserStoreByDomainName(base64URLDecodeId(domainId),
+        //         createUserStoreDTO(userStoreReq, domainId));
         try {
-            userStoreConfigService.updateUserStoreByDomainName(base64URLDecodeId(domainId),
-                    createUserStoreDTO(userStoreReq));
+            userStoreConfigService.updateUserStore(createUserStoreDTO(userStoreReq), false);
             return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
@@ -283,7 +285,7 @@ public class ServerUserStoreService {
         try {
             isConnectionEstablished = userStoreConfigService.testRDBMSConnection("",
                     rdBMSConnectionReq.getDriverName(), rdBMSConnectionReq.getConnectionURL(),
-                    rdBMSConnectionReq.getUsername(), rdBMSConnectionReq.getPassword(), "");
+                    rdBMSConnectionReq.getUsername(), rdBMSConnectionReq.getConnectionPassword(), "");
             if (isConnectionEstablished) {
                 connectionEstablishedResponse.setConnection(true);
             }
@@ -591,6 +593,21 @@ public class ServerUserStoreService {
             propertyDTO.setValue(value.getValue());
             propertiesToAdd.add(propertyDTO);
         }
+        return generatePropertiesWithUniqueIDProperty (propertiesToAdd);
+    }
+
+    /**
+     * Construct PropertyDTO array with UniqueID.
+     *
+     * @param propertiesToAdd Array list of properties.
+     * @return PropertyDTO[].
+     */
+    private PropertyDTO[] generatePropertiesWithUniqueIDProperty(ArrayList<PropertyDTO> propertiesToAdd) {
+
+        PropertyDTO propertyDTO = new PropertyDTO();
+        propertyDTO.setName("UniqueID");
+        propertyDTO.setValue(UUID.randomUUID().toString());
+        propertiesToAdd.add(propertyDTO);
 
         return propertiesToAdd.toArray(new PropertyDTO[0]);
     }
