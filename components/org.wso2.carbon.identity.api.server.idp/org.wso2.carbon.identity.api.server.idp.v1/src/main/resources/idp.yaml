@@ -926,9 +926,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OutboundConnectorListResponse'
+                $ref: '#/components/schemas/OutboundConnectorListResponse'
         '400':
           description: Bad Request
           content:
@@ -1771,7 +1769,8 @@ components:
       items:
         $ref: '#/components/schemas/Patch'
     Patch:
-      description: A JSONPatch as defined by RFC 6902. Patch operation is supported only for rool level attributes of an Identity Provider.
+      description: A JSONPatch as defined by RFC 6902. Patch operation is supported only for root level attributes of
+       an Identity Provider.
       required:
         - operation
         - path
@@ -1805,23 +1804,16 @@ components:
           description: Describes how the current context is related to the target resource
           example: identity-providers
       readOnly: true
-    JWKS:
-      type: object
-      properties:
-        jwksUri:
-          type: string
-          example: "https://localhost:9444/oauth2/jwks"
-    X509Certificate:
-      type: object
-      properties:
-        certificates:
-          type: array
-          items:
-            type: string
     Certificate:
-      oneOf:
-        - $ref: '#/components/schemas/X509Certificate'
-        - $ref: '#/components/schemas/JWKS'
+          type: object
+          properties:
+            certificates:
+              type: array
+              items:
+                type: string
+            jwksUri:
+              type: string
+              example: "https://localhost:9444/oauth2/jwks"
     IdentityProviderPOSTRequest:
       type: object
       required:

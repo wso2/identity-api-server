@@ -58,7 +58,12 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     @Override
     public Response deleteIDP(String identityProviderId, Boolean force) {
 
-        idpManagementService.deleteIDP(identityProviderId, force);
+        if (force) {
+            idpManagementService.forceDeleteIDP(identityProviderId);
+        } else {
+            idpManagementService.deleteIDP(identityProviderId);
+        }
+
         return Response.noContent().build();
     }
 

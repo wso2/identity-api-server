@@ -42,6 +42,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResp
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
+import org.wso2.carbon.identity.api.server.idp.v1.model.Link;
 import org.wso2.carbon.identity.api.server.idp.v1.model.MetaFederatedAuthenticator;
 import org.wso2.carbon.identity.api.server.idp.v1.model.MetaFederatedAuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.idp.v1.model.MetaOutboundConnector;
@@ -76,6 +77,7 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
+import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
@@ -114,11 +116,11 @@ public class ServerIdpManagementService {
     public IdentityProviderListResponse getIDPs(String attributes, Integer limit, Integer offset, String filter, String
             sortBy, String sortOrder) {
 
-        handleNotImplementedCapabilities(attributes, limit, offset, filter, sortBy, sortOrder);
+        handleNotImplementedCapabilities(attributes);
         try {
             return createIDPListResponse(
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPs(ContextLoader
-                            .getTenantDomainFromContext()));
+                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPs(limit, offset, filter,
+                            sortBy, sortOrder, ContextLoader.getTenantDomainFromContext()));
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
         }
@@ -170,7 +172,9 @@ public class ServerIdpManagementService {
      * @param identityProviderId Identity Provider resource ID.
      * @param patchRequest       Patch request in Json Patch notation See
      *                           <a href="https://tools.ietf.org/html/rfc6902">https://tools.ietf
-     *                           .org/html/rfc6902</a>
+     *                           .org/html/rfc6902</a>.
+     *                           We support only Patch 'replace' operation on root level attributes of an Identity
+     *                           Provider.
      */
     public IdentityProviderResponse patchIDP(String identityProviderId, List<Patch> patchRequest) {
 
@@ -183,47 +187,7 @@ public class ServerIdpManagementService {
                         identityProviderId);
             }
             IdentityProvider idpToUpdate = createIdPClone(identityProvider);
-            for (Patch patch : patchRequest) {
-                String path = patch.getPath();
-                Patch.OperationEnum operation = patch.getOperation();
-                // We support only 'REPLACE' patch operation.
-                if (operation == Patch.OperationEnum.REPLACE) {
-                    String value = null;
-                    if (patch.getValue() instanceof String) {
-                        value = (String) patch.getValue();
-                    }
-                    switch (path) {
-                        case Constants.NAME_PATH:
-                            idpToUpdate.setIdentityProviderName(value);
-                            break;
-                        case Constants.DESCRIPTION_PATH:
-                            idpToUpdate.setIdentityProviderDescription(value);
-                            break;
-                        case Constants.IMAGE_PATH:
-                            idpToUpdate.setImageUrl(value);
-                            break;
-                        case Constants.IS_PRIMARY_PATH:
-                            idpToUpdate.setPrimary(Boolean.parseBoolean(value));
-                            break;
-                        case Constants.IS_ENABLED_PATH:
-                            idpToUpdate.setEnable(Boolean.parseBoolean(value));
-                            break;
-                        case Constants.IS_FEDERATION_HUB_PATH:
-                            idpToUpdate.setFederationHub(Boolean.parseBoolean(value));
-                            break;
-                        case Constants.HOME_REALM_PATH:
-                            idpToUpdate.setHomeRealmId(value);
-                            break;
-                        default:
-                            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                                    .ERROR_CODE_INVALID_INPUT, null);
-                    }
-                } else {
-                    // Throw an error if any other patch operations are sent in the request.
-                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                            .ERROR_CODE_INVALID_INPUT, null);
-                }
-            }
+            processPatchRequest(patchRequest, idpToUpdate);
             IdentityProvider updatedIdP = IdentityProviderServiceHolder.getIdentityProviderManager()
                     .updateIdPByResourceId(identityProviderId, idpToUpdate,
                             ContextLoader.getTenantDomainFromContext());
@@ -238,21 +202,28 @@ public class ServerIdpManagementService {
      * Delete an Identity Provider.
      *
      * @param identityProviderId Identity Provider resource ID.
-     * @param force              when force is set to true, IDP will be forcefully deleted even-though it is being
-     *                           referred by service providers.
      */
-    public void deleteIDP(String identityProviderId, boolean force) {
+    public void deleteIDP(String identityProviderId) {
 
         try {
-            if (force) {
-                IdentityProviderServiceHolder.getIdentityProviderManager()
-                        .forceDeleteIdpByResourceId(identityProviderId, ContextLoader
-                                .getTenantDomainFromContext());
-            } else {
-                IdentityProviderServiceHolder.getIdentityProviderManager()
-                        .deleteIdPByResourceId(identityProviderId, ContextLoader
-                                .getTenantDomainFromContext());
-            }
+            IdentityProviderServiceHolder.getIdentityProviderManager().deleteIdPByResourceId(identityProviderId,
+                    ContextLoader.getTenantDomainFromContext());
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP, identityProviderId);
+        }
+    }
+
+    /**
+     * Forcefully delete an Identity Provider. When force is set to true, IDP will be forcefully deleted even-though
+     * it is being referred by service providers.
+     *
+     * @param identityProviderId Identity Provider resource ID.
+     */
+    public void forceDeleteIDP(String identityProviderId) {
+
+        try {
+            IdentityProviderServiceHolder.getIdentityProviderManager().forceDeleteIdpByResourceId(identityProviderId,
+                    ContextLoader.getTenantDomainFromContext());
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP, identityProviderId);
         }
@@ -265,13 +236,12 @@ public class ServerIdpManagementService {
      */
     public List<MetaFederatedAuthenticatorListItem> getMetaFederatedAuthenticators() {
 
-        List<MetaFederatedAuthenticatorListItem> metaAuthenticators = null;
+        List<MetaFederatedAuthenticatorListItem> metaAuthenticators = new ArrayList<>();
         try {
             FederatedAuthenticatorConfig[] authenticatorConfigs =
                     IdentityProviderServiceHolder.getIdentityProviderManager()
                             .getAllFederatedAuthenticators();
             if (ArrayUtils.isNotEmpty(authenticatorConfigs)) {
-                metaAuthenticators = new ArrayList<>();
                 for (FederatedAuthenticatorConfig authenticatorConfig : authenticatorConfigs) {
                     MetaFederatedAuthenticatorListItem metaFederatedAuthenticator =
                             createMetaFederatedAuthenticatorListItem(authenticatorConfig);
@@ -298,7 +268,7 @@ public class ServerIdpManagementService {
             FederatedAuthenticatorConfig[] authenticatorConfigs =
                     IdentityProviderServiceHolder.getIdentityProviderManager()
                             .getAllFederatedAuthenticators();
-            if (authenticatorConfigs != null) {
+            if (ArrayUtils.isNotEmpty(authenticatorConfigs)) {
                 for (FederatedAuthenticatorConfig authenticatorConfig : authenticatorConfigs) {
                     if (StringUtils.equals(authenticatorConfig.getName(), authenticatorName)) {
                         authenticator = createMetaFederatedAuthenticator(authenticatorConfig);
@@ -319,12 +289,11 @@ public class ServerIdpManagementService {
      */
     public List<MetaOutboundConnectorListItem> getMetaOutboundConnectors() {
 
-        List<MetaOutboundConnectorListItem> metaOutboundConnectors = null;
+        List<MetaOutboundConnectorListItem> metaOutboundConnectors = new ArrayList<>();
         try {
             ProvisioningConnectorConfig[] connectorConfigs = IdentityProviderServiceHolder.getIdentityProviderManager()
                     .getAllProvisioningConnectors();
             if (ArrayUtils.isNotEmpty(connectorConfigs)) {
-                metaOutboundConnectors = new ArrayList<>();
                 for (ProvisioningConnectorConfig connectorConfig : connectorConfigs) {
                     MetaOutboundConnectorListItem metaOutboundConnector = createMetaOutboundConnectorListItem
                             (connectorConfig);
@@ -350,7 +319,7 @@ public class ServerIdpManagementService {
         try {
             ProvisioningConnectorConfig[] connectorConfigs = IdentityProviderServiceHolder.getIdentityProviderManager()
                     .getAllProvisioningConnectors();
-            if (connectorConfigs != null) {
+            if (ArrayUtils.isNotEmpty(connectorConfigs)) {
                 for (ProvisioningConnectorConfig connectorConfig : connectorConfigs) {
                     if (StringUtils.equals(connectorConfig.getName(), connectorName)) {
                         connector = createMetaOutboundConnector(connectorConfig);
@@ -478,7 +447,7 @@ public class ServerIdpManagementService {
                 fedAuthConfigs[configPos] = authConfig;
             } else {
                 // If configPos is -1 add new authenticator to the list.
-                if (isAuthenticatorValid(federatedAuthenticatorId)) {
+                if (isValidAuthenticator(federatedAuthenticatorId)) {
                     List<FederatedAuthenticatorConfig> authConfigList = new ArrayList<>(Arrays.asList(fedAuthConfigs));
                     authConfigList.add(authConfig);
                     fedAuthConfigs = authConfigList.toArray(new FederatedAuthenticatorConfig[0]);
@@ -609,7 +578,7 @@ public class ServerIdpManagementService {
                 provConnectorConfigs[configPos] = connectorConfig;
             } else {
                 // if configPos is -1 add new authenticator to the list.
-                if (isConnectorValid(connectorId)) {
+                if (isValidConnector(connectorId)) {
                     List<ProvisioningConnectorConfig> connectorConfigsList = new ArrayList<>(
                             Arrays.asList(provConnectorConfigs));
                     connectorConfigsList.add(connectorConfig);
@@ -855,6 +824,7 @@ public class ServerIdpManagementService {
 
         MetaOutboundConnector metaOutboundProvisioningConnector = new MetaOutboundConnector();
         metaOutboundProvisioningConnector.setName(connectorConfig.getName());
+        metaOutboundProvisioningConnector.setDisplayName(connectorConfig.getName());
         metaOutboundProvisioningConnector.setConnectorId(base64URLEncode(connectorConfig.getName()));
         Property[] properties = connectorConfig.getProvisioningProperties();
         List<MetaProperty> metaProperties = Arrays.stream(properties).map(propertyToExternalMeta).collect(Collectors
@@ -1136,25 +1106,74 @@ public class ServerIdpManagementService {
         return idp;
     }
 
-    private IdentityProviderListResponse createIDPListResponse(List<IdentityProvider> idps) {
+    private IdentityProviderListResponse createIDPListResponse(IdpSearchResult idpSearchResult) {
 
+        List<IdentityProvider> idps = idpSearchResult.getIdPs();
         IdentityProviderListResponse listResponse = new IdentityProviderListResponse();
-        List<IdentityProviderListItem> identityProviderListItem = new ArrayList<>();
-        for (IdentityProvider idp : idps) {
-            IdentityProviderListItem listItem = new IdentityProviderListItem();
-            listItem.setId(idp.getResourceId());
-            listItem.setName(idp.getIdentityProviderName());
-            listItem.setDescription(idp.getIdentityProviderDescription());
-            listItem.setIsEnabled(idp.isEnable());
-            listItem.setImage(idp.getImageUrl());
-            listItem.setSelf(
-                    ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT + "/%s",
-                            idp.getResourceId())).toString());
-            identityProviderListItem.add(listItem);
+        if (CollectionUtils.isNotEmpty(idps)) {
+            List<IdentityProviderListItem> identityProviderList = new ArrayList<>();
+            for (IdentityProvider idp : idps) {
+                IdentityProviderListItem listItem = new IdentityProviderListItem();
+                listItem.setId(idp.getResourceId());
+                listItem.setName(idp.getIdentityProviderName());
+                listItem.setDescription(idp.getIdentityProviderDescription());
+                listItem.setIsEnabled(idp.isEnable());
+                listItem.setImage(idp.getImageUrl());
+                listItem.setSelf(
+                        ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT + "/%s",
+                                idp.getResourceId())).toString());
+                identityProviderList.add(listItem);
+            }
+            listResponse.setIdentityProviders(identityProviderList);
+            listResponse.setCount(idps.size());
+        } else {
+            listResponse.setCount(0);
         }
-        listResponse.setIdentityProviders(identityProviderListItem);
 
+        listResponse.setTotalResults(idpSearchResult.getTotalIDPCount());
+        listResponse.setStartIndex(idpSearchResult.getOffSet() + 1);
+        listResponse.setLinks(createLinks(idpSearchResult.getLimit(), idpSearchResult.getOffSet(), idpSearchResult
+                .getTotalIDPCount()));
         return listResponse;
+    }
+
+    private List<Link> createLinks(int limit, int offset, int total) {
+
+        List<Link> links = new ArrayList<>();
+
+        // Next Link
+        if ((offset + limit) < total) {
+            links.add(buildPageLink(Constants.PAGE_LINK_REL_NEXT, (offset + limit), limit));
+        }
+
+        // Previous Link
+        // Previous link matters only if offset is greater than 0.
+        if (offset > 0) {
+            if ((offset - limit) >= 0) { // A previous page of size 'limit' exists
+                links.add(buildPageLink(Constants.PAGE_LINK_REL_PREVIOUS, calculateOffsetForPreviousLink(offset,
+                        limit, total), limit));
+            } else { // A previous page exists but it's size is less than the specified limit
+                links.add(buildPageLink(Constants.PAGE_LINK_REL_PREVIOUS, 0, offset));
+            }
+        }
+
+        return links;
+    }
+
+    private int calculateOffsetForPreviousLink(int offset, int limit, int total) {
+
+        int newOffset = (offset - limit);
+        if (newOffset < total) {
+            return newOffset;
+        }
+
+        return calculateOffsetForPreviousLink(newOffset, limit, total);
+    }
+
+    private Link buildPageLink(String rel, int offset, int limit) {
+
+        return new Link().rel(rel).href(ContextLoader.buildURIForBody(
+                (String.format(Constants.IDP_PAGINATION_LINK_FORMAT, offset, limit))).toString());
     }
 
     private IdentityProviderResponse createIDPResponse(IdentityProvider identityProvider) {
@@ -1370,9 +1389,9 @@ public class ServerIdpManagementService {
         metaSubProperty.setDescription(property.getDescription());
         metaSubProperty.setDisplayName(property.getDisplayName());
         metaSubProperty.setDisplayOrder(property.getDisplayOrder());
-        metaSubProperty.setRegex(property.getRegex());
+        metaSubProperty.setRegex(property.getRegex() != null ? property.getRegex() : ".*");
         metaSubProperty.setOptions(Arrays.asList(property.getOptions()));
-        metaSubProperty.setDefaultValue(property.getDefaultValue());
+        metaSubProperty.setDefaultValue(property.getDefaultValue() != null ? property.getDefaultValue() : "");
         return metaSubProperty;
     };
 
@@ -1386,9 +1405,9 @@ public class ServerIdpManagementService {
         metaProperty.setDescription(property.getDescription());
         metaProperty.setDisplayName(property.getDisplayName());
         metaProperty.setDisplayOrder(property.getDisplayOrder());
-        metaProperty.setRegex(property.getRegex());
+        metaProperty.setRegex(property.getRegex() != null ? property.getRegex() : ".*");
         metaProperty.setOptions(Arrays.asList(property.getOptions()));
-        metaProperty.setDefaultValue(property.getDefaultValue());
+        metaProperty.setDefaultValue(property.getDefaultValue() != null ? property.getDefaultValue() : "");
         List<MetaProperty> metaSubProperties = Arrays.stream(property.getSubProperties()).map(subPropertyToExternalMeta)
                 .collect(Collectors.toList());
         metaProperty.setSubProperties(metaSubProperties);
@@ -1403,7 +1422,7 @@ public class ServerIdpManagementService {
      */
     private MetaProperty.TypeEnum getMetaPropertyType(String propertyType) {
 
-        MetaProperty.TypeEnum typeEnum = null;
+        MetaProperty.TypeEnum typeEnum = MetaProperty.TypeEnum.STRING;
 
         if (StringUtils.isNotBlank(propertyType)) {
             switch (propertyType) {
@@ -1417,7 +1436,7 @@ public class ServerIdpManagementService {
                     typeEnum = MetaProperty.TypeEnum.INTEGER;
                     break;
                 default:
-                    typeEnum = null;
+                    typeEnum = MetaProperty.TypeEnum.STRING;
             }
         }
         return typeEnum;
@@ -1432,8 +1451,13 @@ public class ServerIdpManagementService {
     private String getDisplayNameOfLocalClaim(String claimUri) {
 
         LocalClaim localClaim = getLocalClaim(claimUri);
-        Map<String, String> localClaimProperties = localClaim.getClaimProperties();
-        return localClaimProperties.get(Constants.PROP_DISPLAY_NAME);
+        if (localClaim != null) {
+            Map<String, String> localClaimProperties = localClaim.getClaimProperties();
+            return localClaimProperties.get(Constants.PROP_DISPLAY_NAME);
+        } else {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_INVALID_LOCAL_CLAIM_ID, claimUri);
+        }
     }
 
     /**
@@ -1568,7 +1592,7 @@ public class ServerIdpManagementService {
      * @return whether Connector is a supported one by the server.
      * @throws IdentityProviderManagementException IdentityProviderManagementException.
      */
-    private boolean isConnectorValid(String connectorId) throws IdentityProviderManagementException {
+    private boolean isValidConnector(String connectorId) throws IdentityProviderManagementException {
 
         ProvisioningConnectorConfig[] supportedConnectorConfigs =
                 IdentityProviderServiceHolder.getIdentityProviderManager()
@@ -1699,7 +1723,7 @@ public class ServerIdpManagementService {
      * @return whether Authenticator is a supported one by the server.
      * @throws IdentityProviderManagementException IdentityProviderManagementException.
      */
-    private boolean isAuthenticatorValid(String federatedAuthenticatorId) throws
+    private boolean isValidAuthenticator(String federatedAuthenticatorId) throws
             IdentityProviderManagementException {
 
         FederatedAuthenticatorConfig[] supportedAuthConfigs = IdentityProviderServiceHolder.getIdentityProviderManager()
@@ -1824,6 +1848,60 @@ public class ServerIdpManagementService {
     }
 
     /**
+     * Evaluate the list of patch operations and update the root level attributes of the identity provider accordingly.
+     *
+     * @param patchRequest List of patch operations.
+     * @param idpToUpdate  Identity Provider to be updated.
+     */
+    private void processPatchRequest(List<Patch> patchRequest, IdentityProvider idpToUpdate) {
+
+        if (CollectionUtils.isEmpty(patchRequest)) {
+            return;
+        }
+        for (Patch patch : patchRequest) {
+            String path = patch.getPath();
+            Patch.OperationEnum operation = patch.getOperation();
+            // We support only 'REPLACE' patch operation.
+            if (operation == Patch.OperationEnum.REPLACE) {
+                String value = null;
+                if (patch.getValue() instanceof String) {
+                    value = (String) patch.getValue();
+                }
+                switch (path) {
+                    case Constants.NAME_PATH:
+                        idpToUpdate.setIdentityProviderName(value);
+                        break;
+                    case Constants.DESCRIPTION_PATH:
+                        idpToUpdate.setIdentityProviderDescription(value);
+                        break;
+                    case Constants.IMAGE_PATH:
+                        idpToUpdate.setImageUrl(value);
+                        break;
+                    case Constants.IS_PRIMARY_PATH:
+                        idpToUpdate.setPrimary(Boolean.parseBoolean(value));
+                        break;
+                    case Constants.IS_ENABLED_PATH:
+                        idpToUpdate.setEnable(Boolean.parseBoolean(value));
+                        break;
+                    case Constants.IS_FEDERATION_HUB_PATH:
+                        idpToUpdate.setFederationHub(Boolean.parseBoolean(value));
+                        break;
+                    case Constants.HOME_REALM_PATH:
+                        idpToUpdate.setHomeRealmId(value);
+                        break;
+                    default:
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, null);
+                }
+            } else {
+                // Throw an error if any other patch operations are sent in the request.
+                throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                        .ERROR_CODE_INVALID_INPUT, null);
+            }
+        }
+    }
+
+    /**
      * Base64-decode content.
      *
      * @param encodedContent Encoded message content.
@@ -1921,28 +1999,12 @@ public class ServerIdpManagementService {
      * Return Not Implemented error response for IDP List attributes which are not yet supported by the server.
      *
      * @param attributes Attributes query param.
-     * @param limit      Limit query param.
-     * @param offset     Offset query param.
-     * @param filter     Filter string.
-     * @param sortBy     SortBy query param.
-     * @param sortOrder  SortOrder query param.
      */
-    private void handleNotImplementedCapabilities(String attributes, Integer limit, Integer offset, String filter,
-                                                  String sortBy, String sortOrder) {
+    private void handleNotImplementedCapabilities(String attributes) {
 
         Constants.ErrorMessage errorEnum = null;
 
-        if (limit != null) {
-            errorEnum = Constants.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
-        } else if (offset != null) {
-            errorEnum = Constants.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
-        } else if (filter != null) {
-            errorEnum = Constants.ErrorMessage.ERROR_CODE_FILTERING_NOT_IMPLEMENTED;
-        } else if (sortBy != null) {
-            errorEnum = Constants.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
-        } else if (sortOrder != null) {
-            errorEnum = Constants.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
-        } else if (attributes != null) {
+        if (attributes != null) {
             errorEnum = Constants.ErrorMessage.ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
         }
 

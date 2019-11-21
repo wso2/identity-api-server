@@ -397,14 +397,14 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/provisioning/outbound-connectors")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Outbound provisioning connectors of an identity provider ", notes = "This API provides a list of outbound provisioning connectors enabled for an identity provider ", response = OutboundConnectorListResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Outbound provisioning connectors of an identity provider ", notes = "This API provides a list of outbound provisioning connectors enabled for an identity provider ", response = OutboundConnectorListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Provisioning", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response", response = OutboundConnectorListResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "Successful response", response = OutboundConnectorListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),

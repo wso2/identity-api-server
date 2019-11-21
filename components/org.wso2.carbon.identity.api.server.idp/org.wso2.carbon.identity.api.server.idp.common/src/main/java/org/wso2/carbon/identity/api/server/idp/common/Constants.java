@@ -40,6 +40,11 @@ public class Constants {
     public static final String IS_FEDERATION_HUB_PATH = "/isFederationHub";
     public static final String HOME_REALM_PATH = "/homeRealmIdentifier";
 
+    // IdP pagination constants.
+    public static final String IDP_PAGINATION_LINK_FORMAT = "/v1/identity-providers?offset=%d&limit=%d";
+    public static final String PAGE_LINK_REL_NEXT = "next";
+    public static final String PAGE_LINK_REL_PREVIOUS = "previous";
+
     /**
      * Enum for error messages.
      */

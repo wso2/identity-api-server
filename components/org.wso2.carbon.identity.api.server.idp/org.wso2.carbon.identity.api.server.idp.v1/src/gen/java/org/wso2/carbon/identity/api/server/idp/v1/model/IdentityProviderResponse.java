@@ -17,21 +17,11 @@
 package org.wso2.carbon.identity.api.server.idp.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
-import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
-import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
-import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
-import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
-import javax.validation.constraints.*;
 
 
-import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
 
 public class IdentityProviderResponse  {
   

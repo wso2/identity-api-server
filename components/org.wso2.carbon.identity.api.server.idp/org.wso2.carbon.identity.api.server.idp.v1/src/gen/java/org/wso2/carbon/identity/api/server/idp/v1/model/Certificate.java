@@ -22,8 +22,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.idp.v1.model.JWKS;
-import org.wso2.carbon.identity.api.server.idp.v1.model.X509Certificate;
 import javax.validation.constraints.*;
 
 
