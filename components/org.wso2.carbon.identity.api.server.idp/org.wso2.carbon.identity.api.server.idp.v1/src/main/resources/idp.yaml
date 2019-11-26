@@ -1605,7 +1605,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 servers:
-  - url: 'https://apis.is.com/t/{tenant-domain}/api/server/v1'
+  - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
     variables:
       tenant-domain:
         default: carbon.super
@@ -1788,7 +1788,7 @@ components:
           description: A JSON-Pointer
           example: '/homeRealmIdentifier'
         value:
-          type: object
+          type: string
           description: The value to be used within the operations
           example: 'google'
     Link:

@@ -23,14 +23,14 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
 /**
- * A JSONPatch as defined by RFC 6902. Patch operation is supported only for rool level attributes of an Identity Provider.
+ * A JSONPatch as defined by RFC 6902. Patch operation is supported only for root level attributes of an Identity Provider.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "A JSONPatch as defined by RFC 6902. Patch operation is supported only for rool level attributes of an Identity Provider.")
+@ApiModel(description = "A JSONPatch as defined by RFC 6902. Patch operation is supported only for root level attributes of an Identity Provider.")
 public class Patch  {
   
 
@@ -68,7 +68,7 @@ public enum OperationEnum {
 
     private OperationEnum operation;
     private String path;
-    private Object value;
+    private String value;
 
     /**
     * The operation to be performed
@@ -115,7 +115,7 @@ public enum OperationEnum {
     /**
     * The value to be used within the operations
     **/
-    public Patch value(Object value) {
+    public Patch value(String value) {
 
         this.value = value;
         return this;
@@ -124,10 +124,10 @@ public enum OperationEnum {
     @ApiModelProperty(example = "google", value = "The value to be used within the operations")
     @JsonProperty("value")
     @Valid
-    public Object getValue() {
+    public String getValue() {
         return value;
     }
-    public void setValue(Object value) {
+    public void setValue(String value) {
         this.value = value;
     }
 

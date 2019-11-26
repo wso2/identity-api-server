@@ -140,11 +140,11 @@ public class Constants {
         ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED("65041",
                 "Attribute filtering not supported.",
                 "Attribute filtering capability is not supported in this version of the API."),
-        ERROR_CODE_INVALID_LOCAL_CLAIM_ID("65042",
+        ERROR_CODE_INVALID_LOCAL_CLAIM_ID("60024",
                 "Invalid claim uri.",
                 "Invalid claim uri %s provided in claim config."),
-        ERROR_CODE_INVALID_INPUT("65043", "Invalid input.", "One of the given inputs is invalid."),
-        ERROR_CODE_INVALID_SAML_METADATA("65044", "Invalid SAML metadata.", "SAML metadata is invalid/empty.");
+        ERROR_CODE_INVALID_INPUT("60025", "Invalid input.", "One of the given inputs is invalid."),
+        ERROR_CODE_INVALID_SAML_METADATA("60026", "Invalid SAML metadata.", "SAML metadata is invalid/empty.");
 
         private final String code;
         private final String message;

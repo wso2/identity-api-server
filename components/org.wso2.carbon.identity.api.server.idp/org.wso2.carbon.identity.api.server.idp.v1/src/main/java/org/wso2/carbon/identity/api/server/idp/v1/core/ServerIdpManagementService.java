@@ -1863,10 +1863,7 @@ public class ServerIdpManagementService {
             Patch.OperationEnum operation = patch.getOperation();
             // We support only 'REPLACE' patch operation.
             if (operation == Patch.OperationEnum.REPLACE) {
-                String value = null;
-                if (patch.getValue() instanceof String) {
-                    value = (String) patch.getValue();
-                }
+                String value = patch.getValue();
                 switch (path) {
                     case Constants.NAME_PATH:
                         idpToUpdate.setIdentityProviderName(value);
