@@ -102,15 +102,9 @@ public class Utils {
         return buildServerError(errorCode, errorMessage, errorDescription, e);
     }
 
-    public static APIError buildServerError(String message) {
+    public static APIError buildServerError(String errorDescrption) {
 
-        return buildServerError(message, null);
-    }
-
-    public static APIError buildApiError(Response.Status statusCode, String message) {
-
-        ErrorResponse errorResponse = new ErrorResponse.Builder().withMessage(message).build(log, message);
-        return new APIError(statusCode, errorResponse);
+        return buildServerError(errorDescrption, null);
     }
 
     public static APIError buildNotImplementedError(String message) {
@@ -123,6 +117,11 @@ public class Utils {
 
         Response.Status status = Response.Status.NOT_IMPLEMENTED;
         return new APIError(status, errorResponse);
+    }
+
+    public static APIError buildServerError(String errorCode, String message, String description) {
+
+        throw buildServerError(errorCode, message, description, null);
     }
 
     public static APIError buildServerError(String errorCode, String message, String description, Exception e) {

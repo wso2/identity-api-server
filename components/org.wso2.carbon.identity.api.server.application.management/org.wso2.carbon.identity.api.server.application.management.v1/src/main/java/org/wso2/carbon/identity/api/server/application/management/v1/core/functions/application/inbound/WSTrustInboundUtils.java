@@ -66,7 +66,7 @@ public class WSTrustInboundUtils {
 
         } catch (SecurityConfigException e) {
             // Error while adding WS Trust, we can't continue
-            throw buildServerError("Error while adding WS-Trust configuration. " + e.getMessage(), e);
+            throw buildServerError("Error while adding WSTrust configuration. " + e.getMessage(), e);
         }
     }
 
@@ -86,7 +86,7 @@ public class WSTrustInboundUtils {
                     .orElse(null);
 
         } catch (SecurityConfigException e) {
-            throw buildServerError("Error while retrieving wsTrust configuration for audience: " + audience, e);
+            throw buildServerError("Error while retrieving WSTrust configuration for audience: " + audience, e);
         }
     }
 
@@ -96,7 +96,7 @@ public class WSTrustInboundUtils {
             String trustedServiceAudience = inbound.getInboundAuthKey();
             ApplicationManagementServiceHolder.getStsAdminService().removeTrustedService(trustedServiceAudience);
         } catch (SecurityConfigException e) {
-            throw buildServerError("Error while trying to rollback wsTrust configuration. " + e.getMessage(), e);
+            throw buildServerError("Error while trying to rollback WSTrust configuration. " + e.getMessage(), e);
         }
     }
 }

@@ -20,7 +20,6 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.ws.rs.core.Response;
 
 /**
  * Holds constants related to Application Management components.
@@ -48,69 +47,55 @@ public class ApplicationManagementConstants {
      */
     public enum ErrorMessage {
 
-        // Client errors.
-        ERROR_CODE_INVALID_INPUT("50001",
-                Response.Status.BAD_REQUEST,
-                "Invalid input.",
-                "One of the given inputs is invalid."),
-        ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE("50002",
-                Response.Status.BAD_REQUEST,
-                "Filtering using the attempted attribute is not supported.",
+        // Client errors with codes defined at Application Management Layer.
+        UNSUPPORTED_FILTER_ATTRIBUTE("60004", "Filtering using the attempted attribute is not supported.",
                 "Filtering cannot be done with the '%s' attribute. " +
                         "Filtering is only supported with the 'name' attribute."),
-        ERROR_CODE_INVALID_FILTER_FORMAT("50003",
-                Response.Status.BAD_REQUEST,
+        INVALID_FILTER_FORMAT("60004",
                 "Invalid format user for filtering.",
                 "Filter needs to be in the format <attribute>+<operation>+<value>. Eg: name+eq+john"),
-        ERROR_CODE_INVALID_FILTER_OPERATION("55004",
-                Response.Status.BAD_REQUEST,
+        INVALID_FILTER_OPERATION("60004",
                 "Attempted filtering operation is not invalid.",
                 "Attempted filtering operation '%s' is invalid. " +
                         "Please use one of the supported filtering operations such as 'eq', 'co', 'sw' or 'ew'."),
-        ERROR_CODE_APPLICATION_NOT_FOUND("50005",
-                Response.Status.NOT_FOUND,
+        APPLICATION_NOT_FOUND("60006",
                 "Application not found.",
                 "Application cannot be found for the provided id: %s in the tenantDomain: %s."),
-        ERROR_INBOUND_PROTOCOL_NOT_FOUND("50006", Response.Status.NOT_FOUND,
-                "Inbound protocol not found.",
-                "Inbound protocol cannot be found for the provided id."),
-        ERROR_IMPORTING_APPLICATION("50007", Response.Status.INTERNAL_SERVER_ERROR,
-                "Importing application failed.",
-                "Unexpected error occurred while importing the application from file."),
 
-        INBOUND_NOT_CONFIGURED("60501", Response.Status.NOT_FOUND,
+        // Client errors defined at API level.
+        INVALID_INBOUND_PROTOCOL("60501",
+                "Inbound protocol not found.",
+                "Inbound protocol cannot be found for the provided id: %s"),
+        INBOUND_NOT_CONFIGURED("60502",
                 "Inbound protocol not configured.",
                 "Inbound protocol: %s not configured for application id: %s."),
 
         // Server Errors.
-        ERROR_CODE_SORTING_NOT_IMPLEMENTED("55001",
-                Response.Status.NOT_IMPLEMENTED,
-                "Sorting not supported.",
-                "Sorting capability is not supported in this version of the API."),
-        ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED("55002",
-                Response.Status.NOT_IMPLEMENTED,
-                "Attribute filtering not supported.",
-                "Attribute filtering capability is not supported in this version of the API."),
-        ERROR_WHILE_RETRIEVING_SAML_METADATA("55003", Response.Status.INTERNAL_SERVER_ERROR,
+        ERROR_RETRIEVING_SAML_METADATA("65001",
                 "Error occurred while retrieving SAML Metadata.",
                 "Unexpected error occurred while retrieving SAML Metadata."),
-        ERROR_WHILE_RETRIEVING_WS_TRUST_METADATA("55004", Response.Status.INTERNAL_SERVER_ERROR,
+        ERROR_RETRIEVING_WS_TRUST_METADATA("65001",
                 "Error occurred while retrieving WS Trust Metadata.",
                 "Unexpected error occurred while retrieving WS Trust Metadata."),
+        SORTING_NOT_IMPLEMENTED("65002",
+                "Sorting not supported.",
+                "Sorting capability is not supported in this version of the API."),
+        ATTRIBUTE_FILTERING_NOT_IMPLEMENTED("65003",
+                "Attribute filtering not supported.",
+                "Attribute filtering capability is not supported in this version of the API."),
 
-        APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED("65500", Response.Status.NOT_IMPLEMENTED,
+        // Server errors defined at REST API layer.
+        APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED("65501",
                 "Unsupported Operation.",
                 "Application creation with templates is not supported in this version of the API.");
 
         private final String code;
-        private Response.Status httpStatusCode;
         private final String message;
         private final String description;
 
-        ErrorMessage(String code, Response.Status statusCode, String message, String description) {
+        ErrorMessage(String code, String message, String description) {
 
             this.code = code;
-            this.httpStatusCode = statusCode;
             this.message = message;
             this.description = description;
         }
@@ -128,11 +113,6 @@ public class ApplicationManagementConstants {
         public String getDescription() {
 
             return description;
-        }
-
-        public Response.Status getHttpStatusCode() {
-
-            return httpStatusCode;
         }
 
         @Override

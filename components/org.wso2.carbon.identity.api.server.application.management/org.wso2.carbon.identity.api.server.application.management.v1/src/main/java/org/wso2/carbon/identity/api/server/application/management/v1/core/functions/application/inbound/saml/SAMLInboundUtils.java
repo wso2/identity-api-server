@@ -15,16 +15,13 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
@@ -32,18 +29,11 @@ import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2ClientException;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2SSOException;
-import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder.getSamlssoConfigService;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildApiError;
 
 /**
  * Helper functions for SAML inbound management.
@@ -53,11 +43,6 @@ public class SAMLInboundUtils {
     private SAMLInboundUtils() {
 
     }
-
-    private static final int CONNECTION_TIMEOUT_IN_SECONDS = 10;
-    private static final int READ_TIMEOUT_IN_SECONDS = 20;
-
-    private static final Log log = LogFactory.getLog(SAMLInboundUtils.class);
 
     public static InboundAuthenticationRequestConfig putSAMLInbound(ServiceProvider application,
                                                                     SAML2Configuration saml2Configuration) {
@@ -70,19 +55,13 @@ public class SAMLInboundUtils {
                 getSamlssoConfigService().removeServiceProvider(currentIssuer);
             }
 
-            String createdIssuer = createSAMLInbound(saml2Configuration);
-            // Update the inbound details.
-            InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
-            samlInbound.setInboundAuthType(StandardInboundProtocols.SAML2);
-            samlInbound.setInboundAuthKey(createdIssuer);
-
-            return samlInbound;
+            return createSAMLInbound(saml2Configuration);
         } catch (IdentityException e) {
             throw handleException(e);
         }
     }
 
-    public static String createSAMLInbound(SAML2Configuration saml2Configuration) {
+    public static InboundAuthenticationRequestConfig createSAMLInbound(SAML2Configuration saml2Configuration) {
 
         SAML2ServiceProvider samlManualConfiguration = saml2Configuration.getManualConfiguration();
 
@@ -98,7 +77,10 @@ public class SAMLInboundUtils {
                     "serviceProvider manual configuration needs to be present.");
         }
 
-        return issuer;
+        InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
+        samlInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.SAML2);
+        samlInbound.setInboundAuthKey(issuer);
+        return samlInbound;
     }
 
     public static SAML2ServiceProvider getSAML2ServiceProvider(InboundAuthenticationRequestConfig inboundAuth) {
@@ -130,18 +112,10 @@ public class SAMLInboundUtils {
 
     private static String createSAMLSpWithManualConfiguration(SAML2ServiceProvider saml2SpModel) {
 
-        SAMLSSOServiceProviderDTO samlSp = new ApiModelToSAMLSSOServiceProvider().apply(saml2SpModel);
-        String issuerWithQualifier = getIssuerWithQualifier(samlSp);
+        SAMLSSOServiceProviderDTO serviceProviderDTO = new ApiModelToSAMLSSOServiceProvider().apply(saml2SpModel);
         try {
-            boolean success = getSamlssoConfigService().addRPServiceProvider(samlSp);
-            if (success) {
-                return issuerWithQualifier;
-            } else {
-                String msg = "Error adding SAML configuration. SAML service provider with issuer: %s and " +
-                        "qualifier: %s already exists.";
-                throw buildApiError(Response.Status.CONFLICT,
-                        String.format(msg, samlSp.getIssuer(), samlSp.getIssuerQualifier()));
-            }
+            SAMLSSOServiceProviderDTO addedSAMLSp = getSamlssoConfigService().createServiceProvider(serviceProviderDTO);
+            return addedSAMLSp.getIssuer();
         } catch (IdentityException e) {
             throw handleException(e);
         }
@@ -169,38 +143,11 @@ public class SAMLInboundUtils {
     private static String createSAMLSpWithMetadataUrl(String metadataUrl) {
 
         try {
-            String metadataFileContent = getMetaContentFromUrl(metadataUrl);
             SAMLSSOServiceProviderDTO serviceProviderDTO =
-                    getSamlssoConfigService().uploadRPServiceProvider(metadataFileContent);
+                    getSamlssoConfigService().createServiceProviderWithMetadataURL(metadataUrl);
             return serviceProviderDTO.getIssuer();
         } catch (IdentitySAML2SSOException e) {
             throw handleException(e);
-        }
-    }
-
-    private static String getMetaContentFromUrl(String metadataUrl) {
-        // DO a HTTP call and get the metadata file.
-        InputStream in = null;
-        try {
-            URL url = new URL(metadataUrl);
-            URLConnection con = url.openConnection();
-            con.setConnectTimeout(CONNECTION_TIMEOUT_IN_SECONDS * 1000);
-            con.setReadTimeout(READ_TIMEOUT_IN_SECONDS * 1000);
-            in = con.getInputStream();
-            return IOUtils.toString(in);
-        } catch (IOException e) {
-            throw Utils.buildServerError("Error while fetching SAML metadata from URL: " + metadataUrl, e);
-        } finally {
-            IOUtils.closeQuietly(in);
-        }
-    }
-
-    private static String getIssuerWithQualifier(SAMLSSOServiceProviderDTO samlSp) {
-
-        if (StringUtils.isNotBlank(samlSp.getIssuerQualifier())) {
-            return SAMLSSOUtil.getIssuerWithQualifier(samlSp.getIssuer(), samlSp.getIssuerQualifier());
-        } else {
-            return samlSp.getIssuer();
         }
     }
 

@@ -483,7 +483,7 @@ public class ServerApplicationManagementService {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             application = getApplicationManagementService().getApplicationByResourceId(applicationId, tenantDomain);
             if (application == null) {
-                throw buildClientError(ErrorMessage.ERROR_CODE_APPLICATION_NOT_FOUND, applicationId, tenantDomain);
+                throw buildClientError(ErrorMessage.APPLICATION_NOT_FOUND, applicationId, tenantDomain);
             }
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error retrieving application with id: " + applicationId;
@@ -525,11 +525,11 @@ public class ServerApplicationManagementService {
                     String searchValue = filterArgs[2];
                     return generateFilterStringForBackend(searchField, searchOperation, searchValue);
                 } else {
-                    throw buildClientError(ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE, searchField);
+                    throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, searchField);
                 }
 
             } else {
-                throw buildClientError(ErrorMessage.ERROR_CODE_INVALID_FILTER_FORMAT);
+                throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
             }
         } else {
             return null;
@@ -555,7 +555,7 @@ public class ServerApplicationManagementService {
                 formattedFilter = "*" + searchValue + "*";
                 break;
             default:
-                throw buildClientError(ErrorMessage.ERROR_CODE_INVALID_FILTER_OPERATION, searchOperation);
+                throw buildClientError(ErrorMessage.INVALID_FILTER_OPERATION, searchOperation);
         }
 
         return formattedFilter;
@@ -644,13 +644,13 @@ public class ServerApplicationManagementService {
 
         ErrorMessage errorEnum = null;
         if (sortBy != null || sortOrder != null) {
-            errorEnum = ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
+            errorEnum = ErrorMessage.SORTING_NOT_IMPLEMENTED;
         } else if (requiredAttributes != null) {
-            errorEnum = ErrorMessage.ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
+            errorEnum = ErrorMessage.ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
         }
 
         if (errorEnum != null) {
-            throw buildClientError(errorEnum);
+            throw Utils.buildServerError(errorEnum.getCode(), errorEnum.getMessage(), errorEnum.getDescription());
         }
     }
 

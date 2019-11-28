@@ -15,32 +15,31 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound;
 
-import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
-import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundUtils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundUtils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundUtils;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
-import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
-import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.rollbackInbounds;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundUtils.createPassiveSTSInboundConfig;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundUtils.createWsTrustInbound;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundUtils.createCustomInbound;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundUtils.createOAuthInbound;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundUtils.createSAMLInbound;
 
 /**
  * Updates the inbound authentication protocols defined by the API model in the Service Provider model.
  */
 public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, InboundProtocols> {
+
+    private static final Log log = LogFactory.getLog(UpdateInboundProtocols.class);
 
     @Override
     public void update(ServiceProvider application, InboundProtocols inboundProtocols) {
@@ -49,30 +48,34 @@ public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, I
 
         try {
             if (inboundProtocols.getOidc() != null) {
-                inbounds.add(getOIDCInbound(inboundProtocols.getOidc()));
+                inbounds.add(createOAuthInbound(inboundProtocols.getOidc()));
             }
 
             if (inboundProtocols.getSaml() != null) {
-                inbounds.add(getSAMLInbound(inboundProtocols.getSaml()));
+                inbounds.add(createSAMLInbound(inboundProtocols.getSaml()));
             }
 
             if (inboundProtocols.getWsTrust() != null) {
-                inbounds.add(getWsTrustInbound(inboundProtocols.getWsTrust()));
+                inbounds.add(createWsTrustInbound(inboundProtocols.getWsTrust()));
             }
         } catch (APIError error) {
-            // TODO: a log here.
+            if (log.isDebugEnabled()) {
+                log.debug("Error while adding inbound protocols for application id: "
+                        + application.getApplicationResourceId() + ". Cleaning up possible partially created inbound " +
+                        "configurations.");
+            }
             rollbackInbounds(inbounds);
             throw error;
         }
 
         if (inboundProtocols.getPassiveSts() != null) {
-            inbounds.add(getPassiveStsInbound(inboundProtocols.getPassiveSts()));
+            inbounds.add(createPassiveSTSInboundConfig(inboundProtocols.getPassiveSts()));
         }
 
         if (inboundProtocols.getCustom() != null) {
             inboundProtocols.getCustom().forEach(inboundConfigModel -> {
-                // Add validate at swagger to make sure inbound key and name are not null.
-                InboundAuthenticationRequestConfig inboundRequestConfig = buildCustomInbound(inboundConfigModel);
+                // TODO Add validate at swagger to make sure inbound key and name are not null.
+                InboundAuthenticationRequestConfig inboundRequestConfig = createCustomInbound(inboundConfigModel);
                 inbounds.add(inboundRequestConfig);
             });
         }
@@ -83,43 +86,5 @@ public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, I
         );
 
         application.setInboundAuthenticationConfig(inboundAuthConfig);
-    }
-
-    private InboundAuthenticationRequestConfig buildCustomInbound(CustomInboundProtocolConfiguration inboundModel) {
-
-        return CustomInboundUtils.createCustomInbound(inboundModel);
-    }
-
-    private InboundAuthenticationRequestConfig getOIDCInbound(OpenIDConnectConfiguration oidcModel) {
-
-        // Build a consumer apps object.
-        OAuthConsumerAppDTO registeredOAuthApp = OAuthInboundUtils.createOAuthInbound(oidcModel);
-
-        // Try to register it.
-        // Set the consumer key and secret in inbound.
-        InboundAuthenticationRequestConfig oidcInbound = new InboundAuthenticationRequestConfig();
-        oidcInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.OAUTH2);
-        oidcInbound.setInboundAuthKey(registeredOAuthApp.getOauthConsumerKey());
-        return oidcInbound;
-    }
-
-    private InboundAuthenticationRequestConfig getSAMLInbound(SAML2Configuration saml2Configuration) {
-
-        String issuer = SAMLInboundUtils.createSAMLInbound(saml2Configuration);
-
-        InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
-        samlInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.SAML2);
-        samlInbound.setInboundAuthKey(issuer);
-        return samlInbound;
-    }
-
-    private InboundAuthenticationRequestConfig getPassiveStsInbound(PassiveStsConfiguration passiveSts) {
-
-        return PassiveSTSInboundUtils.createPassiveSTSInboundConfig(passiveSts);
-    }
-
-    private InboundAuthenticationRequestConfig getWsTrustInbound(WSTrustConfiguration wsTrust) {
-
-        return WSTrustInboundUtils.createWsTrustInbound(wsTrust);
     }
 }

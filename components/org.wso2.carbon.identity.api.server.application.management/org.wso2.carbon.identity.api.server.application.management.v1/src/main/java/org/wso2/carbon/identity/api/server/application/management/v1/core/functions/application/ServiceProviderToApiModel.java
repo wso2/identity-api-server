@@ -102,6 +102,11 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         AuthenticationSequence.TypeEnum authenticationType = getAuthenticationType(authConfig);
         if (authenticationType == AuthenticationSequence.TypeEnum.DEFAULT) {
             // If this is the default sequence we need to set the default tenant authentication sequence.
+            if (log.isDebugEnabled()) {
+                log.debug("Authentication type is set to 'DEFAULT'. Reading the authentication sequence from the " +
+                        "'default' application and showing the effective authentication sequence for application " +
+                        "with id: " + application.getApplicationResourceId());
+            }
             ServiceProvider defaultSP = getDefaultServiceProvider();
             authConfig = defaultSP.getLocalAndOutBoundAuthenticationConfig();
         }

@@ -43,33 +43,23 @@ public class OAuthInboundUtils {
 
         // First we identify whether this is a insert or update.
         String currentClientId = InboundUtils.getInboundAuthKey(application, StandardInboundProtocols.OAUTH2);
-        String updatedClientId;
         try {
             if (currentClientId != null) {
-                // Get the current clientId and secret since they are not specified in the request.
+                // This is an update.
                 OAuthConsumerAppDTO oauthApp = ApplicationManagementServiceHolder.getOAuthAdminService()
                         .getOAuthApplicationData(currentClientId);
-
                 oidcConfigModel.setClientId(oauthApp.getOauthConsumerKey());
                 oidcConfigModel.setClientSecret(oauthApp.getOauthConsumerSecret());
 
                 OAuthConsumerAppDTO appToUpdate = new ApiModelToOAuthConsumerApp().apply(oidcConfigModel);
-                updatedClientId = appToUpdate.getOauthConsumerKey();
                 // Delete the current app.
                 ApplicationManagementServiceHolder.getOAuthAdminService().updateConsumerApplication(appToUpdate);
+
+                String updatedClientId = appToUpdate.getOauthConsumerKey();
+                return createInboundAuthRequestConfig(updatedClientId);
             } else {
-
-                OAuthConsumerAppDTO addedConsumerApp = createOAuthInbound(oidcConfigModel);
-                updatedClientId = addedConsumerApp.getOauthConsumerKey();
+                return createOAuthInbound(oidcConfigModel);
             }
-
-            // Update the inbound details.
-            InboundAuthenticationRequestConfig oidcInbound = new InboundAuthenticationRequestConfig();
-            oidcInbound.setInboundAuthType(StandardInboundProtocols.OAUTH2);
-            oidcInbound.setInboundAuthKey(updatedClientId);
-
-            return oidcInbound;
-            // updateOrInsertInbound(application, StandardInboundProtocols.OAUTH2, oidcInbound);
 
         } catch (IdentityOAuthAdminException e) {
             throw handleOAuthException(e);
@@ -85,16 +75,26 @@ public class OAuthInboundUtils {
         return buildServerError(message, e);
     }
 
-    public static OAuthConsumerAppDTO createOAuthInbound(OpenIDConnectConfiguration oidcModel) {
+    public static InboundAuthenticationRequestConfig createOAuthInbound(OpenIDConnectConfiguration oidcModel) {
 
         // Build a consumer apps object.
         OAuthConsumerAppDTO consumerApp = new ApiModelToOAuthConsumerApp().apply(oidcModel);
         try {
-            return ApplicationManagementServiceHolder.getOAuthAdminService()
+            OAuthConsumerAppDTO createdOAuthApp = ApplicationManagementServiceHolder.getOAuthAdminService()
                     .registerAndRetrieveOAuthApplicationData(consumerApp);
+
+            return createInboundAuthRequestConfig(createdOAuthApp.getOauthConsumerKey());
         } catch (IdentityOAuthAdminException e) {
             throw handleOAuthException(e);
         }
+    }
+
+    private static InboundAuthenticationRequestConfig createInboundAuthRequestConfig(String clientId) {
+
+        InboundAuthenticationRequestConfig oidcInbound = new InboundAuthenticationRequestConfig();
+        oidcInbound.setInboundAuthType(StandardInboundProtocols.OAUTH2);
+        oidcInbound.setInboundAuthKey(clientId);
+        return oidcInbound;
     }
 
     public static OpenIDConnectConfiguration getOAuthConfiguration(InboundAuthenticationRequestConfig inboundAuth) {
