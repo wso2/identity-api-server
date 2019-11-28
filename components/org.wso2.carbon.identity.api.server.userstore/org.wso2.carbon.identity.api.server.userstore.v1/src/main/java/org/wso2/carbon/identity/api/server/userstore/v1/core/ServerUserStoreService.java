@@ -17,6 +17,7 @@
 package org.wso2.carbon.identity.api.server.userstore.v1.core;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -42,6 +43,8 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
 import org.wso2.carbon.identity.user.store.configuration.UserStoreConfigService;
 import org.wso2.carbon.identity.user.store.configuration.dto.PropertyDTO;
 import org.wso2.carbon.identity.user.store.configuration.dto.UserStoreDTO;
+import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreClientException;
+import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreInternalException;
 import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreMgtException;
 import org.wso2.carbon.user.api.Properties;
 import org.wso2.carbon.user.api.Property;
@@ -77,14 +80,14 @@ public class ServerUserStoreService {
     public UserStoreResponse addUserStore(UserStoreReq userStoreReq) {
 
         try {
+            validateMandatoryProperties(getUserStoreType(base64URLDecodeId(userStoreReq.getTypeId())), userStoreReq);
             UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
             userStoreConfigService.addUserStore(createUserStoreDTO(userStoreReq));
             return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_USER_STORE;
-            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-            throw handleException(e, errorEnum, status);
+            throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
     }
 
@@ -102,8 +105,7 @@ public class ServerUserStoreService {
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_USER_STORE;
-            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-            throw handleException(e, errorEnum, status);
+            throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
     }
 
@@ -127,8 +129,7 @@ public class ServerUserStoreService {
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_USER_STORE;
-            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-            throw handleException(e, errorEnum, status);
+            throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
     }
 
@@ -157,8 +158,7 @@ public class ServerUserStoreService {
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_RETRIEVING_USER_STORE_TYPE;
-            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-            throw handleException(e, errorEnum, status);
+            throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
     }
 
@@ -186,8 +186,7 @@ public class ServerUserStoreService {
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_USER_STORE;
-            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-            throw handleException(e, errorEnum, status);
+            throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
     }
 
@@ -227,8 +226,7 @@ public class ServerUserStoreService {
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_USER_STORE_BY_DOMAIN_ID;
-            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-            throw handleException(e, errorEnum, status);
+            throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
     }
 
@@ -265,8 +263,7 @@ public class ServerUserStoreService {
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_USER_STORE;
-            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-            throw handleException(e, errorEnum, status);
+            throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
     }
 
@@ -292,8 +289,7 @@ public class ServerUserStoreService {
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_DATASOURCE_CONNECTION;
-            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-            throw handleException(e, errorEnum, status);
+            throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
         return connectionEstablishedResponse;
     }
@@ -352,8 +348,7 @@ public class ServerUserStoreService {
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_USER_STORE;
-            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-            throw handleException(e, errorEnum, status);
+            throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
     }
 
@@ -633,20 +628,6 @@ public class ServerUserStoreService {
     /**
      * Handle exceptions generated in API.
      *
-     * @param e         Exception.
-     * @param errorEnum Error Message information.
-     * @param status    Error status code.
-     * @return APIError.
-     */
-    private APIError handleException(Exception e, UserStoreConstants.ErrorMessage errorEnum, Response.Status status) {
-
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, e, errorEnum.getDescription());
-        return new APIError(status, errorResponse);
-    }
-
-    /**
-     * Handle exceptions generated in API.
-     *
      * @param status HTTP Status.
      * @param error  Error Message information.
      * @return APIError.
@@ -720,5 +701,83 @@ public class ServerUserStoreService {
 
             throw new APIError(status, errorResponse);
         }
+    }
+
+    /**
+     * To check whether API request has all user store mandatory properties or not.
+     *
+     * @param className the user store class name
+     * @param userStoreReq {@link UserStoreReq}
+     */
+    private void validateMandatoryProperties(String className, UserStoreReq userStoreReq) {
+
+        HashMap<String, String> hashMap = new HashMap<String, String>();
+        Property[] mandatoryProperties = UserStoreManagerRegistry.
+                getUserStoreProperties(className).getMandatoryProperties();
+        for (org.wso2.carbon.identity.api.server.userstore.v1.model.Property property : userStoreReq.getProperties()) {
+            hashMap.put(property.getName(), property.getValue());
+        }
+        for (Property property : mandatoryProperties) {
+            if (!hashMap.containsKey(property.getName()) || (StringUtils.isEmpty(hashMap.get(property.getName())))) {
+                UserStoreConstants.ErrorMessage errorEnum =
+                        UserStoreConstants.ErrorMessage.ERROR_CODE_MANDATORY_PROPERTIES_NOT_FOUND;
+                Response.Status status = Response.Status.NOT_FOUND;
+                throw handleException(status, errorEnum);
+            }
+        }
+    }
+
+    /**
+     * Handle handleIdentityUserStoreMgtException, extract the error code and description from the exception and set
+     * to the API Error Response.
+     *
+     * @param exception Exception thrown
+     * @param errorEnum Corresponding error enum
+     * @return API Error object.
+     */
+    private APIError handleIdentityUserStoreMgtException(IdentityUserStoreMgtException exception,
+                                                         UserStoreConstants.ErrorMessage errorEnum) {
+        Response.Status status;
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
+        if (exception instanceof IdentityUserStoreInternalException &&
+                UserStoreConstants.getMappedErrorMessage(exception.getErrorCode()) != null) {
+            UserStoreConstants.ErrorMessage errorMessage = UserStoreConstants.
+                    getMappedErrorMessage(exception.getErrorCode());
+            errorResponse = getErrorBuilder(errorMessage).build(LOG, exception, errorEnum.getDescription());
+            status = errorMessage.getHttpStatus();
+            return new APIError(status, errorResponse);
+        } else if (exception instanceof IdentityUserStoreClientException) {
+            // Send client error with specific error code or as a BAD request.
+            return handleIdentityUserStoreClientException(exception, errorEnum);
+        } else {
+            // Server error
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+            return new APIError(status, errorResponse);
+        }
+    }
+
+    /**
+     * Handle handleIdentityUserStoreClientException, extract the error code and description from the client exception
+     * if it is present otherwise set BAD request in the API Error Response.
+     *
+     * @param exception Exception thrown
+     * @param errorEnum Corresponding error enum
+     * @return API Error object.
+     */
+    private APIError handleIdentityUserStoreClientException(IdentityUserStoreMgtException exception,
+                                                            UserStoreConstants.ErrorMessage errorEnum) {
+
+        Response.Status status;
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
+        if (UserStoreConstants.getMappedErrorMessage(exception.getErrorCode()) != null) {
+            UserStoreConstants.ErrorMessage errorMessage = UserStoreConstants.
+                    getMappedErrorMessage(exception.getErrorCode());
+            errorResponse = getErrorBuilder(errorMessage).build(LOG, exception, errorEnum.getDescription());
+            status = errorMessage.getHttpStatus();
+        } else {
+            status = Response.Status.BAD_REQUEST;
+            errorResponse.setDescription(exception.getMessage());
+        }
+        return new APIError(status, errorResponse);
     }
 }
