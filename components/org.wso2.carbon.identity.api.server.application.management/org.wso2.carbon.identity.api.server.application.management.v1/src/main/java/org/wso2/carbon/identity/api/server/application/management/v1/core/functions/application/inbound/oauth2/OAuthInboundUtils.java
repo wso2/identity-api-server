@@ -48,6 +48,7 @@ public class OAuthInboundUtils {
                 // This is an update.
                 OAuthConsumerAppDTO oauthApp = ApplicationManagementServiceHolder.getOAuthAdminService()
                         .getOAuthApplicationData(currentClientId);
+                // TODO: reject if client not equals previous
                 oidcConfigModel.setClientId(oauthApp.getOauthConsumerKey());
                 oidcConfigModel.setClientSecret(oauthApp.getOauthConsumerSecret());
 
@@ -106,7 +107,6 @@ public class OAuthInboundUtils {
             return new OAuthConsumerAppToApiModel().apply(oauthApp);
 
         } catch (IdentityOAuthAdminException e) {
-
             throw buildServerError("Error while retrieving oauth application for clientId: " + clientId, e);
         }
     }

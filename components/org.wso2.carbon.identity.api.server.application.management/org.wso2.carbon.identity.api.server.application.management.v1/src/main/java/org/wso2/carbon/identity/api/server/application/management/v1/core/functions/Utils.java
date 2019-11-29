@@ -79,7 +79,6 @@ public class Utils {
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutPutStream.toByteArray());
             objInputStream = new ObjectInputStream(byteArrayInputStream);
             newObject = (ServiceProvider) objInputStream.readObject();
-
         } catch (ClassNotFoundException | IOException e) {
             throw buildServerError("Error deep cloning application object.", e);
         }
