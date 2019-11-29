@@ -44,8 +44,8 @@ import org.wso2.carbon.identity.user.store.configuration.UserStoreConfigService;
 import org.wso2.carbon.identity.user.store.configuration.dto.PropertyDTO;
 import org.wso2.carbon.identity.user.store.configuration.dto.UserStoreDTO;
 import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreClientException;
-import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreInternalException;
 import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreMgtException;
+import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreServerException;
 import org.wso2.carbon.user.api.Properties;
 import org.wso2.carbon.user.api.Property;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
@@ -249,7 +249,7 @@ public class ServerUserStoreService {
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         try {
             UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
-            if (userStoreDTOS == null) {
+            if (userStoreDTOS == null || userStoreDTOS.length == 0) {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
             }
             List<UserStoreDTO> userStoresByTypeNameList = new ArrayList<>();
@@ -739,7 +739,7 @@ public class ServerUserStoreService {
                                                          UserStoreConstants.ErrorMessage errorEnum) {
         Response.Status status;
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
-        if (exception instanceof IdentityUserStoreInternalException &&
+        if (exception instanceof IdentityUserStoreServerException &&
                 UserStoreConstants.getMappedErrorMessage(exception.getErrorCode()) != null) {
             UserStoreConstants.ErrorMessage errorMessage = UserStoreConstants.
                     getMappedErrorMessage(exception.getErrorCode());
@@ -750,7 +750,7 @@ public class ServerUserStoreService {
             // Send client error with specific error code or as a BAD request.
             return handleIdentityUserStoreClientException(exception, errorEnum);
         } else {
-            // Server error
+            // Internal Server error
             status = Response.Status.INTERNAL_SERVER_ERROR;
             return new APIError(status, errorResponse);
         }
