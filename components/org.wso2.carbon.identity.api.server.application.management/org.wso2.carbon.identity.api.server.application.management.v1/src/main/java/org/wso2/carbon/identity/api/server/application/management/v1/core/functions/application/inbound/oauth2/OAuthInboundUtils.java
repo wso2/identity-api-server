@@ -24,6 +24,7 @@ import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRe
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
 import org.wso2.carbon.identity.oauth.IdentityOAuthClientException;
+import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
@@ -133,5 +134,13 @@ public class OAuthInboundUtils {
         }
     }
 
-    // TODO: Updating a state of an OAuth application needs to be implemented.
+    public static void revokeOAuthClient(String clientId) {
+
+        try {
+            ApplicationManagementServiceHolder.getOAuthAdminService()
+                    .updateConsumerAppState(clientId, OAuthConstants.OauthAppStates.APP_STATE_REVOKED);
+        } catch (IdentityOAuthAdminException e) {
+            throw buildServerError("Error while revoking oauth application.", e);
+        }
+    }
 }

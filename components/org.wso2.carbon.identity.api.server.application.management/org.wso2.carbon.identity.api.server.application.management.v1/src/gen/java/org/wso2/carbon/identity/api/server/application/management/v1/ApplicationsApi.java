@@ -671,9 +671,33 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response regenerateOAuthApplicationSecret(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
+    public Response regenerateOAuthClientSecret(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
 
-        return delegate.regenerateOAuthApplicationSecret(applicationId );
+        return delegate.regenerateOAuthClientSecret(applicationId );
+    }
+
+    @Valid
+    @POST
+    @Path("/{applicationId}/inbound-protocols/oidc/revoke")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Revokes the OAuth2/OIDC client. ", notes = "This API provides revokes the OAuth2/OIDC client secret. To re-activate the client the client secret needs to be regenerated. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Protocols - OAuth / OIDC", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Application Revoked", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response revokeOAuthClient(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.revokeOAuthClient(applicationId );
     }
 
     @Valid

@@ -200,11 +200,18 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response regenerateOAuthApplicationSecret(String applicationId) {
+    public Response regenerateOAuthClientSecret(String applicationId) {
 
         OpenIDConnectConfiguration openIDConnectConfiguration =
                 applicationManagementService.regenerateOAuthApplicationSecret(applicationId);
         return Response.ok(openIDConnectConfiguration).build();
+    }
+
+    @Override
+    public Response revokeOAuthClient(String applicationId) {
+
+        applicationManagementService.revokeOAuthClient(applicationId);
+        return Response.ok().build();
     }
 
     @Override

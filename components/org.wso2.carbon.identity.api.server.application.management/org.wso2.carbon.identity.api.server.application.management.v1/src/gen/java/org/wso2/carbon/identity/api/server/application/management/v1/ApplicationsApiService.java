@@ -97,7 +97,9 @@ public interface ApplicationsApiService {
 
       public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel);
 
-      public Response regenerateOAuthApplicationSecret(String applicationId);
+      public Response regenerateOAuthClientSecret(String applicationId);
+
+      public Response revokeOAuthClient(String applicationId);
 
       public Response updateCustomInboundConfiguration(String applicationId, String inboundProtocolId, CustomInboundProtocolConfiguration customInboundProtocolConfiguration);
 

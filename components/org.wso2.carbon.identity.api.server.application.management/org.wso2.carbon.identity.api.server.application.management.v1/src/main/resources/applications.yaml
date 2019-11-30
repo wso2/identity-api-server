@@ -1203,66 +1203,6 @@ paths:
       x-wso2-request: ''
       x-wso2-response: |
         "HTTP/1.1 200 Ok"
-  # '/applications/{applicationId}/inbound-protocols/oidc/state':
-  #   post:
-  #     tags:
-  #       - Inbound Protocols - OAuth / OIDC
-  #     summary: |
-  #       Revoke the OAuth2/OIDC client configuration of an application.
-  #     description: >
-  #       This API allow updating the state of the oauth2 inbound of an
-  #       application.
-  #     operationId: updateOAuthAppState
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application
-  #         required: true
-  #         schema:
-  #           type: string
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             $ref: '#/components/schemas/OAuthAppStateUpdateRequest'
-  #       description: Represents the state update request.
-  #       required: true
-  #     responses:
-  #       '200':
-  #         description: OK
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
   '/applications/{applicationId}/inbound-protocols/oidc/regenerate-secret':
     post:
       tags:
@@ -1271,7 +1211,7 @@ paths:
         Regenerate the OAuth2/OIDC client secret.
       description: |
         This API provides regenerate the OAuth2/OIDC client secret.
-      operationId: regenerateOAuthApplicationSecret
+      operationId: regenerateOAuthClientSecret
       parameters:
         - name: applicationId
           in: path
@@ -1317,67 +1257,60 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-                # '/applications/{applicationId}/inbound-protocols/oidc/state':
-                # patch:
-                #   tags:
-                #     - Inbound Protocols - OAuth / OIDC
-                #   summary: |
-                #     Update the OAuth2/OIDC client state.
-                #   description: |
-                #     This API provides the capability to update the state of the OAuth client.
-                #   operationId: updateOAuthApplicationState
-                #   parameters:
-                #     - name: applicationId
-                #       in: path
-                #       description: Id of the application
-                #       required: true
-                #       schema:
-                #         type: string
-                #   requestBody:
-                #     content:
-                #       application/json:
-                #         schema:
-                #           $ref: '#/components/schemas/OAuthApplicationState'
-                #     description: >-
-                #       This represents the OIDC client state of an application.
-                #     required: true
-                #   responses:
-                #     '200':
-                #       description: OK
-                #       content:
-                #         application/json:
-                #           schema:
-                #             $ref: '#/components/schemas/OpenIDConnectConfiguration'
-                #     '400':
-                #       description: Bad Request
-                #       content:
-                #         application/json:
-                #           schema:
-                #             $ref: '#/components/schemas/Error'
-                #     '401':
-                #       description: Unauthorized
-                #       content:
-                #         application/json:
-                #           schema:
-                #             $ref: '#/components/schemas/Error'
-                #     '403':
-                #       description: Forbidden
-                #       content:
-                #         application/json:
-                #           schema:
-                #             $ref: '#/components/schemas/Error'
-                #     '404':
-                #       description: Not Found
-                #       content:
-                #         application/json:
-                #           schema:
-                #             $ref: '#/components/schemas/Error'
-                #     '500':
-                #       description: Server Error
-                #       content:
-                #         application/json:
-                #           schema:
-                #             $ref: '#/components/schemas/Error'
+  '/applications/{applicationId}/inbound-protocols/oidc/revoke':
+    post:
+      tags:
+        - Inbound Protocols - OAuth / OIDC
+      summary: |
+        Revokes the OAuth2/OIDC client.
+      description: |
+        This API provides revokes the OAuth2/OIDC client secret. To re-activate the client the client secret needs to be regenerated.
+      operationId: revokeOAuthClient
+      parameters:
+        - name: applicationId
+          in: path
+          description: Id of the application
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Application Revoked
+          # content:
+          #   application/json:
+          #     schema:
+          #       $ref: '#/components/schemas/OpenIDConnectConfiguration'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 
   '/applications/{applicationId}/inbound-protocols/passive-sts':
     get:

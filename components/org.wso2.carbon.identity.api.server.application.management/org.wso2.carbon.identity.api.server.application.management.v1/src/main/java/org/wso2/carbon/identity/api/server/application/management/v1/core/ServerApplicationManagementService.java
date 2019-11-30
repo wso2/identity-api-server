@@ -433,26 +433,38 @@ public class ServerApplicationManagementService {
                              String inboundType,
                              Function<InboundAuthenticationRequestConfig, T> getInboundApiModelFunction) {
 
+        InboundAuthenticationRequestConfig inboundAuthenticationRequestConfig =
+                getInboundAuthRequestConfig(applicationId, inboundType);
+        // Apply the function and convert the authentication request config to API model.
+        return getInboundApiModelFunction.apply(inboundAuthenticationRequestConfig);
+    }
+
+    public OpenIDConnectConfiguration regenerateOAuthApplicationSecret(String applicationId) {
+
+        InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
+        String clientId = oauthInbound.getInboundAuthKey();
+        return OAuthInboundUtils.regenerateClientSecret(clientId);
+    }
+
+    public void revokeOAuthClient(String applicationId) {
+
+        InboundAuthenticationRequestConfig oauthInbound = getInboundAuthRequestConfig(applicationId, OAUTH2);
+        String clientId = oauthInbound.getInboundAuthKey();
+        OAuthInboundUtils.revokeOAuthClient(clientId);
+    }
+
+    private InboundAuthenticationRequestConfig getInboundAuthRequestConfig(String applicationId, String inboundType) {
+
         ServiceProvider application = getServiceProvider(applicationId);
         // Extract the inbound authentication request config for the given inbound type.
         InboundAuthenticationRequestConfig inboundAuthenticationRequestConfig =
                 getInboundAuthenticationRequestConfig(application, inboundType);
 
-        // Apply the function and convert the authentication request config to API model.
-        T inboundModel = getInboundApiModelFunction.apply(inboundAuthenticationRequestConfig);
-        if (inboundModel == null) {
+        if (inboundAuthenticationRequestConfig == null) {
             // This means the inbound is not configured for the particular app.
             throw buildClientError(INBOUND_NOT_CONFIGURED, inboundType, applicationId);
         }
-
-        return inboundModel;
-    }
-
-    public OpenIDConnectConfiguration regenerateOAuthApplicationSecret(String applicationId) {
-
-        OpenIDConnectConfiguration inboundOAuthConfiguration = getInboundOAuthConfiguration(applicationId);
-        String clientId = inboundOAuthConfiguration.getClientId();
-        return OAuthInboundUtils.regenerateClientSecret(clientId);
+        return inboundAuthenticationRequestConfig;
     }
 
     private void deleteInbound(String applicationId, String inboundType) {
