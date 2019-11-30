@@ -37,38 +37,40 @@ public class PatchServiceProvider implements UpdateFunction<ServiceProvider, App
         setIfNotNull(applicationPatchModel.getName(), serviceProvider::setApplicationName);
         setIfNotNull(applicationPatchModel.getDescription(), serviceProvider::setDescription);
         setIfNotNull(applicationPatchModel.getImageUrl(), serviceProvider::setImageUrl);
-        setIfNotNull(applicationPatchModel.getLoginUrl(), serviceProvider::setLoginUrl);
+        setIfNotNull(applicationPatchModel.getAccessUrl(), serviceProvider::setAccessUrl);
 
-        updateClaimConfiguration(serviceProvider, applicationPatchModel.getClaimConfiguration());
-        updateAuthenticationSequence(applicationPatchModel.getAuthenticationSequence(), serviceProvider);
-        updateAdvancedConfiguration(serviceProvider, applicationPatchModel.getAdvancedConfigurations());
-        updateProvisioningConfiguration(applicationPatchModel.getProvisioningConfigurations(), serviceProvider);
+        patchClaimConfiguration(serviceProvider, applicationPatchModel.getClaimConfiguration());
+        patchAuthenticationSequence(applicationPatchModel.getAuthenticationSequence(), serviceProvider);
+        patchAdvancedConfiguration(serviceProvider, applicationPatchModel.getAdvancedConfigurations());
+        patchProvisioningConfiguration(applicationPatchModel.getProvisioningConfigurations(), serviceProvider);
     }
 
-    private void updateClaimConfiguration(ServiceProvider serviceProvider, ClaimConfiguration claimConfiguration) {
+    private void patchClaimConfiguration(ServiceProvider serviceProvider, ClaimConfiguration claimConfiguration) {
 
-        update(serviceProvider, claimConfiguration, new UpdateClaimConfiguration());
+        patchServiceProvider(serviceProvider, claimConfiguration, new UpdateClaimConfiguration());
     }
 
-    private void updateAuthenticationSequence(AuthenticationSequence authenticationSequence,
-                                              ServiceProvider serviceProvider) {
+    private void patchAuthenticationSequence(AuthenticationSequence authenticationSequence,
+                                             ServiceProvider serviceProvider) {
 
-        update(serviceProvider, authenticationSequence, new UpdateAuthenticationSequence());
+        patchServiceProvider(serviceProvider, authenticationSequence, new UpdateAuthenticationSequence());
     }
 
-    private void updateAdvancedConfiguration(ServiceProvider serviceProvider,
-                                             AdvancedApplicationConfiguration advancedConfigurations) {
+    private void patchAdvancedConfiguration(ServiceProvider serviceProvider,
+                                            AdvancedApplicationConfiguration advancedConfigurations) {
 
-        update(serviceProvider, advancedConfigurations, new UpdateAdvancedConfigurations());
+        patchServiceProvider(serviceProvider, advancedConfigurations, new UpdateAdvancedConfigurations());
     }
 
-    private void updateProvisioningConfiguration(ProvisioningConfiguration provisioningConfigurations,
-                                                 ServiceProvider serviceProvider) {
+    private void patchProvisioningConfiguration(ProvisioningConfiguration provisioningConfigurations,
+                                                ServiceProvider serviceProvider) {
 
-        update(serviceProvider, provisioningConfigurations, new UpdateProvisioningConfiguration());
+        patchServiceProvider(serviceProvider, provisioningConfigurations, new UpdateProvisioningConfiguration());
     }
 
-    private <T> void update(ServiceProvider application, T t, UpdateFunction<ServiceProvider, T> function) {
+    private <T> void patchServiceProvider(ServiceProvider application,
+                                          T t,
+                                          UpdateFunction<ServiceProvider, T> function) {
 
         if (t != null) {
             function.update(application, t);

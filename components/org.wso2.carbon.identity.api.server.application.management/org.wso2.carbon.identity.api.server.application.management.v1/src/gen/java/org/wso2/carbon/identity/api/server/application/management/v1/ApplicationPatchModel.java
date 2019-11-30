@@ -37,7 +37,7 @@ public class ApplicationPatchModel  {
     private String name;
     private String description;
     private String imageUrl;
-    private String loginUrl;
+    private String accessUrl;
     private ClaimConfiguration claimConfiguration;
     private AuthenticationSequence authenticationSequence;
     private AdvancedApplicationConfiguration advancedConfigurations;
@@ -99,20 +99,20 @@ public class ApplicationPatchModel  {
 
     /**
     **/
-    public ApplicationPatchModel loginUrl(String loginUrl) {
+    public ApplicationPatchModel accessUrl(String accessUrl) {
 
-        this.loginUrl = loginUrl;
+        this.accessUrl = accessUrl;
         return this;
     }
     
     @ApiModelProperty(example = "https://example.com/login", value = "")
-    @JsonProperty("loginUrl")
+    @JsonProperty("accessUrl")
     @Valid
-    public String getLoginUrl() {
-        return loginUrl;
+    public String getAccessUrl() {
+        return accessUrl;
     }
-    public void setLoginUrl(String loginUrl) {
-        this.loginUrl = loginUrl;
+    public void setAccessUrl(String accessUrl) {
+        this.accessUrl = accessUrl;
     }
 
     /**
@@ -202,7 +202,7 @@ public class ApplicationPatchModel  {
         return Objects.equals(this.name, applicationPatchModel.name) &&
             Objects.equals(this.description, applicationPatchModel.description) &&
             Objects.equals(this.imageUrl, applicationPatchModel.imageUrl) &&
-            Objects.equals(this.loginUrl, applicationPatchModel.loginUrl) &&
+            Objects.equals(this.accessUrl, applicationPatchModel.accessUrl) &&
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
             Objects.equals(this.authenticationSequence, applicationPatchModel.authenticationSequence) &&
             Objects.equals(this.advancedConfigurations, applicationPatchModel.advancedConfigurations) &&
@@ -211,7 +211,7 @@ public class ApplicationPatchModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, imageUrl, loginUrl, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, imageUrl, accessUrl, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -223,7 +223,7 @@ public class ApplicationPatchModel  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
-        sb.append("    loginUrl: ").append(toIndentedString(loginUrl)).append("\n");
+        sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");

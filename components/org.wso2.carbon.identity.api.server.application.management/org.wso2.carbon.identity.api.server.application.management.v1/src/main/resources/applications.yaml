@@ -112,10 +112,10 @@ paths:
               description: Location of the newly created application.
               schema:
                 type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApplicationModel'
+          # content:
+          #   application/json:
+          #     schema:
+          #       $ref: '#/components/schemas/ApplicationModel'
         '400':
           description: Bad Request
           content:
@@ -142,6 +142,12 @@ paths:
                 $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
           content:
             application/json:
               schema:
@@ -176,10 +182,10 @@ paths:
               description: Location of the newly created application.
               schema:
                 type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApplicationModel'
+          # content:
+          #   application/json:
+          #     schema:
+          #       $ref: '#/components/schemas/ApplicationModel'
         '400':
           description: Bad Request
           content:
@@ -377,15 +383,15 @@ paths:
       responses:
         '200':
           description: Successfully Updated
-          headers:
-            Location:
-              description: Location of the updated identity provider
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApplicationResponseModel'
+          # headers:
+          #   Location:
+          #     description: Location of the updated identity provider
+          #     schema:
+          #       type: string
+          # content:
+          #   application/json:
+          #     schema:
+          #       $ref: '#/components/schemas/ApplicationResponseModel'
         '400':
           description: Bad Request
           content:
@@ -1087,7 +1093,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/OpenIDConnectConfiguration'
         '201':
-          description: Successful response.
+          description: Created
           headers:
             Location:
               description: Location of the newly created OIDC Authentication Configuration.
@@ -3187,6 +3193,7 @@ components:
       schema:
         type: integer
         minimum: 0
+        default: 0
     filterQueryParam:
       in: query
       name: filter
@@ -3310,7 +3317,7 @@ components:
         image:
           type: string
           example: 'https://example.com/logo/my-logo.png'
-        loginUrl:
+        accessUrl:
           type: string
           example: 'https://example.com/app/login'
         self:
@@ -3336,7 +3343,7 @@ components:
         imageUrl:
           type: string
           example: 'https://example.com/logo/my-logo.png'
-        loginUrl:
+        accessUrl:
           type: string
           example: 'https://example.com/login'
         claimConfiguration:
@@ -3369,7 +3376,7 @@ components:
         imageUrl:
           type: string
           example: 'https://example.com/logo/my-logo.png'
-        loginUrl:
+        accessUrl:
           type: string
           example: 'https://example.com/login'
         claimConfiguration:
@@ -3396,7 +3403,7 @@ components:
         imageUrl:
           type: string
           example: 'https://example.com/logo/my-logo.png'
-        loginUrl:
+        accessUrl:
           type: string
           example: 'https://example.com/login'
         claimConfiguration:
@@ -3807,11 +3814,11 @@ components:
           #         - frontchannel_http_redirect
           #         - frontchannel_http_post
           #       default: backchannel
-    OAuthApplicationState:
-      type: string
-      enum:
-        - ACTIVE
-        - REVOKED
+    # OAuthApplicationState:
+    #   type: string
+    #   enum:
+    #     - ACTIVE
+    #     - REVOKED
 
     OpenIDConnectConfiguration:
       type: object

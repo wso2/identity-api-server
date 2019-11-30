@@ -225,7 +225,7 @@ public class ServerApplicationManagementService {
         }
     }
 
-    public ApplicationResponseModel createApplication(ApplicationModel applicationModel, String template) {
+    public String createApplication(ApplicationModel applicationModel, String template) {
 
         if (StringUtils.isNotBlank(template)) {
             throw buildNotImplementedError("Application creation with templates not supported.");
@@ -236,9 +236,7 @@ public class ServerApplicationManagementService {
 
         ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
         try {
-            ServiceProvider createdApp = getApplicationManagementService()
-                    .createApplication(application, tenantDomain, username);
-            return new ServiceProviderToApiModel().apply(createdApp);
+            return getApplicationManagementService().createApplication(application, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Error while creating application. Rolling back possibly created inbound config data.");

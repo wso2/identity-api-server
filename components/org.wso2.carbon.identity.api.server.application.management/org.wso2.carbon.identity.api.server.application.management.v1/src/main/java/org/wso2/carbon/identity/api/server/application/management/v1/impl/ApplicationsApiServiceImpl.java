@@ -72,9 +72,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response createApplication(ApplicationModel applicationModel, String template) {
 
-        ApplicationResponseModel createdApp =
-                applicationManagementService.createApplication(applicationModel, template);
-        return Response.created(getResourceLocation(createdApp.getId())).entity(createdApp).build();
+        String resourceId = applicationManagementService.createApplication(applicationModel, template);
+        return Response.created(getResourceLocation(resourceId)).build();
     }
 
     @Override

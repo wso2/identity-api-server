@@ -76,7 +76,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .name(application.getApplicationName())
                     .description(application.getDescription())
                     .imageUrl(application.getImageUrl())
-                    .loginUrl(application.getLoginUrl())
+                    .accessUrl(application.getAccessUrl())
                     .claimConfiguration(buildClaimConfiguration(application))
                     .inboundProtocols(buildInboundProtocols(application))
                     .advancedConfigurations(buildAdvancedAppConfiguration(application))

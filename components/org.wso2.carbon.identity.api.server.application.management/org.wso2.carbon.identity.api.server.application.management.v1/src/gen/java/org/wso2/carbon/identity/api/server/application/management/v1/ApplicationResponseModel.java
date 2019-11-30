@@ -41,7 +41,7 @@ public class ApplicationResponseModel  {
     private String name;
     private String description;
     private String imageUrl;
-    private String loginUrl;
+    private String accessUrl;
     private ClaimConfiguration claimConfiguration;
     private List<InboundProtocolListItem> inboundProtocols = null;
 
@@ -125,20 +125,20 @@ public class ApplicationResponseModel  {
 
     /**
     **/
-    public ApplicationResponseModel loginUrl(String loginUrl) {
+    public ApplicationResponseModel accessUrl(String accessUrl) {
 
-        this.loginUrl = loginUrl;
+        this.accessUrl = accessUrl;
         return this;
     }
     
     @ApiModelProperty(example = "https://example.com/login", value = "")
-    @JsonProperty("loginUrl")
+    @JsonProperty("accessUrl")
     @Valid
-    public String getLoginUrl() {
-        return loginUrl;
+    public String getAccessUrl() {
+        return accessUrl;
     }
-    public void setLoginUrl(String loginUrl) {
-        this.loginUrl = loginUrl;
+    public void setAccessUrl(String accessUrl) {
+        this.accessUrl = accessUrl;
     }
 
     /**
@@ -255,7 +255,7 @@ public class ApplicationResponseModel  {
             Objects.equals(this.name, applicationResponseModel.name) &&
             Objects.equals(this.description, applicationResponseModel.description) &&
             Objects.equals(this.imageUrl, applicationResponseModel.imageUrl) &&
-            Objects.equals(this.loginUrl, applicationResponseModel.loginUrl) &&
+            Objects.equals(this.accessUrl, applicationResponseModel.accessUrl) &&
             Objects.equals(this.claimConfiguration, applicationResponseModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocols, applicationResponseModel.inboundProtocols) &&
             Objects.equals(this.authenticationSequence, applicationResponseModel.authenticationSequence) &&
@@ -265,7 +265,7 @@ public class ApplicationResponseModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, loginUrl, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -278,7 +278,7 @@ public class ApplicationResponseModel  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
-        sb.append("    loginUrl: ").append(toIndentedString(loginUrl)).append("\n");
+        sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocols: ").append(toIndentedString(inboundProtocols)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
