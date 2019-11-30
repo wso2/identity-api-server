@@ -40,7 +40,7 @@ public class WSTrustInboundUtils {
     public static InboundAuthenticationRequestConfig putWSTrustConfiguration(ServiceProvider application,
                                                                              WSTrustConfiguration wsTrustModel) {
 
-        String inboundAuthKey = InboundUtils.getInboundAuthKey(application, WS_TRUST);
+        String inboundAuthKey = InboundFunctions.getInboundAuthKey(application, WS_TRUST);
         try {
             if (inboundAuthKey != null) {
                 ApplicationManagementServiceHolder.getStsAdminService().removeTrustedService(inboundAuthKey);

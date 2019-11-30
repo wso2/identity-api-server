@@ -86,55 +86,36 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
-        ApplicationResponseModel applicationModel =
-                applicationManagementService.patchApplication(applicationId, applicationPatchModel);
-        return Response.ok(applicationModel).build();
+        applicationManagementService.patchApplication(applicationId, applicationPatchModel);
+        return Response.ok().build();
     }
 
     @Override
     public Response getInboundOAuthConfiguration(String applicationId) {
 
-        OpenIDConnectConfiguration openIDConnectConfiguration =
-                applicationManagementService.getInboundOAuthConfiguration(applicationId);
-
-        if (openIDConnectConfiguration == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        } else {
-            return Response.ok(openIDConnectConfiguration).build();
-        }
+        OpenIDConnectConfiguration oauthApp = applicationManagementService.getInboundOAuthConfiguration(applicationId);
+        return Response.ok(oauthApp).build();
     }
 
     @Override
     public Response getInboundSAMLConfiguration(String applicationId) {
 
         SAML2ServiceProvider samlSp = applicationManagementService.getInboundSAMLConfiguration(applicationId);
-        if (samlSp == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        } else {
-            return Response.ok(samlSp).build();
-        }
+        return Response.ok(samlSp).build();
     }
 
     @Override
     public Response getPassiveStsConfiguration(String applicationId) {
 
         PassiveStsConfiguration passiveStsApp = applicationManagementService.getPassiveStsConfiguration(applicationId);
-        if (passiveStsApp == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        } else {
-            return Response.ok(passiveStsApp).build();
-        }
+        return Response.ok(passiveStsApp).build();
     }
 
     @Override
     public Response getWSTrustConfiguration(String applicationId) {
 
         WSTrustConfiguration wsTrustConfiguration = applicationManagementService.getWSTrustConfiguration(applicationId);
-        if (wsTrustConfiguration == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        } else {
-            return Response.ok(wsTrustConfiguration).build();
-        }
+        return Response.ok(wsTrustConfiguration).build();
     }
 
     @Override
@@ -142,11 +123,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
         CustomInboundProtocolConfiguration customInbound =
                 applicationManagementService.getCustomInboundConfiguration(applicationId, inboundProtocolId);
-        if (customInbound == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        } else {
-            return Response.ok(customInbound).build();
-        }
+        return Response.ok(customInbound).build();
     }
 
     @Override
@@ -235,44 +212,38 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                                                      String inboundProtocolId,
                                                      CustomInboundProtocolConfiguration customInboundModel) {
 
-        CustomInboundProtocolConfiguration updatedCustomInbound =
-                applicationManagementService.updateCustomInbound(applicationId, inboundProtocolId, customInboundModel);
-
-        return Response.ok(updatedCustomInbound).build();
+        applicationManagementService.updateCustomInbound(applicationId, inboundProtocolId, customInboundModel);
+        return Response.ok().build();
     }
 
     @Override
     public Response updateInboundOAuthConfiguration(String applicationId,
                                                     OpenIDConnectConfiguration openIDConnectConfiguration) {
 
-        OpenIDConnectConfiguration updatedOIDCConfig =
-                applicationManagementService.putInboundOAuthConfiguration(applicationId, openIDConnectConfiguration);
-        return Response.ok(updatedOIDCConfig).build();
+        applicationManagementService.putInboundOAuthConfiguration(applicationId, openIDConnectConfiguration);
+        return Response.ok().build();
     }
 
     @Override
     public Response updateInboundSAMLConfiguration(String applicationId, SAML2Configuration saml2Configuration) {
 
-        SAML2ServiceProvider saml2ServiceProvider =
-                applicationManagementService.putInboundSAMLConfiguration(applicationId, saml2Configuration);
-        return Response.ok(saml2ServiceProvider).build();
+        applicationManagementService.putInboundSAMLConfiguration(applicationId, saml2Configuration);
+        return Response.ok().build();
     }
 
     @Override
     public Response updatePassiveStsConfiguration(String applicationId,
                                                   PassiveStsConfiguration passiveStsConfiguration) {
 
-        PassiveStsConfiguration updatedPassiveSTSConfig =
-                applicationManagementService.putInboundPassiveSTSConfiguration(applicationId, passiveStsConfiguration);
-        return Response.ok(updatedPassiveSTSConfig).build();
+        applicationManagementService.putInboundPassiveSTSConfiguration(applicationId, passiveStsConfiguration);
+        return Response.ok().build();
     }
 
     @Override
     public Response updateWSTrustConfiguration(String applicationId, WSTrustConfiguration wsTrustConfiguration) {
 
-        WSTrustConfiguration updatedWSTrustConfig =
-                applicationManagementService.putInboundWSTrustConfiguration(applicationId, wsTrustConfiguration);
-        return Response.ok(updatedWSTrustConfig).build();
+        applicationManagementService.putInboundWSTrustConfiguration(applicationId, wsTrustConfiguration);
+        return Response.ok().build();
     }
 
     @Override

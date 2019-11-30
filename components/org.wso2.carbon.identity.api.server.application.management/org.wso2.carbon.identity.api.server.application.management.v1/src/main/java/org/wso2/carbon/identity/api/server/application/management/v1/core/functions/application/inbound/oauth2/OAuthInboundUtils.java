@@ -17,7 +17,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
@@ -42,7 +42,7 @@ public class OAuthInboundUtils {
                                                                      OpenIDConnectConfiguration oidcConfigModel) {
 
         // First we identify whether this is a insert or update.
-        String currentClientId = InboundUtils.getInboundAuthKey(application, StandardInboundProtocols.OAUTH2);
+        String currentClientId = InboundFunctions.getInboundAuthKey(application, StandardInboundProtocols.OAUTH2);
         try {
             if (currentClientId != null) {
                 // This is an update.

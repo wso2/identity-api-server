@@ -15,12 +15,6 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound;
 
-import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundUtils;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
@@ -34,48 +28,24 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.OAUTH2;
-import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.PASSIVE_STS;
-import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.SAML2;
-import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.WS_TRUST;
-
 /**
  * Utility functions related to application inbound protocols.
  */
-public class InboundUtils {
+public class InboundFunctions {
 
-    private InboundUtils() {
+    private InboundFunctions() {
 
     }
 
-    public static OpenIDConnectConfiguration getOAuthInbound(ServiceProvider application) {
-
-        return getInboundConfiguration(application, OAUTH2, OAuthInboundUtils::getOAuthConfiguration);
-    }
-
-    public static SAML2ServiceProvider getSAMLInbound(ServiceProvider application) {
-
-        return getInboundConfiguration(application, SAML2, SAMLInboundUtils::getSAML2ServiceProvider);
-    }
-
-    public static PassiveStsConfiguration getPassiveSTSInbound(ServiceProvider application) {
-
-        return getInboundConfiguration(application, PASSIVE_STS, PassiveSTSInboundUtils::getPassiveSTSConfiguration);
-    }
-
-    public static WSTrustConfiguration getWSTrustInbound(ServiceProvider application) {
-
-        return getInboundConfiguration(application, WS_TRUST, WSTrustInboundUtils::getWSTrustConfiguration);
-    }
-
-    public static CustomInboundProtocolConfiguration getCustomInbound(ServiceProvider application, String inboundType) {
-
-        return getInboundConfiguration(application, inboundType, CustomInboundUtils::getCustomInbound);
-    }
-
-    private static <T> T getInboundConfiguration(ServiceProvider application,
-                                                 String inboundType,
-                                                 Function<InboundAuthenticationRequestConfig, T> getInboundDetails) {
+    /**
+     * Extract the inbound configuration of a particular type from an application and converts it to the API model.
+     *
+     * @param application
+     * @param inboundType Inbound Type
+     * @return
+     */
+    public static InboundAuthenticationRequestConfig getInboundAuthenticationRequestConfig(ServiceProvider application,
+                                                                                           String inboundType) {
 
         InboundAuthenticationConfig inboundAuthConfig = application.getInboundAuthenticationConfig();
         if (inboundAuthConfig != null) {
@@ -84,7 +54,6 @@ public class InboundUtils {
                 return Arrays.stream(inbounds)
                         .filter(inbound -> inboundType.equals(inbound.getInboundAuthType()))
                         .findAny()
-                        .map(getInboundDetails)
                         .orElse(null);
             }
         }

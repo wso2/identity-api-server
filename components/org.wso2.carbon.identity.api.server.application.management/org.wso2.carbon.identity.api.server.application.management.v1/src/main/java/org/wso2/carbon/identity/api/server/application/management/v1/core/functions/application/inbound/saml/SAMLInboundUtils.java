@@ -19,7 +19,7 @@ import org.wso2.carbon.identity.api.server.application.management.common.Applica
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
@@ -48,7 +48,7 @@ public class SAMLInboundUtils {
                                                                     SAML2Configuration saml2Configuration) {
 
         // First we identify whether this is a insert or update.
-        String currentIssuer = InboundUtils.getInboundAuthKey(application, StandardInboundProtocols.SAML2);
+        String currentIssuer = InboundFunctions.getInboundAuthKey(application, StandardInboundProtocols.SAML2);
         try {
             if (currentIssuer != null) {
                 // Delete the current app.

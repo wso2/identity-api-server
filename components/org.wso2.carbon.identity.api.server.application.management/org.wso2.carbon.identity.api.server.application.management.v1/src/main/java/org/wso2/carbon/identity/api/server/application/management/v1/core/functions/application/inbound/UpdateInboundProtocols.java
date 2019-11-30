@@ -27,7 +27,7 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.rollbackInbounds;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.rollbackInbounds;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundUtils.createPassiveSTSInboundConfig;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundUtils.createWsTrustInbound;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundUtils.createCustomInbound;

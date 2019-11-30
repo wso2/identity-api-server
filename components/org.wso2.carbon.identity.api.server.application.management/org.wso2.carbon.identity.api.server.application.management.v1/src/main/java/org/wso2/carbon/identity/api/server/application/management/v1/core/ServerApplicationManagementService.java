@@ -45,7 +45,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationBasicInfoToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.PatchServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundsToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundUtils;
@@ -80,12 +79,18 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.updateApplication;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.getInboundAuthKey;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.rollbackInbound;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.rollbackInbounds;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundUtils.updateOrInsertInbound;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthKey;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthenticationRequestConfig;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.rollbackInbound;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.rollbackInbounds;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.updateOrInsertInbound;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.OAUTH2;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.PASSIVE_STS;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.SAML2;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.WS_TRUST;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.INVALID_REQUEST;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
 
@@ -248,10 +253,10 @@ public class ServerApplicationManagementService {
         }
     }
 
-    public ApplicationResponseModel patchApplication(String applicationId,
-                                                     ApplicationPatchModel applicationPatchModel) {
+    public void patchApplication(String applicationId,
+                                 ApplicationPatchModel applicationPatchModel) {
 
-        ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
+        ServiceProvider appToUpdate = cloneApplication(applicationId);
         updateApplication(appToUpdate, applicationPatchModel, new PatchServiceProvider());
 
         try {
@@ -259,10 +264,6 @@ public class ServerApplicationManagementService {
             String username = ContextLoader.getUsernameFromContext();
             getApplicationManagementService()
                     .updateApplicationByResourceId(applicationId, appToUpdate, tenantDomain, username);
-
-            ServiceProvider updatedApp =
-                    getApplicationManagementService().getApplicationByResourceId(applicationId, tenantDomain);
-            return new ServiceProviderToApiModel().apply(updatedApp);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error patching application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
@@ -294,7 +295,7 @@ public class ServerApplicationManagementService {
             ServiceProvider application = getResidentSp(tenantDomain);
 
             String residentSpResourceId = application.getApplicationResourceId();
-            ServiceProvider applicationToUpdate = getClonedServiceProvider(residentSpResourceId);
+            ServiceProvider applicationToUpdate = cloneApplication(residentSpResourceId);
 
             // Add provisioning configs to resident SP.
             updateApplication(applicationToUpdate, provisioningConfig, new UpdateProvisioningConfiguration());
@@ -331,7 +332,7 @@ public class ServerApplicationManagementService {
 
     public void deleteOAuthInbound(String applicationId) {
 
-        deleteInbound(applicationId, StandardInboundProtocols.OAUTH2);
+        deleteInbound(applicationId, OAUTH2);
     }
 
     public void deleteSAMLInbound(String applicationId) {
@@ -356,38 +357,38 @@ public class ServerApplicationManagementService {
 
     public OpenIDConnectConfiguration getInboundOAuthConfiguration(String applicationId) {
 
-        return getInbound(applicationId, InboundUtils::getOAuthInbound);
+        return getInbound(applicationId, OAUTH2, OAuthInboundUtils::getOAuthConfiguration);
     }
 
     public SAML2ServiceProvider getInboundSAMLConfiguration(String applicationId) {
 
-        return getInbound(applicationId, InboundUtils::getSAMLInbound);
+        return getInbound(applicationId, SAML2, SAMLInboundUtils::getSAML2ServiceProvider);
     }
 
     public PassiveStsConfiguration getPassiveStsConfiguration(String applicationId) {
 
-        return getInbound(applicationId, InboundUtils::getPassiveSTSInbound);
+        return getInbound(applicationId, PASSIVE_STS, PassiveSTSInboundUtils::getPassiveSTSConfiguration);
     }
 
     public WSTrustConfiguration getWSTrustConfiguration(String applicationId) {
 
-        return getInbound(applicationId, InboundUtils::getWSTrustInbound);
+        return getInbound(applicationId, WS_TRUST, WSTrustInboundUtils::getWSTrustConfiguration);
     }
 
     public CustomInboundProtocolConfiguration getCustomInboundConfiguration(String applicationId, String inboundType) {
 
-        if (!isValidCustomInboundType(inboundType)) {
+        if (isUnknownInboundType(inboundType)) {
             throw Utils.buildBadRequestError("Unknown inbound type: " + inboundType);
         }
 
-        return getInbound(applicationId, application -> InboundUtils.getCustomInbound(application, inboundType));
+        return getInbound(applicationId, inboundType, CustomInboundUtils::getCustomInbound);
     }
 
-    private boolean isValidCustomInboundType(String inboundType) {
+    private boolean isUnknownInboundType(String inboundType) {
 
         List<AuthProtocolMetadata> inboundProtocols = applicationMetadataService.getInboundProtocols(true);
         return inboundProtocols.stream()
-                .anyMatch(metadata -> StringUtils.equals(metadata.getName(), inboundType));
+                .noneMatch(metadata -> StringUtils.equals(metadata.getName(), inboundType));
     }
 
     public List<InboundProtocolListItem> getInboundProtocols(String applicationId) {
@@ -396,68 +397,71 @@ public class ServerApplicationManagementService {
         return new InboundsToApiModel().apply(serviceProvider);
     }
 
-    public OpenIDConnectConfiguration putInboundOAuthConfiguration(String applicationId,
-                                                                   OpenIDConnectConfiguration oidcConfigModel) {
+    public void putInboundOAuthConfiguration(String applicationId, OpenIDConnectConfiguration oidcConfigModel) {
 
-        return putInbound(applicationId, oidcConfigModel, OAuthInboundUtils::putOAuthInbound,
-                InboundUtils::getOAuthInbound
-        );
+        putInbound(applicationId, oidcConfigModel, OAuthInboundUtils::putOAuthInbound);
     }
 
-    public SAML2ServiceProvider putInboundSAMLConfiguration(String applicationId,
-                                                            SAML2Configuration saml2Configuration) {
+    public void putInboundSAMLConfiguration(String applicationId, SAML2Configuration saml2Configuration) {
 
-        return putInbound(applicationId, saml2Configuration, SAMLInboundUtils::putSAMLInbound,
-                InboundUtils::getSAMLInbound
-        );
+        putInbound(applicationId, saml2Configuration, SAMLInboundUtils::putSAMLInbound);
     }
 
-    public PassiveStsConfiguration putInboundPassiveSTSConfiguration(String applicationId,
-                                                                     PassiveStsConfiguration passiveStsConfiguration) {
+    public void putInboundPassiveSTSConfiguration(String applicationId,
+                                                  PassiveStsConfiguration passiveStsConfiguration) {
 
-        return putInbound(applicationId, passiveStsConfiguration, PassiveSTSInboundUtils::putPassiveSTSInbound,
-                InboundUtils::getPassiveSTSInbound);
+        putInbound(applicationId, passiveStsConfiguration, PassiveSTSInboundUtils::putPassiveSTSInbound);
     }
 
-    public WSTrustConfiguration putInboundWSTrustConfiguration(String applicationId,
-                                                               WSTrustConfiguration wsTrustConfiguration) {
+    public void putInboundWSTrustConfiguration(String applicationId, WSTrustConfiguration wsTrustConfiguration) {
 
-        return putInbound(applicationId, wsTrustConfiguration, WSTrustInboundUtils::putWSTrustConfiguration,
-                InboundUtils::getWSTrustInbound);
+        putInbound(applicationId, wsTrustConfiguration, WSTrustInboundUtils::putWSTrustConfiguration);
     }
 
-    public CustomInboundProtocolConfiguration updateCustomInbound(String applicationId,
-                                                                  String inboundType,
-                                                                  CustomInboundProtocolConfiguration customInbound) {
+    public void updateCustomInbound(String applicationId, String inboundType,
+                                    CustomInboundProtocolConfiguration customInbound) {
 
-        return putInbound(applicationId, customInbound, CustomInboundUtils::putCustomInbound,
-                application -> InboundUtils.getCustomInbound(application, inboundType));
+        if (isUnknownInboundType(inboundType)) {
+            throw Utils.buildBadRequestError("Unknown inbound type: " + inboundType);
+        }
+
+        customInbound.setName(inboundType);
+        putInbound(applicationId, customInbound, CustomInboundUtils::putCustomInbound);
     }
 
-    private <T> T getInbound(String applicationId, Function<ServiceProvider, T> getInboundFunction) {
+    private <T> T getInbound(String applicationId,
+                             String inboundType,
+                             Function<InboundAuthenticationRequestConfig, T> getInboundApiModelFunction) {
 
-        ServiceProvider serviceProvider = getServiceProvider(applicationId);
-        return getInboundFunction.apply(serviceProvider);
+        ServiceProvider application = getServiceProvider(applicationId);
+        // Extract the inbound authentication request config for the given inbound type.
+        InboundAuthenticationRequestConfig inboundAuthenticationRequestConfig =
+                getInboundAuthenticationRequestConfig(application, inboundType);
+
+        // Apply the function and convert the authentication request config to API model.
+        T inboundModel = getInboundApiModelFunction.apply(inboundAuthenticationRequestConfig);
+        if (inboundModel == null) {
+            // This means the inbound is not configured for the particular app.
+            throw buildClientError(INBOUND_NOT_CONFIGURED, inboundType, applicationId);
+        }
+
+        return inboundModel;
     }
 
     public OpenIDConnectConfiguration regenerateOAuthApplicationSecret(String applicationId) {
 
         OpenIDConnectConfiguration inboundOAuthConfiguration = getInboundOAuthConfiguration(applicationId);
-        if (inboundOAuthConfiguration == null) {
-            throw buildClientError(ErrorMessage.INBOUND_NOT_CONFIGURED, StandardInboundProtocols.OAUTH2, applicationId);
-        } else {
-            String clientId = inboundOAuthConfiguration.getClientId();
-            return OAuthInboundUtils.regenerateClientSecret(clientId);
-        }
+        String clientId = inboundOAuthConfiguration.getClientId();
+        return OAuthInboundUtils.regenerateClientSecret(clientId);
     }
 
     private void deleteInbound(String applicationId, String inboundType) {
 
-        ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
+        ServiceProvider appToUpdate = cloneApplication(applicationId);
         InboundAuthenticationConfig inboundAuthConfig = appToUpdate.getInboundAuthenticationConfig();
 
         if (ArrayUtils.isNotEmpty(inboundAuthConfig.getInboundAuthenticationRequestConfigs())) {
-            // Remove the deleted inbound type.
+            // Remove the deleted inbound type by filtering it out of the available inbounds and doing an update.
             InboundAuthenticationRequestConfig[] filteredInbounds =
                     Arrays.stream(inboundAuthConfig.getInboundAuthenticationRequestConfigs())
                             .filter(inbound -> !StringUtils.equals(inboundType, inbound.getInboundAuthType()))
@@ -468,7 +472,7 @@ public class ServerApplicationManagementService {
         }
     }
 
-    private ServiceProvider getClonedServiceProvider(String applicationId) {
+    private ServiceProvider cloneApplication(String applicationId) {
 
         ServiceProvider originalSp = getServiceProvider(applicationId);
         return Utils.deepCopyApplication(originalSp);
@@ -562,23 +566,18 @@ public class ServerApplicationManagementService {
     /**
      * Create or replace the provided inbound configuration.
      *
-     * @param <T>               Inbound creation/update API model
-     * @param <R>               Inbound API model
+     * @param <I>               Inbound API model
      * @param applicationId     Unique id of the app
      * @param inboundApiModel   Inbound API model to be created or replaced
      * @param getUpdatedInbound A function that takes the inbound API model and application as input and provides
      *                          updated inbound details.
-     * @param getInboundDetails A function that extracts inbound details from an updated ServiceProvider and
-     *                          converts to API model.
-     * @return Updated inbound details in the form of it's API model.
      */
-    private <T, R> T putInbound(String applicationId,
-                                R inboundApiModel,
-                                BiFunction<ServiceProvider, R, InboundAuthenticationRequestConfig> getUpdatedInbound,
-                                Function<ServiceProvider, T> getInboundDetails) {
+    private <I> void putInbound(String applicationId,
+                                I inboundApiModel,
+                                BiFunction<ServiceProvider, I, InboundAuthenticationRequestConfig> getUpdatedInbound) {
 
         // We need a cloned copy of the Service Provider so that we changes we do not make cache dirty.
-        ServiceProvider appToUpdate = getClonedServiceProvider(applicationId);
+        ServiceProvider appToUpdate = cloneApplication(applicationId);
         // Update the service provider with the inbound configuration.
         InboundAuthenticationRequestConfig updatedInbound = getUpdatedInbound.apply(appToUpdate, inboundApiModel);
         // Add the updated inbound details
@@ -595,16 +594,6 @@ public class ServerApplicationManagementService {
             doRollback(applicationId, updatedInbound);
             throw error;
         }
-
-        ServiceProvider updatedApplication = getServiceProvider(applicationId);
-        // Return the inbound details from updated service provider.
-        T updateInboundDetails = getInboundDetails.apply(updatedApplication);
-
-        if (updateInboundDetails == null) {
-            throw Utils.buildServerError("Error while retrieving updated inbound information.");
-        }
-
-        return updateInboundDetails;
     }
 
     private void doRollback(String applicationId, InboundAuthenticationRequestConfig updatedInbound) {
