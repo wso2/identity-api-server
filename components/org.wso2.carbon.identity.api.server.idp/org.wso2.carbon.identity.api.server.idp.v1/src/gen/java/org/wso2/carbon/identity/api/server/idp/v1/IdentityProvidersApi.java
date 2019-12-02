@@ -83,7 +83,7 @@ public class IdentityProvidersApi  {
     @DELETE
     @Path("/{identity-provider-id}")
     
-    @Produces({ "application/json", "application/xml" })
+    @Produces({ "application/json" })
     @ApiOperation(value = "Delete an identity provider by using identity provider's id ", notes = "This API provides the capability to delete an identity provider by giving it id ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
@@ -227,7 +227,7 @@ public class IdentityProvidersApi  {
     @GET
     
     
-    @Produces({ "application/json", "application/xml" })
+    @Produces({ "application/json" })
     @ApiOperation(value = "List identity providers ", notes = "This API provides the capability to retrive the list of identity providers ", response = IdentityProviderListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
@@ -467,8 +467,8 @@ public class IdentityProvidersApi  {
     @Valid
     @PATCH
     @Path("/{identity-provider-id}")
-    @Consumes({ "application/json", "application/xml" })
-    @Produces({ "application/json", "application/xml" })
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
     @ApiOperation(value = "Patch an identity provider property by id. Patch is supported only for key-value pairs ", notes = "This API provides the capability to update an identity provider property using patch request. IDP patch is supported only for key-value pairs ", response = IdentityProviderResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
@@ -491,8 +491,8 @@ public class IdentityProvidersApi  {
     @Valid
     @PUT
     @Path("/{identity-provider-id}/claims")
-    @Consumes({ "application/json", "application/xml" })
-    @Produces({ "application/json", "application/xml" })
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
     @ApiOperation(value = "Update the claims of an identity provider ", notes = "This API provides the capability to update the claim config of an existing identity provider ", response = Claims.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
@@ -515,8 +515,8 @@ public class IdentityProvidersApi  {
     @Valid
     @PUT
     @Path("/{identity-provider-id}/federated-authenticators/{federated-authenticator-id}")
-    @Consumes({ "application/json", "application/xml" })
-    @Produces({ "application/json", "application/xml" })
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
     @ApiOperation(value = "Update a federated authenticator of an identity provider by using authenticator id ", notes = "This API provides the capability to update an identity provider's federated authenticator config by specifying authenticator id ", response = FederatedAuthenticator.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
@@ -539,8 +539,8 @@ public class IdentityProvidersApi  {
     @Valid
     @PUT
     @Path("/{identity-provider-id}/provisioning/jit")
-    @Consumes({ "application/json", "application/xml" })
-    @Produces({ "application/json", "application/xml" })
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
     @ApiOperation(value = "Update the just-in-time provisioning config of an identity provider ", notes = "This API provides the capability to update the just-in-time provisioning config of an identity provider by specifying identity provider id. This includes the ability to enable/disable JIT provisioning, change provisioning userstore and enable/disable user prompts for username, password and consent ", response = JustInTimeProvisioning.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
@@ -563,8 +563,8 @@ public class IdentityProvidersApi  {
     @Valid
     @PUT
     @Path("/{identity-provider-id}/provisioning/outbound-connectors/{outbound-provisioning-connector-id}")
-    @Consumes({ "application/json", "application/xml" })
-    @Produces({ "application/json", "application/xml" })
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
     @ApiOperation(value = "Update an outbound provisioning connector of an identity provider ", notes = "This API provides the capability to update an outbound provisioning connector config of an identity provider by specifying the provisioning connector id ", response = OutboundConnector.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
@@ -587,8 +587,8 @@ public class IdentityProvidersApi  {
     @Valid
     @PUT
     @Path("/{identity-provider-id}/roles")
-    @Consumes({ "application/json", "application/xml" })
-    @Produces({ "application/json", "application/xml" })
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
     @ApiOperation(value = "Update the role config of an identity provider ", notes = "This API provides the capability to update the role config of an identity provider by specifying identity provider id ", response = Roles.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {

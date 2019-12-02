@@ -1133,17 +1133,17 @@ public class ServerIdpManagementService {
         listResponse.setTotalResults(idpSearchResult.getTotalIDPCount());
         listResponse.setStartIndex(idpSearchResult.getOffSet() + 1);
         listResponse.setLinks(createLinks(idpSearchResult.getLimit(), idpSearchResult.getOffSet(), idpSearchResult
-                .getTotalIDPCount()));
+                .getTotalIDPCount(), idpSearchResult.getFilter()));
         return listResponse;
     }
 
-    private List<Link> createLinks(int limit, int offset, int total) {
+    private List<Link> createLinks(int limit, int offset, int total, String filter) {
 
         List<Link> links = new ArrayList<>();
 
         // Next Link
         if ((offset + limit) < total) {
-            links.add(buildPageLink(Constants.PAGE_LINK_REL_NEXT, (offset + limit), limit));
+            links.add(buildPageLink(Constants.PAGE_LINK_REL_NEXT, (offset + limit), limit, filter));
         }
 
         // Previous Link
@@ -1151,9 +1151,9 @@ public class ServerIdpManagementService {
         if (offset > 0) {
             if ((offset - limit) >= 0) { // A previous page of size 'limit' exists
                 links.add(buildPageLink(Constants.PAGE_LINK_REL_PREVIOUS, calculateOffsetForPreviousLink(offset,
-                        limit, total), limit));
+                        limit, total), limit, filter));
             } else { // A previous page exists but it's size is less than the specified limit
-                links.add(buildPageLink(Constants.PAGE_LINK_REL_PREVIOUS, 0, offset));
+                links.add(buildPageLink(Constants.PAGE_LINK_REL_PREVIOUS, 0, offset, filter));
             }
         }
 
@@ -1170,10 +1170,13 @@ public class ServerIdpManagementService {
         return calculateOffsetForPreviousLink(newOffset, limit, total);
     }
 
-    private Link buildPageLink(String rel, int offset, int limit) {
+    private Link buildPageLink(String rel, int offset, int limit, String filter) {
 
-        return new Link().rel(rel).href(ContextLoader.buildURIForBody(
-                (String.format(Constants.IDP_PAGINATION_LINK_FORMAT, offset, limit))).toString());
+        String url = String.format(Constants.IDP_PAGINATION_LINK_FORMAT, offset, limit);
+        if (StringUtils.isNotBlank(url) && StringUtils.isNotBlank(filter)) {
+            url = url + "&filter=" + filter;
+        }
+        return new Link().rel(rel).href(ContextLoader.buildURIForBody((url)).toString());
     }
 
     private IdentityProviderResponse createIDPResponse(IdentityProvider identityProvider) {
