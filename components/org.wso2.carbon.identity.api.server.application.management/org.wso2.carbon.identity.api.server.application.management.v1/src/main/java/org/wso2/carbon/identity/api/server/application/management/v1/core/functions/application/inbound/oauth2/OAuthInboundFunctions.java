@@ -33,9 +33,9 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
 /**
  * Helper functions for OAuth inbound management.
  */
-public class OAuthInboundUtils {
+public class OAuthInboundFunctions {
 
-    private OAuthInboundUtils() {
+    private OAuthInboundFunctions() {
 
     }
 

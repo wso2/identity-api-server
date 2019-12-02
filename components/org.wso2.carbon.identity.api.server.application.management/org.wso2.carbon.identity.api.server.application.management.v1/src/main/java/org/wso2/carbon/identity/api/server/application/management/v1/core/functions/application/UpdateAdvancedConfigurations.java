@@ -29,8 +29,8 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
 public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvider, AdvancedApplicationConfiguration> {
 
     @Override
-    public void update(ServiceProvider serviceProvider,
-                       AdvancedApplicationConfiguration advancedConfigurations) {
+    public void apply(ServiceProvider serviceProvider,
+                      AdvancedApplicationConfiguration advancedConfigurations) {
 
         if (advancedConfigurations != null) {
             setIfNotNull(advancedConfigurations.getSaas(), serviceProvider::setSaasApp);

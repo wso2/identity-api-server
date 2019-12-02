@@ -34,13 +34,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RequestedCl
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundsToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
+import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
@@ -53,6 +54,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.arrayToStream;
 
 /**
  * Converts the backend model ServiceProvider into the corresponding API model object.
@@ -87,7 +90,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
     private List<InboundProtocolListItem> buildInboundProtocols(ServiceProvider application) {
 
-        return new InboundsToApiModel().apply(application);
+        return new InboundAuthConfigToApiModel().apply(application);
     }
 
     private boolean isResidentSp(ServiceProvider application) {
@@ -107,8 +110,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                         "'default' application and showing the effective authentication sequence for application " +
                         "with id: " + application.getApplicationResourceId());
             }
-            ServiceProvider defaultSP = getDefaultServiceProvider();
-            authConfig = defaultSP.getLocalAndOutBoundAuthenticationConfig();
+            authConfig = getDefaultAuthenticationConfig();
         }
 
         AuthenticationSequence authSequence = new AuthenticationSequence();
@@ -116,6 +118,23 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         if (authConfig.getAuthenticationScriptConfig() != null) {
             authSequence.script(authConfig.getAuthenticationScriptConfig().getContent());
         }
+
+        addAuthenticationStepInformation(authConfig, authSequence);
+
+        List<String> requestPathAuthenticators = getRequestPathAuthenticators(application);
+        authSequence.setRequestPathAuthenticators(requestPathAuthenticators);
+
+        return authSequence;
+    }
+
+    private List<String> getRequestPathAuthenticators(ServiceProvider application) {
+
+        RequestPathAuthenticatorConfig[] requestPathConfigs = application.getRequestPathAuthenticatorConfigs();
+        return arrayToStream(requestPathConfigs).map(LocalAuthenticatorConfig::getName).collect(Collectors.toList());
+    }
+
+    private void addAuthenticationStepInformation(LocalAndOutboundAuthenticationConfig authConfig,
+                                                  AuthenticationSequence authSequence) {
 
         if (authConfig.getAuthenticationSteps() != null) {
             Arrays.stream(authConfig.getAuthenticationSteps()).forEach(authenticationStep -> {
@@ -138,14 +157,12 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 authSequence.setAttributeStepId(1);
             }
         }
+    }
 
-        RequestPathAuthenticatorConfig[] requestPathConfigs = application.getRequestPathAuthenticatorConfigs();
-        if (requestPathConfigs != null) {
-            Arrays.stream(requestPathConfigs).forEach(requestPathConfig ->
-                    authSequence.addRequestPathAuthenticatorsItem(requestPathConfig.getName()));
-        }
+    private LocalAndOutboundAuthenticationConfig getDefaultAuthenticationConfig() {
 
-        return authSequence;
+        ServiceProvider defaultSP = getDefaultServiceProvider();
+        return defaultSP.getLocalAndOutBoundAuthenticationConfig();
     }
 
     private AuthenticationSequence.TypeEnum getAuthenticationType(LocalAndOutboundAuthenticationConfig authConfig) {
@@ -178,18 +195,14 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         AuthenticationStepModel authStep = new AuthenticationStepModel();
         authStep.setId(authenticationStep.getStepOrder());
 
-        if (authenticationStep.getFederatedIdentityProviders() != null) {
-            Arrays.stream(authenticationStep.getFederatedIdentityProviders()).forEach(y -> authStep.addOptionsItem(
-                    new Authenticator().idp(y.getIdentityProviderName())
-                            .authenticator(y.getDefaultAuthenticatorConfig().getName()))
-            );
-        }
+        arrayToStream(authenticationStep.getFederatedIdentityProviders()).forEach(y -> authStep.addOptionsItem(
+                new Authenticator().idp(y.getIdentityProviderName())
+                        .authenticator(y.getDefaultAuthenticatorConfig().getName()))
+        );
 
-        if (authenticationStep.getLocalAuthenticatorConfigs() != null) {
-            Arrays.stream(authenticationStep.getLocalAuthenticatorConfigs()).forEach(y -> authStep.addOptionsItem(
-                    new Authenticator().idp(FrameworkConstants.LOCAL_IDP_NAME).authenticator(y.getName()))
-            );
-        }
+        arrayToStream(authenticationStep.getLocalAuthenticatorConfigs()).forEach(y -> authStep.addOptionsItem(
+                new Authenticator().idp(FrameworkConstants.LOCAL_IDP_NAME).authenticator(y.getName()))
+        );
 
         return authStep;
     }
@@ -200,36 +213,34 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .dialect(getDialect(application))
                 .role(buildRoleConfig(application))
                 .subject(buildSubjectClaimConfig(application))
-                .requestedClaims(buildRequestClaims(application))
+                .requestedClaims(buildRequestedClaims(application))
                 .claimMappings(buildClaimMappings(application));
     }
 
     private List<ClaimMappings> buildClaimMappings(ServiceProvider application) {
 
         if (application.getClaimConfig() != null) {
-            if (application.getClaimConfig().getClaimMappings() != null) {
-                return Arrays.stream(application.getClaimConfig().getClaimMappings())
-                        .map(claimMapping -> new ClaimMappings()
-                                .applicationClaim(claimMapping.getRemoteClaim().getClaimUri())
-                                .localClaim(buildClaimModel(claimMapping.getLocalClaim().getClaimUri())))
-                        .collect(Collectors.toList());
-            }
+            return arrayToStream(application.getClaimConfig().getClaimMappings())
+                    .map(claimMapping -> new ClaimMappings()
+                            .applicationClaim(claimMapping.getRemoteClaim().getClaimUri())
+                            .localClaim(buildClaimModel(claimMapping.getLocalClaim().getClaimUri())))
+                    .collect(Collectors.toList());
         }
+
         return Collections.emptyList();
     }
 
-    private List<RequestedClaimConfiguration> buildRequestClaims(ServiceProvider application) {
+    private List<RequestedClaimConfiguration> buildRequestedClaims(ServiceProvider application) {
 
         if (application.getClaimConfig() != null) {
-            if (application.getClaimConfig().getClaimMappings() != null) {
-                return Arrays.stream(application.getClaimConfig().getClaimMappings())
-                        .filter(ClaimMapping::isRequested)
-                        .map(claimMapping -> new RequestedClaimConfiguration()
-                                .claim(buildClaimModel(claimMapping.getRemoteClaim().getClaimUri()))
-                                .mandatory(claimMapping.isMandatory()))
-                        .collect(Collectors.toList());
-            }
+            return arrayToStream(application.getClaimConfig().getClaimMappings())
+                    .filter(ClaimMapping::isRequested)
+                    .map(claimMapping -> new RequestedClaimConfiguration()
+                            .claim(buildClaimModel(claimMapping.getRemoteClaim().getClaimUri()))
+                            .mandatory(claimMapping.isMandatory()))
+                    .collect(Collectors.toList());
         }
+
         return Collections.emptyList();
     }
 
@@ -292,14 +303,13 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         if (application.getPermissionAndRoleConfig() != null) {
             RoleMapping[] roleMappings = application.getPermissionAndRoleConfig().getRoleMappings();
-            if (roleMappings != null) {
-                Arrays.stream(roleMappings)
-                        .forEach(roleMapping -> roleConfig.addMappingsItem(
-                                new org.wso2.carbon.identity.api.server.application.management.v1.RoleMapping()
-                                        .applicationRole(roleMapping.getRemoteRole())
-                                        .localRole(roleMapping.getLocalRole().getLocalRoleName())
-                        ));
-            }
+            arrayToStream(roleMappings)
+                    .forEach(roleMapping -> roleConfig.addMappingsItem(
+                            new org.wso2.carbon.identity.api.server.application.management.v1.RoleMapping()
+                                    .applicationRole(roleMapping.getRemoteRole())
+                                    .localRole(roleMapping.getLocalRole().getLocalRoleName())
+                    ));
+
         }
 
         return roleConfig;

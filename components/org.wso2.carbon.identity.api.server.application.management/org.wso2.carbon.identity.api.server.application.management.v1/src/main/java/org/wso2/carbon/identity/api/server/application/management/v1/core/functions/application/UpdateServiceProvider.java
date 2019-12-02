@@ -29,10 +29,10 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
 /**
  * Partially update the provided application based on patch request.
  */
-public class PatchServiceProvider implements UpdateFunction<ServiceProvider, ApplicationPatchModel> {
+public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, ApplicationPatchModel> {
 
     @Override
-    public void update(ServiceProvider serviceProvider, ApplicationPatchModel applicationPatchModel) {
+    public void apply(ServiceProvider serviceProvider, ApplicationPatchModel applicationPatchModel) {
 
         setIfNotNull(applicationPatchModel.getName(), serviceProvider::setApplicationName);
         setIfNotNull(applicationPatchModel.getDescription(), serviceProvider::setDescription);
@@ -47,33 +47,32 @@ public class PatchServiceProvider implements UpdateFunction<ServiceProvider, App
 
     private void patchClaimConfiguration(ServiceProvider serviceProvider, ClaimConfiguration claimConfiguration) {
 
-        patchServiceProvider(serviceProvider, claimConfiguration, new UpdateClaimConfiguration());
+        if (claimConfiguration != null) {
+            new UpdateClaimConfiguration().apply(serviceProvider, claimConfiguration);
+        }
     }
 
     private void patchAuthenticationSequence(AuthenticationSequence authenticationSequence,
                                              ServiceProvider serviceProvider) {
 
-        patchServiceProvider(serviceProvider, authenticationSequence, new UpdateAuthenticationSequence());
+        if (authenticationSequence != null) {
+            new UpdateAuthenticationSequence().apply(serviceProvider, authenticationSequence);
+        }
     }
 
     private void patchAdvancedConfiguration(ServiceProvider serviceProvider,
                                             AdvancedApplicationConfiguration advancedConfigurations) {
 
-        patchServiceProvider(serviceProvider, advancedConfigurations, new UpdateAdvancedConfigurations());
+        if (advancedConfigurations != null) {
+            new UpdateAdvancedConfigurations().apply(serviceProvider, advancedConfigurations);
+        }
     }
 
     private void patchProvisioningConfiguration(ProvisioningConfiguration provisioningConfigurations,
                                                 ServiceProvider serviceProvider) {
 
-        patchServiceProvider(serviceProvider, provisioningConfigurations, new UpdateProvisioningConfiguration());
-    }
-
-    private <T> void patchServiceProvider(ServiceProvider application,
-                                          T t,
-                                          UpdateFunction<ServiceProvider, T> function) {
-
-        if (t != null) {
-            function.update(application, t);
+        if (provisioningConfigurations != null) {
+            new UpdateProvisioningConfiguration().apply(serviceProvider, provisioningConfigurations);
         }
     }
 }

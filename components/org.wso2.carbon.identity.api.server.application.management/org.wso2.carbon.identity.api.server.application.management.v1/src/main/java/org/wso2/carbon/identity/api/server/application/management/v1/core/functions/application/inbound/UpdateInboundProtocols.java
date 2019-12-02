@@ -28,11 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.rollbackInbounds;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundUtils.createPassiveSTSInboundConfig;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundUtils.createWsTrustInbound;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundUtils.createCustomInbound;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundUtils.createOAuthInbound;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundUtils.createSAMLInbound;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundFunctions.createPassiveSTSInboundConfig;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundFunctions.createWsTrustInbound;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundFunctions.createCustomInbound;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundFunctions.createOAuthInbound;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundFunctions.createSAMLInbound;
 
 /**
  * Updates the inbound authentication protocols defined by the API model in the Service Provider model.
@@ -42,7 +42,7 @@ public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, I
     private static final Log log = LogFactory.getLog(UpdateInboundProtocols.class);
 
     @Override
-    public void update(ServiceProvider application, InboundProtocols inboundProtocols) {
+    public void apply(ServiceProvider application, InboundProtocols inboundProtocols) {
 
         List<InboundAuthenticationRequestConfig> inbounds = new ArrayList<>();
 

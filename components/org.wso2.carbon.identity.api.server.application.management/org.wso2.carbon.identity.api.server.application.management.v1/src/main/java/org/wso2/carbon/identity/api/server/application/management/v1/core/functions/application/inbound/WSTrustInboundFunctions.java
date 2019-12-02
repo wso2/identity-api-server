@@ -31,9 +31,9 @@ import static org.wso2.carbon.identity.application.authentication.framework.util
 /**
  * Helper functions for WSTrust inbound management.
  */
-public class WSTrustInboundUtils {
+public class WSTrustInboundFunctions {
 
-    private WSTrustInboundUtils() {
+    private WSTrustInboundFunctions() {
 
     }
 

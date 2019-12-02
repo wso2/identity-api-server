@@ -63,15 +63,6 @@ public class Utils {
         return object != null ? Stream.of(object) : Stream.empty();
     }
 
-    public static <T> void updateApplication(ServiceProvider application,
-                                             T configsToUpdate,
-                                             UpdateFunction<ServiceProvider, T> function) {
-
-        if (configsToUpdate != null) {
-            function.update(application, configsToUpdate);
-        }
-    }
-
     public static ServiceProvider deepCopyApplication(ServiceProvider application) {
 
         ObjectOutputStream objOutPutStream;

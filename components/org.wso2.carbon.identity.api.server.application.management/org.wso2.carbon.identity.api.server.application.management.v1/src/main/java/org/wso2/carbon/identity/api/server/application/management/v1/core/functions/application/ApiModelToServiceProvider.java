@@ -27,8 +27,6 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
 import java.util.function.Function;
 
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.updateApplication;
-
 /**
  * Converts the API model object into a ServiceProvider object.
  */
@@ -56,28 +54,38 @@ public class ApiModelToServiceProvider implements Function<ApplicationModel, Ser
     private void addInboundAuthenticationProtocolsToApplication(ServiceProvider application,
                                                                 InboundProtocols inboundProtocolsModel) {
 
-        updateApplication(application, inboundProtocolsModel, new UpdateInboundProtocols());
+        if (inboundProtocolsModel != null) {
+            new UpdateInboundProtocols().apply(application, inboundProtocolsModel);
+        }
     }
 
     private void addAuthenticationSequence(ServiceProvider application, AuthenticationSequence authSequenceApiModel) {
 
-        updateApplication(application, authSequenceApiModel, new UpdateAuthenticationSequence());
+        if (authSequenceApiModel != null) {
+            new UpdateAuthenticationSequence().apply(application, authSequenceApiModel);
+        }
     }
 
     private void addProvisioningConfiguration(ServiceProvider application,
                                               ProvisioningConfiguration provisioningConfigApiModel) {
 
-        updateApplication(application, provisioningConfigApiModel, new UpdateProvisioningConfiguration());
+        if (provisioningConfigApiModel != null) {
+            new UpdateProvisioningConfiguration().apply(application, provisioningConfigApiModel);
+        }
     }
 
     private void addClaimConfigurationToApplication(ServiceProvider application, ClaimConfiguration claimApiModel) {
 
-        updateApplication(application, claimApiModel, new UpdateClaimConfiguration());
+        if (claimApiModel != null) {
+            new UpdateClaimConfiguration().apply(application, claimApiModel);
+        }
     }
 
     private void addAdvancedConfigurationToApplication(ServiceProvider application,
                                                        AdvancedApplicationConfiguration advancedApplicationConfig) {
 
-        updateApplication(application, advancedApplicationConfig, new UpdateAdvancedConfigurations());
+        if (advancedApplicationConfig != null) {
+            new UpdateAdvancedConfigurations().apply(application, advancedApplicationConfig);
+        }
     }
 }

@@ -36,7 +36,7 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
 public class UpdateProvisioningConfiguration implements UpdateFunction<ServiceProvider, ProvisioningConfiguration> {
 
     @Override
-    public void update(ServiceProvider application, ProvisioningConfiguration provisioningConfigApiModel) {
+    public void apply(ServiceProvider application, ProvisioningConfiguration provisioningConfigApiModel) {
 
         if (provisioningConfigApiModel != null) {
             InboundSCIMProvisioningConfiguration inboundProvisioningModel =

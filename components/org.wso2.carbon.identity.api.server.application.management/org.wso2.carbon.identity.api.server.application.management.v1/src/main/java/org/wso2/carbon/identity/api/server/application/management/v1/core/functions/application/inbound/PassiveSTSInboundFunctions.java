@@ -29,9 +29,9 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
 /**
  * Helper functions for Passive STS inbound management.
  */
-public class PassiveSTSInboundUtils {
+public class PassiveSTSInboundFunctions {
 
-    private PassiveSTSInboundUtils() {
+    private PassiveSTSInboundFunctions() {
 
     }
 

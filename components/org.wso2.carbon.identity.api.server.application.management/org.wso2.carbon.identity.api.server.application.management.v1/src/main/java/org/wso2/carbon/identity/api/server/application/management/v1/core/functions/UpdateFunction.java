@@ -24,5 +24,5 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 @FunctionalInterface
 public interface UpdateFunction<T, S> {
 
-    void update(T t, S s);
+    void apply(T t, S s);
 }

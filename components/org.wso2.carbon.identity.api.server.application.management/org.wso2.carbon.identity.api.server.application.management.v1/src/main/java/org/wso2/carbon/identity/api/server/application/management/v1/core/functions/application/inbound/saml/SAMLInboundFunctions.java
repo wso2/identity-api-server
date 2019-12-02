@@ -38,9 +38,9 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 /**
  * Helper functions for SAML inbound management.
  */
-public class SAMLInboundUtils {
+public class SAMLInboundFunctions {
 
-    private SAMLInboundUtils() {
+    private SAMLInboundFunctions() {
 
     }
 

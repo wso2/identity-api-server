@@ -29,9 +29,9 @@ import java.util.stream.Collectors;
 /**
  * Helper class for custom inbound management.
  */
-public class CustomInboundUtils {
+public class CustomInboundFunctions {
 
-    private CustomInboundUtils() {
+    private CustomInboundFunctions() {
 
     }
 
@@ -55,7 +55,7 @@ public class CustomInboundUtils {
 
         return Optional.of(inboundConfigModel.getProperties())
                 .map(modelProperties ->
-                        modelProperties.stream().map(CustomInboundUtils::buildProperty).toArray(Property[]::new))
+                        modelProperties.stream().map(CustomInboundFunctions::buildProperty).toArray(Property[]::new))
                 .orElse(new Property[0]);
     }
 
@@ -75,7 +75,7 @@ public class CustomInboundUtils {
                 .properties(
                         Optional.ofNullable(inbound.getProperties())
                                 .map(inboundProperties -> Arrays.stream(inboundProperties)
-                                        .map(CustomInboundUtils::buildPropertyModel).collect(Collectors.toList())
+                                        .map(CustomInboundFunctions::buildPropertyModel).collect(Collectors.toList())
                                 ).orElse(Collections.emptyList())
                 );
     }

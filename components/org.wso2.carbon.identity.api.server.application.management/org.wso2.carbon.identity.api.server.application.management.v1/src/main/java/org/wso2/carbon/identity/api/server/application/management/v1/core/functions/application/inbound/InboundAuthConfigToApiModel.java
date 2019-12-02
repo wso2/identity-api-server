@@ -41,7 +41,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 /**
  * Converts Inbound Authentication configuration of an application into the API model.
  */
-public class InboundsToApiModel implements Function<ServiceProvider, List<InboundProtocolListItem>> {
+public class InboundAuthConfigToApiModel implements Function<ServiceProvider, List<InboundProtocolListItem>> {
 
     @Override
     public List<InboundProtocolListItem> apply(ServiceProvider application) {

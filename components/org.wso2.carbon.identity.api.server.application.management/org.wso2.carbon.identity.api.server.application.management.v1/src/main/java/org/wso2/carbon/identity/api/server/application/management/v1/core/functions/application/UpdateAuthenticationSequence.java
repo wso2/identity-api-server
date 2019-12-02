@@ -44,7 +44,7 @@ import java.util.Optional;
 public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvider, AuthenticationSequence> {
 
     @Override
-    public void update(ServiceProvider application, AuthenticationSequence authSequenceApiModel) {
+    public void apply(ServiceProvider application, AuthenticationSequence authSequenceApiModel) {
 
         if (authSequenceApiModel != null) {
             updateRequestPathAuthenticatorConfigs(authSequenceApiModel, application);

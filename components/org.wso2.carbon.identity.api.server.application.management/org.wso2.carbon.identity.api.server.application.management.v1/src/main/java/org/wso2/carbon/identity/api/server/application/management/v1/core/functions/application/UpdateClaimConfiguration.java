@@ -41,7 +41,7 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
 public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider, ClaimConfiguration> {
 
     @Override
-    public void update(ServiceProvider application, ClaimConfiguration claimApiModel) {
+    public void apply(ServiceProvider application, ClaimConfiguration claimApiModel) {
 
         if (claimApiModel != null) {
             ClaimConfig claimConfigs = getClaimConfig(application);

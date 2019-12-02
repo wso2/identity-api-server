@@ -15,8 +15,8 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound;
 
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundUtils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundUtils;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundFunctions;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
@@ -90,13 +90,13 @@ public class InboundFunctions {
 
         switch (inbound.getInboundAuthType()) {
             case FrameworkConstants.StandardInboundProtocols.SAML2:
-                SAMLInboundUtils.deleteSAMLServiceProvider(inbound);
+                SAMLInboundFunctions.deleteSAMLServiceProvider(inbound);
                 break;
             case FrameworkConstants.StandardInboundProtocols.OAUTH2:
-                OAuthInboundUtils.deleteOAuthInbound(inbound);
+                OAuthInboundFunctions.deleteOAuthInbound(inbound);
                 break;
             case FrameworkConstants.StandardInboundProtocols.WS_TRUST:
-                WSTrustInboundUtils.deleteWSTrustConfiguration(inbound);
+                WSTrustInboundFunctions.deleteWSTrustConfiguration(inbound);
                 break;
             default:
                 // No rollbacks required for other inbounds.
