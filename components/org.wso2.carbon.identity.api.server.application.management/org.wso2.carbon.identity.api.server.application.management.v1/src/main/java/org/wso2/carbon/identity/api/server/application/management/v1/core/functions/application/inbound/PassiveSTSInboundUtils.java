@@ -23,8 +23,7 @@ import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 
-import java.util.Arrays;
-
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.arrayToStream;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.PassiveSTS.PASSIVE_STS_REPLY_URL;
 
 /**
@@ -58,8 +57,7 @@ public class PassiveSTSInboundUtils {
 
     public static PassiveStsConfiguration getPassiveSTSConfiguration(InboundAuthenticationRequestConfig inboundAuth) {
 
-        // TODO : null check on property array
-        String replyTo = Arrays.stream(inboundAuth.getProperties())
+        String replyTo = arrayToStream(inboundAuth.getProperties())
                 .filter(property -> StringUtils.equals(property.getName(), PASSIVE_STS_REPLY_URL))
                 .findAny()
                 .map(Property::getValue).orElse(null);

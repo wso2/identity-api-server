@@ -246,7 +246,7 @@ public class ServerApplicationManagementService {
             if (log.isDebugEnabled()) {
                 log.debug("Error while creating application. Rolling back possibly created inbound config data.");
             }
-            rollbackInbounds(getInboundAuthenticationRequestConfigs(application));
+            rollbackInbounds(getConfiguredInbounds(application));
 
             String msg = "Error creating application.";
             throw handleIdentityApplicationManagementException(e, msg);
@@ -506,7 +506,7 @@ public class ServerApplicationManagementService {
         return application;
     }
 
-    private List<InboundAuthenticationRequestConfig> getInboundAuthenticationRequestConfigs(ServiceProvider app) {
+    private List<InboundAuthenticationRequestConfig> getConfiguredInbounds(ServiceProvider app) {
 
         if (app.getInboundAuthenticationConfig() != null &&
                 app.getInboundAuthenticationConfig().getInboundAuthenticationRequestConfigs() != null) {

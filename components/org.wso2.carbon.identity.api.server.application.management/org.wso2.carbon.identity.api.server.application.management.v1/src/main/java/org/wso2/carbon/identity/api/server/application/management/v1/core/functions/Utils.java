@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.INVALID_REQUEST;
@@ -55,6 +56,11 @@ public class Utils {
         if (value != null) {
             consumer.accept(value);
         }
+    }
+
+    public static <T> Stream<T> arrayToStream(T[] object) {
+
+        return object != null ? Stream.of(object) : Stream.empty();
     }
 
     public static <T> void updateApplication(ServiceProvider application,
