@@ -15,10 +15,6 @@
  */
 package org.wso2.carbon.identity.api.server.userstore.common;
 
-import org.wso2.carbon.identity.user.store.configuration.utils.UserStoreConfigurationConstant;
-
-import java.util.HashMap;
-import java.util.Map;
 import javax.ws.rs.core.Response;
 
 /**
@@ -26,13 +22,12 @@ import javax.ws.rs.core.Response;
  */
 public class UserStoreConstants {
 
-    private static final String SECONDARY_USER_STORE_PREFIX = "SUS-";
+    public static final String SECONDARY_USER_STORE_PREFIX = "SUS-";
     public static final String USER_STORE_PATH_COMPONENT = "/userstores";
     public static final String USER_STORE_DESCRIPTION = "/description";
     public static final String USER_STORE_CLASS_NAME = "/className";
     public static final String USER_STORE_DOMAIN_NAME = "/domainName";
     public static final String USER_STORE_PROPERTIES = "/properties/";
-    private static final Map<String, ErrorMessage> ERROR_CODE_MAP = new HashMap<>();
 
     /**
      * Enum for user store related errors in the format of
@@ -86,17 +81,12 @@ public class UserStoreConstants {
                 "Resource not found.",
                 "Unable to find any user store's domain id with the provided identifier",
                 Response.Status.NOT_FOUND),
-        ERROR_CODE_INVALID_INPUT("60002", "Invalid Input", "Provided Input is not valid.",
-                Response.Status.BAD_REQUEST),
         ERROR_CODE_NOT_FOUND("60003", "Resource not found.",
                 "Unable to find a required resource for this request", Response.Status.NOT_FOUND),
-        ERROR_CODE_XML_FILE_ALREADY_EXISTS("60004",
-                "Resource already exists",
-                "The user store configuration file already exists", Response.Status.CONFLICT),
-        ERROR_CODE_USER_STORE_DOMAIN_ALREADY_EXISTS("60005", "User store domain already exists",
-                " Already there is a user store with same domain ", Response.Status.CONFLICT),
         ERROR_CODE_MANDATORY_PROPERTIES_NOT_FOUND("60006", "Mandatory property is missing ",
-                " Required user store  property or its value is missing in the request ");
+                " Required user store  property or its value is missing in the request "),
+        ERROR_CODE_INVALID_INPUT("60004", "Invalid Input", "Provided Input is not valid.",
+                                 Response.Status.BAD_REQUEST);
 
         private final String code;
         private final String message;
@@ -137,21 +127,5 @@ public class UserStoreConstants {
         public String toString() {
             return code + " | " + message;
         }
-    }
-
-    static {
-        ERROR_CODE_MAP.put(UserStoreConfigurationConstant.ErrorCodes.XML_FILE_NOT_FOUND,
-                ErrorMessage.ERROR_CODE_NOT_FOUND);
-        ERROR_CODE_MAP.put(UserStoreConfigurationConstant.ErrorCodes.XML_FILE_ALREADY_EXISTS,
-                ErrorMessage.ERROR_CODE_XML_FILE_ALREADY_EXISTS);
-        ERROR_CODE_MAP.put(UserStoreConfigurationConstant.ErrorCodes.USER_STORE_DOMAIN_ALREADY_EXISTS,
-                ErrorMessage.ERROR_CODE_USER_STORE_DOMAIN_ALREADY_EXISTS);
-        ERROR_CODE_MAP.put(UserStoreConfigurationConstant.ErrorCodes.USER_STORE_DOMAIN_NOT_FOUND,
-                ErrorMessage.ERROR_CODE_DOMAIN_ID_NOT_FOUND);
-    }
-
-    public static ErrorMessage getMappedErrorMessage(String errorCode) {
-
-        return ERROR_CODE_MAP.get(errorCode);
     }
 }

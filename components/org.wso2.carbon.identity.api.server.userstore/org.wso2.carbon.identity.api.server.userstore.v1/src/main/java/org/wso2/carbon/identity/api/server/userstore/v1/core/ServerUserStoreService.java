@@ -178,7 +178,7 @@ public class ServerUserStoreService {
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         try {
             UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
-            if (userStoreDTOS == null) {
+            if (userStoreDTOS.length == 0) {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
             }
             return buildUserStoreListResponse(userStoreDTOS);
@@ -249,7 +249,7 @@ public class ServerUserStoreService {
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         try {
             UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
-            if (userStoreDTOS == null || userStoreDTOS.length == 0) {
+            if (userStoreDTOS.length == 0) {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
             }
             List<UserStoreDTO> userStoresByTypeNameList = new ArrayList<>();
@@ -728,8 +728,8 @@ public class ServerUserStoreService {
     }
 
     /**
-     * Handle handleIdentityUserStoreMgtException, extract the error code and description from the exception and set
-     * to the API Error Response.
+     * Handle handleIdentityUserStoreMgtException, ie, handle the appropriate client and server exception and set
+     * proper API Error Response.
      *
      * @param exception Exception thrown
      * @param errorEnum Corresponding error enum
@@ -739,16 +739,13 @@ public class ServerUserStoreService {
                                                          UserStoreConstants.ErrorMessage errorEnum) {
         Response.Status status;
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
-        if (exception instanceof IdentityUserStoreServerException &&
-                UserStoreConstants.getMappedErrorMessage(exception.getErrorCode()) != null) {
-            UserStoreConstants.ErrorMessage errorMessage = UserStoreConstants.
-                    getMappedErrorMessage(exception.getErrorCode());
-            errorResponse = getErrorBuilder(errorMessage).build(LOG, exception, errorEnum.getDescription());
-            status = errorMessage.getHttpStatus();
-            return new APIError(status, errorResponse);
+        if (exception instanceof IdentityUserStoreServerException) {
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+            return handleIdentityUserStoreException(exception, errorResponse, status);
         } else if (exception instanceof IdentityUserStoreClientException) {
             // Send client error with specific error code or as a BAD request.
-            return handleIdentityUserStoreClientException(exception, errorEnum);
+            status = Response.Status.BAD_REQUEST;
+            return handleIdentityUserStoreException(exception, errorResponse, status);
         } else {
             // Internal Server error
             status = Response.Status.INTERNAL_SERVER_ERROR;
@@ -757,27 +754,24 @@ public class ServerUserStoreService {
     }
 
     /**
-     * Handle handleIdentityUserStoreClientException, extract the error code and description from the client exception
-     * if it is present otherwise set BAD request in the API Error Response.
+     * Handle handleIdentityUserStoreException, extract the error code and the error message from the corresponding
+     * exception and set it to the API Error Response.
      *
-     * @param exception Exception thrown
-     * @param errorEnum Corresponding error enum
+     * @param exception     Exception thrown
+     * @param errorResponse Corresponding error response
      * @return API Error object.
      */
-    private APIError handleIdentityUserStoreClientException(IdentityUserStoreMgtException exception,
-                                                            UserStoreConstants.ErrorMessage errorEnum) {
+    private APIError handleIdentityUserStoreException(IdentityUserStoreMgtException exception,
+                                                      ErrorResponse errorResponse, Response.Status status) {
 
-        Response.Status status;
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
-        if (UserStoreConstants.getMappedErrorMessage(exception.getErrorCode()) != null) {
-            UserStoreConstants.ErrorMessage errorMessage = UserStoreConstants.
-                    getMappedErrorMessage(exception.getErrorCode());
-            errorResponse = getErrorBuilder(errorMessage).build(LOG, exception, errorEnum.getDescription());
-            status = errorMessage.getHttpStatus();
-        } else {
-            status = Response.Status.BAD_REQUEST;
-            errorResponse.setDescription(exception.getMessage());
+        if (exception.getErrorCode() != null) {
+            String errorCode = exception.getErrorCode();
+            errorCode =
+                    errorCode.contains(UserStoreConstants.SECONDARY_USER_STORE_PREFIX) ?
+                            errorCode : UserStoreConstants.SECONDARY_USER_STORE_PREFIX + errorCode;
+            errorResponse.setCode(errorCode);
         }
+        errorResponse.setDescription(exception.getMessage());
         return new APIError(status, errorResponse);
     }
 }
