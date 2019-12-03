@@ -22,7 +22,6 @@ import org.wso2.carbon.identity.api.server.application.management.common.Applica
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
@@ -171,10 +170,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response importApplication(InputStream fileInputStream, Attachment fileDetail) {
 
-        ApplicationResponseModel applicationModel =
-                applicationManagementService.importApplication(fileInputStream, fileDetail);
-        URI location = getResourceLocation(applicationModel.getId());
-        return Response.created(location).entity(applicationModel).build();
+        String resourceId = applicationManagementService.importApplication(fileInputStream, fileDetail);
+        return Response.created(getResourceLocation(resourceId)).build();
     }
 
     @Override

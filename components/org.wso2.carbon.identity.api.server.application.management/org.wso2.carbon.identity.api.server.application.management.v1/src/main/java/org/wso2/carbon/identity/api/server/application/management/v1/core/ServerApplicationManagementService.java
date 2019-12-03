@@ -199,9 +199,9 @@ public class ServerApplicationManagementService {
      *
      * @param fileInputStream File to be imported as an input stream.
      * @param fileDetail      File details.
-     * @return An application model of the created application.
+     * @return Unique identifier of the created application.
      */
-    public ApplicationResponseModel importApplication(InputStream fileInputStream, Attachment fileDetail) {
+    public String importApplication(InputStream fileInputStream, Attachment fileDetail) {
 
         try {
             SpFileContent spFileContent = new SpFileContent();
@@ -216,9 +216,9 @@ public class ServerApplicationManagementService {
                 ServiceProvider application =
                         getApplicationManagementService().getApplicationExcludingFileBasedSPs(
                                 importResponse.getApplicationName(), tenantDomain);
-                return new ServiceProviderToApiModel().apply(application);
+                return application.getApplicationResourceId();
             } else {
-                throw Utils.buildServerError("Error importing application from XML file.");
+                throw handleErrorResponse(importResponse);
             }
         } catch (IOException e) {
             throw Utils.buildServerError("Error importing application from XML file.", e);
@@ -227,6 +227,17 @@ public class ServerApplicationManagementService {
         } finally {
             IOUtils.closeQuietly(fileInputStream);
         }
+    }
+
+    private APIError handleErrorResponse(ImportResponse importResponse) {
+
+        String msg = "Error importing application from XML file.";
+        String description = null;
+        if (ArrayUtils.isNotEmpty(importResponse.getErrors())) {
+            description = importResponse.getErrors()[0];
+        }
+
+        return Utils.buildClientError(INVALID_REQUEST.getCode(), msg, description);
     }
 
     public String createApplication(ApplicationModel applicationModel, String template) {
