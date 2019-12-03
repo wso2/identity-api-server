@@ -95,6 +95,8 @@ public interface ApplicationsApiService {
 
       public Response importApplication(InputStream fileInputStream, Attachment fileDetail);
 
+      public Response importApplicationForUpdate(InputStream fileInputStream, Attachment fileDetail);
+
       public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel);
 
       public Response regenerateOAuthClientSecret(String applicationId);

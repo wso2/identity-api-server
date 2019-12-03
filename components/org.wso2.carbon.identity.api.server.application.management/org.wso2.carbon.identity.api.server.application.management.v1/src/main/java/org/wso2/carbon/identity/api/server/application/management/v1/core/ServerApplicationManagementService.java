@@ -252,8 +252,7 @@ public class ServerApplicationManagementService {
         }
     }
 
-    public void patchApplication(String applicationId,
-                                 ApplicationPatchModel applicationPatchModel) {
+    public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
         if (applicationPatchModel != null) {

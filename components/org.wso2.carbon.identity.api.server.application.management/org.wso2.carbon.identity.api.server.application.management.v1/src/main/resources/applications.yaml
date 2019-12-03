@@ -112,10 +112,6 @@ paths:
               description: Location of the newly created application.
               schema:
                 type: string
-          # content:
-          #   application/json:
-          #     schema:
-          #       $ref: '#/components/schemas/ApplicationModel'
         '400':
           description: Bad Request
           content:
@@ -182,10 +178,6 @@ paths:
               description: Location of the newly created application.
               schema:
                 type: string
-          # content:
-          #   application/json:
-          #     schema:
-          #       $ref: '#/components/schemas/ApplicationModel'
         '400':
           description: Bad Request
           content:
@@ -200,6 +192,65 @@ paths:
                 $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Applications
+      summary: |
+        Import an application from file and update.
+      operationId: importApplicationForUpdate
+      description: >
+        This API provides the capability to updated an application from information provided as a file.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: file to upload
+        description: This represents the application to be updated.
+        required: true
+      responses:
+        '200':
+          description: Successfully Updated.
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
           content:
             application/json:
               schema:
@@ -288,76 +339,8 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
-    # put:
-    #   tags:
-    #     - Applications
-    #   summary: |
-    #     Update an application by id
-    #   operationId: updateApplication
-    #   description: |
-    #     This API provides the capability to update an application.
-    #   parameters:
-    #     - name: applicationId
-    #       in: path
-    #       description: Id of the application.
-    #       required: true
-    #       schema:
-    #         type: string
-    #   responses:
-    #     '200':
-    #       description: Successful response.
-    #       headers:
-    #         Location:
-    #           description: Location of the updated application
-    #           schema:
-    #             type: string
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/ApplicationModel'
-    #     '400':
-    #       description: Bad Request
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '401':
-    #       description: Unauthorized
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '403':
-    #       description: Forbidden
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '404':
-    #       description: Not Found
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '500':
-    #       description: Server Error
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #   x-wso2-request: ''
-    #   x-wso2-response: |
-    #     "HTTP/1.1 200 Ok"
-    #   requestBody:
-    #     content:
-    #       application/json:
-    #         schema:
-    #           $ref: '#/components/schemas/ApplicationModel'
-    #     description: This represents the application to be updated.
-    #     required: true
+
+
     patch:
       tags:
         - Applications
@@ -383,15 +366,6 @@ paths:
       responses:
         '200':
           description: Successfully Updated
-          # headers:
-          #   Location:
-          #     description: Location of the updated identity provider
-          #     schema:
-          #       type: string
-          # content:
-          #   application/json:
-          #     schema:
-          #       $ref: '#/components/schemas/ApplicationResponseModel'
         '400':
           description: Bad Request
           content:
@@ -464,9 +438,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
   /applications/{applicationId}/export:
     get:
       tags:
@@ -567,9 +538,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
     put:
       tags:
         - Resident Application
@@ -631,9 +599,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
       requestBody:
         content:
           application/json:
@@ -691,139 +656,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
-    # put:
-    #   tags:
-    #     - Inbound Protocols
-    #   summary: |
-    #     Update inbound protocol configurations of an application.
-    #   operationId: updateInboundAuthenticationConfigurations
-    #   description: >
-    #     This API provides the capability to update inbound protocol
-    #     configurations of an application.
-    #   parameters:
-    #     - name: applicationId
-    #       in: path
-    #       description: Id of the application.
-    #       required: true
-    #       schema:
-    #         type: string
-    #   responses:
-    #     '200':
-    #       description: Successful
-    #     '201':
-    #       description: Successful response.
-    #       headers:
-    #         Location:
-    #           description: Location of inbound protocol configurations of the application.
-    #           schema:
-    #             type: string
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/InboundProtocols'
-    #     '400':
-    #       description: Bad Request
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '401':
-    #       description: Unauthorized
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '403':
-    #       description: Forbidden
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '404':
-    #       description: Not Found
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '409':
-    #       description: Conflict
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '500':
-    #       description: Server Error
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #   x-wso2-request: ''
-    #   x-wso2-response: |
-    #     "HTTP/1.1 200 Ok"
-    #   requestBody:
-    #     content:
-    #       application/json:
-    #         schema:
-    #           $ref: '#/components/schemas/InboundProtocols'
-    #     description: >-
-    #       This represents the inbound protocol configurations of the
-    #       application.
-    #     required: true
-    # delete:
-    #   tags:
-    #     - Inbound Protocols
-    #   summary: |
-    #     Delete inbound protocol configurations of an application.
-    #   operationId: deleteInboundAuthenticationConfigurations
-    #   description: >
-    #     This API provides the capability to delete inbound protocol
-    #     configurations of an application.
-    #   parameters:
-    #     - name: applicationId
-    #       in: path
-    #       description: Id of the application.
-    #       required: true
-    #       schema:
-    #         type: string
-    #   responses:
-    #     '204':
-    #       description: Delete successful
-    #     '400':
-    #       description: Bad Request
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '401':
-    #       description: Unauthorized
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '403':
-    #       description: Forbidden
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '404':
-    #       description: Not Found
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #     '500':
-    #       description: Server Error
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: '#/components/schemas/Error'
-    #   x-wso2-request: ''
-    #   x-wso2-response: |
-    #     "HTTP/1.1 200 Ok"
   '/applications/{applicationId}/inbound-protocols/saml':
     get:
       tags:
@@ -872,9 +704,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
+
     put:
       tags:
         - Inbound Protocols - SAML
@@ -950,9 +781,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
+
       requestBody:
         content:
           application/json:
@@ -1009,9 +839,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
+
   '/applications/{applicationId}/inbound-protocols/oidc':
     get:
       tags:
@@ -1066,9 +895,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
     put:
       tags:
         - Inbound Protocols - OAuth / OIDC
@@ -1139,9 +965,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
       requestBody:
         content:
           application/json:
@@ -1200,9 +1023,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
+
   '/applications/{applicationId}/inbound-protocols/oidc/regenerate-secret':
     post:
       tags:
@@ -1311,7 +1133,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-
   '/applications/{applicationId}/inbound-protocols/passive-sts':
     get:
       tags:
@@ -1367,9 +1188,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
     put:
       tags:
         - Inbound Protocols - Passive STS
@@ -1442,9 +1261,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
       requestBody:
         content:
           application/json:
@@ -1503,9 +1320,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
   '/applications/{applicationId}/inbound-protocols/ws-trust':
     get:
       tags:
@@ -1560,9 +1375,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
     put:
       tags:
         - Inbound Protocols - WS Trust
@@ -1635,9 +1448,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
       requestBody:
         content:
           application/json:
@@ -1696,191 +1507,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
-  # '/applications/{applicationId}/auth-protocols/kerberos-kdc':
-  #   get:
-  #     tags:
-  #       - Inbound Protocols - Kerberos KDC
-  #     summary: |
-  #       Retrieve Kerberos KDC parameters of an application.
-  #     description: >
-  #       This API provides the capability to retrieve Kerberos KDC parameters of
-  #       the application.
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: OK
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/KerberosKDCParameters'
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-  #   put:
-  #     tags:
-  #       - Inbound Protocols - Kerberos KDC
-  #     summary: |
-  #       Update Kerberos KDC parameters of an application.
-  #     description: >
-  #       This API provides the capability to update the Kerberos KDC protocol
-  #       parameters of an application.
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: Successful
-  #       '201':
-  #         description: Successful response.
-  #         headers:
-  #           Location:
-  #             description: Location of the newly created Kerberos KDC Configuration.
-  #             schema:
-  #               type: string
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/KerberosKDCParameters'
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '409':
-  #         description: Conflict
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             $ref: '#/components/schemas/KerberosKDCParameters'
-  #       description: This represents the Kerberos KDC configuration of an application.
-  #       required: true
-  #   delete:
-  #     tags:
-  #       - Inbound Protocols - Kerberos KDC
-  #     summary: |
-  #       Delete Kerberos KDC parameters of an application.
-  #     description: >
-  #       This API provides the capability to delete Kerberos KDC parameters of an
-  #       application.
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '204':
-  #         description: Delete Success
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
+
   '/applications/{applicationId}/inbound-protocols/{inboundProtocolId}':
     get:
       tags:
@@ -1942,9 +1569,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
     put:
       tags:
         - Inbound Protocols - Custom
@@ -2023,9 +1647,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
       requestBody:
         content:
           application/json:
@@ -2091,743 +1712,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
-
-
-
-  # '/applications/{applicationId}/claims':
-  #   get:
-  #     tags:
-  #       - Claims
-  #     summary: |
-  #       Retrieve claim configuration application by id
-  #     description: >
-  #       This API provides the capability to retrieve the application claim
-  #       configuration by id.
-  #     operationId: getClaimConfiguration
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: OK
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ClaimConfiguration'
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-  #   put:
-  #     tags:
-  #       - Claims
-  #     summary: |
-  #       Update the claim configuration of an application by id
-  #     description: >
-  #       This API provides the capability to update claim configuration of an
-  #       application.
-  #     operationId: updateClaimConfiguration
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: Successful
-  #       '201':
-  #         description: Successful response.
-  #         headers:
-  #           Location:
-  #             description: >-
-  #               Location of the newly created claim Configuration of the
-  #               application.
-  #             schema:
-  #               type: string
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ClaimConfiguration'
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             $ref: '#/components/schemas/ClaimConfiguration'
-  #       description: This represents the application to be updated.
-  #       required: true
-  #   delete:
-  #     tags:
-  #       - Claims
-  #     summary: |
-  #       Delete claim configuration of an application by id
-  #     description: |
-  #       This API provides the capability to delete an application by id.
-  #     operationId: deleteClaimConfiguration
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '204':
-  #         description: Successfully Deleted
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-
-  # '/applications/{applicationId}/advanced-configs':
-  #   get:
-  #     tags:
-  #       - Advanced Configs
-  #     summary: |
-  #       Retrieve advanced configurations of an application by id
-  #     description: >
-  #       This API provides the capability to retrieve the advanced configurations
-  #       of an application by id.
-  #     operationId: getAdvancedConfigurations
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: OK
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/AdvancedApplicationConfiguration'
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-  #   put:
-  #     tags:
-  #       - Advanced Configs
-  #     summary: |
-  #       Update the the advanced configurations of an application by id
-  #     description: >
-  #       This API provides the capability to update the advanced configurations
-  #       of an application by id.
-  #     operationId: updateAdvancedConfigurations
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: Successful
-  #       '201':
-  #         description: Successful response.
-  #         headers:
-  #           Location:
-  #             description: >-
-  #               Location of the newly created advanced configurations of the
-  #               application.
-  #             schema:
-  #               type: string
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/AdvancedApplicationConfiguration'
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             $ref: '#/components/schemas/AdvancedApplicationConfiguration'
-  #       description: >-
-  #         This represents advanced configurations of the application to be
-  #         updated.
-  #       required: true
-  #   delete:
-  #     tags:
-  #       - Advanced Configs
-  #     summary: |
-  #       Delete advanced configurations of an application by id
-  #     description: >
-  #       This API provides the capability to delete advanced configurations an
-  #       application by id.
-  #     operationId: deleteAdvancedConfigurations
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '204':
-  #         description: Successfully Deleted
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-
-  # '/applications/{applicationId}/provisioning-configs':
-  #   get:
-  #     tags:
-  #       - Provisioning Configs
-  #     summary: |
-  #       Retrieve provisioning configurations of application by id
-  #     description: >
-  #       This API provides the capability to retrieve the provisioning
-  #       configurations of an application by id.
-  #     operationId: getProvisioningConfiguration
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: OK
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ProvisioningConfiguration'
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-  #   put:
-  #     tags:
-  #       - Provisioning Configs
-  #     summary: |
-  #       Update the the provisioning configurations of an application by id
-  #     description: >
-  #       This API provides the capability to update the provisioning
-  #       configurations of an application by id.
-  #     operationId: updateProvisioningConfiguration
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: Successful
-  #       '201':
-  #         description: Successful response.
-  #         headers:
-  #           Location:
-  #             description: >-
-  #               Location of the newly created provisioning configurations of the
-  #               application.
-  #             schema:
-  #               type: string
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/ProvisioningConfiguration'
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             $ref: '#/components/schemas/ProvisioningConfiguration'
-  #       description: >-
-  #         This represents provisioning configurations of the application to be
-  #         updated.
-  #       required: true
-  #   delete:
-  #     tags:
-  #       - Provisioning Configs
-  #     summary: |
-  #       Delete provisioning configurations of an application by id
-  #     description: >
-  #       This API provides the capability to delete provisioning configurations
-  #       an application by id.
-  #     operationId: deleteProvisioningConfiguration
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '204':
-  #         description: Successfully Deleted
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-  # '/applications/{applicationId}/authentication-sequence':
-  #   get:
-  #     tags:
-  #       - Authentication Sequence
-  #     summary: |
-  #       Retrieve authentication sequence of application by id
-  #     description: >
-  #       This API provides the capability to retrieve authentication sequence of
-  #       an application by id.
-  #     operationId: getAuthenticationSequence
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: OK
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/AuthenticationSequence'
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-  #   put:
-  #     tags:
-  #       - Authentication Sequence
-  #     summary: |
-  #       Update the the authentication sequence of an application by id
-  #     description: >
-  #       This API provides the capability to update the authentication sequence
-  #       of an application by id.
-  #     operationId: updateAuthenticationSequence
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: Successful
-  #       '201':
-  #         description: Successful response.
-  #         headers:
-  #           Location:
-  #             description: >-
-  #               Location of the newly created provisioning configurations of the
-  #               application.
-  #             schema:
-  #               type: string
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/AuthenticationSequence'
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             $ref: '#/components/schemas/AuthenticationSequence'
-  #       description: >-
-  #         This represents provisioning configurations of the application to be
-  #         updated.
-  #       required: true
-  #   delete:
-  #     tags:
-  #       - Authentication Sequence
-  #     summary: |
-  #       Delete authentication sequence of an application by id
-  #     description: >
-  #       This API provides the capability to delete the authentication sequence
-  #       an application by id.
-  #     operationId: deleteAuthenticationSequence
-  #     parameters:
-  #       - name: applicationId
-  #         in: path
-  #         description: Id of the application.
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '204':
-  #         description: Successfully Deleted
-  #       '400':
-  #         description: Bad Request
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '401':
-  #         description: Unauthorized
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '403':
-  #         description: Forbidden
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '404':
-  #         description: Not Found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #       '500':
-  #         description: Server Error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #     x-wso2-request: ''
-  #     x-wso2-response: |
-  #       "HTTP/1.1 200 Ok"
 
   '/applications/meta/inbound-protocols':
     get:
@@ -2877,9 +1761,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
   '/applications/meta/inbound-protocols/saml':
     get:
       tags:
@@ -2920,9 +1802,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
   '/applications/meta/inbound-protocols/oidc':
     get:
       tags:
@@ -2964,9 +1844,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
   '/applications/meta/inbound-protocols/ws-trust':
     get:
       tags:
@@ -3007,9 +1885,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
   '/applications/meta/inbound-protocols/{inboundProtocolId}':
     get:
       tags:
@@ -3058,9 +1934,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
+
   '/applications/meta/adaptive-auth-templates':
     get:
       tags:
@@ -3101,9 +1975,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-wso2-request: ''
-      x-wso2-response: |
-        "HTTP/1.1 200 Ok"
 
 components:
   parameters:
@@ -3125,7 +1996,6 @@ components:
         Number of records to skip for pagination.
       schema:
         type: integer
-        minimum: 0
         default: 0
     filterQueryParam:
       in: query
@@ -3740,18 +2610,13 @@ components:
             #     singleLogoutRequestUrl:
             #       type: string
             #       description: Single logout request accepting endpoint
-            #     singleLogoutMethod:
+          #     singleLogoutMethod:
           #       type: string
           #       enum:
           #         - backchannel
           #         - frontchannel_http_redirect
           #         - frontchannel_http_post
           #       default: backchannel
-    # OAuthApplicationState:
-    #   type: string
-    #   enum:
-    #     - ACTIVE
-    #     - REVOKED
 
     OpenIDConnectConfiguration:
       type: object
@@ -3894,28 +2759,6 @@ components:
         frontChannelLogoutUrl:
           type: string
           example: 'https://app.example.com/frontchannel/callback'
-
-    # OAuthAppStateUpdateRequest:
-    #   type: object
-    #   properties:
-    #     state:
-    #       type: string
-    #       enum:
-    #         - ACTIVE
-    #         - REVOKED
-
-    # OIDCBackChannelLogoutConfig:
-    #   type: object
-    #   properties:
-    #     # enabled:
-    #     #   type: boolean
-    #     #   default: false
-    #     #   example: false
-    #     backChannelLogoutUrl:
-    #       type: string
-    #       example: 'https://app.example.com/backchannellogout/callback'
-
-
     PassiveStsConfiguration:
       type: object
       properties:
@@ -3936,18 +2779,6 @@ components:
         certificateAlias:
           type: string
           example: "wso2carbon"
-    # KerberosKDCParameters:
-    #   type: object
-    #   required:
-    #     - serviceName
-    #     - password
-    #   properties:
-    #     serviceName:
-    #       type: string
-    #     description:
-    #       type: string
-    #     password:
-    #       type: string
     CustomInboundProtocolConfiguration:
       type: object
       required:

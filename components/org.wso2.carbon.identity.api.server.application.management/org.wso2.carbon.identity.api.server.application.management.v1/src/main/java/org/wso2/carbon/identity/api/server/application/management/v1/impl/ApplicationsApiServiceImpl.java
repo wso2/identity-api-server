@@ -178,6 +178,12 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response importApplicationForUpdate(InputStream fileInputStream, Attachment fileDetail) {
+
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    @Override
     public Response getInboundAuthenticationConfigurations(String applicationId) {
 
         List<InboundProtocolListItem> inbounds = applicationManagementService.getInboundProtocols(applicationId);
