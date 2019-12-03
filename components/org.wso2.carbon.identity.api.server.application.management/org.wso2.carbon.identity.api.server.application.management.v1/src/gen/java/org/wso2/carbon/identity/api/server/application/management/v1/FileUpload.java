@@ -29,14 +29,14 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class InlineObject1  {
+public class FileUpload  {
   
     private File file;
 
     /**
     * file to upload
     **/
-    public InlineObject1 file(File file) {
+    public FileUpload file(File file) {
 
         this.file = file;
         return this;
@@ -63,8 +63,8 @@ public class InlineObject1  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        InlineObject1 inlineObject1 = (InlineObject1) o;
-        return Objects.equals(this.file, inlineObject1.file);
+        FileUpload fileUpload = (FileUpload) o;
+        return Objects.equals(this.file, fileUpload.file);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class InlineObject1  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class InlineObject1 {\n");
+        sb.append("class FileUpload {\n");
         
         sb.append("    file: ").append(toIndentedString(file)).append("\n");
         sb.append("}");

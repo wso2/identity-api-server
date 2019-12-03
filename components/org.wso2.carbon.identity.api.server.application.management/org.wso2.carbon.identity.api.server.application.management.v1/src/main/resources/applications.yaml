@@ -162,12 +162,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-                  description: file to upload
+              $ref: '#/components/schemas/FileUpload'
         description: This represents the application to be created.
         required: true
       responses:
@@ -220,12 +215,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
-                  description: file to upload
+              $ref: '#/components/schemas/FileUpload'
         description: This represents the application to be updated.
         required: true
       responses:
@@ -2104,7 +2094,6 @@ components:
           items:
             $ref: '#/components/schemas/Link'
 
-
     ApplicationListItem:
       type: object
       properties:
@@ -2246,18 +2235,6 @@ components:
             This property becomes only applicable if the proxy-mode config is
             set to false
 
-    # InboundProvisioningSCIMConfiguration:
-    #   type: object
-    #   properties:
-    #     provisioningUserstoreDomain:
-    #       type: string
-    #       example: PRIMARY
-    #       description: >-
-    #         This property becomes only applicable if the proxy-mode config is
-    #         set to false
-    #     proxy-mode:
-    #       type: boolean
-    #       example: false
     OutboundProvisioningConfiguration:
       type: object
       properties:
@@ -2329,7 +2306,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CustomInboundProtocolConfiguration'
-
 
     InboundProtocolsListResponse:
       type: array
@@ -2582,42 +2558,6 @@ components:
           type: string
           description: "Default value is the IdP Entity ID value specified in Resident IdP"
 
-            # SAML2ArtifactBindingConfiguration:
-            #   type: object
-            #   properties:
-            #     validateSignatureInRequest:
-            #       type: boolean
-            #       default: false
-            #       description: "Enable Signature Validation in Artifact Resolve Request"
-
-            # SAML2SingleLogoutConfiguration:
-            #   type: object
-            #   properties:
-            #     enableIdpInitiatedSingleLogOut:
-            #       type: boolean
-            #       default: false
-
-
-            # SpInitiatedSingleLogoutConfiguration:
-            #   type: object
-            #   properties:
-            #     enableSingleLogout:
-            #       type: boolean
-            #       default: true
-            #     singleLogoutResponseUrl:
-            #       type: string
-            #       description: Single logout response accepting endpoint
-            #     singleLogoutRequestUrl:
-            #       type: string
-            #       description: Single logout request accepting endpoint
-          #     singleLogoutMethod:
-          #       type: string
-          #       enum:
-          #         - backchannel
-          #         - frontchannel_http_redirect
-          #         - frontchannel_http_post
-          #       default: backchannel
-
     OpenIDConnectConfiguration:
       type: object
       required:
@@ -2751,8 +2691,6 @@ components:
     OIDCLogoutConfiguration:
       type: object
       properties:
-        # backChannelLogout:
-        #   $ref: '#/components/schemas/OIDCBackChannelLogoutConfig'
         backChannelLogoutUrl:
           type: string
           example: 'https://app.example.com/backchannel/callback'
@@ -2984,6 +2922,14 @@ components:
         templatesJSON:
           type: string
           example: 'Adaptive Auth Templates JSON'
+
+    FileUpload:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: file to upload
 
     Error:
       type: object
