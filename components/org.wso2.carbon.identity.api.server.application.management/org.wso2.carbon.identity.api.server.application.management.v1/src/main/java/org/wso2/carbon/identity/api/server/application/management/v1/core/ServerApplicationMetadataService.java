@@ -21,7 +21,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
@@ -31,8 +31,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.MetadataPro
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
-import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.mgt.AbstractInboundAuthenticatorConfig;
 import org.wso2.carbon.identity.base.IdentityException;
@@ -50,7 +50,7 @@ import java.util.Map;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_CERTIFICATE_ALIAS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_NAME_ID_FORMAT;
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_WHILE_RETRIEVING_SAML_METADATA;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_RETRIEVING_SAML_METADATA;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.getOAuthGrantTypeNames;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 
@@ -116,7 +116,7 @@ public class ServerApplicationMetadataService {
                     .defaultValue(DEFAULT_CERTIFICATE_ALIAS)
                     .options(Arrays.asList(samlSSOConfigService.getCertAliasOfPrimaryKeyStore())));
         } catch (IdentityException e) {
-            throw handleException(e, ERROR_WHILE_RETRIEVING_SAML_METADATA);
+            throw handleException(e);
         }
 
         samlMetaData.setResponseSigningAlgorithm(new MetadataProperty()
@@ -151,7 +151,7 @@ public class ServerApplicationMetadataService {
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
         List<String> supportedGrantTypeNames = new ArrayList<>();
         // Iterate through the standard grant type names and add matching elements.
-        for (String grantType: getOAuthGrantTypeNames().keySet()) {
+        for (String grantType : getOAuthGrantTypeNames().keySet()) {
             if (supportedGrantTypes.contains(grantType)) {
                 supportedGrantTypeNames.add(getOAuthGrantTypeNames().get(grantType));
                 supportedGrantTypes.remove(grantType);
@@ -211,7 +211,7 @@ public class ServerApplicationMetadataService {
                     .options(Arrays.asList(
                             ApplicationManagementServiceHolder.getStsAdminService().getCertAliasOfPrimaryKeyStore())));
         } catch (SecurityConfigException e) {
-            throw handleException(e, ERROR_WHILE_RETRIEVING_SAML_METADATA);
+            throw handleException(e);
         }
         return wsTrustMetaData;
     }
@@ -239,7 +239,7 @@ public class ServerApplicationMetadataService {
         }
 
         // Throw 404 error if the protocol not found
-        throw buildApiError(ApplicationManagementConstants.ErrorMessage.ERROR_INBOUND_PROTOCOL_NOT_FOUND);
+        throw handleInvalidInboundProtocol(inboundProtocolId);
     }
 
     /**
@@ -295,31 +295,26 @@ public class ServerApplicationMetadataService {
     /**
      * If the passed exception has an error message, set it to the description of the API error response.
      *
-     * @param e         Exception caught.
-     * @param errorEnum Specific error enum.
+     * @param e Exception caught.
      * @return APIError with exception error message if present.
      */
-    private APIError handleException(Exception e, ApplicationManagementConstants.ErrorMessage errorEnum) {
+    private APIError handleException(Exception e) {
 
-        ErrorResponse errorResponse = buildErrorResponse(errorEnum);
+        ErrorMessage errorEnum = ERROR_RETRIEVING_SAML_METADATA;
+        String description = errorEnum.getDescription();
         if (StringUtils.isNotBlank(e.getMessage())) {
-            errorResponse.setDescription(e.getMessage());
+            description = e.getMessage();
         }
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
+
+        return Utils.buildServerError(errorEnum.getCode(), errorEnum.getMessage(), description, e);
     }
 
-    private APIError buildApiError(ApplicationManagementConstants.ErrorMessage errorEnum) {
+    private APIError handleInvalidInboundProtocol(String inboundName) {
 
-        ErrorResponse errorResponse = buildErrorResponse(errorEnum);
-        return new APIError(errorEnum.getHttpStatusCode(), errorResponse);
-    }
+        String errorCode = ErrorMessage.INVALID_INBOUND_PROTOCOL.getCode();
+        String errorMessage = ErrorMessage.INVALID_INBOUND_PROTOCOL.getMessage();
+        String errorDescription = String.format(ErrorMessage.INVALID_INBOUND_PROTOCOL.getDescription(), inboundName);
 
-    private ErrorResponse buildErrorResponse(ApplicationManagementConstants.ErrorMessage errorEnum) {
-
-        return new ErrorResponse.Builder()
-                .withCode(errorEnum.getCode())
-                .withDescription(errorEnum.getDescription())
-                .withMessage(errorEnum.getMessage())
-                .build(LOG, errorEnum.getDescription());
+        return Utils.buildClientError(errorCode, errorMessage, errorDescription);
     }
 }

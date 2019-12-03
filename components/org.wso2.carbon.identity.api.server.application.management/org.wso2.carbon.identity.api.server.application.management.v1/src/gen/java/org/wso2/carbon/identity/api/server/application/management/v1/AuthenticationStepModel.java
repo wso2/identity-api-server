@@ -20,7 +20,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.application.management.v1.Claim;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.Authenticator;
 import javax.validation.constraints.*;
 
 
@@ -29,53 +31,59 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class ClaimMappings  {
+public class AuthenticationStepModel  {
   
-    private String applicationClaim;
-    private Claim localClaim;
+    private Integer id;
+    private List<Authenticator> options = new ArrayList<>();
+
 
     /**
-    * Claim URI recieved by the application
+    * minimum: 1
     **/
-    public ClaimMappings applicationClaim(String applicationClaim) {
+    public AuthenticationStepModel id(Integer id) {
 
-        this.applicationClaim = applicationClaim;
+        this.id = id;
         return this;
     }
     
-    @ApiModelProperty(example = "firstname", required = true, value = "Claim URI recieved by the application")
-    @JsonProperty("applicationClaim")
+    @ApiModelProperty(example = "1", required = true, value = "")
+    @JsonProperty("id")
     @Valid
-    @NotNull(message = "Property applicationClaim cannot be null.")
-
-    public String getApplicationClaim() {
-        return applicationClaim;
+    @NotNull(message = "Property id cannot be null.")
+ @Min(1)
+    public Integer getId() {
+        return id;
     }
-    public void setApplicationClaim(String applicationClaim) {
-        this.applicationClaim = applicationClaim;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     /**
     **/
-    public ClaimMappings localClaim(Claim localClaim) {
+    public AuthenticationStepModel options(List<Authenticator> options) {
 
-        this.localClaim = localClaim;
+        this.options = options;
         return this;
     }
     
     @ApiModelProperty(required = true, value = "")
-    @JsonProperty("localClaim")
+    @JsonProperty("options")
     @Valid
-    @NotNull(message = "Property localClaim cannot be null.")
-
-    public Claim getLocalClaim() {
-        return localClaim;
+    @NotNull(message = "Property options cannot be null.")
+ @Size(min=1)
+    public List<Authenticator> getOptions() {
+        return options;
     }
-    public void setLocalClaim(Claim localClaim) {
-        this.localClaim = localClaim;
+    public void setOptions(List<Authenticator> options) {
+        this.options = options;
     }
 
+    public AuthenticationStepModel addOptionsItem(Authenticator optionsItem) {
+        this.options.add(optionsItem);
+        return this;
+    }
 
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -86,24 +94,24 @@ public class ClaimMappings  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ClaimMappings claimMappings = (ClaimMappings) o;
-        return Objects.equals(this.applicationClaim, claimMappings.applicationClaim) &&
-            Objects.equals(this.localClaim, claimMappings.localClaim);
+        AuthenticationStepModel authenticationStepModel = (AuthenticationStepModel) o;
+        return Objects.equals(this.id, authenticationStepModel.id) &&
+            Objects.equals(this.options, authenticationStepModel.options);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(applicationClaim, localClaim);
+        return Objects.hash(id, options);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ClaimMappings {\n");
+        sb.append("class AuthenticationStepModel {\n");
         
-        sb.append("    applicationClaim: ").append(toIndentedString(applicationClaim)).append("\n");
-        sb.append("    localClaim: ").append(toIndentedString(localClaim)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    options: ").append(toIndentedString(options)).append("\n");
         sb.append("}");
         return sb.toString();
     }

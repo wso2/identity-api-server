@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.application.management.v1.Claim;
+import java.io.File;
 import javax.validation.constraints.*;
 
 
@@ -29,50 +29,27 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class ClaimMappings  {
+public class FileUpload  {
   
-    private String applicationClaim;
-    private Claim localClaim;
+    private File file;
 
     /**
-    * Claim URI recieved by the application
+    * file to upload
     **/
-    public ClaimMappings applicationClaim(String applicationClaim) {
+    public FileUpload file(File file) {
 
-        this.applicationClaim = applicationClaim;
+        this.file = file;
         return this;
     }
     
-    @ApiModelProperty(example = "firstname", required = true, value = "Claim URI recieved by the application")
-    @JsonProperty("applicationClaim")
+    @ApiModelProperty(value = "file to upload")
+    @JsonProperty("file")
     @Valid
-    @NotNull(message = "Property applicationClaim cannot be null.")
-
-    public String getApplicationClaim() {
-        return applicationClaim;
+    public File getFile() {
+        return file;
     }
-    public void setApplicationClaim(String applicationClaim) {
-        this.applicationClaim = applicationClaim;
-    }
-
-    /**
-    **/
-    public ClaimMappings localClaim(Claim localClaim) {
-
-        this.localClaim = localClaim;
-        return this;
-    }
-    
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("localClaim")
-    @Valid
-    @NotNull(message = "Property localClaim cannot be null.")
-
-    public Claim getLocalClaim() {
-        return localClaim;
-    }
-    public void setLocalClaim(Claim localClaim) {
-        this.localClaim = localClaim;
+    public void setFile(File file) {
+        this.file = file;
     }
 
 
@@ -86,24 +63,22 @@ public class ClaimMappings  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ClaimMappings claimMappings = (ClaimMappings) o;
-        return Objects.equals(this.applicationClaim, claimMappings.applicationClaim) &&
-            Objects.equals(this.localClaim, claimMappings.localClaim);
+        FileUpload fileUpload = (FileUpload) o;
+        return Objects.equals(this.file, fileUpload.file);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(applicationClaim, localClaim);
+        return Objects.hash(file);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ClaimMappings {\n");
+        sb.append("class FileUpload {\n");
         
-        sb.append("    applicationClaim: ").append(toIndentedString(applicationClaim)).append("\n");
-        sb.append("    localClaim: ").append(toIndentedString(localClaim)).append("\n");
+        sb.append("    file: ").append(toIndentedString(file)).append("\n");
         sb.append("}");
         return sb.toString();
     }

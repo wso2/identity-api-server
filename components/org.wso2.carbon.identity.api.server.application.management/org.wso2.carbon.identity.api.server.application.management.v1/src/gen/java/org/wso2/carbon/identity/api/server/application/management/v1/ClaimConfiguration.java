@@ -41,7 +41,7 @@ public class ClaimConfiguration  {
 @XmlEnum(String.class)
 public enum DialectEnum {
 
-    @XmlEnumValue("CUSTOM") CUSTOM(String.valueOf("CUSTOM")), @XmlEnumValue("EXTERNAL") EXTERNAL(String.valueOf("EXTERNAL")), @XmlEnumValue("LOCAL") LOCAL(String.valueOf("LOCAL"));
+    @XmlEnumValue("CUSTOM") CUSTOM(String.valueOf("CUSTOM")), @XmlEnumValue("LOCAL") LOCAL(String.valueOf("LOCAL"));
 
 
     private String value;

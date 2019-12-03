@@ -33,7 +33,7 @@ public class SAML2Configuration  {
   
     private String metadataFile;
     private String metadataURL;
-    private SAML2ServiceProvider serviceProvider;
+    private SAML2ServiceProvider manualConfiguration;
 
     /**
     **/
@@ -73,20 +73,20 @@ public class SAML2Configuration  {
 
     /**
     **/
-    public SAML2Configuration serviceProvider(SAML2ServiceProvider serviceProvider) {
+    public SAML2Configuration manualConfiguration(SAML2ServiceProvider manualConfiguration) {
 
-        this.serviceProvider = serviceProvider;
+        this.manualConfiguration = manualConfiguration;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("serviceProvider")
+    @JsonProperty("manualConfiguration")
     @Valid
-    public SAML2ServiceProvider getServiceProvider() {
-        return serviceProvider;
+    public SAML2ServiceProvider getManualConfiguration() {
+        return manualConfiguration;
     }
-    public void setServiceProvider(SAML2ServiceProvider serviceProvider) {
-        this.serviceProvider = serviceProvider;
+    public void setManualConfiguration(SAML2ServiceProvider manualConfiguration) {
+        this.manualConfiguration = manualConfiguration;
     }
 
 
@@ -103,12 +103,12 @@ public class SAML2Configuration  {
         SAML2Configuration saML2Configuration = (SAML2Configuration) o;
         return Objects.equals(this.metadataFile, saML2Configuration.metadataFile) &&
             Objects.equals(this.metadataURL, saML2Configuration.metadataURL) &&
-            Objects.equals(this.serviceProvider, saML2Configuration.serviceProvider);
+            Objects.equals(this.manualConfiguration, saML2Configuration.manualConfiguration);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(metadataFile, metadataURL, serviceProvider);
+        return Objects.hash(metadataFile, metadataURL, manualConfiguration);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class SAML2Configuration  {
         
         sb.append("    metadataFile: ").append(toIndentedString(metadataFile)).append("\n");
         sb.append("    metadataURL: ").append(toIndentedString(metadataURL)).append("\n");
-        sb.append("    serviceProvider: ").append(toIndentedString(serviceProvider)).append("\n");
+        sb.append("    manualConfiguration: ").append(toIndentedString(manualConfiguration)).append("\n");
         sb.append("}");
         return sb.toString();
     }

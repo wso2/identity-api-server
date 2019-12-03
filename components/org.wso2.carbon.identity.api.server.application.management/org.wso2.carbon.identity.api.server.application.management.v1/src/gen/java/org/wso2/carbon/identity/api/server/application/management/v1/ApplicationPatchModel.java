@@ -23,7 +23,6 @@ import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import javax.validation.constraints.*;
 
@@ -33,50 +32,28 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class ApplicationModel  {
+public class ApplicationPatchModel  {
   
-    private String id;
     private String name;
     private String description;
     private String imageUrl;
     private String accessUrl;
     private ClaimConfiguration claimConfiguration;
-    private InboundProtocols inboundProtocolConfiguration;
     private AuthenticationSequence authenticationSequence;
     private AdvancedApplicationConfiguration advancedConfigurations;
     private ProvisioningConfiguration provisioningConfigurations;
 
     /**
     **/
-    public ApplicationModel id(String id) {
-
-        this.id = id;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "394b8adcce24c64a8a09a0d80abf8c337bd253de", value = "")
-    @JsonProperty("id")
-    @Valid
-    public String getId() {
-        return id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-    **/
-    public ApplicationModel name(String name) {
+    public ApplicationPatchModel name(String name) {
 
         this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "pickup", required = true, value = "")
+    @ApiModelProperty(example = "pickup", value = "")
     @JsonProperty("name")
-    @Valid
-    @NotNull(message = "Property name cannot be null.")
- @Pattern(regexp="^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$")
+    @Valid @Pattern(regexp="^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$")
     public String getName() {
         return name;
     }
@@ -86,7 +63,7 @@ public class ApplicationModel  {
 
     /**
     **/
-    public ApplicationModel description(String description) {
+    public ApplicationPatchModel description(String description) {
 
         this.description = description;
         return this;
@@ -104,7 +81,7 @@ public class ApplicationModel  {
 
     /**
     **/
-    public ApplicationModel imageUrl(String imageUrl) {
+    public ApplicationPatchModel imageUrl(String imageUrl) {
 
         this.imageUrl = imageUrl;
         return this;
@@ -122,7 +99,7 @@ public class ApplicationModel  {
 
     /**
     **/
-    public ApplicationModel accessUrl(String accessUrl) {
+    public ApplicationPatchModel accessUrl(String accessUrl) {
 
         this.accessUrl = accessUrl;
         return this;
@@ -140,7 +117,7 @@ public class ApplicationModel  {
 
     /**
     **/
-    public ApplicationModel claimConfiguration(ClaimConfiguration claimConfiguration) {
+    public ApplicationPatchModel claimConfiguration(ClaimConfiguration claimConfiguration) {
 
         this.claimConfiguration = claimConfiguration;
         return this;
@@ -158,25 +135,7 @@ public class ApplicationModel  {
 
     /**
     **/
-    public ApplicationModel inboundProtocolConfiguration(InboundProtocols inboundProtocolConfiguration) {
-
-        this.inboundProtocolConfiguration = inboundProtocolConfiguration;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("inboundProtocolConfiguration")
-    @Valid
-    public InboundProtocols getInboundProtocolConfiguration() {
-        return inboundProtocolConfiguration;
-    }
-    public void setInboundProtocolConfiguration(InboundProtocols inboundProtocolConfiguration) {
-        this.inboundProtocolConfiguration = inboundProtocolConfiguration;
-    }
-
-    /**
-    **/
-    public ApplicationModel authenticationSequence(AuthenticationSequence authenticationSequence) {
+    public ApplicationPatchModel authenticationSequence(AuthenticationSequence authenticationSequence) {
 
         this.authenticationSequence = authenticationSequence;
         return this;
@@ -194,7 +153,7 @@ public class ApplicationModel  {
 
     /**
     **/
-    public ApplicationModel advancedConfigurations(AdvancedApplicationConfiguration advancedConfigurations) {
+    public ApplicationPatchModel advancedConfigurations(AdvancedApplicationConfiguration advancedConfigurations) {
 
         this.advancedConfigurations = advancedConfigurations;
         return this;
@@ -212,7 +171,7 @@ public class ApplicationModel  {
 
     /**
     **/
-    public ApplicationModel provisioningConfigurations(ProvisioningConfiguration provisioningConfigurations) {
+    public ApplicationPatchModel provisioningConfigurations(ProvisioningConfiguration provisioningConfigurations) {
 
         this.provisioningConfigurations = provisioningConfigurations;
         return this;
@@ -239,37 +198,33 @@ public class ApplicationModel  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ApplicationModel applicationModel = (ApplicationModel) o;
-        return Objects.equals(this.id, applicationModel.id) &&
-            Objects.equals(this.name, applicationModel.name) &&
-            Objects.equals(this.description, applicationModel.description) &&
-            Objects.equals(this.imageUrl, applicationModel.imageUrl) &&
-            Objects.equals(this.accessUrl, applicationModel.accessUrl) &&
-            Objects.equals(this.claimConfiguration, applicationModel.claimConfiguration) &&
-            Objects.equals(this.inboundProtocolConfiguration, applicationModel.inboundProtocolConfiguration) &&
-            Objects.equals(this.authenticationSequence, applicationModel.authenticationSequence) &&
-            Objects.equals(this.advancedConfigurations, applicationModel.advancedConfigurations) &&
-            Objects.equals(this.provisioningConfigurations, applicationModel.provisioningConfigurations);
+        ApplicationPatchModel applicationPatchModel = (ApplicationPatchModel) o;
+        return Objects.equals(this.name, applicationPatchModel.name) &&
+            Objects.equals(this.description, applicationPatchModel.description) &&
+            Objects.equals(this.imageUrl, applicationPatchModel.imageUrl) &&
+            Objects.equals(this.accessUrl, applicationPatchModel.accessUrl) &&
+            Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
+            Objects.equals(this.authenticationSequence, applicationPatchModel.authenticationSequence) &&
+            Objects.equals(this.advancedConfigurations, applicationPatchModel.advancedConfigurations) &&
+            Objects.equals(this.provisioningConfigurations, applicationPatchModel.provisioningConfigurations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, imageUrl, accessUrl, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ApplicationModel {\n");
+        sb.append("class ApplicationPatchModel {\n");
         
-        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
-        sb.append("    inboundProtocolConfiguration: ").append(toIndentedString(inboundProtocolConfiguration)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
         sb.append("    provisioningConfigurations: ").append(toIndentedString(provisioningConfigurations)).append("\n");
