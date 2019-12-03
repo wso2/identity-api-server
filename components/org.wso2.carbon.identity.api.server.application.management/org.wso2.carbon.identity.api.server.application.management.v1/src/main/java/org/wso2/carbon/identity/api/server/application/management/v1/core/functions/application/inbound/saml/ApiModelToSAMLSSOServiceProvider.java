@@ -78,5 +78,4 @@ public class ApiModelToSAMLSSOServiceProvider implements Function<SAML2ServicePr
             return spModel.getAssertionConsumerUrls().get(0);
         }
     }
-
 }
