@@ -42,7 +42,7 @@ public class InboundSCIMProvisioningConfiguration  {
     }
     
     @ApiModelProperty(example = "false", value = "")
-    @JsonProperty("proxy-mode")
+    @JsonProperty("proxyMode")
     @Valid
     public Boolean getProxyMode() {
         return proxyMode;

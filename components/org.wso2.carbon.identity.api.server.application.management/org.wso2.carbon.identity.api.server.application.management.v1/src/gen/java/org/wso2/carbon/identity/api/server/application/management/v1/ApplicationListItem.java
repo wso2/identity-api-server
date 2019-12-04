@@ -34,7 +34,7 @@ public class ApplicationListItem  {
     private String name;
     private String description;
     private String image;
-    private String loginUrl;
+    private String accessUrl;
     private String self;
 
     /**
@@ -111,20 +111,20 @@ public class ApplicationListItem  {
 
     /**
     **/
-    public ApplicationListItem loginUrl(String loginUrl) {
+    public ApplicationListItem accessUrl(String accessUrl) {
 
-        this.loginUrl = loginUrl;
+        this.accessUrl = accessUrl;
         return this;
     }
     
     @ApiModelProperty(example = "https://example.com/app/login", value = "")
-    @JsonProperty("loginUrl")
+    @JsonProperty("accessUrl")
     @Valid
-    public String getLoginUrl() {
-        return loginUrl;
+    public String getAccessUrl() {
+        return accessUrl;
     }
-    public void setLoginUrl(String loginUrl) {
-        this.loginUrl = loginUrl;
+    public void setAccessUrl(String accessUrl) {
+        this.accessUrl = accessUrl;
     }
 
     /**
@@ -161,13 +161,13 @@ public class ApplicationListItem  {
             Objects.equals(this.name, applicationListItem.name) &&
             Objects.equals(this.description, applicationListItem.description) &&
             Objects.equals(this.image, applicationListItem.image) &&
-            Objects.equals(this.loginUrl, applicationListItem.loginUrl) &&
+            Objects.equals(this.accessUrl, applicationListItem.accessUrl) &&
             Objects.equals(this.self, applicationListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, loginUrl, self);
+        return Objects.hash(id, name, description, image, accessUrl, self);
     }
 
     @Override
@@ -180,7 +180,7 @@ public class ApplicationListItem  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
-        sb.append("    loginUrl: ").append(toIndentedString(loginUrl)).append("\n");
+        sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();

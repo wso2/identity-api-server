@@ -28,14 +28,15 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class Property  {
+public class PropertyModel  {
   
     private String key;
     private String value;
+    private String friendlyName;
 
     /**
     **/
-    public Property key(String key) {
+    public PropertyModel key(String key) {
 
         this.key = key;
         return this;
@@ -53,7 +54,7 @@ public class Property  {
 
     /**
     **/
-    public Property value(String value) {
+    public PropertyModel value(String value) {
 
         this.value = value;
         return this;
@@ -69,6 +70,24 @@ public class Property  {
         this.value = value;
     }
 
+    /**
+    **/
+    public PropertyModel friendlyName(String friendlyName) {
+
+        this.friendlyName = friendlyName;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Application Identifier", value = "")
+    @JsonProperty("friendlyName")
+    @Valid
+    public String getFriendlyName() {
+        return friendlyName;
+    }
+    public void setFriendlyName(String friendlyName) {
+        this.friendlyName = friendlyName;
+    }
+
 
 
     @Override
@@ -80,24 +99,26 @@ public class Property  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Property property = (Property) o;
-        return Objects.equals(this.key, property.key) &&
-            Objects.equals(this.value, property.value);
+        PropertyModel propertyModel = (PropertyModel) o;
+        return Objects.equals(this.key, propertyModel.key) &&
+            Objects.equals(this.value, propertyModel.value) &&
+            Objects.equals(this.friendlyName, propertyModel.friendlyName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(key, value);
+        return Objects.hash(key, value, friendlyName);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class Property {\n");
+        sb.append("class PropertyModel {\n");
         
         sb.append("    key: ").append(toIndentedString(key)).append("\n");
         sb.append("    value: ").append(toIndentedString(value)).append("\n");
+        sb.append("    friendlyName: ").append(toIndentedString(friendlyName)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -20,9 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.Authenticator;
 import javax.validation.constraints.*;
 
 
@@ -31,59 +28,73 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class AuthenticationStep  {
+public class InboundProtocolListItem  {
   
-    private Integer id;
-    private List<Authenticator> options = new ArrayList<>();
-
-
-    /**
-    * minimum: 1
-    **/
-    public AuthenticationStep id(Integer id) {
-
-        this.id = id;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "1", required = true, value = "")
-    @JsonProperty("id")
-    @Valid
-    @NotNull(message = "Property id cannot be null.")
- @Min(1)
-    public Integer getId() {
-        return id;
-    }
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    private String type;
+    private String name;
+    private String self;
 
     /**
     **/
-    public AuthenticationStep options(List<Authenticator> options) {
+    public InboundProtocolListItem type(String type) {
 
-        this.options = options;
+        this.type = type;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("options")
+    @ApiModelProperty(example = "samlsso", required = true, value = "")
+    @JsonProperty("type")
     @Valid
-    @NotNull(message = "Property options cannot be null.")
- @Size(min=1)
-    public List<Authenticator> getOptions() {
-        return options;
+    @NotNull(message = "Property type cannot be null.")
+
+    public String getType() {
+        return type;
     }
-    public void setOptions(List<Authenticator> options) {
-        this.options = options;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public AuthenticationStep addOptionsItem(Authenticator optionsItem) {
-        this.options.add(optionsItem);
+    /**
+    **/
+    public InboundProtocolListItem name(String name) {
+
+        this.name = name;
         return this;
     }
-
     
+    @ApiModelProperty(example = "SAML2 Inbound", required = true, value = "")
+    @JsonProperty("name")
+    @Valid
+    @NotNull(message = "Property name cannot be null.")
+
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+    **/
+    public InboundProtocolListItem self(String self) {
+
+        this.self = self;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "/t/carbon.super/api/server/v1/applications/29048810-1447-4ea0-a348-30d15ab65fa3/inbound-protocols/saml", required = true, value = "")
+    @JsonProperty("self")
+    @Valid
+    @NotNull(message = "Property self cannot be null.")
+
+    public String getSelf() {
+        return self;
+    }
+    public void setSelf(String self) {
+        this.self = self;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -94,24 +105,26 @@ public class AuthenticationStep  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AuthenticationStep authenticationStep = (AuthenticationStep) o;
-        return Objects.equals(this.id, authenticationStep.id) &&
-            Objects.equals(this.options, authenticationStep.options);
+        InboundProtocolListItem inboundProtocolListItem = (InboundProtocolListItem) o;
+        return Objects.equals(this.type, inboundProtocolListItem.type) &&
+            Objects.equals(this.name, inboundProtocolListItem.name) &&
+            Objects.equals(this.self, inboundProtocolListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, options);
+        return Objects.hash(type, name, self);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class AuthenticationStep {\n");
+        sb.append("class InboundProtocolListItem {\n");
         
-        sb.append("    id: ").append(toIndentedString(id)).append("\n");
-        sb.append("    options: ").append(toIndentedString(options)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -155,7 +155,7 @@ public enum StateEnum {
     @JsonProperty("grantTypes")
     @Valid
     @NotNull(message = "Property grantTypes cannot be null.")
-
+ @Size(min=1)
     public List<String> getGrantTypes() {
         return grantTypes;
     }

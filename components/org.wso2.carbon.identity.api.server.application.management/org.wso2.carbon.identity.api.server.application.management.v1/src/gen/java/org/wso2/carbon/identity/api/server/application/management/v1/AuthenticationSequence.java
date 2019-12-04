@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationStep;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationStepModel;
 import javax.validation.constraints.*;
 
 
@@ -67,7 +67,7 @@ public enum TypeEnum {
 }
 
     private TypeEnum type = TypeEnum.DEFAULT;
-    private List<AuthenticationStep> steps = null;
+    private List<AuthenticationStepModel> steps = null;
 
     private List<String> requestPathAuthenticators = null;
 
@@ -95,7 +95,7 @@ public enum TypeEnum {
 
     /**
     **/
-    public AuthenticationSequence steps(List<AuthenticationStep> steps) {
+    public AuthenticationSequence steps(List<AuthenticationStepModel> steps) {
 
         this.steps = steps;
         return this;
@@ -104,14 +104,14 @@ public enum TypeEnum {
     @ApiModelProperty(value = "")
     @JsonProperty("steps")
     @Valid
-    public List<AuthenticationStep> getSteps() {
+    public List<AuthenticationStepModel> getSteps() {
         return steps;
     }
-    public void setSteps(List<AuthenticationStep> steps) {
+    public void setSteps(List<AuthenticationStepModel> steps) {
         this.steps = steps;
     }
 
-    public AuthenticationSequence addStepsItem(AuthenticationStep stepsItem) {
+    public AuthenticationSequence addStepsItem(AuthenticationStepModel stepsItem) {
         if (this.steps == null) {
             this.steps = new ArrayList<>();
         }

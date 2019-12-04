@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.File;
 import javax.validation.constraints.*;
 
 
@@ -29,27 +28,66 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class InlineObject  {
+public class Claim  {
   
-    private File file;
+    private String id;
+    private String uri;
+    private String displayName;
 
     /**
-    * file to upload
     **/
-    public InlineObject file(File file) {
+    public Claim id(String id) {
 
-        this.file = file;
+        this.id = id;
         return this;
     }
     
-    @ApiModelProperty(value = "file to upload")
-    @JsonProperty("file")
+    @ApiModelProperty(example = "aHR0cDovL3dzbzIub3JnL2NsYWltcy91c2VybmFtZQ", value = "")
+    @JsonProperty("id")
     @Valid
-    public File getFile() {
-        return file;
+    public String getId() {
+        return id;
     }
-    public void setFile(File file) {
-        this.file = file;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+    **/
+    public Claim uri(String uri) {
+
+        this.uri = uri;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "http://wso2.org/claims/username", required = true, value = "")
+    @JsonProperty("uri")
+    @Valid
+    @NotNull(message = "Property uri cannot be null.")
+
+    public String getUri() {
+        return uri;
+    }
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    /**
+    **/
+    public Claim displayName(String displayName) {
+
+        this.displayName = displayName;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Username", value = "")
+    @JsonProperty("displayName")
+    @Valid
+    public String getDisplayName() {
+        return displayName;
+    }
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
 
@@ -63,22 +101,26 @@ public class InlineObject  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        InlineObject inlineObject = (InlineObject) o;
-        return Objects.equals(this.file, inlineObject.file);
+        Claim claim = (Claim) o;
+        return Objects.equals(this.id, claim.id) &&
+            Objects.equals(this.uri, claim.uri) &&
+            Objects.equals(this.displayName, claim.displayName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(file);
+        return Objects.hash(id, uri, displayName);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class InlineObject {\n");
+        sb.append("class Claim {\n");
         
-        sb.append("    file: ").append(toIndentedString(file)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
+        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("}");
         return sb.toString();
     }
