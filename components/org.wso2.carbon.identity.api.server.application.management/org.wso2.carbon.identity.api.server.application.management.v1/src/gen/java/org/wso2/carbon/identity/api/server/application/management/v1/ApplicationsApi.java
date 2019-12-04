@@ -634,7 +634,7 @@ public class ApplicationsApi  {
     @Path("/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Import an application from file and update. ", notes = "This API provides the capability to updated an application from information provided as a file. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update an application from file. ", notes = "This API provides the capability to update an application from information exported as a file. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
