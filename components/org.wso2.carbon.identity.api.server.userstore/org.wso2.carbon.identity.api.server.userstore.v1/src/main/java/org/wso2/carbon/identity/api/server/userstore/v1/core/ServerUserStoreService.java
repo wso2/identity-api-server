@@ -766,9 +766,8 @@ public class ServerUserStoreService {
 
         if (exception.getErrorCode() != null) {
             String errorCode = exception.getErrorCode();
-            errorCode =
-                    errorCode.contains(UserStoreConstants.SECONDARY_USER_STORE_PREFIX) ?
-                            errorCode : UserStoreConstants.SECONDARY_USER_STORE_PREFIX + errorCode;
+            errorCode = errorCode.contains(UserStoreConstants.SECONDARY_USER_STORE_PREFIX) ?
+                    errorCode : UserStoreConstants.SECONDARY_USER_STORE_PREFIX + errorCode;
             errorResponse.setCode(errorCode);
         }
         errorResponse.setDescription(exception.getMessage());
