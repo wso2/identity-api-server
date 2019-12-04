@@ -164,7 +164,6 @@ paths:
             schema:
               $ref: '#/components/schemas/FileUpload'
         description: This represents the application to be created.
-        required: true
       responses:
         '201':
           description: Successfully created.
@@ -207,20 +206,24 @@ paths:
       tags:
         - Applications
       summary: |
-        Import an application from file and update.
+        Update an application from file.
       operationId: importApplicationForUpdate
       description: >
-        This API provides the capability to updated an application from information provided as a file.
+        This API provides the capability to update an application from information exported as a file.
       requestBody:
         content:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/FileUpload'
         description: This represents the application to be updated.
-        required: true
       responses:
         '200':
           description: Successfully Updated.
+          headers:
+            Location:
+              description: Location of the updated application.
+              schema:
+                type: string
         '400':
           description: Bad Request
           content:
