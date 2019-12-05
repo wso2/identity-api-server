@@ -672,7 +672,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SAML2ServiceProvider'
+                $ref: '#/components/schemas/SAMLRequestValidation'
         '400':
           description: Bad Request
           content:
@@ -2440,95 +2440,90 @@ components:
         metadataFile:
           type: string
           example: 'Base64 encoded metadata file content'
-          writeOnly: true
         metadataURL:
           type: string
           example: 'https://example.com/samlsso/meta'
-          writeOnly: true
         manualConfiguration:
           $ref: '#/components/schemas/SAML2ServiceProvider'
 
-    SAML2ServiceProvider:
+    SingleSignOnProfile:
       type: object
-      required:
-        - issuer
-        - assertionConsumerUrls
       properties:
-        issuer:
-          type: string
-        serviceProviderQualifier:
-          type: string
-        assertionConsumerUrls:
+        bindings:
           type: array
           items:
             type: string
-          minItems: 1
-        defaultAssertionConsumerUrl:
-          type: string
+            enum:
+              - HTTP_POST
+              - HTTP_REDIRECT
+              - ARTIFACT
+          default: [ "HTTP_POST", "HTTP_REDIRECT"]
+
+        enableSignatureValidationForArtifactBinding:
+          type: boolean
+          description: Enables Signature validation for SAML Artifact Binding. Applicable only if SAML Artifact binding is enabled through the bindings option.
+          default: false
+
         attributeConsumingServiceIndex:
           type: string
           readOnly: true
 
-        enableRequestSignatureValidation:
-          type: boolean
-          default: true
-
-        enableAssertionEncryption:
-          type: boolean
-          default: false
-        assertionEncryptionAlgroithm:
-          type: string
-        keyEncryptionAlgorithm:
-          type: string
-        nameIdFormat:
-          type: string
-          default: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
-          example: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
         enableIdpInitiatedSingleSignOn:
           type: boolean
           default: false
 
-        enableResponseSigning:
+        assertion:
+          $ref: '#/components/schemas/SAMLAssertionConfiguration'
+
+    SAMLAttributeProfile:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          default: false
+        alwaysIncludeAttributesInResponse:
+          type: boolean
+          default: false
+
+    SingleLogoutProfile:
+      type: object
+      properties:
+        enabled:
           type: boolean
           default: true
-
-        requestValidationCertificateAlias:
-          type: string
-        responseSigningAlgorithm:
-          type: string
-        responseDigestAlgorithm:
-          type: string
-
-
-        enableSingleLogout:
-          type: boolean
-          default: true
-        singleLogoutResponseUrl:
-          type: string
-          description: Single logout response accepting endpoint
-        singleLogoutRequestUrl:
+        logoutRequestUrl:
           type: string
           description: Single logout request accepting endpoint
-        singleLogoutMethod:
+        logoutResponseUrl:
+          type: string
+          description: Single logout response accepting endpoint
+        logoutMethod:
           type: string
           enum:
             - BACKCHANNEL
             - FRONTCHANNEL_HTTP_REDIRECT
             - FRONTCHANNEL_HTTP_POST
-        enableIdpInitiatedSingleLogOut:
+        idpInitiatedSingleLogout:
+          $ref: '#/components/schemas/IdpInitiatedSingleLogout'
+
+    IdpInitiatedSingleLogout:
+      type: object
+      properties:
+        enabled:
           type: boolean
           default: false
-        idpInitiatedLogoutReturnUrls:
+        returnToUrls:
           type: array
           items:
             type: string
 
-        enableAttributeProfile:
-          type: boolean
-          default: false
-        includedAttributeInResponseAlways:
-          type: boolean
-          default: false
+    SAMLAssertionConfiguration:
+      type: object
+      properties:
+        nameIdFormat:
+          type: string
+          default: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+          example: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
 
         audiences:
           type: array
@@ -2546,20 +2541,85 @@ components:
           items:
             type: string
 
+        digestAlgorithm:
+          type: string
+          default: "http://www.w3.org/2000/09/xmldsig#sha1"
+          example: "http://www.w3.org/2000/09/xmldsig#sha1"
+        encryption:
+          $ref: '#/components/schemas/AssertionEncryptionConfiguration'
+
+    AssertionEncryptionConfiguration:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          default: false
+        assertionEncryptionAlgorithm:
+          type: string
+          default: "http://www.w3.org/2001/04/xmlenc#aes256-cbc"
+        keyEncryptionAlgorithm:
+          type: string
+          default: "http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p"
+
+    SAMLRequestValidation:
+      type: object
+      properties:
+        enableSignatureValidation:
+          type: boolean
+          default: true
+        signatureValidationCertAlias:
+          type: string
+
+    SAMLResponseSigning:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          default: true
+        signingAlgorithm:
+          type: string
+
+    SAML2ServiceProvider:
+      type: object
+      required:
+        - issuer
+        - assertionConsumerUrls
+
+      properties:
+        issuer:
+          type: string
+        serviceProviderQualifier:
+          type: string
+        assertionConsumerUrls:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        defaultAssertionConsumerUrl:
+          type: string
+          description: "If not provided, the first assertion consumer URL on the assertionConsumerUrls will be picked as the default assertion consumer URL."
+        idpEntityIdAlias  :
+          type: string
+          description: "Default value is the IdP Entity ID value specified in Resident IdP"
+
+        singleSignOnProfile:
+          $ref: '#/components/schemas/SingleSignOnProfile'
+
+        attributeProfile:
+          $ref: '#/components/schemas/SAMLAttributeProfile'
+
+        singleLogoutProfile:
+          $ref: '#/components/schemas/SingleLogoutProfile'
+
+        requestValidation:
+          $ref: '#/components/schemas/SAMLRequestValidation'
+
+        responseSigning:
+          $ref: '#/components/schemas/SAMLResponseSigning'
+
         enableAssertionQueryProfile:
           type: boolean
           default: false
-
-        enableSAML2ArtifactBinding:
-          type: boolean
-          default: false
-        enableSignatureValidationInArtifactBinding:
-          type: boolean
-          default: false
-
-        idPEntityidAlias  :
-          type: string
-          description: "Default value is the IdP Entity ID value specified in Resident IdP"
 
     OpenIDConnectConfiguration:
       type: object
