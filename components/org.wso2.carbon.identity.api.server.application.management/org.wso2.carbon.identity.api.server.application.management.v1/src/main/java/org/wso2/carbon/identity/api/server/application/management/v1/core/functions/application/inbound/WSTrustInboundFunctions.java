@@ -25,6 +25,7 @@ import org.wso2.carbon.security.sts.service.util.TrustedServiceData;
 
 import java.util.Arrays;
 
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerError;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.WS_TRUST;
 
@@ -43,6 +44,10 @@ public class WSTrustInboundFunctions {
         String inboundAuthKey = InboundFunctions.getInboundAuthKey(application, WS_TRUST);
         try {
             if (inboundAuthKey != null) {
+                if (wsTrustAudienceChanged(wsTrustModel, inboundAuthKey)) {
+                    // We do not allow the inbound unique key to be changed during an update.
+                    throw buildBadRequestError("Invalid audience value provided for update.");
+                }
                 ApplicationManagementServiceHolder.getStsAdminService().removeTrustedService(inboundAuthKey);
             }
 
@@ -51,6 +56,11 @@ public class WSTrustInboundFunctions {
             String applicationId = application.getApplicationResourceId();
             throw buildServerError("Error while creating/updating WSTrust inbound of application: " + applicationId, e);
         }
+    }
+
+    private static boolean wsTrustAudienceChanged(WSTrustConfiguration wsTrustModel, String inboundAuthKey) {
+
+        return !StringUtils.equals(inboundAuthKey, wsTrustModel.getAudience());
     }
 
     public static InboundAuthenticationRequestConfig createWsTrustInbound(WSTrustConfiguration wsTrustConfiguration) {
