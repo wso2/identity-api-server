@@ -32,6 +32,8 @@ import org.wso2.carbon.identity.api.server.idp.common.IdentityProviderServiceHol
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claim;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
+import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApp;
+import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticator;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
@@ -77,6 +79,7 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
+import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 
 import java.lang.reflect.InvocationTargetException;
@@ -778,7 +781,57 @@ public class ServerIdpManagementService {
         }
     }
 
+    /**
+     * Get applications that are connected to the Identity Provider identified by resource ID.
+     *
+     * @param resourceId    IDP resource ID.
+     * @param limit         Limit parameter.
+     * @param offset        Offset parameter.
+     * @return  ConnectedApps.
+     */
+    public ConnectedApps getConnectedApps(String resourceId, Integer limit, Integer offset) {
+
+        try {
+            ConnectedAppsResult connectedAppsResult =
+                    IdentityProviderServiceHolder.getIdentityProviderManager().getConnectedApplications(resourceId,
+                            limit, offset, ContextLoader.getTenantDomainFromContext());
+            return createConnectedAppsResponse(resourceId, connectedAppsResult);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS,
+                    resourceId);
+        }
+    }
+
     // Private utility Methods.
+
+    private ConnectedApps createConnectedAppsResponse(String resourceId, ConnectedAppsResult connectedAppsResult) {
+
+        ConnectedApps connectedAppsResponse = new ConnectedApps();
+        if (connectedAppsResult == null) {
+            return connectedAppsResponse;
+        }
+        List<ConnectedApp> connectedAppList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(connectedAppsResult.getApps())) {
+            for (String app : connectedAppsResult.getApps()) {
+                ConnectedApp listItem = new ConnectedApp();
+                listItem.setAppId(app);
+                listItem.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
+                                "/applications/%s", app)).toString());
+                connectedAppList.add(listItem);
+            }
+            connectedAppsResponse.setConnectedApps(connectedAppList);
+            connectedAppsResponse.setCount(connectedAppList.size());
+        } else {
+            connectedAppsResponse.setCount(0);
+        }
+
+        connectedAppsResponse.setTotalResults(connectedAppsResult.getTotalAppCount());
+        connectedAppsResponse.setStartIndex(connectedAppsResult.getOffSet() + 1);
+        connectedAppsResponse.setLinks(createLinks(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT +
+                        Constants.PATH_SEPERATOR + resourceId + "/connected-apps", connectedAppsResult.getLimit(),
+                connectedAppsResult.getOffSet(), connectedAppsResult.getTotalAppCount(), null));
+        return connectedAppsResponse;
+    }
 
     private MetaFederatedAuthenticatorListItem createMetaFederatedAuthenticatorListItem(FederatedAuthenticatorConfig
                                                                                                 authenticatorConfig) {
@@ -1132,28 +1185,30 @@ public class ServerIdpManagementService {
 
         listResponse.setTotalResults(idpSearchResult.getTotalIDPCount());
         listResponse.setStartIndex(idpSearchResult.getOffSet() + 1);
-        listResponse.setLinks(createLinks(idpSearchResult.getLimit(), idpSearchResult.getOffSet(), idpSearchResult
-                .getTotalIDPCount(), idpSearchResult.getFilter()));
+        listResponse.setLinks(createLinks(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT, idpSearchResult
+                        .getLimit(), idpSearchResult.getOffSet(), idpSearchResult.getTotalIDPCount(), idpSearchResult
+                .getFilter()));
         return listResponse;
     }
 
-    private List<Link> createLinks(int limit, int offset, int total, String filter) {
+    private List<Link> createLinks(String url, int limit, int offset, int total, String filter) {
 
         List<Link> links = new ArrayList<>();
 
         // Next Link
-        if ((offset + limit) < total) {
-            links.add(buildPageLink(Constants.PAGE_LINK_REL_NEXT, (offset + limit), limit, filter));
+        if (limit > 0 && offset >= 0 && (offset + limit) < total) {
+            links.add(buildPageLink(new StringBuilder(url), Constants.PAGE_LINK_REL_NEXT, (offset +
+                    limit), limit, filter));
         }
 
         // Previous Link
-        // Previous link matters only if offset is greater than 0.
-        if (offset > 0) {
+        // Previous link matters only if offset and limit are greater than 0.
+        if (offset > 0 && limit > 0) {
             if ((offset - limit) >= 0) { // A previous page of size 'limit' exists
-                links.add(buildPageLink(Constants.PAGE_LINK_REL_PREVIOUS, calculateOffsetForPreviousLink(offset,
-                        limit, total), limit, filter));
+                links.add(buildPageLink(new StringBuilder(url), Constants.PAGE_LINK_REL_PREVIOUS,
+                        calculateOffsetForPreviousLink(offset, limit, total), limit, filter));
             } else { // A previous page exists but it's size is less than the specified limit
-                links.add(buildPageLink(Constants.PAGE_LINK_REL_PREVIOUS, 0, offset, filter));
+                links.add(buildPageLink(new StringBuilder(url), Constants.PAGE_LINK_REL_PREVIOUS, 0, offset, filter));
             }
         }
 
@@ -1170,13 +1225,14 @@ public class ServerIdpManagementService {
         return calculateOffsetForPreviousLink(newOffset, limit, total);
     }
 
-    private Link buildPageLink(String rel, int offset, int limit, String filter) {
+    private Link buildPageLink(StringBuilder url, String rel, int offset, int limit, String filter) {
 
-        String url = String.format(Constants.IDP_PAGINATION_LINK_FORMAT, offset, limit);
-        if (StringUtils.isNotBlank(url) && StringUtils.isNotBlank(filter)) {
-            url = url + "&filter=" + filter;
+        if (StringUtils.isNotBlank(filter)) {
+            url.append(String.format(Constants.PAGINATION_WITH_FILTER_LINK_FORMAT, offset, limit, filter));
+        } else {
+            url.append(String.format(Constants.PAGINATION_LINK_FORMAT, offset, limit));
         }
-        return new Link().rel(rel).href(ContextLoader.buildURIForBody((url)).toString());
+        return new Link().rel(rel).href(ContextLoader.buildURIForBody((url.toString())).toString());
     }
 
     private IdentityProviderResponse createIDPResponse(IdentityProvider identityProvider) {

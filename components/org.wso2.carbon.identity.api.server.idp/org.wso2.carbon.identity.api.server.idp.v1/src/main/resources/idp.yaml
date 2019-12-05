@@ -1352,6 +1352,8 @@ paths:
         This API provides the list of applications which are using this identity provider for federated/provisioning.
       operationId: getConnectedApps
       parameters:
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/offsetQueryParam'
         - name: identity-provider-id
           in: path
           description: Id of the identity provider
@@ -2088,15 +2090,41 @@ components:
           default: PRIMARY
           example: PRIMARY
     ConnectedApps:
-      type: array
-      items:
-        $ref: '#/components/schemas/ConnectedApp'
+      type: object
+      properties:
+        totalResults:
+          type: integer
+          example: 10
+        startIndex:
+          type: integer
+          example: 1
+        count:
+          type: integer
+          example: 10
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+          example:
+            [
+                {
+                    "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=50&limit=10",
+                    "rel": "next"
+                },  {
+                    "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=30&limit=10",
+                    "rel": "previous"
+                }
+            ]
+        connectedApps:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectedApp'
     ConnectedApp:
       type: object
       properties:
         appId:
           type: string
           example: app-id
-        connectedApp:
+        self:
           type: string
           example: connected-app-url

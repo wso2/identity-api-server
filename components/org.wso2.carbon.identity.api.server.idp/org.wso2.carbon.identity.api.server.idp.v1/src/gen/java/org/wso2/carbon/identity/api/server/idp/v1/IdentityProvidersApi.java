@@ -18,7 +18,7 @@ package org.wso2.carbon.identity.api.server.idp.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
-import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApp;
+import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Error;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticator;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
@@ -132,23 +132,23 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/connected-apps")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Connected applications of an identity provider ", notes = "This API provides the list of applications which are using this identity provider for federated/provisioning. ", response = ConnectedApp.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Connected applications of an identity provider ", notes = "This API provides the list of applications which are using this identity provider for federated/provisioning. ", response = ConnectedApps.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Connected Apps", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response", response = ConnectedApp.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "Successful response", response = ConnectedApps.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getConnectedApps(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId) {
+    public Response getConnectedApps(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Maximum number of records to return ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination ")  @QueryParam("offset") Integer offset) {
 
-        return delegate.getConnectedApps(identityProviderId );
+        return delegate.getConnectedApps(identityProviderId,  limit,  offset );
     }
 
     @Valid
