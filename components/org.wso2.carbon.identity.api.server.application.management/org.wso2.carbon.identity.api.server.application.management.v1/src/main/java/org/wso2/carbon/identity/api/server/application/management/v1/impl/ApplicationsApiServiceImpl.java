@@ -177,7 +177,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response importApplicationForUpdate(InputStream fileInputStream, Attachment fileDetail) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        String resourceId = applicationManagementService.importApplicationForUpdate(fileInputStream, fileDetail);
+        return Response.ok().location(getResourceLocation(resourceId)).build();
     }
 
     @Override
