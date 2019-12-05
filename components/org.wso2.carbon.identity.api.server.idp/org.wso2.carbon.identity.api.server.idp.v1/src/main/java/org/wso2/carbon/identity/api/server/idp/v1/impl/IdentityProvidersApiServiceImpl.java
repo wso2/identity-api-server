@@ -74,9 +74,9 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     }
 
     @Override
-    public Response getConnectedApps(String identityProviderId) {
+    public Response getConnectedApps(String identityProviderId, Integer limit, Integer offset) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return Response.ok().entity(idpManagementService.getConnectedApps(identityProviderId, limit, offset)).build();
     }
 
     @Override

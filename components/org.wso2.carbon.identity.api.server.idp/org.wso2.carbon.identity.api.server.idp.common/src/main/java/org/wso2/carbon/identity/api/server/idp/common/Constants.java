@@ -23,6 +23,7 @@ public class Constants {
 
     public static final String IDP_MANAGEMENT_PREFIX = "IDP-";
     public static final String IDP_PATH_COMPONENT = "/identity-providers";
+    public static final String PATH_SEPERATOR = "/";
     public static final String JWKS_URI = "jwksUri";
     public static final String META_DATA_SAML = "meta_data_saml";
     public static final String SELECT_MODE = "SelectMode";
@@ -41,7 +42,8 @@ public class Constants {
     public static final String HOME_REALM_PATH = "/homeRealmIdentifier";
 
     // IdP pagination constants.
-    public static final String IDP_PAGINATION_LINK_FORMAT = "/v1/identity-providers?offset=%d&limit=%d";
+    public static final String PAGINATION_LINK_FORMAT = "?offset=%d&limit=%d";
+    public static final String PAGINATION_WITH_FILTER_LINK_FORMAT = "?offset=%d&limit=%d&filter=%s";
     public static final String PAGE_LINK_REL_NEXT = "next";
     public static final String PAGE_LINK_REL_PREVIOUS = "previous";
 
@@ -100,6 +102,9 @@ public class Constants {
         ERROR_CODE_ERROR_RETRIEVING_IDP_JIT("65032",
                 "Unable to retrieve identity provider JIT config.",
                 "Server encountered an error while retrieving the identity provider JIT config for identifier %s."),
+        ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS("65042",
+                "Unable to retrieve identity provider connected applications.",
+                "Server encountered an error while retrieving the identity provider connected applications %s."),
         ERROR_CODE_ERROR_UPDATING_IDP("65005",
                 "Unable to update identity provider.",
                 "Server encountered an error while updating the identity provider for identifier %s."),

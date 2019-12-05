@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.*;
 public class ConnectedApp  {
   
     private String appId;
-    private String connectedApp;
+    private String self;
 
     /**
     **/
@@ -53,20 +53,20 @@ public class ConnectedApp  {
 
     /**
     **/
-    public ConnectedApp connectedApp(String connectedApp) {
+    public ConnectedApp self(String self) {
 
-        this.connectedApp = connectedApp;
+        this.self = self;
         return this;
     }
     
     @ApiModelProperty(example = "connected-app-url", value = "")
-    @JsonProperty("connectedApp")
+    @JsonProperty("self")
     @Valid
-    public String getConnectedApp() {
-        return connectedApp;
+    public String getSelf() {
+        return self;
     }
-    public void setConnectedApp(String connectedApp) {
-        this.connectedApp = connectedApp;
+    public void setSelf(String self) {
+        this.self = self;
     }
 
 
@@ -82,12 +82,12 @@ public class ConnectedApp  {
         }
         ConnectedApp connectedApp = (ConnectedApp) o;
         return Objects.equals(this.appId, connectedApp.appId) &&
-            Objects.equals(this.connectedApp, connectedApp.connectedApp);
+            Objects.equals(this.self, connectedApp.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(appId, connectedApp);
+        return Objects.hash(appId, self);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class ConnectedApp  {
         sb.append("class ConnectedApp {\n");
         
         sb.append("    appId: ").append(toIndentedString(appId)).append("\n");
-        sb.append("    connectedApp: ").append(toIndentedString(connectedApp)).append("\n");
+        sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
     }
