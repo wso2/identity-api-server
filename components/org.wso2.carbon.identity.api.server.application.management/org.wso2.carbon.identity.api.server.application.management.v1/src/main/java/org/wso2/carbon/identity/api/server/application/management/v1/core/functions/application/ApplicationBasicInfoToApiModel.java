@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListItem;
 import org.wso2.carbon.identity.api.server.common.Constants;
@@ -37,7 +37,7 @@ public class ApplicationBasicInfoToApiModel implements Function<ApplicationBasic
                 .name(applicationBasicInfo.getApplicationName())
                 .description(applicationBasicInfo.getDescription())
                 .image(applicationBasicInfo.getImageUrl())
-                .loginUrl(applicationBasicInfo.getLoginUrl())
+                .accessUrl(applicationBasicInfo.getAccessUrl())
                 .self(getApplicationLocation(applicationBasicInfo.getApplicationResourceId()));
     }
 

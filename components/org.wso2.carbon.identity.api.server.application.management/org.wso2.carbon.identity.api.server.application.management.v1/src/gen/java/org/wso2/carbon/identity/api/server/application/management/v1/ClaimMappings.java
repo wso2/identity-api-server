@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.Claim;
 import javax.validation.constraints.*;
 
 
@@ -30,43 +31,48 @@ import javax.xml.bind.annotation.*;
 
 public class ClaimMappings  {
   
-    private String applicationClaimUri;
-    private String localClaimUri;
+    private String applicationClaim;
+    private Claim localClaim;
 
     /**
+    * Claim URI recieved by the application
     **/
-    public ClaimMappings applicationClaimUri(String applicationClaimUri) {
+    public ClaimMappings applicationClaim(String applicationClaim) {
 
-        this.applicationClaimUri = applicationClaimUri;
+        this.applicationClaim = applicationClaim;
         return this;
     }
     
-    @ApiModelProperty(example = "firstname", value = "")
-    @JsonProperty("applicationClaimUri")
+    @ApiModelProperty(example = "firstname", required = true, value = "Claim URI recieved by the application")
+    @JsonProperty("applicationClaim")
     @Valid
-    public String getApplicationClaimUri() {
-        return applicationClaimUri;
+    @NotNull(message = "Property applicationClaim cannot be null.")
+
+    public String getApplicationClaim() {
+        return applicationClaim;
     }
-    public void setApplicationClaimUri(String applicationClaimUri) {
-        this.applicationClaimUri = applicationClaimUri;
+    public void setApplicationClaim(String applicationClaim) {
+        this.applicationClaim = applicationClaim;
     }
 
     /**
     **/
-    public ClaimMappings localClaimUri(String localClaimUri) {
+    public ClaimMappings localClaim(Claim localClaim) {
 
-        this.localClaimUri = localClaimUri;
+        this.localClaim = localClaim;
         return this;
     }
     
-    @ApiModelProperty(example = "http://wso2.org/claims/givenname", value = "")
-    @JsonProperty("localClaimUri")
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("localClaim")
     @Valid
-    public String getLocalClaimUri() {
-        return localClaimUri;
+    @NotNull(message = "Property localClaim cannot be null.")
+
+    public Claim getLocalClaim() {
+        return localClaim;
     }
-    public void setLocalClaimUri(String localClaimUri) {
-        this.localClaimUri = localClaimUri;
+    public void setLocalClaim(Claim localClaim) {
+        this.localClaim = localClaim;
     }
 
 
@@ -81,13 +87,13 @@ public class ClaimMappings  {
             return false;
         }
         ClaimMappings claimMappings = (ClaimMappings) o;
-        return Objects.equals(this.applicationClaimUri, claimMappings.applicationClaimUri) &&
-            Objects.equals(this.localClaimUri, claimMappings.localClaimUri);
+        return Objects.equals(this.applicationClaim, claimMappings.applicationClaim) &&
+            Objects.equals(this.localClaim, claimMappings.localClaim);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(applicationClaimUri, localClaimUri);
+        return Objects.hash(applicationClaim, localClaim);
     }
 
     @Override
@@ -96,8 +102,8 @@ public class ClaimMappings  {
         StringBuilder sb = new StringBuilder();
         sb.append("class ClaimMappings {\n");
         
-        sb.append("    applicationClaimUri: ").append(toIndentedString(applicationClaimUri)).append("\n");
-        sb.append("    localClaimUri: ").append(toIndentedString(localClaimUri)).append("\n");
+        sb.append("    applicationClaim: ").append(toIndentedString(applicationClaim)).append("\n");
+        sb.append("    localClaim: ").append(toIndentedString(localClaim)).append("\n");
         sb.append("}");
         return sb.toString();
     }

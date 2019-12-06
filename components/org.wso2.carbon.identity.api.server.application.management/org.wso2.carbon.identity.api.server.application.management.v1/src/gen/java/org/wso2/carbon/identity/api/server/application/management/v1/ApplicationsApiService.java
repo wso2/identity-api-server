@@ -22,12 +22,11 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
-import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
-import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
-import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
@@ -39,6 +38,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsC
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
@@ -49,17 +49,9 @@ public interface ApplicationsApiService {
 
       public Response createApplication(ApplicationModel applicationModel, String template);
 
-      public Response deleteAdvancedConfigurations(String applicationId);
-
       public Response deleteApplication(String applicationId);
 
-      public Response deleteAuthenticationSequence(String applicationId);
-
-      public Response deleteClaimConfiguration(String applicationId);
-
       public Response deleteCustomInboundConfiguration(String applicationId, String inboundProtocolId);
-
-      public Response deleteInboundAuthenticationConfigurations(String applicationId);
 
       public Response deleteInboundOAuthConfiguration(String applicationId);
 
@@ -67,23 +59,15 @@ public interface ApplicationsApiService {
 
       public Response deletePassiveStsConfiguration(String applicationId);
 
-      public Response deleteProvisioningConfiguration(String applicationId);
-
       public Response deleteWSTrustConfiguration(String applicationId);
 
       public Response exportApplication(String applicationId, Boolean exportSecrets);
 
       public Response getAdaptiveAuthTemplates();
 
-      public Response getAdvancedConfigurations(String applicationId);
-
       public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String attributes);
 
       public Response getApplication(String applicationId);
-
-      public Response getAuthenticationSequence(String applicationId);
-
-      public Response getClaimConfiguration(String applicationId);
 
       public Response getCustomInboundConfiguration(String applicationId, String inboundProtocolId);
 
@@ -101,8 +85,6 @@ public interface ApplicationsApiService {
 
       public Response getPassiveStsConfiguration(String applicationId);
 
-      public Response getProvisioningConfiguration(String applicationId);
-
       public Response getResidentApplication();
 
       public Response getSAMLMetadata();
@@ -113,29 +95,21 @@ public interface ApplicationsApiService {
 
       public Response importApplication(InputStream fileInputStream, Attachment fileDetail);
 
-      public Response regenerateOAuthApplicationSecret(String applicationId);
+      public Response importApplicationForUpdate(InputStream fileInputStream, Attachment fileDetail);
 
-      public Response revokeOAuthApplication(String applicationId);
+      public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel);
 
-      public Response updateAdvancedConfigurations(String applicationId, AdvancedApplicationConfiguration advancedApplicationConfiguration);
+      public Response regenerateOAuthClientSecret(String applicationId);
 
-      public Response updateApplication(String applicationId, ApplicationModel applicationModel);
-
-      public Response updateAuthenticationSequence(String applicationId, AuthenticationSequence authenticationSequence);
-
-      public Response updateClaimConfiguration(String applicationId, ClaimConfiguration claimConfiguration);
+      public Response revokeOAuthClient(String applicationId);
 
       public Response updateCustomInboundConfiguration(String applicationId, String inboundProtocolId, CustomInboundProtocolConfiguration customInboundProtocolConfiguration);
-
-      public Response updateInboundAuthenticationConfigurations(String applicationId, InboundProtocols inboundProtocols);
 
       public Response updateInboundOAuthConfiguration(String applicationId, OpenIDConnectConfiguration openIDConnectConfiguration);
 
       public Response updateInboundSAMLConfiguration(String applicationId, SAML2Configuration saML2Configuration);
 
       public Response updatePassiveStsConfiguration(String applicationId, PassiveStsConfiguration passiveStsConfiguration);
-
-      public Response updateProvisioningConfiguration(String applicationId, ProvisioningConfiguration provisioningConfiguration);
 
       public Response updateResidentApplication(ProvisioningConfiguration provisioningConfiguration);
 

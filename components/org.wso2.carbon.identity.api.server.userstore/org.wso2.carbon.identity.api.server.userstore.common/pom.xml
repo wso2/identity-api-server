@@ -18,7 +18,7 @@
     <parent>
         <artifactId>org.wso2.carbon.identity.api.server.userstore</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
-        <version>1.0.48-SNAPSHOT</version>
+        <version>1.0.54-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -32,6 +32,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

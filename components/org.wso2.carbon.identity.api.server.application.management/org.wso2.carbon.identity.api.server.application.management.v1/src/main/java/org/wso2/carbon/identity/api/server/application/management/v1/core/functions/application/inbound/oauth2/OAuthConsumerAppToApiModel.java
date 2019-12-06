@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2;
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
@@ -62,21 +62,21 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 Arrays.asList(oauthAppDTO.getScopeValidators()) : Collections.emptyList();
     }
 
-    private static OIDCLogoutConfiguration buildLogoutConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+    private OIDCLogoutConfiguration buildLogoutConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
 
         return new OIDCLogoutConfiguration()
                 .backChannelLogoutUrl(oAuthConsumerAppDTO.getBackChannelLogoutUrl())
                 .frontChannelLogoutUrl(oAuthConsumerAppDTO.getFrontchannelLogoutUrl());
     }
 
-    private static OAuth2PKCEConfiguration buildPKCEConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+    private OAuth2PKCEConfiguration buildPKCEConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
 
         return new OAuth2PKCEConfiguration()
                 .mandatory(oAuthConsumerAppDTO.getPkceMandatory())
                 .supportPlainTransformAlgorithm(oAuthConsumerAppDTO.getPkceSupportPlain());
     }
 
-    private static AccessTokenConfiguration buildTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+    private AccessTokenConfiguration buildTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
 
         return new AccessTokenConfiguration()
                 .type(oAuthConsumerAppDTO.getTokenType())
@@ -84,22 +84,31 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .applicationAccessTokenExpiryInSeconds(oAuthConsumerAppDTO.getApplicationAccessTokenExpiryTime());
     }
 
-    private static RefreshTokenConfiguration buildRefreshTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+    private RefreshTokenConfiguration buildRefreshTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
 
         return new RefreshTokenConfiguration()
                 .expiryInSeconds(oAuthConsumerAppDTO.getRefreshTokenExpiryTime())
                 .renewRefreshToken(Boolean.parseBoolean(oAuthConsumerAppDTO.getRenewRefreshTokenEnabled()));
     }
 
-    private static IdTokenConfiguration buildIdTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+    private IdTokenConfiguration buildIdTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
 
         return new IdTokenConfiguration()
                 .expiryInSeconds(oAuthConsumerAppDTO.getIdTokenExpiryTime())
-                .audience(Arrays.asList(oAuthConsumerAppDTO.getAudiences()))
+                .audience(getAudiences(oAuthConsumerAppDTO))
                 .encryption(buildIdTokenEncryptionConfiguration(oAuthConsumerAppDTO));
     }
 
-    private static IdTokenEncryptionConfiguration buildIdTokenEncryptionConfiguration(OAuthConsumerAppDTO appDTO) {
+    private List<String> getAudiences(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+
+        if (oAuthConsumerAppDTO.getAudiences() == null) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.asList(oAuthConsumerAppDTO.getAudiences());
+        }
+    }
+
+    private IdTokenEncryptionConfiguration buildIdTokenEncryptionConfiguration(OAuthConsumerAppDTO appDTO) {
 
         return new IdTokenEncryptionConfiguration()
                 .enabled(appDTO.isIdTokenEncryptionEnabled())
@@ -107,18 +116,21 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .method(appDTO.getIdTokenEncryptionMethod());
     }
 
-    private static List<String> buildGrantTypeList(OAuthConsumerAppDTO oauthApp) {
+    private List<String> buildGrantTypeList(OAuthConsumerAppDTO oauthApp) {
 
-        return oauthApp.getGrantTypes() != null ?
-                Arrays.asList(oauthApp.getGrantTypes().split("\\s+")) : new ArrayList<>();
+        if (StringUtils.isNotBlank(oauthApp.getGrantTypes())) {
+            return Arrays.asList(oauthApp.getGrantTypes().split("\\s+"));
+        } else {
+            return Collections.emptyList();
+        }
     }
 
-    private static List<String> getAllowedOrigins(OAuthConsumerAppDTO oauthApp) {
+    private List<String> getAllowedOrigins(OAuthConsumerAppDTO oauthApp) {
 
         return Collections.emptyList();
     }
 
-    private static List<String> getCallbackUrls(OAuthConsumerAppDTO oauthApp) {
+    private List<String> getCallbackUrls(OAuthConsumerAppDTO oauthApp) {
 
         List<String> callbackUris = new ArrayList<>();
         if (StringUtils.isNotBlank(oauthApp.getCallbackUrl())) {

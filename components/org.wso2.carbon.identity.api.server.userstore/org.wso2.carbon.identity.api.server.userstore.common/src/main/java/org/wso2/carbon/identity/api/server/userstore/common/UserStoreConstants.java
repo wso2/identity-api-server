@@ -15,12 +15,14 @@
  */
 package org.wso2.carbon.identity.api.server.userstore.common;
 
+import javax.ws.rs.core.Response;
+
 /**
  * Contains all the user store related constants.
  */
 public class UserStoreConstants {
 
-    private static final String SECONDARY_USER_STORE_PREFIX = "SUS-";
+    public static final String SECONDARY_USER_STORE_PREFIX = "SUS-";
     public static final String USER_STORE_PATH_COMPONENT = "/userstores";
     public static final String USER_STORE_DESCRIPTION = "/description";
     public static final String USER_STORE_CLASS_NAME = "/className";
@@ -35,50 +37,73 @@ public class UserStoreConstants {
      */
     public enum ErrorMessage {
 
-        ERROR_CODE_ERROR_ADDING_USER_STORE("50001",
+        // For server errors,  allocated the error code range starting from 650
+        ERROR_CODE_ERROR_ADDING_USER_STORE("65001",
                 "Unable to add the secondary user store.",
-                "Server Encountered an error while adding secondary user store."),
-        ERROR_CODE_ERROR_DELETING_USER_STORE("50002",
+                "Server Encountered an error while adding secondary user store.",
+                Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_ERROR_DELETING_USER_STORE("65002",
                 "Unable to delete the secondary user store.",
-                "Server Encountered an error while deleting the secondary user store."),
-        ERROR_CODE_ERROR_RETRIEVING_USER_STORE("50003",
+                "Server Encountered an error while deleting the secondary user store.",
+                Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_ERROR_RETRIEVING_USER_STORE("65003",
                 "Unable to get the configured user stores.",
-                "Server Encountered an error while retrieving secondary user stores."),
-        ERROR_CODE_ERROR_UPDATING_USER_STORE("50004",
+                "Server Encountered an error while retrieving secondary user stores.",
+                Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_ERROR_UPDATING_USER_STORE("65004",
                 "Unable to update the secondary user store configurations.",
-                "Server Encountered an error while updating the secondary user store configurations."),
-        ERROR_CODE_PAGINATION_NOT_IMPLEMENTED("50005",
+                "Server Encountered an error while updating the secondary user store configurations.",
+                Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_PAGINATION_NOT_IMPLEMENTED("65005",
                 "Pagination not supported.",
                 "Pagination capabilities are not supported in this version of the API."),
-        ERROR_CODE_FILTERING_NOT_IMPLEMENTED("50006",
+        ERROR_CODE_FILTERING_NOT_IMPLEMENTED("65006",
                 "Filtering not supported.",
                 "Filtering capability is not supported in this version of the API."),
-        ERROR_CODE_SORTING_NOT_IMPLEMENTED("50007",
+        ERROR_CODE_SORTING_NOT_IMPLEMENTED("65007",
                 "Sorting not supported.",
                 "Sorting capability is not supported in this version of the API."),
-        ERROR_CODE_DOMAIN_ID_NOT_FOUND("50008",
-                "Resource not found.",
-                "Unable to find any user store's id with the provided identifier %s."),
-        ERROR_CODE_DATASOURCE_CONNECTION("50009",
+        ERROR_CODE_DATASOURCE_CONNECTION("65008",
                 "Unable to check RDBMS connection Health",
-                "Server Encountered an error while checking the data source connection."),
-        ERROR_CODE_RETRIEVING_USER_STORE_TYPE("50010",
+                "Server Encountered an error while checking the data source connection.",
+                Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_RETRIEVING_USER_STORE_TYPE("65009",
                 "Unable to retrieve the user store implementations",
-                "Server Encountered an error while retrieving the user store types."),
-        ERROR_CODE_INVALID_INPUT("50011", "Invalid Input", "Provided Input is not valid."),
-        ERROR_CODE_NOT_FOUND("50012", "Resource not found.",
-                "Unable to find a required resource for this request"),
-        ERROR_CODE_ERROR_RETRIEVING_USER_STORE_BY_DOMAIN_ID("50013", "Unable to get the user store by its domain id.",
-                "Server Encountered an error while retrieving the user store by its domain id");
+                "Server Encountered an error while retrieving the user store types.",
+                Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_ERROR_RETRIEVING_USER_STORE_BY_DOMAIN_ID("65010",
+                "Unable to get the user store by its domain id.",
+                "Server Encountered an error while retrieving the user store by its domain id.",
+                Response.Status.INTERNAL_SERVER_ERROR),
+
+        // For client errors,  allocated the error code range starting from 600
+        ERROR_CODE_DOMAIN_ID_NOT_FOUND("60001",
+                "Resource not found.",
+                "Unable to find any user store's domain id with the provided identifier",
+                Response.Status.NOT_FOUND),
+        ERROR_CODE_NOT_FOUND("60003", "Resource not found.",
+                "Unable to find a required resource for this request", Response.Status.NOT_FOUND),
+        ERROR_CODE_MANDATORY_PROPERTIES_NOT_FOUND("60006", "Mandatory property is missing ",
+                " Required user store  property or its value is missing in the request "),
+        ERROR_CODE_INVALID_INPUT("60004", "Invalid Input", "Provided Input is not valid.",
+                                 Response.Status.BAD_REQUEST);
 
         private final String code;
         private final String message;
         private final String description;
+        private Response.Status httpStatus;
 
         ErrorMessage(String code, String message, String description) {
             this.code = code;
             this.message = message;
             this.description = description;
+        }
+
+        ErrorMessage(String code, String message, String description, Response.Status httpStatus) {
+            this.code = code;
+            this.message = message;
+            this.description = description;
+            this.httpStatus = httpStatus;
         }
 
         public String getCode() {
@@ -91,6 +116,11 @@ public class UserStoreConstants {
 
         public String getDescription() {
             return description;
+        }
+
+        public Response.Status getHttpStatus() {
+
+            return httpStatus;
         }
 
         @Override

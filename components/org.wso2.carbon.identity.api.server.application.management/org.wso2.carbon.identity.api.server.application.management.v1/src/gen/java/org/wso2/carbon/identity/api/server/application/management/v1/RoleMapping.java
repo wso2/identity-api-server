@@ -41,9 +41,11 @@ public class RoleMapping  {
         return this;
     }
     
-    @ApiModelProperty(example = "admin", value = "")
+    @ApiModelProperty(example = "admin", required = true, value = "")
     @JsonProperty("localRole")
     @Valid
+    @NotNull(message = "Property localRole cannot be null.")
+
     public String getLocalRole() {
         return localRole;
     }
@@ -59,9 +61,11 @@ public class RoleMapping  {
         return this;
     }
     
-    @ApiModelProperty(example = "Administrator", value = "")
+    @ApiModelProperty(example = "Administrator", required = true, value = "")
     @JsonProperty("applicationRole")
     @Valid
+    @NotNull(message = "Property applicationRole cannot be null.")
+
     public String getApplicationRole() {
         return applicationRole;
     }
