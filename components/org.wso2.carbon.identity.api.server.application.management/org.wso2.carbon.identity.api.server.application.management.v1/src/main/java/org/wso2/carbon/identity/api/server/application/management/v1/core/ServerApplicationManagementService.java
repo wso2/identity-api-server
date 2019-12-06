@@ -203,22 +203,36 @@ public class ServerApplicationManagementService {
      */
     public String importApplication(InputStream fileInputStream, Attachment fileDetail) {
 
+        return doImportApplication(fileInputStream, fileDetail, false);
+    }
+
+    /**
+     * Create a new application by importing an XML configuration file.
+     *
+     * @param fileInputStream File to be imported as an input stream.
+     * @param fileDetail      File details.
+     * @return Unique identifier of the created application.
+     */
+    public String importApplicationForUpdate(InputStream fileInputStream, Attachment fileDetail) {
+
+        return doImportApplication(fileInputStream, fileDetail, true);
+    }
+
+    private String doImportApplication(InputStream fileInputStream, Attachment fileDetail, boolean isAppUpdate) {
+
         try {
-            SpFileContent spFileContent = new SpFileContent();
-            spFileContent.setContent(IOUtils.toString(fileInputStream, StandardCharsets.UTF_8.name()));
-            spFileContent.setFileName(fileDetail.getDataHandler().getName());
+            SpFileContent spFileContent = buildSpFileContent(fileInputStream, fileDetail);
 
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String username = ContextLoader.getUsernameFromContext();
-            ImportResponse importResponse = getApplicationManagementService().importSPApplication(
-                    spFileContent, tenantDomain, username, false);
-            if (importResponse.getResponseCode() == ImportResponse.CREATED) {
-                ServiceProvider application =
-                        getApplicationManagementService().getApplicationExcludingFileBasedSPs(
-                                importResponse.getApplicationName(), tenantDomain);
-                return application.getApplicationResourceId();
-            } else {
+
+            ImportResponse importResponse = getApplicationManagementService()
+                    .importSPApplication(spFileContent, tenantDomain, username, isAppUpdate);
+
+            if (importResponse.getResponseCode() == ImportResponse.FAILED) {
                 throw handleErrorResponse(importResponse);
+            } else {
+                return importResponse.getApplicationResourceId();
             }
         } catch (IOException e) {
             throw Utils.buildServerError("Error importing application from XML file.", e);
@@ -229,15 +243,25 @@ public class ServerApplicationManagementService {
         }
     }
 
+    private SpFileContent buildSpFileContent(InputStream fileInputStream, Attachment fileDetail) throws IOException {
+
+        SpFileContent spFileContent = new SpFileContent();
+        spFileContent.setContent(IOUtils.toString(fileInputStream, StandardCharsets.UTF_8.name()));
+        spFileContent.setFileName(fileDetail.getDataHandler().getName());
+        return spFileContent;
+    }
+
     private APIError handleErrorResponse(ImportResponse importResponse) {
 
+        String errorCode = importResponse.getErrorCode() != null ?
+                importResponse.getErrorCode() : INVALID_REQUEST.getCode();
         String msg = "Error importing application from XML file.";
         String description = null;
         if (ArrayUtils.isNotEmpty(importResponse.getErrors())) {
             description = importResponse.getErrors()[0];
         }
 
-        return Utils.buildClientError(INVALID_REQUEST.getCode(), msg, description);
+        return Utils.buildClientError(errorCode, msg, description);
     }
 
     public String createApplication(ApplicationModel applicationModel, String template) {
