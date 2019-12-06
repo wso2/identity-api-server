@@ -17,18 +17,21 @@
  */
 package org.wso2.carbon.identity.api.server.image.service.v1.core;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 
-import java.io.File;
-import java.io.IOException;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.image.service.common.ImageServiceConstants;
+import org.wso2.carbon.identity.api.server.image.service.common.ImageServiceDataHolder;
+import org.wso2.carbon.identity.image.StorageSystemManager;
+import org.wso2.carbon.identity.image.exception.StorageSystemException;
+
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.UUID;
+import javax.ws.rs.core.Response;
 
 /**
  * Perform image service related operations.
@@ -47,54 +50,75 @@ public class ServerImageService {
      */
     public String uploadImage(InputStream fileInputStream, Attachment fileDetail, String type) {
 
-        // TODO: 11/18/19 Invoke the OSGi serivce. 
-        return uploadImageToFileSystem(fileInputStream, fileDetail, type);
-
-    }
-
-    public InputStream downloadImage(String id, String type) {
-        // TODO: 11/18/19 Invoke the OSGi Service 
-        return downloadImageFromFileSystem(id, type);
-    }
-
-    /**
-     * Temporary method.
-     *
-     * @param fileInputStream
-     * @param fileDetail
-     * @param type
-     * @return
-     */
-    private String uploadImageToFileSystem(InputStream fileInputStream, Attachment fileDetail, String type) {
-
-        String location = null;
-        String fileName = UUID.randomUUID().toString();
-        Path fileStorageLocation = Paths.get(System.getProperty("user.home") + File.separator + "uploads")
-                .toAbsolutePath().normalize();
-        Path targetLocation = fileStorageLocation.resolve(fileName);
+        StorageSystemManager storageSystemManager = ImageServiceDataHolder.getStorageSystemManager();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
-            Files.copy(fileInputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            log.error("Error while storing the image.");
+            return storageSystemManager.addFile(fileInputStream, type, tenantDomain);
+        } catch (StorageSystemException e) {
+            ImageServiceConstants.ErrorMessage errorMessage = ImageServiceConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_UPLOADING_IMAGE;
+            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            throw handleException(e, errorMessage, status);
         }
-        if ("idp".equals(type)) {
-            location = "i" + "/" + fileName;
-        }
-        return location;
+
     }
 
-    private InputStream downloadImageFromFileSystem(String id, String type) {
+    public byte[] downloadImage(String id, String type) {
 
-        Path fileStorageLocation = Paths.get(System.getProperty("user.home") + File.separator + "uploads")
-                .toAbsolutePath().normalize();
-        String fileName = id;
-        Path filePath = fileStorageLocation.resolve(fileName).normalize();
-        InputStream inputStream = null;
+        StorageSystemManager storageSystemManager = ImageServiceDataHolder.getStorageSystemManager();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
-            inputStream = Files.newInputStream(filePath);
-        } catch (IOException e) {
-            log.error("Error while retrieving the image ");
+            return storageSystemManager.getFile(id, type, tenantDomain);
+        } catch (StorageSystemException e) {
+            ImageServiceConstants.ErrorMessage errorMessage = ImageServiceConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_DOWNLOADING_IMAGE;
+            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            throw handleException(e, errorMessage, status);
         }
-        return inputStream;
+    }
+
+    public void deleteImage(String id, String type) {
+
+        StorageSystemManager storageSystemManager = ImageServiceDataHolder.getStorageSystemManager();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            storageSystemManager.deleteFile(id, type, tenantDomain);
+        } catch (StorageSystemException e) {
+            ImageServiceConstants.ErrorMessage errorMessage = ImageServiceConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_DELETING_IMAGE;
+            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            throw handleException(e, errorMessage, status);
+        }
+
+    }
+
+    private APIError handleException(Exception e, ImageServiceConstants.ErrorMessage errorEnum,
+            Response.Status status) {
+
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(log, e, errorEnum.getDescription());
+        return new APIError(status, errorResponse);
+    }
+
+    private ErrorResponse.Builder getErrorBuilder(ImageServiceConstants.ErrorMessage errorMsg, String... data) {
+
+        return new ErrorResponse.Builder().withCode(errorMsg.getCode()).withMessage(errorMsg.getMessage())
+                .withDescription(buildErrorDescription(errorMsg, data));
+    }
+
+    private String buildErrorDescription(ImageServiceConstants.ErrorMessage errorEnum, String... data) {
+
+        String errorDescription;
+
+        if (ArrayUtils.isNotEmpty(data)) {
+            if (data.length == 1) {
+                errorDescription = String.format(errorEnum.getDescription(), (Object) data);
+            } else {
+                errorDescription = String.format(errorEnum.getDescription(), (Object[]) data);
+            }
+        } else {
+            errorDescription = errorEnum.getDescription();
+        }
+
+        return errorDescription;
     }
 }

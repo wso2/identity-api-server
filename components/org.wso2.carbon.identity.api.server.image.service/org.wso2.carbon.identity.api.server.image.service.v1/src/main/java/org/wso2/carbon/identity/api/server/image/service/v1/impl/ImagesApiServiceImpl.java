@@ -23,10 +23,14 @@ import org.wso2.carbon.identity.api.server.image.service.v1.core.ServerImageServ
 
 import java.io.InputStream;
 import java.net.URI;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
+import static org.wso2.carbon.identity.api.server.image.service.common.ImageServiceConstants.IDP;
+import static org.wso2.carbon.identity.api.server.image.service.common.ImageServiceConstants.SP;
+import static org.wso2.carbon.identity.api.server.image.service.common.ImageServiceConstants.USER;
 
 /**
  * Implementation class of image service.
@@ -39,25 +43,45 @@ public class ImagesApiServiceImpl implements ImagesApiService {
     @Override
     public Response deleteImage(String id, String type) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        serverImageService.deleteImage(id, type);
+        return Response.noContent().build();
     }
 
     @Override
     public Response downloadImage(String id, String type) {
-        InputStream resource = serverImageService.downloadImage(id, type);
-        return Response.ok().entity(resource).build();
+        byte[] resource = serverImageService.downloadImage(id, type);
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setMaxAge(86400);
+        cacheControl.setPrivate(true);
+        return Response.ok().entity(resource).cacheControl(cacheControl).build();
     }
 
     @Override
     public Response uploadImage(InputStream fileInputStream, Attachment fileDetail, String type) {
-
         String uuid = serverImageService.uploadImage(fileInputStream, fileDetail, type);
-        return Response.created(getResourceLocation(uuid)).build();
+        return Response.created(getResourceLocation(uuid, type)).build();
     }
 
-    private URI getResourceLocation(String id) {
+    private URI getResourceLocation(String id, String type) {
 
-        return buildURIForHeader(String.format(V1_API_PATH_COMPONENT + "/images" + "/%s", id));
+        String imagecategory = getImageCategoryType(type);
+        return buildURIForHeader(String.format(V1_API_PATH_COMPONENT + "/images" + "/%s" + "/%s", imagecategory, id));
+    }
+
+    private String getImageCategoryType(String type) {
+
+        switch (type) {
+        case IDP:
+            return "i";
+
+        case SP:
+            return "a";
+
+        case USER:
+            return "u";
+
+        default:
+            return "";
+        }
     }
 }

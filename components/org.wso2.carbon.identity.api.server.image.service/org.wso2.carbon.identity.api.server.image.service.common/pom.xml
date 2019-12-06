@@ -19,7 +19,8 @@
     <parent>
         <artifactId>org.wso2.carbon.identity.api.server.image.service</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
-        <version>1.0.46-SNAPSHOT</version>
+        <version>1.0.54-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -29,6 +30,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.content.repository</groupId>
+            <artifactId>org.wso2.carbon.identity.image</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

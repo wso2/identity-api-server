@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.image.service.common;
 
+import org.wso2.carbon.identity.image.StorageSystemManager;
 
 
 /**
@@ -22,4 +23,14 @@ package org.wso2.carbon.identity.api.server.image.service.common;
  */
 public class ImageServiceDataHolder {
 
+    private static StorageSystemManager storageSystemManager;
+
+    public static StorageSystemManager getStorageSystemManager() {
+
+        return storageSystemManager;
+    }
+
+    public static void setStorageSystemManager(StorageSystemManager storageSystemManager) {
+        ImageServiceDataHolder.storageSystemManager = storageSystemManager;
+    }
 }
