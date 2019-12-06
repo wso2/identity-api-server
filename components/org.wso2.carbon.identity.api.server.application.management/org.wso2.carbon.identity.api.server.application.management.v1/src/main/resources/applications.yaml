@@ -99,9 +99,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ApplicationModel'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/ApplicationResponseModel'
         description: This represents the application to be created.
         required: true
       responses:
@@ -284,9 +281,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicationResponseModel'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/ApplicationResponseModel'
         '400':
           description: Bad Request
           content:
@@ -332,7 +326,6 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/Error'
-
 
     patch:
       tags:
@@ -552,10 +545,6 @@ paths:
                 application.
               schema:
                 type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProvisioningConfiguration'
         '400':
           description: Bad Request
           content:
@@ -672,7 +661,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SAMLRequestValidation'
+                $ref: '#/components/schemas/SAML2ServiceProvider'
         '400':
           description: Bad Request
           content:
@@ -698,7 +687,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-
     put:
       tags:
         - Inbound Protocols - SAML
@@ -723,21 +711,13 @@ paths:
       responses:
         '200':
           description: Successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SAML2ServiceProvider'
         '201':
           description: Successful response.
           headers:
             Location:
-              description: Location of the newly created application.
+              description: Location of the newly created SAML Inbound configuration.
               schema:
                 type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SAML2ServiceProvider'
         '400':
           description: Bad Request
           content:
@@ -774,8 +754,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
-
       requestBody:
         content:
           application/json:
@@ -907,10 +885,6 @@ paths:
       responses:
         '200':
           description: Successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OpenIDConnectConfiguration'
         '201':
           description: Created
           headers:
@@ -918,10 +892,6 @@ paths:
               description: Location of the newly created OIDC Authentication Configuration.
               schema:
                 type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OpenIDConnectConfiguration'
         '400':
           description: Bad Request
           content:
@@ -1091,10 +1061,6 @@ paths:
       responses:
         '200':
           description: Application Revoked
-          # content:
-          #   application/json:
-          #     schema:
-          #       $ref: '#/components/schemas/OpenIDConnectConfiguration'
         '400':
           description: Bad Request
           content:
@@ -1201,10 +1167,6 @@ paths:
       responses:
         '200':
           description: Successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PassiveStsConfiguration'
         '201':
           description: Successful response.
           headers:
@@ -1214,10 +1176,6 @@ paths:
                 Configuration.
               schema:
                 type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PassiveStsConfiguration'
         '400':
           description: Bad Request
           content:
@@ -1388,10 +1346,6 @@ paths:
       responses:
         '200':
           description: Successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WSTrustConfiguration'
         '201':
           description: Successful response.
           headers:
@@ -1401,10 +1355,6 @@ paths:
                 Configuration.
               schema:
                 type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WSTrustConfiguration'
         '400':
           description: Bad Request
           content:
@@ -1587,10 +1537,6 @@ paths:
       responses:
         '200':
           description: Successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CustomInboundProtocolConfiguration'
         '201':
           description: Successful response.
           headers:
@@ -1600,10 +1546,6 @@ paths:
                 protocol Configuration.
               schema:
                 type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CustomInboundProtocolConfiguration'
         '400':
           description: Bad Request
           content:
@@ -2457,7 +2399,6 @@ components:
               - HTTP_POST
               - HTTP_REDIRECT
               - ARTIFACT
-          default: [ "HTTP_POST", "HTTP_REDIRECT"]
 
         enableSignatureValidationForArtifactBinding:
           type: boolean
