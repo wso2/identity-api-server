@@ -381,7 +381,12 @@
                 <version>${carbon.identity.content.repository.version}</version>
                 <scope>provided</scope>
             </dependency>
-
+            <dependency>
+                <groupId>commons-io.wso2</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+                <scope>compile</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -462,6 +467,7 @@
         <identity.inbound.saml2.version>5.7.6</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <carbon.identity.content.repository.version>1.0.0-SNAPSHOT</carbon.identity.content.repository.version>
+        <commons.io.version>2.4.0.wso2v1</commons.io.version>
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
     </properties>
 

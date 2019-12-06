@@ -17,7 +17,6 @@ package org.wso2.carbon.identity.api.server.image.service.common;
 
 import org.wso2.carbon.identity.image.StorageSystemManager;
 
-
 /**
  * OSGi service holder class for image api.
  */

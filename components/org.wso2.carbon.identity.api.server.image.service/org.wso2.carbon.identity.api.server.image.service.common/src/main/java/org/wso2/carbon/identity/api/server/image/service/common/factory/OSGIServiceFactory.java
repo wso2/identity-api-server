@@ -48,6 +48,5 @@ public class OSGIServiceFactory extends AbstractFactoryBean<StorageSystemManager
 
         }
         return this.storageSystemManager;
-
     }
 }

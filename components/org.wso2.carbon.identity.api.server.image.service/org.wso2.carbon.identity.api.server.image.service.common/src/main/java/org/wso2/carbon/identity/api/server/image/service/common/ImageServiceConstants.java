@@ -67,7 +67,5 @@ public class ImageServiceConstants {
         public String toString() {
             return code + " | " + message;
         }
-
     }
-
 }
