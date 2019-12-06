@@ -80,6 +80,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthKey;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthenticationRequestConfig;
@@ -415,7 +416,7 @@ public class ServerApplicationManagementService {
     public CustomInboundProtocolConfiguration getCustomInboundConfiguration(String applicationId, String inboundType) {
 
         if (isUnknownInboundType(inboundType)) {
-            throw Utils.buildBadRequestError("Unknown inbound type: " + inboundType);
+            throw buildBadRequestError("Unknown inbound type: " + inboundType);
         }
 
         return getInbound(applicationId, inboundType, CustomInboundFunctions::getCustomInbound);
@@ -459,7 +460,7 @@ public class ServerApplicationManagementService {
                                     CustomInboundProtocolConfiguration customInbound) {
 
         if (isUnknownInboundType(inboundType)) {
-            throw Utils.buildBadRequestError("Unknown inbound type: " + inboundType);
+            throw buildBadRequestError("Unknown inbound type: " + inboundType);
         }
 
         customInbound.setName(inboundType);
@@ -648,11 +649,12 @@ public class ServerApplicationManagementService {
     private void doRollback(String applicationId, InboundAuthenticationRequestConfig updatedInbound) {
 
         ServiceProvider serviceProvider = getServiceProvider(applicationId);
-        // Current inbound key. This will give us an idea whether updatedInbound was added or updated.
-        String inboundAuthKey = getInboundAuthKey(serviceProvider, updatedInbound.getInboundAuthType());
-        if (inboundAuthKey == null) {
-            // This means the application did not have any associated inbound before. So the updated inbound
-            // could have been created before the update. Attempt to rollback by creating any inbound configs created.
+        // Current inbound key. This will give us an idea whether updatedInbound was newly added or not.
+        String previousInboundKey = getInboundAuthKey(serviceProvider, updatedInbound.getInboundAuthType());
+        String attemptedInboundKeyForUpdate = updatedInbound.getInboundAuthKey();
+        if (!StringUtils.equals(previousInboundKey, attemptedInboundKeyForUpdate)) {
+            // This means the application was updated with a newly created inbound. So the updated inbound details
+            // could have been created before the update. Attempt to rollback by deleting any inbound configs created.
             if (log.isDebugEnabled()) {
                 String inboundType = updatedInbound.getInboundAuthType();
                 log.debug("Removing inbound data related to inbound type: " + inboundType + " of application: "

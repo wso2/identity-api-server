@@ -40,6 +40,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApp
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAMLRequestValidation;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
@@ -446,14 +447,14 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/saml")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve SAML2 authentication protocol parameters of an application. ", notes = "This API provides the capability to retrieve SAML2 authentication protocol parameters of an application. ", response = SAML2ServiceProvider.class, authorizations = {
+    @ApiOperation(value = "Retrieve SAML2 authentication protocol parameters of an application. ", notes = "This API provides the capability to retrieve SAML2 authentication protocol parameters of an application. ", response = SAMLRequestValidation.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Inbound Protocols - SAML", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = SAML2ServiceProvider.class),
+        @ApiResponse(code = 200, message = "OK", response = SAMLRequestValidation.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),

@@ -24,6 +24,7 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.arrayToStream;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.PassiveSTS.PASSIVE_STS_REPLY_URL;
 
 /**
@@ -38,7 +39,18 @@ public class PassiveSTSInboundFunctions {
     public static InboundAuthenticationRequestConfig putPassiveSTSInbound(ServiceProvider application,
                                                                           PassiveStsConfiguration passiveSTSConfig) {
 
+        String currentRealm = InboundFunctions.getInboundAuthKey(application, StandardInboundProtocols.PASSIVE_STS);
+        if (currentRealm != null && isRealmValueChanged(passiveSTSConfig, currentRealm)) {
+            // We do not allow the inbound unique key to be changed during an update.
+            throw buildBadRequestError("Invalid realm value provided for update.");
+        }
+
         return createPassiveSTSInboundConfig(passiveSTSConfig);
+    }
+
+    private static boolean isRealmValueChanged(PassiveStsConfiguration passiveSTSConfig, String currentRealm) {
+
+        return !StringUtils.equals(currentRealm, passiveSTSConfig.getRealm());
     }
 
     public static InboundAuthenticationRequestConfig createPassiveSTSInboundConfig(PassiveStsConfiguration config) {

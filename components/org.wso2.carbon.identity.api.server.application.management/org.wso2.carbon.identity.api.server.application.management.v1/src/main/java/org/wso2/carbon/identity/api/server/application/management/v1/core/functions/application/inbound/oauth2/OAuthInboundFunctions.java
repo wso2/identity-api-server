@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions;
@@ -43,18 +44,22 @@ public class OAuthInboundFunctions {
                                                                      OpenIDConnectConfiguration oidcConfigModel) {
 
         // First we identify whether this is a insert or update.
-        String currentClientId = InboundFunctions.getInboundAuthKey(application, StandardInboundProtocols.OAUTH2);
         try {
+            String currentClientId = InboundFunctions.getInboundAuthKey(application, StandardInboundProtocols.OAUTH2);
             if (currentClientId != null) {
                 // This is an update.
                 OAuthConsumerAppDTO oauthApp = ApplicationManagementServiceHolder.getOAuthAdminService()
                         .getOAuthApplicationData(currentClientId);
-                // TODO: reject if client not equals previous
-                oidcConfigModel.setClientId(oauthApp.getOauthConsumerKey());
-                oidcConfigModel.setClientSecret(oauthApp.getOauthConsumerSecret());
+
+                if (!StringUtils.equals(oauthApp.getOauthConsumerKey(), oidcConfigModel.getClientId())) {
+                    throw buildBadRequestError("Invalid ClientID provided for update.");
+                }
+
+                if (!StringUtils.equals(oauthApp.getOauthConsumerSecret(), oidcConfigModel.getClientSecret())) {
+                    throw buildBadRequestError("Invalid ClientSecret provided for update.");
+                }
 
                 OAuthConsumerAppDTO appToUpdate = new ApiModelToOAuthConsumerApp().apply(oidcConfigModel);
-                // Delete the current app.
                 ApplicationManagementServiceHolder.getOAuthAdminService().updateConsumerApplication(appToUpdate);
 
                 String updatedClientId = appToUpdate.getOauthConsumerKey();
