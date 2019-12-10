@@ -15,6 +15,8 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
@@ -29,6 +31,7 @@ import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2ClientException;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2SSOException;
+import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -40,6 +43,8 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
  */
 public class SAMLInboundFunctions {
 
+    private static final Log logger = LogFactory.getLog(SAMLInboundFunctions.class);
+
     private SAMLInboundFunctions() {
 
     }
@@ -49,15 +54,40 @@ public class SAMLInboundFunctions {
 
         // First we identify whether this is a insert or update.
         String currentIssuer = InboundFunctions.getInboundAuthKey(application, StandardInboundProtocols.SAML2);
+        SAMLSSOServiceProviderDTO oldSAMLSp = null;
         try {
             if (currentIssuer != null) {
                 // Delete the current app.
+                oldSAMLSp = getSamlssoConfigService().getServiceProvider(currentIssuer);
                 getSamlssoConfigService().removeServiceProvider(currentIssuer);
             }
-
-            return createSAMLInbound(saml2Configuration);
         } catch (IdentityException e) {
             throw handleException(e);
+        }
+
+        try {
+            return createSAMLInbound(saml2Configuration);
+        } catch (APIError error) {
+            // Try to rollback by recreating the previous SAML SP.
+            rollbackSAMLSpRemoval(oldSAMLSp);
+            throw error;
+        }
+    }
+
+    private static void rollbackSAMLSpRemoval(SAMLSSOServiceProviderDTO oldSAMLSp) {
+
+        if (oldSAMLSp != null) {
+            if (logger.isDebugEnabled()) {
+                String issuer =
+                        SAMLSSOUtil.getIssuerWithQualifier(oldSAMLSp.getIssuer(), oldSAMLSp.getIssuerQualifier());
+                logger.debug("Error occurred while updating SAML SP with issuer: " + issuer +
+                        ". Attempting to rollback by recreating the old SAML SP.");
+            }
+            try {
+                getSamlssoConfigService().addRPServiceProvider(oldSAMLSp);
+            } catch (IdentityException e) {
+                throw handleException(e);
+            }
         }
     }
 
