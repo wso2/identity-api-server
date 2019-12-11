@@ -2073,7 +2073,6 @@ components:
         name:
           type: string
           example: pickup
-          pattern: '^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$'
         description:
           type: string
           example: This is the configuration for Pickup application.
@@ -2106,7 +2105,6 @@ components:
         name:
           type: string
           example: pickup
-          pattern: '^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$'
         description:
           type: string
           example: This is the configuration for Pickup application.
@@ -2133,7 +2131,6 @@ components:
         name:
           type: string
           example: pickup
-          pattern: '^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$'
         description:
           type: string
           example: This is the configuration for Pickup application.
