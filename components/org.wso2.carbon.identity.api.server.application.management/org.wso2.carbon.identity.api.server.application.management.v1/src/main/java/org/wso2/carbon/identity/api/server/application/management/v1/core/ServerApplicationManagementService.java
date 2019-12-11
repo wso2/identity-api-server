@@ -79,6 +79,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
@@ -268,7 +269,8 @@ public class ServerApplicationManagementService {
     public String createApplication(ApplicationModel applicationModel, String template) {
 
         if (StringUtils.isNotBlank(template)) {
-            throw buildNotImplementedError("Application creation with templates not supported.");
+            String errorCode = APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED.getCode();
+            throw buildNotImplementedError(errorCode, "Application creation with templates not supported.");
         }
 
         String username = ContextLoader.getUsernameFromContext();
