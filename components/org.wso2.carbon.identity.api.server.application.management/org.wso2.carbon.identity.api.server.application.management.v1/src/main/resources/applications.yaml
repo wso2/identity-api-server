@@ -370,6 +370,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -2073,7 +2079,6 @@ components:
         name:
           type: string
           example: pickup
-          pattern: '^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$'
         description:
           type: string
           example: This is the configuration for Pickup application.
@@ -2106,7 +2111,6 @@ components:
         name:
           type: string
           example: pickup
-          pattern: '^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$'
         description:
           type: string
           example: This is the configuration for Pickup application.
@@ -2133,7 +2137,6 @@ components:
         name:
           type: string
           example: pickup
-          pattern: '^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$'
         description:
           type: string
           example: This is the configuration for Pickup application.

@@ -53,7 +53,7 @@ public class ApplicationPatchModel  {
     
     @ApiModelProperty(example = "pickup", value = "")
     @JsonProperty("name")
-    @Valid @Pattern(regexp="^[a-zA-Z0-9._-]+(?: [a-zA-Z0-9._-]+)*$")
+    @Valid
     public String getName() {
         return name;
     }

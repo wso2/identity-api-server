@@ -115,6 +115,19 @@ public class Utils {
         return new APIError(status, errorResponse);
     }
 
+    public static APIError buildNotImplementedError(String errorCode, String message) {
+
+        ErrorResponse.Builder builder = new ErrorResponse.Builder();
+        ErrorResponse errorResponse = builder
+                .withMessage("Server error while trying the attempted operation.")
+                .withCode(errorCode)
+                .withDescription(message)
+                .build(log, message);
+
+        Response.Status status = Response.Status.NOT_IMPLEMENTED;
+        return new APIError(status, errorResponse);
+    }
+
     public static APIError buildServerError(String errorCode, String message, String description) {
 
         throw buildServerError(errorCode, message, description, null);
