@@ -1,0 +1,158 @@
+openapi: 3.0.0
+info:
+  version: 'v1'
+  title: 'WSO2 Identity Server - Image API'
+  description: 'This is the RESTful API for image upload/download in WSO2 Identity Server'
+  contact:
+    name: WSO2 Identity Server
+    url: 'https://wso2.com/identity-and-access-management'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: https://localhost:9443/t/{tenant-domain}/api/server/v1/
+tags:
+  - name: Image Upload
+    description: "Uploads an image"
+  - name: Image Download
+    description: "Downloads an image"
+  - name: Image Delete
+    description: "Deletes an image"
+
+paths:
+  /images:
+    post:
+      tags:
+        - Image Upload
+      summary: Uploads an image (image can be of idp,app or user type).
+      operationId: uploadImage
+      security:
+        - BasicAuth: []
+        - OAuth2: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImageFile'
+      responses:
+        '201':
+          description: Successfull upload
+          headers:
+            Location:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          description: Unexpected error.
+
+
+  /images/{type}/{id}:
+    get:
+      tags:
+        - Image Download
+      summary: Downloads an image file.
+      operationId: downloadImage
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+        - $ref: '#/components/parameters/typeParam'
+      responses:
+        '200':
+          description: Successfull operation
+          content:
+            image/png:
+              schema:
+                $ref: '#/components/schemas/Image'
+        '400':
+          description: Bad request. Id must be an integer and larger than 0.
+        '404':
+          description: An image with the specified ID was not found.
+        '500':
+          description: Unexpected error.
+
+    delete:
+      tags:
+        - Image Delete
+      summary: Deletes an image file.
+      operationId: deleteImage
+      security:
+        - BasicAuth: []
+        - OAuth2: []
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+        - $ref: '#/components/parameters/typeParam'
+      responses:
+        '204':
+          description: Successful deletion
+        '500':
+          description: Unexpected error.
+
+
+components:
+  parameters:
+    idParam:
+      in: path
+      name: id
+      description: unique id for the image
+      required: true
+      schema:
+        type: string
+    typeParam:
+      in: path
+      name: type
+      description: type of uploading image
+      required: true
+      schema:
+        type: string
+        enum:
+          - i
+          - a
+          - u
+    serviceProviderImagePathParam:
+      name: id
+      in: path
+      description: unique id for the image
+      required: true
+      schema:
+        type: string
+    userImagePathParam:
+      name: id
+      in: path
+      description: unique id for the image
+      required: true
+      schema:
+        type: string
+  schemas:
+
+    ImageFile:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: file to upload
+        type:
+          type: string
+          description: Type of image uploading. It can be 'idp', 'app' or 'user'.
+
+      required:
+        - file
+    Image:
+      type: string
+      format: binary
+
+  responses:
+    UnauthorizedError:
+      description: Authentication information is missing or invalid
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth/authorize'
+          tokenUrl: 'https://localhost:9443/oauth/token'
+          scopes: {}
