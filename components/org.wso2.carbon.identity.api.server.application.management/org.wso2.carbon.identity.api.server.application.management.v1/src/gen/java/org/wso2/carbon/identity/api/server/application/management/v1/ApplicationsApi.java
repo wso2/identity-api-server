@@ -31,7 +31,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import java.io.File;
-import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
+import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
@@ -376,14 +376,14 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve inbound protocol configurations of an application. ", notes = "This API provides the capability to retrieve authentication protocol configurations of an application. ", response = InboundProtocols.class, authorizations = {
+    @ApiOperation(value = "Retrieve inbound protocol configurations of an application. ", notes = "This API provides the capability to retrieve authentication protocol configurations of an application. ", response = InboundProtocolListItem.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Inbound Protocols", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = InboundProtocols.class),
+        @ApiResponse(code = 200, message = "OK", response = InboundProtocolListItem.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),

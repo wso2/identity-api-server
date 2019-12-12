@@ -619,7 +619,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InboundProtocols'
+                $ref: '#/components/schemas/InboundProtocolsListResponse'
         '400':
           description: Bad Request
           content:
@@ -1522,7 +1522,7 @@ paths:
       tags:
         - Inbound Protocols - Custom
       summary: |
-        Update WS Trust authentication protocol parameters of an application.
+        Update the Custom Inbound authentication protocol parameters of an application.
       description: >
         This API provides the capability to store WS Trust authentication
         protocol parameters of an application.
