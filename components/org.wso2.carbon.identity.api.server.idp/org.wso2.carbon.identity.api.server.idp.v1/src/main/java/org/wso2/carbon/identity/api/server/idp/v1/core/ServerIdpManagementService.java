@@ -82,7 +82,9 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1228,7 +1230,13 @@ public class ServerIdpManagementService {
     private Link buildPageLink(StringBuilder url, String rel, int offset, int limit, String filter) {
 
         if (StringUtils.isNotBlank(filter)) {
-            url.append(String.format(Constants.PAGINATION_WITH_FILTER_LINK_FORMAT, offset, limit, filter));
+            try {
+                url.append(String.format(Constants.PAGINATION_WITH_FILTER_LINK_FORMAT, offset, limit, URLEncoder
+                        .encode(filter, StandardCharsets.UTF_8.name())));
+            } catch (UnsupportedEncodingException e) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                        .ERROR_CODE_BUILDING_LINKS, "Unable to url-encode filter: " + filter);
+            }
         } else {
             url.append(String.format(Constants.PAGINATION_LINK_FORMAT, offset, limit));
         }
