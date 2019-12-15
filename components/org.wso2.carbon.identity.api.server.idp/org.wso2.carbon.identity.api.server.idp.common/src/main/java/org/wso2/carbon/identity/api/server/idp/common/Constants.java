@@ -149,7 +149,9 @@ public class Constants {
                 "Invalid claim uri.",
                 "Invalid claim uri %s provided in claim config."),
         ERROR_CODE_INVALID_INPUT("60025", "Invalid input.", "One of the given inputs is invalid."),
-        ERROR_CODE_INVALID_SAML_METADATA("60026", "Invalid SAML metadata.", "SAML metadata is invalid/empty.");
+        ERROR_CODE_INVALID_SAML_METADATA("60026", "Invalid SAML metadata.", "SAML metadata is invalid/empty."),
+        ERROR_CODE_BUILDING_LINKS("65042", "Error building page links", "Error occurred during building page links. " +
+                "%s");
 
         private final String code;
         private final String message;
