@@ -3,7 +3,7 @@ info:
   description: >
     This document specifies a **Application Management RESTful API** for **WSO2
     Identity Server** .
-  version: "0.1.0-oas3"
+  version: "v1.0.0"
   title: WSO2 Identity Server - Application Management Rest API
   termsOfService: 'http://swagger.io/terms/'
   contact:
@@ -150,11 +150,10 @@ paths:
       tags:
         - Applications
       summary: |
-        Import an application from file.
+        Create an application from an exported XML file.
       operationId: importApplication
       description: >
-        This API provides the capability to store the application information,
-        provided as a file.
+        This API provides the capability to create an application from an exported XML file of an application.
       requestBody:
         content:
           multipart/form-data:
@@ -203,7 +202,7 @@ paths:
       tags:
         - Applications
       summary: |
-        Update an application from file.
+        Update an application from an exported XML file.
       operationId: importApplicationForUpdate
       description: >
         This API provides the capability to update an application from information exported as a file.
