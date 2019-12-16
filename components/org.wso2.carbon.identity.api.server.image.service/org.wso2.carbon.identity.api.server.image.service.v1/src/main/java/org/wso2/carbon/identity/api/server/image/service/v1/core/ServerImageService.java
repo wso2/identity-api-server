@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.image.service.common.ImageServiceConstants;
 import org.wso2.carbon.identity.api.server.image.service.common.ImageServiceDataHolder;
+import org.wso2.carbon.identity.image.ContentData;
 import org.wso2.carbon.identity.image.StorageSystemManager;
 import org.wso2.carbon.identity.image.exception.StorageSystemException;
 
@@ -63,7 +64,7 @@ public class ServerImageService {
 
     }
 
-    public byte[] downloadImage(String id, String type) {
+    public ContentData downloadImage(String id, String type) {
 
         StorageSystemManager storageSystemManager = ImageServiceDataHolder.getStorageSystemManager();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
