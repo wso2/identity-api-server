@@ -610,7 +610,7 @@ public class ApplicationsApi  {
     @Path("/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Import an application from file. ", notes = "This API provides the capability to store the application information, provided as a file. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Create an application from an exported XML file. ", notes = "This API provides the capability to create an application from an exported XML file of an application. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -634,7 +634,7 @@ public class ApplicationsApi  {
     @Path("/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update an application from file. ", notes = "This API provides the capability to update an application from information exported as a file. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update an application from an exported XML file. ", notes = "This API provides the capability to update an application from information exported as a file. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -731,7 +731,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update WS Trust authentication protocol parameters of an application. ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update the Custom Inbound authentication protocol parameters of an application. ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
