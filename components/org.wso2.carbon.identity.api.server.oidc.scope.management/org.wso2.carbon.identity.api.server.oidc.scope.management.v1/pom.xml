@@ -22,7 +22,7 @@
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.oidc.scope.management</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.0.58-SNAPSHOT</version>
+        <version>1.0.59-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.api.server.oidc.scope.management.v1</artifactId>
@@ -172,10 +172,10 @@
             <artifactId>org.wso2.carbon.security.mgt</artifactId>
             <scope>provided</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.wso2.carbon.identity.server.api</groupId>-->
-<!--            <artifactId>org.wso2.carbon.identity.api.server.oidc.scope.management.common</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.wso2.carbon.identity.server.api</groupId>
+            <artifactId>org.wso2.carbon.identity.api.server.oidc.scope.management.common</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>

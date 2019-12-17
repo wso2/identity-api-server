@@ -16,11 +16,15 @@
 
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1.impl;
 
-import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.*;
-import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.*;
-import java.util.List;
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.OidcApiService;
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Claims;
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeObject;
+
 import javax.ws.rs.core.Response;
 
+/**
+ * API service implementation of OIDC scope management service operations.
+ */
 public class OidcApiServiceImpl implements OidcApiService {
 
     @Override
