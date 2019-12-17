@@ -3,7 +3,7 @@ info:
   description: >
     This document specifies a **Identity Provider Management RESTful API** for
     **WSO2 Identity Server**
-  version: "v1.0.0"
+  version: "v1"
   title: WSO2 Identity Server - Identity Provider Management API definition
   termsOfService: 'http://swagger.io/terms/'
   contact:

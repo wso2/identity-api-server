@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: "v1.0.0"
+  version: "v1"
   title: WSO2 Identity Server - Email Template API
   description: >-
     This is the RESTful API for managing Email Templates in the WSO2 Identity
