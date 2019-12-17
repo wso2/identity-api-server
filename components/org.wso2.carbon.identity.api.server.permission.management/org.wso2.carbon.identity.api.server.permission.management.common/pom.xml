@@ -22,7 +22,7 @@
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.permission.management</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.0.59</version>
+        <version>1.0.60-SNAPSHOT</version>
     </parent>
     <name>WSO2 Identity Server - Common Permission Management</name>
     <description>WSO2 Identity Server - PCommon Permission Management</description>
