@@ -22,12 +22,12 @@
     <parent>
         <artifactId>identity-api-server</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
-        <version>1.0.59-SNAPSHOT</version>
+        <version>1.0.59</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>org.wso2.carbon.identity.api.server.application.management</artifactId>
-    <version>1.0.59-SNAPSHOT</version>
+    <version>1.0.59</version>
     <packaging>pom</packaging>
 
     <modules>
