@@ -20,9 +20,14 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.image.service.v1.ImagesApiService;
 import org.wso2.carbon.identity.api.server.image.service.v1.core.ServerImageService;
+import org.wso2.carbon.identity.image.DataContent;
+import org.wso2.carbon.identity.image.FileContent;
+import org.wso2.carbon.identity.image.StreamContent;
 
 import java.io.InputStream;
 import java.net.URI;
+
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
 
@@ -49,11 +54,18 @@ public class ImagesApiServiceImpl implements ImagesApiService {
 
     @Override
     public Response downloadImage(String id, String type) {
-        byte[] resource = serverImageService.downloadImage(id, type);
+
+        DataContent resource = serverImageService.downloadImage(id, type);
         CacheControl cacheControl = new CacheControl();
         cacheControl.setMaxAge(86400);
         cacheControl.setPrivate(true);
-        return Response.ok().entity(resource).cacheControl(cacheControl).build();
+
+        if (resource instanceof FileContent) {
+            return Response.ok(((FileContent) resource).getFile()).cacheControl(cacheControl).build();
+        } else if (resource instanceof StreamContent) {
+            return Response.ok().entity(((StreamContent) resource).getInputStream()).cacheControl(cacheControl).build();
+        }
+        return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
     }
 
     @Override
