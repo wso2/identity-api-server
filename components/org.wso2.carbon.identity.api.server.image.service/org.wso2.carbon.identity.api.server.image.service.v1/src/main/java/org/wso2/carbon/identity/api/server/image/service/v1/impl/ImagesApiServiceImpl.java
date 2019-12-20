@@ -21,8 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.image.service.v1.ImagesApiService;
 import org.wso2.carbon.identity.api.server.image.service.v1.core.ServerImageService;
 import org.wso2.carbon.identity.image.DataContent;
-import org.wso2.carbon.identity.image.FileContentImpl;
-import org.wso2.carbon.identity.image.StreamContentImpl;
+import org.wso2.carbon.identity.image.FileContent;
+import org.wso2.carbon.identity.image.StreamContent;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -60,11 +60,10 @@ public class ImagesApiServiceImpl implements ImagesApiService {
         cacheControl.setMaxAge(86400);
         cacheControl.setPrivate(true);
 
-        if (resource instanceof FileContentImpl) {
-            return Response.ok(((FileContentImpl) resource).getFile()).cacheControl(cacheControl).build();
-        } else if (resource instanceof StreamContentImpl) {
-            return Response.ok().entity(((StreamContentImpl) resource).getInputStream()).cacheControl(cacheControl)
-                    .build();
+        if (resource instanceof FileContent) {
+            return Response.ok(((FileContent) resource).getFile()).cacheControl(cacheControl).build();
+        } else if (resource instanceof StreamContent) {
+            return Response.ok().entity(((StreamContent) resource).getInputStream()).cacheControl(cacheControl).build();
         }
         return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
     }
