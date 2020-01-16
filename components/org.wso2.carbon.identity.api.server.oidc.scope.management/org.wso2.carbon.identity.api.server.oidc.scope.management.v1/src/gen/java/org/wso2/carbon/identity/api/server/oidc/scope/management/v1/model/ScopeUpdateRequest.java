@@ -30,41 +30,60 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class ScopeObject  {
+public class ScopeUpdateRequest  {
   
-    private String name;
+    private String displayName;
+    private String description;
     private List<String> claims = null;
 
 
     /**
     **/
-    public ScopeObject name(String name) {
+    public ScopeUpdateRequest displayName(String displayName) {
 
-        this.name = name;
+        this.displayName = displayName;
         return this;
     }
     
-    @ApiModelProperty(example = "Scope1", required = true, value = "")
-    @JsonProperty("name")
+    @ApiModelProperty(example = "scopeOne", required = true, value = "")
+    @JsonProperty("displayName")
     @Valid
-    @NotNull(message = "Property name cannot be null.")
+    @NotNull(message = "Property displayName cannot be null.")
 
-    public String getName() {
-        return name;
+    public String getDisplayName() {
+        return displayName;
     }
-    public void setName(String name) {
-        this.name = name;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     /**
     **/
-    public ScopeObject claims(List<String> claims) {
+    public ScopeUpdateRequest description(String description) {
+
+        this.description = description;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Sample updated scope one", value = "")
+    @JsonProperty("description")
+    @Valid
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+    **/
+    public ScopeUpdateRequest claims(List<String> claims) {
 
         this.claims = claims;
         return this;
     }
     
-    @ApiModelProperty(example = "[\"birthdate\",\"gender\"]", value = "")
+    @ApiModelProperty(example = "[\"birthdate\",\"gender\",\"age\"]", value = "")
     @JsonProperty("claims")
     @Valid
     public List<String> getClaims() {
@@ -74,7 +93,7 @@ public class ScopeObject  {
         this.claims = claims;
     }
 
-    public ScopeObject addClaimsItem(String claimsItem) {
+    public ScopeUpdateRequest addClaimsItem(String claimsItem) {
         if (this.claims == null) {
             this.claims = new ArrayList<>();
         }
@@ -93,23 +112,25 @@ public class ScopeObject  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ScopeObject scopeObject = (ScopeObject) o;
-        return Objects.equals(this.name, scopeObject.name) &&
-            Objects.equals(this.claims, scopeObject.claims);
+        ScopeUpdateRequest scopeUpdateRequest = (ScopeUpdateRequest) o;
+        return Objects.equals(this.displayName, scopeUpdateRequest.displayName) &&
+            Objects.equals(this.description, scopeUpdateRequest.description) &&
+            Objects.equals(this.claims, scopeUpdateRequest.claims);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, claims);
+        return Objects.hash(displayName, description, claims);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ScopeObject {\n");
+        sb.append("class ScopeUpdateRequest {\n");
         
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+        sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
         sb.append("}");
         return sb.toString();

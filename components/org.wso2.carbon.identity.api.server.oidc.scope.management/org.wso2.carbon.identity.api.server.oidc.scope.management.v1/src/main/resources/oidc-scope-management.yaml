@@ -44,7 +44,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ScopeObject'
+                  $ref: '#/components/schemas/Scope'
         400:
           $ref: '#/components/responses/BadRequest'
         401:
@@ -67,7 +67,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ScopeObject'
+              $ref: '#/components/schemas/Scope'
       responses:
         201:
           $ref: '#/components/responses/Created'
@@ -103,9 +103,9 @@ paths:
         200:
           description: OK.
           content:
-           application/json:
-            schema:
-              $ref: '#/components/schemas/ScopeObject'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scope'
         401:
           $ref: '#/components/responses/Unauthorized'
         403:
@@ -134,7 +134,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Claims'
+              $ref: '#/components/schemas/ScopeUpdateRequest'
       responses:
         200:
           description: OK.
@@ -152,7 +152,7 @@ paths:
       tags:
         - OIDC Scope Endpoint
       summary: Delete an OIDC Scope
-      operationId: delelteScope
+      operationId: deleteScope
       security:
         - BasicAuth: []
         - OAuth2: []
@@ -179,7 +179,7 @@ paths:
 components:
   responses:
     NoContent:
-     description: No Content.
+      description: No Content.
     BadRequest:
       description: Bad Request.
       content:
@@ -211,51 +211,65 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     InvalidInput:
-     description: Invalid input request.
-     content:
-       application/json:
-         schema:
-           $ref: '#/components/schemas/ErrorResponse'
+      description: Invalid input request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
     Conflict:
-     description: Scope is already Exists.
-     content:
-       application/json:
-         schema:
-           $ref: '#/components/schemas/ErrorResponse'
+      description: Scope is already Exists.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
     Created:
       description: Created
       headers:
-            Set-Cookie:
-              description: Location of the newly created scope
-              schema:
-                type: string
-                format: uri
-                example: https://apis.is.com/t/wso2.com/api/server/v1/oidc/scopes/Scope1
+        Set-Cookie:
+          description: Location of the newly created scope
+          schema:
+            type: string
+            format: uri
+            example: https://apis.is.com/t/wso2.com/api/server/v1/oidc/scopes/Scope1
   schemas:
-    ScopeObject:
+    Scope:
       type: object
       required:
         - name
+        - displayName
         - claims[]
       properties:
         name:
           type: string
           example: Scope1
+        displayName:
+          type: string
+          example: scope1
+        description:
+          type: string
+          example: "Sample scope one"
         claims:
           type: array
           items:
             type: string
           example: [birthdate,gender]
-    Claims:
+    ScopeUpdateRequest:
       type: object
       required:
+        - displayName
         - claims[]
       properties:
+        displayName:
+          type: string
+          example: scopeOne
+        description:
+          type: string
+          example: "Sample updated scope one"
         claims:
           type: array
           items:
             type: string
-          example: [birthdate,gender]
+          example: [birthdate,gender,age]
     ErrorResponse:
       type: object
       required:

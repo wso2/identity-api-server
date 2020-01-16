@@ -21,21 +21,21 @@ import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
-import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ErrorResponse;
-import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeObject;
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
 import javax.ws.rs.core.Response;
 
 
 public interface OidcApiService {
 
-      public Response addScope(ScopeObject scopeObject);
+      public Response addScope(Scope scope);
 
-      public Response delelteScope(String id);
+      public Response deleteScope(String id);
 
       public Response getScope(String id);
 
       public Response getScopes();
 
-      public Response updateScope(String id, Claims claims);
+      public Response updateScope(String id, ScopeUpdateRequest scopeUpdateRequest);
 }

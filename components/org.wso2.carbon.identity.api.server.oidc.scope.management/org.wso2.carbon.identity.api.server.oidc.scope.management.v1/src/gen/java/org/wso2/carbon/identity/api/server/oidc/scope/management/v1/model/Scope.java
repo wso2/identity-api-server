@@ -30,14 +30,75 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class Claims  {
+public class Scope  {
   
+    private String name;
+    private String displayName;
+    private String description;
     private List<String> claims = null;
 
 
     /**
     **/
-    public Claims claims(List<String> claims) {
+    public Scope name(String name) {
+
+        this.name = name;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Scope1", required = true, value = "")
+    @JsonProperty("name")
+    @Valid
+    @NotNull(message = "Property name cannot be null.")
+
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+    **/
+    public Scope displayName(String displayName) {
+
+        this.displayName = displayName;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "scope1", required = true, value = "")
+    @JsonProperty("displayName")
+    @Valid
+    @NotNull(message = "Property displayName cannot be null.")
+
+    public String getDisplayName() {
+        return displayName;
+    }
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    /**
+    **/
+    public Scope description(String description) {
+
+        this.description = description;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Sample scope one", value = "")
+    @JsonProperty("description")
+    @Valid
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+    **/
+    public Scope claims(List<String> claims) {
 
         this.claims = claims;
         return this;
@@ -53,7 +114,7 @@ public class Claims  {
         this.claims = claims;
     }
 
-    public Claims addClaimsItem(String claimsItem) {
+    public Scope addClaimsItem(String claimsItem) {
         if (this.claims == null) {
             this.claims = new ArrayList<>();
         }
@@ -72,21 +133,27 @@ public class Claims  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Claims claims = (Claims) o;
-        return Objects.equals(this.claims, claims.claims);
+        Scope scope = (Scope) o;
+        return Objects.equals(this.name, scope.name) &&
+            Objects.equals(this.displayName, scope.displayName) &&
+            Objects.equals(this.description, scope.description) &&
+            Objects.equals(this.claims, scope.claims);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(claims);
+        return Objects.hash(name, displayName, description, claims);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class Claims {\n");
+        sb.append("class Scope {\n");
         
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+        sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
         sb.append("}");
         return sb.toString();

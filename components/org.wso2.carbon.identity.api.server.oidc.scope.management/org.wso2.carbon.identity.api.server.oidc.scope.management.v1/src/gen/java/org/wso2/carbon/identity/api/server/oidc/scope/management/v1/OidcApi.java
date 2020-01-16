@@ -17,21 +17,15 @@
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
 
-import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ErrorResponse;
-import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeObject;
-import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.OidcApiService;
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
 
 @Path("/oidc")
 @Api(description = "The oidc API")
@@ -55,9 +49,9 @@ public class OidcApi  {
         @ApiResponse(code = 409, message = "Scope is already Exists.", response = ErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = ErrorResponse.class)
     })
-    public Response addScope(@ApiParam(value = "" ) @Valid ScopeObject scopeObject) {
+    public Response addScope(@ApiParam(value = "" ) @Valid Scope scope) {
 
-        return delegate.addScope(scopeObject );
+        return delegate.addScope(scope );
     }
 
     @Valid
@@ -75,7 +69,7 @@ public class OidcApi  {
     })
     public Response delelteScope(@ApiParam(value = "scope name as the id",required=true) @PathParam("id") String id) {
 
-        return delegate.delelteScope(id );
+        return delegate.deleteScope(id);
     }
 
     @Valid
@@ -83,9 +77,9 @@ public class OidcApi  {
     @Path("/scopes/{id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get a scope", notes = "This REST API can be used to get the scope.", response = ScopeObject.class, tags={ "OIDC Scope Endpoint", })
+    @ApiOperation(value = "Get a scope", notes = "This REST API can be used to get the scope.", response = Scope.class, tags={ "OIDC Scope Endpoint", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK.", response = ScopeObject.class),
+        @ApiResponse(code = 200, message = "OK.", response = Scope.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = ErrorResponse.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = ErrorResponse.class),
         @ApiResponse(code = 404, message = "Resource Not Found.", response = ErrorResponse.class),
@@ -101,9 +95,9 @@ public class OidcApi  {
     @Path("/scopes")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the list of scopes", notes = "This REST API can be used to get the avaiable scopes details.", response = ScopeObject.class, responseContainer = "List", tags={ "OIDC Scope Endpoint", })
+    @ApiOperation(value = "Retrieves the list of scopes", notes = "This REST API can be used to get the avaiable scopes details.", response = Scope.class, responseContainer = "List", tags={ "OIDC Scope Endpoint", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK.", response = ScopeObject.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "OK.", response = Scope.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request.", response = ErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = ErrorResponse.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = ErrorResponse.class),
@@ -129,9 +123,9 @@ public class OidcApi  {
         @ApiResponse(code = 404, message = "Resource Not Found.", response = ErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = ErrorResponse.class)
     })
-    public Response updateScope(@ApiParam(value = "scope name as the id",required=true) @PathParam("id") String id, @ApiParam(value = "" ) @Valid Claims claims) {
+    public Response updateScope(@ApiParam(value = "scope name as the id",required=true) @PathParam("id") String id, @ApiParam(value = "" ) @Valid ScopeUpdateRequest scopeUpdateRequest) {
 
-        return delegate.updateScope(id,  claims );
+        return delegate.updateScope(id,  scopeUpdateRequest );
     }
 
 }

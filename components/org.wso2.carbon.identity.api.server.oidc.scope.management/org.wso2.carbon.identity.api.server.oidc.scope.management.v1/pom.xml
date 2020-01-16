@@ -54,7 +54,7 @@
 <!--                                <hideGenerationTimestamp>true</hideGenerationTimestamp>-->
 <!--                            </configOptions>-->
 <!--                            <output>.</output>-->
-<!--                            <skipOverwrite>true</skipOverwrite>-->
+<!--                            <skipOverwrite>false</skipOverwrite>-->
 <!--                        </configuration>-->
 <!--                    </execution>-->
 <!--                </executions>-->
