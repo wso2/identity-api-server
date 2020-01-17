@@ -39,7 +39,7 @@ public class OidcApiServiceImpl implements OidcApiService {
     public Response addScope(Scope scope) {
 
         String resourceId = oidcScopeManagementService.addScope(scope);
-        return Response.ok(getResourceLocation(resourceId)).build();
+        return Response.created(getResourceLocation(resourceId)).build();
     }
 
     @Override

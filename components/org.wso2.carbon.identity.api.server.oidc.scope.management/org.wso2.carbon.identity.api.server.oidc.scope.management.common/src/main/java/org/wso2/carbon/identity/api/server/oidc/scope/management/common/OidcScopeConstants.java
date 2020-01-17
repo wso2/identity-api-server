@@ -9,13 +9,12 @@ public class OidcScopeConstants {
     public static final String PATH_SEPERATOR = "/";
 
     /**
-     * Enum for OIDC Scope management service related errors.
+     * Enum for OIDC scope management service related errors.
      */
     public enum ErrorMessage {
 
         INVALID_REQUEST("60001", "Invalid Request."),
-        ERROR_CONFLICT_REQUEST("41004", "Scope ID: %s already exists with OIDC claim " +
-                "mapping in the system. Please use a different scope name or different OIDC claims to map.");
+        ERROR_CONFLICT_REQUEST("41004", "Scope is already exists.");
 
         private final String code;
         private final String message;

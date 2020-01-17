@@ -25,6 +25,12 @@ public class OidcScopeManagementService {
 
     private static final Log LOG = LogFactory.getLog(OidcScopeManagementService.class);
 
+    /**
+     * Add an OIDC scope.
+     *
+     * @param scopeObject Scope.
+     * @return Return location URI of created scope.
+     */
     public String addScope(Scope scopeObject) {
 
         try {
@@ -39,6 +45,11 @@ public class OidcScopeManagementService {
         }
     }
 
+    /**
+     * Delete an OIDC scope.
+     *
+     * @param id Scope name.
+     */
     public void deleteScope(String id) {
 
         try {
@@ -48,6 +59,12 @@ public class OidcScopeManagementService {
         }
     }
 
+    /**
+     * Get an OIDC scope.
+     *
+     * @param id Scope name.
+     * @return Return scope details.
+     */
     public Scope getScope(String id) {
 
         try {
@@ -58,6 +75,11 @@ public class OidcScopeManagementService {
         }
     }
 
+    /**
+     * List all available OIDC scopes.
+     *
+     * @return List of scopes.
+     */
     public List<Scope> getScopes() {
 
         try {
@@ -69,6 +91,12 @@ public class OidcScopeManagementService {
 
     }
 
+    /**
+     * Update an existing scope.
+     *
+     * @param id                Scope name.
+     * @param scopeUpdateObject Updated scope object.
+     */
     public void updateScope(String id, ScopeUpdateRequest scopeUpdateObject) {
 
         try {
@@ -82,6 +110,12 @@ public class OidcScopeManagementService {
         }
     }
 
+    /**
+     * Build scope list.
+     *
+     * @param scopeDTOS ScopeDTOs.
+     * @return Return list of scope.
+     */
     private List<Scope> buildScopeList(ScopeDTO[] scopeDTOS) {
 
         List<Scope> scopeList = new ArrayList<>();
@@ -93,6 +127,12 @@ public class OidcScopeManagementService {
 
     }
 
+    /**
+     * Convert ScopeDTO to Scope object.
+     *
+     * @param scopeDTO ScopeDTO.
+     * @return Converted Scope.
+     */
     private Scope convertScopeDTOObjectToScope(ScopeDTO scopeDTO) {
 
         Scope scope = new Scope();
@@ -104,6 +144,13 @@ public class OidcScopeManagementService {
 
     }
 
+    /**
+     * Handle error cases.
+     *
+     * @param e       Exception.
+     * @param message Error message.
+     * @return API error.
+     */
     private APIError handleException(IdentityOAuthAdminException e, String message) {
 
         ErrorResponse.Builder builder = new ErrorResponse.Builder().withCode(e.getErrorCode())
