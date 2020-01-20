@@ -57,7 +57,6 @@ import static org.wso2.carbon.identity.api.server.script.library.common.Constant
 public class ServerScriptLibrariesService {
 
     private static final Log log = LogFactory.getLog(ServerScriptLibrariesService.class);
-    private static final int DEFAULT_OFFSET = 0;
 
     /**
      * Get list of Script Libraries.
@@ -89,7 +88,8 @@ public class ServerScriptLibrariesService {
         if (offset != null && offset >= 0) {
             return offset;
         } else {
-            return DEFAULT_OFFSET;
+            throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_SCRIPT_LIBRARY_OFFSET_VALIDATION,
+                    Response.Status.BAD_REQUEST);
         }
     }
 
@@ -204,8 +204,7 @@ public class ServerScriptLibrariesService {
                         .updateFunctionLibrary(scriptLibraryName, functionLibrary,
                                 ContextLoader.getTenantDomainFromContext());
             } catch (FunctionLibraryManagementException e) {
-                throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SCRIPT_LIBRARY
-                                              );
+                throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SCRIPT_LIBRARY);
             }
             return createScriptLibraryResponse(functionLibrary);
         } else {

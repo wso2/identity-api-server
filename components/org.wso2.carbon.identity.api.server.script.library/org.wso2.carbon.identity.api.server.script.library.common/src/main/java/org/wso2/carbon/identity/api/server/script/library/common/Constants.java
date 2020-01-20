@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,9 @@ public class Constants {
         ERROR_SCRIPT_LIBRARY_ALREADY_FOUND("60007", "Script library already exist.",
                 "Script library already exist for the provided name: %s in the tenantDomain: %s."),
         ERROR_SCRIPT_LIBRARY_NAME_VALIDATION("60008", "Invalid script library name.",
-                "Script library name should include the .js extension.");
+                "Script library name should include the .js extension."),
+        ERROR_SCRIPT_LIBRARY_OFFSET_VALIDATION("60009", "Invalid offset.",
+                "Offset should be greater than or equal to 0");
 
         private final String code;
         private final String message;
