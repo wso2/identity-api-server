@@ -17,15 +17,21 @@
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
 
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ErrorResponse;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.OidcApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+
+import javax.validation.constraints.*;
 
 @Path("/oidc")
 @Api(description = "The oidc API")
@@ -67,9 +73,9 @@ public class OidcApi  {
         @ApiResponse(code = 404, message = "Resource Not Found.", response = ErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = ErrorResponse.class)
     })
-    public Response delelteScope(@ApiParam(value = "scope name as the id",required=true) @PathParam("id") String id) {
+    public Response deleteScope(@ApiParam(value = "scope name as the id",required=true) @PathParam("id") String id) {
 
-        return delegate.deleteScope(id);
+        return delegate.deleteScope(id );
     }
 
     @Valid

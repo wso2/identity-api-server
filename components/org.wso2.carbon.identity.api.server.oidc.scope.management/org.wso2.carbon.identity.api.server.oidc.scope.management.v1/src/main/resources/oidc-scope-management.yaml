@@ -237,7 +237,7 @@ components:
       required:
         - name
         - displayName
-        - claims[]
+        - claims
       properties:
         name:
           type: string
@@ -257,7 +257,7 @@ components:
       type: object
       required:
         - displayName
-        - claims[]
+        - claims
       properties:
         displayName:
           type: string

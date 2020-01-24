@@ -35,7 +35,7 @@ public class Scope  {
     private String name;
     private String displayName;
     private String description;
-    private List<String> claims = null;
+    private List<String> claims = new ArrayList<>();
 
 
     /**
@@ -104,9 +104,11 @@ public class Scope  {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"birthdate\",\"gender\"]", value = "")
+    @ApiModelProperty(example = "[\"birthdate\",\"gender\"]", required = true, value = "")
     @JsonProperty("claims")
     @Valid
+    @NotNull(message = "Property claims cannot be null.")
+
     public List<String> getClaims() {
         return claims;
     }
@@ -115,9 +117,6 @@ public class Scope  {
     }
 
     public Scope addClaimsItem(String claimsItem) {
-        if (this.claims == null) {
-            this.claims = new ArrayList<>();
-        }
         this.claims.add(claimsItem);
         return this;
     }
