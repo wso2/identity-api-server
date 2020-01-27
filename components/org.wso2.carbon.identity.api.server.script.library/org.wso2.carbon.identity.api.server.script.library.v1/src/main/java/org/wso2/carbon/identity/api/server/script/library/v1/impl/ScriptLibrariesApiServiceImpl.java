@@ -83,8 +83,7 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
     public Response updateScriptLibrary(String scriptLibraryName, InputStream contentInputStream,
                                         Attachment contentDetail, String description) {
 
-        ScriptLibraryResponse scriptLibraryResponse =
-                serverScriptLibrariesService.updateScriptLibrary(scriptLibraryName, contentInputStream, description);
-        return Response.ok().entity(scriptLibraryResponse).build();
+        serverScriptLibrariesService.updateScriptLibrary(scriptLibraryName, contentInputStream, description);
+        return Response.ok().build();
     }
 }

@@ -182,10 +182,9 @@ public class ServerScriptLibrariesService {
      * @param scriptLibraryName  Name of the script library.
      * @param contentInputStream Content of the script library code.
      * @param description        Description of the script library
-     * @return ScriptLibrary.
      */
-    public ScriptLibraryResponse updateScriptLibrary(String scriptLibraryName, InputStream contentInputStream,
-                                                     String description) {
+    public void updateScriptLibrary(String scriptLibraryName, InputStream contentInputStream,
+                                    String description) {
 
         ScriptLibraryPUTRequest scriptLibraryPUTRequest = new ScriptLibraryPUTRequest();
         scriptLibraryPUTRequest.setDescription(description);
@@ -206,7 +205,6 @@ public class ServerScriptLibrariesService {
             } catch (FunctionLibraryManagementException e) {
                 throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SCRIPT_LIBRARY);
             }
-            return createScriptLibraryResponse(functionLibrary);
         } else {
             throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_SCRIPT_LIBRARY_NOT_FOUND,
                     Response.Status.NOT_FOUND, scriptLibraryName, ContextLoader.getTenantDomainFromContext());
@@ -249,8 +247,7 @@ public class ServerScriptLibrariesService {
                 ScriptLibraryServiceHolder.getScriptLibraryManagementService()
                         .deleteFunctionLibrary(scriptLibraryId, ContextLoader.getTenantDomainFromContext());
             } catch (FunctionLibraryManagementException e) {
-                throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_SCRIPT_LIBRARY
-                                              );
+                throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_SCRIPT_LIBRARY);
             }
         } else {
             throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_SCRIPT_LIBRARY_NOT_FOUND,
