@@ -102,10 +102,12 @@ public class ServerScriptLibrariesService {
     private int validateLimit(Integer limit) {
 
         final int maximumItemPerPage = IdentityUtil.getMaximumItemPerPage();
-        if (limit != null && limit > 0 && limit <= maximumItemPerPage) {
+        if (limit == null) {
+            return IdentityUtil.getDefaultItemsPerPage();
+        } else if (limit <= maximumItemPerPage) {
             return limit;
         } else {
-            return IdentityUtil.getDefaultItemsPerPage();
+            return maximumItemPerPage;
         }
     }
 
