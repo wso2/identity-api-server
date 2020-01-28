@@ -39,7 +39,7 @@ public class AdvancedApplicationConfiguration  {
     private Boolean enableAuthorization;
 
     /**
-    * Decides whether the application is allowed to be accessed across tenants.
+    * Decides whether the application is accessible across tenants.
     **/
     public AdvancedApplicationConfiguration saas(Boolean saas) {
 
@@ -47,7 +47,7 @@ public class AdvancedApplicationConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Decides whether the application is allowed to be accessed across tenants.")
+    @ApiModelProperty(example = "false", value = "Decides whether the application is accessible across tenants.")
     @JsonProperty("saas")
     @Valid
     public Boolean getSaas() {
@@ -114,7 +114,7 @@ public class AdvancedApplicationConfiguration  {
     }
 
     /**
-    * Decides whether the list of authenticated identity providers need to returned in the authentication response.
+    * Decides whether the list of authenticated identity providers need to be returned in the authentication response.
     **/
     public AdvancedApplicationConfiguration returnAuthenticatedIdpList(Boolean returnAuthenticatedIdpList) {
 
@@ -122,7 +122,7 @@ public class AdvancedApplicationConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Decides whether the list of authenticated identity providers need to returned in the authentication response.")
+    @ApiModelProperty(example = "false", value = "Decides whether the list of authenticated identity providers need to be returned in the authentication response.")
     @JsonProperty("returnAuthenticatedIdpList")
     @Valid
     public Boolean getReturnAuthenticatedIdpList() {

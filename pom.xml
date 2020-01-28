@@ -466,10 +466,10 @@
     </properties>
 
     <modules>
+        <module>components/org.wso2.carbon.identity.api.server.common</module>
         <module>components/org.wso2.carbon.identity.api.server.challenge</module>
         <module>components/org.wso2.carbon.identity.api.server.claim.management</module>
         <module>components/org.wso2.carbon.identity.api.server.identity.governance</module>
-        <module>components/org.wso2.carbon.identity.api.server.common</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow.engine</module>
         <module>components/org.wso2.carbon.identity.api.server.permission.management</module>
         <module>components/org.wso2.carbon.identity.api.server.email.template</module>
