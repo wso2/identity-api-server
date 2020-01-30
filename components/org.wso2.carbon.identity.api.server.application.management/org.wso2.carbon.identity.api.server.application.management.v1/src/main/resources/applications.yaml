@@ -2538,7 +2538,7 @@ components:
           description: "If not provided, the first assertion consumer URL on the assertionConsumerUrls will be picked as the default assertion consumer URL."
         idpEntityIdAlias  :
           type: string
-          description: "Default value is the IdP Entity ID value specified in Resident IdP"
+          description: "Default value is the IdP Entity ID value specified in Resident IdP."
 
         singleSignOnProfile:
           $ref: '#/components/schemas/SingleSignOnProfile'
@@ -2603,7 +2603,7 @@ components:
           default: false
           description: >-
             Enabling this option will allow the client to authenticate without a
-            client secret
+            client secret.
           example: false
         pkce:
           $ref: '#/components/schemas/OAuth2PKCEConfiguration'
@@ -2657,7 +2657,7 @@ components:
           format: int64
           example: 86400
         renewRefreshToken:
-          description: "Decides whether the refresh token needs to renewed during refresh grant flow"
+          description: "Decides whether the refresh token needs to renewed during refresh grant flow."
           type: boolean
           example: true
     IdTokenConfiguration:
