@@ -89,7 +89,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete an application by id ", notes = "This API provides the capability to delete an application by id. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete application by ID ", notes = "This API provides the capability to delete an application by ID. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -103,7 +103,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response deleteApplication(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
+    public Response deleteApplication(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.deleteApplication(applicationId );
     }
@@ -113,7 +113,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete Custom Inbound authentication protocol parameters of an application. ", notes = "This API provides the capability to delete Custom Inbound authentication protocol of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete custom inbound authentication protocol parameters of application ", notes = "This API provides the capability to delete custom inbound authentication protocol of an application. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -127,7 +127,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response deleteCustomInboundConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Inbound Authentication Protocol ID",required=true) @PathParam("inboundProtocolId") String inboundProtocolId) {
+    public Response deleteCustomInboundConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Inbound Authentication Protocol ID",required=true) @PathParam("inboundProtocolId") String inboundProtocolId) {
 
         return delegate.deleteCustomInboundConfiguration(applicationId,  inboundProtocolId );
     }
@@ -137,7 +137,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete OIDC authentication protocol parameters of an application. ", notes = "This API provides the capability to delete OIDC authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete OIDC authentication protocol parameters of application ", notes = "This API provides the capability to delete OIDC authentication protocol parameters of an application. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -151,7 +151,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response deleteInboundOAuthConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
+    public Response deleteInboundOAuthConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.deleteInboundOAuthConfiguration(applicationId );
     }
@@ -161,7 +161,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/saml")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete SAML2 authentication protocol parameters of an application. ", notes = "This API provides the capability to delete SAML2 authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete SAML2 authentication protocol parameters of application ", notes = "This API provides the capability to delete SAML2 authentication protocol parameters of an application. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -175,7 +175,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response deleteInboundSAMLConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
+    public Response deleteInboundSAMLConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.deleteInboundSAMLConfiguration(applicationId );
     }
@@ -185,7 +185,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/passive-sts")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete Passive STS authentication protocol parameters of an application. ", notes = "This API provides the capability to delete Passive STS authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete Passive STS authentication protocol parameters of application ", notes = "This API provides the capability to delete Passive STS authentication protocol parameters of an application. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -199,7 +199,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response deletePassiveStsConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
+    public Response deletePassiveStsConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.deletePassiveStsConfiguration(applicationId );
     }
@@ -209,7 +209,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/ws-trust")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete WS Trust authentication protocol parameters of an application. ", notes = "This API provides the capability to delete WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete WS Trust authentication protocol parameters of application ", notes = "This API provides the capability to delete WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -223,7 +223,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response deleteWSTrustConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
+    public Response deleteWSTrustConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.deleteWSTrustConfiguration(applicationId );
     }
@@ -233,7 +233,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/export")
     
     @Produces({ "application/octet-stream", "application/json" })
-    @ApiOperation(value = "Export an application as an XML file. ", notes = "This API provides the capability to retrieve the application as an XML file. ", response = Object.class, authorizations = {
+    @ApiOperation(value = "Export application as an XML file ", notes = "This API provides the capability to retrieve the application as an XML file. ", response = Object.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -247,7 +247,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response exportApplication(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId,     @Valid@ApiParam(value = "Specifies whether to export secrets when exporting an application. ", defaultValue="false") @DefaultValue("false")  @QueryParam("exportSecrets") Boolean exportSecrets) {
+    public Response exportApplication(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId,     @Valid@ApiParam(value = "Specifies whether to export secrets when exporting an application. ", defaultValue="false") @DefaultValue("false")  @QueryParam("exportSecrets") Boolean exportSecrets) {
 
         return delegate.exportApplication(applicationId,  exportSecrets );
     }
@@ -305,7 +305,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}")
     
     @Produces({ "application/json", "application/xml",  })
-    @ApiOperation(value = "Retrieve application by id ", notes = "This API provides the capability to retrieve the application information by id. ", response = ApplicationResponseModel.class, authorizations = {
+    @ApiOperation(value = "Retrieve application by ID ", notes = "This API provides the capability to retrieve the application information by ID. ", response = ApplicationResponseModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -319,7 +319,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getApplication(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
+    public Response getApplication(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getApplication(applicationId );
     }
@@ -329,7 +329,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve Custom Inbound authentication protocol parameters of an application. ", notes = "This API provides the capability to retrieve Custom Inbound authentication protocol parameters of an application. ", response = CustomInboundProtocolConfiguration.class, authorizations = {
+    @ApiOperation(value = "Retrieve custom Inbound authentication protocol parameters of application. ", notes = "This API provides the capability to retrieve custom inbound authentication protocol parameters of an application. ", response = CustomInboundProtocolConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -343,7 +343,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getCustomInboundConfiguration(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Inbound Authentication Protocol ID",required=true) @PathParam("inboundProtocolId") String inboundProtocolId) {
+    public Response getCustomInboundConfiguration(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Inbound Authentication Protocol ID",required=true) @PathParam("inboundProtocolId") String inboundProtocolId) {
 
         return delegate.getCustomInboundConfiguration(applicationId,  inboundProtocolId );
     }
@@ -376,7 +376,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve inbound protocol configurations of an application. ", notes = "This API provides the capability to retrieve authentication protocol configurations of an application. ", response = InboundProtocolListItem.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve inbound protocol configurations of application ", notes = "This API provides the capability to retrieve authentication protocol configurations of an application. ", response = InboundProtocolListItem.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -389,7 +389,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getInboundAuthenticationConfigurations(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
+    public Response getInboundAuthenticationConfigurations(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getInboundAuthenticationConfigurations(applicationId );
     }
@@ -399,7 +399,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve OIDC authentication protocol parameters of an application. ", notes = "This API provides the capability to retrieve OIDC authentication protocol parameters of an application. ", response = OpenIDConnectConfiguration.class, authorizations = {
+    @ApiOperation(value = "Retrieve OIDC authentication protocol parameters of application ", notes = "This API provides the capability to retrieve OIDC authentication protocol parameters of an application. ", response = OpenIDConnectConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -413,7 +413,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getInboundOAuthConfiguration(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
+    public Response getInboundOAuthConfiguration(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getInboundOAuthConfiguration(applicationId );
     }
@@ -423,7 +423,7 @@ public class ApplicationsApi  {
     @Path("/meta/inbound-protocols")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the list of inbound authentication protocols available. ", notes = "This API provides the capability to retrieve the list of inbound authentication protocols available. If the query parameter 'customOnly' is set to true, only custom inbound protocols will be listed. ", response = AuthProtocolMetadata.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve the list of inbound authentication protocols available ", notes = "This API provides the capability to retrieve the list of inbound authentication protocols available. If the query parameter 'customOnly' is set to true, only custom inbound protocols will be listed. ", response = AuthProtocolMetadata.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -446,7 +446,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/saml")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve SAML2 authentication protocol parameters of an application. ", notes = "This API provides the capability to retrieve SAML2 authentication protocol parameters of an application. ", response = SAML2ServiceProvider.class, authorizations = {
+    @ApiOperation(value = "Retrieve SAML2 authentication protocol parameters of application ", notes = "This API provides the capability to retrieve SAML2 authentication protocol parameters of an application. ", response = SAML2ServiceProvider.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -459,7 +459,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getInboundSAMLConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId) {
+    public Response getInboundSAMLConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getInboundSAMLConfiguration(applicationId );
     }
@@ -492,7 +492,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/passive-sts")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve Passive STS authentication protocol parameters of an application. ", notes = "This API provides the capability to retrieve Passive STS authentication protocol parameters of an application. ", response = PassiveStsConfiguration.class, authorizations = {
+    @ApiOperation(value = "Retrieve Passive STS authentication protocol parameters of application ", notes = "This API provides the capability to retrieve Passive STS authentication protocol parameters of an application. ", response = PassiveStsConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -506,7 +506,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getPassiveStsConfiguration(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
+    public Response getPassiveStsConfiguration(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getPassiveStsConfiguration(applicationId );
     }
@@ -516,7 +516,7 @@ public class ApplicationsApi  {
     @Path("/resident")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get Resident Service Provider Information. ", notes = "This API provides the capability to retrieve the resident SP information. ", response = ResidentApplication.class, authorizations = {
+    @ApiOperation(value = "Get Resident application ", notes = "This API provides the capability to retrieve the resident application information. ", response = ResidentApplication.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -563,7 +563,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/ws-trust")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve WS Trust authentication protocol parameters of an application. ", notes = "This API provides the capability to retrieve Passive STS authentication protocol parameters of an application. ", response = WSTrustConfiguration.class, authorizations = {
+    @ApiOperation(value = "Retrieve WS Trust authentication protocol parameters of application ", notes = "This API provides the capability to retrieve Passive STS authentication protocol parameters of an application. ", response = WSTrustConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -577,7 +577,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getWSTrustConfiguration(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
+    public Response getWSTrustConfiguration(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getWSTrustConfiguration(applicationId );
     }
@@ -587,7 +587,7 @@ public class ApplicationsApi  {
     @Path("/meta/inbound-protocols/ws-trust")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the metadata related to the auth protocol WS_Trust ", notes = "This API provides the capability to retrieve all the metadata related to the auth protocol WS_Trust. ", response = WSTrustMetaData.class, authorizations = {
+    @ApiOperation(value = "Retrieve all the metadata related to the auth protocol WS Trust ", notes = "This API provides the capability to retrieve all the metadata related to the auth protocol WS_Trust. ", response = WSTrustMetaData.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -610,7 +610,7 @@ public class ApplicationsApi  {
     @Path("/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create an application from an exported XML file. ", notes = "This API provides the capability to create an application from an exported XML file of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Create application from an exported XML file ", notes = "This API provides the capability to store the application information, provided as a file. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -634,7 +634,7 @@ public class ApplicationsApi  {
     @Path("/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update an application from an exported XML file. ", notes = "This API provides the capability to update an application from information exported as a file. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update application from an exported XML file ", notes = "This API provides the capability to update an application from information that has been exported as an XML file. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -659,7 +659,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Partially update an application by id ", notes = "This API provides the capability to partially update an application by id. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Partially update application by ID ", notes = "This API provides the capability to partially update an application by ID. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -673,7 +673,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response patchApplication(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the application details to be updated." ,required=true) @Valid ApplicationPatchModel applicationPatchModel) {
+    public Response patchApplication(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the application details to be updated." ,required=true) @Valid ApplicationPatchModel applicationPatchModel) {
 
         return delegate.patchApplication(applicationId,  applicationPatchModel );
     }
@@ -683,7 +683,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc/regenerate-secret")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Regenerate the OAuth2/OIDC client secret. ", notes = "This API provides regenerate the OAuth2/OIDC client secret. ", response = OpenIDConnectConfiguration.class, authorizations = {
+    @ApiOperation(value = "Regenerate the OAuth2/OIDC client secret of application ", notes = "This API regenerates the OAuth2/OIDC client secret. ", response = OpenIDConnectConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -697,7 +697,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response regenerateOAuthClientSecret(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
+    public Response regenerateOAuthClientSecret(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.regenerateOAuthClientSecret(applicationId );
     }
@@ -707,7 +707,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc/revoke")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Revokes the OAuth2/OIDC client. ", notes = "This API provides revokes the OAuth2/OIDC client secret. To re-activate the client the client secret needs to be regenerated. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Revoke the OAuth2/OIDC client of application ", notes = "This API revokes the OAuth2/OIDC client secret. To re-activate the client, the client secret needs to be regenerated. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -721,7 +721,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response revokeOAuthClient(@ApiParam(value = "Id of the application",required=true) @PathParam("applicationId") String applicationId) {
+    public Response revokeOAuthClient(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.revokeOAuthClient(applicationId );
     }
@@ -731,7 +731,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the Custom Inbound authentication protocol parameters of an application. ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update the custom inbound authentication protocol parameters of application ", notes = "This API provides the capability to store custom inbound authentication protocol parameters of an application. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -747,7 +747,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateCustomInboundConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Inbound Authentication Protocol ID",required=true) @PathParam("inboundProtocolId") String inboundProtocolId, @ApiParam(value = "This represents the Custom Inbound authentication protocol parameters of an application." ,required=true) @Valid CustomInboundProtocolConfiguration customInboundProtocolConfiguration) {
+    public Response updateCustomInboundConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Inbound Authentication Protocol ID",required=true) @PathParam("inboundProtocolId") String inboundProtocolId, @ApiParam(value = "This represents the Custom Inbound authentication protocol parameters of an application." ,required=true) @Valid CustomInboundProtocolConfiguration customInboundProtocolConfiguration) {
 
         return delegate.updateCustomInboundConfiguration(applicationId,  inboundProtocolId,  customInboundProtocolConfiguration );
     }
@@ -757,7 +757,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update OIDC authentication protocol parameters of an application. ", notes = "This API provides the capability to store OIDC authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update OIDC authentication protocol parameters of application ", notes = "This API provides the capability to store OIDC authentication protocol parameters of an application. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -773,7 +773,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateInboundOAuthConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the OIDC authentication protocol parameters of an application." ,required=true) @Valid OpenIDConnectConfiguration openIDConnectConfiguration) {
+    public Response updateInboundOAuthConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the OIDC authentication protocol parameters of an application." ,required=true) @Valid OpenIDConnectConfiguration openIDConnectConfiguration) {
 
         return delegate.updateInboundOAuthConfiguration(applicationId,  openIDConnectConfiguration );
     }
@@ -783,7 +783,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/saml")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update SAML2 authentication protocol parameters of an application. ", notes = "This API provides the capability to store SAML2 authentication protocol parameters of an application. - There are three methods to create/update SAML2 authentication protocol configuration.     1. Metadata File (Need to send Base64 encoded content of the metadata file.)     2. Metadata URL.     3. Manual configuration. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update SAML2 authentication protocol parameters of application ", notes = "This API provides the capability to store SAML2 authentication protocol parameters of an application. - There are three methods to create/update SAML2 authentication protocol configuration.     1. Metadata File (by sending the Base64 encoded content of the metadata file.)     2. Metadata URL     3. Manual configuration ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -799,7 +799,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateInboundSAMLConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the SAML2 protocol attributes of the application." ,required=true) @Valid SAML2Configuration saML2Configuration) {
+    public Response updateInboundSAMLConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the SAML2 protocol attributes of the application." ,required=true) @Valid SAML2Configuration saML2Configuration) {
 
         return delegate.updateInboundSAMLConfiguration(applicationId,  saML2Configuration );
     }
@@ -809,7 +809,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/passive-sts")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update Passive STS authentication protocol parameters of an application. ", notes = "This API provides the capability to store passive STS authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update Passive STS authentication protocol parameters of application ", notes = "This API provides the capability to store passive STS authentication protocol parameters of an application. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -825,7 +825,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updatePassiveStsConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the Passive STS authentication protocol parameters of an application." ,required=true) @Valid PassiveStsConfiguration passiveStsConfiguration) {
+    public Response updatePassiveStsConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the Passive STS authentication protocol parameters of an application." ,required=true) @Valid PassiveStsConfiguration passiveStsConfiguration) {
 
         return delegate.updatePassiveStsConfiguration(applicationId,  passiveStsConfiguration );
     }
@@ -835,7 +835,7 @@ public class ApplicationsApi  {
     @Path("/resident")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update Resident Application's provisioning configuration. ", notes = "This API provides the capability to update Resident Service Provider Configuration. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update Resident Application ", notes = "This API provides the capability to update Resident Application Configuration. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -861,7 +861,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/ws-trust")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update WS Trust authentication protocol parameters of an application. ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update WS Trust authentication protocol parameters of application ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -877,7 +877,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateWSTrustConfiguration(@ApiParam(value = "Id of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the Passive STS authentication protocol parameters of an application." ,required=true) @Valid WSTrustConfiguration wsTrustConfiguration) {
+    public Response updateWSTrustConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the Passive STS authentication protocol parameters of an application." ,required=true) @Valid WSTrustConfiguration wsTrustConfiguration) {
 
         return delegate.updateWSTrustConfiguration(applicationId,  wsTrustConfiguration );
     }

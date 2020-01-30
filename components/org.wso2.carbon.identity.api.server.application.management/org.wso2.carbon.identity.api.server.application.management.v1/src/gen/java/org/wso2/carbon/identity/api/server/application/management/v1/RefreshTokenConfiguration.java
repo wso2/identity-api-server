@@ -52,7 +52,7 @@ public class RefreshTokenConfiguration  {
     }
 
     /**
-    * Decideds the refresh token needs to renewed during refresh grant flow
+    * Decides whether the refresh token needs to renewed during refresh grant flow
     **/
     public RefreshTokenConfiguration renewRefreshToken(Boolean renewRefreshToken) {
 
@@ -60,7 +60,7 @@ public class RefreshTokenConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "true", value = "Decideds the refresh token needs to renewed during refresh grant flow")
+    @ApiModelProperty(example = "true", value = "Decides whether the refresh token needs to renewed during refresh grant flow")
     @JsonProperty("renewRefreshToken")
     @Valid
     public Boolean getRenewRefreshToken() {
