@@ -28,8 +28,9 @@ public class OidcScopeConstants {
      */
     public enum ErrorMessage {
 
-        INVALID_REQUEST("60001", "Invalid Request."),
-        ERROR_CONFLICT_REQUEST("41004", "Scope already exists.");
+        INVALID_REQUEST("OAUTH-60001", "Invalid Request."),
+        ERROR_CONFLICT_REQUEST("41004", "Scope already exists."),
+        SCOPE_NOT_FOUND("41003", "Scope not found.");
 
         private final String code;
         private final String message;

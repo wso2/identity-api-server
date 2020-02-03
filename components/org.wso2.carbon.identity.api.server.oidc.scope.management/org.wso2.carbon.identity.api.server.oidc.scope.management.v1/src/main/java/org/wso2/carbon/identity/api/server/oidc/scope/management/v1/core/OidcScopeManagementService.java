@@ -174,6 +174,8 @@ public class OidcScopeManagementService {
             status = Response.Status.BAD_REQUEST;
         } else if (OidcScopeConstants.ErrorMessage.ERROR_CONFLICT_REQUEST.getCode().equals(e.getErrorCode())) {
             status = Response.Status.CONFLICT;
+        } else if (OidcScopeConstants.ErrorMessage.SCOPE_NOT_FOUND.getCode().equals(e.getErrorCode())) {
+            status = Response.Status.NOT_FOUND;
         } else {
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
