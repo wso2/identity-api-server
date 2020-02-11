@@ -55,7 +55,7 @@ public class ApplicationManagementConstants {
                 "Invalid format user for filtering.",
                 "Filter needs to be in the format <attribute>+<operation>+<value>. Eg: name+eq+john"),
         INVALID_FILTER_OPERATION("60004",
-                "Attempted filtering operation is not invalid.",
+                "Attempted filtering operation is invalid.",
                 "Attempted filtering operation '%s' is invalid. " +
                         "Please use one of the supported filtering operations such as 'eq', 'co', 'sw' or 'ew'."),
         APPLICATION_NOT_FOUND("60006",
