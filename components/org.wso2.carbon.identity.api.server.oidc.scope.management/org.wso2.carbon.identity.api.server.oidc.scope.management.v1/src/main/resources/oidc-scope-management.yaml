@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   description: |
-    This is the RESTful API for OIDC Scope managment related operations in WSO2 Identity Server.
+    This is the RESTful API for OIDC Scope management related operations in WSO2 Identity Server.
   version: "1.0.0-oas3"
   title:  WSO2 Identity Server - OIDC Scope Management API
   termsOfService: 'http://swagger.io/terms/'
@@ -32,7 +32,7 @@ paths:
         - OIDC Scope Endpoint
       summary: Retrieves the list of scopes
       operationId: getScopes
-      description: This REST API can be used to get the avaiable scopes details.
+      description: This REST API can be used to get details of the available scopes.
       security:
         - BasicAuth: []
         - OAuth2: []
@@ -125,7 +125,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: scope name as the id
+          description: scope name as the ID
           required: true
           schema:
             type: string
@@ -159,7 +159,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: scope name as the id
+          description: scope name as the ID
           required: true
           schema:
             type: string
@@ -217,7 +217,7 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
     Conflict:
-      description: Scope is already Exists.
+      description: Scope already Exists.
       content:
         application/json:
           schema:
