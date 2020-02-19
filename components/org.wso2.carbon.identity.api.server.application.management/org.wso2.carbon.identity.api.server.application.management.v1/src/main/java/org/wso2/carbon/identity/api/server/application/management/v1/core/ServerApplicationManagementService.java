@@ -53,6 +53,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundFunctions;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
@@ -79,6 +80,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
@@ -111,6 +113,10 @@ public class ServerApplicationManagementService {
     private static final String FILTER_EQUALS = "eq";
     private static final String FILTER_CONTAINS = "co";
     private static final int DEFAULT_OFFSET = 0;
+    private static final String PAGE_LINK_REL_NEXT = "next";
+    private static final String PAGE_LINK_REL_PREVIOUS = "previous";
+    private static final String APPLICATIONS_PAGINATION_LINK_FORMAT = Constants.V1_API_PATH_COMPONENT
+            + APPLICATION_MANAGEMENT_PATH_COMPONENT + "?offset=%d&limit=%d";
 
     static {
         SEARCH_SUPPORTED_FIELDS.add(APP_NAME);
@@ -557,8 +563,44 @@ public class ServerApplicationManagementService {
 
     private List<Link> buildLinks(int limit, int currentOffset, String filter, int totalResultsFromSearch) {
 
-        // TODO: prev and next
-        return new ArrayList<>();
+        List<Link> links = new ArrayList<>();
+
+        // Next link.
+        if ((currentOffset + limit) < totalResultsFromSearch) {
+            links.add(buildPageLink(PAGE_LINK_REL_NEXT, (currentOffset + limit), limit));
+        }
+
+        /*
+        Previous link.
+        Previous link matters only if offset is greater than 0.
+        */
+        if (currentOffset > 0) {
+            if ((currentOffset - limit) >= 0) { // A previous page of size 'limit' exists.
+                links.add(buildPageLink(PAGE_LINK_REL_PREVIOUS, calculateOffsetForPreviousLink(currentOffset, limit,
+                        totalResultsFromSearch),
+                        limit));
+            } else { // A previous page exists but it's size is less than the specified limit.
+                links.add(buildPageLink(PAGE_LINK_REL_PREVIOUS, 0, currentOffset));
+            }
+        }
+
+        return links;
+    }
+
+    private Link buildPageLink(String rel, int offset, int limit) {
+
+        return new Link().rel(rel).href(ContextLoader.buildURIForBody
+                (String.format(APPLICATIONS_PAGINATION_LINK_FORMAT, offset, limit)).toString());
+    }
+
+    private int calculateOffsetForPreviousLink(int offset, int limit, int total) {
+
+        int newOffset = (offset - limit);
+        if (newOffset < total) {
+            return newOffset;
+        }
+
+        return calculateOffsetForPreviousLink(newOffset, limit, total);
     }
 
     private List<ApplicationListItem> getApplicationListItems(ApplicationBasicInfo[] allApplicationBasicInfo) {
