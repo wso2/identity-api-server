@@ -53,8 +53,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundFunctions;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
-import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
@@ -113,10 +113,6 @@ public class ServerApplicationManagementService {
     private static final String FILTER_EQUALS = "eq";
     private static final String FILTER_CONTAINS = "co";
     private static final int DEFAULT_OFFSET = 0;
-    private static final String PAGE_LINK_REL_NEXT = "next";
-    private static final String PAGE_LINK_REL_PREVIOUS = "previous";
-    private static final String APPLICATIONS_PAGINATION_LINK_FORMAT = Constants.V1_API_PATH_COMPONENT
-            + APPLICATION_MANAGEMENT_PATH_COMPONENT + "?offset=%d&limit=%d";
 
     static {
         SEARCH_SUPPORTED_FIELDS.add(APP_NAME);
@@ -150,7 +146,11 @@ public class ServerApplicationManagementService {
                     .startIndex(offset)
                     .count(resultsInCurrentPage)
                     .applications(getApplicationListItems(filteredAppList))
-                    .links(buildLinks(limit, offset, filter, totalResults));
+                    .links(Util.buildPaginationLinks(limit, offset, totalResults, APPLICATION_MANAGEMENT_PATH_COMPONENT)
+                            .entrySet()
+                            .stream()
+                            .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
+                            .collect(Collectors.toList()));
 
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error listing applications of tenantDomain: " + tenantDomain;
@@ -559,48 +559,6 @@ public class ServerApplicationManagementService {
             return Arrays.asList(app.getInboundAuthenticationConfig().getInboundAuthenticationRequestConfigs());
         }
         return Collections.emptyList();
-    }
-
-    private List<Link> buildLinks(int limit, int currentOffset, String filter, int totalResultsFromSearch) {
-
-        List<Link> links = new ArrayList<>();
-
-        // Next link.
-        if ((currentOffset + limit) < totalResultsFromSearch) {
-            links.add(buildPageLink(PAGE_LINK_REL_NEXT, (currentOffset + limit), limit));
-        }
-
-        /*
-        Previous link.
-        Previous link matters only if offset is greater than 0.
-        */
-        if (currentOffset > 0) {
-            if ((currentOffset - limit) >= 0) { // A previous page of size 'limit' exists.
-                links.add(buildPageLink(PAGE_LINK_REL_PREVIOUS, calculateOffsetForPreviousLink(currentOffset, limit,
-                        totalResultsFromSearch),
-                        limit));
-            } else { // A previous page exists but it's size is less than the specified limit.
-                links.add(buildPageLink(PAGE_LINK_REL_PREVIOUS, 0, currentOffset));
-            }
-        }
-
-        return links;
-    }
-
-    private Link buildPageLink(String rel, int offset, int limit) {
-
-        return new Link().rel(rel).href(ContextLoader.buildURIForBody
-                (String.format(APPLICATIONS_PAGINATION_LINK_FORMAT, offset, limit)).toString());
-    }
-
-    private int calculateOffsetForPreviousLink(int offset, int limit, int total) {
-
-        int newOffset = (offset - limit);
-        if (newOffset < total) {
-            return newOffset;
-        }
-
-        return calculateOffsetForPreviousLink(newOffset, limit, total);
     }
 
     private List<ApplicationListItem> getApplicationListItems(ApplicationBasicInfo[] allApplicationBasicInfo) {
