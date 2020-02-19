@@ -94,13 +94,11 @@ public class ChallengesApi  {
     
     @io.swagger.annotations.ApiOperation(value = "Remove a challenge question in a set.", notes = "Removes a specific question from an existing challenge question set. By specifying the locale query parameter, locale specific challenge question entry for the question can be deleted.\n\n  <b>Permission required:</b>\n    * /permission/admin/manage/identity/challenge/delete\n", response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "Item Deleted"),
+        @io.swagger.annotations.ApiResponse(code = 204, message = "No Content."),
         
         @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid input request"),
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized"),
-        
-        @io.swagger.annotations.ApiResponse(code = 404, message = "The specified resource is not found"),
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error") })
 
@@ -116,13 +114,11 @@ public class ChallengesApi  {
     
     @io.swagger.annotations.ApiOperation(value = "Removes a challenge question set.", notes = "Removes an existing challenge question set from the system. By specifying the locale query parameter, questions of specific locale can be deleted within the Set.\n\n  <b>Permission required:</b>\n    * /permission/admin/manage/identity/challenge/delete\n", response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "Item Deleted"),
+        @io.swagger.annotations.ApiResponse(code = 204, message = "No Content."),
         
         @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid input request"),
         
         @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized"),
-        
-        @io.swagger.annotations.ApiResponse(code = 404, message = "The specified resource is not found"),
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error") })
 
@@ -134,7 +130,7 @@ public class ChallengesApi  {
     @GET
     @Path("/{challenge-set-id}")
     
-    
+    @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Retrieve a challenge set.", notes = "Retrieve the challenge questions in the system in a set identified by the challenge-set-id.\n\n  <b>Permission required:</b>\n    * /permission/admin/manage/identity/challenge/view\n", response = ChallengeSetDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "search results matching criteria"),
@@ -157,7 +153,7 @@ public class ChallengesApi  {
     @GET
     
     
-    
+    @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Retrieve all the challenge questions.", notes = "Retrieve all the challenge questions in the system.\n\n  <b>Permission required:</b>\n    * /permission/admin/manage/identity/challenge/view\n", response = ChallengeSetDTO.class, responseContainer = "List")
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "search results matching criteria"),
