@@ -51,6 +51,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.claim.management.common.ClaimManagementDataHolder.getClaimMetadataManagementService;
@@ -133,9 +134,16 @@ public class ServerClaimManagementService {
      */
     public void deleteClaimDialect(String dialectId) {
 
+        String claimDialectURI;
+        try {
+            claimDialectURI = base64DecodeId(dialectId);
+        } catch (Exception e) {
+            // Ignoring the delete operation and return 204 response code, since the resource does not exist.
+            return;
+        }
         try {
             getClaimMetadataManagementService().removeClaimDialect(
-                    new ClaimDialect(base64DecodeId(dialectId)),
+                    new ClaimDialect(claimDialectURI),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_DELETING_DIALECT, dialectId);
@@ -265,9 +273,17 @@ public class ServerClaimManagementService {
      */
     public void deleteLocalClaim(String claimId) {
 
+
+        String claimURI;
+        try {
+            claimURI = base64DecodeId(claimId);
+        } catch (Exception e) {
+            // Ignoring the delete operation and return 204 response code, since the resource does not exist.
+            return;
+        }
         try {
             getClaimMetadataManagementService().removeLocalClaim(
-                    base64DecodeId(claimId),
+                    claimURI,
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_DELETING_LOCAL_CLAIM, claimId);
@@ -370,7 +386,7 @@ public class ServerClaimManagementService {
 
         try {
             if (!isDialectExists(dialectId)) {
-                throw handleClaimManagementClientError(ERROR_CODE_INVALID_DIALECT_ID, BAD_REQUEST, dialectId);
+                throw handleClaimManagementClientError(ERROR_CODE_INVALID_DIALECT_ID, NOT_FOUND, dialectId);
             }
 
             getClaimMetadataManagementService().addExternalClaim(
@@ -392,10 +408,20 @@ public class ServerClaimManagementService {
      */
     public void deleteExternalClaim(String dialectId, String claimId) {
 
+        String externalClaimURI;
+        String externalClaimDialectURI;
+        try {
+            externalClaimURI = base64DecodeId(claimId);
+            externalClaimDialectURI = base64DecodeId(dialectId);
+        } catch (Exception e) {
+            // Ignoring the delete operation and return 204 response code, since the resource does not exist.
+            return;
+        }
+
         try {
             getClaimMetadataManagementService().removeExternalClaim(
-                    base64DecodeId(dialectId),
-                    base64DecodeId(claimId),
+                    externalClaimDialectURI,
+                    externalClaimURI,
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_DELETING_EXTERNAL_CLAIM, claimId);
