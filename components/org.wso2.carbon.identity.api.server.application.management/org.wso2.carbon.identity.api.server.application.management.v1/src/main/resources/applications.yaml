@@ -418,12 +418,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -803,12 +797,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -975,12 +963,6 @@ paths:
                 $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
           content:
             application/json:
               schema:
@@ -1263,12 +1245,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -1438,12 +1414,6 @@ paths:
                 $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
           content:
             application/json:
               schema:
@@ -1631,12 +1601,6 @@ paths:
                 $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Not Found
           content:
             application/json:
               schema:

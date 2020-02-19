@@ -509,7 +509,16 @@ public class ServerApplicationManagementService {
 
     private void deleteInbound(String applicationId, String inboundType) {
 
-        ServiceProvider appToUpdate = cloneApplication(applicationId);
+        ServiceProvider appToUpdate;
+        try {
+            appToUpdate = cloneApplication(applicationId);
+        } catch (APIError e) {
+            if (ErrorMessage.APPLICATION_NOT_FOUND.getCode().equals(e.getCode())) {
+                // Ignoring the delete operation and return 204 response code, since the resource does not exist.
+                return;
+            }
+            throw e;
+        }
         InboundAuthenticationConfig inboundAuthConfig = appToUpdate.getInboundAuthenticationConfig();
 
         if (ArrayUtils.isNotEmpty(inboundAuthConfig.getInboundAuthenticationRequestConfigs())) {

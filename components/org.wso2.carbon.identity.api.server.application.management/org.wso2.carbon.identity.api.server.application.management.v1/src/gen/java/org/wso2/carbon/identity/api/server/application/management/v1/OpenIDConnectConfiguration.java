@@ -223,7 +223,7 @@ public enum StateEnum {
     }
 
         /**
-    * Enabling this option will allow the client to authenticate without a client secret
+    * Enabling this option will allow the client to authenticate without a client secret.
     **/
     public OpenIDConnectConfiguration publicClient(Boolean publicClient) {
 
@@ -231,7 +231,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Enabling this option will allow the client to authenticate without a client secret")
+    @ApiModelProperty(example = "false", value = "Enabling this option will allow the client to authenticate without a client secret.")
     @JsonProperty("publicClient")
     @Valid
     public Boolean getPublicClient() {
