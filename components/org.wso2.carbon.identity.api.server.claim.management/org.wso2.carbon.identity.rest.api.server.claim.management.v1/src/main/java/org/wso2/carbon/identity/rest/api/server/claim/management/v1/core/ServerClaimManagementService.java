@@ -16,7 +16,6 @@
 
 package org.wso2.carbon.identity.rest.api.server.claim.management.v1.core;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -133,13 +132,12 @@ public class ServerClaimManagementService {
      *
      * @param dialectId dialectId.
      */
-    @SuppressFBWarnings("DE_MIGHT_IGNORE")
     public void deleteClaimDialect(String dialectId) {
 
         String claimDialectURI;
         try {
             claimDialectURI = base64DecodeId(dialectId);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             // Ignoring the delete operation and return 204 response code, since the resource does not exist.
             return;
         }
@@ -273,14 +271,13 @@ public class ServerClaimManagementService {
      *
      * @param claimId claimId.
      */
-    @SuppressFBWarnings("DE_MIGHT_IGNORE")
     public void deleteLocalClaim(String claimId) {
 
 
         String claimURI;
         try {
             claimURI = base64DecodeId(claimId);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             // Ignoring the delete operation and return 204 response code, since the resource does not exist.
             return;
         }
@@ -409,7 +406,6 @@ public class ServerClaimManagementService {
      * @param dialectId dialectId.
      * @param claimId   claimId.
      */
-    @SuppressFBWarnings("DE_MIGHT_IGNORE")
     public void deleteExternalClaim(String dialectId, String claimId) {
 
         String externalClaimURI;
@@ -417,7 +413,7 @@ public class ServerClaimManagementService {
         try {
             externalClaimURI = base64DecodeId(claimId);
             externalClaimDialectURI = base64DecodeId(dialectId);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             // Ignoring the delete operation and return 204 response code, since the resource does not exist.
             return;
         }
