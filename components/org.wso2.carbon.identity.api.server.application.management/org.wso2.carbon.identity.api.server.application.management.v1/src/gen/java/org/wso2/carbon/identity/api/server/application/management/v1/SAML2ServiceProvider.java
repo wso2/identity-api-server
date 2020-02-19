@@ -133,7 +133,7 @@ public class SAML2ServiceProvider  {
     }
 
     /**
-    * Default value is the IdP Entity ID value specified in Resident IdP
+    * Default value is the IdP Entity ID value specified in Resident IdP.
     **/
     public SAML2ServiceProvider idpEntityIdAlias(String idpEntityIdAlias) {
 
@@ -141,7 +141,7 @@ public class SAML2ServiceProvider  {
         return this;
     }
     
-    @ApiModelProperty(value = "Default value is the IdP Entity ID value specified in Resident IdP")
+    @ApiModelProperty(value = "Default value is the IdP Entity ID value specified in Resident IdP.")
     @JsonProperty("idpEntityIdAlias")
     @Valid
     public String getIdpEntityIdAlias() {
