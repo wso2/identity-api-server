@@ -95,7 +95,6 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteIDP(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Enforce the forceful deletetion of either an identity provider, federated authenticator or an outbound provisioning connector eventhough it is being reffered by a service provider ", defaultValue="false") @DefaultValue("false")  @QueryParam("force") Boolean force) {
