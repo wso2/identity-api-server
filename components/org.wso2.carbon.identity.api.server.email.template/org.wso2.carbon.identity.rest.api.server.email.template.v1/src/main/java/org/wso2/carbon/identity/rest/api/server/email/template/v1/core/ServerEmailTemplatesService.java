@@ -248,7 +248,13 @@ public class ServerEmailTemplatesService {
      */
     public void deleteEmailTemplateType(String templateTypeId) {
 
-        String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
+        String templateTypeDisplayName;
+        try {
+            templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
+        } catch (APIError e) {
+            // Ignoring the delete operation and return 204 response code, since the resource does not exist.
+            return;
+        }
         try {
             boolean isTemplateTypeExists =
                     EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateTypeExists(
@@ -270,7 +276,13 @@ public class ServerEmailTemplatesService {
      */
     public void deleteEmailTemplate(String templateTypeId, String templateId) {
 
-        String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
+        String templateTypeDisplayName;
+        try {
+            templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
+        } catch (APIError e) {
+            // Ignoring the delete operation and return 204 response code, since the resource does not exist.
+            return;
+        }
         try {
             boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateExists(
                     templateTypeDisplayName, templateId, getTenantDomainFromContext());
@@ -455,7 +467,7 @@ public class ServerEmailTemplatesService {
         try {
             return base64URLDecode(encodedTemplateTypeId);
         } catch (Throwable e) {
-            throw handleError(Constants.ErrorMessage.ERROR_INVALID_TEMPLATE_TYPE_ID);
+            throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
         }
     }
 
