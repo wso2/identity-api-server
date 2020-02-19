@@ -62,6 +62,8 @@ paths:
         - admin
       summary: Retrieve all the challenge questions.
       operationId: searchChallenges
+      produces:
+      - application/json
       description: |
         Retrieve all the challenge questions in the system.
 
@@ -88,6 +90,8 @@ paths:
         - admin
       summary: Retrieve a challenge set.
       operationId: getChallengeQuestionSet
+      produces:
+      - application/json
       description: |
         Retrieve the challenge questions in the system in a set identified by the challenge-set-id.
 
@@ -188,14 +192,12 @@ paths:
         - $ref: '#/parameters/questionSetIdPathParam'
         - $ref: '#/parameters/localeQueryParam'
       responses:
-        200:
-          $ref: '#/responses/Deleted'
+        204:
+          $ref: '#/responses/NoContent'
         400:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          $ref: '#/responses/NotFound'
         500:
           $ref: '#/responses/ServerError'
   /challenges/{challenge-set-id}/questions/{question-id}:
@@ -214,14 +216,12 @@ paths:
         - $ref: '#/parameters/questionSetIdPathParam'
         - $ref: '#/parameters/localeQueryParam'
       responses:
-        200:
-          $ref: '#/responses/Deleted'
+        204:
+          $ref: '#/responses/NoContent'
         400:
           $ref: '#/responses/InvalidInput'
         401:
           $ref: '#/responses/Unauthorized'
-        404:
-          $ref: '#/responses/NotFound'
         500:
           $ref: '#/responses/ServerError'
 parameters:
@@ -376,8 +376,8 @@ responses:
     description: Item Created
   OK:
     description: OK
-  Deleted:
-    description: Item Deleted
+  NoContent:
+    description: No Content.
 
 host: localhost:9443
 basePath: /t/{tenant-domain}/api/server/v1

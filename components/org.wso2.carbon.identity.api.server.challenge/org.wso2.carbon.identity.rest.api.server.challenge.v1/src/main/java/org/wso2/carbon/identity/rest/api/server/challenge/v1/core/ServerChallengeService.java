@@ -124,16 +124,14 @@ public class ServerChallengeService {
             locale = StringUtils.EMPTY;
         }
         try {
-            if (!isChallengeSetExists(challengeSetId, ContextLoader.getTenantDomainFromContext())) {
-                throw handleError(Response.Status.NOT_FOUND,
-                        ChallengeConstant.ErrorMessage.ERROR_CHALLENGE_SET_NOT_EXISTS);
+            if (isChallengeSetExists(challengeSetId, ContextLoader.getTenantDomainFromContext())) {
+                ChallengeQuestion[] toDelete = {
+                        new ChallengeQuestion(challengeSetId, questionId, StringUtils.EMPTY, locale)
+                };
+                getChallengeQuestionManager()
+                        .deleteChallengeQuestions(toDelete, ContextLoader.getTenantDomainFromContext());
             }
 
-            ChallengeQuestion[] toDelete = {
-                    new ChallengeQuestion(challengeSetId, questionId, StringUtils.EMPTY, locale)
-            };
-            getChallengeQuestionManager()
-                    .deleteChallengeQuestions(toDelete, ContextLoader.getTenantDomainFromContext());
         } catch (IdentityRecoveryException e) {
             throw handleIdentityRecoveryException(e,
                     ChallengeConstant.ErrorMessage.ERROR_CODE_ERROR_DELETING_CHALLENGE);
@@ -154,12 +152,10 @@ public class ServerChallengeService {
             locale = StringUtils.EMPTY;
         }
         try {
-            if (!isChallengeSetExists(challengeSetId, ContextLoader.getTenantDomainFromContext())) {
-                throw handleError(Response.Status.NOT_FOUND,
-                        ChallengeConstant.ErrorMessage.ERROR_CHALLENGE_SET_NOT_EXISTS);
+            if (isChallengeSetExists(challengeSetId, ContextLoader.getTenantDomainFromContext())) {
+                getChallengeQuestionManager()
+                        .deleteChallengeQuestionSet(challengeSetId, locale, ContextLoader.getTenantDomainFromContext());
             }
-            getChallengeQuestionManager()
-                    .deleteChallengeQuestionSet(challengeSetId, locale, ContextLoader.getTenantDomainFromContext());
         } catch (IdentityRecoveryException e) {
             throw handleIdentityRecoveryException(e,
                     ChallengeConstant.ErrorMessage.ERROR_CODE_ERROR_DELETING_CHALLENGES);
