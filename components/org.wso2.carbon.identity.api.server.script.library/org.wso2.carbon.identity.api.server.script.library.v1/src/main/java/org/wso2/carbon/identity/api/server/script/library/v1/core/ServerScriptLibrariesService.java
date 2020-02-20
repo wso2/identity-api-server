@@ -251,9 +251,6 @@ public class ServerScriptLibrariesService {
             } catch (FunctionLibraryManagementException e) {
                 throw handleScriptLibraryError(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_SCRIPT_LIBRARY);
             }
-        } else {
-            throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_SCRIPT_LIBRARY_NOT_FOUND,
-                    Response.Status.NOT_FOUND, scriptLibraryId, ContextLoader.getTenantDomainFromContext());
         }
     }
 
