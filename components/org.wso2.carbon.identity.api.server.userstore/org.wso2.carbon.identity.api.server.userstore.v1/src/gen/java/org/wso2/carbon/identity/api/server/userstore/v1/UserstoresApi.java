@@ -84,7 +84,6 @@ public class UserstoresApi  {
         @ApiResponse(code = 204, message = "No Content.", response = Void.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
     public Response deleteUserStore(@ApiParam(value = "The unique name of the user store domain",required=true) @PathParam("userstore-domain-id") String userstoreDomainId) {
