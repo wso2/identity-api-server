@@ -54,6 +54,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
@@ -79,6 +80,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
@@ -144,7 +146,11 @@ public class ServerApplicationManagementService {
                     .startIndex(offset)
                     .count(resultsInCurrentPage)
                     .applications(getApplicationListItems(filteredAppList))
-                    .links(buildLinks(limit, offset, filter, totalResults));
+                    .links(Util.buildPaginationLinks(limit, offset, totalResults, APPLICATION_MANAGEMENT_PATH_COMPONENT)
+                            .entrySet()
+                            .stream()
+                            .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
+                            .collect(Collectors.toList()));
 
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error listing applications of tenantDomain: " + tenantDomain;
@@ -562,12 +568,6 @@ public class ServerApplicationManagementService {
             return Arrays.asList(app.getInboundAuthenticationConfig().getInboundAuthenticationRequestConfigs());
         }
         return Collections.emptyList();
-    }
-
-    private List<Link> buildLinks(int limit, int currentOffset, String filter, int totalResultsFromSearch) {
-
-        // TODO: prev and next
-        return new ArrayList<>();
     }
 
     private List<ApplicationListItem> getApplicationListItems(ApplicationBasicInfo[] allApplicationBasicInfo) {

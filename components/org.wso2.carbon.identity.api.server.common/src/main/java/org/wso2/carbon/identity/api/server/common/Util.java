@@ -22,12 +22,19 @@ import org.wso2.carbon.identity.recovery.ChallengeQuestionManager;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * Common util class
  */
 public class Util {
+
+    private static final String PAGE_LINK_REL_NEXT = "next";
+    private static final String PAGE_LINK_REL_PREVIOUS = "previous";
+    private static final String PAGINATION_LINK_FORMAT = Constants.V1_API_PATH_COMPONENT
+            + "%s?offset=%d&limit=%d";
 
     /**
      * Get ChallengeQuestionManager osgi service
@@ -89,5 +96,54 @@ public class Util {
         return new String(
                 Base64.getUrlDecoder().decode(value),
                 StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Build 'next' and 'previous' pagination links.
+     * @param limit Value of the 'limit' parameter.
+     * @param currentOffset Value of the 'currentOffset' parameter.
+     * @param totalResultsFromSearch Value of the 'totalResultsFromSearch' parameter.
+     * @param servicePathComponent API service path. E.g: applications/
+     * @return A map containing pagination link key-value pairs.
+     */
+    public static Map<String, String> buildPaginationLinks(int limit, int currentOffset, int totalResultsFromSearch,
+                                                           String servicePathComponent) {
+
+        Map<String, String> links = new HashMap<>();
+
+        // Next link.
+        if ((currentOffset + limit) < totalResultsFromSearch) {
+            links.put(PAGE_LINK_REL_NEXT, ContextLoader.buildURIForBody
+                    (String.format(PAGINATION_LINK_FORMAT, servicePathComponent, (currentOffset + limit), limit))
+                    .toString());
+        }
+
+        /*
+        Previous link.
+        Previous link matters only if offset is greater than 0.
+        */
+        if (currentOffset > 0) {
+            if ((currentOffset - limit) >= 0) { // A previous page of size 'limit' exists.
+                links.put(PAGE_LINK_REL_PREVIOUS, ContextLoader.buildURIForBody
+                        (String.format(PAGINATION_LINK_FORMAT, servicePathComponent,
+                                calculateOffsetForPreviousLink(currentOffset, limit, totalResultsFromSearch), limit))
+                        .toString());
+            } else { // A previous page exists but it's size is less than the specified limit.
+                links.put(PAGE_LINK_REL_PREVIOUS, ContextLoader.buildURIForBody
+                        (String.format(PAGINATION_LINK_FORMAT, servicePathComponent, 0, currentOffset)).toString());
+            }
+        }
+
+        return links;
+    }
+
+    private static int calculateOffsetForPreviousLink(int offset, int limit, int total) {
+
+        int newOffset = (offset - limit);
+        if (newOffset < total) {
+            return newOffset;
+        }
+
+        return calculateOffsetForPreviousLink(newOffset, limit, total);
     }
 }
