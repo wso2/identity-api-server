@@ -70,7 +70,6 @@ public class OidcApi  {
         @ApiResponse(code = 204, message = "No Content.", response = Void.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = ErrorResponse.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = ErrorResponse.class),
-        @ApiResponse(code = 404, message = "Resource Not Found.", response = ErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = ErrorResponse.class)
     })
     public Response deleteScope(@ApiParam(value = "scope name as the id",required=true) @PathParam("id") String id) {
