@@ -54,7 +54,6 @@ public class KeystoresApi  {
         @ApiResponse(code = 400, message = "Bad Request.", response = ErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = ErrorResponse.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = ErrorResponse.class),
-        @ApiResponse(code = 404, message = "Resource Not Found.", response = ErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = ErrorResponse.class)
     })
     public Response deleteCertificate(@ApiParam(value = "alias of the certificate",required=true) @PathParam("alias") String alias) {

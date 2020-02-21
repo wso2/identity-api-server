@@ -76,8 +76,7 @@ public class KeyStoreService {
         try {
             aliasList = getKeyStoreManager().getKeyStoreCertificateAliases(tenantDomain, filter);
         } catch (KeyStoreManagementException e) {
-            throw handleException(e, "Server encountered an error while retrieving the list of certificates " +
-                    "from keystore.");
+            throw handleException(e, "Unable to list certificates from keystore.");
         }
         return generateCertificateResponseList(aliasList, false);
     }
@@ -96,8 +95,7 @@ public class KeyStoreService {
         try {
             certificate = getKeyStoreManager().getKeyStoreCertificate(tenantDomain, alias);
         } catch (KeyStoreManagementException e) {
-            throw handleException(e, "Server encountered an error while retrieving the certificate with alias: "
-                    + alias + " from keystore");
+            throw handleException(e, "Unable to retrieve the certificate with alias: " + alias + " from keystore");
         }
 
         if (certificate == null) {
@@ -119,8 +117,7 @@ public class KeyStoreService {
         try {
             getKeyStoreManager().addCertificate(tenantDomain, alias, certificate);
         } catch (KeyStoreManagementException e) {
-            throw handleException(e, "Server encountered an error while importing the certificate with alias: "
-                    + alias + " to the keystore.");
+            throw handleException(e, "Unable to upload the certificate with alias: " + alias + " to the keystore.");
         }
         String certificateEndPoint = String.format(V1_API_PATH_COMPONENT + KEYSTORES_API_PATH_COMPONENT +
                 CERTIFICATE_PATH_COMPONENT, alias);
@@ -138,8 +135,7 @@ public class KeyStoreService {
         try {
             getKeyStoreManager().deleteCertificate(tenantDomain, alias);
         } catch (KeyStoreManagementException e) {
-            throw handleException(e, "Server encountered an error while removing the certificate with alias: "
-                    + alias + " from the keystore.");
+            throw handleException(e, "Unable to remove the certificate with alias: " + alias + " from the keystore.");
         }
     }
 
@@ -156,8 +152,7 @@ public class KeyStoreService {
         try {
             aliasList = getKeyStoreManager().getClientCertificateAliases(tenantDomain, filter);
         } catch (KeyStoreManagementException e) {
-            throw handleException(e, "Server encountered an error while retrieving the list of certificates " +
-                    "from client truststore.");
+            throw handleException(e, "Unable to retrieve the list of certificates from client truststore.");
         }
         return generateCertificateResponseList(aliasList, true);
     }
@@ -176,8 +171,8 @@ public class KeyStoreService {
         try {
             certificate = getKeyStoreManager().getClientCertificate(tenantDomain, alias);
         } catch (KeyStoreManagementException e) {
-            throw handleException(e, "Server encountered an error while retrieving the certificate with alias: "
-                    + alias + " from client truststore.");
+            throw handleException(e,
+                    "Unable to retrieve the certificate with alias: " + alias + " from client truststore.");
         }
 
         if (certificate == null) {
@@ -200,8 +195,7 @@ public class KeyStoreService {
         try {
             certificateData = getKeyStoreManager().getPublicCertificate(tenantDomain);
         } catch (KeyStoreManagementException e) {
-            throw handleException(e, "Server encountered an error while retrieving the public certificate from " +
-                    "from keystore.");
+            throw handleException(e, "Unable to retrieve the public certificate from from keystore.");
         }
 
         String alias = null;
@@ -277,12 +271,14 @@ public class KeyStoreService {
     private APIError handleException(KeyStoreManagementException e, String description) {
 
         ErrorResponse.Builder builder = new ErrorResponse.Builder().withCode(e.getErrorCode())
-                .withMessage(e.getMessage()).withDescription(description);
-        ErrorResponse errorResponse = builder.build(LOG, e, description);
+                .withMessage(description).withDescription(e.getMessage());
         Response.Status status;
+        ErrorResponse errorResponse;
         if (e instanceof KeyStoreManagementServerException) {
+            errorResponse = builder.build(LOG, e, description);
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
+            errorResponse = builder.build(LOG, description);
             status = Response.Status.BAD_REQUEST;
         }
         return new APIError(status, errorResponse);
