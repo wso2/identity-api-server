@@ -85,6 +85,8 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
         
+        @io.swagger.annotations.ApiResponse(code = 404, message = "The specified resource is not found."),
+        
         @io.swagger.annotations.ApiResponse(code = 409, message = "Element Already Exists."),
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
