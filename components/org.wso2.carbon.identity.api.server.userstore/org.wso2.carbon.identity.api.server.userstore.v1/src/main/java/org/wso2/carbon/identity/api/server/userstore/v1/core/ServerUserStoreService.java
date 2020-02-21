@@ -102,6 +102,10 @@ public class ServerUserStoreService {
             UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.
                     getUserStoreConfigService();
             userStoreConfigService.deleteUserStore(base64URLDecodeId(userstoreDomainId));
+        } catch (IdentityUserStoreClientException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(e);
+            }
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_USER_STORE;
