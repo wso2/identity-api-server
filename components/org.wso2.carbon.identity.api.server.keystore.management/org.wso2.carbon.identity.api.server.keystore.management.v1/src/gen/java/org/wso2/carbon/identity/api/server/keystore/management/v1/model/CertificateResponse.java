@@ -62,7 +62,7 @@ public class CertificateResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "https://apis.is.com/t/carbon.super/api/server/v1/keystore/public-certificates/wso2carbon", required = true, value = "")
+    @ApiModelProperty(example = "https://localhost:9443/t/carbon.super/api/server/v1/keystores/certs/wso2carbon", required = true, value = "")
     @JsonProperty("certificate")
     @Valid
     @NotNull(message = "Property certificate cannot be null.")
