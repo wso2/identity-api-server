@@ -64,7 +64,7 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
     public Response getClientCertificate(String alias, Boolean encodeCert) {
 
         if (!StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
 
         if (encodeCert == null) {
@@ -95,11 +95,11 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
     public Response uploadCertificate(CertificateRequest certificateRequest) {
 
         if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
         URI certResource = keyStoreService.uploadCertificate(certificateRequest.getAlias(),
                 certificateRequest.getCertificate());
-        NewCookie resourceCookie = new NewCookie("Certificate", certResource.toString());
+        NewCookie resourceCookie = new NewCookie("Location", certResource.toString());
         return Response.created(certResource).cookie(resourceCookie).build();
     }
 }
