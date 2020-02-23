@@ -39,7 +39,7 @@ public class KeystoresApiServiceImpl implements KeystoresApiService {
     public Response deleteCertificate(String alias) {
 
         if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
         keyStoreService.deleteCertificate(alias);
         return Response.noContent().build();
