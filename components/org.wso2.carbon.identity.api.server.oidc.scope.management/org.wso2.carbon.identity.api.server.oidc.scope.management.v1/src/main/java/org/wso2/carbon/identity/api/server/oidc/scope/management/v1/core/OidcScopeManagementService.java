@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.api.server.oidc.scope.management.common.OidcScop
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
 import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
+import org.wso2.carbon.identity.oauth.IdentityOAuthClientException;
 import org.wso2.carbon.identity.oauth.dto.ScopeDTO;
 
 import java.util.ArrayList;
@@ -69,6 +70,10 @@ public class OidcScopeManagementService {
 
         try {
             getOAuthAdminService().deleteScope(id);
+        } catch (IdentityOAuthClientException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(e);
+            }
         } catch (IdentityOAuthAdminException e) {
             throw handleException(e, "Server encountered an error while deleting OIDC scope: " + id);
         }
