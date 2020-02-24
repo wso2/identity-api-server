@@ -149,7 +149,9 @@ public class Constant {
                 "Mapped local claim URI is invalid."),
         ERROR_CODE_INVALID_INPUT("50037",
                 "Invalid input.",
-                "One of the given inputs is invalid.")
+                "One of the given inputs is invalid."),
+        ERROR_CODE_EXISTING_EXTERNAL_CLAIM_URI("50038", "Unable to add external claim.",
+                "External claim URI already exists. External claim URI must be unique.")
         ;
 
         private final String code;
