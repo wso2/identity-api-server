@@ -57,6 +57,7 @@ public class ApiModelToOAuthConsumerApp implements Function<OpenIDConnectConfigu
 
         consumerAppDTO.setBypassClientCredentials(oidcModel.getPublicClient());
         consumerAppDTO.setRequestObjectSignatureValidationEnabled(oidcModel.getValidateRequestObjectSignature());
+        consumerAppDTO.setTokenBindingType(oidcModel.getAccessTokenBindingType());
 
         updateAllowedOrigins(consumerAppDTO, oidcModel.getAllowedOrigins());
         updatePkceConfigurations(consumerAppDTO, oidcModel.getPkce());
