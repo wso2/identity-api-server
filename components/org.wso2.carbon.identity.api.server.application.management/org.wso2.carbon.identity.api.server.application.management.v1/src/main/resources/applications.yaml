@@ -2590,6 +2590,12 @@ components:
             - RoleBasedScopeValidator
           items:
             type: string
+        accessTokenBindingType:
+          type: string
+          description: Access token binding type.
+          example:
+            - sso-session
+            - cookie
     OAuth2PKCEConfiguration:
       type: object
       properties:

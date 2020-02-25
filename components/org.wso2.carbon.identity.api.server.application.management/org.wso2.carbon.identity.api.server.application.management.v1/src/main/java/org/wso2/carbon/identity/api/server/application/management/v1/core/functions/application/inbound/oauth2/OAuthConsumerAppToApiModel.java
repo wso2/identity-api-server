@@ -53,7 +53,8 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .idToken(buildIdTokenConfiguration(oauthAppDTO))
                 .logout(buildLogoutConfiguration(oauthAppDTO))
                 .scopeValidators(getScopeValidators(oauthAppDTO))
-                .validateRequestObjectSignature(oauthAppDTO.isRequestObjectSignatureValidationEnabled());
+                .validateRequestObjectSignature(oauthAppDTO.isRequestObjectSignatureValidationEnabled())
+                .accessTokenBindingType(oauthAppDTO.getTokenBindingType());
     }
 
     private List<String> getScopeValidators(OAuthConsumerAppDTO oauthAppDTO) {

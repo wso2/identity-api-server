@@ -88,6 +88,7 @@ public enum StateEnum {
     private Boolean validateRequestObjectSignature = false;
     private List<String> scopeValidators = null;
 
+    private String accessTokenBindingType;
 
     /**
     **/
@@ -375,7 +376,26 @@ public enum StateEnum {
         return this;
     }
 
+        /**
+    * Access token binding type.
+    **/
+    public OpenIDConnectConfiguration accessTokenBindingType(String accessTokenBindingType) {
+
+        this.accessTokenBindingType = accessTokenBindingType;
+        return this;
+    }
     
+    @ApiModelProperty(example = "[\"sso-session\",\"cookie\"]", value = "Access token binding type.")
+    @JsonProperty("accessTokenBindingType")
+    @Valid
+    public String getAccessTokenBindingType() {
+        return accessTokenBindingType;
+    }
+    public void setAccessTokenBindingType(String accessTokenBindingType) {
+        this.accessTokenBindingType = accessTokenBindingType;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -400,12 +420,13 @@ public enum StateEnum {
             Objects.equals(this.idToken, openIDConnectConfiguration.idToken) &&
             Objects.equals(this.logout, openIDConnectConfiguration.logout) &&
             Objects.equals(this.validateRequestObjectSignature, openIDConnectConfiguration.validateRequestObjectSignature) &&
-            Objects.equals(this.scopeValidators, openIDConnectConfiguration.scopeValidators);
+            Objects.equals(this.scopeValidators, openIDConnectConfiguration.scopeValidators) &&
+            Objects.equals(this.accessTokenBindingType, openIDConnectConfiguration.accessTokenBindingType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clientId, clientSecret, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, refreshToken, idToken, logout, validateRequestObjectSignature, scopeValidators);
+        return Objects.hash(clientId, clientSecret, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, refreshToken, idToken, logout, validateRequestObjectSignature, scopeValidators, accessTokenBindingType);
     }
 
     @Override
@@ -428,6 +449,7 @@ public enum StateEnum {
         sb.append("    logout: ").append(toIndentedString(logout)).append("\n");
         sb.append("    validateRequestObjectSignature: ").append(toIndentedString(validateRequestObjectSignature)).append("\n");
         sb.append("    scopeValidators: ").append(toIndentedString(scopeValidators)).append("\n");
+        sb.append("    accessTokenBindingType: ").append(toIndentedString(accessTokenBindingType)).append("\n");
         sb.append("}");
         return sb.toString();
     }
