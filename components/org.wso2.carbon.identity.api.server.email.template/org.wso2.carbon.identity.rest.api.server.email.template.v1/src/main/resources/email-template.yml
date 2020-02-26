@@ -425,16 +425,8 @@ components:
             $ref: '#/components/schemas/Error'
     Unauthorized:
       description: Unauthorized
-      content:
-        'application/json':
-          schema:
-            $ref: '#/components/schemas/Error'
     Forbidden:
       description: Forbidden
-      content:
-        'application/json':
-          schema:
-            $ref: '#/components/schemas/Error'
     ServerError:
       description: Internal Server Error
       content:
