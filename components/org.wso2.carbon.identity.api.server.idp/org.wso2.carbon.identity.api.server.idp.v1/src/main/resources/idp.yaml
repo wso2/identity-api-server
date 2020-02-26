@@ -1716,6 +1716,9 @@ components:
         name:
           type: string
           example: google
+        defaultAuthenticatorId:
+          type: string
+          example: R29vZ2xlT0lEQ0F1dGhlbnRpY2F0b3I
         description:
           type: string
           example: identity provider for google federation

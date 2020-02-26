@@ -17,6 +17,10 @@
 package org.wso2.carbon.identity.api.server.idp.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Error;

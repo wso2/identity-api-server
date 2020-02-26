@@ -32,6 +32,7 @@ public class IdentityProviderListItem  {
   
     private String id;
     private String name;
+    private String defaultAuthenticatorId;
     private String description;
     private Boolean isEnabled = true;
     private String image;
@@ -71,6 +72,24 @@ public class IdentityProviderListItem  {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+    **/
+    public IdentityProviderListItem defaultAuthenticatorId(String defaultAuthenticatorId) {
+
+        this.defaultAuthenticatorId = defaultAuthenticatorId;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "R29vZ2xlT0lEQ0F1dGhlbnRpY2F0b3I", value = "")
+    @JsonProperty("defaultAuthenticatorId")
+    @Valid
+    public String getDefaultAuthenticatorId() {
+        return defaultAuthenticatorId;
+    }
+    public void setDefaultAuthenticatorId(String defaultAuthenticatorId) {
+        this.defaultAuthenticatorId = defaultAuthenticatorId;
     }
 
     /**
@@ -159,6 +178,7 @@ public class IdentityProviderListItem  {
         IdentityProviderListItem identityProviderListItem = (IdentityProviderListItem) o;
         return Objects.equals(this.id, identityProviderListItem.id) &&
             Objects.equals(this.name, identityProviderListItem.name) &&
+            Objects.equals(this.defaultAuthenticatorId, identityProviderListItem.defaultAuthenticatorId) &&
             Objects.equals(this.description, identityProviderListItem.description) &&
             Objects.equals(this.isEnabled, identityProviderListItem.isEnabled) &&
             Objects.equals(this.image, identityProviderListItem.image) &&
@@ -167,7 +187,7 @@ public class IdentityProviderListItem  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, isEnabled, image, self);
+        return Objects.hash(id, name, defaultAuthenticatorId, description, isEnabled, image, self);
     }
 
     @Override
@@ -178,6 +198,7 @@ public class IdentityProviderListItem  {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    defaultAuthenticatorId: ").append(toIndentedString(defaultAuthenticatorId)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");

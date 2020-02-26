@@ -1174,6 +1174,8 @@ public class ServerIdpManagementService {
                 listItem.setDescription(idp.getIdentityProviderDescription());
                 listItem.setIsEnabled(idp.isEnable());
                 listItem.setImage(idp.getImageUrl());
+                listItem.setDefaultAuthenticatorId(idp.getDefaultAuthenticatorConfig() != null ? base64URLEncode(idp
+                        .getDefaultAuthenticatorConfig().getName()) : null);
                 listItem.setSelf(
                         ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT + "/%s",
                                 idp.getResourceId())).toString());
