@@ -94,6 +94,11 @@ public class ApiModelToOAuthConsumerApp implements Function<OpenIDConnectConfigu
                     .map(audiences -> audiences.toArray(new String[0]))
                     .orElse(new String[0])
             );
+            consumerAppDTO.setIdTokenEncryptionEnabled(idToken.getEncryption().getEnabled());
+            if (idToken.getEncryption().getEnabled()) {
+                consumerAppDTO.setIdTokenEncryptionAlgorithm(idToken.getEncryption().getAlgorithm());
+                consumerAppDTO.setIdTokenEncryptionMethod(idToken.getEncryption().getMethod());
+            }
         }
     }
 
