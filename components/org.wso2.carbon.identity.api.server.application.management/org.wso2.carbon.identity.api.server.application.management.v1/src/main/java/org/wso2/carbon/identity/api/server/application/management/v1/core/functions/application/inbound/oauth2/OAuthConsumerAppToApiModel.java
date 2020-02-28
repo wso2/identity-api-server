@@ -113,8 +113,12 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
 
         return new IdTokenEncryptionConfiguration()
                 .enabled(appDTO.isIdTokenEncryptionEnabled())
-                .algorithm(appDTO.getIdTokenEncryptionAlgorithm())
-                .method(appDTO.getIdTokenEncryptionMethod());
+                .algorithm(StringUtils.equals(appDTO.getIdTokenEncryptionAlgorithm(), "null") ||
+                        StringUtils.isBlank(appDTO.getIdTokenEncryptionAlgorithm()) ? "" :
+                        appDTO.getIdTokenEncryptionAlgorithm())
+                .method(StringUtils.equals(appDTO.getIdTokenEncryptionMethod(), "null") ||
+                        StringUtils.isBlank(appDTO.getIdTokenEncryptionMethod()) ? "" :
+                        appDTO.getIdTokenEncryptionMethod());
     }
 
     private List<String> buildGrantTypeList(OAuthConsumerAppDTO oauthApp) {
