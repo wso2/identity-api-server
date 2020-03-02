@@ -20,6 +20,7 @@ import org.wso2.carbon.identity.api.server.userstore.v1.*;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStoreClassesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ConnectionEstablishedResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.Error;
@@ -42,7 +43,7 @@ public interface UserstoresApiService {
 
       public Response getAvailableUserStoreTypes();
 
-      public Response getSecondaryUserStores(Integer limit, Integer offset, String filter, String sort);
+      public Response getSecondaryUserStores(Integer limit, Integer offset, String filter, String sort, String attributes);
 
       public Response getUserStoreByDomainId(String userstoreDomainId);
 

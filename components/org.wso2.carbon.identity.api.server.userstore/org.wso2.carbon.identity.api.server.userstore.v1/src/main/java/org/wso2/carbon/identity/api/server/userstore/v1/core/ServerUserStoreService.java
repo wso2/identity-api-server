@@ -52,6 +52,7 @@ import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -175,7 +176,8 @@ public class ServerUserStoreService {
      * @param sort   to specify the sorting order.
      * @return List<UserStoreListResponse>.
      */
-    public List<UserStoreListResponse> getUserStoreList(Integer limit, Integer offset, String filter, String sort) {
+    public List<UserStoreListResponse> getUserStoreList(Integer limit, Integer offset, String filter, String sort,
+                                                        String attributes) {
 
         handleNotImplementedBehaviour(limit, offset, filter, sort);
 
@@ -185,7 +187,7 @@ public class ServerUserStoreService {
             if (userStoreDTOS.length == 0) {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
             }
-            return buildUserStoreListResponse(userStoreDTOS);
+            return buildUserStoreListResponse(userStoreDTOS, attributes);
 
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
@@ -436,7 +438,7 @@ public class ServerUserStoreService {
      * @param userStoreDTOS array of UserStoreDTO object.
      * @return List<UserStoreListResponse>.
      */
-    private List<UserStoreListResponse> buildUserStoreListResponse(UserStoreDTO[] userStoreDTOS) {
+    private List<UserStoreListResponse> buildUserStoreListResponse(UserStoreDTO[] userStoreDTOS, String attributes) {
 
         List<UserStoreListResponse> userStoreListResponseToAdd = new ArrayList<>();
         for (UserStoreDTO jsonObject : userStoreDTOS) {
@@ -447,9 +449,35 @@ public class ServerUserStoreService {
             userStoreList.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
                             UserStoreConstants.USER_STORE_PATH_COMPONENT + "/%s",
                     base64URLEncodeId(jsonObject.getDomainId()))).toString());
+
+            if (StringUtils.isNotBlank(attributes)) {
+                String[] attributesArray = attributes.split(",");
+                addUserstoreProperties(jsonObject, userStoreList, Arrays.asList(attributesArray));
+            }
             userStoreListResponseToAdd.add(userStoreList);
         }
         return userStoreListResponseToAdd;
+    }
+
+    /**
+     * Add requested user store properties to the response.
+     *
+     * @param userStoreDTO            userStoreDTO object.
+     * @param userStoreListResponse   userStoreListResponse object.
+     * @param requestedAttributesList Requested user store properties name list.
+     */
+    private void addUserstoreProperties(UserStoreDTO userStoreDTO, UserStoreListResponse userStoreListResponse,
+                                        List<String> requestedAttributesList) {
+
+        for (PropertyDTO propertyDTO : userStoreDTO.getProperties()) {
+            if (requestedAttributesList.contains(propertyDTO.getName()) &&
+                    StringUtils.isNotBlank(propertyDTO.getValue())) {
+                AddUserStorePropertiesRes addUserStorePropertiesRes = new AddUserStorePropertiesRes();
+                addUserStorePropertiesRes.setName(propertyDTO.getName());
+                addUserStorePropertiesRes.setValue(propertyDTO.getValue());
+                userStoreListResponse.addPropertiesItem(addUserStorePropertiesRes);
+            }
+        }
     }
 
     /**
