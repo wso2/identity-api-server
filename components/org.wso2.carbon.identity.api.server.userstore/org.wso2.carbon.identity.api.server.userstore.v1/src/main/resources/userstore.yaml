@@ -72,7 +72,7 @@ paths:
         - $ref: '#/components/parameters/offsetQueryParam'
         - $ref: '#/components/parameters/filterQueryParam'
         - $ref: '#/components/parameters/sortQueryParam'
-        - $ref: '#/components/parameters/attributesQueryParam'
+        - $ref: '#/components/parameters/requiredAttributesQueryParam'
       responses:
         '200':
           description: Successful response.
@@ -369,9 +369,9 @@ components:
       description: Define the order how the retrieved records should be sorted.
       schema:
         type: string
-    attributesQueryParam:
+    requiredAttributesQueryParam:
       in: query
-      name: attributes
+      name: requiredAttributes
       required: false
       description: Define set of user store attributes (as comma separated) to be returned.
       schema:
