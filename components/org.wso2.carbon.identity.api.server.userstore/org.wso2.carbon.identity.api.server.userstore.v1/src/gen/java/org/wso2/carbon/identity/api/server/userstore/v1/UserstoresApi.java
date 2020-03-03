@@ -63,7 +63,7 @@ public class UserstoresApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Successful response", response = UserStoreResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
         @ApiResponse(code = 409, message = "Element Already Exists.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
@@ -86,7 +86,7 @@ public class UserstoresApi  {
     }, tags={ "User Store", })
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "No Content.", response = Void.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
@@ -108,7 +108,7 @@ public class UserstoresApi  {
     }, tags={ "Meta", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response.", response = AvailableUserStoreClassesRes.class, responseContainer = "List"),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
     public Response getAvailableUserStoreTypes() {
@@ -129,7 +129,7 @@ public class UserstoresApi  {
     }, tags={ "User Store", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = UserStoreListResponse.class, responseContainer = "List"),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
@@ -152,7 +152,7 @@ public class UserstoresApi  {
     }, tags={ "User Store", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = UserStoreConfigurationsRes.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
@@ -175,7 +175,7 @@ public class UserstoresApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = MetaUserStoreType.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
@@ -199,7 +199,7 @@ public class UserstoresApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = UserStoreResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
@@ -223,7 +223,7 @@ public class UserstoresApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = ConnectionEstablishedResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
     public Response testRDBMSConnection(@ApiParam(value = "RDBMS connection properties used to connect to the datasource used by a JDBC user store manager." ) @Valid RDBMSConnectionReq rdBMSConnectionReq) {
@@ -245,7 +245,7 @@ public class UserstoresApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = UserStoreResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
