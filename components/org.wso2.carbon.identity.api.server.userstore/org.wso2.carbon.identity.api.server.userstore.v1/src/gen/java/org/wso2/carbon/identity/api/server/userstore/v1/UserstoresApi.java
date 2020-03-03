@@ -134,9 +134,9 @@ public class UserstoresApi  {
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response getSecondaryUserStores(    @Valid@ApiParam(value = "maximum number of records to return")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records.")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted.")  @QueryParam("sort") String sort,     @Valid@ApiParam(value = "Define set of user store attributes (as comma separated) to be returned.")  @QueryParam("attributes") String attributes) {
+    public Response getSecondaryUserStores(    @Valid@ApiParam(value = "maximum number of records to return")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records.")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted.")  @QueryParam("sort") String sort,     @Valid@ApiParam(value = "Define set of user store attributes (as comma separated) to be returned.")  @QueryParam("requiredAttributes") String requiredAttributes) {
 
-        return delegate.getSecondaryUserStores(limit,  offset,  filter,  sort,  attributes );
+        return delegate.getSecondaryUserStores(limit,  offset,  filter,  sort,  requiredAttributes );
     }
 
     @Valid

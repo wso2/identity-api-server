@@ -43,7 +43,7 @@ public interface UserstoresApiService {
 
       public Response getAvailableUserStoreTypes();
 
-      public Response getSecondaryUserStores(Integer limit, Integer offset, String filter, String sort, String attributes);
+      public Response getSecondaryUserStores(Integer limit, Integer offset, String filter, String sort, String requiredAttributes);
 
       public Response getUserStoreByDomainId(String userstoreDomainId);
 

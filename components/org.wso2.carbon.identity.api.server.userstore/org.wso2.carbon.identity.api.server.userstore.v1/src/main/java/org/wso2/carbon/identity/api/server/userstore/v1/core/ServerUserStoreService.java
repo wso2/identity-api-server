@@ -177,7 +177,7 @@ public class ServerUserStoreService {
      * @return List<UserStoreListResponse>.
      */
     public List<UserStoreListResponse> getUserStoreList(Integer limit, Integer offset, String filter, String sort,
-                                                        String attributes) {
+                                                        String requiredAttributes) {
 
         handleNotImplementedBehaviour(limit, offset, filter, sort);
 
@@ -187,7 +187,7 @@ public class ServerUserStoreService {
             if (userStoreDTOS.length == 0) {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
             }
-            return buildUserStoreListResponse(userStoreDTOS, attributes);
+            return buildUserStoreListResponse(userStoreDTOS, requiredAttributes);
 
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
@@ -438,7 +438,8 @@ public class ServerUserStoreService {
      * @param userStoreDTOS array of UserStoreDTO object.
      * @return List<UserStoreListResponse>.
      */
-    private List<UserStoreListResponse> buildUserStoreListResponse(UserStoreDTO[] userStoreDTOS, String attributes) {
+    private List<UserStoreListResponse> buildUserStoreListResponse(UserStoreDTO[] userStoreDTOS,
+                                                                   String requiredAttributes) {
 
         List<UserStoreListResponse> userStoreListResponseToAdd = new ArrayList<>();
         for (UserStoreDTO jsonObject : userStoreDTOS) {
@@ -450,9 +451,9 @@ public class ServerUserStoreService {
                             UserStoreConstants.USER_STORE_PATH_COMPONENT + "/%s",
                     base64URLEncodeId(jsonObject.getDomainId()))).toString());
 
-            if (StringUtils.isNotBlank(attributes)) {
-                String[] attributesArray = attributes.split(",");
-                addUserstoreProperties(jsonObject, userStoreList, Arrays.asList(attributesArray));
+            if (StringUtils.isNotBlank(requiredAttributes)) {
+                String[] requiredAttributesArray = requiredAttributes.split(",");
+                addUserstoreProperties(jsonObject, userStoreList, Arrays.asList(requiredAttributesArray));
             }
             userStoreListResponseToAdd.add(userStoreList);
         }
