@@ -17,6 +17,10 @@
 package org.wso2.carbon.identity.api.server.idp.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Error;
@@ -69,8 +73,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Successful response", response = IdentityProviderResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -93,8 +97,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteIDP(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Enforce the forceful deletetion of either an identity provider, federated authenticator or an outbound provisioning connector eventhough it is being reffered by a service provider ", defaultValue="false") @DefaultValue("false")  @QueryParam("force") Boolean force) {
@@ -116,8 +120,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = Claims.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -140,8 +144,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = ConnectedApps.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -164,8 +168,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = FederatedAuthenticator.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -188,8 +192,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = FederatedAuthenticatorListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -212,8 +216,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = IdentityProviderResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -236,8 +240,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = IdentityProviderListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
@@ -261,8 +265,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = JustInTimeProvisioning.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -285,8 +289,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = MetaFederatedAuthenticator.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -309,8 +313,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = MetaFederatedAuthenticatorListItem.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -333,8 +337,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = MetaOutboundConnector.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -357,8 +361,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = MetaOutboundConnectorListItem.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -381,8 +385,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = OutboundConnector.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -405,8 +409,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = OutboundConnectorListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -429,8 +433,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = ProvisioningResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -453,8 +457,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = Roles.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -477,8 +481,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = IdentityProviderResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -501,8 +505,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = Claims.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -525,8 +529,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = FederatedAuthenticator.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -549,8 +553,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = JustInTimeProvisioning.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -573,8 +577,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = OutboundConnector.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -597,8 +601,8 @@ public class IdentityProvidersApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response", response = Roles.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
