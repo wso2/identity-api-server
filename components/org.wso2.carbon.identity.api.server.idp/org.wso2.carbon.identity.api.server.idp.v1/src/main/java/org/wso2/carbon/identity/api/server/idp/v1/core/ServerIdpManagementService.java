@@ -1953,6 +1953,12 @@ public class ServerIdpManagementService {
                     case Constants.HOME_REALM_PATH:
                         idpToUpdate.setHomeRealmId(value);
                         break;
+                    case Constants.ALIAS:
+                        idpToUpdate.setAlias(value);
+                        break;
+                    case Constants.CERTIFICATE:
+                        idpToUpdate.setCertificate(value);
+                        break;
                     default:
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                 .ERROR_CODE_INVALID_INPUT, null);
