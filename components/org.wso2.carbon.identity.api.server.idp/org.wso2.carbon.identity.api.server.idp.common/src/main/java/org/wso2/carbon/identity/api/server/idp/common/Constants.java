@@ -47,6 +47,17 @@ public class Constants {
     public static final String PAGE_LINK_REL_NEXT = "next";
     public static final String PAGE_LINK_REL_PREVIOUS = "previous";
 
+    // IdP attributes constants.
+    public static final String IS_PRIMARY = "isPrimary";
+    public static final String IS_FEDERATION_HUB = "isFederationHub";
+    public static final String HOME_REALM_IDENTIFIER = "homeRealmIdentifier";
+    public static final String CERTIFICATE = "certificate";
+    public static final String ALIAS = "alias";
+    public static final String CLAIMS = "claims";
+    public static final String ROLES = "roles";
+    public static final String FEDERATED_AUTHENTICATORS = "federatedAuthenticators";
+    public static final String PROVISIONING = "provisioning";
+
     /**
      * Enum for error messages.
      */

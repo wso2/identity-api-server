@@ -61,7 +61,7 @@ public interface IdentityProvidersApiService {
 
       public Response getIDP(String identityProviderId);
 
-      public Response getIDPs(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String attributes);
+      public Response getIDPs(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String requiredAttributes);
 
       public Response getJITConfig(String identityProviderId);
 

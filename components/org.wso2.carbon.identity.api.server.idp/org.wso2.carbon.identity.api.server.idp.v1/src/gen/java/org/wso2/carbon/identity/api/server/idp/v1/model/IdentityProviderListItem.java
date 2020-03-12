@@ -20,6 +20,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
+import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
+import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
 import javax.validation.constraints.*;
 
 
@@ -36,6 +41,15 @@ public class IdentityProviderListItem  {
     private Boolean isEnabled = true;
     private String image;
     private String self;
+    private Boolean isPrimary;
+    private Boolean isFederationHub;
+    private String homeRealmIdentifier;
+    private Certificate certificate;
+    private String alias;
+    private Claims claims;
+    private Roles roles;
+    private FederatedAuthenticatorListResponse federatedAuthenticators;
+    private ProvisioningResponse provisioning;
 
     /**
     **/
@@ -145,6 +159,168 @@ public class IdentityProviderListItem  {
         this.self = self;
     }
 
+    /**
+    **/
+    public IdentityProviderListItem isPrimary(Boolean isPrimary) {
+
+        this.isPrimary = isPrimary;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("isPrimary")
+    @Valid
+    public Boolean getIsPrimary() {
+        return isPrimary;
+    }
+    public void setIsPrimary(Boolean isPrimary) {
+        this.isPrimary = isPrimary;
+    }
+
+    /**
+    **/
+    public IdentityProviderListItem isFederationHub(Boolean isFederationHub) {
+
+        this.isFederationHub = isFederationHub;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("isFederationHub")
+    @Valid
+    public Boolean getIsFederationHub() {
+        return isFederationHub;
+    }
+    public void setIsFederationHub(Boolean isFederationHub) {
+        this.isFederationHub = isFederationHub;
+    }
+
+    /**
+    **/
+    public IdentityProviderListItem homeRealmIdentifier(String homeRealmIdentifier) {
+
+        this.homeRealmIdentifier = homeRealmIdentifier;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "localhost", value = "")
+    @JsonProperty("homeRealmIdentifier")
+    @Valid
+    public String getHomeRealmIdentifier() {
+        return homeRealmIdentifier;
+    }
+    public void setHomeRealmIdentifier(String homeRealmIdentifier) {
+        this.homeRealmIdentifier = homeRealmIdentifier;
+    }
+
+    /**
+    **/
+    public IdentityProviderListItem certificate(Certificate certificate) {
+
+        this.certificate = certificate;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("certificate")
+    @Valid
+    public Certificate getCertificate() {
+        return certificate;
+    }
+    public void setCertificate(Certificate certificate) {
+        this.certificate = certificate;
+    }
+
+    /**
+    **/
+    public IdentityProviderListItem alias(String alias) {
+
+        this.alias = alias;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "https://localhost:9444/oauth2/token", value = "")
+    @JsonProperty("alias")
+    @Valid
+    public String getAlias() {
+        return alias;
+    }
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    /**
+    **/
+    public IdentityProviderListItem claims(Claims claims) {
+
+        this.claims = claims;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("claims")
+    @Valid
+    public Claims getClaims() {
+        return claims;
+    }
+    public void setClaims(Claims claims) {
+        this.claims = claims;
+    }
+
+    /**
+    **/
+    public IdentityProviderListItem roles(Roles roles) {
+
+        this.roles = roles;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("roles")
+    @Valid
+    public Roles getRoles() {
+        return roles;
+    }
+    public void setRoles(Roles roles) {
+        this.roles = roles;
+    }
+
+    /**
+    **/
+    public IdentityProviderListItem federatedAuthenticators(FederatedAuthenticatorListResponse federatedAuthenticators) {
+
+        this.federatedAuthenticators = federatedAuthenticators;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("federatedAuthenticators")
+    @Valid
+    public FederatedAuthenticatorListResponse getFederatedAuthenticators() {
+        return federatedAuthenticators;
+    }
+    public void setFederatedAuthenticators(FederatedAuthenticatorListResponse federatedAuthenticators) {
+        this.federatedAuthenticators = federatedAuthenticators;
+    }
+
+    /**
+    **/
+    public IdentityProviderListItem provisioning(ProvisioningResponse provisioning) {
+
+        this.provisioning = provisioning;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("provisioning")
+    @Valid
+    public ProvisioningResponse getProvisioning() {
+        return provisioning;
+    }
+    public void setProvisioning(ProvisioningResponse provisioning) {
+        this.provisioning = provisioning;
+    }
+
 
 
     @Override
@@ -162,12 +338,21 @@ public class IdentityProviderListItem  {
             Objects.equals(this.description, identityProviderListItem.description) &&
             Objects.equals(this.isEnabled, identityProviderListItem.isEnabled) &&
             Objects.equals(this.image, identityProviderListItem.image) &&
-            Objects.equals(this.self, identityProviderListItem.self);
+            Objects.equals(this.self, identityProviderListItem.self) &&
+            Objects.equals(this.isPrimary, identityProviderListItem.isPrimary) &&
+            Objects.equals(this.isFederationHub, identityProviderListItem.isFederationHub) &&
+            Objects.equals(this.homeRealmIdentifier, identityProviderListItem.homeRealmIdentifier) &&
+            Objects.equals(this.certificate, identityProviderListItem.certificate) &&
+            Objects.equals(this.alias, identityProviderListItem.alias) &&
+            Objects.equals(this.claims, identityProviderListItem.claims) &&
+            Objects.equals(this.roles, identityProviderListItem.roles) &&
+            Objects.equals(this.federatedAuthenticators, identityProviderListItem.federatedAuthenticators) &&
+            Objects.equals(this.provisioning, identityProviderListItem.provisioning);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, isEnabled, image, self);
+        return Objects.hash(id, name, description, isEnabled, image, self, isPrimary, isFederationHub, homeRealmIdentifier, certificate, alias, claims, roles, federatedAuthenticators, provisioning);
     }
 
     @Override
@@ -182,6 +367,15 @@ public class IdentityProviderListItem  {
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
+        sb.append("    isPrimary: ").append(toIndentedString(isPrimary)).append("\n");
+        sb.append("    isFederationHub: ").append(toIndentedString(isFederationHub)).append("\n");
+        sb.append("    homeRealmIdentifier: ").append(toIndentedString(homeRealmIdentifier)).append("\n");
+        sb.append("    certificate: ").append(toIndentedString(certificate)).append("\n");
+        sb.append("    alias: ").append(toIndentedString(alias)).append("\n");
+        sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
+        sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
+        sb.append("    federatedAuthenticators: ").append(toIndentedString(federatedAuthenticators)).append("\n");
+        sb.append("    provisioning: ").append(toIndentedString(provisioning)).append("\n");
         sb.append("}");
         return sb.toString();
     }
