@@ -1931,16 +1931,17 @@ public class ServerIdpManagementService {
             // We support only 'REPLACE' patch operation.
             if (operation == Patch.OperationEnum.REPLACE) {
                 String value = patch.getValue();
-                if (path.contains(Constants.CERTIFICATE)) {
+                if (path.matches("/certificate/certificates/[0-9]+")) {
                     List<String> certificates = new ArrayList<>();
-                    for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
-                        certificates.add(certInfo.getCertValue());
-                    }
                     int index = Integer.parseInt(path.split("/")[3]);
-                    certificates.set(index - 1, value);
+                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
+                        for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
+                            certificates.add(certInfo.getCertValue());
+                        }
+                        certificates.set(index - 1, value);
+                    }
                     idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
-                }
-                else {
+                } else {
                     switch (path) {
                         case Constants.NAME_PATH:
                             idpToUpdate.setIdentityProviderName(value);
