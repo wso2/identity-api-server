@@ -1931,31 +1931,58 @@ public class ServerIdpManagementService {
             // We support only 'REPLACE' patch operation.
             if (operation == Patch.OperationEnum.REPLACE) {
                 String value = patch.getValue();
-                switch (path) {
-                    case Constants.NAME_PATH:
-                        idpToUpdate.setIdentityProviderName(value);
-                        break;
-                    case Constants.DESCRIPTION_PATH:
-                        idpToUpdate.setIdentityProviderDescription(value);
-                        break;
-                    case Constants.IMAGE_PATH:
-                        idpToUpdate.setImageUrl(value);
-                        break;
-                    case Constants.IS_PRIMARY_PATH:
-                        idpToUpdate.setPrimary(Boolean.parseBoolean(value));
-                        break;
-                    case Constants.IS_ENABLED_PATH:
-                        idpToUpdate.setEnable(Boolean.parseBoolean(value));
-                        break;
-                    case Constants.IS_FEDERATION_HUB_PATH:
-                        idpToUpdate.setFederationHub(Boolean.parseBoolean(value));
-                        break;
-                    case Constants.HOME_REALM_PATH:
-                        idpToUpdate.setHomeRealmId(value);
-                        break;
-                    default:
+                if (path.matches(Constants.CERTIFICATE_PATH_REGEX)) {
+                    List<String> certificates = new ArrayList<>();
+                    int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
+                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index > 0)
+                            && (index <= idpToUpdate.getCertificateInfoArray().length)) {
+                        for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
+                            certificates.add(certInfo.getCertValue());
+                        }
+                        certificates.set(index - 1, value);
+                        idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
+                    } else {
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                 .ERROR_CODE_INVALID_INPUT, null);
+                    }
+                } else {
+                    switch (path) {
+                        case Constants.NAME_PATH:
+                            idpToUpdate.setIdentityProviderName(value);
+                            break;
+                        case Constants.DESCRIPTION_PATH:
+                            idpToUpdate.setIdentityProviderDescription(value);
+                            break;
+                        case Constants.IMAGE_PATH:
+                            idpToUpdate.setImageUrl(value);
+                            break;
+                        case Constants.IS_PRIMARY_PATH:
+                            idpToUpdate.setPrimary(Boolean.parseBoolean(value));
+                            break;
+                        case Constants.IS_ENABLED_PATH:
+                            idpToUpdate.setEnable(Boolean.parseBoolean(value));
+                            break;
+                        case Constants.IS_FEDERATION_HUB_PATH:
+                            idpToUpdate.setFederationHub(Boolean.parseBoolean(value));
+                            break;
+                        case Constants.HOME_REALM_PATH:
+                            idpToUpdate.setHomeRealmId(value);
+                            break;
+                        case Constants.ALIAS:
+                            idpToUpdate.setAlias(value);
+                            break;
+                        case Constants.CERTIFICATE_JWKSURI:
+                            List<IdentityProviderProperty> idpProperties = new ArrayList<>();
+                            IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
+                            jwksProperty.setName(Constants.JWKS_URI);
+                            jwksProperty.setValue(value);
+                            idpProperties.add(jwksProperty);
+                            idpToUpdate.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
+                            break;
+                        default:
+                            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                    .ERROR_CODE_INVALID_INPUT, null);
+                    }
                 }
             } else {
                 // Throw an error if any other patch operations are sent in the request.
