@@ -28,7 +28,6 @@ public class Constants {
     public static final String META_DATA_SAML = "meta_data_saml";
     public static final String SELECT_MODE = "SelectMode";
     public static final String SELECT_MODE_METADATA = "Metadata File Configuration";
-    public static final String CERTIFICATE_PATH_REGEX = "/certificate/certificates/[0-9]+";
 
     // IdP property keys.
     public static final String PROP_DISPLAY_NAME = "DisplayName";
@@ -43,7 +42,7 @@ public class Constants {
     public static final String HOME_REALM_PATH = "/homeRealmIdentifier";
     public static final String ALIAS = "/alias";
     public static final String CERTIFICATE_JWKSURI = "/certificate/jwksUri";
-    public static final String CERTIFICATE = "/certificate/certificates";
+    public static final String CERTIFICATE_PATH_REGEX = "/certificate/certificates/[0-9]+";
 
     // IdP pagination constants.
     public static final String PAGINATION_LINK_FORMAT = "?offset=%d&limit=%d";

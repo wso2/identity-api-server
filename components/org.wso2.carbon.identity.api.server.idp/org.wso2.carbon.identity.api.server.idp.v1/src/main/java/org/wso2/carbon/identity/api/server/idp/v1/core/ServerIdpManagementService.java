@@ -1922,7 +1922,7 @@ public class ServerIdpManagementService {
      */
     private void processPatchRequest(List<Patch> patchRequest, IdentityProvider idpToUpdate) {
 
-        int index = 0;
+        int index;
         if (CollectionUtils.isEmpty(patchRequest)) {
             return;
         }
@@ -1941,7 +1941,7 @@ public class ServerIdpManagementService {
                             certificates.add(certInfo.getCertValue());
                         }
                         certificates.set(index - 1, value);
-                        idpToUpdate.setCertificate(StringUtils.join(certificates, StringUtils.EMPTY));
+                        idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
                     } else {
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                 .ERROR_CODE_INVALID_INPUT, null);
