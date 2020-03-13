@@ -1922,7 +1922,6 @@ public class ServerIdpManagementService {
      */
     private void processPatchRequest(List<Patch> patchRequest, IdentityProvider idpToUpdate) {
 
-        int index;
         if (CollectionUtils.isEmpty(patchRequest)) {
             return;
         }
@@ -1934,7 +1933,7 @@ public class ServerIdpManagementService {
                 String value = patch.getValue();
                 if (path.matches(Constants.CERTIFICATE_PATH_REGEX)) {
                     List<String> certificates = new ArrayList<>();
-                    index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
+                    int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
                     if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index > 0)
                             && (index <= idpToUpdate.getCertificateInfoArray().length)) {
                         for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
