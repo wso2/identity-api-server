@@ -1922,6 +1922,7 @@ public class ServerIdpManagementService {
      */
     private void processPatchRequest(List<Patch> patchRequest, IdentityProvider idpToUpdate) {
 
+        int index = 0;
         if (CollectionUtils.isEmpty(patchRequest)) {
             return;
         }
@@ -1931,16 +1932,20 @@ public class ServerIdpManagementService {
             // We support only 'REPLACE' patch operation.
             if (operation == Patch.OperationEnum.REPLACE) {
                 String value = patch.getValue();
-                if (path.matches("/certificate/certificates/[0-9]+")) {
+                if (path.matches(Constants.CERTIFICATE_PATH_REGEX)) {
                     List<String> certificates = new ArrayList<>();
-                    int index = Integer.parseInt(path.split("/")[3]);
-                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
+                    index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
+                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index > 0)
+                            && (index <= idpToUpdate.getCertificateInfoArray().length)) {
                         for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
                             certificates.add(certInfo.getCertValue());
                         }
                         certificates.set(index - 1, value);
+                        idpToUpdate.setCertificate(StringUtils.join(certificates, StringUtils.EMPTY));
+                    } else {
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, null);
                     }
-                    idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
                 } else {
                     switch (path) {
                         case Constants.NAME_PATH:

@@ -28,6 +28,7 @@ public class Constants {
     public static final String META_DATA_SAML = "meta_data_saml";
     public static final String SELECT_MODE = "SelectMode";
     public static final String SELECT_MODE_METADATA = "Metadata File Configuration";
+    public static final String CERTIFICATE_PATH_REGEX = "/certificate/certificates/[0-9]+";
 
     // IdP property keys.
     public static final String PROP_DISPLAY_NAME = "DisplayName";
