@@ -1186,7 +1186,7 @@ public class ServerIdpManagementService {
         }
 
         listResponse.setTotalResults(idpSearchResult.getTotalIDPCount());
-        listResponse.setStartIndex(idpSearchResult.getOffSet() + 1);
+        listResponse.setStartIndex(idpSearchResult.getOffSet());
         listResponse.setLinks(createLinks(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT, idpSearchResult
                         .getLimit(), idpSearchResult.getOffSet(), idpSearchResult.getTotalIDPCount(), idpSearchResult
                 .getFilter()));
