@@ -1529,9 +1529,6 @@ components:
         image:
           type: string
           example: "google-logo-url"
-        self:
-          type: string
-          example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000
         isPrimary:
           type: boolean
           example: false
@@ -1554,6 +1551,9 @@ components:
           $ref: '#/components/schemas/FederatedAuthenticatorListResponse'
         provisioning:
           $ref: '#/components/schemas/ProvisioningResponse'
+        self:
+          type: string
+          example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000
     MetaFederatedAuthenticatorListItem:
       type: object
       properties:
