@@ -45,10 +45,9 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
 
         if (claimApiModel != null) {
             ClaimConfig applicationClaimConfiguration = getClaimConfig(application);
-            if (claimApiModel.getDialect() == ClaimConfiguration.DialectEnum.LOCAL) {
-                applicationClaimConfiguration.setLocalClaimDialect(true);
-            }
 
+            // Check if dialect is local or a custom one.
+            applicationClaimConfiguration.setLocalClaimDialect(isLocalDialect(claimApiModel.getDialect()));
             // Requested claims / Claim mappings.
             applicationClaimConfiguration.setClaimMappings(getClaimMappings(claimApiModel));
             // Role claim.
@@ -56,6 +55,11 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
             // Subject claim.
             updateSubjectClaimConfigs(claimApiModel.getSubject(), application);
         }
+    }
+
+    private boolean isLocalDialect(ClaimConfiguration.DialectEnum dialect) {
+
+        return dialect == null || dialect == ClaimConfiguration.DialectEnum.LOCAL;
     }
 
     private ClaimConfig getClaimConfig(ServiceProvider application) {
@@ -121,18 +125,21 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
         return ClaimMapping.build(mapping.getLocalClaim().getUri(), mapping.getApplicationClaim(), null, false);
     }
 
-    private void updateSubjectClaimConfigs(SubjectConfig subject, ServiceProvider application) {
+    private void updateSubjectClaimConfigs(SubjectConfig subjectApiModel, ServiceProvider application) {
 
-        if (subject != null) {
-            ClaimConfig claimConfig = getClaimConfig(application);
-            if (subject.getClaim() != null) {
-                setIfNotNull(subject.getClaim().getUri(), claimConfig::setUserClaimURI);
-            }
-            setIfNotNull(subject.getUseMappedLocalSubject(), claimConfig::setAlwaysSendMappedLocalSubjectId);
+        if (subjectApiModel != null) {
 
             LocalAndOutboundAuthenticationConfig authConfig = getLocalAndOutboundConfig(application);
-            setIfNotNull(subject.getIncludeTenantDomain(), authConfig::setUseTenantDomainInLocalSubjectIdentifier);
-            setIfNotNull(subject.getIncludeUserDomain(), authConfig::setUseUserstoreDomainInLocalSubjectIdentifier);
+            if (subjectApiModel.getClaim() != null) {
+                setIfNotNull(subjectApiModel.getClaim().getUri(), authConfig::setSubjectClaimUri);
+            }
+            setIfNotNull(subjectApiModel.getIncludeTenantDomain(),
+                    authConfig::setUseTenantDomainInLocalSubjectIdentifier);
+            setIfNotNull(subjectApiModel.getIncludeUserDomain(),
+                    authConfig::setUseUserstoreDomainInLocalSubjectIdentifier);
+
+            ClaimConfig claimConfig = getClaimConfig(application);
+            setIfNotNull(subjectApiModel.getUseMappedLocalSubject(), claimConfig::setAlwaysSendMappedLocalSubjectId);
         }
     }
 
