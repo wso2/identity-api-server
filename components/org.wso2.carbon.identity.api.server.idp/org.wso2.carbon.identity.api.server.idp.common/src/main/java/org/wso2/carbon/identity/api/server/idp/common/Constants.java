@@ -40,6 +40,9 @@ public class Constants {
     public static final String IS_ENABLED_PATH = "/isEnabled";
     public static final String IS_FEDERATION_HUB_PATH = "/isFederationHub";
     public static final String HOME_REALM_PATH = "/homeRealmIdentifier";
+    public static final String ALIAS = "/alias";
+    public static final String CERTIFICATE_JWKSURI = "/certificate/jwksUri";
+    public static final String CERTIFICATE_PATH_REGEX = "/certificate/certificates/[0-9]+";
 
     // IdP pagination constants.
     public static final String PAGINATION_LINK_FORMAT = "?offset=%d&limit=%d";
