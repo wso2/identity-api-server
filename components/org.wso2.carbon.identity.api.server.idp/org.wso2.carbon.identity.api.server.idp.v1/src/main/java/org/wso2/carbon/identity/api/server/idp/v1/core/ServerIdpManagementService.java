@@ -110,7 +110,7 @@ public class ServerIdpManagementService {
     /**
      * Get list of identity providers.
      *
-     * @param attributes Required attributes in the IDP list response.
+     * @param requiredAttributes Required attributes in the IDP list response.
      * @param limit      Items per page.
      * @param offset     Offset.
      * @param filter     Filter string. E.g. filter="name" sw "google" and "isEnabled" eq "true"
@@ -118,14 +118,18 @@ public class ServerIdpManagementService {
      * @param sortOrder  Order in which IDPs should be sorted. Can be either ASC or DESC.
      * @return IdentityProviderListResponse.
      */
-    public IdentityProviderListResponse getIDPs(String attributes, Integer limit, Integer offset, String filter, String
-            sortBy, String sortOrder) {
+    public IdentityProviderListResponse getIDPs(String requiredAttributes, Integer limit, Integer offset, String filter,
+                                                String sortBy, String sortOrder) {
 
-        handleNotImplementedCapabilities(attributes);
         try {
+            List<String> requestedAttributeList = null;
+            if (StringUtils.isNotBlank(requiredAttributes)) {
+                requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
+            }
             return createIDPListResponse(
                     IdentityProviderServiceHolder.getIdentityProviderManager().getIdPs(limit, offset, filter,
-                            sortBy, sortOrder, ContextLoader.getTenantDomainFromContext()));
+                            sortBy, sortOrder, ContextLoader.getTenantDomainFromContext(), requestedAttributeList),
+                    requestedAttributeList);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
         }
@@ -1161,22 +1165,15 @@ public class ServerIdpManagementService {
         return idp;
     }
 
-    private IdentityProviderListResponse createIDPListResponse(IdpSearchResult idpSearchResult) {
+    private IdentityProviderListResponse createIDPListResponse(IdpSearchResult idpSearchResult,
+                                                               List<String> requestedAttributeList) {
 
         List<IdentityProvider> idps = idpSearchResult.getIdPs();
         IdentityProviderListResponse listResponse = new IdentityProviderListResponse();
         if (CollectionUtils.isNotEmpty(idps)) {
             List<IdentityProviderListItem> identityProviderList = new ArrayList<>();
             for (IdentityProvider idp : idps) {
-                IdentityProviderListItem listItem = new IdentityProviderListItem();
-                listItem.setId(idp.getResourceId());
-                listItem.setName(idp.getIdentityProviderName());
-                listItem.setDescription(idp.getIdentityProviderDescription());
-                listItem.setIsEnabled(idp.isEnable());
-                listItem.setImage(idp.getImageUrl());
-                listItem.setSelf(
-                        ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT + "/%s",
-                                idp.getResourceId())).toString());
+                IdentityProviderListItem listItem = populateIDPListResponse(idp, requestedAttributeList);
                 identityProviderList.add(listItem);
             }
             listResponse.setIdentityProviders(identityProviderList);
@@ -1191,6 +1188,57 @@ public class ServerIdpManagementService {
                         .getLimit(), idpSearchResult.getOffSet(), idpSearchResult.getTotalIDPCount(), idpSearchResult
                 .getFilter()));
         return listResponse;
+    }
+
+    private IdentityProviderListItem populateIDPListResponse(IdentityProvider idp,
+                                                             List<String> requestedAttributeList) {
+
+        IdentityProviderListItem identityProviderListItem = new IdentityProviderListItem();
+        // Create IDP basic information.
+        identityProviderListItem.setId(idp.getResourceId());
+        identityProviderListItem.setName(idp.getIdentityProviderName());
+        identityProviderListItem.setDescription(idp.getIdentityProviderDescription());
+        identityProviderListItem.setIsEnabled(idp.isEnable());
+        identityProviderListItem.setImage(idp.getImageUrl());
+        identityProviderListItem.setSelf(
+                ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT + "/%s",
+                        idp.getResourceId())).toString());
+
+        // Populate optional IDP information if exists.
+        if (requestedAttributeList != null) {
+            for (String requestedAttribute : requestedAttributeList) {
+                switch (requestedAttribute) {
+                    case Constants.IS_PRIMARY:
+                        identityProviderListItem.setIsPrimary(idp.isPrimary());
+                        break;
+                    case Constants.IS_FEDERATION_HUB:
+                        identityProviderListItem.setIsFederationHub(idp.isFederationHub());
+                        break;
+                    case Constants.HOME_REALM_IDENTIFIER:
+                        identityProviderListItem.setHomeRealmIdentifier(idp.getHomeRealmId());
+                        break;
+                    case Constants.CERTIFICATE:
+                        identityProviderListItem.setCertificate(createIDPCertificate(idp));
+                        break;
+                    case Constants.ALIAS_PATH:
+                        identityProviderListItem.setAlias(idp.getAlias());
+                        break;
+                    case Constants.CLAIMS:
+                        identityProviderListItem.setClaims(createClaimResponse(idp.getClaimConfig()));
+                        break;
+                    case Constants.ROLES:
+                        identityProviderListItem.setRoles(createRoleResponse(idp));
+                        break;
+                    case Constants.FEDERATED_AUTHENTICATORS:
+                        identityProviderListItem.setFederatedAuthenticators(createFederatedAuthenticatorResponse(idp));
+                        break;
+                    case Constants.PROVISIONING:
+                        identityProviderListItem.setProvisioning(createProvisioningResponse(idp));
+                        break;
+                }
+            }
+        }
+        return identityProviderListItem;
     }
 
     private List<Link> createLinks(String url, int limit, int offset, int total, String filter) {
@@ -1294,55 +1342,57 @@ public class ServerIdpManagementService {
         List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> apiMappings = new ArrayList<>();
         List<ProvisioningClaim> provClaims = new ArrayList<>();
 
-        if (claimConfig.getClaimMappings() != null) {
-            for (ClaimMapping mapping : claimConfig.getClaimMappings()) {
-                org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping apiMapping = new org.wso2.carbon
-                        .identity.api.server.idp.v1.model.ClaimMapping();
+        if (claimConfig != null) {
+            if (claimConfig.getClaimMappings() != null) {
+                for (ClaimMapping mapping : claimConfig.getClaimMappings()) {
+                    org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping apiMapping = new org.wso2.carbon
+                            .identity.api.server.idp.v1.model.ClaimMapping();
 
-                Claim localClaim = new Claim();
-                localClaim.setId(base64URLEncode(mapping.getLocalClaim().getClaimUri()));
-                localClaim.setUri(mapping.getLocalClaim().getClaimUri());
-                localClaim.setDisplayName(getDisplayNameOfLocalClaim(mapping.getLocalClaim().getClaimUri()));
-                apiMapping.setLocalClaim(localClaim);
-                // As the provisioning claims are added as claim mappings without any remote claim internally, we
-                // need to validate this here.
-                if (StringUtils.isNotBlank(mapping.getRemoteClaim().getClaimUri())) {
-                    apiMapping.setIdpClaim(mapping.getRemoteClaim().getClaimUri());
-                    apiMappings.add(apiMapping);
-                }
-
-                if (StringUtils.isNotBlank(mapping.getDefaultValue()) && mapping.isRequested()) {
-                    ProvisioningClaim provClaimResponse = new ProvisioningClaim();
-                    Claim provClaim = new Claim();
+                    Claim localClaim = new Claim();
+                    localClaim.setId(base64URLEncode(mapping.getLocalClaim().getClaimUri()));
+                    localClaim.setUri(mapping.getLocalClaim().getClaimUri());
+                    localClaim.setDisplayName(getDisplayNameOfLocalClaim(mapping.getLocalClaim().getClaimUri()));
+                    apiMapping.setLocalClaim(localClaim);
+                    // As the provisioning claims are added as claim mappings without any remote claim internally, we
+                    // need to validate this here.
                     if (StringUtils.isNotBlank(mapping.getRemoteClaim().getClaimUri())) {
-                        provClaim.setUri(mapping.getRemoteClaim().getClaimUri());
-                    } else {
-                        provClaim.setId(base64URLEncode(mapping.getLocalClaim().getClaimUri()));
-                        provClaim.setUri(mapping.getLocalClaim().getClaimUri());
-                        provClaim.setDisplayName(getDisplayNameOfLocalClaim(mapping.getLocalClaim().getClaimUri()));
+                        apiMapping.setIdpClaim(mapping.getRemoteClaim().getClaimUri());
+                        apiMappings.add(apiMapping);
                     }
-                    provClaimResponse.setClaim(provClaim);
-                    provClaimResponse.setDefaultValue(mapping.getDefaultValue());
-                    provClaims.add(provClaimResponse);
+
+                    if (StringUtils.isNotBlank(mapping.getDefaultValue()) && mapping.isRequested()) {
+                        ProvisioningClaim provClaimResponse = new ProvisioningClaim();
+                        Claim provClaim = new Claim();
+                        if (StringUtils.isNotBlank(mapping.getRemoteClaim().getClaimUri())) {
+                            provClaim.setUri(mapping.getRemoteClaim().getClaimUri());
+                        } else {
+                            provClaim.setId(base64URLEncode(mapping.getLocalClaim().getClaimUri()));
+                            provClaim.setUri(mapping.getLocalClaim().getClaimUri());
+                            provClaim.setDisplayName(getDisplayNameOfLocalClaim(mapping.getLocalClaim().getClaimUri()));
+                        }
+                        provClaimResponse.setClaim(provClaim);
+                        provClaimResponse.setDefaultValue(mapping.getDefaultValue());
+                        provClaims.add(provClaimResponse);
+                    }
                 }
             }
-        }
 
-        Claim roleClaim = new Claim();
-        if (getLocalClaim(claimConfig.getRoleClaimURI()) != null) {
-            roleClaim.setId(base64URLEncode(claimConfig.getRoleClaimURI()));
-            roleClaim.setDisplayName(getDisplayNameOfLocalClaim(claimConfig.getRoleClaimURI()));
-        }
-        roleClaim.setUri(claimConfig.getRoleClaimURI());
-        apiClaims.setRoleClaim(roleClaim);
+            Claim roleClaim = new Claim();
+            if (getLocalClaim(claimConfig.getRoleClaimURI()) != null) {
+                roleClaim.setId(base64URLEncode(claimConfig.getRoleClaimURI()));
+                roleClaim.setDisplayName(getDisplayNameOfLocalClaim(claimConfig.getRoleClaimURI()));
+            }
+            roleClaim.setUri(claimConfig.getRoleClaimURI());
+            apiClaims.setRoleClaim(roleClaim);
 
-        Claim userIdClaim = new Claim();
-        if (getLocalClaim(claimConfig.getUserClaimURI()) != null) {
-            userIdClaim.setId(base64URLEncode(claimConfig.getUserClaimURI()));
-            userIdClaim.setDisplayName(getDisplayNameOfLocalClaim(claimConfig.getUserClaimURI()));
+            Claim userIdClaim = new Claim();
+            if (getLocalClaim(claimConfig.getUserClaimURI()) != null) {
+                userIdClaim.setId(base64URLEncode(claimConfig.getUserClaimURI()));
+                userIdClaim.setDisplayName(getDisplayNameOfLocalClaim(claimConfig.getUserClaimURI()));
+            }
+            userIdClaim.setUri(claimConfig.getUserClaimURI());
+            apiClaims.setUserIdClaim(userIdClaim);
         }
-        userIdClaim.setUri(claimConfig.getUserClaimURI());
-        apiClaims.setUserIdClaim(userIdClaim);
 
         apiClaims.setMappings(apiMappings);
         apiClaims.setProvisioningClaims(provClaims);
@@ -1356,18 +1406,21 @@ public class ServerIdpManagementService {
 
         List<org.wso2.carbon.identity.api.server.idp.v1.model.RoleMapping> apiRoleMappings = new ArrayList<>();
 
-        if (permissionsAndRoleConfig.getRoleMappings() != null) {
-            for (RoleMapping roleMapping : permissionsAndRoleConfig.getRoleMappings()) {
-                org.wso2.carbon.identity.api.server.idp.v1.model.RoleMapping apiRoleMapping = new org.wso2.carbon
-                        .identity.api.server.idp.v1.model.RoleMapping();
-                apiRoleMapping.setIdpRole(roleMapping.getRemoteRole());
-                apiRoleMapping.setLocalRole(IdentityUtil.addDomainToName(roleMapping
-                        .getLocalRole().getLocalRoleName(), roleMapping.getLocalRole().getUserStoreId()));
-                apiRoleMappings.add(apiRoleMapping);
+        if (permissionsAndRoleConfig != null) {
+            if (permissionsAndRoleConfig.getRoleMappings() != null) {
+                for (RoleMapping roleMapping : permissionsAndRoleConfig.getRoleMappings()) {
+                    org.wso2.carbon.identity.api.server.idp.v1.model.RoleMapping apiRoleMapping = new org.wso2.carbon
+                            .identity.api.server.idp.v1.model.RoleMapping();
+                    apiRoleMapping.setIdpRole(roleMapping.getRemoteRole());
+                    apiRoleMapping.setLocalRole(IdentityUtil.addDomainToName(roleMapping
+                            .getLocalRole().getLocalRoleName(), roleMapping.getLocalRole().getUserStoreId()));
+                    apiRoleMappings.add(apiRoleMapping);
+                }
             }
         }
-        String provRoles = identityProvider.getProvisioningRole();
         roleConfig.setMappings(apiRoleMappings);
+
+        String provRoles = identityProvider.getProvisioningRole();
         if (StringUtils.isNotBlank(provRoles)) {
             roleConfig.setOutboundProvisioningRoles(Arrays.asList(provRoles.split(",")));
         }
@@ -1403,17 +1456,19 @@ public class ServerIdpManagementService {
         provisioningResponse.setJit(createJITResponse(idp));
         ProvisioningConnectorConfig[] connectorConfigs = idp.getProvisioningConnectorConfigs();
         List<OutboundConnectorListItem> connectors = new ArrayList<>();
-        for (ProvisioningConnectorConfig connectorConfig : connectorConfigs) {
-            OutboundConnectorListItem connectorListItem = new OutboundConnectorListItem();
-            connectorListItem.setConnectorId(base64URLEncode(connectorConfig.getName()));
-            connectorListItem.setName(connectorConfig.getName());
-            connectorListItem.setIsEnabled(connectorConfig.isEnabled());
-            connectorListItem.setSelf(
-                    ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT +
-                                    "/%s/provisioning/outbound-connectors/%s", idp.getResourceId(),
-                            base64URLEncode(connectorConfig.getName())))
-                            .toString());
-            connectors.add(connectorListItem);
+        if (connectorConfigs != null) {
+            for (ProvisioningConnectorConfig connectorConfig : connectorConfigs) {
+                OutboundConnectorListItem connectorListItem = new OutboundConnectorListItem();
+                connectorListItem.setConnectorId(base64URLEncode(connectorConfig.getName()));
+                connectorListItem.setName(connectorConfig.getName());
+                connectorListItem.setIsEnabled(connectorConfig.isEnabled());
+                connectorListItem.setSelf(
+                        ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT +
+                                        "/%s/provisioning/outbound-connectors/%s", idp.getResourceId(),
+                                base64URLEncode(connectorConfig.getName())))
+                                .toString());
+                connectors.add(connectorListItem);
+            }
         }
         OutboundConnectorListResponse outboundConnectorListResponse = new OutboundConnectorListResponse();
         outboundConnectorListResponse.setDefaultConnectorId(idp.getDefaultProvisioningConnectorConfig() != null ?
@@ -1426,22 +1481,24 @@ public class ServerIdpManagementService {
     private JustInTimeProvisioning createJITResponse(IdentityProvider idp) {
 
         JustInTimeProvisioning jitConfig = new JustInTimeProvisioning();
-        jitConfig.setIsEnabled(idp.getJustInTimeProvisioningConfig().isProvisioningEnabled());
+        if (idp.getJustInTimeProvisioningConfig() != null) {
+            jitConfig.setIsEnabled(idp.getJustInTimeProvisioningConfig().isProvisioningEnabled());
 
-        if (idp.getJustInTimeProvisioningConfig().isProvisioningEnabled()) {
-            boolean modifyUsername = idp.getJustInTimeProvisioningConfig().isModifyUserNameAllowed();
-            boolean passwordProvision = idp.getJustInTimeProvisioningConfig().isPasswordProvisioningEnabled();
-            boolean promptConsent = idp.getJustInTimeProvisioningConfig().isPromptConsent();
-            if (modifyUsername && passwordProvision && promptConsent) {
-                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_USERNAME_PASSWORD_CONSENT);
-            } else if (passwordProvision && promptConsent) {
-                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_PASSWORD_CONSENT);
-            } else if (promptConsent) {
-                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_CONSENT);
-            } else {
-                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROVISION_SILENTLY);
+            if (idp.getJustInTimeProvisioningConfig().isProvisioningEnabled()) {
+                boolean modifyUsername = idp.getJustInTimeProvisioningConfig().isModifyUserNameAllowed();
+                boolean passwordProvision = idp.getJustInTimeProvisioningConfig().isPasswordProvisioningEnabled();
+                boolean promptConsent = idp.getJustInTimeProvisioningConfig().isPromptConsent();
+                if (modifyUsername && passwordProvision && promptConsent) {
+                    jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_USERNAME_PASSWORD_CONSENT);
+                } else if (passwordProvision && promptConsent) {
+                    jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_PASSWORD_CONSENT);
+                } else if (promptConsent) {
+                    jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_CONSENT);
+                } else {
+                    jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROVISION_SILENTLY);
+                }
+                jitConfig.setUserstore(idp.getJustInTimeProvisioningConfig().getProvisioningUserStore());
             }
-            jitConfig.setUserstore(idp.getJustInTimeProvisioningConfig().getProvisioningUserStore());
         }
         return jitConfig;
     }
@@ -1968,10 +2025,10 @@ public class ServerIdpManagementService {
                         case Constants.HOME_REALM_PATH:
                             idpToUpdate.setHomeRealmId(value);
                             break;
-                        case Constants.ALIAS:
+                        case Constants.ALIAS_PATH:
                             idpToUpdate.setAlias(value);
                             break;
-                        case Constants.CERTIFICATE_JWKSURI:
+                        case Constants.CERTIFICATE_JWKSURI_PATH:
                             List<IdentityProviderProperty> idpProperties = new ArrayList<>();
                             IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
                             jwksProperty.setName(Constants.JWKS_URI);
@@ -2084,25 +2141,5 @@ public class ServerIdpManagementService {
             message = error.getDescription();
         }
         return message;
-    }
-
-    /**
-     * Return Not Implemented error response for IDP List attributes which are not yet supported by the server.
-     *
-     * @param attributes Attributes query param.
-     */
-    private void handleNotImplementedCapabilities(String attributes) {
-
-        Constants.ErrorMessage errorEnum = null;
-
-        if (attributes != null) {
-            errorEnum = Constants.ErrorMessage.ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
-        }
-
-        if (errorEnum != null) {
-            ErrorResponse errorResponse = getErrorBuilder(errorEnum, null).build(log, errorEnum.getDescription());
-            Response.Status status = Response.Status.NOT_IMPLEMENTED;
-            throw new APIError(status, errorResponse);
-        }
     }
 }
