@@ -1220,7 +1220,7 @@ public class ServerIdpManagementService {
                     case Constants.CERTIFICATE:
                         identityProviderListItem.setCertificate(createIDPCertificate(idp));
                         break;
-                    case Constants.ALIAS:
+                    case Constants.ALIAS_PATH:
                         identityProviderListItem.setAlias(idp.getAlias());
                         break;
                     case Constants.CLAIMS:
@@ -2025,10 +2025,10 @@ public class ServerIdpManagementService {
                         case Constants.HOME_REALM_PATH:
                             idpToUpdate.setHomeRealmId(value);
                             break;
-                        case Constants.ALIAS:
+                        case Constants.ALIAS_PATH:
                             idpToUpdate.setAlias(value);
                             break;
-                        case Constants.CERTIFICATE_JWKSURI:
+                        case Constants.CERTIFICATE_JWKSURI_PATH:
                             List<IdentityProviderProperty> idpProperties = new ArrayList<>();
                             IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
                             jwksProperty.setName(Constants.JWKS_URI);
