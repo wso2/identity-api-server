@@ -63,6 +63,7 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.common.Constants.REGEX_COMMA;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 
 /**
@@ -452,7 +453,7 @@ public class ServerUserStoreService {
                     base64URLEncodeId(jsonObject.getDomainId()))).toString());
 
             if (StringUtils.isNotBlank(requiredAttributes)) {
-                String[] requiredAttributesArray = requiredAttributes.split(",");
+                String[] requiredAttributesArray = requiredAttributes.split(REGEX_COMMA);
                 addUserstoreProperties(jsonObject, userStoreList, Arrays.asList(requiredAttributesArray));
             }
             userStoreListResponseToAdd.add(userStoreList);
