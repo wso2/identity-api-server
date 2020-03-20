@@ -22,10 +22,13 @@
           class="org.wso2.carbon.identity.api.server.idp.common.factory.IdPMgtOSGIServiceFactory"/>
     <bean id="claimMetadataServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.idp.common.factory.ClaimMetadataMgtOSGIServiceFactory"/>
+    <bean id="templateManagerServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.idp.common.factory.TemplateMgtOSGIServiceFactory"/>
     <bean id="identityProviderServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.idp.common.IdentityProviderServiceHolder">
         <property name="identityProviderManager" ref="identityProviderServiceFactoryBean"/>
         <property name="claimMetadataManagementService" ref="claimMetadataServiceFactoryBean"/>
+        <property name="templateManager" ref="templateManagerServiceFactoryBean"/>
     </bean>
 
 </beans>
