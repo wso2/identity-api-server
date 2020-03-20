@@ -20,6 +20,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.*;
 import org.wso2.carbon.identity.api.server.idp.v1.model.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Error;
@@ -60,7 +61,7 @@ public interface IdentityProvidersApiService {
 
       public Response getIDP(String identityProviderId);
 
-      public Response getIDPs(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String attributes);
+      public Response getIDPs(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String requiredAttributes);
 
       public Response getJITConfig(String identityProviderId);
 

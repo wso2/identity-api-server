@@ -693,7 +693,12 @@ public class ServerClaimManagementService {
             claimProperties.put(PROP_REG_EX, localClaimReqDTO.getRegEx());
         }
 
-        claimProperties.put(PROP_DISPLAY_ORDER, String.valueOf(localClaimReqDTO.getDisplayOrder()));
+        if (localClaimReqDTO.getDisplayOrder() != null) {
+            claimProperties.put(PROP_DISPLAY_ORDER, String.valueOf(localClaimReqDTO.getDisplayOrder()));
+        } else {
+            claimProperties.put(PROP_DISPLAY_ORDER, "0");
+        }
+
         claimProperties.put(PROP_READ_ONLY, String.valueOf(localClaimReqDTO.getReadOnly()));
         claimProperties.put(PROP_REQUIRED, String.valueOf(localClaimReqDTO.getRequired()));
         claimProperties.put(PROP_SUPPORTED_BY_DEFAULT, String.valueOf(localClaimReqDTO.getSupportedByDefault()));

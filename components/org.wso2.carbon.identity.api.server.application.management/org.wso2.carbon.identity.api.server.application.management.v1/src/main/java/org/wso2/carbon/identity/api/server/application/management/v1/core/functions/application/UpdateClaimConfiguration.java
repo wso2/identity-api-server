@@ -44,18 +44,22 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
     public void apply(ServiceProvider application, ClaimConfiguration claimApiModel) {
 
         if (claimApiModel != null) {
-            ClaimConfig claimConfigs = getClaimConfig(application);
-            if (claimApiModel.getDialect() == ClaimConfiguration.DialectEnum.LOCAL) {
-                claimConfigs.setLocalClaimDialect(true);
-            }
+            ClaimConfig applicationClaimConfiguration = getClaimConfig(application);
 
+            // Check if dialect is local or a custom one.
+            applicationClaimConfiguration.setLocalClaimDialect(isLocalDialect(claimApiModel.getDialect()));
             // Requested claims / Claim mappings.
-            claimConfigs.setClaimMappings(getClaimMappings(claimApiModel));
+            applicationClaimConfiguration.setClaimMappings(getClaimMappings(claimApiModel));
             // Role claim.
             updateRoleClaimConfigs(claimApiModel.getRole(), application);
             // Subject claim.
             updateSubjectClaimConfigs(claimApiModel.getSubject(), application);
         }
+    }
+
+    private boolean isLocalDialect(ClaimConfiguration.DialectEnum dialect) {
+
+        return dialect == null || dialect == ClaimConfiguration.DialectEnum.LOCAL;
     }
 
     private ClaimConfig getClaimConfig(ServiceProvider application) {
@@ -66,27 +70,30 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
         return application.getClaimConfig();
     }
 
-    private ClaimMapping[] getClaimMappings(ClaimConfiguration claimConfig) {
+    private ClaimMapping[] getClaimMappings(ClaimConfiguration claimConfigApiModel) {
 
-        if (claimConfig.getClaimMappings() == null) {
-            return Optional.ofNullable(claimConfig.getRequestedClaims())
+        if (claimConfigApiModel.getClaimMappings() == null) {
+            // No application level claim mappings. So simply mark requested claims if any.
+            return Optional.ofNullable(claimConfigApiModel.getRequestedClaims())
                     .map(requestedClaims ->
                             requestedClaims.stream()
                                     .map(this::buildRequestClaimMapping).toArray(ClaimMapping[]::new))
                     .orElse(new ClaimMapping[0]);
 
         } else {
-
-            Map<String, ClaimMapping> claimMappings = claimConfig.getClaimMappings().stream()
+            // Application claim mappings defined. First build a map of application claim URI -> claim mapping.
+            Map<String, ClaimMapping> claimMappings = claimConfigApiModel.getClaimMappings().stream()
                     .collect(Collectors.toMap(ClaimMappings::getApplicationClaim, this::buildClaimMapping));
 
             // Set the request/mandatory claims from the defined claim mappings.
-            Optional.ofNullable(claimConfig.getRequestedClaims())
-                    .ifPresent(requestClaims -> {
-                                requestClaims.forEach(requestedClaim -> {
+            Optional.ofNullable(claimConfigApiModel.getRequestedClaims())
+                    .ifPresent(requestedClaims -> {
+                                requestedClaims.forEach(requestedClaim -> {
+                                    // Check if claim mapping defined for requested claim.
                                     ClaimMapping claimMapping = claimMappings.get(getClaimUri(requestedClaim));
                                     if (claimMapping != null) {
                                         claimMapping.setRequested(true);
+                                        // Mark claim as mandatory if the flag is set.
                                         setIfNotNull(requestedClaim.getMandatory(), claimMapping::setMandatory);
                                     }
                                 });
@@ -115,21 +122,24 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
 
     private ClaimMapping buildClaimMapping(ClaimMappings mapping) {
 
-        return ClaimMapping.build(mapping.getApplicationClaim(), mapping.getLocalClaim().getUri(), null, false);
+        return ClaimMapping.build(mapping.getLocalClaim().getUri(), mapping.getApplicationClaim(), null, false);
     }
 
-    private void updateSubjectClaimConfigs(SubjectConfig subject, ServiceProvider application) {
+    private void updateSubjectClaimConfigs(SubjectConfig subjectApiModel, ServiceProvider application) {
 
-        if (subject != null) {
-            ClaimConfig claimConfig = getClaimConfig(application);
-            if (subject.getClaim() != null) {
-                setIfNotNull(subject.getClaim().getUri(), claimConfig::setUserClaimURI);
-            }
-            setIfNotNull(subject.getUseMappedLocalSubject(), claimConfig::setAlwaysSendMappedLocalSubjectId);
+        if (subjectApiModel != null) {
 
             LocalAndOutboundAuthenticationConfig authConfig = getLocalAndOutboundConfig(application);
-            setIfNotNull(subject.getIncludeTenantDomain(), authConfig::setUseTenantDomainInLocalSubjectIdentifier);
-            setIfNotNull(subject.getIncludeUserDomain(), authConfig::setUseUserstoreDomainInLocalSubjectIdentifier);
+            if (subjectApiModel.getClaim() != null) {
+                setIfNotNull(subjectApiModel.getClaim().getUri(), authConfig::setSubjectClaimUri);
+            }
+            setIfNotNull(subjectApiModel.getIncludeTenantDomain(),
+                    authConfig::setUseTenantDomainInLocalSubjectIdentifier);
+            setIfNotNull(subjectApiModel.getIncludeUserDomain(),
+                    authConfig::setUseUserstoreDomainInLocalSubjectIdentifier);
+
+            ClaimConfig claimConfig = getClaimConfig(application);
+            setIfNotNull(subjectApiModel.getUseMappedLocalSubject(), claimConfig::setAlwaysSendMappedLocalSubjectId);
         }
     }
 

@@ -100,9 +100,9 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
 
     @Override
     public Response getIDPs(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
-                            String attributes) {
+                            String requiredAttributes) {
 
-        return Response.ok().entity(idpManagementService.getIDPs(attributes, limit, offset, filter, sortBy,
+        return Response.ok().entity(idpManagementService.getIDPs(requiredAttributes, limit, offset, filter, sortBy,
                 sortOrder)).build();
     }
 

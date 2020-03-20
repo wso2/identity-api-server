@@ -258,9 +258,10 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             subjectConfig.includeTenantDomain(localAndOutboundAuthConfig.isUseTenantDomainInLocalSubjectIdentifier());
             subjectConfig.includeUserDomain(localAndOutboundAuthConfig.isUseUserstoreDomainInLocalSubjectIdentifier());
 
-            if (StringUtils.isBlank(localAndOutboundAuthConfig.getSubjectClaimUri())
-                    && isLocalClaimDialectUsedBySp(application)) {
-                subjectConfig.claim(buildClaimModel(FrameworkConstants.USERNAME_CLAIM));
+            if (StringUtils.isBlank(localAndOutboundAuthConfig.getSubjectClaimUri())) {
+                if (isLocalClaimDialectUsedBySp(application)) {
+                    subjectConfig.claim(buildClaimModel(FrameworkConstants.USERNAME_CLAIM));
+                }
             } else {
                 subjectConfig.claim(buildClaimModel(localAndOutboundAuthConfig.getSubjectClaimUri()));
             }
@@ -290,10 +291,13 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         if (application.getClaimConfig() != null) {
             String roleClaimId = application.getClaimConfig().getRoleClaimURI();
 
-            if (StringUtils.isBlank(roleClaimId) && application.getClaimConfig().isLocalClaimDialect()) {
-                roleClaimId = FrameworkConstants.LOCAL_ROLE_CLAIM_URI;
+            if (StringUtils.isBlank(roleClaimId)) {
+                if (application.getClaimConfig().isLocalClaimDialect()) {
+                    roleConfig.claim(buildClaimModel(FrameworkConstants.LOCAL_ROLE_CLAIM_URI));
+                }
+            } else {
+                roleConfig.claim(buildClaimModel(roleClaimId));
             }
-            roleConfig.claim(buildClaimModel(roleClaimId));
         }
 
         if (application.getLocalAndOutBoundAuthenticationConfig() != null) {
