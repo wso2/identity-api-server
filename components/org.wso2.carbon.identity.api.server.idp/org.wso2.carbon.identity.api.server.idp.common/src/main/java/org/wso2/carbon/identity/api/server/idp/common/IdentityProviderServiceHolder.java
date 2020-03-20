@@ -81,7 +81,7 @@ public class IdentityProviderServiceHolder {
     }
 
     /**
-     * Get TemplateManager osgi service
+     * Get TemplateManager osgi service.
      *
      * @return TemplateManager
      */

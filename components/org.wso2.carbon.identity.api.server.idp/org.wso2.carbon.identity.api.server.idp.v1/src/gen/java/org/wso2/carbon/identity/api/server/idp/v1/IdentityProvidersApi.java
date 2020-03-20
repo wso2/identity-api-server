@@ -30,6 +30,8 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPU
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplate;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplateListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.idp.v1.model.MetaFederatedAuthenticator;
@@ -84,6 +86,30 @@ public class IdentityProvidersApi  {
     }
 
     @Valid
+    @POST
+    @Path("/templates")
+    @Consumes({ "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml" })
+    @ApiOperation(value = "Create a new IDP template ", notes = "This API provides the capability to create a new IDP template. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Template management", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Successful response", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response addIDPTemplate(@ApiParam(value = "This represents the identity provider template to be created" ,required=true) @Valid IdentityProviderTemplate identityProviderTemplate) {
+
+        return delegate.addIDPTemplate(identityProviderTemplate );
+    }
+
+    @Valid
     @DELETE
     @Path("/{identity-provider-id}")
     
@@ -99,11 +125,36 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteIDP(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Enforce the forceful deletetion of either an identity provider, federated authenticator or an outbound provisioning connector eventhough it is being reffered by a service provider ", defaultValue="false") @DefaultValue("false")  @QueryParam("force") Boolean force) {
 
         return delegate.deleteIDP(identityProviderId,  force );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/templates/{template-id}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete a IDP template using the template Id. ", notes = "This API provides the capability to delete a IDP template using the template Id. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Template management", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteIDPTemplate(@ApiParam(value = "Id of the IDP template",required=true) @PathParam("template-id") String templateId) {
+
+        return delegate.deleteIDPTemplate(templateId );
     }
 
     @Valid
@@ -224,6 +275,54 @@ public class IdentityProvidersApi  {
     public Response getIDP(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId) {
 
         return delegate.getIDP(identityProviderId );
+    }
+
+    @Valid
+    @GET
+    @Path("/templates/{template-id}")
+    
+    @Produces({ "application/json", "application/xml" })
+    @ApiOperation(value = "Retrieve identity provider template by id ", notes = "This API provides the capability to retrieve an indentity provider template using it's id. ", response = IdentityProviderTemplate.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Template management", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = IdentityProviderTemplate.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getIDPTemplate(@ApiParam(value = "Id of the IDP template",required=true) @PathParam("template-id") String templateId) {
+
+        return delegate.getIDPTemplate(templateId );
+    }
+
+    @Valid
+    @GET
+    @Path("/templates")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "List identity provider templates ", notes = "This API provides the list of available identity provider templates. ", response = IdentityProviderTemplateListResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Template management", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = IdentityProviderTemplateListResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getIDPTemplates(    @Valid@ApiParam(value = "Maximum number of records to return ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination ")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records. Supports 'sw', 'co', 'ew' and 'eq' operations and also complex queries with 'and' operations. E.g. /identity-providers?filter=name+sw+\"google\"+and+isEnabled+eq+\"true\" ")  @QueryParam("filter") String filter) {
+
+        return delegate.getIDPTemplates(limit,  offset,  filter );
     }
 
     @Valid
@@ -537,6 +636,31 @@ public class IdentityProvidersApi  {
     public Response updateFederatedAuthenticator(@ApiParam(value = "Id of the Identity Provider",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "Id of the federated authenticator",required=true) @PathParam("federated-authenticator-id") String federatedAuthenticatorId, @ApiParam(value = "This represents the federated authenticator to be updated" ,required=true) @Valid FederatedAuthenticatorPUTRequest federatedAuthenticatorPUTRequest) {
 
         return delegate.updateFederatedAuthenticator(identityProviderId,  federatedAuthenticatorId,  federatedAuthenticatorPUTRequest );
+    }
+
+    @Valid
+    @PUT
+    @Path("/templates/{template-id}")
+    @Consumes({ "application/json", "application/xml" })
+    @Produces({ "application/json", "application/xml",  })
+    @ApiOperation(value = "Update the IDP template of a given template id. ", notes = "This API provides the capability to update the IDP template of a given template id. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Template management", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully updated", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateIDPTemplate(@ApiParam(value = "Id of the IDP template",required=true) @PathParam("template-id") String templateId, @ApiParam(value = "This represents the identity provider template to be created" ,required=true) @Valid IdentityProviderTemplate identityProviderTemplate) {
+
+        return delegate.updateIDPTemplate(templateId,  identityProviderTemplate );
     }
 
     @Valid

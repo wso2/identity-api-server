@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1.core;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -43,6 +45,9 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListItem
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplate;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplateListItem;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplateListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Link;
 import org.wso2.carbon.identity.api.server.idp.v1.model.MetaFederatedAuthenticator;
@@ -75,13 +80,21 @@ import org.wso2.carbon.identity.application.common.model.SubProperty;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.template.mgt.TemplateManager;
+import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
+import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementClientException;
+import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementException;
+import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementServerException;
+import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
@@ -89,6 +102,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -99,6 +113,10 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPLATE_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_CATEGORY;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_DISPLAY_ORDER;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.TEMPLATE_MGT_ERROR_CODE_DELIMITER;
 
 /**
  * Call internal osgi services to perform server identity provider related operations.
@@ -485,7 +503,7 @@ public class ServerIdpManagementService {
     }
 
     /**
-     * Get outbound provisioning connectors of a specific Identity Provider
+     * Get outbound provisioning connectors of a specific Identity Provider.
      *
      * @param idpId Identity Provider resource ID.
      * @return OutboundConnectorListResponse.
@@ -808,7 +826,234 @@ public class ServerIdpManagementService {
         }
     }
 
-    // Private utility Methods.
+    /**
+     * Retrieve the list of IDP templates.
+     *
+     * @param limit      Items per page.
+     * @param offset     Offset.
+     * @param filter     Filter string. E.g. filter="name" sw "google" and "category" eq "DEFAULT"
+     * @return  List of identity templates.
+     */
+    public IdentityProviderTemplateListResponse getIDPTemplates(Integer limit, Integer offset, String filter) {
+
+        try {
+            TemplateManager templateManager = IdentityProviderServiceHolder.getTemplateManager();
+            List<Template> templateList = templateManager.listTemplates(
+                    TemplateMgtConstants.TemplateType.IDP_TEMPLATE.toString(), limit, offset);
+            return createIDPTemplateListResponse(templateList, offset, limit, filter);
+        } catch (TemplateManagementException e) {
+            throw handleTemplateMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDP_TEMPLATES, null);
+        }
+    }
+
+    /**
+     * Get an identity provider template identified by resource ID.
+     *
+     * @param templateId IDP template Id
+     * @return IdentityProviderTemplateResponse
+     */
+    public IdentityProviderTemplate getIDPTemplate(String templateId) {
+
+        try {
+            Template idpTemplate = IdentityProviderServiceHolder.getTemplateManager().getTemplateById(templateId);
+            return createIDPTemplateResponse(idpTemplate);
+        } catch (TemplateManagementException e) {
+            throw handleTemplateMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_TEMPLATE,
+                    templateId);
+        } catch (IOException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_TEMPLATE, templateId);
+        }
+    }
+
+    /**
+     * Update IDP template.
+     *
+     * @param identityProviderTemplate Updated IDP template
+     */
+    public void updateIDPTemplate(String templateId, IdentityProviderTemplate identityProviderTemplate) {
+
+        try {
+            Template idpTemplate = generateIDPTemplate(identityProviderTemplate);
+            IdentityProviderServiceHolder.getTemplateManager().updateTemplateById(templateId, idpTemplate);
+        } catch (TemplateManagementException e) {
+            throw handleTemplateMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_TEMPLATE,
+                    identityProviderTemplate.getId());
+        } catch (JsonProcessingException e) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_TEMPLATE, templateId);
+        }
+    }
+
+    /**
+     * Create a new IDP template.
+     *
+     * @param identityProviderTemplate identityProviderTemplatePOSTRequest
+     * @return IdentityProviderTemplateResponse
+     */
+    public String createIDPTemplate(IdentityProviderTemplate identityProviderTemplate) {
+
+        try {
+            TemplateManager templateManager = IdentityProviderServiceHolder.getTemplateManager();
+            Template idpTemplate = generateIDPTemplate(identityProviderTemplate);
+            return templateManager.addTemplate(idpTemplate);
+        } catch (TemplateManagementException e) {
+            throw handleTemplateMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP_TEMPLATE, null);
+        } catch (JsonProcessingException e) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP_TEMPLATE, null);
+        }
+    }
+
+    /**
+     * Delete a IDP template identified by resource Id.
+     *
+     * @param templateId Id of the IDP template
+     */
+    public void deleteIDPTemplate(String templateId) {
+
+        try {
+            TemplateManager templateManager = IdentityProviderServiceHolder.getTemplateManager();
+            templateManager.deleteTemplateById(templateId);
+        } catch (TemplateManagementException e) {
+            throw handleTemplateMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP_TEMPLATE,
+                    templateId);
+        }
+    }
+
+//  Private utility Methods.
+
+    private IdentityProviderTemplateListResponse createIDPTemplateListResponse(
+            List<Template> templateInfoList, Integer offset, Integer limit, String filter) {
+
+        IdentityProviderTemplateListResponse idpTemplateListResponse = new IdentityProviderTemplateListResponse();
+        if (!CollectionUtils.isEmpty(templateInfoList)) {
+            List<IdentityProviderTemplateListItem> idpTemplates = new ArrayList<>();
+            for (Template idpTemplate: templateInfoList) {
+                IdentityProviderTemplateListItem idpTemplateListItem = new IdentityProviderTemplateListItem();
+                idpTemplateListItem.setId(idpTemplate.getTemplateId());
+                idpTemplateListItem.setDescription(idpTemplate.getDescription());
+                idpTemplateListItem.setName(idpTemplate.getTemplateName());
+                idpTemplateListItem.setImage(idpTemplate.getImageUrl());
+                idpTemplateListItem.setSelf(
+                        ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT
+                                        + IDP_TEMPLATE_PATH_COMPONENT + "/%s",
+                                idpTemplate.getTemplateId())).toString());
+                if (idpTemplate.getPropertiesMap().containsKey(PROP_CATEGORY)) {
+                    if (idpTemplate.getPropertiesMap().get(PROP_CATEGORY) ==
+                            IdentityProviderTemplateListItem.CategoryEnum.CUSTOM.toString()) {
+                        idpTemplateListItem.setCategory(IdentityProviderTemplateListItem.CategoryEnum.CUSTOM);
+                    } else {
+                        idpTemplateListItem.setCategory(IdentityProviderTemplateListItem.CategoryEnum.DEFAULT);
+                    }
+                }
+                if (idpTemplate.getPropertiesMap().containsKey(PROP_DISPLAY_ORDER)) {
+                    idpTemplateListItem.setDisplayOrder(
+                            Integer.valueOf(idpTemplate.getPropertiesMap().get(PROP_DISPLAY_ORDER)));
+                }
+                idpTemplates.add(idpTemplateListItem);
+            }
+            idpTemplateListResponse.setTemplates(idpTemplates);
+            idpTemplateListResponse.setCount(idpTemplates.size());
+        } else {
+            idpTemplateListResponse.setCount(0);
+        }
+        limit = (limit == null) ? 0 : limit;
+        offset = (offset == null) ? 0 : offset;
+        idpTemplateListResponse.setTotalResults(templateInfoList.size());
+        idpTemplateListResponse.setStartIndex(offset + 1);
+        idpTemplateListResponse.setLinks(createLinks(V1_API_PATH_COMPONENT + IDP_TEMPLATE_PATH_COMPONENT,
+                limit, offset, templateInfoList.size(), filter));
+        return idpTemplateListResponse;
+    }
+
+    private IdentityProviderTemplate createIDPTemplateResponse(Template idpTemplate) throws IOException {
+
+        IdentityProviderTemplate idpTemplateResponse = new IdentityProviderTemplate();
+        idpTemplateResponse.setId(idpTemplate.getTemplateId());
+        idpTemplateResponse.setName(idpTemplate.getTemplateName());
+        idpTemplateResponse.setDescription(idpTemplate.getDescription());
+        idpTemplateResponse.setImage(idpTemplate.getImageUrl());
+        if (idpTemplate.getPropertiesMap().containsKey(PROP_CATEGORY)) {
+            if (idpTemplate.getPropertiesMap().get(PROP_CATEGORY) ==
+                    IdentityProviderTemplateListItem.CategoryEnum.CUSTOM.toString()) {
+                idpTemplateResponse.setCategory(IdentityProviderTemplate.CategoryEnum.CUSTOM);
+            } else {
+                idpTemplateResponse.setCategory(IdentityProviderTemplate.CategoryEnum.DEFAULT);
+            }
+        }
+        if (idpTemplate.getPropertiesMap().containsKey(PROP_DISPLAY_ORDER)) {
+            idpTemplateResponse.setDisplayOrder(
+                    Integer.valueOf(idpTemplate.getPropertiesMap().get(PROP_DISPLAY_ORDER)));
+        }
+        if (idpTemplate.getTemplateScript() != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            IdentityProviderPOSTRequest idp = mapper.readValue(idpTemplate.getTemplateScript(),
+                    IdentityProviderPOSTRequest.class);
+            idpTemplateResponse.setIdp(idp);
+        }
+        return idpTemplateResponse;
+    }
+
+    private Template generateIDPTemplate(IdentityProviderTemplate idpTemplate) throws JsonProcessingException {
+
+        Template identityProviderTemplate = new Template();
+
+        identityProviderTemplate.setTemplateName(idpTemplate.getName());
+        identityProviderTemplate.setDescription(idpTemplate.getDescription());
+        identityProviderTemplate.setImageUrl(idpTemplate.getImage());
+        identityProviderTemplate.setTenantId(IdentityTenantUtil
+                .getTenantId(ContextLoader.getTenantDomainFromContext()));
+        Map<String, String> properties = new HashMap<>();
+        if (idpTemplate.getCategory() != null) {
+            properties.put(PROP_CATEGORY, idpTemplate.getCategory().toString());
+        }
+        if (idpTemplate.getDisplayOrder() != null) {
+            properties.put(PROP_DISPLAY_ORDER, String.valueOf(idpTemplate.getDisplayOrder()));
+        }
+        identityProviderTemplate.setTemplateType(TemplateMgtConstants.TemplateType.IDP_TEMPLATE);
+        identityProviderTemplate.setPropertiesMap(properties);
+        identityProviderTemplate.setTemplateScript(createIDPTemplateScript(idpTemplate.getIdp()));
+        return identityProviderTemplate;
+    }
+
+    private APIError handleTemplateMgtException(TemplateManagementException e, Constants.ErrorMessage errorEnum,
+                                                String data) {
+
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
+
+        Response.Status status;
+
+        if (e instanceof TemplateManagementClientException) {
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode = errorCode.contains(TEMPLATE_MGT_ERROR_CODE_DELIMITER) ?
+                        errorCode : Constants.IDP_MANAGEMENT_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.BAD_REQUEST;
+        } else if (e instanceof TemplateManagementServerException) {
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode = errorCode.contains(TEMPLATE_MGT_ERROR_CODE_DELIMITER) ?
+                        errorCode : Constants.IDP_MANAGEMENT_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        } else {
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+
+        return new APIError(status, errorResponse);
+    }
+
+    private String createIDPTemplateScript(IdentityProviderPOSTRequest idpTemplate) throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(idpTemplate);
+    }
 
     private ConnectedApps createConnectedAppsResponse(String resourceId, ConnectedAppsResult connectedAppsResult) {
 
