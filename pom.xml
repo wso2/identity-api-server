@@ -387,6 +387,12 @@
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.configs.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -493,6 +499,7 @@
         <module>components/org.wso2.carbon.identity.api.server.idp</module>
         <module>components/org.wso2.carbon.identity.api.server.script.library</module>
         <module>components/org.wso2.carbon.identity.api.server.oidc.scope.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.configs</module>
     </modules>
 
 </project>
