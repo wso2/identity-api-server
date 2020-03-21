@@ -20,6 +20,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.AddUserStorePropertiesRes;
 import javax.validation.constraints.*;
 
 
@@ -34,6 +37,8 @@ public class UserStoreListResponse  {
     private String name;
     private String description;
     private String self;
+    private List<AddUserStorePropertiesRes> properties = null;
+
 
     /**
     * base64 url encoded value of domain name
@@ -110,7 +115,34 @@ public class UserStoreListResponse  {
         this.self = self;
     }
 
+    /**
+    * Requested configured user store property for the set
+    **/
+    public UserStoreListResponse properties(List<AddUserStorePropertiesRes> properties) {
 
+        this.properties = properties;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Requested configured user store property for the set")
+    @JsonProperty("properties")
+    @Valid
+    public List<AddUserStorePropertiesRes> getProperties() {
+        return properties;
+    }
+    public void setProperties(List<AddUserStorePropertiesRes> properties) {
+        this.properties = properties;
+    }
+
+    public UserStoreListResponse addPropertiesItem(AddUserStorePropertiesRes propertiesItem) {
+        if (this.properties == null) {
+            this.properties = new ArrayList<>();
+        }
+        this.properties.add(propertiesItem);
+        return this;
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -125,12 +157,13 @@ public class UserStoreListResponse  {
         return Objects.equals(this.id, userStoreListResponse.id) &&
             Objects.equals(this.name, userStoreListResponse.name) &&
             Objects.equals(this.description, userStoreListResponse.description) &&
-            Objects.equals(this.self, userStoreListResponse.self);
+            Objects.equals(this.self, userStoreListResponse.self) &&
+            Objects.equals(this.properties, userStoreListResponse.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, self);
+        return Objects.hash(id, name, description, self, properties);
     }
 
     @Override
@@ -143,6 +176,7 @@ public class UserStoreListResponse  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
+        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
     }

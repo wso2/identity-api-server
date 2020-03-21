@@ -72,6 +72,7 @@ paths:
         - $ref: '#/components/parameters/offsetQueryParam'
         - $ref: '#/components/parameters/filterQueryParam'
         - $ref: '#/components/parameters/sortQueryParam'
+        - $ref: '#/components/parameters/requiredAttributesQueryParam'
       responses:
         '200':
           description: Successful response.
@@ -368,6 +369,13 @@ components:
       description: Define the order how the retrieved records should be sorted.
       schema:
         type: string
+    requiredAttributesQueryParam:
+      in: query
+      name: requiredAttributes
+      required: false
+      description: Define set of user store attributes (as comma separated) to be returned.
+      schema:
+        type: string
   responses:
     NotFound:
       description: The specified resource is not found.
@@ -557,6 +565,11 @@ components:
           type: string
           example: /t/{tenant-domain}/api/server/v1/userstores/SkRCQy1TRUNPTkRBUlk
           description: Location of the created/updated resource.
+        properties:
+          type: array
+          description: Requested configured user store property for the set
+          items:
+            $ref: '#/components/schemas/AddUserStorePropertiesRes'
     MetaUserStoreType:
       type: object
       properties:
