@@ -47,7 +47,7 @@ public interface UserstoresApiService {
 
       public Response getUserStoreByDomainId(String userstoreDomainId);
 
-      public Response getUserStoreManagerProperties(String typeId, Integer limit, Integer offset, String filter, String sort);
+      public Response getUserStoreManagerProperties(String typeId);
 
       public Response patchUserStore(String userstoreDomainId, List<PatchDocument> patchDocument);
 

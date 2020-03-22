@@ -180,9 +180,9 @@ public class UserstoresApi  {
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response getUserStoreManagerProperties(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId,     @Valid@ApiParam(value = "maximum number of records to return")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records.")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted.")  @QueryParam("sort") String sort) {
+    public Response getUserStoreManagerProperties(@ApiParam(value = "Id of the user store type", required = true) @PathParam("type-id") String typeId) {
 
-        return delegate.getUserStoreManagerProperties(typeId,  limit,  offset,  filter,  sort );
+        return delegate.getUserStoreManagerProperties(typeId);
     }
 
     @Valid

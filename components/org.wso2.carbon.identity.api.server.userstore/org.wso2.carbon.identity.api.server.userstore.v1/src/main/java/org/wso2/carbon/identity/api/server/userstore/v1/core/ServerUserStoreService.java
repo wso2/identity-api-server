@@ -238,35 +238,24 @@ public class ServerUserStoreService {
     }
 
     /**
-     * Retrieve the meta of configured user store type.
+     * Retrieve the meta of user store type.
      *
      * @param typeId the user store type id.
-     * @param limit  items per page.
-     * @param offset to specify the offset param.
-     * @param filter to specify the filtering capabilities.
-     * @param sort   to specify the sorting order.
      * @return MetaUserStoreType.
      */
 
-    public List<MetaUserStoreType> getUserStoreManagerProperties(String typeId, Integer limit, Integer offset,
-                                                                 String filter, String sort) {
-
-        handleNotImplementedBehaviour(limit, offset, filter, sort);
+    public MetaUserStoreType getUserStoreManagerProperties(String typeId) {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
+        Set<String> classNames;
         try {
-            UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
-            if (userStoreDTOS.length == 0) {
-                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
+            classNames = userStoreConfigService.getAvailableUserStoreClasses();
+            if (classNames.contains(getUserStoreType(base64URLDecodeId(typeId)))) {
+                return buildUserStoreMetaResponse(typeId);
+            } else {
+                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.
+                        ERROR_CODE_NOT_FOUND);
             }
-            List<UserStoreDTO> userStoresByTypeNameList = new ArrayList<>();
-            for (UserStoreDTO userStoreDTO : userStoreDTOS) {
-                if (Objects.equals(getUserStoreType(base64URLDecodeId(typeId)), userStoreDTO.getClassName())) {
-                    userStoresByTypeNameList.add(userStoreDTO);
-                }
-            }
-            return buildUserStoreMetaResponse(userStoresByTypeNameList, typeId);
-
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_USER_STORE;
@@ -483,32 +472,26 @@ public class ServerUserStoreService {
     }
 
     /**
-     * Construct the configured user store type's meta.
+     * Construct the user store type's meta.
      *
-     * @param userStoreDTOS the list of {@link UserStoreDTO}.
      * @param typeId        the type id of the user store.
      * @return MetaUserStoreType.
      */
-    private List<MetaUserStoreType> buildUserStoreMetaResponse(List<UserStoreDTO> userStoreDTOS, String typeId) {
+    private MetaUserStoreType buildUserStoreMetaResponse(String typeId) {
 
-        List<MetaUserStoreType> metaUserStoreTypes = new ArrayList<>();
-        for (UserStoreDTO userStoreDTO : userStoreDTOS) {
-            Properties properties = UserStoreManagerRegistry.getUserStoreProperties(userStoreDTO.getClassName());
-            MetaUserStoreType metaUserStore = new MetaUserStoreType();
-            UserStorePropertiesRes userStorePropertiesRes = new UserStorePropertiesRes();
-            userStorePropertiesRes.mandatory(buildPropertiesRes(properties.getMandatoryProperties()));
-            userStorePropertiesRes.optional(buildPropertiesRes(properties.getOptionalProperties()));
-            userStorePropertiesRes.advanced(buildPropertiesRes(properties.getAdvancedProperties()));
-            metaUserStore.setProperties(userStorePropertiesRes);
-            metaUserStore.setTypeId(typeId);
-            metaUserStore.setName(userStoreDTO.getDomainId());
-            metaUserStore.setDescription(userStoreDTO.getDescription());
-            metaUserStore.setTypeName(base64URLDecodeId(typeId));
-            metaUserStore.setClassName(getUserStoreType(base64URLDecodeId(typeId)));
-            metaUserStoreTypes.add(metaUserStore);
+        Properties properties = UserStoreManagerRegistry.getUserStoreProperties(
+                getUserStoreType(base64URLDecodeId(typeId)));
+        MetaUserStoreType metaUserStore = new MetaUserStoreType();
+        UserStorePropertiesRes userStorePropertiesRes = new UserStorePropertiesRes();
+        userStorePropertiesRes.mandatory(buildPropertiesRes(properties.getMandatoryProperties()));
+        userStorePropertiesRes.optional(buildPropertiesRes(properties.getOptionalProperties()));
+        userStorePropertiesRes.advanced(buildPropertiesRes(properties.getAdvancedProperties()));
+        metaUserStore.setProperties(userStorePropertiesRes);
+        metaUserStore.setTypeId(typeId);
+        metaUserStore.setTypeName(base64URLDecodeId(typeId));
+        metaUserStore.setClassName(getUserStoreType(base64URLDecodeId(typeId)));
 
-        }
-        return metaUserStoreTypes;
+        return metaUserStore;
     }
 
     /**
