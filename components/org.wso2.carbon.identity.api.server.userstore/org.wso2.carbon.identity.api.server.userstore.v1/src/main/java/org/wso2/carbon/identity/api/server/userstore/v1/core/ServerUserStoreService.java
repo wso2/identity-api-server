@@ -250,7 +250,7 @@ public class ServerUserStoreService {
         Set<String> classNames;
         try {
             classNames = userStoreConfigService.getAvailableUserStoreClasses();
-            if (classNames.contains(getUserStoreType(base64URLDecodeId(typeId)))) {
+            if (!classNames.isEmpty() && classNames.contains(getUserStoreType(base64URLDecodeId(typeId)))) {
                 return buildUserStoreMetaResponse(typeId);
             } else {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.
