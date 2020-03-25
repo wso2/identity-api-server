@@ -160,7 +160,8 @@ public class ServerUserStoreService {
                 availableUserStoreClassesResDTO.setClassName(className);
                 availableUserStoreClassesResDTO.setTypeName(getUserStoreTypeName(className));
                 availableUserStoreClassesResDTO.setTypeId(typeId);
-                availableUserStoreClassesResDTO.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
+                availableUserStoreClassesResDTO.setSelf(
+                        ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
                         UserStoreConstants.USER_STORE_PATH_COMPONENT + "/meta/types/%s", typeId)).toString());
                 propertiesToAdd.add(availableUserStoreClassesResDTO);
             }
