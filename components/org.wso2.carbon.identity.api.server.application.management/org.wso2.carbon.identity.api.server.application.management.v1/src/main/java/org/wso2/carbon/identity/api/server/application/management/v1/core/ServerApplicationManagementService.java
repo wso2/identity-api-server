@@ -500,6 +500,12 @@ public class ServerApplicationManagementService {
         putInbound(applicationId, customInbound, CustomInboundFunctions::putCustomInbound);
     }
 
+    /**
+     * Create a new template object.
+     *
+     * @param applicationTemplateModel applicationTemplateModel from which the template is created.
+     * @return unique id of the newly created template.
+     */
     public String createApplicationTemplate(ApplicationTemplateModel applicationTemplateModel) {
 
         Template template = new ApplicationTemplateApiModelToTemplate().apply(applicationTemplateModel);
@@ -511,6 +517,13 @@ public class ServerApplicationManagementService {
         }
     }
 
+    /**
+     * List all the application templates of the tenant.
+     *
+     * @param limit  maximum number of items to be returned.
+     * @param offset number of records to skip for pagination.
+     * @return ApplicationTemplatesList containing the list of templates.
+     */
     public ApplicationTemplatesList listApplicationTemplates(Integer limit, Integer offset) {
 
         validatePaginationSupport(limit, offset);
@@ -528,6 +541,12 @@ public class ServerApplicationManagementService {
         }
     }
 
+    /**
+     * Retrieve the application template given the template id.
+     *
+     * @param templateId id of the template.
+     * @return ApplicationTemplateModel
+     */
     public ApplicationTemplateModel getApplicationTemplateById(String templateId) {
 
         try {
@@ -541,6 +560,11 @@ public class ServerApplicationManagementService {
         }
     }
 
+    /**
+     * Delete the application template given the template id.
+     *
+     * @param templateId id of the template.
+     */
     public void deleteApplicationTemplateById(String templateId) {
 
         try {
@@ -554,6 +578,12 @@ public class ServerApplicationManagementService {
         }
     }
 
+    /**
+     * Update the application template given the template id and the new ApplicationTemplateModel.
+     *
+     * @param templateId id of the template.
+     * @param model      template object to be replaced.
+     */
     public void updateApplicationTemplateById(String templateId, ApplicationTemplateModel model) {
 
         try {

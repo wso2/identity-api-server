@@ -48,7 +48,7 @@ public class TemplateToApplicationTemplateListItem implements Function<Template,
         listItem.setDescription(template.getDescription());
         listItem.setImage(template.getImageUrl());
 
-        if (!template.getPropertiesMap().isEmpty()) {
+        if (template.getPropertiesMap() != null) {
             template.getPropertiesMap().forEach((key, value) -> {
                 if (ApplicationManagementConstants.TemplateProperties.TYPES.equals(key) && StringUtils.isNotBlank
                         (value)) {
@@ -76,4 +76,3 @@ public class TemplateToApplicationTemplateListItem implements Function<Template,
                         APPLICATION_TEMPLATE_MANAGEMENT_PATH_COMPONENT + "/" + templateId).toString();
     }
 }
-    

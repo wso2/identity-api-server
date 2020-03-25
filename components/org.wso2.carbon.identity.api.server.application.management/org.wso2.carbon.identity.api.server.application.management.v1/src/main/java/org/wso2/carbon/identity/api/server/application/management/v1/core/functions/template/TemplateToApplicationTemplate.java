@@ -49,7 +49,7 @@ public class TemplateToApplicationTemplate implements Function<Template, Applica
             applicationTemplate.setApplication(createApplicationTemplate(template.getTemplateScript()));
         }
 
-        if (!template.getPropertiesMap().isEmpty()) {
+        if (template.getPropertiesMap() != null) {
             template.getPropertiesMap().forEach((key, value) -> {
                 if (ApplicationManagementConstants.TemplateProperties.TYPES.equals(key) && StringUtils.isNotBlank
                         (value)) {
