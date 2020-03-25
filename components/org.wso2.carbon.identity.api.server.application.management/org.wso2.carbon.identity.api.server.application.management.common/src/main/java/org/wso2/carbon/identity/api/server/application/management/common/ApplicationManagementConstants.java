@@ -32,6 +32,7 @@ public class ApplicationManagementConstants {
 
     private static final String APPLICATION_MANAGEMENT_PREFIX = "APP-";
     public static final String APPLICATION_MANAGEMENT_PATH_COMPONENT = "/applications";
+    public static final String APPLICATION_TEMPLATE_MANAGEMENT_PATH_COMPONENT = "/templates";
     public static final String INBOUND_PROTOCOLS_PATH_COMPONENT = "/inbound-protocols";
     public static final String INBOUND_PROTOCOL_OAUTH2_PATH_COMPONENT = "/oidc";
     public static final String INBOUND_PROTOCOL_SAML_PATH_COMPONENT = "/saml";
@@ -83,6 +84,12 @@ public class ApplicationManagementConstants {
         ATTRIBUTE_FILTERING_NOT_IMPLEMENTED("65003",
                 "Attribute filtering not supported.",
                 "Attribute filtering capability is not supported in this version of the API."),
+        PAGINATED_LISTING_NOT_IMPLEMENTED("65004",
+                "Paginated listing not supported.",
+                "Paginated listing capability is not supported in this version of the API."),
+        ERROR_RESOLVING_APPLICATION_TEMPLATE("65005",
+                "Error occurred while retrieving application template.",
+                "Unexpected error occurred while retrieving application template."),
 
         // Server errors defined at REST API layer.
         APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED("65501",
@@ -136,5 +143,20 @@ public class ApplicationManagementConstants {
     public static Map<String, String> getOAuthGrantTypeNames() {
 
         return OAUTH_GRANT_TYPE_NAMES;
+    }
+
+    /**
+     * This class contains the constant values related to the Application Template properties.
+     */
+    public static class TemplateProperties {
+
+        public static final String INBOUND_PROTOCOL = "protocol";
+        public static final String TYPES = "types";
+        public static final String CATEGORY = "category";
+        public static final String DISPLAY_ORDER = "display-order";
+
+        private TemplateProperties() {
+
+        }
     }
 }

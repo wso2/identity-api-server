@@ -29,6 +29,9 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
@@ -41,18 +44,35 @@ import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Config
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationBasicInfoToApiModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application
+        .ApiModelToServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application
+        .ApplicationBasicInfoToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application
+        .ServiceProviderToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundFunctions;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundFunctions;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundFunctions;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundFunctions;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundFunctions;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound
+        .InboundAuthConfigToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound
+        .PassiveSTSInboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound
+        .WSTrustInboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom
+        .CustomInboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound
+        .oauth2.OAuthInboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml
+        .SAMLInboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning
+        .BuildProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning
+        .UpdateProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.template
+        .ApplicationTemplateApiModelToTemplate;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.template
+        .TemplateToApplicationTemplate;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.template
+        .TemplateToApplicationTemplateListItem;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -68,6 +88,11 @@ import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.template.mgt.TemplateManager;
+import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
+import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementClientException;
+import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementException;
+import org.wso2.carbon.identity.template.mgt.model.Template;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -475,6 +500,74 @@ public class ServerApplicationManagementService {
         putInbound(applicationId, customInbound, CustomInboundFunctions::putCustomInbound);
     }
 
+    public String createApplicationTemplate(ApplicationTemplateModel applicationTemplateModel) {
+
+        Template template = new ApplicationTemplateApiModelToTemplate().apply(applicationTemplateModel);
+
+        try {
+            return getTemplateManager().addTemplate(template);
+        } catch (TemplateManagementException e) {
+            throw handleTemplateManagementException(e, "Error while adding the new application template.");
+        }
+    }
+
+    public ApplicationTemplatesList listApplicationTemplates(Integer limit, Integer offset) {
+
+        validatePaginationSupport(limit, offset);
+        try {
+            List<Template> templateList = getTemplateManager().listTemplates(TemplateMgtConstants.TemplateType
+                    .APPLICATION_TEMPLATE.toString(), null, null);
+            List<ApplicationTemplatesListItem> applicationTemplateList = templateList.stream().map(new
+                    TemplateToApplicationTemplateListItem()).collect(Collectors.toList());
+
+            ApplicationTemplatesList applicationTemplates = new ApplicationTemplatesList();
+            applicationTemplates.setTemplates(applicationTemplateList);
+            return applicationTemplates;
+        } catch (TemplateManagementException e) {
+            throw handleTemplateManagementException(e, "Error while listing application templates.");
+        }
+    }
+
+    public ApplicationTemplateModel getApplicationTemplateById(String templateId) {
+
+        try {
+            return new TemplateToApplicationTemplate().apply(getTemplateManager().getTemplateById(templateId));
+        } catch (TemplateManagementException e) {
+            if (TemplateMgtConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode().equals(e.getErrorCode())) {
+                throw handleTemplateNotFoundException(e);
+            }
+            String errorMessage = "Error while retrieving the application template with id " + templateId + ".";
+            throw handleTemplateManagementException(e, errorMessage);
+        }
+    }
+
+    public void deleteApplicationTemplateById(String templateId) {
+
+        try {
+            getTemplateManager().deleteTemplateById(templateId);
+        } catch (TemplateManagementException e) {
+            if (TemplateMgtConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode().equals(e.getErrorCode())) {
+                throw handleTemplateNotFoundException(e);
+            }
+            String errorMessage = "Error while deleting the application template with id " + templateId + ".";
+            throw handleTemplateManagementException(e, errorMessage);
+        }
+    }
+
+    public void updateApplicationTemplateById(String templateId, ApplicationTemplateModel model) {
+
+        try {
+            getTemplateManager().updateTemplateById(templateId,
+                    new ApplicationTemplateApiModelToTemplate().apply(model));
+        } catch (TemplateManagementException e) {
+            if (TemplateMgtConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode().equals(e.getErrorCode())) {
+                throw handleTemplateNotFoundException(e);
+            }
+            String errorMessage = "Error while updating the application template with id " + templateId + ".";
+            throw handleTemplateManagementException(e, errorMessage);
+        }
+    }
+
     private <T> T getInbound(String applicationId,
                              String inboundType,
                              Function<InboundAuthenticationRequestConfig, T> getInboundApiModelFunction) {
@@ -703,9 +796,22 @@ public class ServerApplicationManagementService {
         }
     }
 
+    private void validatePaginationSupport(Integer limit, Integer offset) {
+
+        if (limit != null || offset != null) {
+            ErrorMessage errorEnum = ErrorMessage.PAGINATED_LISTING_NOT_IMPLEMENTED;
+            throw Utils.buildNotImplementedError(errorEnum.getCode(), errorEnum.getDescription());
+        }
+    }
+
     private ApplicationManagementService getApplicationManagementService() {
 
         return ApplicationManagementServiceHolder.getApplicationManagementService();
+    }
+
+    private TemplateManager getTemplateManager() {
+
+        return ApplicationManagementServiceHolder.getTemplateManager();
     }
 
     private APIError handleIdentityApplicationManagementException(IdentityApplicationManagementException e,
@@ -730,6 +836,37 @@ public class ServerApplicationManagementService {
     }
 
     private String getErrorCode(IdentityApplicationManagementException e, String defaultErrorCode) {
+
+        return e.getErrorCode() != null ? e.getErrorCode() : defaultErrorCode;
+    }
+
+    private APIError handleTemplateManagementException(TemplateManagementException e, String msg) {
+
+        if (e instanceof TemplateManagementClientException) {
+            throw buildClientError(e, msg);
+        }
+        throw buildServerError(e, msg);
+    }
+
+    private APIError handleTemplateNotFoundException(TemplateManagementException e) {
+
+        String errorMessage = "Template not found";
+        return Utils.buildNotFoundError(e.getErrorCode(), errorMessage, e.getMessage());
+    }
+
+    private APIError buildServerError(TemplateManagementException e, String message) {
+
+        String errorCode = getErrorCode(e, UNEXPECTED_SERVER_ERROR.getCode());
+        return Utils.buildServerError(errorCode, message, e.getMessage(), e);
+    }
+
+    private APIError buildClientError(TemplateManagementException e, String message) {
+
+        String errorCode = getErrorCode(e, INVALID_REQUEST.getCode());
+        return Utils.buildClientError(errorCode, message, e.getMessage());
+    }
+
+    private String getErrorCode(TemplateManagementException e, String defaultErrorCode) {
 
         return e.getErrorCode() != null ? e.getErrorCode() : defaultErrorCode;
     }

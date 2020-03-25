@@ -156,4 +156,16 @@ public class Utils {
         Response.Status status = Response.Status.BAD_REQUEST;
         return new APIError(status, errorResponse);
     }
+
+    public static APIError buildNotFoundError(String errorCode, String message, String description) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorCode)
+                .withMessage(message)
+                .withDescription(description)
+                .build(log, description);
+
+        Response.Status status = Response.Status.NOT_FOUND;
+        return new APIError(status, errorResponse);
+    }
 }
