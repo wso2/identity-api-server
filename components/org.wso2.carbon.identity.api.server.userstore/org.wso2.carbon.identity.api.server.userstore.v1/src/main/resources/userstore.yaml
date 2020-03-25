@@ -268,19 +268,13 @@ paths:
           description: Id of the user store type
           schema:
             type: string
-        - $ref: '#/components/parameters/limitQueryParam'
-        - $ref: '#/components/parameters/offsetQueryParam'
-        - $ref: '#/components/parameters/filterQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
       responses:
         '200':
           description: Successful response.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MetaUserStoreType'
+                $ref: '#/components/schemas/MetaUserStoreType'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -573,10 +567,6 @@ components:
     MetaUserStoreType:
       type: object
       properties:
-        name:
-          type: string
-          example: JDBC-SECONDARY
-          description: domain name of the secondary user store
         typeName:
           type: string
           example: JDBCUserStoreManager
@@ -586,9 +576,6 @@ components:
         className:
           type: string
           example: org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager
-        description:
-          type: string
-          example: Some description of the user store
         properties:
           $ref: '#/components/schemas/UserStorePropertiesRes'
     UserStoreResponse:
@@ -629,6 +616,9 @@ components:
         className:
           type: string
           example: org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager
+        self:
+          type: string
+          example: /t/{tenant-domain}/api/server/v1/userstores/meta/types/SkRCQ1VzZXJTdG9yZU1hbmFnZXI
     UserStoreConfigurationsRes:
       type: object
       description: Available User Store Configurations Response.

@@ -76,11 +76,9 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     }
 
     @Override
-    public Response getUserStoreManagerProperties(String typeId, Integer limit, Integer offset, String filter,
-                                                  String sort) {
+    public Response getUserStoreManagerProperties(String typeId) {
 
-        return Response.ok().entity(serverUserStoreService.getUserStoreManagerProperties(typeId, limit, offset, filter,
-                sort)).build();
+        return Response.ok().entity(serverUserStoreService.getUserStoreManagerProperties(typeId)).build();
     }
 
     @Override
