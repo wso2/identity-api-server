@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.userstore.v1.core;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -52,6 +53,7 @@ import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +64,7 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.common.Constants.REGEX_COMMA;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 
 /**
@@ -152,10 +155,14 @@ public class ServerUserStoreService {
             List<AvailableUserStoreClassesRes> propertiesToAdd = new ArrayList<>();
             for (String className : classNames) {
                 AvailableUserStoreClassesRes availableUserStoreClassesResDTO = new AvailableUserStoreClassesRes();
+                String typeId = base64URLEncodeId(Objects.
+                        requireNonNull(getUserStoreTypeName(className)));
                 availableUserStoreClassesResDTO.setClassName(className);
                 availableUserStoreClassesResDTO.setTypeName(getUserStoreTypeName(className));
-                availableUserStoreClassesResDTO.setTypeId(base64URLEncodeId(Objects.
-                        requireNonNull(getUserStoreTypeName(className))));
+                availableUserStoreClassesResDTO.setTypeId(typeId);
+                availableUserStoreClassesResDTO.setSelf(
+                        ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
+                        UserStoreConstants.USER_STORE_PATH_COMPONENT + "/meta/types/%s", typeId)).toString());
                 propertiesToAdd.add(availableUserStoreClassesResDTO);
             }
             return propertiesToAdd;
@@ -175,7 +182,8 @@ public class ServerUserStoreService {
      * @param sort   to specify the sorting order.
      * @return List<UserStoreListResponse>.
      */
-    public List<UserStoreListResponse> getUserStoreList(Integer limit, Integer offset, String filter, String sort) {
+    public List<UserStoreListResponse> getUserStoreList(Integer limit, Integer offset, String filter, String sort,
+                                                        String requiredAttributes) {
 
         handleNotImplementedBehaviour(limit, offset, filter, sort);
 
@@ -185,7 +193,7 @@ public class ServerUserStoreService {
             if (userStoreDTOS.length == 0) {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
             }
-            return buildUserStoreListResponse(userStoreDTOS);
+            return buildUserStoreListResponse(userStoreDTOS, requiredAttributes);
 
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
@@ -235,35 +243,25 @@ public class ServerUserStoreService {
     }
 
     /**
-     * Retrieve the meta of configured user store type.
+     * Retrieve the meta of user store type.
      *
      * @param typeId the user store type id.
-     * @param limit  items per page.
-     * @param offset to specify the offset param.
-     * @param filter to specify the filtering capabilities.
-     * @param sort   to specify the sorting order.
      * @return MetaUserStoreType.
      */
 
-    public List<MetaUserStoreType> getUserStoreManagerProperties(String typeId, Integer limit, Integer offset,
-                                                                 String filter, String sort) {
-
-        handleNotImplementedBehaviour(limit, offset, filter, sort);
+    public MetaUserStoreType getUserStoreManagerProperties(String typeId) {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
+        Set<String> classNames;
         try {
-            UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
-            if (userStoreDTOS.length == 0) {
-                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
+            classNames = userStoreConfigService.getAvailableUserStoreClasses();
+            if (CollectionUtils.isNotEmpty(classNames) &&
+                    classNames.contains(getUserStoreType(base64URLDecodeId(typeId)))) {
+                return buildUserStoreMetaResponse(typeId);
+            } else {
+                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.
+                        ERROR_CODE_NOT_FOUND);
             }
-            List<UserStoreDTO> userStoresByTypeNameList = new ArrayList<>();
-            for (UserStoreDTO userStoreDTO : userStoreDTOS) {
-                if (Objects.equals(getUserStoreType(base64URLDecodeId(typeId)), userStoreDTO.getClassName())) {
-                    userStoresByTypeNameList.add(userStoreDTO);
-                }
-            }
-            return buildUserStoreMetaResponse(userStoresByTypeNameList, typeId);
-
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_USER_STORE;
@@ -436,7 +434,8 @@ public class ServerUserStoreService {
      * @param userStoreDTOS array of UserStoreDTO object.
      * @return List<UserStoreListResponse>.
      */
-    private List<UserStoreListResponse> buildUserStoreListResponse(UserStoreDTO[] userStoreDTOS) {
+    private List<UserStoreListResponse> buildUserStoreListResponse(UserStoreDTO[] userStoreDTOS,
+                                                                   String requiredAttributes) {
 
         List<UserStoreListResponse> userStoreListResponseToAdd = new ArrayList<>();
         for (UserStoreDTO jsonObject : userStoreDTOS) {
@@ -447,38 +446,61 @@ public class ServerUserStoreService {
             userStoreList.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
                             UserStoreConstants.USER_STORE_PATH_COMPONENT + "/%s",
                     base64URLEncodeId(jsonObject.getDomainId()))).toString());
+
+            if (StringUtils.isNotBlank(requiredAttributes)) {
+                String[] requiredAttributesArray = requiredAttributes.split(REGEX_COMMA);
+                addUserstoreProperties(jsonObject, userStoreList, Arrays.asList(requiredAttributesArray));
+            }
             userStoreListResponseToAdd.add(userStoreList);
         }
         return userStoreListResponseToAdd;
     }
 
     /**
-     * Construct the configured user store type's meta.
+     * Add requested user store properties to the response.
      *
-     * @param userStoreDTOS the list of {@link UserStoreDTO}.
+     * @param userStoreDTO            userStoreDTO object.
+     * @param userStoreListResponse   userStoreListResponse object.
+     * @param requestedAttributesList Requested user store properties name list.
+     */
+    private void addUserstoreProperties(UserStoreDTO userStoreDTO, UserStoreListResponse userStoreListResponse,
+                                        List<String> requestedAttributesList) {
+
+        for (PropertyDTO propertyDTO : userStoreDTO.getProperties()) {
+            if (requestedAttributesList.contains(propertyDTO.getName()) &&
+                    StringUtils.isNotBlank(propertyDTO.getValue())) {
+                AddUserStorePropertiesRes addUserStorePropertiesRes = new AddUserStorePropertiesRes();
+                addUserStorePropertiesRes.setName(propertyDTO.getName());
+                addUserStorePropertiesRes.setValue(propertyDTO.getValue());
+                userStoreListResponse.addPropertiesItem(addUserStorePropertiesRes);
+            }
+        }
+    }
+
+    /**
+     * Construct the user store type's meta.
+     *
      * @param typeId        the type id of the user store.
      * @return MetaUserStoreType.
      */
-    private List<MetaUserStoreType> buildUserStoreMetaResponse(List<UserStoreDTO> userStoreDTOS, String typeId) {
+    private MetaUserStoreType buildUserStoreMetaResponse(String typeId) {
 
-        List<MetaUserStoreType> metaUserStoreTypes = new ArrayList<>();
-        for (UserStoreDTO userStoreDTO : userStoreDTOS) {
-            Properties properties = UserStoreManagerRegistry.getUserStoreProperties(userStoreDTO.getClassName());
-            MetaUserStoreType metaUserStore = new MetaUserStoreType();
-            UserStorePropertiesRes userStorePropertiesRes = new UserStorePropertiesRes();
+        String typeName = base64URLDecodeId(typeId);
+        Properties properties = UserStoreManagerRegistry.getUserStoreProperties(
+                getUserStoreType(typeName));
+        MetaUserStoreType metaUserStore = new MetaUserStoreType();
+        UserStorePropertiesRes userStorePropertiesRes = new UserStorePropertiesRes();
+        if ((properties != null)) {
             userStorePropertiesRes.mandatory(buildPropertiesRes(properties.getMandatoryProperties()));
             userStorePropertiesRes.optional(buildPropertiesRes(properties.getOptionalProperties()));
             userStorePropertiesRes.advanced(buildPropertiesRes(properties.getAdvancedProperties()));
-            metaUserStore.setProperties(userStorePropertiesRes);
-            metaUserStore.setTypeId(typeId);
-            metaUserStore.setName(userStoreDTO.getDomainId());
-            metaUserStore.setDescription(userStoreDTO.getDescription());
-            metaUserStore.setTypeName(base64URLDecodeId(typeId));
-            metaUserStore.setClassName(getUserStoreType(base64URLDecodeId(typeId)));
-            metaUserStoreTypes.add(metaUserStore);
-
         }
-        return metaUserStoreTypes;
+        metaUserStore.setProperties(userStorePropertiesRes);
+        metaUserStore.setTypeId(typeId);
+        metaUserStore.setTypeName(typeName);
+        metaUserStore.setClassName(getUserStoreType(typeName));
+
+        return metaUserStore;
     }
 
     /**

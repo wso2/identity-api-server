@@ -33,7 +33,7 @@ paths:
         - $ref: '#/components/parameters/filterQueryParam'
         - $ref: '#/components/parameters/sortQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
-        - $ref: '#/components/parameters/attributesQueryParam'
+        - $ref: '#/components/parameters/requiredAttributesQueryParam'
       responses:
         '200':
           description: Successful Response
@@ -1251,13 +1251,12 @@ components:
         _This parameter is not supported yet_
       schema:
         type: string
-    attributesQueryParam:
+    requiredAttributesQueryParam:
       in: query
-      name: attributes
+      name: requiredAttributes
       required: false
       description: |
-        Specifies the required parameters in the response
-        _This parameter is not supported yet_
+        Specifies the required parameters in the response.
       schema:
         type: string
     forceQueryParam:
@@ -1530,6 +1529,28 @@ components:
         image:
           type: string
           example: "google-logo-url"
+        isPrimary:
+          type: boolean
+          example: false
+        isFederationHub:
+          type: boolean
+          example: false
+        homeRealmIdentifier:
+          type: string
+          example: localhost
+        certificate:
+          $ref: '#/components/schemas/Certificate'
+        alias:
+          type: string
+          example: 'https://localhost:9444/oauth2/token'
+        claims:
+          $ref: '#/components/schemas/Claims'
+        roles:
+          $ref: '#/components/schemas/Roles'
+        federatedAuthenticators:
+          $ref: '#/components/schemas/FederatedAuthenticatorListResponse'
+        provisioning:
+          $ref: '#/components/schemas/ProvisioningResponse'
         self:
           type: string
           example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000

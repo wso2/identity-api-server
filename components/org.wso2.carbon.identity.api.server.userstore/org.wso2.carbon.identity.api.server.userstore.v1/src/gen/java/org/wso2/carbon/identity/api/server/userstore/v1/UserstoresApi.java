@@ -17,6 +17,10 @@
 package org.wso2.carbon.identity.api.server.userstore.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStoreClassesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ConnectionEstablishedResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.Error;
@@ -59,7 +63,7 @@ public class UserstoresApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Successful response", response = UserStoreResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
         @ApiResponse(code = 409, message = "Element Already Exists.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
@@ -82,7 +86,7 @@ public class UserstoresApi  {
     }, tags={ "User Store", })
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "No Content.", response = Void.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
@@ -104,7 +108,7 @@ public class UserstoresApi  {
     }, tags={ "Meta", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response.", response = AvailableUserStoreClassesRes.class, responseContainer = "List"),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
     public Response getAvailableUserStoreTypes() {
@@ -125,14 +129,14 @@ public class UserstoresApi  {
     }, tags={ "User Store", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = UserStoreListResponse.class, responseContainer = "List"),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response getSecondaryUserStores(    @Valid@ApiParam(value = "maximum number of records to return")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records.")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted.")  @QueryParam("sort") String sort) {
+    public Response getSecondaryUserStores(    @Valid@ApiParam(value = "maximum number of records to return")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records.")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted.")  @QueryParam("sort") String sort,     @Valid@ApiParam(value = "Define set of user store attributes (as comma separated) to be returned.")  @QueryParam("requiredAttributes") String requiredAttributes) {
 
-        return delegate.getSecondaryUserStores(limit,  offset,  filter,  sort );
+        return delegate.getSecondaryUserStores(limit,  offset,  filter,  sort,  requiredAttributes );
     }
 
     @Valid
@@ -148,7 +152,7 @@ public class UserstoresApi  {
     }, tags={ "User Store", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = UserStoreConfigurationsRes.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
@@ -162,23 +166,23 @@ public class UserstoresApi  {
     @Path("/meta/types/{type-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the properties of secondary user store of a given user store type.", notes = "This API provides the capability to retrieve the properties of secondary user store of a given class name.   <b>Permission required:</b>  *_/permission/admin ", response = MetaUserStoreType.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve the properties of secondary user store of a given user store type.", notes = "This API provides the capability to retrieve the properties of secondary user store of a given class name.   <b>Permission required:</b>  *_/permission/admin ", response = MetaUserStoreType.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Meta", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response.", response = MetaUserStoreType.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "Successful response.", response = MetaUserStoreType.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response getUserStoreManagerProperties(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId,     @Valid@ApiParam(value = "maximum number of records to return")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records.")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted.")  @QueryParam("sort") String sort) {
+    public Response getUserStoreManagerProperties(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId) {
 
-        return delegate.getUserStoreManagerProperties(typeId,  limit,  offset,  filter,  sort );
+        return delegate.getUserStoreManagerProperties(typeId);
     }
 
     @Valid
@@ -195,7 +199,7 @@ public class UserstoresApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = UserStoreResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
@@ -219,7 +223,7 @@ public class UserstoresApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = ConnectionEstablishedResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
     public Response testRDBMSConnection(@ApiParam(value = "RDBMS connection properties used to connect to the datasource used by a JDBC user store manager." ) @Valid RDBMSConnectionReq rdBMSConnectionReq) {
@@ -241,7 +245,7 @@ public class UserstoresApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = UserStoreResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)

@@ -61,9 +61,12 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     }
 
     @Override
-    public Response getSecondaryUserStores(Integer limit, Integer offset, String filter, String sort) {
+    public Response getSecondaryUserStores(Integer limit, Integer offset, String filter, String sort,
+                                           String requiredAttributes) {
 
-        return Response.ok().entity(serverUserStoreService.getUserStoreList(limit, offset, filter, sort)).build();
+        return Response.ok()
+                .entity(serverUserStoreService.getUserStoreList(limit, offset, filter, sort, requiredAttributes))
+                .build();
     }
 
     @Override
@@ -73,11 +76,9 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     }
 
     @Override
-    public Response getUserStoreManagerProperties(String typeId, Integer limit, Integer offset, String filter,
-                                                  String sort) {
+    public Response getUserStoreManagerProperties(String typeId) {
 
-        return Response.ok().entity(serverUserStoreService.getUserStoreManagerProperties(typeId, limit, offset, filter,
-                sort)).build();
+        return Response.ok().entity(serverUserStoreService.getUserStoreManagerProperties(typeId)).build();
     }
 
     @Override

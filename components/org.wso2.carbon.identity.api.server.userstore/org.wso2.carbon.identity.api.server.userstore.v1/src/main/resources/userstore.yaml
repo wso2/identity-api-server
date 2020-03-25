@@ -72,6 +72,7 @@ paths:
         - $ref: '#/components/parameters/offsetQueryParam'
         - $ref: '#/components/parameters/filterQueryParam'
         - $ref: '#/components/parameters/sortQueryParam'
+        - $ref: '#/components/parameters/requiredAttributesQueryParam'
       responses:
         '200':
           description: Successful response.
@@ -267,19 +268,13 @@ paths:
           description: Id of the user store type
           schema:
             type: string
-        - $ref: '#/components/parameters/limitQueryParam'
-        - $ref: '#/components/parameters/offsetQueryParam'
-        - $ref: '#/components/parameters/filterQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
       responses:
         '200':
           description: Successful response.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MetaUserStoreType'
+                $ref: '#/components/schemas/MetaUserStoreType'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -366,6 +361,13 @@ components:
       name: sort
       required: false
       description: Define the order how the retrieved records should be sorted.
+      schema:
+        type: string
+    requiredAttributesQueryParam:
+      in: query
+      name: requiredAttributes
+      required: false
+      description: Define set of user store attributes (as comma separated) to be returned.
       schema:
         type: string
   responses:
@@ -557,13 +559,14 @@ components:
           type: string
           example: /t/{tenant-domain}/api/server/v1/userstores/SkRCQy1TRUNPTkRBUlk
           description: Location of the created/updated resource.
+        properties:
+          type: array
+          description: Requested configured user store property for the set
+          items:
+            $ref: '#/components/schemas/AddUserStorePropertiesRes'
     MetaUserStoreType:
       type: object
       properties:
-        name:
-          type: string
-          example: JDBC-SECONDARY
-          description: domain name of the secondary user store
         typeName:
           type: string
           example: JDBCUserStoreManager
@@ -573,9 +576,6 @@ components:
         className:
           type: string
           example: org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager
-        description:
-          type: string
-          example: Some description of the user store
         properties:
           $ref: '#/components/schemas/UserStorePropertiesRes'
     UserStoreResponse:
@@ -616,6 +616,9 @@ components:
         className:
           type: string
           example: org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager
+        self:
+          type: string
+          example: /t/{tenant-domain}/api/server/v1/userstores/meta/types/SkRCQ1VzZXJTdG9yZU1hbmFnZXI
     UserStoreConfigurationsRes:
       type: object
       description: Available User Store Configurations Response.

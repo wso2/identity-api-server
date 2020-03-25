@@ -30,6 +30,8 @@ public class Constants {
     public static final String V1_API_PATH_COMPONENT = "/v1";
     public static final String TENANT_CONTEXT_PATH_COMPONENT = "/t/%s";
 
+    public static final String REGEX_COMMA = ",";
+
     /**
      * Enum for server error prefixes.
      */
