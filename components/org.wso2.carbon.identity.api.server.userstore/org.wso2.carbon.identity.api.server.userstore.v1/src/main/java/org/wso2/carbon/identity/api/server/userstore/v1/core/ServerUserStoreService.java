@@ -155,10 +155,13 @@ public class ServerUserStoreService {
             List<AvailableUserStoreClassesRes> propertiesToAdd = new ArrayList<>();
             for (String className : classNames) {
                 AvailableUserStoreClassesRes availableUserStoreClassesResDTO = new AvailableUserStoreClassesRes();
+                String typeId = base64URLEncodeId(Objects.
+                        requireNonNull(getUserStoreTypeName(className)));
                 availableUserStoreClassesResDTO.setClassName(className);
                 availableUserStoreClassesResDTO.setTypeName(getUserStoreTypeName(className));
-                availableUserStoreClassesResDTO.setTypeId(base64URLEncodeId(Objects.
-                        requireNonNull(getUserStoreTypeName(className))));
+                availableUserStoreClassesResDTO.setTypeId(typeId);
+                availableUserStoreClassesResDTO.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
+                        UserStoreConstants.USER_STORE_PATH_COMPONENT + "/meta/types/%s", typeId)).toString());
                 propertiesToAdd.add(availableUserStoreClassesResDTO);
             }
             return propertiesToAdd;

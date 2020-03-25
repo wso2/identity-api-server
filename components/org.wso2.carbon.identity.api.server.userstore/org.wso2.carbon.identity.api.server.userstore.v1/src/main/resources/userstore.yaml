@@ -616,6 +616,9 @@ components:
         className:
           type: string
           example: org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager
+        self:
+          type: string
+          example: /t/{tenant-domain}/api/server/v1/userstores/meta/types/SkRCQ1VzZXJTdG9yZU1hbmFnZXI
     UserStoreConfigurationsRes:
       type: object
       description: Available User Store Configurations Response.
