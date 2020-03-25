@@ -143,7 +143,7 @@ public class ServerApplicationManagementService {
 
             return new ApplicationListResponse()
                     .totalResults(totalResults)
-                    .startIndex(offset)
+                    .startIndex(offset + 1)
                     .count(resultsInCurrentPage)
                     .applications(getApplicationListItems(filteredAppList))
                     .links(Util.buildPaginationLinks(limit, offset, totalResults, APPLICATION_MANAGEMENT_PATH_COMPONENT)
