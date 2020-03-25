@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.userstore.v1.core;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -250,7 +251,7 @@ public class ServerUserStoreService {
         Set<String> classNames;
         try {
             classNames = userStoreConfigService.getAvailableUserStoreClasses();
-            if (!classNames.isEmpty() && classNames.contains(getUserStoreType(base64URLDecodeId(typeId)))) {
+            if (CollectionUtils.isNotEmpty(classNames) && classNames.contains(getUserStoreType(base64URLDecodeId(typeId)))) {
                 return buildUserStoreMetaResponse(typeId);
             } else {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.
@@ -479,17 +480,20 @@ public class ServerUserStoreService {
      */
     private MetaUserStoreType buildUserStoreMetaResponse(String typeId) {
 
+        String typeName = base64URLDecodeId(typeId);
         Properties properties = UserStoreManagerRegistry.getUserStoreProperties(
-                getUserStoreType(base64URLDecodeId(typeId)));
+                getUserStoreType(typeName));
         MetaUserStoreType metaUserStore = new MetaUserStoreType();
         UserStorePropertiesRes userStorePropertiesRes = new UserStorePropertiesRes();
-        userStorePropertiesRes.mandatory(buildPropertiesRes(properties.getMandatoryProperties()));
-        userStorePropertiesRes.optional(buildPropertiesRes(properties.getOptionalProperties()));
-        userStorePropertiesRes.advanced(buildPropertiesRes(properties.getAdvancedProperties()));
+        if ((properties != null)) {
+            userStorePropertiesRes.mandatory(buildPropertiesRes(properties.getMandatoryProperties()));
+            userStorePropertiesRes.optional(buildPropertiesRes(properties.getOptionalProperties()));
+            userStorePropertiesRes.advanced(buildPropertiesRes(properties.getAdvancedProperties()));
+        }
         metaUserStore.setProperties(userStorePropertiesRes);
         metaUserStore.setTypeId(typeId);
-        metaUserStore.setTypeName(base64URLDecodeId(typeId));
-        metaUserStore.setClassName(getUserStoreType(base64URLDecodeId(typeId)));
+        metaUserStore.setTypeName(typeName);
+        metaUserStore.setClassName(getUserStoreType(typeName));
 
         return metaUserStore;
     }
