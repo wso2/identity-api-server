@@ -23,13 +23,12 @@
     <parent>
         <artifactId>identity-api-server</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
-        <version>1.0.85-SNAPSHOT</version>
+        <version>1.0.93-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.api.server.configs</artifactId>
-    <version>1.0.85-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
