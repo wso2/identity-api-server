@@ -836,12 +836,12 @@ public class ServerApplicationManagementService {
 
     private ApplicationManagementService getApplicationManagementService() {
 
-        return ApplicationManagementServiceHolder.getApplicationManagementService();
+        return ApplicationManagementServiceHolder.getInstance().getApplicationManagementService();
     }
 
     private TemplateManager getTemplateManager() {
 
-        return ApplicationManagementServiceHolder.getTemplateManager();
+        return ApplicationManagementServiceHolder.getInstance().getTemplateManager();
     }
 
     private APIError handleIdentityApplicationManagementException(IdentityApplicationManagementException e,

@@ -74,7 +74,8 @@ public class ServerApplicationMetadataService {
 
         // Add custom inbound protocols
         Map<String, AbstractInboundAuthenticatorConfig> allCustomAuthenticators =
-                ApplicationManagementServiceHolder.getApplicationManagementService().getAllInboundAuthenticatorConfig();
+                ApplicationManagementServiceHolder.getInstance().getApplicationManagementService()
+                        .getAllInboundAuthenticatorConfig();
 
         for (Map.Entry<String, AbstractInboundAuthenticatorConfig> entry : allCustomAuthenticators
                 .entrySet()) {
@@ -107,7 +108,8 @@ public class ServerApplicationMetadataService {
     public SAMLMetaData getSAMLMetadata() {
 
         SAMLMetaData samlMetaData = new SAMLMetaData();
-        SAMLSSOConfigServiceImpl samlSSOConfigService = ApplicationManagementServiceHolder.getSamlssoConfigService();
+        SAMLSSOConfigServiceImpl samlSSOConfigService = ApplicationManagementServiceHolder.getInstance()
+                .getSamlssoConfigService();
 
         samlMetaData.setDefaultNameIdFormat(DEFAULT_NAME_ID_FORMAT);
 
@@ -146,7 +148,8 @@ public class ServerApplicationMetadataService {
     public OIDCMetaData getOIDCMetadata() {
 
         OIDCMetaData oidcMetaData = new OIDCMetaData();
-        OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
+        OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getInstance()
+                .getOAuthAdminService();
 
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
         List<String> supportedGrantTypeNames = new ArrayList<>();
@@ -208,8 +211,8 @@ public class ServerApplicationMetadataService {
         try {
             wsTrustMetaData.setCertificateAlias(new MetadataProperty()
                     .defaultValue(null)
-                    .options(Arrays.asList(
-                            ApplicationManagementServiceHolder.getStsAdminService().getCertAliasOfPrimaryKeyStore())));
+                    .options(Arrays.asList(ApplicationManagementServiceHolder.getInstance().getStsAdminService()
+                            .getCertAliasOfPrimaryKeyStore())));
         } catch (SecurityConfigException e) {
             throw handleException(e);
         }
@@ -226,7 +229,8 @@ public class ServerApplicationMetadataService {
 
         String protocolName = base64URLDecode(inboundProtocolId);
         Map<String, AbstractInboundAuthenticatorConfig> allCustomAuthenticators =
-                ApplicationManagementServiceHolder.getApplicationManagementService().getAllInboundAuthenticatorConfig();
+                ApplicationManagementServiceHolder.getInstance().getApplicationManagementService()
+                        .getAllInboundAuthenticatorConfig();
 
         // Loop through all custom inbound protocols and match the name.
         for (Map.Entry<String, AbstractInboundAuthenticatorConfig> entry : allCustomAuthenticators
@@ -287,8 +291,8 @@ public class ServerApplicationMetadataService {
     public AdaptiveAuthTemplates getAdaptiveAuthTemplates() {
 
         AdaptiveAuthTemplates adaptiveAuthTemplates = new AdaptiveAuthTemplates();
-        adaptiveAuthTemplates.setTemplatesJSON(
-                ApplicationManagementServiceHolder.getApplicationManagementService().getAuthenticationTemplatesJSON());
+        adaptiveAuthTemplates.setTemplatesJSON(ApplicationManagementServiceHolder.getInstance()
+                .getApplicationManagementService().getAuthenticationTemplatesJSON());
         return adaptiveAuthTemplates;
     }
 

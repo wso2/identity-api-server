@@ -27,6 +27,9 @@ import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
  */
 public class ApplicationManagementServiceHolder {
 
+    private static ApplicationManagementServiceHolder instance = new
+            ApplicationManagementServiceHolder();
+
     private static ApplicationManagementService applicationManagementService;
 
     private static OAuthAdminServiceImpl oauthAdminService;
@@ -39,62 +42,71 @@ public class ApplicationManagementServiceHolder {
 
     private static TemplateManager templateManager;
 
-    public static ApplicationManagementService getApplicationManagementService() {
+    private ApplicationManagementServiceHolder(){
+
+    }
+
+    public static ApplicationManagementServiceHolder getInstance() {
+
+        return instance;
+    }
+
+    public ApplicationManagementService getApplicationManagementService() {
 
         return applicationManagementService;
     }
 
-    public static void setApplicationManagementService(ApplicationManagementService applicationManagementService) {
+    public void setApplicationManagementService(ApplicationManagementService applicationManagementService) {
 
         ApplicationManagementServiceHolder.applicationManagementService = applicationManagementService;
     }
 
-    public static OAuthAdminServiceImpl getOAuthAdminService() {
+    public OAuthAdminServiceImpl getOAuthAdminService() {
 
         return oauthAdminService;
     }
 
-    public static void setOauthAdminService(OAuthAdminServiceImpl oauthAdminService) {
+    public void setOauthAdminService(OAuthAdminServiceImpl oauthAdminService) {
 
         ApplicationManagementServiceHolder.oauthAdminService = oauthAdminService;
     }
 
-    public static STSAdminServiceInterface getStsAdminService() {
+    public STSAdminServiceInterface getStsAdminService() {
 
         return stsAdminService;
     }
 
-    public static void setStsAdminService(STSAdminServiceInterface stsAdminService) {
+    public void setStsAdminService(STSAdminServiceInterface stsAdminService) {
 
         ApplicationManagementServiceHolder.stsAdminService = stsAdminService;
     }
 
-    public static SAMLSSOConfigServiceImpl getSamlssoConfigService() {
+    public SAMLSSOConfigServiceImpl getSamlssoConfigService() {
 
         return samlssoConfigService;
     }
 
-    public static void setSamlssoConfigService(SAMLSSOConfigServiceImpl samlssoConfigService) {
+    public void setSamlssoConfigService(SAMLSSOConfigServiceImpl samlssoConfigService) {
 
         ApplicationManagementServiceHolder.samlssoConfigService = samlssoConfigService;
     }
 
-    public static OAuthServerConfiguration getoAuthServerConfiguration() {
+    public OAuthServerConfiguration getoAuthServerConfiguration() {
 
         return oAuthServerConfiguration;
     }
 
-    public static void setoAuthServerConfiguration(OAuthServerConfiguration oAuthServerConfiguration) {
+    public void setoAuthServerConfiguration(OAuthServerConfiguration oAuthServerConfiguration) {
 
         ApplicationManagementServiceHolder.oAuthServerConfiguration = oAuthServerConfiguration;
     }
 
-    public static TemplateManager getTemplateManager() {
+    public TemplateManager getTemplateManager() {
 
         return templateManager;
     }
 
-    public static void setTemplateManager(TemplateManager templateManager) {
+    public void setTemplateManager(TemplateManager templateManager) {
 
         ApplicationManagementServiceHolder.templateManager = templateManager;
     }
