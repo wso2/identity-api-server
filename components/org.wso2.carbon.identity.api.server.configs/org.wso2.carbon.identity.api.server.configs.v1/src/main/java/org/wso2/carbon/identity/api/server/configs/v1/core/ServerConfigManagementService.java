@@ -63,9 +63,9 @@ public class ServerConfigManagementService {
     public List<AuthenticatorListItem> getAuthenticators() {
 
         try {
-            return buildAuthenticatorListResponse(
-                    ConfigsServiceHolder.getApplicationManagementService()
-                            .getAllLocalAuthenticators(ContextLoader.getTenantDomainFromContext()));
+            LocalAuthenticatorConfig[] authenticatorConfigs = ConfigsServiceHolder.getApplicationManagementService()
+                    .getAllLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
+            return buildAuthenticatorListResponse(authenticatorConfigs);
         } catch (IdentityApplicationManagementException e) {
             throw handleApplicationMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_AUTHENTICATORS,
                     null);

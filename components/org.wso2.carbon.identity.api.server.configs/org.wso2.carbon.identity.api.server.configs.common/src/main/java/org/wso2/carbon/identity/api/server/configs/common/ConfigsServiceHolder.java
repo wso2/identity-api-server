@@ -23,7 +23,15 @@ import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
  */
 public class ConfigsServiceHolder {
 
+    private static ConfigsServiceHolder instance = new ConfigsServiceHolder();
     private static ApplicationManagementService applicationManagementService;
+
+    private ConfigsServiceHolder() {}
+
+    public static ConfigsServiceHolder getInstance() {
+
+        return instance;
+    }
 
     /**
      * Get ApplicationManagementService osgi service.

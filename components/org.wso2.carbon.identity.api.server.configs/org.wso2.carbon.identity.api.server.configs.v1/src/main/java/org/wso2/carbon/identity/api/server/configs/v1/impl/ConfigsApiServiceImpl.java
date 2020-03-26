@@ -34,7 +34,6 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response getAuthenticator(String authenticatorId) {
 
         return Response.ok().entity(configManagementService.getAuthenticator(authenticatorId)).build();
-
     }
 
     @Override
