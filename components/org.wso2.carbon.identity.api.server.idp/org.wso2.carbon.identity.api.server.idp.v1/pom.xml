@@ -180,6 +180,11 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.template.mgt</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     
 </project>

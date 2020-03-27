@@ -30,6 +30,8 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPU
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplate;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplateListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.idp.v1.model.MetaFederatedAuthenticator;
@@ -49,7 +51,11 @@ public interface IdentityProvidersApiService {
 
       public Response addIDP(IdentityProviderPOSTRequest identityProviderPOSTRequest);
 
+      public Response addIDPTemplate(IdentityProviderTemplate identityProviderTemplate);
+
       public Response deleteIDP(String identityProviderId, Boolean force);
+
+      public Response deleteIDPTemplate(String templateId);
 
       public Response getClaimConfig(String identityProviderId);
 
@@ -60,6 +66,10 @@ public interface IdentityProvidersApiService {
       public Response getFederatedAuthenticators(String identityProviderId);
 
       public Response getIDP(String identityProviderId);
+
+      public Response getIDPTemplate(String templateId);
+
+      public Response getIDPTemplates(Integer limit, Integer offset, String filter);
 
       public Response getIDPs(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String requiredAttributes);
 
@@ -86,6 +96,8 @@ public interface IdentityProvidersApiService {
       public Response updateClaimConfig(String identityProviderId, Claims claims);
 
       public Response updateFederatedAuthenticator(String identityProviderId, String federatedAuthenticatorId, FederatedAuthenticatorPUTRequest federatedAuthenticatorPUTRequest);
+
+      public Response updateIDPTemplate(String templateId, IdentityProviderTemplate identityProviderTemplate);
 
       public Response updateJITConfig(String identityProviderId, JustInTimeProvisioning justInTimeProvisioning);
 

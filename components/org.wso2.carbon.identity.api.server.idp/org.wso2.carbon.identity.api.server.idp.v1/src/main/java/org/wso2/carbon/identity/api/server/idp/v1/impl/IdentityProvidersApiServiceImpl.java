@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnectorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
@@ -37,6 +38,7 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPLATE_PATH_COMPONENT;
 
 /**
  * Implementation of the Identity Provider Rest API.
@@ -56,6 +58,16 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     }
 
     @Override
+    public Response addIDPTemplate(IdentityProviderTemplate identityProviderTemplatePOSTRequest) {
+
+        String idpTemplateId =
+                idpManagementService.createIDPTemplate(identityProviderTemplatePOSTRequest);
+        URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT +
+                IDP_PATH_COMPONENT + IDP_TEMPLATE_PATH_COMPONENT + "/" + idpTemplateId);
+        return Response.created(location).build();
+    }
+
+    @Override
     public Response deleteIDP(String identityProviderId, Boolean force) {
 
         if (force) {
@@ -64,6 +76,13 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
             idpManagementService.deleteIDP(identityProviderId);
         }
 
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response deleteIDPTemplate(String templateId) {
+
+        idpManagementService.deleteIDPTemplate(templateId);
         return Response.noContent().build();
     }
 
@@ -96,6 +115,18 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     public Response getIDP(String identityProviderId) {
 
         return Response.ok().entity(idpManagementService.getIDP(identityProviderId)).build();
+    }
+
+    @Override
+    public Response getIDPTemplate(String templateId) {
+
+        return Response.ok().entity(idpManagementService.getIDPTemplate(templateId)).build();
+    }
+
+    @Override
+    public Response getIDPTemplates(Integer limit, Integer offset, String filter) {
+
+        return Response.ok().entity(idpManagementService.getIDPTemplates(limit, offset, filter)).build();
     }
 
     @Override
@@ -183,6 +214,14 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
         return Response.ok().entity(idpManagementService.updateFederatedAuthenticator(identityProviderId,
                 federatedAuthenticatorId, federatedAuthenticatorPUTRequest))
                 .build();
+    }
+
+    @Override
+    public Response updateIDPTemplate(String templateId, IdentityProviderTemplate
+            identityProviderTemplatePOSTRequest) {
+
+        idpManagementService.updateIDPTemplate(templateId, identityProviderTemplatePOSTRequest);
+        return Response.ok().build();
     }
 
     @Override
