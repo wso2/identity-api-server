@@ -45,7 +45,7 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
-import static org.wso2.carbon.identity.api.server.configs.common.Constants.CONFIGS_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.configs.common.Constants.CONFIGS_AUTHENTICATOR_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_SEPERATOR;
 
 /**
@@ -108,7 +108,7 @@ public class ServerConfigManagementService {
                 authenticatorListItem.setDisplayName(config.getDisplayName());
                 authenticatorListItem.setIsEnabled(config.isEnabled());
                 authenticatorListItem.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
-                        CONFIGS_PATH_COMPONENT + PATH_SEPERATOR + "%s", authenticatorId)).toString());
+                        CONFIGS_AUTHENTICATOR_PATH_COMPONENT + PATH_SEPERATOR + "%s", authenticatorId)).toString());
                 authenticatorListItems.add(authenticatorListItem);
             }
         }

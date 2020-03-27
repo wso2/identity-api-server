@@ -26,7 +26,7 @@ public class Constants {
     }
 
     public static final String CONFIG_PREFIX = "CNF-";
-    public static final String CONFIGS_PATH_COMPONENT = "/configs";
+    public static final String CONFIGS_AUTHENTICATOR_PATH_COMPONENT = "/configs/authenticators";
     public static final String PATH_SEPERATOR = "/";
 
     /**
