@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.base.IdentityException;
+import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2ClientException;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2SSOException;
@@ -35,8 +36,6 @@ import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder.getSamlssoConfigService;
 
 /**
  * Helper functions for SAML inbound management.
@@ -58,8 +57,8 @@ public class SAMLInboundFunctions {
         try {
             if (currentIssuer != null) {
                 // Delete the current app.
-                oldSAMLSp = getSamlssoConfigService().getServiceProvider(currentIssuer);
-                getSamlssoConfigService().removeServiceProvider(currentIssuer);
+                oldSAMLSp = getSamlSsoConfigService().getServiceProvider(currentIssuer);
+                getSamlSsoConfigService().removeServiceProvider(currentIssuer);
             }
         } catch (IdentityException e) {
             throw handleException(e);
@@ -84,7 +83,7 @@ public class SAMLInboundFunctions {
                         ". Attempting to rollback by recreating the old SAML SP.");
             }
             try {
-                getSamlssoConfigService().addRPServiceProvider(oldSAMLSp);
+                getSamlSsoConfigService().addRPServiceProvider(oldSAMLSp);
             } catch (IdentityException e) {
                 throw handleException(e);
             }
@@ -117,8 +116,7 @@ public class SAMLInboundFunctions {
 
         String issuer = inboundAuth.getInboundAuthKey();
         try {
-            SAMLSSOServiceProviderDTO serviceProvider =
-                    ApplicationManagementServiceHolder.getSamlssoConfigService().getServiceProvider(issuer);
+            SAMLSSOServiceProviderDTO serviceProvider = getSamlSsoConfigService().getServiceProvider(issuer);
 
             if (serviceProvider != null) {
                 return new SAMLSSOServiceProviderToAPIModel().apply(serviceProvider);
@@ -134,7 +132,7 @@ public class SAMLInboundFunctions {
 
         try {
             String issuer = inbound.getInboundAuthKey();
-            ApplicationManagementServiceHolder.getSamlssoConfigService().removeServiceProvider(issuer);
+            ApplicationManagementServiceHolder.getInstance().getSamlssoConfigService().removeServiceProvider(issuer);
         } catch (IdentityException e) {
             throw buildServerError("Error while trying to rollback SAML2 configuration. " + e.getMessage(), e);
         }
@@ -144,7 +142,7 @@ public class SAMLInboundFunctions {
 
         SAMLSSOServiceProviderDTO serviceProviderDTO = new ApiModelToSAMLSSOServiceProvider().apply(saml2SpModel);
         try {
-            SAMLSSOServiceProviderDTO addedSAMLSp = getSamlssoConfigService().createServiceProvider(serviceProviderDTO);
+            SAMLSSOServiceProviderDTO addedSAMLSp = getSamlSsoConfigService().createServiceProvider(serviceProviderDTO);
             return addedSAMLSp.getIssuer();
         } catch (IdentityException e) {
             throw handleException(e);
@@ -166,7 +164,7 @@ public class SAMLInboundFunctions {
     private static String createSAMLSpWithMetadataContent(String metadataContent) throws IdentitySAML2SSOException {
 
         SAMLSSOServiceProviderDTO serviceProviderDTO =
-                getSamlssoConfigService().uploadRPServiceProvider(metadataContent);
+                getSamlSsoConfigService().uploadRPServiceProvider(metadataContent);
         return serviceProviderDTO.getIssuer();
     }
 
@@ -174,7 +172,7 @@ public class SAMLInboundFunctions {
 
         try {
             SAMLSSOServiceProviderDTO serviceProviderDTO =
-                    getSamlssoConfigService().createServiceProviderWithMetadataURL(metadataUrl);
+                    getSamlSsoConfigService().createServiceProviderWithMetadataURL(metadataUrl);
             return serviceProviderDTO.getIssuer();
         } catch (IdentitySAML2SSOException e) {
             throw handleException(e);
@@ -206,4 +204,10 @@ public class SAMLInboundFunctions {
 
         return Utils.buildServerError(errorCode, message, errorDescription, e);
     }
+
+    private static SAMLSSOConfigServiceImpl getSamlSsoConfigService() {
+
+        return ApplicationManagementServiceHolder.getInstance().getSamlssoConfigService();
+    }
+
 }

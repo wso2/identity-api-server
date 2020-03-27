@@ -48,8 +48,8 @@ public class OAuthInboundFunctions {
             String currentClientId = InboundFunctions.getInboundAuthKey(application, StandardInboundProtocols.OAUTH2);
             if (currentClientId != null) {
                 // This is an update.
-                OAuthConsumerAppDTO oauthApp = ApplicationManagementServiceHolder.getOAuthAdminService()
-                        .getOAuthApplicationData(currentClientId);
+                OAuthConsumerAppDTO oauthApp = ApplicationManagementServiceHolder.getInstance().getOAuthAdminService
+                        ().getOAuthApplicationData(currentClientId);
 
                 if (!StringUtils.equals(oauthApp.getOauthConsumerKey(), oidcConfigModel.getClientId())) {
                     throw buildBadRequestError("Invalid ClientID provided for update.");
@@ -60,7 +60,8 @@ public class OAuthInboundFunctions {
                 }
 
                 OAuthConsumerAppDTO appToUpdate = new ApiModelToOAuthConsumerApp().apply(oidcConfigModel);
-                ApplicationManagementServiceHolder.getOAuthAdminService().updateConsumerApplication(appToUpdate);
+                ApplicationManagementServiceHolder.getInstance().getOAuthAdminService().updateConsumerApplication
+                        (appToUpdate);
 
                 String updatedClientId = appToUpdate.getOauthConsumerKey();
                 return createInboundAuthRequestConfig(updatedClientId);
@@ -87,7 +88,8 @@ public class OAuthInboundFunctions {
         // Build a consumer apps object.
         OAuthConsumerAppDTO consumerApp = new ApiModelToOAuthConsumerApp().apply(oidcModel);
         try {
-            OAuthConsumerAppDTO createdOAuthApp = ApplicationManagementServiceHolder.getOAuthAdminService()
+            OAuthConsumerAppDTO createdOAuthApp = ApplicationManagementServiceHolder.getInstance()
+                    .getOAuthAdminService()
                     .registerAndRetrieveOAuthApplicationData(consumerApp);
 
             return createInboundAuthRequestConfig(createdOAuthApp.getOauthConsumerKey());
@@ -109,7 +111,8 @@ public class OAuthInboundFunctions {
         String clientId = inboundAuth.getInboundAuthKey();
         try {
             OAuthConsumerAppDTO oauthApp =
-                    ApplicationManagementServiceHolder.getOAuthAdminService().getOAuthApplicationData(clientId);
+                    ApplicationManagementServiceHolder.getInstance().getOAuthAdminService().getOAuthApplicationData
+                            (clientId);
             return new OAuthConsumerAppToApiModel().apply(oauthApp);
 
         } catch (IdentityOAuthAdminException e) {
@@ -121,7 +124,8 @@ public class OAuthInboundFunctions {
 
         try {
             String consumerKey = inbound.getInboundAuthKey();
-            ApplicationManagementServiceHolder.getOAuthAdminService().removeOAuthApplicationData(consumerKey);
+            ApplicationManagementServiceHolder.getInstance().getOAuthAdminService().removeOAuthApplicationData
+                    (consumerKey);
         } catch (IdentityOAuthAdminException e) {
             throw buildServerError("Error while trying to rollback OAuth2/OpenIDConnect " +
                     "configuration." + e.getMessage(), e);
@@ -131,8 +135,8 @@ public class OAuthInboundFunctions {
     public static OpenIDConnectConfiguration regenerateClientSecret(String clientId) {
 
         try {
-            OAuthConsumerAppDTO oAuthConsumerAppDTO = ApplicationManagementServiceHolder.getOAuthAdminService()
-                    .updateAndRetrieveOauthSecretKey(clientId);
+            OAuthConsumerAppDTO oAuthConsumerAppDTO = ApplicationManagementServiceHolder.getInstance()
+                    .getOAuthAdminService().updateAndRetrieveOauthSecretKey(clientId);
             return new OAuthConsumerAppToApiModel().apply(oAuthConsumerAppDTO);
         } catch (IdentityOAuthAdminException e) {
             throw buildServerError("Error while regenerating client secret of oauth application.", e);
@@ -142,7 +146,7 @@ public class OAuthInboundFunctions {
     public static void revokeOAuthClient(String clientId) {
 
         try {
-            ApplicationManagementServiceHolder.getOAuthAdminService()
+            ApplicationManagementServiceHolder.getInstance().getOAuthAdminService()
                     .updateConsumerAppState(clientId, OAuthConstants.OauthAppStates.APP_STATE_REVOKED);
         } catch (IdentityOAuthAdminException e) {
             throw buildServerError("Error while revoking oauth application.", e);

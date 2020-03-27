@@ -22,6 +22,7 @@ import org.wso2.carbon.identity.api.server.application.management.common.Applica
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
@@ -69,6 +70,12 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response getApplicationTemplate(String templateId) {
+
+        return Response.ok().entity(applicationManagementService.getApplicationTemplateById(templateId)).build();
+    }
+
+    @Override
     public Response createApplication(ApplicationModel applicationModel, String template) {
 
         String resourceId = applicationManagementService.createApplication(applicationModel, template);
@@ -76,9 +83,23 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response createApplicationTemplate(ApplicationTemplateModel applicationTemplateModel) {
+
+        String templateId = applicationManagementService.createApplicationTemplate(applicationTemplateModel);
+        return Response.created(getTemplateResourceLocation(templateId)).build();
+    }
+
+    @Override
     public Response deleteApplication(String applicationId) {
 
         applicationManagementService.deleteApplication(applicationId);
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response deleteApplicationTemplate(String templateId) {
+
+        applicationManagementService.deleteApplicationTemplateById(templateId);
         return Response.noContent().build();
     }
 
@@ -219,6 +240,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response updateApplicationTemplate(String templateId, ApplicationTemplateModel applicationTemplateModel) {
+
+        applicationManagementService.updateApplicationTemplateById(templateId, applicationTemplateModel);
+        return Response.ok().build();
+    }
+
+    @Override
     public Response updateCustomInboundConfiguration(String applicationId,
                                                      String inboundProtocolId,
                                                      CustomInboundProtocolConfiguration customInboundModel) {
@@ -293,9 +321,22 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         return Response.ok().entity(applicationMetadataService.getAdaptiveAuthTemplates()).build();
     }
 
+    @Override
+    public Response getAllApplicationTemplates(Integer limit, Integer offset) {
+
+        return Response.ok().entity(applicationManagementService.listApplicationTemplates(limit, offset)).build();
+    }
+
     private URI getResourceLocation(String resourceId) {
 
         return ContextLoader.buildURIForHeader(Constants.V1_API_PATH_COMPONENT +
                 ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT + "/" + resourceId);
+    }
+
+    private URI getTemplateResourceLocation(String resourceId) {
+
+        return ContextLoader.buildURIForHeader(Constants.V1_API_PATH_COMPONENT +
+                ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT +
+                ApplicationManagementConstants.APPLICATION_TEMPLATE_MANAGEMENT_PATH_COMPONENT + "/" + resourceId);
     }
 }

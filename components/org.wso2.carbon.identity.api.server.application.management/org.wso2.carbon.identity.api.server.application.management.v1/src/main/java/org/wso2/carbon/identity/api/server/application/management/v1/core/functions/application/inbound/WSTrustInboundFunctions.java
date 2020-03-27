@@ -48,7 +48,8 @@ public class WSTrustInboundFunctions {
                     // We do not allow the inbound unique key to be changed during an update.
                     throw buildBadRequestError("Invalid audience value provided for update.");
                 }
-                ApplicationManagementServiceHolder.getStsAdminService().removeTrustedService(inboundAuthKey);
+                ApplicationManagementServiceHolder.getInstance().getStsAdminService().removeTrustedService
+                        (inboundAuthKey);
             }
 
             return createWsTrustInbound(wsTrustModel);
@@ -66,7 +67,7 @@ public class WSTrustInboundFunctions {
     public static InboundAuthenticationRequestConfig createWsTrustInbound(WSTrustConfiguration wsTrustConfiguration) {
 
         try {
-            ApplicationManagementServiceHolder.getStsAdminService()
+            ApplicationManagementServiceHolder.getInstance().getStsAdminService()
                     .addTrustedService(wsTrustConfiguration.getAudience(), wsTrustConfiguration.getCertificateAlias());
 
             InboundAuthenticationRequestConfig wsTrustInbound = new InboundAuthenticationRequestConfig();
@@ -85,7 +86,7 @@ public class WSTrustInboundFunctions {
         String audience = inboundAuth.getInboundAuthKey();
         try {
             TrustedServiceData[] trustedServices =
-                    ApplicationManagementServiceHolder.getStsAdminService().getTrustedServices();
+                    ApplicationManagementServiceHolder.getInstance().getStsAdminService().getTrustedServices();
 
             return Arrays.stream(trustedServices)
                     .filter(trustedServiceData -> StringUtils.equals(trustedServiceData.getServiceAddress(), audience))
@@ -104,7 +105,8 @@ public class WSTrustInboundFunctions {
 
         try {
             String trustedServiceAudience = inbound.getInboundAuthKey();
-            ApplicationManagementServiceHolder.getStsAdminService().removeTrustedService(trustedServiceAudience);
+            ApplicationManagementServiceHolder.getInstance().getStsAdminService().removeTrustedService
+                    (trustedServiceAudience);
         } catch (SecurityConfigException e) {
             throw buildServerError("Error while trying to rollback WSTrust configuration. " + e.getMessage(), e);
         }
