@@ -34,7 +34,8 @@ public class AdvancedApplicationConfiguration  {
     private Boolean saas;
     private Boolean discoverableByEndUsers;
     private Certificate certificate;
-    private Boolean skipConsent;
+    private Boolean skipLoginConsent;
+    private Boolean skipLogoutConsent;
     private Boolean returnAuthenticatedIdpList;
     private Boolean enableAuthorization;
 
@@ -97,20 +98,39 @@ public class AdvancedApplicationConfiguration  {
     /**
     * Decides whether user consent needs to be skipped during login flows.
     **/
-    public AdvancedApplicationConfiguration skipConsent(Boolean skipConsent) {
+    public AdvancedApplicationConfiguration skipLoginConsent(Boolean skipLoginConsent) {
 
-        this.skipConsent = skipConsent;
+        this.skipLoginConsent = skipLoginConsent;
         return this;
     }
     
     @ApiModelProperty(example = "false", value = "Decides whether user consent needs to be skipped during login flows.")
-    @JsonProperty("skipConsent")
+    @JsonProperty("skipLoginConsent")
     @Valid
-    public Boolean getSkipConsent() {
-        return skipConsent;
+    public Boolean getSkipLoginConsent() {
+        return skipLoginConsent;
     }
-    public void setSkipConsent(Boolean skipConsent) {
-        this.skipConsent = skipConsent;
+    public void setSkipLoginConsent(Boolean skipLoginConsent) {
+        this.skipLoginConsent = skipLoginConsent;
+    }
+
+    /**
+    * Decides whether user consent needs to be skipped during logout flows.
+    **/
+    public AdvancedApplicationConfiguration skipLogoutConsent(Boolean skipLogoutConsent) {
+
+        this.skipLogoutConsent = skipLogoutConsent;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Decides whether user consent needs to be skipped during logout flows.")
+    @JsonProperty("skipLogoutConsent")
+    @Valid
+    public Boolean getSkipLogoutConsent() {
+        return skipLogoutConsent;
+    }
+    public void setSkipLogoutConsent(Boolean skipLogoutConsent) {
+        this.skipLogoutConsent = skipLogoutConsent;
     }
 
     /**
@@ -166,14 +186,15 @@ public class AdvancedApplicationConfiguration  {
         return Objects.equals(this.saas, advancedApplicationConfiguration.saas) &&
             Objects.equals(this.discoverableByEndUsers, advancedApplicationConfiguration.discoverableByEndUsers) &&
             Objects.equals(this.certificate, advancedApplicationConfiguration.certificate) &&
-            Objects.equals(this.skipConsent, advancedApplicationConfiguration.skipConsent) &&
+            Objects.equals(this.skipLoginConsent, advancedApplicationConfiguration.skipLoginConsent) &&
+            Objects.equals(this.skipLogoutConsent, advancedApplicationConfiguration.skipLogoutConsent) &&
             Objects.equals(this.returnAuthenticatedIdpList, advancedApplicationConfiguration.returnAuthenticatedIdpList) &&
             Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipConsent, returnAuthenticatedIdpList, enableAuthorization);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, returnAuthenticatedIdpList, enableAuthorization);
     }
 
     @Override
@@ -185,7 +206,8 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    saas: ").append(toIndentedString(saas)).append("\n");
         sb.append("    discoverableByEndUsers: ").append(toIndentedString(discoverableByEndUsers)).append("\n");
         sb.append("    certificate: ").append(toIndentedString(certificate)).append("\n");
-        sb.append("    skipConsent: ").append(toIndentedString(skipConsent)).append("\n");
+        sb.append("    skipLoginConsent: ").append(toIndentedString(skipLoginConsent)).append("\n");
+        sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");
         sb.append("    enableAuthorization: ").append(toIndentedString(enableAuthorization)).append("\n");
         sb.append("}");

@@ -336,7 +336,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .discoverableByEndUsers(serviceProvider.isDiscoverable())
                 .enableAuthorization(authConfig.isEnableAuthorization())
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
-                .skipConsent(authConfig.isSkipConsent())
+                .skipLoginConsent(authConfig.isSkipConsent())
+                .skipLogoutConsent(authConfig.isSkipLogoutConsent())
                 .certificate(getCertificate(serviceProvider));
     }
 
