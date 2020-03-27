@@ -37,7 +37,8 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(advancedConfigurations.getDiscoverableByEndUsers(), serviceProvider::setDiscoverable);
 
             LocalAndOutboundAuthenticationConfig config = getLocalAndOutboundConfig(serviceProvider);
-            setIfNotNull(advancedConfigurations.getSkipConsent(), config::setSkipConsent);
+            setIfNotNull(advancedConfigurations.getSkipLoginConsent(), config::setSkipConsent);
+            setIfNotNull(advancedConfigurations.getSkipLogoutConsent(), config::setSkipLogoutConsent);
             setIfNotNull(advancedConfigurations.getReturnAuthenticatedIdpList(),
                     config::setAlwaysSendBackAuthenticatedListOfIdPs);
             setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
