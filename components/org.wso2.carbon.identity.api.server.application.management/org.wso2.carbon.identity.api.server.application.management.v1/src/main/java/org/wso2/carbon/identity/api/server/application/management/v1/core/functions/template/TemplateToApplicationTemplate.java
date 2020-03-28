@@ -57,7 +57,7 @@ public class TemplateToApplicationTemplate implements Function<Template, Applica
                 }
                 if (ApplicationManagementConstants.TemplateProperties.DISPLAY_ORDER.equals(key) && StringUtils
                         .isNotBlank(value)) {
-                    applicationTemplate.setDisplayOrder(Integer.getInteger(value));
+                    applicationTemplate.setDisplayOrder(Integer.parseInt(value));
                 }
                 if (ApplicationManagementConstants.TemplateProperties.CATEGORY.equals(key)) {
                     applicationTemplate.setCategory(value);
