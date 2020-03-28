@@ -56,7 +56,7 @@ public class TemplateToApplicationTemplateListItem implements Function<Template,
                 }
                 if (ApplicationManagementConstants.TemplateProperties.DISPLAY_ORDER.equals(key) && StringUtils
                         .isNotBlank(value)) {
-                    listItem.setDisplayOrder(Integer.getInteger(value));
+                    listItem.setDisplayOrder(Integer.parseInt(value));
                 }
                 if (ApplicationManagementConstants.TemplateProperties.CATEGORY.equals(key)) {
                     listItem.setCategory(value);
