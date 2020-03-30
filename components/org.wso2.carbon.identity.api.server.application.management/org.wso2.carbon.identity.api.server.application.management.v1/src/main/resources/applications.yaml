@@ -1797,6 +1797,12 @@ paths:
           description: "Unauthorized"
         '403':
           description: "Forbidden"
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '409':
           description: "Conflict"
           content:
@@ -1832,6 +1838,15 @@ paths:
           description: "Unauthorized"
         '403':
           description: "Forbidden"
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: "Server Error"
           content:
