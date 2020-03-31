@@ -30,20 +30,19 @@ import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
 
 /**
  * Converts OpenIDConnectConfiguration api model to OAuthConsumerAppDTO.
  */
-public class ApiModelToOAuthConsumerApp implements Function<OpenIDConnectConfiguration, OAuthConsumerAppDTO> {
+public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFunction<OpenIDConnectConfiguration,
+        OAuthConsumerAppDTO> {
 
     @Override
-    public OAuthConsumerAppDTO apply(OpenIDConnectConfiguration oidcModel) {
+    public OAuthConsumerAppDTO apply(String appName, OpenIDConnectConfiguration oidcModel) {
 
         OAuthConsumerAppDTO consumerAppDTO = new OAuthConsumerAppDTO();
 
-        consumerAppDTO.setApplicationName(UUID.randomUUID().toString());
+        consumerAppDTO.setApplicationName(appName);
         consumerAppDTO.setOauthConsumerKey(oidcModel.getClientId());
         consumerAppDTO.setOauthConsumerSecret(oidcModel.getClientSecret());
 

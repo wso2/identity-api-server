@@ -28,6 +28,8 @@ import org.wso2.carbon.identity.oauth.IdentityOAuthClientException;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
+import java.util.UUID;
+
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerError;
 
@@ -59,14 +61,15 @@ public class OAuthInboundFunctions {
                     throw buildBadRequestError("Invalid ClientSecret provided for update.");
                 }
 
-                OAuthConsumerAppDTO appToUpdate = new ApiModelToOAuthConsumerApp().apply(oidcConfigModel);
+                OAuthConsumerAppDTO appToUpdate = new ApiModelToOAuthConsumerApp().apply(application
+                        .getApplicationName(), oidcConfigModel);
                 ApplicationManagementServiceHolder.getInstance().getOAuthAdminService().updateConsumerApplication
                         (appToUpdate);
 
                 String updatedClientId = appToUpdate.getOauthConsumerKey();
                 return createInboundAuthRequestConfig(updatedClientId);
             } else {
-                return createOAuthInbound(oidcConfigModel);
+                return createOAuthInbound(application.getApplicationName(), oidcConfigModel);
             }
 
         } catch (IdentityOAuthAdminException e) {
@@ -83,10 +86,25 @@ public class OAuthInboundFunctions {
         return buildServerError(message, e);
     }
 
+    /**
+     * @deprecated
+     *
+     * This method will be removed in the upcoming major release.
+     * Because, service provider name should be passed to create oauth app name.
+     * Use {@link #createOAuthInbound(String, OpenIDConnectConfiguration)} instead.
+     *
+     */
+    @Deprecated
     public static InboundAuthenticationRequestConfig createOAuthInbound(OpenIDConnectConfiguration oidcModel) {
 
+        return createOAuthInbound(UUID.randomUUID().toString(), oidcModel);
+    }
+
+    public static InboundAuthenticationRequestConfig createOAuthInbound(String appName, OpenIDConnectConfiguration
+                                                                        oidcModel) {
+
         // Build a consumer apps object.
-        OAuthConsumerAppDTO consumerApp = new ApiModelToOAuthConsumerApp().apply(oidcModel);
+        OAuthConsumerAppDTO consumerApp = new ApiModelToOAuthConsumerApp().apply(appName, oidcModel);
         try {
             OAuthConsumerAppDTO createdOAuthApp = ApplicationManagementServiceHolder.getInstance()
                     .getOAuthAdminService()
