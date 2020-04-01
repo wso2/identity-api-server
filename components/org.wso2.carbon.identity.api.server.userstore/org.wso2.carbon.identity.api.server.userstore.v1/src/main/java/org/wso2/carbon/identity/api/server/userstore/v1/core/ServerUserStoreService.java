@@ -331,6 +331,10 @@ public class ServerUserStoreService {
             if (userStoreDTO == null) {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
             }
+            if (StringUtils.isBlank(path)) {
+                throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
+                        .ERROR_CODE_INVALID_INPUT);
+            }
             PropertyDTO[] propertyDTOS = userStoreDTO.getProperties();
             if (path.startsWith(UserStoreConstants.USER_STORE_PROPERTIES)) {
                 String[] propertiesList = path.split("/");
@@ -339,17 +343,18 @@ public class ServerUserStoreService {
                         propertyDTO.setValue(value);
                     }
                 }
-                return buildResponseForPatchReplace(userStoreDTO, propertyDTOS);
             } else if (path.equals(UserStoreConstants.USER_STORE_DESCRIPTION)) {
                 userStoreDTO.setDescription(value);
-                return buildResponseForPatchReplace(userStoreDTO, propertyDTOS);
             } else {
                 throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
                         .ERROR_CODE_INVALID_INPUT);
             }
+            userStoreDTO.setProperties(propertyDTOS);
+            userStoreConfigService.updateUserStore(userStoreDTO, false);
+            return buildResponseForPatchReplace(userStoreDTO, propertyDTOS);
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
-                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_USER_STORE;
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_USER_STORE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
     }
