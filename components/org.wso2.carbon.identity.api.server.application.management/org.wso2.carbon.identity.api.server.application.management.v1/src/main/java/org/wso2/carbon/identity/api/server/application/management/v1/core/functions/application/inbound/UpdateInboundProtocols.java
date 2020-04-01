@@ -48,7 +48,7 @@ public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, I
 
         try {
             if (inboundProtocols.getOidc() != null) {
-                inbounds.add(createOAuthInbound(inboundProtocols.getOidc()));
+                inbounds.add(createOAuthInbound(application.getApplicationName(), inboundProtocols.getOidc()));
             }
 
             if (inboundProtocols.getSaml() != null) {
