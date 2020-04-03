@@ -2676,6 +2676,9 @@ components:
           example: 'https://app.example.com/frontchannel/callback'
     PassiveStsConfiguration:
       type: object
+      required:
+        - realm
+        - replyTo
       properties:
         realm:
           type: string
