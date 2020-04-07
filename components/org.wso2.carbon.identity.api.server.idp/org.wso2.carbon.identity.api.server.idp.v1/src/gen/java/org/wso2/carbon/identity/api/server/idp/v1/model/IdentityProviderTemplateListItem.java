@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 
 
@@ -69,6 +71,8 @@ public enum CategoryEnum {
 
     private CategoryEnum category;
     private Integer displayOrder;
+    private List<String> services = null;
+
     private String self;
 
     /**
@@ -181,6 +185,32 @@ public enum CategoryEnum {
 
     /**
     **/
+    public IdentityProviderTemplateListItem services(List<String> services) {
+
+        this.services = services;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("services")
+    @Valid
+    public List<String> getServices() {
+        return services;
+    }
+    public void setServices(List<String> services) {
+        this.services = services;
+    }
+
+    public IdentityProviderTemplateListItem addServicesItem(String servicesItem) {
+        if (this.services == null) {
+            this.services = new ArrayList<>();
+        }
+        this.services.add(servicesItem);
+        return this;
+    }
+
+        /**
+    **/
     public IdentityProviderTemplateListItem self(String self) {
 
         this.self = self;
@@ -215,12 +245,13 @@ public enum CategoryEnum {
             Objects.equals(this.image, identityProviderTemplateListItem.image) &&
             Objects.equals(this.category, identityProviderTemplateListItem.category) &&
             Objects.equals(this.displayOrder, identityProviderTemplateListItem.displayOrder) &&
+            Objects.equals(this.services, identityProviderTemplateListItem.services) &&
             Objects.equals(this.self, identityProviderTemplateListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, category, displayOrder, self);
+        return Objects.hash(id, name, description, image, category, displayOrder, services, self);
     }
 
     @Override
@@ -235,6 +266,7 @@ public enum CategoryEnum {
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    category: ").append(toIndentedString(category)).append("\n");
         sb.append("    displayOrder: ").append(toIndentedString(displayOrder)).append("\n");
+        sb.append("    services: ").append(toIndentedString(services)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();

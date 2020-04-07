@@ -70,6 +70,11 @@ public class Constants {
     // IdP template property keys
     public static final String PROP_CATEGORY = "category";
     public static final String PROP_DISPLAY_ORDER = "displayOrder";
+    public static final String PROP_SERVICES = "services";
+
+    // IdP template services
+    public static final String SERV_AUTHENTICATION = "authentication";
+    public static final String SERV_PROVISIONING = "provisioning";
 
     // IdP Template Search.
     public static final List<String> SEARCH_KEYS = Collections.unmodifiableList(Arrays.asList("description", "image",
