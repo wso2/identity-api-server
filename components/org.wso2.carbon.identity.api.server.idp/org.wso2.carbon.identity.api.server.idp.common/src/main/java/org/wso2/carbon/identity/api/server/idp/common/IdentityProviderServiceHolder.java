@@ -17,6 +17,7 @@
 package org.wso2.carbon.identity.api.server.idp.common;
 
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
+import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 
 /**
@@ -26,6 +27,7 @@ public class IdentityProviderServiceHolder {
 
     private static IdentityProviderManager identityProviderManager;
     private static ClaimMetadataManagementService claimMetadataManagementService;
+    private static TemplateManager templateManager;
 
     /**
      * Get IdentityProviderManager osgi service.
@@ -66,5 +68,25 @@ public class IdentityProviderServiceHolder {
             ClaimMetadataManagementService claimMetadataManagementService) {
 
         IdentityProviderServiceHolder.claimMetadataManagementService = claimMetadataManagementService;
+    }
+
+    /**
+     * Set TemplateManager osgi service.
+     *
+     * @param templateManager TemplateManager service
+     */
+    public static void setTemplateManager(TemplateManager templateManager) {
+
+        IdentityProviderServiceHolder.templateManager = templateManager;
+    }
+
+    /**
+     * Get TemplateManager osgi service.
+     *
+     * @return TemplateManager
+     */
+    public static TemplateManager getTemplateManager() {
+
+        return templateManager;
     }
 }

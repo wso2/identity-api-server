@@ -67,7 +67,7 @@ public class ApiModelToSAMLSSOServiceProvider implements Function<SAML2ServicePr
 
         if (responseSigning != null) {
             setIfNotNull(responseSigning.getEnabled(), dto::setDoSignResponse);
-            dto.setSigningAlgorithmURI(dto.getSigningAlgorithmURI());
+            dto.setSigningAlgorithmURI(responseSigning.getSigningAlgorithm());
         }
     }
 

@@ -26,6 +26,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
@@ -73,8 +75,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Successful response.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
@@ -82,6 +84,31 @@ public class ApplicationsApi  {
     public Response createApplication(@ApiParam(value = "This represents the application to be created." ,required=true) @Valid ApplicationModel applicationModel,     @Valid@ApiParam(value = "Pre-defined template to use when creating the application. ")  @QueryParam("template") String template) {
 
         return delegate.createApplication(applicationModel,  template );
+    }
+
+    @Valid
+    @POST
+    @Path("/templates")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Add application template ", notes = "This API provides the capability to store the application template provided by users. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Successful response.", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
+    })
+    public Response createApplicationTemplate(@ApiParam(value = "This represents the application template to be created." ,required=true) @Valid ApplicationTemplateModel applicationTemplateModel) {
+
+        return delegate.createApplicationTemplate(applicationTemplateModel );
     }
 
     @Valid
@@ -98,13 +125,37 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteApplication(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.deleteApplication(applicationId );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/templates/{template-id}")
+    
+    @Produces({ "application/json", "application/xml",  })
+    @ApiOperation(value = "Delete application template by template ID. ", notes = "This API provides the capability to delete an application template by template ID. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteApplicationTemplate(@ApiParam(value = "Application template ID. This should be a valid locale. ",required=true) @PathParam("template-id") String templateId) {
+
+        return delegate.deleteApplicationTemplate(templateId );
     }
 
     @Valid
@@ -121,8 +172,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Delete Success", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteCustomInboundConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Inbound Authentication Protocol ID",required=true) @PathParam("inboundProtocolId") String inboundProtocolId) {
@@ -144,8 +195,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Delete Success", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteInboundOAuthConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
@@ -167,8 +218,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Delete successful", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteInboundSAMLConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
@@ -190,8 +241,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Delete Success", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deletePassiveStsConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
@@ -213,8 +264,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Delete Success", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteWSTrustConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
@@ -236,8 +287,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = Object.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -259,14 +310,39 @@ public class ApplicationsApi  {
     }, tags={ "Application Metadata", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = AdaptiveAuthTemplates.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response getAdaptiveAuthTemplates() {
 
         return delegate.getAdaptiveAuthTemplates();
+    }
+
+    @Valid
+    @GET
+    @Path("/templates")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "List Application Templates ", notes = "This API provides the capability to retrieve the list of templates available. ", response = ApplicationTemplatesList.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = ApplicationTemplatesList.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
+    })
+    public Response getAllApplicationTemplates(    @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset) {
+
+        return delegate.getAllApplicationTemplates(limit,  offset );
     }
 
     @Valid
@@ -283,8 +359,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = ApplicationListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
@@ -308,14 +384,38 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = ApplicationResponseModel.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response getApplication(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getApplication(applicationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/templates/{template-id}")
+    
+    @Produces({ "application/json", "application/xml",  })
+    @ApiOperation(value = "Retrieve application template by ID ", notes = "This API provides the capability to retrieve the application template from the template id. ", response = ApplicationTemplateModel.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = ApplicationTemplateModel.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getApplicationTemplate(@ApiParam(value = "Application template ID. This should be a valid locale. ",required=true) @PathParam("template-id") String templateId) {
+
+        return delegate.getApplicationTemplate(templateId );
     }
 
     @Valid
@@ -332,8 +432,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = CustomInboundProtocolConfiguration.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -355,8 +455,8 @@ public class ApplicationsApi  {
     }, tags={ "Application Metadata", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = CustomInboundProtocolMetaData.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -379,7 +479,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = InboundProtocolListItem.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -402,8 +503,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = OpenIDConnectConfiguration.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -425,8 +526,8 @@ public class ApplicationsApi  {
     }, tags={ "Application Metadata", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = AuthProtocolMetadata.class, responseContainer = "List"),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -449,7 +550,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = SAML2ServiceProvider.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -471,8 +573,8 @@ public class ApplicationsApi  {
     }, tags={ "Application Metadata", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = OIDCMetaData.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -495,8 +597,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = PassiveStsConfiguration.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -519,8 +621,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = ResidentApplication.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -566,8 +668,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = WSTrustConfiguration.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -589,8 +691,8 @@ public class ApplicationsApi  {
     }, tags={ "Application Metadata", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = WSTrustMetaData.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -613,8 +715,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Successfully created.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -637,8 +739,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successfully Updated.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
@@ -662,8 +764,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successfully Updated", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -686,8 +788,8 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = OpenIDConnectConfiguration.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
@@ -710,14 +812,39 @@ public class ApplicationsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Application Revoked", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response revokeOAuthClient(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.revokeOAuthClient(applicationId );
+    }
+
+    @Valid
+    @PUT
+    @Path("/templates/{template-id}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update the application template by the template ID. ", notes = "This API provides the capability to update an application template by the template ID. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully Updated", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateApplicationTemplate(@ApiParam(value = "Application template ID. This should be a valid locale. ",required=true) @PathParam("template-id") String templateId, @ApiParam(value = "This represents the new application template." ,required=true) @Valid ApplicationTemplateModel applicationTemplateModel) {
+
+        return delegate.updateApplicationTemplate(templateId,  applicationTemplateModel );
     }
 
     @Valid
@@ -735,8 +862,8 @@ public class ApplicationsApi  {
         @ApiResponse(code = 200, message = "Successful", response = Void.class),
         @ApiResponse(code = 201, message = "Successful response.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
@@ -761,8 +888,8 @@ public class ApplicationsApi  {
         @ApiResponse(code = 200, message = "Successful", response = Void.class),
         @ApiResponse(code = 201, message = "Created", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
@@ -787,8 +914,8 @@ public class ApplicationsApi  {
         @ApiResponse(code = 200, message = "Successful", response = Void.class),
         @ApiResponse(code = 201, message = "Successful response.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
@@ -813,8 +940,8 @@ public class ApplicationsApi  {
         @ApiResponse(code = 200, message = "Successful", response = Void.class),
         @ApiResponse(code = 201, message = "Successful response.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
@@ -839,8 +966,8 @@ public class ApplicationsApi  {
         @ApiResponse(code = 200, message = "Successful", response = Void.class),
         @ApiResponse(code = 201, message = "Successful response.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
@@ -865,8 +992,8 @@ public class ApplicationsApi  {
         @ApiResponse(code = 200, message = "Successful", response = Void.class),
         @ApiResponse(code = 201, message = "Successful response.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)

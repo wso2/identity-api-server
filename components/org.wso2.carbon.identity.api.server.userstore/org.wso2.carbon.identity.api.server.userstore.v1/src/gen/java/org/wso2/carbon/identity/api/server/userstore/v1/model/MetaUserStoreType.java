@@ -31,31 +31,10 @@ import javax.xml.bind.annotation.*;
 
 public class MetaUserStoreType  {
   
-    private String name;
     private String typeName;
     private String typeId;
     private String className;
-    private String description;
     private UserStorePropertiesRes properties;
-
-    /**
-    * domain name of the secondary user store
-    **/
-    public MetaUserStoreType name(String name) {
-
-        this.name = name;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "JDBC-SECONDARY", value = "domain name of the secondary user store")
-    @JsonProperty("name")
-    @Valid
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
 
     /**
     **/
@@ -113,24 +92,6 @@ public class MetaUserStoreType  {
 
     /**
     **/
-    public MetaUserStoreType description(String description) {
-
-        this.description = description;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "Some description of the user store", value = "")
-    @JsonProperty("description")
-    @Valid
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-    **/
     public MetaUserStoreType properties(UserStorePropertiesRes properties) {
 
         this.properties = properties;
@@ -159,17 +120,15 @@ public class MetaUserStoreType  {
             return false;
         }
         MetaUserStoreType metaUserStoreType = (MetaUserStoreType) o;
-        return Objects.equals(this.name, metaUserStoreType.name) &&
-            Objects.equals(this.typeName, metaUserStoreType.typeName) &&
+        return Objects.equals(this.typeName, metaUserStoreType.typeName) &&
             Objects.equals(this.typeId, metaUserStoreType.typeId) &&
             Objects.equals(this.className, metaUserStoreType.className) &&
-            Objects.equals(this.description, metaUserStoreType.description) &&
             Objects.equals(this.properties, metaUserStoreType.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, typeName, typeId, className, description, properties);
+        return Objects.hash(typeName, typeId, className, properties);
     }
 
     @Override
@@ -178,11 +137,9 @@ public class MetaUserStoreType  {
         StringBuilder sb = new StringBuilder();
         sb.append("class MetaUserStoreType {\n");
         
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    typeName: ").append(toIndentedString(typeName)).append("\n");
         sb.append("    typeId: ").append(toIndentedString(typeId)).append("\n");
         sb.append("    className: ").append(toIndentedString(className)).append("\n");
-        sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();

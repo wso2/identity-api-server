@@ -26,6 +26,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
@@ -49,7 +51,11 @@ public interface ApplicationsApiService {
 
       public Response createApplication(ApplicationModel applicationModel, String template);
 
+      public Response createApplicationTemplate(ApplicationTemplateModel applicationTemplateModel);
+
       public Response deleteApplication(String applicationId);
+
+      public Response deleteApplicationTemplate(String templateId);
 
       public Response deleteCustomInboundConfiguration(String applicationId, String inboundProtocolId);
 
@@ -65,9 +71,13 @@ public interface ApplicationsApiService {
 
       public Response getAdaptiveAuthTemplates();
 
+      public Response getAllApplicationTemplates(Integer limit, Integer offset);
+
       public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String attributes);
 
       public Response getApplication(String applicationId);
+
+      public Response getApplicationTemplate(String templateId);
 
       public Response getCustomInboundConfiguration(String applicationId, String inboundProtocolId);
 
@@ -102,6 +112,8 @@ public interface ApplicationsApiService {
       public Response regenerateOAuthClientSecret(String applicationId);
 
       public Response revokeOAuthClient(String applicationId);
+
+      public Response updateApplicationTemplate(String templateId, ApplicationTemplateModel applicationTemplateModel);
 
       public Response updateCustomInboundConfiguration(String applicationId, String inboundProtocolId, CustomInboundProtocolConfiguration customInboundProtocolConfiguration);
 

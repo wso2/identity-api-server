@@ -23,11 +23,13 @@ public class Constants {
 
     public static final String IDP_MANAGEMENT_PREFIX = "IDP-";
     public static final String IDP_PATH_COMPONENT = "/identity-providers";
+    public static final String IDP_TEMPLATE_PATH_COMPONENT = "/templates";
     public static final String PATH_SEPERATOR = "/";
     public static final String JWKS_URI = "jwksUri";
     public static final String META_DATA_SAML = "meta_data_saml";
     public static final String SELECT_MODE = "SelectMode";
     public static final String SELECT_MODE_METADATA = "Metadata File Configuration";
+    public static final String TEMPLATE_MGT_ERROR_CODE_DELIMITER = "_";
 
     // IdP property keys.
     public static final String PROP_DISPLAY_NAME = "DisplayName";
@@ -60,6 +62,11 @@ public class Constants {
     public static final String ROLES = "roles";
     public static final String FEDERATED_AUTHENTICATORS = "federatedAuthenticators";
     public static final String PROVISIONING = "provisioning";
+
+    // IdP template property keys
+    public static final String PROP_CATEGORY = "category";
+    public static final String PROP_DISPLAY_ORDER = "displayOrder";
+
 
     /**
      * Enum for error messages.
@@ -165,7 +172,17 @@ public class Constants {
         ERROR_CODE_INVALID_INPUT("60025", "Invalid input.", "One of the given inputs is invalid."),
         ERROR_CODE_INVALID_SAML_METADATA("60026", "Invalid SAML metadata.", "SAML metadata is invalid/empty."),
         ERROR_CODE_BUILDING_LINKS("65042", "Error building page links", "Error occurred during building page links. " +
-                "%s");
+                "%s"),
+        ERROR_CODE_ERROR_LISTING_IDP_TEMPLATES("65050", "Unable to list existing identity provider " +
+                "templates.", "Error occured while listing identity provider templates."),
+        ERROR_CODE_ERROR_ADDING_IDP_TEMPLATE("65051", "Unable to add IDP template.",
+                "Error occurred while trying to add the IDP template."),
+        ERROR_CODE_ERROR_DELETING_IDP_TEMPLATE("65052", "Unable to delete IDP template.",
+                "Error occurred while trying to delete the IDP template with identifier %s."),
+        ERROR_CODE_ERROR_UPDATING_IDP_TEMPLATE("65053", "Unable to update IDP template.",
+                "Error occurred while updating the IDP template with identifier %s."),
+        ERROR_CODE_ERROR_RETRIEVING_IDP_TEMPLATE("65054", "Unable to retrieve IDP template.",
+                "Error occurred while retrieving the IDP template with identifier %s");
 
         private final String code;
         private final String message;

@@ -3,8 +3,9 @@ info:
   version: "v1"
   title: WSO2 Identity Server - Email Template API
   description: >-
-    This is the RESTful API for managing Email Templates in the WSO2 Identity
-    Server.
+    This is the RESTful API for managing email templates in WSO2 Identity
+    Server.This API allows adding, retrieving, replacing, and removing email
+    templates and template types.
   contact:
     name: WSO2 Identity Server
     url: 'https://wso2.com/identity-and-access-management/'
@@ -25,13 +26,16 @@ paths:
     get:
       tags:
         - Email Template Types
-      summary: Retrieve all the Email Template Types.
+      summary: Retrieves all the email template types.
       operationId: getAllEmailTemplateTypes
       description: |
-        Retrieve all the Email Template Types in the system, with limited details of the email templates.
+        Retrieves all the email template types in the system, with limited details of the email templates.
 
-        <b>Permission required:</b>
+        <b>Permission required:</b><br>
         * /permission/admin/manage/identity/emailmgt/view
+        <br> 
+        <b>Scopes required:</b> 
+        <br>* internal_email_mgt_view
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
@@ -55,15 +59,18 @@ paths:
     post:
       tags:
         - Email Template Types
-      summary: Add a new email template type.
+      summary: Adds a new email template type.
       operationId: addEmailTemplateType
       description: |
-        Adds a new email template type to the system. An email template type can have any number of email templates.
+        Adds a new email template type to the system. An email template type can have any number of email templates. <br>
 
-        * Attribute _**displayName**_ of the template type should be unique.
+        * Attribute _**displayName**_ of the template type should be unique. <br>
 
-        <b>Permission required:</b>
+        <b>Permission required:</b> <br>
         * /permission/admin/manage/identity/emailmgt/create
+        <br> 
+        <b>Scopes required:</b> 
+        <br>* internal_email_mgt_create
       requestBody:
         content:
           application/json:
@@ -75,7 +82,7 @@ paths:
           description: Item Created
           headers:
             self:
-              description: Location of the newly created identity provider
+              description: Location of the newly created identity provider.
               schema:
                 type: string
           content:
@@ -96,13 +103,15 @@ paths:
     get:
       tags:
         - Email Template Types
-      summary: Retrieve the email template type corresponds to the template type id.
+      summary: Retrieves the email template type corresponding to the template type id.
       operationId: getEmailTemplateType
       description: |
-        Retrieve the email template type in the system identified by the template-type-id.
+        Retrieves the email template type in the system identified by the template-type-id. <br>
 
-        <b>Permission required:</b>
+        <b>Permission required:</b> <br>
         * /permission/admin/manage/identity/emailmgt/view
+        <br><b>Scopes required:</b><br>
+        * internal_email_mgt_view<br>
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/limitQueryParam'
@@ -129,15 +138,15 @@ paths:
     post:
       tags:
         - Email Templates
-      summary: Add a new email template to an existing email template type.
+      summary: Adds a new email template to an existing email template type.
       operationId: addEmailTemplate
       description: |
-        Adds a new email template an existing email template type in the system.
-        The locale of the new email template should not already exists in the
-        respective email template type.
-
+        Another email template with the same locale should not already exist in the
+        respective email template type. <br>
+  
         <b>Permission required:</b>
-        * /permission/admin/manage/identity/emailmgt/create
+        * /permission/admin/manage/identity/emailmgt/create<br>
+        <b>Scopes required:</b> <br>* internal_email_mgt_create
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       requestBody:
@@ -171,14 +180,16 @@ paths:
     put:
       tags:
         - Email Template Types
-      summary: Replace all email templates of the respective email template type
+      summary: Replaces all email templates of the respective email template type
       operationId: updateEmailTemplateType
       description: |
-        Replace all email templates of the respective email template type with
-        the newly provided email templates.
+        Replaces all email templates of the respective email template type with
+        the newly provided email templates. <br>
 
-        <b>Permission required:</b>
-        * /permission/admin/manage/identity/emailmgt/update
+        <b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/emailmgt/update <br>
+        <b>Scopes required:</b><br>
+        * internal_email_mgt_update
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       requestBody:
@@ -208,11 +219,13 @@ paths:
       summary: Removes an email template type.
       operationId: deleteEmailTemplateType
       description: |
-        Removes an existing email template type with all it's email templates
-        from the system.
+        Removes an existing email template type with all its email templates
+        from the system. <br>
 
-        <b>Permission required:</b>
-        * /permission/admin/manage/identity/emailmgt/delete
+        <b>Permission required:</b><br>
+        * /permission/admin/manage/identity/emailmgt/delete <br>
+        <b>Scopes required:</b><br>
+        * internal_email_mgt_delete
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       responses:
@@ -224,19 +237,24 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
   '/email/template-types/{template-type-id}/templates':
     get:
       tags:
         - Email Templates
-      summary: Retrieve the list of email templates in the template type id.
+      summary: Retrieves the list of email templates in the template type id.
       operationId: getTemplatesListOfEmailTemplateType
       description: |
-        Retrieve the list of email templates in the template type id.
+        Retrieves the list of email templates in the template type id. <br>
 
-        <b>Permission required:</b>
-          * /permission/admin/manage/identity/emailmgt/view
+
+        <b>Permission required:</b> <br>
+          * /permission/admin/manage/identity/emailmgt/view <br>
+          <b>Scopes required:</b><br>
+          * internal_email_mgt_view<br>
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/limitQueryParam'
@@ -269,10 +287,11 @@ paths:
       summary: Retrieves a single email template.
       operationId: getEmailTemplate
       description: |
-        Retrieves the email template that matches to the template-type-id and the template-id
+        Retrieves the email template that matches to the template-type-id and the template-id. <br>
 
-        <b>Permission required:</b>
-          * /permission/admin/manage/identity/emailmgt/view
+        <b>Permission required:</b> <br>
+          * /permission/admin/manage/identity/emailmgt/view <br>
+          <b>Scopes required:</b><br>* internal_email_mgt_view
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/templateIdPathParam'
@@ -300,13 +319,15 @@ paths:
     put:
       tags:
         - Email Templates
-      summary: Replace an existing email template.
+      summary: Replaces an existing email template.
       operationId: updateEmailTemplate
       description: |
-        Replace the email template identified by the template-type-id and the template-id.
+        Replaces the email template identified by the template-type-id and the template-id. <br>
 
-        <b>Permission required:</b>
-          * /permission/admin/manage/identity/emailmgt/update
+        <b>Permission required:</b> <br>
+          * /permission/admin/manage/identity/emailmgt/update <br>
+          <b>Scopes required:</b><br>
+          * internal_email_mgt_update
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/templateIdPathParam'
@@ -335,10 +356,12 @@ paths:
       summary: Removes an email template.
       operationId: deleteEmailTemplate
       description: |
-        Removes an email template identified by the template-type-id and the template-id.
+        Removes an email template identified by the template-type-id and the template-id. <br>
 
-        <b>Permission required:</b>
-          * /permission/admin/manage/identity/emailmgt/delete
+        <b>Permission required:</b> <br>
+          * /permission/admin/manage/identity/emailmgt/delete <br>
+          <b>Scopes required:</b><br>
+        * internal_email_mgt_delete
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/templateIdPathParam'
@@ -351,6 +374,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
 servers:
@@ -400,7 +425,7 @@ components:
       name: sortOrder
       required: false
       description: >-
-        Define the order how the retrieved records should be sorted. _<b>This
+        Define the order in which the retrieved records should be sorted. _<b>This
         option is not yet supported.<b>_
       schema:
         type: string
@@ -471,7 +496,7 @@ components:
         id:
           type: string
           example: YWNjb3VudGNvbmZpcm1hdGlvbg
-          description: Unique id of the email template type.
+          description: Unique ID of the email template type.
         displayName:
           type: string
           example: Account Confirmation
@@ -504,7 +529,7 @@ components:
             id:
               type: string
               example: YWNjb3VudGNvbmZpcm1hdGlvbg
-              description: Unique id of the email template type.
+              description: Unique ID of the email template type.
     EmailTemplate:
       type: object
       required:
@@ -539,7 +564,7 @@ components:
               type: string
               example: en_US
               description: >-
-                Unique ID of the email template. This id represents the locale of the email template.
+                Unique ID of the email template. This ID represents the locale of the email template.
     SimpleEmailTemplate:
       type: object
       required:
@@ -550,7 +575,7 @@ components:
           type: string
           example: en_US
           description: >-
-            Unique ID of the email template. This id represents the locale of the email template.
+            Unique ID of the email template. This ID represents the locale of the email template.
         self:
           type: string
           example: /t/{tenant-domain}/api/server/v1/email/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg/templates/en_US

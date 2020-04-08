@@ -181,7 +181,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         ServiceProvider defaultSP;
         try {
-            defaultSP = ApplicationManagementServiceHolder.getApplicationManagementService()
+            defaultSP = ApplicationManagementServiceHolder.getInstance().getApplicationManagementService()
                     .getServiceProvider(IdentityApplicationConstants.DEFAULT_SP_CONFIG,
                             MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
         } catch (IdentityApplicationManagementException e) {
@@ -336,7 +336,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .discoverableByEndUsers(serviceProvider.isDiscoverable())
                 .enableAuthorization(authConfig.isEnableAuthorization())
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
-                .skipConsent(authConfig.isSkipConsent())
+                .skipLoginConsent(authConfig.isSkipConsent())
+                .skipLogoutConsent(authConfig.isSkipLogoutConsent())
                 .certificate(getCertificate(serviceProvider));
     }
 

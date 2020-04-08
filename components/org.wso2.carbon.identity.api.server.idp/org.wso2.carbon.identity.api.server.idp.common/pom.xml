@@ -22,7 +22,7 @@
         <artifactId>org.wso2.carbon.identity.api.server.idp</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.0.90-SNAPSHOT</version>
+        <version>1.0.107-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -56,6 +56,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.template.mgt</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
   description: >
-    This document specifies a **Application Management RESTful API** for **WSO2
-    Identity Server** .
+    This document specifies an **Application Management RESTful API** for **WSO2
+    Identity Server**.
   version: "v1"
   title: WSO2 Identity Server - Application Management Rest API
   termsOfService: 'http://swagger.io/terms/'
@@ -26,7 +26,11 @@ paths:
       summary: |
         List applications
       description: |
-        This API provides the capability to retrieve the list of applications.
+        This API provides the capability to retrieve the list of applications.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
@@ -77,7 +81,11 @@ paths:
       operationId: createApplication
       description: >
         This API provides the capability to store the application information
-        provided by users.
+        that is provided by users.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/create <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_create
       parameters:
         - in: query
           name: template
@@ -98,7 +106,7 @@ paths:
           description: Successful response.
           headers:
             Location:
-              description: Location of the newly created application.
+              description: This denotes the location of the newly-created application.
               schema:
                 type: string
         '400':
@@ -138,7 +146,11 @@ paths:
       operationId: importApplication
       description: >
         This API provides the capability to store the application information,
-        provided as a file.
+        provided as a file.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/create <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_create
       requestBody:
         content:
           multipart/form-data:
@@ -182,7 +194,11 @@ paths:
         Update application from an exported XML file
       operationId: importApplicationForUpdate
       description: >
-        This API provides the capability to update an application from information that has been exported as an XML file.
+        This API provides the capability to update an application from information that has been exported as an XML file.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_update
       requestBody:
         content:
           multipart/form-data:
@@ -234,7 +250,11 @@ paths:
       operationId: getApplication
       description: >
         This API provides the capability to retrieve the application information
-        by ID.
+        by ID. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       parameters:
         - name: applicationId
           in: path
@@ -288,7 +308,11 @@ paths:
         Partially update application by ID
       operationId: patchApplication
       description: |
-        This API provides the capability to partially update an application by ID.
+        This API provides the capability to partially update an application by ID.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_update
       parameters:
         - name: applicationId
           in: path
@@ -335,7 +359,11 @@ paths:
         Delete application by ID
       operationId: deleteApplication
       description: |
-        This API provides the capability to delete an application by ID.
+        This API provides the capability to delete an application by ID. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/delete <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_delete
       parameters:
         - name: applicationId
           in: path
@@ -356,6 +384,12 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -370,7 +404,11 @@ paths:
       summary: |
         Export application as an XML file
       description: |
-        This API provides the capability to retrieve the application as an XML file.
+        This API provides the capability to retrieve the application as an XML file.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       parameters:
         - name: applicationId
           in: path
@@ -417,6 +455,11 @@ paths:
       operationId: getResidentApplication
       description: |
         This API provides the capability to retrieve the resident application information.
+        <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       responses:
         '200':
           description: OK
@@ -453,7 +496,11 @@ paths:
         Update Resident Application
       operationId: updateResidentApplication
       description: >
-        This API provides the capability to update Resident Application Configuration.
+        This API provides the capability to update the Resident Application Configuration. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_update
       responses:
         '200':
           description: Successful
@@ -508,11 +555,15 @@ paths:
       tags:
         - Inbound Protocols
       summary: |
-        Retrieve inbound protocol configurations of application
+        Retrieve inbound protocol configurations of the application
       operationId: getInboundAuthenticationConfigurations
       description: >
         This API provides the capability to retrieve authentication protocol
-        configurations of an application.
+        configurations of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       parameters:
         - name: applicationId
           in: path
@@ -558,7 +609,11 @@ paths:
       operationId: getInboundSAMLConfiguration
       description: >
         This API provides the capability to retrieve SAML2 authentication
-        protocol parameters of an application.
+        protocol parameters of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       parameters:
         - name: applicationId
           in: path
@@ -604,7 +659,11 @@ paths:
       operationId: updateInboundSAMLConfiguration
       description: >
         This API provides the capability to store SAML2 authentication protocol
-        parameters of an application.
+        parameters of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_update
 
         - There are three methods to create/update SAML2 authentication protocol configuration.
             1. Metadata File (by sending the Base64 encoded content of the metadata file.)
@@ -670,7 +729,11 @@ paths:
       operationId: deleteInboundSAMLConfiguration
       description: >
         This API provides the capability to delete SAML2 authentication protocol
-        parameters of an application.
+        parameters of an application. <br>
+          <b>Permissi on required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/delete <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_delete
       parameters:
         - name: applicationId
           in: path
@@ -691,6 +754,12 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -707,7 +776,11 @@ paths:
         Retrieve OIDC authentication protocol parameters of application
       description: >
         This API provides the capability to retrieve OIDC authentication
-        protocol parameters of an application.
+        protocol parameters of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       operationId: getInboundOAuthConfiguration
       parameters:
         - name: applicationId
@@ -752,7 +825,11 @@ paths:
         Update OIDC authentication protocol parameters of application
       description: >
         This API provides the capability to store OIDC authentication protocol
-        parameters of an application.
+        parameters of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_update
       operationId: updateInboundOAuthConfiguration
       parameters:
         - name: applicationId
@@ -768,7 +845,7 @@ paths:
           description: Created
           headers:
             Location:
-              description: Location of the newly created OIDC Authentication Configuration.
+              description: This is the location of the newly created OIDC Authentication Configuration.
               schema:
                 type: string
         '400':
@@ -815,7 +892,11 @@ paths:
         Delete OIDC authentication protocol parameters of application
       description: >
         This API provides the capability to delete OIDC authentication protocol
-        parameters of an application.
+        parameters of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/delete <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_delete
       operationId: deleteInboundOAuthConfiguration
       parameters:
         - name: applicationId
@@ -837,6 +918,12 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -852,7 +939,11 @@ paths:
       summary: |
         Regenerate the OAuth2/OIDC client secret of application
       description: |
-        This API regenerates the OAuth2/OIDC client secret.
+        This API regenerates the OAuth2/OIDC client secret. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/create <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_create
       operationId: regenerateOAuthClientSecret
       parameters:
         - name: applicationId
@@ -898,7 +989,11 @@ paths:
       summary: |
         Revoke the OAuth2/OIDC client of application
       description: |
-        This API revokes the OAuth2/OIDC client secret. To re-activate the client, the client secret needs to be regenerated.
+        This API revokes the OAuth2/OIDC client secret. To re-activate the client, the client secret needs to be regenerated. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/create <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_create
       operationId: revokeOAuthClient
       parameters:
         - name: applicationId
@@ -941,7 +1036,11 @@ paths:
         Retrieve Passive STS authentication protocol parameters of application
       description: >
         This API provides the capability to retrieve Passive STS authentication
-        protocol parameters of an application.
+        protocol parameters of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       operationId: getPassiveStsConfiguration
       parameters:
         - name: applicationId
@@ -987,7 +1086,11 @@ paths:
         Update Passive STS authentication protocol parameters of application
       description: >
         This API provides the capability to store passive STS authentication
-        protocol parameters of an application.
+        protocol parameters of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_update
       operationId: updatePassiveStsConfiguration
       parameters:
         - name: applicationId
@@ -1053,7 +1156,11 @@ paths:
         Delete Passive STS authentication protocol parameters of application
       description: >
         This API provides the capability to delete Passive STS authentication
-        protocol parameters of an application.
+        protocol parameters of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/delete <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_delete
       operationId: deletePassiveStsConfiguration
       parameters:
         - name: applicationId
@@ -1075,6 +1182,12 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -1090,7 +1203,11 @@ paths:
         Retrieve WS Trust authentication protocol parameters of application
       description: >
         This API provides the capability to retrieve Passive STS authentication
-        protocol parameters of an application.
+        protocol parameters of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       operationId: getWSTrustConfiguration
       parameters:
         - name: applicationId
@@ -1136,7 +1253,11 @@ paths:
         Update WS Trust authentication protocol parameters of application
       description: >
         This API provides the capability to store WS Trust authentication
-        protocol parameters of an application.
+        protocol parameters of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_update
       operationId: updateWSTrustConfiguration
       parameters:
         - name: applicationId
@@ -1202,7 +1323,11 @@ paths:
         Delete WS Trust authentication protocol parameters of application
       description: >
         This API provides the capability to delete WS Trust authentication
-        protocol parameters of an application.
+        protocol parameters of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/delete <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_delete
       operationId: deleteWSTrustConfiguration
       parameters:
         - name: applicationId
@@ -1224,6 +1349,12 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -1239,7 +1370,11 @@ paths:
         Retrieve custom Inbound authentication protocol parameters of application.
       description: >
         This API provides the capability to retrieve custom inbound
-        authentication protocol parameters of an application.
+        authentication protocol parameters of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       operationId: getCustomInboundConfiguration
       parameters:
         - name: applicationId
@@ -1290,6 +1425,11 @@ paths:
         Update the custom inbound authentication protocol parameters of application
       description: >
         This API provides the capability to store custom inbound authentication protocol parameters of an application.
+        <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_update
       operationId: updateCustomInboundConfiguration
       parameters:
         - name: applicationId
@@ -1359,7 +1499,11 @@ paths:
       summary: >
         Delete custom inbound authentication protocol parameters of application
       description: >
-        This API provides the capability to delete custom inbound authentication protocol of an application.
+        This API provides the capability to delete custom inbound authentication protocol of an application. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/delete <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_delete
       operationId: deleteCustomInboundConfiguration
       parameters:
         - name: applicationId
@@ -1387,6 +1531,12 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -1403,6 +1553,11 @@ paths:
       description: >
         This API provides the capability to retrieve the list of inbound authentication protocols available.
         If the query parameter 'customOnly' is set to true, only custom inbound protocols will be listed.
+        <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       operationId: getInboundProtocols
       parameters:
         - $ref: '#/components/parameters/inboundProtocolsCustomOnly'
@@ -1442,7 +1597,11 @@ paths:
       summary: |
         Retrieve all the metadata related to the auth protocol SAML
       description: >
-        This API provides the capability to retrieve all the metadata related to the auth protocol SAML.
+        This API provides the capability to retrieve all the metadata related to the auth protocol SAML. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       operationId: getSAMLMetadata
       responses:
         '200':
@@ -1483,8 +1642,11 @@ paths:
       summary: |
         Retrieve all the metadata related to the authentication protocol OAuth / OIDC
       description: >
-        This API provides the capability to retrieve all the metadata related to the authentication
-         protocol OAuth / OIDC.
+        This API provides the capability to retrieve all the metadata related to the authentication protocol OAuth / OIDC. <br>
+           <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       operationId: getOIDCMetadata
       responses:
         '200':
@@ -1517,7 +1679,11 @@ paths:
       summary: |
         Retrieve all the metadata related to the auth protocol WS Trust
       description: >
-        This API provides the capability to retrieve all the metadata related to the auth protocol WS_Trust.
+        This API provides the capability to retrieve all the metadata related to the auth protocol WS_Trust. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       operationId: getWSTrustMetadata
       responses:
         '200':
@@ -1551,7 +1717,11 @@ paths:
         Retrieve all the metadata related to the custom auth protocol identified by the inboundProtocolId
       description: >
         This API provides the capability to retrieve all the metadata related to the custom auth protocol
-        identified by the inboundProtocolId.
+        identified by the inboundProtocolId. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       operationId: getCustomProtocolMetadata
       parameters:
         - name: inboundProtocolId
@@ -1591,7 +1761,11 @@ paths:
       summary: |
         Retrieve the sample adaptive authentication templates.
       description: >
-        This API provides the capability to retrieve the sample adaptive authentication templates.
+        This API provides the capability to retrieve the sample adaptive authentication templates. <br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       operationId: getAdaptiveAuthTemplates
       responses:
         '200':
@@ -1617,6 +1791,243 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /applications/templates:
+    get:
+      tags:
+        - Application Templates
+      operationId: getAllApplicationTemplates
+      summary: |
+        List Application Templates
+      description: |
+        This API provides the capability to retrieve the list of templates available.
+      parameters:
+        - $ref: '#/components/parameters/limitWithoutDefaultQueryParam'
+        - $ref: '#/components/parameters/offsetWithoutDefaultQueryParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationTemplatesList'
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: "Unauthorized"
+        '403':
+          description: "Forbidden"
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: "Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: "Not Implemented"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Application Templates
+      summary: |
+        Add application template
+      operationId: createApplicationTemplate
+      description: >
+        This API provides the capability to store the application template provided by users.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationTemplateModel'
+        description: "This represents the application template to be created."
+        required: true
+      responses:
+        '201':
+          description: "Successful response."
+          headers:
+            Location:
+              description: "Location of the newly created application template."
+              schema:
+                type: string
+                example: "/t/wso2.com/api/server/v1/applications/templates/85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: "Unauthorized"
+        '403':
+          description: "Forbidden"
+        '409':
+          description: "Conflict"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: "Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: "Not Implemented"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /applications/templates/{template-id}:
+    get:
+      tags:
+        - Application Templates
+      summary: |
+        Retrieve application template by ID
+      operationId: getApplicationTemplate
+      description: >
+        This API provides the capability to retrieve the application template from the template id.
+      parameters:
+        - $ref: '#/components/parameters/templateIdPathParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationTemplateModel'
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: "Unauthorized"
+        '403':
+          description: "Forbidden"
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: "Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      tags:
+        - Application Templates
+      summary: |
+        Update the application template by the template ID.
+      operationId: updateApplicationTemplate
+      description: |
+        This API provides the capability to update an application template by the template ID.
+      parameters:
+        - $ref: '#/components/parameters/templateIdPathParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationTemplateModel'
+        description: "This represents the new application template."
+        required: true
+      responses:
+        '200':
+          description: "Successfully Updated"
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: "Unauthorized"
+        '403':
+          description: "Forbidden"
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: "Conflict"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: "Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Application Templates
+      summary: |
+        Delete application template by template ID.
+      operationId: deleteApplicationTemplate
+      description: |
+        This API provides the capability to delete an application template by template ID.
+      parameters:
+        - $ref: '#/components/parameters/templateIdPathParam'
+      responses:
+        '204':
+          description: "Successfully Deleted"
+        '400':
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: "Unauthorized"
+        '403':
+          description: "Forbidden"
+        '404':
+          description: "Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: "Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   parameters:
     limitQueryParam:
@@ -1629,6 +2040,14 @@ components:
         type: integer
         minimum: 1
         default: 30
+    limitWithoutDefaultQueryParam:
+      in: query
+      name: limit
+      required: false
+      description: |
+        Maximum number of records to return.
+      schema:
+        type: integer
     offsetQueryParam:
       in: query
       name: offset
@@ -1638,6 +2057,14 @@ components:
       schema:
         type: integer
         default: 0
+    offsetWithoutDefaultQueryParam:
+      in: query
+      name: offset
+      required: false
+      description: |
+        Number of records to skip for pagination.
+      schema:
+        type: integer
     filterQueryParam:
       in: query
       name: filter
@@ -1698,6 +2125,14 @@ components:
         type: boolean
         example: true
         default: false
+    templateIdPathParam:
+      in: path
+      name: template-id
+      required: true
+      description: |
+        Application template ID. This should be a valid locale.
+      schema:
+        type: string
   securitySchemes:
     BasicAuth:
       type: http
@@ -1719,7 +2154,6 @@ components:
         rel:
           type: string
           example: "next"
-
 
     ApplicationListResponse:
       type: object
@@ -1914,10 +2348,14 @@ components:
           description: Decides whether the application is visible for end users.
         certificate:
           $ref: '#/components/schemas/Certificate'
-        skipConsent:
+        skipLoginConsent:
           type: boolean
           example: false
           description: Decides whether user consent needs to be skipped during login flows.
+        skipLogoutConsent:
+          type: boolean
+          example: false
+          description: Decides whether user consent needs to be skipped during logout flows.
         returnAuthenticatedIdpList:
           type: boolean
           example: false
@@ -2369,7 +2807,7 @@ components:
           format: int64
           example: 86400
         renewRefreshToken:
-          description: "Decides whether the refresh token needs to renewed during refresh grant flow."
+          description: Decides whether the refresh token needs to be renewed during refresh grant flow.
           type: boolean
           example: true
     IdTokenConfiguration:
@@ -2412,6 +2850,9 @@ components:
           example: 'https://app.example.com/frontchannel/callback'
     PassiveStsConfiguration:
       type: object
+      required:
+        - realm
+        - replyTo
       properties:
         realm:
           type: string
@@ -2464,9 +2905,9 @@ components:
         type:
           type: string
           description: "
-          - DEFAULT type indicates that the application will use the default authentication sequence specified at the tenant level. When DEFAULT type is used the information given other fields of the AuthenticationSequence will be ignored and overriden with values defined at the tenant level.
+          - DEFAULT type indicates that the application will use the default authentication sequence specified at the tenant level. When the DEFAULT type is used, the information given in the other fields of the AuthenticationSequence will be ignored and overriden with values defined at the tenant level.
 
-           - USER_DEFINED type indicates that the application will use a user defined authentication sequence."
+           - USER_DEFINED type indicates that the application will use a user-defined authentication sequence."
           enum:
             - DEFAULT
             - USER_DEFINED
@@ -2647,7 +3088,86 @@ components:
           type: string
           format: binary
           description: file to upload
+    ApplicationTemplatesList:
+      type: object
+      properties:
+        templates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApplicationTemplatesListItem'
 
+    ApplicationTemplatesListItem:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
+        name:
+          type: string
+          example: "OIDC Protocol Template"
+        description:
+          type: string
+          example: "Template to be used for Single Page Applications"
+        image:
+          type: string
+          example: "https://example.com/logo/my-logo.png"
+        authenticationProtocol:
+          type: string
+          example: "oidc"
+        types:
+          type: array
+          items:
+            type: string
+            example:
+              - react
+              - angular
+        category:
+          type: string
+          example: "Server Template"
+        displayOrder:
+          type: integer
+          example: 2
+        self:
+          type: string
+          example: "/t/wso2.com/api/server/v1/applications/templates/85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
+
+    ApplicationTemplateModel:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          example: "85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
+        name:
+          type: string
+          example: "OIDC Protocol Template"
+        description:
+          type: string
+          example: "Template to be used for Single Page Applications"
+        image:
+          type: string
+          example: "https://example.com/logo/my-logo.png"
+        authenticationProtocol:
+          type: string
+          example: "oidc"
+        types:
+          type: array
+          items:
+            type: string
+          example:
+            - react
+            - angular
+        category:
+          type: string
+          example: "Server Template"
+        displayOrder:
+          type: integer
+          example: 2
+        application:
+          $ref : '#/components/schemas/ApplicationModel'
+      required:
+        - name
+        - application
     Error:
       type: object
       properties:

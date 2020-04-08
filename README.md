@@ -37,7 +37,7 @@ The suggested name for the file name of the API definition is `<resource>.yaml`.
 
 If you are working with Swagger 2.0 still, you have to convert the API definition to OpenAPI 3.0
 
-    ```
+```
     +-- identity-api-server
     |   +-- components
     |       +-- org.wso2.carbon.identity.api.server.<resource>
@@ -48,10 +48,11 @@ If you are working with Swagger 2.0 still, you have to convert the API definitio
     |                           +--api.yaml
     |               +-- pom.xml
     |           +-- pom.xml
-    ```
+```
      
-     Let's consider sample definition as *challenge.yaml*
+   Let's consider sample definition as *challenge.yaml*
      
+```
         +-- identity-api-server
         |   +-- components
         |       +-- org.wso2.carbon.identity.api.server.challenge
@@ -62,12 +63,13 @@ If you are working with Swagger 2.0 still, you have to convert the API definitio
         |                           +--challenge.yaml
         |               +-- pom.xml
         |           +-- pom.xml
-   
+```
    
         
 2. Include the given plugin to the `pom.xml` file of the module `org.wso2.carbon.identity.api.server.<resource>
 .<version>`
-    ```
+
+  ```
   <plugin>
       <groupId>org.openapitools</groupId>
       <artifactId>openapi-generator-maven-plugin</artifactId>
@@ -101,9 +103,11 @@ If you are working with Swagger 2.0 still, you have to convert the API definitio
           </dependency>
       </dependencies>
   </plugin>
-    ```
-    For our example: 
-    ```
+  ```
+
+  For our example: 
+    
+  ```
     <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
@@ -137,11 +141,12 @@ If you are working with Swagger 2.0 still, you have to convert the API definitio
             </dependency>
         </dependencies>
     </plugin>
-    ```
+  ```
+
 3. Do a maven build inside the module `org.wso2.carbon.identity.api.server.<resource>.<version>` to generate the stubs
-    ```
+   ```
     mvn clean install
-    ```
+   ```
 4. Comment out the plugin added for your API definition before committing to the git. Because it will regenerate during each build.
 
 
@@ -152,7 +157,8 @@ A new version is introduced only when a major version of API swagger definition 
 1. Locate the correct parent module of the current API implementation. Create a new module with the new version 
 and include the API swagger definition in the new module project . Suggested name 
 for the file name of the API definition is *<resource>.yaml*
-    ```
+
+```
     +-- identity-api-server
     |   +-- components
     |       +-- org.wso2.carbon.identity.api.server.<resource>
@@ -169,10 +175,11 @@ for the file name of the API definition is *<resource>.yaml*
     |                           +--api.yaml
     |               +-- pom.xml
     |           +-- pom.xml
-    ```
+```
      
-     Let's consider sample definition as *challenge.yaml*
+   Let's consider sample definition as *challenge.yaml*
      
+```
         +-- identity-api-server
         |   +-- components
         |       +-- org.wso2.carbon.identity.api.server.challenge
@@ -189,9 +196,11 @@ for the file name of the API definition is *<resource>.yaml*
         |                           +--challenge.yaml
         |               +-- pom.xml
         |           +-- pom.xml
-2. Include the given plugin to the `pom.xml` file of the module `org.wso2.carbon.identity.api.server.<resource>
-.<version+1>`
-        ```
+```
+   
+2. Include the given plugin to the `pom.xml` file of the module `org.wso2.carbon.identity.api.server.<resource>.<version+1>`
+        
+```
       <plugin>
           <groupId>org.openapitools</groupId>
           <artifactId>openapi-generator-maven-plugin</artifactId>
@@ -225,9 +234,11 @@ for the file name of the API definition is *<resource>.yaml*
               </dependency>
           </dependencies>
       </plugin>
-        ```
-        For our example: 
-        ```
+```
+        
+   For our example: 
+        
+```
         <plugin>
             <groupId>org.openapitools</groupId>
             <artifactId>openapi-generator-maven-plugin</artifactId>
@@ -261,7 +272,8 @@ for the file name of the API definition is *<resource>.yaml*
                 </dependency>
             </dependencies>
         </plugin>
-      ```
+```
+   
 3. Do a maven build inside the module `org.wso2.carbon.identity.api.server.<resource>.<version+1>` to generate the stubs
     ```
     mvn clean install
@@ -275,23 +287,23 @@ Once you execute the above steps to generate the code it will generate set of ja
 definition. 
 
 ```    
-├── src
-│   ├── gen
-│   │   └── java.org.wso2.carbon.identity.rest.api.server.<resource>.<version>
-│   └── main
-│       ├── java
-│       │   └── java.org.wso2.carbon.identity.rest.api.server.<resource>.<version>.impl
+        ├── src
+        │   ├── gen
+        │   │   └── java.org.wso2.carbon.identity.rest.api.server.<resource>.<version>
+        │   └── main
+        │       ├── java
+        │       │   └── java.org.wso2.carbon.identity.rest.api.server.<resource>.<version>.impl
 ```  
 
 In our example
 
 ```    
-├── src
-│   ├── gen
-│   │   └── java.org.wso2.carbon.identity.rest.api.server.challenge.v1
-│   └── main
-│       ├── java
-│       │   └── java.org.wso2.carbon.identity.rest.api.server.challenge.v1.impl
+        ├── src
+        │   ├── gen
+        │   │   └── java.org.wso2.carbon.identity.rest.api.server.challenge.v1
+        │   └── main
+        │       ├── java
+        │       │   └── java.org.wso2.carbon.identity.rest.api.server.challenge.v1.impl
 ```  
 
 You need to implement the functions of the classes under `java.org.wso2.carbon.identity.rest.api.server.challenge.v1
@@ -300,32 +312,32 @@ You need to implement the functions of the classes under `java.org.wso2.carbon.i
 Inorder to improve re-usability of common implementations between versions, we encourage you to include a common 
 component `org.wso2.carbon.identity.api.server.<resource>.common` for your resource type component as below.
 
- ```
-    +-- identity-api-server
-    |   +-- components
-    |       +-- org.wso2.carbon.identity.api.server.<resource>
-    |           +-- org.wso2.carbon.identity.api.server.<resource>.common
-    |               +-- src
-    |               +-- pom.xml
-    |           +-- org.wso2.carbon.identity.api.server.<resource>.<version>
-    |               +-- src
-    |                   +-- main
-    |                       +-- resources
-    |                           +--api.yaml
-    |               +-- pom.xml
-    |           +-- org.wso2.carbon.identity.api.server.<resource>.<version+1>
-    |               +-- src
-    |                   +-- main
-    |                       +-- resources
-    |                           +--api.yaml
-    |               +-- pom.xml
-    |           +-- pom.xml
-    
-   ```
+```
+        +-- identity-api-server
+        |   +-- components
+        |       +-- org.wso2.carbon.identity.api.server.<resource>
+        |           +-- org.wso2.carbon.identity.api.server.<resource>.common
+        |               +-- src
+        |               +-- pom.xml
+        |           +-- org.wso2.carbon.identity.api.server.<resource>.<version>
+        |               +-- src
+        |                   +-- main
+        |                       +-- resources
+        |                           +--api.yaml
+        |               +-- pom.xml
+        |           +-- org.wso2.carbon.identity.api.server.<resource>.<version+1>
+        |               +-- src
+        |                   +-- main
+        |                       +-- resources
+        |                           +--api.yaml
+        |               +-- pom.xml
+        |           +-- pom.xml
+        
+```
      
   Let's consider sample resource
     
-   ``` 
+``` 
         +-- identity-api-server
         |   +-- components
         |       +-- org.wso2.carbon.identity.api.server.challenge
@@ -345,7 +357,7 @@ component `org.wso2.carbon.identity.api.server.<resource>.common` for your resou
         |                           +--challenge.yaml
         |               +-- pom.xml
         |           +-- pom.xml
-   ```
+```
    
 You may add this common component in both the api version specific components as dependency and reuse.
 

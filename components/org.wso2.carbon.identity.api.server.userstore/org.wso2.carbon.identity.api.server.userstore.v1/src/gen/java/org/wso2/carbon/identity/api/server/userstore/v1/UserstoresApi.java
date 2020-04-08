@@ -166,23 +166,23 @@ public class UserstoresApi  {
     @Path("/meta/types/{type-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the properties of secondary user store of a given user store type.", notes = "This API provides the capability to retrieve the properties of secondary user store of a given class name.   <b>Permission required:</b>  *_/permission/admin ", response = MetaUserStoreType.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve the properties of secondary user store of a given user store type.", notes = "This API provides the capability to retrieve the properties of secondary user store of a given class name.   <b>Permission required:</b>  *_/permission/admin ", response = MetaUserStoreType.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Meta", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response.", response = MetaUserStoreType.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "Successful response.", response = MetaUserStoreType.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response getUserStoreManagerProperties(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId,     @Valid@ApiParam(value = "maximum number of records to return")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records.")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted.")  @QueryParam("sort") String sort) {
+    public Response getUserStoreManagerProperties(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId) {
 
-        return delegate.getUserStoreManagerProperties(typeId,  limit,  offset,  filter,  sort );
+        return delegate.getUserStoreManagerProperties(typeId);
     }
 
     @Valid

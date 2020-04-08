@@ -41,9 +41,11 @@ public class PassiveStsConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("realm")
     @Valid
+    @NotNull(message = "Property realm cannot be null.")
+
     public String getRealm() {
         return realm;
     }
@@ -59,9 +61,11 @@ public class PassiveStsConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("replyTo")
     @Valid
+    @NotNull(message = "Property replyTo cannot be null.")
+
     public String getReplyTo() {
         return replyTo;
     }
