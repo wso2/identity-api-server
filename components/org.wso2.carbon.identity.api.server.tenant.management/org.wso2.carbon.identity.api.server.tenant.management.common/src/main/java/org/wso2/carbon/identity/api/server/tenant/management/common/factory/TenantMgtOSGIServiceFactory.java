@@ -23,18 +23,13 @@ public class TenantMgtOSGIServiceFactory extends AbstractFactoryBean<TenantMgtSe
 
         TenantMgtService tenantMgtService = null;
         if (this.tenantMgtService == null) {
-            try {
-                tenantMgtService = (TenantMgtService)
-                        PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                                .getOSGiService(TenantMgtService.class, null);
-            } catch (NullPointerException ex) {
-                logger.error("erfefe");
-            }
+            tenantMgtService = (TenantMgtService)
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getOSGiService(TenantMgtService.class,
+                            null);
             if (tenantMgtService != null) {
                 this.tenantMgtService = tenantMgtService;
             } else {
-//                throw new Exception("Unable to retrieve TenantMgtService service.");
-                logger.error("erfefe");
+                throw new Exception("Unable to get the TenantMgtService");
             }
         }
         return this.tenantMgtService;

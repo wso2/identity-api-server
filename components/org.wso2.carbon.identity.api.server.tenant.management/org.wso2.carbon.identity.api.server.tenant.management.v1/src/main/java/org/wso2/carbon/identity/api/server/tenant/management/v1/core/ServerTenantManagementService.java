@@ -119,7 +119,7 @@ public class ServerTenantManagementService {
      * Get owners of a tenant which is identified by tenant unique id.
      *
      * @param tenantUniqueID tenant unique identifier.
-     * @return OwnerResponses.
+     * @return List<OwnerResponse>.
      */
     public List<OwnerResponse> getOwners(String tenantUniqueID) {
 
