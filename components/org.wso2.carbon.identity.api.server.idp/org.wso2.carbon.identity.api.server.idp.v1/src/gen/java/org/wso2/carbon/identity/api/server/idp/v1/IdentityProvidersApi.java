@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1;
 
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
@@ -48,6 +49,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.IdentityProvidersApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
 
@@ -66,7 +68,7 @@ public class IdentityProvidersApi  {
     
     @Consumes({ "application/json", "application/xml" })
     @Produces({ "application/json", "application/xml" })
-    @ApiOperation(value = "Add a new Identity Provider ", notes = "This API provides the capability to create a new Identity Provider ", response = IdentityProviderResponse.class, authorizations = {
+    @ApiOperation(value = "Add a new identity provider ", notes = "This API provides the capability to create a new identity provider. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/create <br> <b>Scope required:</b> <br>     * internal_idp_create ", response = IdentityProviderResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -80,7 +82,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response addIDP(@ApiParam(value = "This represents the identity provider to be created" ,required=true) @Valid IdentityProviderPOSTRequest identityProviderPOSTRequest) {
+    public Response addIDP(@ApiParam(value = "This represents the identity provider to be created." ,required=true) @Valid IdentityProviderPOSTRequest identityProviderPOSTRequest) {
 
         return delegate.addIDP(identityProviderPOSTRequest );
     }
@@ -90,7 +92,7 @@ public class IdentityProvidersApi  {
     @Path("/templates")
     @Consumes({ "application/json", "application/xml" })
     @Produces({ "application/json", "application/xml" })
-    @ApiOperation(value = "Create a new IDP template ", notes = "This API provides the capability to create a new IDP template. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Create a new IdP template ", notes = "This API provides the capability to create a new IdP template. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -104,7 +106,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response addIDPTemplate(@ApiParam(value = "This represents the identity provider template to be created" ,required=true) @Valid IdentityProviderTemplate identityProviderTemplate) {
+    public Response addIDPTemplate(@ApiParam(value = "This represents the identity provider template to be created." ,required=true) @Valid IdentityProviderTemplate identityProviderTemplate) {
 
         return delegate.addIDPTemplate(identityProviderTemplate );
     }
@@ -114,7 +116,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete an identity provider by using identity provider's id ", notes = "This API provides the capability to delete an identity provider by giving it id ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete an identity provider by using the identity provider's ID.  ", notes = "This API provides the capability to delete an identity provider by giving its ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/delete <br> <b>Scope required:</b> <br>     * internal_idp_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -128,7 +130,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response deleteIDP(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Enforce the forceful deletetion of either an identity provider, federated authenticator or an outbound provisioning connector eventhough it is being reffered by a service provider ", defaultValue="false") @DefaultValue("false")  @QueryParam("force") Boolean force) {
+    public Response deleteIDP(@ApiParam(value = "ID of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Enforces the forceful deletion of an identity provider, federated authenticator or an outbound provisioning connector even though it is referred by a service provider. ", defaultValue="false") @DefaultValue("false")  @QueryParam("force") Boolean force) {
 
         return delegate.deleteIDP(identityProviderId,  force );
     }
@@ -138,7 +140,7 @@ public class IdentityProvidersApi  {
     @Path("/templates/{template-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete a IDP template using the template Id. ", notes = "This API provides the capability to delete a IDP template using the template Id. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete an IdP template using the template ID. ", notes = "This API provides the capability to delete an IdP template using the template ID. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -152,7 +154,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response deleteIDPTemplate(@ApiParam(value = "Id of the IDP template",required=true) @PathParam("template-id") String templateId) {
+    public Response deleteIDPTemplate(@ApiParam(value = "ID of the IdP template.",required=true) @PathParam("template-id") String templateId) {
 
         return delegate.deleteIDPTemplate(templateId );
     }
@@ -162,7 +164,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/claims")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Claim config of an identity provider ", notes = "This API provides the claim config for an identity provider. This includes idp-to-local claim mappings, claims to be outbound provisioning, userID claim URI and role claim URI ", response = Claims.class, authorizations = {
+    @ApiOperation(value = "Claim config of an identity provider ", notes = "This API provides the claim config for an identity provider. This includes idp-to-local claim mappings, claims to be outbound provisioned, userID claim URI, and role claim URI. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = Claims.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -176,7 +178,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getClaimConfig(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId) {
+    public Response getClaimConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId) {
 
         return delegate.getClaimConfig(identityProviderId );
     }
@@ -186,7 +188,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/connected-apps")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Connected applications of an identity provider ", notes = "This API provides the list of applications which are using this identity provider for federated/provisioning. ", response = ConnectedApps.class, authorizations = {
+    @ApiOperation(value = "Connected applications of an identity provider ", notes = "This API provides the list of applications that use this identity provider for federated authentication/provisioning. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = ConnectedApps.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -200,7 +202,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getConnectedApps(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Maximum number of records to return ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination ")  @QueryParam("offset") Integer offset) {
+    public Response getConnectedApps(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset) {
 
         return delegate.getConnectedApps(identityProviderId,  limit,  offset );
     }
@@ -210,7 +212,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/federated-authenticators/{federated-authenticator-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrive federated authenticator config of an identity provider ", notes = "This API provides the capability to retrive the federated authenticator information of an identity provider by giving the federated authenticator id ", response = FederatedAuthenticator.class, authorizations = {
+    @ApiOperation(value = "Retrieve federated authenticator config of an identity provider ", notes = "This API provides the capability to retrieve the federated authenticator information of an identity provider by giving the federated authenticator's ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = FederatedAuthenticator.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -224,7 +226,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getFederatedAuthenticator(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "Id of the federated authenticator",required=true) @PathParam("federated-authenticator-id") String federatedAuthenticatorId) {
+    public Response getFederatedAuthenticator(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "ID of the federated authenticator.",required=true) @PathParam("federated-authenticator-id") String federatedAuthenticatorId) {
 
         return delegate.getFederatedAuthenticator(identityProviderId,  federatedAuthenticatorId );
     }
@@ -234,7 +236,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/federated-authenticators")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Federated authenticators of an identity provider ", notes = "This API provides a list of federated authenticators enabled for a specific identity provider identified by its id ", response = FederatedAuthenticatorListResponse.class, authorizations = {
+    @ApiOperation(value = "Federated authenticators of an identity provider ", notes = "This API provides a list of federated authenticators enabled for a specific identity provider identified by its ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = FederatedAuthenticatorListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -248,7 +250,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getFederatedAuthenticators(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId) {
+    public Response getFederatedAuthenticators(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId) {
 
         return delegate.getFederatedAuthenticators(identityProviderId );
     }
@@ -258,7 +260,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}")
     
     @Produces({ "application/json", "application/xml" })
-    @ApiOperation(value = "Retrive identity provider by identity provider's id ", notes = "'This API provides the capability to retrive the identity provider details by using its id. Furthermore, by specifying the \"Accept : application/xml\" header, it provides the ability to export IDP data as XML' ", response = IdentityProviderResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve identity provider by identity provider's ID ", notes = "This API provides the capability to retrieve the identity provider details by using its ID. Furthermore, by specifying the \"Accept : application/xml\" header, it provides the ability to export IdP data as XML. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = IdentityProviderResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -272,7 +274,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getIDP(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId) {
+    public Response getIDP(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId) {
 
         return delegate.getIDP(identityProviderId );
     }
@@ -282,7 +284,7 @@ public class IdentityProvidersApi  {
     @Path("/templates/{template-id}")
     
     @Produces({ "application/json", "application/xml" })
-    @ApiOperation(value = "Retrieve identity provider template by id ", notes = "This API provides the capability to retrieve an indentity provider template using it's id. ", response = IdentityProviderTemplate.class, authorizations = {
+    @ApiOperation(value = "Retrieve identity provider template by ID ", notes = "This API provides the capability to retrieve an identity provider template using its ID. ", response = IdentityProviderTemplate.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -296,7 +298,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getIDPTemplate(@ApiParam(value = "Id of the IDP template",required=true) @PathParam("template-id") String templateId) {
+    public Response getIDPTemplate(@ApiParam(value = "ID of the IdP template.",required=true) @PathParam("template-id") String templateId) {
 
         return delegate.getIDPTemplate(templateId );
     }
@@ -320,9 +322,11 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getIDPTemplates(    @Valid@ApiParam(value = "Maximum number of records to return ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination ")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records. Supports 'sw', 'co', 'ew' and 'eq' operations and also complex queries with 'and' operations. E.g. /identity-providers?filter=name+sw+\"google\"+and+isEnabled+eq+\"true\" ")  @QueryParam("filter") String filter) {
+    public Response getIDPTemplates(    @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam
+            ("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")
+    @QueryParam("offset") Integer offset, @Context SearchContext searchContext) {
 
-        return delegate.getIDPTemplates(limit,  offset,  filter );
+        return delegate.getIDPTemplates(limit,  offset, searchContext );
     }
 
     @Valid
@@ -330,7 +334,7 @@ public class IdentityProvidersApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List identity providers ", notes = "This API provides the capability to retrive the list of identity providers ", response = IdentityProviderListResponse.class, authorizations = {
+    @ApiOperation(value = "List identity providers ", notes = "This API provides the capability to retrieve the list of identity providers.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = IdentityProviderListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -345,7 +349,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getIDPs(    @Valid@ApiParam(value = "Maximum number of records to return ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination ")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records. Supports 'sw', 'co', 'ew' and 'eq' operations and also complex queries with 'and' operations. E.g. /identity-providers?filter=name+sw+\"google\"+and+isEnabled+eq+\"true\" ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted _This parameter is not supported yet_ ", allowableValues="ASC, DESC")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted _This parameter is not supported yet_ ")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Specifies the required parameters in the response. ")  @QueryParam("requiredAttributes") String requiredAttributes) {
+    public Response getIDPs(    @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations and also complex queries with 'and' operations. E.g. /identity-providers?filter=name+sw+\"google\"+and+isEnabled+eq+\"true\" ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Defines the order in which the retrieved records should be sorted. _This parameter is not supported yet_ ", allowableValues="ASC, DESC")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _This parameter is not supported yet_ ")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Specifies the required parameters in the response. _This parameter is not supported yet_ ")  @QueryParam("requiredAttributes") String requiredAttributes) {
 
         return delegate.getIDPs(limit,  offset,  filter,  sortOrder,  sortBy,  requiredAttributes );
     }
@@ -355,7 +359,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/provisioning/jit")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Just-In-Time provisioning config of an identity provider ", notes = "This API retrives the Just-In-Time provisioning config of an identity provider by specifying identity provider id ", response = JustInTimeProvisioning.class, authorizations = {
+    @ApiOperation(value = "Just-In-Time provisioning config of an identity provider ", notes = "This API retrieves the Just-In-Time provisioning config of an identity provider by specifying the identity provider ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = JustInTimeProvisioning.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -369,7 +373,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getJITConfig(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId) {
+    public Response getJITConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId) {
 
         return delegate.getJITConfig(identityProviderId );
     }
@@ -379,7 +383,7 @@ public class IdentityProvidersApi  {
     @Path("/meta/federated-authenticators/{federated-authenticator-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Metadata about a supported federated authenticator ", notes = "'This API provides the details of a single supported federated authenticator for an identity provider in Identity Server' ", response = MetaFederatedAuthenticator.class, authorizations = {
+    @ApiOperation(value = "Metadata about a supported federated authenticator ", notes = "This API provides the details of a single supported federated authenticator for an identity provider in the the identity server. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = MetaFederatedAuthenticator.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -403,7 +407,7 @@ public class IdentityProvidersApi  {
     @Path("/meta/federated-authenticators")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Metadata about supported federated authenticators of identity providers ", notes = "This API provides the list of supported federated authenticators for an identity provider in Identity Server", response = MetaFederatedAuthenticatorListItem.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Metadata about supported federated authenticators of identity providers ", notes = "This API provides the list of supported federated authenticators for an identity provider in the the identity server. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view", response = MetaFederatedAuthenticatorListItem.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -427,7 +431,7 @@ public class IdentityProvidersApi  {
     @Path("/meta/outbound-provisioning-connectors/{outbound-provisioning-connector-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Metadata about supported outbound provisioning connectors ", notes = "This API provides the details of a single supported outbound provisioning connectors for an IDP in Identity Server", response = MetaOutboundConnector.class, authorizations = {
+    @ApiOperation(value = "Metadata about supported outbound provisioning connectors ", notes = "This API provides the details of a single supported outbound provisioning connector for an IdP in the identity server. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view", response = MetaOutboundConnector.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -451,7 +455,7 @@ public class IdentityProvidersApi  {
     @Path("/meta/outbound-provisioning-connectors")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Metadata about supported outbound provisioning connectors by identity providers in Identity Server ", notes = "This API provides the list of supported federated authenticators for an IDP in Identity Server", response = MetaOutboundConnectorListItem.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Metadata about supported outbound provisioning connectors by identity providers in the identity server ", notes = "This API provides the list of supported federated authenticators for an IdP in the identity server. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view", response = MetaOutboundConnectorListItem.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -475,7 +479,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/provisioning/outbound-connectors/{outbound-provisioning-connector-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrive outbount provisioning connector of an identity provider ", notes = "This API provides the capability to retrive the outbount provisioning connector information of an identity provider by specifying provisioning connector id ", response = OutboundConnector.class, authorizations = {
+    @ApiOperation(value = "Retrieve outbound provisioning connector of an identity provider ", notes = "This API provides the capability to retrieve the outbound provisioning connector information of an identity provider by specifying the provisioning connector's ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = OutboundConnector.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -489,7 +493,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getOutboundConnector(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "Id of the outbound provisioning connector",required=true) @PathParam("outbound-provisioning-connector-id") String outboundProvisioningConnectorId) {
+    public Response getOutboundConnector(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "ID of the outbound provisioning connector.",required=true) @PathParam("outbound-provisioning-connector-id") String outboundProvisioningConnectorId) {
 
         return delegate.getOutboundConnector(identityProviderId,  outboundProvisioningConnectorId );
     }
@@ -499,7 +503,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/provisioning/outbound-connectors")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Outbound provisioning connectors of an identity provider ", notes = "This API provides a list of outbound provisioning connectors enabled for an identity provider ", response = OutboundConnectorListResponse.class, authorizations = {
+    @ApiOperation(value = "Outbound provisioning connectors of an identity provider ", notes = "This API provides a list of outbound provisioning connectors enabled for an identity provider. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = OutboundConnectorListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -513,7 +517,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getOutboundConnectors(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId) {
+    public Response getOutboundConnectors(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId) {
 
         return delegate.getOutboundConnectors(identityProviderId );
     }
@@ -523,7 +527,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/provisioning")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Provisioning entities of an identity provider ", notes = "'This API provides a list of available provisioning entities of an identity provider. This includes just-in-time provisioning config and outbound provisioning connectors' ", response = ProvisioningResponse.class, authorizations = {
+    @ApiOperation(value = "Provisioning entities of an identity provider ", notes = "This API provides a list of available provisioning entities for an identity provider. This includes just-in-time provisioning config and outbound provisioning connectors <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = ProvisioningResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -537,7 +541,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getProvisioningConfig(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId) {
+    public Response getProvisioningConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId) {
 
         return delegate.getProvisioningConfig(identityProviderId );
     }
@@ -547,7 +551,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/roles")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Role config of an identity provider ", notes = "This API provides the role config of an identity provider. This includes idp-to-local role mappings and/or a list of roles to be outbound-provisioned ", response = Roles.class, authorizations = {
+    @ApiOperation(value = "Role config of an identity provider ", notes = "This API provides the role config of an identity provider. This includes idp-to-local role mappings and/or a list of roles to be outbound-provisioned <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = Roles.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -561,7 +565,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getRoleConfig(@ApiParam(value = "Id of the identity provider",required=true) @PathParam("identity-provider-id") String identityProviderId) {
+    public Response getRoleConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId) {
 
         return delegate.getRoleConfig(identityProviderId );
     }
@@ -571,7 +575,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Patch an identity provider property by id. Patch is supported only for key-value pairs ", notes = "This API provides the capability to update an identity provider property using patch request. IDP patch is supported only for key-value pairs ", response = IdentityProviderResponse.class, authorizations = {
+    @ApiOperation(value = "Patch an identity provider property by ID. Patch is supported only for key-value pairs ", notes = "This API provides the capability to update an identity provider property using patch request. IdP patch is supported only for key-value pairs. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = IdentityProviderResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -585,7 +589,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response patchIDP(@ApiParam(value = "Id of the Identity Provider",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "" ,required=true) @Valid List<Patch> patch) {
+    public Response patchIDP(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "" ,required=true) @Valid List<Patch> patch) {
 
         return delegate.patchIDP(identityProviderId,  patch );
     }
@@ -595,7 +599,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/claims")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the claims of an identity provider ", notes = "This API provides the capability to update the claim config of an existing identity provider ", response = Claims.class, authorizations = {
+    @ApiOperation(value = "Update the claims of an identity provider ", notes = "This API provides the capability to update the claim config of an existing identity provider. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = Claims.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -609,7 +613,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateClaimConfig(@ApiParam(value = "Id of the Identity Provider",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the claim config to be updated" ,required=true) @Valid Claims claims) {
+    public Response updateClaimConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the claim config to be updated" ,required=true) @Valid Claims claims) {
 
         return delegate.updateClaimConfig(identityProviderId,  claims );
     }
@@ -619,7 +623,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/federated-authenticators/{federated-authenticator-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update a federated authenticator of an identity provider by using authenticator id ", notes = "This API provides the capability to update an identity provider's federated authenticator config by specifying authenticator id ", response = FederatedAuthenticator.class, authorizations = {
+    @ApiOperation(value = "Update a federated authenticator of an identity provider by using authenticator id ", notes = "This API provides the capability to update an identity provider's federated authenticator config by specifying the authenticator ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = FederatedAuthenticator.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -633,7 +637,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateFederatedAuthenticator(@ApiParam(value = "Id of the Identity Provider",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "Id of the federated authenticator",required=true) @PathParam("federated-authenticator-id") String federatedAuthenticatorId, @ApiParam(value = "This represents the federated authenticator to be updated" ,required=true) @Valid FederatedAuthenticatorPUTRequest federatedAuthenticatorPUTRequest) {
+    public Response updateFederatedAuthenticator(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "ID of the federated authenticator.",required=true) @PathParam("federated-authenticator-id") String federatedAuthenticatorId, @ApiParam(value = "This represents the federated authenticator to be updated" ,required=true) @Valid FederatedAuthenticatorPUTRequest federatedAuthenticatorPUTRequest) {
 
         return delegate.updateFederatedAuthenticator(identityProviderId,  federatedAuthenticatorId,  federatedAuthenticatorPUTRequest );
     }
@@ -643,7 +647,7 @@ public class IdentityProvidersApi  {
     @Path("/templates/{template-id}")
     @Consumes({ "application/json", "application/xml" })
     @Produces({ "application/json", "application/xml",  })
-    @ApiOperation(value = "Update the IDP template of a given template id. ", notes = "This API provides the capability to update the IDP template of a given template id. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update the IdP template of a given template ID. ", notes = "This API provides the capability to update the IdP template of a given template ID. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -658,7 +662,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateIDPTemplate(@ApiParam(value = "Id of the IDP template",required=true) @PathParam("template-id") String templateId, @ApiParam(value = "This represents the identity provider template to be created" ,required=true) @Valid IdentityProviderTemplate identityProviderTemplate) {
+    public Response updateIDPTemplate(@ApiParam(value = "ID of the IdP template.",required=true) @PathParam("template-id") String templateId, @ApiParam(value = "This represents the identity provider template to be created." ,required=true) @Valid IdentityProviderTemplate identityProviderTemplate) {
 
         return delegate.updateIDPTemplate(templateId,  identityProviderTemplate );
     }
@@ -668,7 +672,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/provisioning/jit")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the just-in-time provisioning config of an identity provider ", notes = "This API provides the capability to update the just-in-time provisioning config of an identity provider by specifying identity provider id. This includes the ability to enable/disable JIT provisioning, change provisioning userstore and enable/disable user prompts for username, password and consent ", response = JustInTimeProvisioning.class, authorizations = {
+    @ApiOperation(value = "Update the just-in-time provisioning config of an identity provider ", notes = "This API provides the capability to update the just-in-time provisioning config of an identity provider by specifying the identity provider's ID. This includes the ability to enable/disable JIT provisioning, change provisioning userstore and enable/disable user prompts for username, password and consent. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = JustInTimeProvisioning.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -682,7 +686,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateJITConfig(@ApiParam(value = "Id of the Identity Provider",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the just-in-time provisioning config to be updated" ,required=true) @Valid JustInTimeProvisioning justInTimeProvisioning) {
+    public Response updateJITConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the just-in-time provisioning config to be updated." ,required=true) @Valid JustInTimeProvisioning justInTimeProvisioning) {
 
         return delegate.updateJITConfig(identityProviderId,  justInTimeProvisioning );
     }
@@ -692,7 +696,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/provisioning/outbound-connectors/{outbound-provisioning-connector-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update an outbound provisioning connector of an identity provider ", notes = "This API provides the capability to update an outbound provisioning connector config of an identity provider by specifying the provisioning connector id ", response = OutboundConnector.class, authorizations = {
+    @ApiOperation(value = "Update an outbound provisioning connector of an identity provider ", notes = "This API provides the capability to update an outbound provisioning connector config of an identity provider by specifying the provisioning connector's ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = OutboundConnector.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -706,7 +710,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateOutboundConnector(@ApiParam(value = "Id of the Identity Provider",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "Id of the outbound provisioning connector",required=true) @PathParam("outbound-provisioning-connector-id") String outboundProvisioningConnectorId, @ApiParam(value = "This represents the outbound provisioning connector to be updated" ,required=true) @Valid OutboundConnectorPUTRequest outboundConnectorPUTRequest) {
+    public Response updateOutboundConnector(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "ID of the outbound provisioning connector.",required=true) @PathParam("outbound-provisioning-connector-id") String outboundProvisioningConnectorId, @ApiParam(value = "This represents the outbound provisioning connector to be updated" ,required=true) @Valid OutboundConnectorPUTRequest outboundConnectorPUTRequest) {
 
         return delegate.updateOutboundConnector(identityProviderId,  outboundProvisioningConnectorId,  outboundConnectorPUTRequest );
     }
@@ -716,7 +720,7 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/roles")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the role config of an identity provider ", notes = "This API provides the capability to update the role config of an identity provider by specifying identity provider id ", response = Roles.class, authorizations = {
+    @ApiOperation(value = "Update the role config of an identity provider ", notes = "This API provides the capability to update the role config of an identity provider by specifying the identity provider ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = Roles.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -730,7 +734,7 @@ public class IdentityProvidersApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateRoleConfig(@ApiParam(value = "Id of the Identity Provider",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the role config to be updated" ,required=true) @Valid Roles roles) {
+    public Response updateRoleConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the role config to be updated." ,required=true) @Valid Roles roles) {
 
         return delegate.updateRoleConfig(identityProviderId,  roles );
     }

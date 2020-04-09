@@ -21,7 +21,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.search.ConditionType;
+import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
+import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListItem;
@@ -87,6 +92,10 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceSearchBean;
+import org.wso2.carbon.identity.configuration.mgt.core.search.ComplexCondition;
+import org.wso2.carbon.identity.configuration.mgt.core.search.Condition;
+import org.wso2.carbon.identity.configuration.mgt.core.search.PrimitiveCondition;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
@@ -121,6 +130,7 @@ import static org.wso2.carbon.identity.application.authentication.framework.util
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.WS_TRUST;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.INVALID_REQUEST;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
+import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
 
 /**
  * Calls internal osgi services to perform server application management related operations.
@@ -524,12 +534,15 @@ public class ServerApplicationManagementService {
      * @param offset number of records to skip for pagination.
      * @return ApplicationTemplatesList containing the list of templates.
      */
-    public ApplicationTemplatesList listApplicationTemplates(Integer limit, Integer offset) {
+    public ApplicationTemplatesList listApplicationTemplates(Integer limit, Integer offset, SearchContext
+            searchContext) {
 
         validatePaginationSupport(limit, offset);
         try {
             List<Template> templateList = getTemplateManager().listTemplates(TemplateMgtConstants.TemplateType
-                    .APPLICATION_TEMPLATE.toString(), null, null);
+                    .APPLICATION_TEMPLATE.toString(), null, null, getSearchCondition
+                    (TemplateMgtConstants.TemplateType.APPLICATION_TEMPLATE.toString(), ContextLoader
+                            .getTenantDomainFromContext(), searchContext));
             List<ApplicationTemplatesListItem> applicationTemplateList = templateList.stream().map(new
                     TemplateToApplicationTemplateListItem()).collect(Collectors.toList());
 
@@ -539,6 +552,136 @@ public class ServerApplicationManagementService {
         } catch (TemplateManagementException e) {
             throw handleTemplateManagementException(e, "Error while listing application templates.");
         }
+    }
+
+    /**
+     * Retrieve search condition from @{SearchContext}.
+     *
+     * @param templateType  Template type.
+     * @param tenantDomain  Tenant domain.
+     * @param searchContext Search context.
+     * @return  Condition.
+     */
+    private Condition getSearchCondition(String templateType, String tenantDomain, SearchContext searchContext) {
+
+        if (searchContext != null) {
+            SearchCondition<ResourceSearchBean> searchCondition = searchContext.getCondition(ResourceSearchBean.class);
+            if (searchCondition != null) {
+                Condition result = buildSearchCondition(searchCondition);
+                List<Condition> list = new ArrayList<>();
+                Condition typeCondition = new PrimitiveCondition(ApplicationManagementConstants.TemplateProperties
+                        .TEMPLATE_TYPE_KEY, EQUALS, templateType);
+                Condition tenantCondition = new PrimitiveCondition(ApplicationManagementConstants.TemplateProperties
+                        .TENANT_DOMAIN_KEY, EQUALS, tenantDomain);
+                if (result instanceof ComplexCondition) {
+                    list = ((ComplexCondition) result).getConditions();
+                    list.add(typeCondition);
+                    list.add(tenantCondition);
+                } else if (result instanceof PrimitiveCondition) {
+                    list.add(result);
+                    list.add(typeCondition);
+                    list.add(tenantCondition);
+                }
+                return new ComplexCondition(getComplexOperatorFromOdata(ConditionType.AND),
+                        list);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Search condition parsed from the search expression is invalid.");
+                }
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Cannot find a valid search context.");
+            }
+        }
+        return null;
+    }
+
+    private Condition buildSearchCondition(SearchCondition searchCondition) {
+
+        if (!(searchCondition.getStatement() == null)) {
+            PrimitiveStatement primitiveStatement = searchCondition.getStatement();
+
+            if (ApplicationManagementConstants.TemplateProperties.SEARCH_KEYS.contains(primitiveStatement.getProperty
+                    ())) {
+                List<Condition> list = new ArrayList<>();
+                Condition attrKeyCondition = new PrimitiveCondition(ApplicationManagementConstants.TemplateProperties
+                        .ATTR_KEY, EQUALS, primitiveStatement.getProperty());
+                Condition attrValueCondition = new PrimitiveCondition(ApplicationManagementConstants
+                        .TemplateProperties.ATTR_VALUE, getPrimitiveOperatorFromOdata(primitiveStatement.getCondition
+                        ()), primitiveStatement.getValue());
+                list.add(attrKeyCondition);
+                list.add(attrValueCondition);
+                return new ComplexCondition(getComplexOperatorFromOdata(ConditionType.AND),
+                        list);
+            } else if (ApplicationManagementConstants.TemplateProperties.SEARCH_KEY_NAME.equals(primitiveStatement
+                    .getProperty())) {
+                return new PrimitiveCondition(ApplicationManagementConstants.TemplateProperties
+                        .SEARCH_KEY_NAME_INTERNAL, getPrimitiveOperatorFromOdata(primitiveStatement
+                        .getCondition()), primitiveStatement.getValue());
+            } else {
+                throw buildClientError(ApplicationManagementConstants.ErrorMessage
+                        .ERROR_CODE_ERROR_INVALID_SEARCH_FILTER, null);
+            }
+        } else {
+            List<Condition> conditions = new ArrayList<>();
+            for (Object condition : searchCondition.getSearchConditions()) {
+                Condition buildCondition = buildSearchCondition((SearchCondition) condition);
+                conditions.add(buildCondition);
+            }
+            return new ComplexCondition(getComplexOperatorFromOdata(searchCondition.getConditionType()), conditions);
+        }
+    }
+
+    private org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator
+    getPrimitiveOperatorFromOdata(org.apache.cxf.jaxrs.ext.search.ConditionType odataConditionType) {
+
+        org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator
+                primitiveConditionType = null;
+        switch (odataConditionType) {
+            case EQUALS:
+                primitiveConditionType = EQUALS;
+                break;
+            case GREATER_OR_EQUALS:
+                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
+                        .ConditionType.PrimitiveOperator.GREATER_OR_EQUALS;
+                break;
+            case LESS_OR_EQUALS:
+                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
+                        .ConditionType.PrimitiveOperator.LESS_OR_EQUALS;
+                break;
+            case GREATER_THAN:
+                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
+                        .ConditionType.PrimitiveOperator.GREATER_THAN;
+                break;
+            case NOT_EQUALS:
+                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
+                        .ConditionType.PrimitiveOperator.NOT_EQUALS;
+                break;
+            case LESS_THAN:
+                primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
+                        .ConditionType.PrimitiveOperator.LESS_THAN;
+                break;
+        }
+        return primitiveConditionType;
+    }
+
+    private org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.ComplexOperator
+    getComplexOperatorFromOdata(org.apache.cxf.jaxrs.ext.search.ConditionType odataConditionType) {
+
+        org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.ComplexOperator
+                complexConditionType = null;
+        switch (odataConditionType) {
+            case OR:
+                complexConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType
+                        .ComplexOperator.OR;
+                break;
+            case AND:
+                complexConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType
+                        .ComplexOperator.AND;
+                break;
+        }
+        return complexConditionType;
     }
 
     /**

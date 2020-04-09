@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1;
 
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.wso2.carbon.identity.api.server.idp.v1.*;
 import org.wso2.carbon.identity.api.server.idp.v1.model.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -69,7 +70,7 @@ public interface IdentityProvidersApiService {
 
       public Response getIDPTemplate(String templateId);
 
-      public Response getIDPTemplates(Integer limit, Integer offset, String filter);
+      public Response getIDPTemplates(Integer limit, Integer offset, SearchContext searchContext);
 
       public Response getIDPs(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String requiredAttributes);
 

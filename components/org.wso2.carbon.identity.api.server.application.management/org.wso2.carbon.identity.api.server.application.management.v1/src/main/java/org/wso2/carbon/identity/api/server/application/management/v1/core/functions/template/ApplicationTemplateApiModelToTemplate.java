@@ -53,9 +53,9 @@ public class ApplicationTemplateApiModelToTemplate implements Function<Applicati
             propertiesMap.put(ApplicationManagementConstants.TemplateProperties.TYPES, String.join(",",
                     applicationTemplate.getTypes()));
         }
-        if (StringUtils.isNotEmpty(applicationTemplate.getCategory())) {
+        if (applicationTemplate.getCategory() != null) {
             propertiesMap.put(ApplicationManagementConstants.TemplateProperties.CATEGORY, applicationTemplate
-                    .getCategory());
+                    .getCategory().value());
         }
         if (applicationTemplate.getDisplayOrder() != null) {
             propertiesMap.put(ApplicationManagementConstants.TemplateProperties.DISPLAY_ORDER, Integer

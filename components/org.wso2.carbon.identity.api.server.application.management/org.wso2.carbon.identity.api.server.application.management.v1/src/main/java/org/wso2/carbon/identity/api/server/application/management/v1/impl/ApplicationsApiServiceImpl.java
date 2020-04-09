@@ -17,6 +17,7 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.impl;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
@@ -322,9 +323,10 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response getAllApplicationTemplates(Integer limit, Integer offset) {
+    public Response getAllApplicationTemplates(Integer limit, Integer offset, SearchContext searchContext) {
 
-        return Response.ok().entity(applicationManagementService.listApplicationTemplates(limit, offset)).build();
+        return Response.ok().entity(applicationManagementService.listApplicationTemplates(limit, offset,
+                searchContext)).build();
     }
 
     private URI getResourceLocation(String resourceId) {
