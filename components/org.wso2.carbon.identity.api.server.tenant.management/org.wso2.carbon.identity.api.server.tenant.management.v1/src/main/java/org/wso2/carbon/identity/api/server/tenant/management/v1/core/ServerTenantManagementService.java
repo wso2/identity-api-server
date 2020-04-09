@@ -17,6 +17,7 @@ import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantMode
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantPutModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantResponseModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantsListResponse;
+import org.wso2.carbon.stratos.common.constants.TenantConstants;
 import org.wso2.carbon.stratos.common.exception.TenantManagementClientException;
 import org.wso2.carbon.stratos.common.exception.TenantManagementServerException;
 import org.wso2.carbon.stratos.common.exception.TenantMgtException;
@@ -54,12 +55,10 @@ public class ServerTenantManagementService {
     public String addTenant(TenantModel tenantModel) {
 
         Tenant tenant;
-        TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
-
-        tenant = createTenantInfoBean(tenantModel);
-
         String resourceId;
+        TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
         try {
+            tenant = createTenantInfoBean(tenantModel);
             resourceId = tenantMgtService.addTenant(tenant);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage
@@ -180,18 +179,22 @@ public class ServerTenantManagementService {
         return tenantResponseModel;
     }
 
-    private Tenant createTenantInfoBean(TenantModel tenantModel) {
+    private Tenant createTenantInfoBean(TenantModel tenantModel) throws TenantManagementClientException {
 
         Tenant tenant = new Tenant();
         tenant.setActive(true);
         tenant.setDomain(tenantModel.getDomain());
-        tenant.setAdminName(tenantModel.getOwners().get(0).getUsername());
-        tenant.setAdminFirstName(tenantModel.getOwners().get(0).getFirstname());
-        tenant.setAdminLastName(tenantModel.getOwners().get(0).getLastname());
-        tenant.setEmail(tenantModel.getOwners().get(0).getEmail());
-        List<AdditionalClaims> additionalClaimsList = tenantModel.getOwners().get(0).getAdditionalClaims();
-        if (CollectionUtils.isNotEmpty(additionalClaimsList)) {
-            tenant.setClaimsMap(createClaimsMapping(additionalClaimsList));
+        if (tenantModel.getOwners() != null) {
+            tenant.setAdminName(tenantModel.getOwners().get(0).getUsername());
+            tenant.setAdminFirstName(tenantModel.getOwners().get(0).getFirstname());
+            tenant.setAdminLastName(tenantModel.getOwners().get(0).getLastname());
+            tenant.setEmail(tenantModel.getOwners().get(0).getEmail());
+            List<AdditionalClaims> additionalClaimsList = tenantModel.getOwners().get(0).getAdditionalClaims();
+            if (CollectionUtils.isNotEmpty(additionalClaimsList)) {
+                tenant.setClaimsMap(createClaimsMapping(additionalClaimsList));
+            }
+        } else {
+            throw new TenantManagementClientException(TenantConstants.ErrorMessage.ERROR_CODE_OWNER_REQUIRED);
         }
 
         return tenant;
