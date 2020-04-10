@@ -16,6 +16,10 @@
 
 package org.wso2.carbon.identity.api.server.idp.common;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Identity Provider Management constant class.
  */
@@ -66,7 +70,21 @@ public class Constants {
     // IdP template property keys
     public static final String PROP_CATEGORY = "category";
     public static final String PROP_DISPLAY_ORDER = "displayOrder";
+    public static final String PROP_SERVICES = "services";
 
+    // IdP template services
+    public static final String SERV_AUTHENTICATION = "authentication";
+    public static final String SERV_PROVISIONING = "provisioning";
+
+    // IdP Template Search.
+    public static final List<String> SEARCH_KEYS = Collections.unmodifiableList(Arrays.asList("description", "image",
+            "category", "displayOrder"));
+    public static final String SEARCH_KEY_NAME = "name";
+    public static final String SEARCH_KEY_NAME_INTERNAL = "resourceName";
+    public static final String ATTR_KEY = "attributeKey";
+    public static final String ATTR_VALUE = "attributeValue";
+    public static final String TEMPLATE_TYPE_KEY = "resourceTypeName";
+    public static final String TENANT_DOMAIN_KEY = "tenantDomain";
 
     /**
      * Enum for error messages.
@@ -182,7 +200,8 @@ public class Constants {
         ERROR_CODE_ERROR_UPDATING_IDP_TEMPLATE("65053", "Unable to update IDP template.",
                 "Error occurred while updating the IDP template with identifier %s."),
         ERROR_CODE_ERROR_RETRIEVING_IDP_TEMPLATE("65054", "Unable to retrieve IDP template.",
-                "Error occurred while retrieving the IDP template with identifier %s");
+                "Error occurred while retrieving the IDP template with identifier %s"),
+        ERROR_CODE_ERROR_INVALID_SEARCH_FILTER("65055", "Search request validation failed.", "Invalid search filter.");
 
         private final String code;
         private final String message;

@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -71,7 +72,7 @@ public interface ApplicationsApiService {
 
       public Response getAdaptiveAuthTemplates();
 
-      public Response getAllApplicationTemplates(Integer limit, Integer offset);
+      public Response getAllApplicationTemplates(Integer limit, Integer offset, SearchContext searchContext);
 
       public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String attributes);
 

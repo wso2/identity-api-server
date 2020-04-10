@@ -59,7 +59,11 @@ public class TemplateToApplicationTemplateListItem implements Function<Template,
                     listItem.setDisplayOrder(Integer.parseInt(value));
                 }
                 if (ApplicationManagementConstants.TemplateProperties.CATEGORY.equals(key)) {
-                    listItem.setCategory(value);
+                    if (ApplicationTemplatesListItem.CategoryEnum.CUSTOM.value().equals(value)) {
+                        listItem.setCategory(ApplicationTemplatesListItem.CategoryEnum.CUSTOM);
+                    } else {
+                        listItem.setCategory(ApplicationTemplatesListItem.CategoryEnum.DEFAULT);
+                    }
                 }
                 if (ApplicationManagementConstants.TemplateProperties.INBOUND_PROTOCOL.equals(key)) {
                     listItem.setAuthenticationProtocol(value);

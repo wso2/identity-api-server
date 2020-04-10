@@ -22,14 +22,14 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.application.management</artifactId>
-        <version>1.0.107-SNAPSHOT</version>
+        <version>1.0.109-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <name>WSO2 Identity Server - Applications Rest API</name>
     <description>WSO2 Identity Server - Applications Rest API</description>
     <artifactId>org.wso2.carbon.identity.api.server.application.management.v1</artifactId>
-    <version>1.0.107-SNAPSHOT</version>
+    <version>1.0.109-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -127,6 +127,11 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-extension-search</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

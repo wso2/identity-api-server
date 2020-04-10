@@ -3123,7 +3123,8 @@ components:
               - angular
         category:
           type: string
-          example: "Server Template"
+          enum: [DEFAULT, CUSTOM]
+          example: 'DEFAULT'
         displayOrder:
           type: integer
           example: 2
@@ -3159,7 +3160,8 @@ components:
             - angular
         category:
           type: string
-          example: "Server Template"
+          enum: [DEFAULT, CUSTOM]
+          example: 'DEFAULT'
         displayOrder:
           type: integer
           example: 2

@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
@@ -48,6 +49,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
 
@@ -340,9 +342,12 @@ public class ApplicationsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getAllApplicationTemplates(    @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset) {
+    public Response getAllApplicationTemplates(    @Valid@ApiParam(value = "Maximum number of records to return. ")
+                                                       @QueryParam("limit") Integer limit,     @Valid@ApiParam(value
+            = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset, @Context
+            SearchContext searchContext) {
 
-        return delegate.getAllApplicationTemplates(limit,  offset );
+        return delegate.getAllApplicationTemplates(limit,  offset, searchContext );
     }
 
     @Valid
