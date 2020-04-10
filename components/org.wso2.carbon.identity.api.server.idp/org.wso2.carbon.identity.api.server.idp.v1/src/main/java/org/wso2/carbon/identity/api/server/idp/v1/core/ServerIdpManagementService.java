@@ -124,6 +124,9 @@ import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_PATH_
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPLATE_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_CATEGORY;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_DISPLAY_ORDER;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_SERVICES;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.SERV_AUTHENTICATION;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.SERV_PROVISIONING;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.TEMPLATE_MGT_ERROR_CODE_DELIMITER;
 import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
 
@@ -1091,6 +1094,11 @@ public class ServerIdpManagementService {
                     idpTemplateListItem.setDisplayOrder(
                             Integer.valueOf(idpTemplate.getPropertiesMap().get(PROP_DISPLAY_ORDER)));
                 }
+                if ((idpTemplate.getPropertiesMap().containsKey(PROP_SERVICES)) &&
+                        (idpTemplate.getPropertiesMap().get(PROP_SERVICES) != null)) {
+                    idpTemplateListItem.setServices(Arrays.asList(
+                            idpTemplate.getPropertiesMap().get(PROP_SERVICES).split(",")));
+                }
                 idpTemplates.add(idpTemplateListItem);
             }
             idpTemplateListResponse.setTemplates(idpTemplates);
@@ -1144,6 +1152,15 @@ public class ServerIdpManagementService {
         identityProviderTemplate.setImageUrl(idpTemplate.getImage());
         identityProviderTemplate.setTenantId(IdentityTenantUtil
                 .getTenantId(ContextLoader.getTenantDomainFromContext()));
+        Map<String, String> properties = createPropertiesMapForIdPTemplate(idpTemplate);
+        identityProviderTemplate.setTemplateType(TemplateMgtConstants.TemplateType.IDP_TEMPLATE);
+        identityProviderTemplate.setPropertiesMap(properties);
+        identityProviderTemplate.setTemplateScript(createIDPTemplateScript(idpTemplate.getIdp()));
+        return identityProviderTemplate;
+    }
+
+    private Map<String, String> createPropertiesMapForIdPTemplate(IdentityProviderTemplate idpTemplate) {
+
         Map<String, String> properties = new HashMap<>();
         if (idpTemplate.getCategory() != null) {
             properties.put(PROP_CATEGORY, idpTemplate.getCategory().toString());
@@ -1151,10 +1168,24 @@ public class ServerIdpManagementService {
         if (idpTemplate.getDisplayOrder() != null) {
             properties.put(PROP_DISPLAY_ORDER, String.valueOf(idpTemplate.getDisplayOrder()));
         }
-        identityProviderTemplate.setTemplateType(TemplateMgtConstants.TemplateType.IDP_TEMPLATE);
-        identityProviderTemplate.setPropertiesMap(properties);
-        identityProviderTemplate.setTemplateScript(createIDPTemplateScript(idpTemplate.getIdp()));
-        return identityProviderTemplate;
+        ArrayList<String> services = createServicesListForIdP(idpTemplate.getIdp());
+        if (!services.isEmpty()) {
+            String servicesString = String.join(",", services);
+            properties.put(PROP_SERVICES, servicesString);
+        }
+        return properties;
+    }
+
+    private ArrayList<String> createServicesListForIdP(IdentityProviderPOSTRequest idp) {
+
+        ArrayList<String> services = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(idp.getProvisioning().getOutboundConnectors().getConnectors())) {
+            services.add(SERV_PROVISIONING);
+        }
+        if (CollectionUtils.isNotEmpty(idp.getFederatedAuthenticators().getAuthenticators())) {
+            services.add(SERV_AUTHENTICATION);
+        }
+        return services;
     }
 
     private APIError handleTemplateMgtException(TemplateManagementException e, Constants.ErrorMessage errorEnum,
