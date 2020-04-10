@@ -18,7 +18,10 @@ package org.wso2.carbon.identity.api.server.application.management.common;
 import org.wso2.carbon.identity.oauth.common.GrantType;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -94,7 +97,9 @@ public class ApplicationManagementConstants {
         // Server errors defined at REST API layer.
         APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED("65501",
                 "Unsupported Operation.",
-                "Application creation with templates is not supported in this version of the API.");
+                "Application creation with templates is not supported in this version of the API."),
+        ERROR_CODE_ERROR_INVALID_SEARCH_FILTER("65502", "Search request validation failed.", "Invalid search filter.");
+
 
         private final String code;
         private final String message;
@@ -154,6 +159,16 @@ public class ApplicationManagementConstants {
         public static final String TYPES = "types";
         public static final String CATEGORY = "category";
         public static final String DISPLAY_ORDER = "display-order";
+
+        // Application Template Search.
+        public static final List<String> SEARCH_KEYS = Collections.unmodifiableList(Arrays.asList("description",
+                "image", "category", "displayOrder", "authenticationProtocol"));
+        public static final String SEARCH_KEY_NAME = "name";
+        public static final String SEARCH_KEY_NAME_INTERNAL = "resourceName";
+        public static final String ATTR_KEY = "attributeKey";
+        public static final String ATTR_VALUE = "attributeValue";
+        public static final String TEMPLATE_TYPE_KEY = "resourceTypeName";
+        public static final String TENANT_DOMAIN_KEY = "tenantDomain";
 
         private TemplateProperties() {
 

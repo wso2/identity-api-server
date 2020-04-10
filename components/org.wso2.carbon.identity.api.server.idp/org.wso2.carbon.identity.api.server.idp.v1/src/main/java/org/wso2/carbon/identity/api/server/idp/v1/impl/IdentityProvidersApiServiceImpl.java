@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.idp.v1.IdentityProvidersApiService;
@@ -124,9 +125,9 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     }
 
     @Override
-    public Response getIDPTemplates(Integer limit, Integer offset, String filter) {
+    public Response getIDPTemplates(Integer limit, Integer offset, SearchContext searchContext) {
 
-        return Response.ok().entity(idpManagementService.getIDPTemplates(limit, offset, filter)).build();
+        return Response.ok().entity(idpManagementService.getIDPTemplates(limit, offset, searchContext)).build();
     }
 
     @Override

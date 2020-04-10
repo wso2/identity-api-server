@@ -39,7 +39,40 @@ public class ApplicationTemplatesListItem  {
     private String authenticationProtocol;
     private List<String> types = null;
 
-    private String category;
+
+@XmlType(name="CategoryEnum")
+@XmlEnum(String.class)
+public enum CategoryEnum {
+
+    @XmlEnumValue("DEFAULT") DEFAULT(String.valueOf("DEFAULT")), @XmlEnumValue("CUSTOM") CUSTOM(String.valueOf("CUSTOM"));
+
+
+    private String value;
+
+    CategoryEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static CategoryEnum fromValue(String value) {
+        for (CategoryEnum b : CategoryEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private CategoryEnum category;
     private Integer displayOrder;
     private String self;
 
@@ -161,19 +194,19 @@ public class ApplicationTemplatesListItem  {
 
         /**
     **/
-    public ApplicationTemplatesListItem category(String category) {
+    public ApplicationTemplatesListItem category(CategoryEnum category) {
 
         this.category = category;
         return this;
     }
     
-    @ApiModelProperty(example = "Server Template", value = "")
+    @ApiModelProperty(example = "DEFAULT", value = "")
     @JsonProperty("category")
     @Valid
-    public String getCategory() {
+    public CategoryEnum getCategory() {
         return category;
     }
-    public void setCategory(String category) {
+    public void setCategory(CategoryEnum category) {
         this.category = category;
     }
 
