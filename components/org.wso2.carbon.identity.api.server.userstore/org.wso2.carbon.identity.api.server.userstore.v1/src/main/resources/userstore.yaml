@@ -132,7 +132,7 @@ paths:
       operationId: deleteUserStore
       description: >
         This API provides the capability to delete a secondary user store
-       based on a given user store domain ID. <br>
+        based on a given user store domain ID. <br>
         <b>Permission required:</b><br>
         */permission/admin/manage/identity/userstore/config/delete<br>
         <b>Scope required:</b><br>
@@ -283,7 +283,7 @@ paths:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
         - $ref: '#/components/parameters/filterQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'    
+        - $ref: '#/components/parameters/sortQueryParam'
       responses:
         '200':
           description: Successful response.
@@ -380,13 +380,6 @@ components:
       name: sort
       required: false
       description: Define the order in which the retrieved records should be sorted.
-      schema:	
-        type: string	
-    requiredAttributesQueryParam:	
-      in: query	
-      name: requiredAttributes	
-      required: false	
-      description: Define set of user store attributes (as comma separated) to be returned.
       schema:
         type: string
     requiredAttributesQueryParam:
