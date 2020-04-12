@@ -33,11 +33,6 @@ paths:
       summary: Retrieves the list of scopes
       operationId: getScopes
       description: This REST API can be used to get details of the available scopes.
-       <br>
-        <b>Permission required:</b> <br>
-              * /permission/admin/manage/identity/applicationmgt/view <br>
-        <b>Scope required:</b> <br>
-              * internal_application_mgt_view
       security:
         - BasicAuth: []
         - OAuth2: []
@@ -65,11 +60,6 @@ paths:
         - OIDC Scope Endpoint
       summary: Add a new OIDC Scope
       operationId: addScope
-      description: This Rest API can be used to add a new OIDC scope. <br>
-        <b>Permission required:</b> <br>
-              * /permission/admin/manage/identity/applicationmgt/create <br>
-        <b>Scope required:</b> <br>
-              * internal_application_mgt_create
       security:
         - BasicAuth: []
         - OAuth2: []
@@ -97,11 +87,7 @@ paths:
         - OIDC Scope Endpoint
       summary: Get a scope
       operationId: getScope
-      description: This REST API can be used to get the scope. <br>
-        <b>Permission required:</b> <br>
-              * /permission/admin/manage/identity/applicationmgt/view <br>
-        <b>Scope required:</b> <br>
-              * internal_application_mgt_view
+      description: This REST API can be used to get the scope.
       security:
         - BasicAuth: []
         - OAuth2: []
@@ -133,11 +119,6 @@ paths:
         - OIDC Scope Endpoint
       summary: Update an OIDC Scope
       operationId: updateScope
-      description: This API can be used to update an existing OIDC scope. <br>
-        <b>Permission required:</b> <br>
-              * /permission/admin/manage/identity/applicationmgt/update <br>
-        <b>Scope required:</b> <br>
-              * internal_application_mgt_update
       security:
         - BasicAuth: []
         - OAuth2: []
@@ -172,11 +153,6 @@ paths:
         - OIDC Scope Endpoint
       summary: Delete an OIDC Scope
       operationId: deleteScope
-      description: This API can be used to delete an existing OIDC scope. <br>
-        <b>Permission required:</b> <br>
-              * /permission/admin/manage/identity/applicationmgt/delete <br>
-        <b>Scope required:</b> <br>
-              * internal_application_mgt_delete
       security:
         - BasicAuth: []
         - OAuth2: []

@@ -1,9 +1,7 @@
 openapi: 3.0.0
 info:
   description: >
-    This is the RESTful API for user store management related operations in WSO2 Identity Server. The API provides the capability to add/update/delete/patch secondary user stores in the identity server.
-    In addition, APIs are available to test the connection to the data source used by a JDBC user store
-    manager, and retrieve available user store types and their properties.
+    This is the RESTful API for user store management related operations in WSO2 Identity Server
   version: "v1"
   title: WSO2 Identity Server - UserStore Rest API
   contact:
@@ -27,12 +25,10 @@ paths:
       summary: Add a secondary user store.
       operationId: addUserStore
       description: |
-        This API provides the capability to add a secondary user store. <br>
-        <b>Permission required:</b><br>
-        */permission/admin/manage/identity/userstore/config/create<br>
-        <b>Scope required:</b><br>
-        */internal_userstore_create
+        This API provides the capability to add a secondary user store.
 
+         <b>Permission required:</b>
+          */permission/admin
       responses:
         '201':
           description: Successful response
@@ -65,14 +61,12 @@ paths:
     get:
       tags:
         - User Store
-      summary: Retrieve or list the configured secondary user stores.
+      summary: Retrieve or List the configured secondary user stores.
       operationId: getSecondaryUserStores
       description: >
-        This API provides the capability to list the configured secondary userstores.<br>
-        <b>Permission required:</b><br>
-        */permission/admin/manage/identity/userstore/config/view<br>
-        <b>Scope required:</b><br>
-        * internal_userstore_view
+        This API provides the capability to list the configured secondary userstores.
+        <b>Permission required:</b>
+        */permission/admin
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
@@ -101,15 +95,14 @@ paths:
       tags:
         - User Store
       summary: >-
-        Retrieve the configurations of the secondary user store based on its domain ID.
+        Retrieve the configurations of secondary user store based on its domain id.
       operationId: getUserStoreByDomainId
       description: >
         This API provides the capability to retrieve the configurations of
-        secondary user store based on its domain ID. <br>
-        <b>Permission required:</b><br>
-        */permission/admin/manage/identity/userstore/config/view<br>
-        <b>Scope required:</b><br>
-        * internal_userstore_view
+        secondary user store based on its domain id.
+
+          <b>Permission required:</b>
+        */permission/admin
       parameters:
         - $ref: '#/components/parameters/domainNamePathParam'
       responses:
@@ -132,11 +125,10 @@ paths:
       operationId: deleteUserStore
       description: >
         This API provides the capability to delete a secondary user store
-        based on a given user store domain ID. <br>
-        <b>Permission required:</b><br>
-        */permission/admin/manage/identity/userstore/config/delete<br>
-        <b>Scope required:</b><br>
-        * internal_userstore_delete
+        matching to the given user store domain id.
+
+         <b>Permission required:</b>
+         */permission/admin
       parameters:
         - $ref: '#/components/parameters/domainNamePathParam'
       responses:
@@ -146,27 +138,24 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
     put:
       tags:
         - User Store
-      summary: Update a user store by its domain ID.
+      summary: Update a user store by its domain id.
       operationId: updateUserStore
       description: >
         This API provides the capability to edit a user store based on its
-        domain ID. <br>
-        <b>Permission required:</b><br>
-        */permission/admin/manage/identity/userstore/config/update<br>
-        <b>Scope required:</b><br>
-        * internal_userstore_update
+        domain id.
+
+         <b>Permission required:</b>
+          */permission/admin
       parameters:
         - in: path
           name: userstore-domain-id
           required: true
-          description: Current domain ID of the user store.
+          description: Current domain id of the user store
           schema:
             type: string
             example: SkRCQy1TRUNPTkRBUlk
@@ -195,7 +184,7 @@ paths:
               # But not allowing to change the typeName and name in the PUT request.
         description: >-
           The secondary user store values which are need to be edited of the
-          given domain ID.
+          given domain id.
     patch:
       tags:
         - User Store
@@ -203,11 +192,10 @@ paths:
       operationId: patchUserStore
       description: >
         This API provides the capability to update the secondary user store's
-        property using a patch request made based on its domain ID. <br>
-        <b>Permission required:</b><br>
-        */permission/admin/manage/identity/userstore/config/update<br>
-        <b>Scope required:</b><br>
-        * internal_userstore_update
+        property using patch request by using it's domain id.
+
+         <b>Permission required:</b>
+         */permission/admin
       parameters:
         - $ref: '#/components/parameters/domainNamePathParam'
       responses:
@@ -241,11 +229,11 @@ paths:
       operationId: getAvailableUserStoreTypes
       description: >
         This API provides the capability to retrieve the available user store
-        types.<br>
-        <b>Permission required:</b><br>
-        */permission/admin/manage/identity/userstore/config/view<br>
-        <b>Scope required:</b><br>
-        * internal_userstore_view
+        types.
+
+         <b>Permission required:</b>
+
+        */permission/admin
       responses:
         '200':
           description: Successful Response.
@@ -264,35 +252,29 @@ paths:
       tags:
         - Meta
       summary: >-
-        Retrieve the properties of the secondary user store of a given user store type.
+        Retrieve the properties of secondary user store of a given user store type.
       operationId: getUserStoreManagerProperties
       description: >
-        This API provides the capability to retrieve the properties of the secondary
-        user store of a given class name. <br>
-        <b>Permission required:</b><br>
-        */permission/admin/manage/identity/userstore/config/view<br>
-        <b>Scope required:</b><br>
-        * internal_userstore_view
+        This API provides the capability to retrieve the properties of secondary
+        user store of a given class name.
+
+         <b>Permission required:</b>
+
+        */permission/admin
       parameters:
         - in: path
           name: type-id
           required: true
-          description: ID of the user store type.
+          description: Id of the user store type
           schema:
             type: string
-        - $ref: '#/components/parameters/limitQueryParam'
-        - $ref: '#/components/parameters/offsetQueryParam'
-        - $ref: '#/components/parameters/filterQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
       responses:
         '200':
           description: Successful response.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MetaUserStoreType'
+                $ref: '#/components/schemas/MetaUserStoreType'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -311,11 +293,10 @@ paths:
       operationId: testRDBMSConnection
       description: >
         This API provides the capability to test the connection to the
-        datasource used by a JDBC user store manager. <br>
-        <b>Permission required:</b><br>
-        */permission/admin/manage/identity/userstore/config/view<br>
-        <b>Scope required:</b><br>
-        * internal_userstore_view
+        datasource used by a JDBC user store manager.
+
+          <b>Permission required:</b>
+          */permission/admin
       responses:
         '200':
           description: Successful response.
@@ -348,7 +329,7 @@ components:
       name: userstore-domain-id
       in: path
       required: true
-      description: The unique name of the user store domain.
+      description: The unique name of the user store domain
       schema:
         type: string
         example: SkRCQy1TRUNPTkRBUlk
@@ -356,7 +337,7 @@ components:
       in: query
       name: limit
       required: false
-      description: Maximum number of records to return.
+      description: maximum number of records to return
       schema:
         type: integer
         format: int32
@@ -364,7 +345,7 @@ components:
       in: query
       name: offset
       required: false
-      description: Number of records to skip for pagination.
+      description: number of records to skip for pagination
       schema:
         type: integer
         format: int32
@@ -372,14 +353,14 @@ components:
       in: query
       name: filter
       required: false
-      description: Condition to filter the retrieval of records.
+      description: Condition to filter the retrival of records.
       schema:
         type: string
     sortQueryParam:
       in: query
       name: sort
       required: false
-      description: Define the order in which the retrieved records should be sorted.
+      description: Define the order how the retrieved records should be sorted.
       schema:
         type: string
     requiredAttributesQueryParam:
@@ -398,10 +379,6 @@ components:
             $ref: '#/components/schemas/Error'
     Unauthorized:
       description: Unauthorized.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     ServerError:
       description: Internal Server Error.
       content:
@@ -464,7 +441,7 @@ components:
       properties:
         typeId:
           type: string
-          description: The ID of the user store manager class type.
+          description: The id of the user store manager class type.
           example: SkRCQ1VzZXJTdG9yZU1hbmFnZXI
         description:
           type: string
@@ -492,14 +469,14 @@ components:
           type: boolean
           example: true
     PatchDocument:
-      description: A JSONPatch document as defined by RFC 6902.
+      description: A JSONPatch document as defined by RFC 6902
       required:
         - operation
         - path
       properties:
         operation:
           type: string
-          description: The operation to be performed.
+          description: The operation to be performed
           enum:
             - ADD
             - REMOVE
@@ -511,7 +488,7 @@ components:
           example: /properties/disabled
         value:
           type: string
-          description: The value to be used within the operations.
+          description: The value to be used within the operations
           example: 'true'
     RDBMSConnectionReq:
       required:
@@ -574,7 +551,7 @@ components:
         name:
           type: string
           example: JDBC-SECONDARY
-          description: Domain name of the secondary user store.
+          description: domain name of the secondary user store
         description:
           type: string
           example: Some description of the user store
@@ -590,10 +567,6 @@ components:
     MetaUserStoreType:
       type: object
       properties:
-        name:
-          type: string
-          example: JDBC-SECONDARY
-          description: Domain name of the secondary user store.
         typeName:
           type: string
           example: JDBCUserStoreManager
@@ -603,9 +576,6 @@ components:
         className:
           type: string
           example: org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager
-        description:
-          type: string
-          example: Some description of the user store
         properties:
           $ref: '#/components/schemas/UserStorePropertiesRes'
     UserStoreResponse:
@@ -618,7 +588,7 @@ components:
         name:
           type: string
           example: JDBC-SECONDARY
-          description: Domain name of the secondary user store.
+          description: domain name of the secondary user store
         typeName:
           type: string
           example: JDBCUserStoreManager
