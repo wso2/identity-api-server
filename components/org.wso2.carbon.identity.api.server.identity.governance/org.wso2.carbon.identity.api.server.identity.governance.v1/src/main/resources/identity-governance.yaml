@@ -28,10 +28,8 @@ paths:
       description: |
         Retrieve governance connector categories.
 
-        <b>Permission required:</b> <br>
-          * /permission/admin/manage/identity/idpmgt/view <br>
-        <b>Scope required:</b> <br>
-            * internal_idp_view
+        <b>Permission required:</b>
+          * /permission/admin/manage
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
@@ -59,11 +57,10 @@ paths:
       summary: Retrieve governance connectors of a category.
       operationId: getConnectorCategory
       description: |
-        Retrieve governance connectors of a category. <br>
-        <b>Permission required:</b> <br>
-            * /permission/admin/manage/identity/idpmgt/view <br>
-        <b>Scope required:</b> <br>
-            * internal_idp_view
+        Retrieve governance connectors of a category.
+
+        <b>Permission required:</b>
+          * /permission/admin/manage
       parameters:
         - $ref: '#/components/parameters/categoryIdPathParam'
       responses:
@@ -86,11 +83,10 @@ paths:
       summary: Retrieve governance connectors of a category.
       operationId: getConnectorsOfCategory
       description: |
-        Retrieve governance connectors of a category.<br>
-        <b>Permission required:</b> <br>
-            * /permission/admin/manage/identity/idpmgt/view <br>
-        <b>Scope required:</b> <br>
-            * internal_idp_view
+        Retrieve governance connectors of a category.
+
+        <b>Permission required:</b>
+          * /permission/admin/manage
       parameters:
         - $ref: '#/components/parameters/categoryIdPathParam'
       responses:
@@ -115,11 +111,10 @@ paths:
       summary: Retrieve governance connector.
       operationId: getConnector
       description: |
-        Retrieve governance connector.<br>
-        <b>Permission required:</b> <br>
-            * /permission/admin/manage/identity/idpmgt/view <br>
-        <b>Scope required:</b> <br>
-            * internal_idp_view
+        Retrieve governance connector.
+
+        <b>Permission required:</b>
+          * /permission/admin/manage
       parameters:
         - $ref: '#/components/parameters/categoryIdPathParam'
         - $ref: '#/components/parameters/connectorIdPathParam'
@@ -142,11 +137,10 @@ paths:
       summary: Patch governance connector.
       operationId: patchConnector
       description: |
-        Patch governance connector.<br>
-        <b>Permission required:</b> <br>
-            * /permission/admin/manage/identity/idpmgt/update <br>
-        <b>Scope required:</b> <br>
-            * internal_idp_update
+        Patch governance connector.
+
+        <b>Permission required:</b>
+          * /permission/admin/manage
       parameters:
         - $ref: '#/components/parameters/categoryIdPathParam'
         - $ref: '#/components/parameters/connectorIdPathParam'
@@ -175,7 +169,7 @@ components:
       in: query
       name: limit
       required: false
-      description: Maximum number of records to return.
+      description: maximum number of records to return
       schema:
         type: integer
         format: int32
@@ -183,7 +177,7 @@ components:
       in: query
       name: offset
       required: false
-      description: Number of records to skip for pagination.
+      description: number of records to skip for pagination
       schema:
         type: integer
         format: int32
@@ -191,14 +185,14 @@ components:
       in: query
       name: filter
       required: false
-      description: Condition to filter the retrieval of records.
+      description: Condition to filter the retrival of records.
       schema:
         type: string
     sortQueryParam:
       in: query
       name: sort
       required: false
-      description: Define the order in which the retrieved records should be sorted.
+      description: Define the order how the retrieved records should be sorted.
       schema:
         type: string
     categoryIdPathParam:

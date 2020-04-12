@@ -1,7 +1,6 @@
 swagger: '2.0'
 info:
-  description: This is the RESTful API for claims management related operations in WSO2 Identity Server. This API allows	
-    adding, retrieving, updating, and deleting local/external claims and claim dialects.
+  description: This is the RESTful API for claims managment related operations in WSO2 Identity Server
   version: "v1"
   title: WSO2 Identity Server - Claim Admin API
   contact:
@@ -32,17 +31,13 @@ paths:
       - management
       summary: Add a local claim.
       operationId: addLocalClaim
-      description: Add a new claim. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/create <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_create
+      description: Add a new claim.
       consumes:
       - application/json
       parameters:
       - in: body
         name: localClaim
-        description: Local claim to be added.
+        description: Local claim to add.
         schema:
           $ref: '#/definitions/LocalClaimReq'
       x-wso2-curl: |
@@ -65,11 +60,7 @@ paths:
       - management
       summary: Retrieve local claims.
       operationId: getLocalClaims
-      description: Retrieve local claims. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/view <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_view
+      description: Retrieve local claims.
       produces:
       - application/json
       parameters:
@@ -99,11 +90,7 @@ paths:
       - management
       summary: Retrieve local claim.
       operationId: getLocalClaim
-      description: Retrieve a local claim matching the given claim ID. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/view <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_view
+      description: Retrieve a local claim matching the given claim id.
       produces:
       - application/json
       parameters:
@@ -130,11 +117,7 @@ paths:
       - management
       summary: Update a local claim.
       operationId: updateLocalClaim
-      description: Update a local claim. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/update <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_update
+      description: Update a local claim.
       consumes:
       - application/json
       parameters:
@@ -164,11 +147,7 @@ paths:
       - management
       summary: Delete a local claim.
       operationId: deleteLocalClaim
-      description: Delete a claim by claim ID. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/delete <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_delete
+      description: Delete a claim by claim id.
       parameters:
       - $ref : '#/parameters/claimIdPathParam'
       x-wso2-curl: |
@@ -190,11 +169,7 @@ paths:
       - management
       summary: Add a claim dialect.
       operationId: addClaimDialect
-      description: Add a new claim dialect. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/create <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_create
+      description: Add a new claim dialect.
       consumes:
       - application/json
       parameters:
@@ -223,11 +198,7 @@ paths:
       - management
       summary: Retrieve claim dialects.
       operationId: getClaimDialects
-      description: Retrieve claim dialects. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/view <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_view
+      description: Retrieve claim dialects.
       produces:
       - application/json
       parameters:
@@ -256,11 +227,7 @@ paths:
       - management
       summary: Retrieve claim dialect.
       operationId: getClaimDialect
-      description: Retrieve a claim dialect matching the given dialect id. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/view <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_view <br>
+      description: Retrieve a claim dialect matching the given dialect id.
       produces:
       - application/json
       parameters:
@@ -287,11 +254,7 @@ paths:
       - management
       summary: Update a claim dialect.
       operationId: updateClaimDialect
-      description: Update a claim dialect. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/update <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_update
+      description: Update a claim dialect.
       consumes:
       - application/json
       parameters:
@@ -319,11 +282,7 @@ paths:
       - management
       summary: Delete a claim dialect.
       operationId: deleteClaimDialect
-      description: Delete a claim dialect by claim ID. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/delete <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_delete
+      description: Delete a claim dialect by claim id.
       parameters:
       - $ref : '#/parameters/dialectIdPathParam'
       x-wso2-curl: |
@@ -345,11 +304,7 @@ paths:
       - management
       summary: Add an external claim.
       operationId: addExternalClaim
-      description: Add a new external claim. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/create <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_create
+      description: Add a new external claim.
       consumes:
       - application/json
       parameters:
@@ -381,11 +336,7 @@ paths:
       - management
       summary: Retrieve external claims.
       operationId: getExternalClaims
-      description: Retrieve External claims. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/view <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_view
+      description: Retrieve External claims.
       produces:
       - application/json
       parameters:
@@ -417,11 +368,7 @@ paths:
       - management
       summary: Retrieve external claim.
       operationId: getExternalClaim
-      description: Retrieve an external claim matching the given dialect ID and claim ID. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/view <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_view
+      description: Retrieve an external claim matching the given dialect id and claim id.
       produces:
       - application/json
       parameters:
@@ -449,11 +396,7 @@ paths:
       - management
       summary: Update an external claim.
       operationId: updateExternalClaim
-      description: Update an external claim. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/update <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_update
+      description: Update an external claim.
       consumes:
       - application/json
       parameters:
@@ -484,11 +427,7 @@ paths:
       - management
       summary: Delete an external claim.
       operationId: deleteExternalClaim
-      description: Delete a claim by dialect ID and claim ID. <br>	
-        <b>Permission required:</b> <br>	
-              * /permission/admin/manage/identity/claimmgt/metadata/delete <br>	
-        <b>Scope required:</b> <br>	
-              * internal_claim_meta_delete
+      description: Delete a claim by dialect id and claim id.
       parameters:
       - $ref : '#/parameters/dialectIdPathParam'
       - $ref : '#/parameters/claimIdPathParam'
@@ -513,27 +452,27 @@ parameters:
     in: query
     name: limit
     required: false
-    description: Maximum number of records to return.
+    description: maximum number of records to return
     type: integer
     format: int32
   offsetQueryParam:
     in: query
     name: offset
     required: false
-    description: Number of records to skip for pagination.
+    description: number of records to skip for pagination
     type: integer
     format: int32
   filterQueryParam:
     in: query
     name: filter
     required: false
-    description: Condition to filter the retrieval of records.
+    description: Condition to filter the retrival of records.
     type: string
   sortQueryParam:
     in: query
     name: sort
     required: false
-    description: Define the order by which the retrieved records should be sorted.
+    description: Define the order how the retrieved records should be sorted.
     type: string
   attributesQueryParam:
     in: query
@@ -622,7 +561,7 @@ definitions:
     properties:
       id:
         type: string
-        description: claim ID.
+        description: Claim id.
         example: "394b8adcce24c64a8a09a8d80abf8c337bd253de"
       claimURI:
         type: string
@@ -750,7 +689,7 @@ definitions:
     properties:
       id:
         type: string
-        description: External claim ID.
+        description: External claim id.
         example: "394b8adcce24c64a8a09a0d80abf8c337dd255de"
       claimURI:
         type: string
