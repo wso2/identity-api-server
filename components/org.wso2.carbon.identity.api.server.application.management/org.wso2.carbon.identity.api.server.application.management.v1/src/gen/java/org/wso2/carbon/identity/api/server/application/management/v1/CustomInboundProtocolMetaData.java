@@ -64,7 +64,7 @@ public class CustomInboundProtocolMetaData  {
         return this;
     }
     
-    @ApiModelProperty(example = "My Custom Protocol", value = "")
+    @ApiModelProperty(example = "Custom Protocol", value = "")
     @JsonProperty("configName")
     @Valid
     public String getConfigName() {
