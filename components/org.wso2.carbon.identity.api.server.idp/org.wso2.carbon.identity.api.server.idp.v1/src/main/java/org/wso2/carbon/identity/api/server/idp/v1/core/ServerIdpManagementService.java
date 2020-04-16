@@ -875,20 +875,13 @@ public class ServerIdpManagementService {
             SearchCondition<ResourceSearchBean> searchCondition = searchContext.getCondition(ResourceSearchBean.class);
             if (searchCondition != null) {
                 Condition result = buildSearchCondition(searchCondition);
+                Condition typeCondition = new PrimitiveCondition(Constants.TEMPLATE_TYPE_KEY, EQUALS, templateType);
+                Condition tenantCondition = new PrimitiveCondition(Constants.TENANT_DOMAIN_KEY, EQUALS, tenantDomain);
+
                 List<Condition> list = new ArrayList<>();
-                Condition typeCondition = new PrimitiveCondition(Constants.TEMPLATE_TYPE_KEY, EQUALS, templateType
-                );
-                Condition tenantCondition = new PrimitiveCondition(Constants.TENANT_DOMAIN_KEY, EQUALS, tenantDomain
-                );
-                if (result instanceof ComplexCondition) {
-                    list = ((ComplexCondition) result).getConditions();
-                    list.add(typeCondition);
-                    list.add(tenantCondition);
-                } else if (result instanceof PrimitiveCondition) {
-                    list.add(result);
-                    list.add(typeCondition);
-                    list.add(tenantCondition);
-                }
+                list.add(result);
+                list.add(typeCondition);
+                list.add(tenantCondition);
                 return new ComplexCondition(getComplexOperatorFromOdata(ConditionType.AND),
                         list);
             } else {
@@ -909,7 +902,29 @@ public class ServerIdpManagementService {
         if (!(searchCondition.getStatement() == null)) {
             PrimitiveStatement primitiveStatement = searchCondition.getStatement();
 
-            if (Constants.SEARCH_KEYS.contains(primitiveStatement.getProperty())) {
+            if (Constants.SEARCH_KEY_NAME.equals(primitiveStatement.getProperty())) {
+                return new PrimitiveCondition(
+                        Constants.SEARCH_KEY_NAME_INTERNAL, getPrimitiveOperatorFromOdata(primitiveStatement
+                        .getCondition()), primitiveStatement.getValue());
+            } else if (Constants.SEARCH_KEY_SERVICES.equals(primitiveStatement.getProperty()) &&
+                    getPrimitiveOperatorFromOdata(primitiveStatement.getCondition()) == EQUALS) {
+                Condition servicesAttrKeyCondition = new PrimitiveCondition(Constants.ATTR_KEY, EQUALS, Constants
+                        .SEARCH_KEY_SERVICES);
+                Condition servicesAttrValueCondition = new PrimitiveCondition(Constants.ATTR_VALUE, EQUALS,
+                        primitiveStatement.getValue());
+                Condition servicesCondition = new ComplexCondition(getComplexOperatorFromOdata(ConditionType.AND),
+                        Arrays.asList(servicesAttrKeyCondition, servicesAttrValueCondition));
+
+                Condition servicesCombinedAttrKeyCondition = new PrimitiveCondition(Constants.ATTR_KEY, EQUALS,
+                        Constants.SEARCH_KEY_SERVICES);
+                Condition servicesCombinedAttrValueCondition = new PrimitiveCondition(Constants.ATTR_VALUE, EQUALS,
+                        Constants.SEARCH_VALUE_AUTHENTICATION_PROVISIONING);
+                Condition servicesCombinedCondition = new ComplexCondition(getComplexOperatorFromOdata(ConditionType
+                        .AND), Arrays.asList(servicesCombinedAttrKeyCondition, servicesCombinedAttrValueCondition));
+
+                return new ComplexCondition(getComplexOperatorFromOdata(ConditionType.OR), Arrays.asList
+                        (servicesCondition, servicesCombinedCondition));
+            } else if (Constants.SEARCH_KEYS.contains(primitiveStatement.getProperty())) {
                 List<Condition> list = new ArrayList<>();
                 Condition attrKeyCondition = new PrimitiveCondition(Constants.ATTR_KEY, EQUALS, primitiveStatement
                         .getProperty());
@@ -920,10 +935,6 @@ public class ServerIdpManagementService {
                 list.add(attrValueCondition);
                 return new ComplexCondition(getComplexOperatorFromOdata(ConditionType.AND),
                         list);
-            } else if (Constants.SEARCH_KEY_NAME.equals(primitiveStatement.getProperty())) {
-                return new PrimitiveCondition(
-                        Constants.SEARCH_KEY_NAME_INTERNAL, getPrimitiveOperatorFromOdata(primitiveStatement
-                        .getCondition()), primitiveStatement.getValue());
             } else {
                 throw handleException(Response.Status.BAD_REQUEST,
                         Constants.ErrorMessage.ERROR_CODE_ERROR_INVALID_SEARCH_FILTER, null);
@@ -1179,10 +1190,12 @@ public class ServerIdpManagementService {
     private ArrayList<String> createServicesListForIdP(IdentityProviderPOSTRequest idp) {
 
         ArrayList<String> services = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(idp.getProvisioning().getOutboundConnectors().getConnectors())) {
+        if (idp.getProvisioning() != null && idp.getProvisioning().getOutboundConnectors() != null && CollectionUtils
+                .isNotEmpty(idp.getProvisioning().getOutboundConnectors().getConnectors())) {
             services.add(SERV_PROVISIONING);
         }
-        if (CollectionUtils.isNotEmpty(idp.getFederatedAuthenticators().getAuthenticators())) {
+        if (idp.getFederatedAuthenticators() != null && CollectionUtils.isNotEmpty(idp.getFederatedAuthenticators()
+                .getAuthenticators())) {
             services.add(SERV_AUTHENTICATION);
         }
         return services;
