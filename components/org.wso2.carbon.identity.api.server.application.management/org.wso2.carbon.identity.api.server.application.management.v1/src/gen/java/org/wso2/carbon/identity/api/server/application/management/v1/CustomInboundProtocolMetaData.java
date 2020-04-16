@@ -34,6 +34,7 @@ import javax.xml.bind.annotation.*;
 public class CustomInboundProtocolMetaData  {
   
     private String displayName;
+    private String configName;
     private List<CustomInboundProtocolProperty> properties = null;
 
 
@@ -53,6 +54,24 @@ public class CustomInboundProtocolMetaData  {
     }
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    /**
+    **/
+    public CustomInboundProtocolMetaData configName(String configName) {
+
+        this.configName = configName;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "My Custom Protocol", value = "")
+    @JsonProperty("configName")
+    @Valid
+    public String getConfigName() {
+        return configName;
+    }
+    public void setConfigName(String configName) {
+        this.configName = configName;
     }
 
     /**
@@ -94,12 +113,13 @@ public class CustomInboundProtocolMetaData  {
         }
         CustomInboundProtocolMetaData customInboundProtocolMetaData = (CustomInboundProtocolMetaData) o;
         return Objects.equals(this.displayName, customInboundProtocolMetaData.displayName) &&
+            Objects.equals(this.configName, customInboundProtocolMetaData.configName) &&
             Objects.equals(this.properties, customInboundProtocolMetaData.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(displayName, properties);
+        return Objects.hash(displayName, configName, properties);
     }
 
     @Override
@@ -109,6 +129,7 @@ public class CustomInboundProtocolMetaData  {
         sb.append("class CustomInboundProtocolMetaData {\n");
         
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+        sb.append("    configName: ").append(toIndentedString(configName)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();

@@ -3031,6 +3031,9 @@ components:
         displayName:
           type: string
           example: 'My Custom Protocol'
+        configName:
+          type: string
+          example: 'Custom Protocol'
         properties:
           type: array
           items:
