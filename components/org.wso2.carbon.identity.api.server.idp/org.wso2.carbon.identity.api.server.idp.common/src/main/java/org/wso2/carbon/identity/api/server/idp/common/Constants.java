@@ -78,13 +78,15 @@ public class Constants {
 
     // IdP Template Search.
     public static final List<String> SEARCH_KEYS = Collections.unmodifiableList(Arrays.asList("description", "image",
-            "category", "displayOrder"));
+            "category", "displayOrder", "services"));
     public static final String SEARCH_KEY_NAME = "name";
+    public static final String SEARCH_KEY_SERVICES = "services";
     public static final String SEARCH_KEY_NAME_INTERNAL = "resourceName";
     public static final String ATTR_KEY = "attributeKey";
     public static final String ATTR_VALUE = "attributeValue";
     public static final String TEMPLATE_TYPE_KEY = "resourceTypeName";
     public static final String TENANT_DOMAIN_KEY = "tenantDomain";
+    public static final String SEARCH_VALUE_AUTHENTICATION_PROVISIONING = SERV_PROVISIONING + "," + SERV_AUTHENTICATION;
 
     /**
      * Enum for error messages.
