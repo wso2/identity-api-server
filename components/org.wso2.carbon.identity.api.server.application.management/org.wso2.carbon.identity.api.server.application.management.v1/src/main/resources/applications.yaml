@@ -1803,6 +1803,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/limitWithoutDefaultQueryParam'
         - $ref: '#/components/parameters/offsetWithoutDefaultQueryParam'
+        - $ref: '#/components/parameters/filterQueryParam'
       responses:
         '200':
           description: OK
