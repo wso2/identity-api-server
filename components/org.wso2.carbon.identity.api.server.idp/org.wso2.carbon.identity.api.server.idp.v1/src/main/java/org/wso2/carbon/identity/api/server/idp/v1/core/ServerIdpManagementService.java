@@ -1649,7 +1649,7 @@ public class ServerIdpManagementService {
                     case Constants.CERTIFICATE:
                         identityProviderListItem.setCertificate(createIDPCertificate(idp));
                         break;
-                    case Constants.ALIAS_PATH:
+                    case Constants.ALIAS:
                         identityProviderListItem.setAlias(idp.getAlias());
                         break;
                     case Constants.CLAIMS:
