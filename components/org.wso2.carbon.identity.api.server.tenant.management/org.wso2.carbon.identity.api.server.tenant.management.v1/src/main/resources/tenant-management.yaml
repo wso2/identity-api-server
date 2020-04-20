@@ -355,9 +355,7 @@ components:
           readOnly: true
           description: Tenant created time.
         lifecycle-status:
-          type: boolean
-          example: false
-          description: Lifecycle-status of the tenant.
+          $ref: '#/components/schemas/LifeCycleStatus'
         region:
           type: string
           example: "USA"
@@ -416,9 +414,7 @@ components:
           readOnly: true
           description: Tenant created time.
         lifecycle-status:
-          type: boolean
-          example: false
-          description: Lifecycle status of the tenant.
+          $ref: '#/components/schemas/LifeCycleStatus'
         region:
           type: string
           example: "USA"
@@ -487,6 +483,14 @@ components:
           type: string
           example: "+94 562 8723"
           description: Mobile number of the tenant owner.
+
+    LifeCycleStatus:
+      type: object
+      properties:
+        activated:
+          type: boolean
+          example: true
+          description: Status of the tenant life cycle
 
     Link:
       type: object

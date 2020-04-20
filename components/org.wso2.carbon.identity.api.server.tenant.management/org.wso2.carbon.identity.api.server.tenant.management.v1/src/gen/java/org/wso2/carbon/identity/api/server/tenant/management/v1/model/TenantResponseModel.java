@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.model.LifeCycleStatus;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerResponse;
 import javax.validation.constraints.*;
 
@@ -38,7 +39,7 @@ public class TenantResponseModel  {
     private List<OwnerResponse> owners = null;
 
     private String createdDate;
-    private Boolean lifecycleStatus;
+    private LifeCycleStatus lifecycleStatus;
     private String region;
 
     /**
@@ -125,21 +126,20 @@ public class TenantResponseModel  {
     }
 
     /**
-    * Lifecycle status of the tenant.
     **/
-    public TenantResponseModel lifecycleStatus(Boolean lifecycleStatus) {
+    public TenantResponseModel lifecycleStatus(LifeCycleStatus lifecycleStatus) {
 
         this.lifecycleStatus = lifecycleStatus;
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Lifecycle status of the tenant.")
+    @ApiModelProperty(value = "")
     @JsonProperty("lifecycle-status")
     @Valid
-    public Boolean getLifecycleStatus() {
+    public LifeCycleStatus getLifecycleStatus() {
         return lifecycleStatus;
     }
-    public void setLifecycleStatus(Boolean lifecycleStatus) {
+    public void setLifecycleStatus(LifeCycleStatus lifecycleStatus) {
         this.lifecycleStatus = lifecycleStatus;
     }
 
