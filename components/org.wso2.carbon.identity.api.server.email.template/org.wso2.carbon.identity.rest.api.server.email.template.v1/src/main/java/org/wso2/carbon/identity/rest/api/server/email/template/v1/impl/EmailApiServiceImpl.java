@@ -83,8 +83,7 @@ public class EmailApiServiceImpl implements EmailApiService {
                                              String requiredAttributes) {
 
         return Response.ok().entity(emailTemplatesService
-                .getAllEmailTemplateTypes(limit, offset, sortOrder, sortBy, requiredAttributes)).
-                build();
+                .getAllEmailTemplateTypes(limit, offset, sortOrder, sortBy, requiredAttributes)).build();
     }
 
     @Override
