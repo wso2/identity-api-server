@@ -34,6 +34,9 @@ public class Constants {
     public static final String EMAIL_TEMPLATES_PATH = "/templates";
     public static final String PATH_SEPARATOR = "/";
 
+    // Required attributes.
+    public static final String LOCALE = "templates.id";
+
     private static final Map<String, ErrorMessage> ERROR_CODE_MAP = new HashMap<>();
 
     /**

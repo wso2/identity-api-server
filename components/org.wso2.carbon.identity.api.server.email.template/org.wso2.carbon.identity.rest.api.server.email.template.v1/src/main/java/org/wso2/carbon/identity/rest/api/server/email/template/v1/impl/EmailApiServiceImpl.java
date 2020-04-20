@@ -79,9 +79,11 @@ public class EmailApiServiceImpl implements EmailApiService {
     }
 
     @Override
-    public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sortOrder, String sortBy) {
+    public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sortOrder, String sortBy,
+                                             String requiredAttributes) {
 
-        return Response.ok().entity(emailTemplatesService.getAllEmailTemplateTypes(limit, offset, sortOrder, sortBy)).
+        return Response.ok().entity(emailTemplatesService
+                .getAllEmailTemplateTypes(limit, offset, sortOrder, sortBy, requiredAttributes)).
                 build();
     }
 

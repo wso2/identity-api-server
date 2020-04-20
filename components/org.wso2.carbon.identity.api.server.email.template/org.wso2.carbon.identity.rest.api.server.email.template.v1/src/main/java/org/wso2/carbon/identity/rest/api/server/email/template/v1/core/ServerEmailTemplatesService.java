@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.rest.api.server.email.template.v1.core;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +39,7 @@ import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTem
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.SimpleEmailTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,17 +70,28 @@ public class ServerEmailTemplatesService {
      * @param offset    Offset to be used with the limit parameter. **Not supported at the moment**
      * @param sortOrder Sort the response in ascending order or descending order. **Not supported at the moment**
      * @param sortBy    Element to sort the responses. **Not supported at the moment**
+     * @param requiredAttributes Required attributes in the email template types list response.
      * @return A list of email template types.
      */
     public List<EmailTemplateTypeWithoutTemplates> getAllEmailTemplateTypes(Integer limit, Integer offset,
-                                                                            String sortOrder, String sortBy) {
+                                                                            String sortOrder, String sortBy,
+                                                                            String requiredAttributes) {
 
         handleNoteSupportedParameters(limit, offset, sortOrder, sortBy);
 
         try {
-            List<EmailTemplate> internalEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
-                    getAllEmailTemplates(getTenantDomainFromContext());
-            return buildEmailTemplateTypeWithoutTemplatesList(internalEmailTemplates);
+            List<String> requestedAttributeList = null;
+            List<EmailTemplate> allTemplates = null;
+            List<String> availableTemplateTypes = EmailTemplatesServiceHolder.getEmailTemplateManager()
+                    .getAvailableTemplateTypes(getTenantDomainFromContext());
+            if (StringUtils.isNotBlank(requiredAttributes)) {
+                requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
+                allTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager()
+                        .getAllEmailTemplates(getTenantDomainFromContext());
+            }
+
+            return buildEmailTemplateTypeWithoutTemplatesList(availableTemplateTypes, allTemplates,
+                    requestedAttributeList);
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPES);
         }
@@ -104,9 +117,6 @@ public class ServerEmailTemplatesService {
         try {
             List<EmailTemplate> internalEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
                     getEmailTemplateType(decodedTemplateTypeId, getTenantDomainFromContext());
-            if (internalEmailTemplates.isEmpty()) {
-                throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
-            }
             return buildEmailTemplateTypeWithID(internalEmailTemplates, templateTypeId);
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPE);
@@ -133,9 +143,6 @@ public class ServerEmailTemplatesService {
         try {
             List<EmailTemplate> internalEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
                     getEmailTemplateType(templateTypeDisplayName, getTenantDomainFromContext());
-            if (internalEmailTemplates.isEmpty()) {
-                throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
-            }
             return buildSimpleEmailTemplatesList(internalEmailTemplates, templateTypeId);
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPE);
@@ -392,26 +399,46 @@ public class ServerEmailTemplatesService {
     /**
      * Create a list EmailTemplateTypeWithoutTemplates objects by reading an internal EmailTemplate list.
      *
+     * @param emailTemplateTypes List of available email template types.
      * @param internalEmailTemplates List of EmailTemplate objects.
+     * @param requestedAttributeList List of required attributes.
      * @return List of EmailTemplateTypeWithoutTemplates objects.
      */
     private List<EmailTemplateTypeWithoutTemplates> buildEmailTemplateTypeWithoutTemplatesList(
-            List<EmailTemplate> internalEmailTemplates) {
+            List<String> emailTemplateTypes, List<EmailTemplate> internalEmailTemplates,
+            List<String> requestedAttributeList) {
 
         Map<String, EmailTemplateTypeWithoutTemplates> templateTypeMap = new HashMap<>();
-        for (EmailTemplate emailTemplate : internalEmailTemplates) {
-            if (!templateTypeMap.containsKey(emailTemplate.getTemplateType())) {
+        for (String templateType : emailTemplateTypes) {
 
-                EmailTemplateTypeWithoutTemplates emailTemplateType = new EmailTemplateTypeWithoutTemplates();
-                // Set display name.
-                emailTemplateType.setDisplayName(emailTemplate.getTemplateDisplayName());
-                // Set id.
-                String templateTypeId = getEmailTemplateIdFromDisplayName(emailTemplate.getTemplateDisplayName());
-                emailTemplateType.setId(templateTypeId);
-                // Set location.
-                emailTemplateType.setSelf(getTemplateTypeLocation(templateTypeId));
+            EmailTemplateTypeWithoutTemplates emailTemplateType = new EmailTemplateTypeWithoutTemplates();
+            // Set display name.
+            emailTemplateType.setDisplayName(templateType);
+            // Set id.
+            String templateTypeId = getEmailTemplateIdFromDisplayName(templateType);
+            emailTemplateType.setId(templateTypeId);
+            // Set location.
+            emailTemplateType.setSelf(getTemplateTypeLocation(templateTypeId));
 
-                templateTypeMap.put(emailTemplate.getTemplateType(), emailTemplateType);
+            if (requestedAttributeList != null) {
+                emailTemplateType.setTemplates(new ArrayList<>());
+            }
+            templateTypeMap.put(templateType, emailTemplateType);
+        }
+
+        // Populate optional email template information if exists.
+        if (requestedAttributeList != null) {
+            for (EmailTemplate emailTemplate : internalEmailTemplates) {
+                for (String requestedAttribute : requestedAttributeList) {
+                    if (StringUtils.equals(Constants.LOCALE, requestedAttribute)) {
+                        EmailTemplateWithID templateWithID = new EmailTemplateWithID();
+                        templateWithID.setId(emailTemplate.getLocale());
+                        // Email template's display name is used to search templateTypeMap key because
+                        // Template's display name and Template type's display name are equal.
+                        templateTypeMap.get(emailTemplate.getTemplateDisplayName()).getTemplates()
+                                .add(templateWithID);
+                    }
+                }
             }
         }
 
@@ -438,6 +465,11 @@ public class ServerEmailTemplatesService {
                 isFirst = false;
             }
             emailTemplateType.getTemplates().add(buildEmailTemplateWithID(internalTemplate));
+        }
+        // Build response if no template exists for the template type.
+        if (CollectionUtils.isEmpty(internalEmailTemplates)) {
+            emailTemplateType.setDisplayName(base64URLDecode(templateTypeId));
+            emailTemplateType.setId(templateTypeId);
         }
         return emailTemplateType;
     }
