@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.security.SecurityConfigException;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -52,7 +53,6 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_NAME_ID_FORMAT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_RETRIEVING_SAML_METADATA;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.getOAuthGrantTypeNames;
-import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 
 /**
  * Calls internal osgi services to get required application metadata.
@@ -86,13 +86,11 @@ public class ServerApplicationMetadataService {
         }
 
         if (customOnly == null || !customOnly) {
-            // Add default inbound protocols
+            // Add default inbound protocols. WS-Federation (Passive) is not added because it doesn't have metadata,
             authProtocolMetadataList.add(new AuthProtocolMetadata().name("saml")
                     .displayName("SAML2 Web SSO Configuration"));
             authProtocolMetadataList.add(new AuthProtocolMetadata().name("oidc")
                     .displayName("OAuth/OpenID Connect Configuration"));
-            authProtocolMetadataList.add(new AuthProtocolMetadata().name("ws-federation")
-                    .displayName("WS-Federation (Passive) Configuration"));
             authProtocolMetadataList.add(new AuthProtocolMetadata().name("ws-trust")
                     .displayName("WS-Trust Security Token Service Configuration"));
         }
@@ -222,12 +220,12 @@ public class ServerApplicationMetadataService {
     /**
      * Pull property metadata of the custom inbound protocol that matches to the protocol name.
      *
-     * @param inboundProtocolId Base64URL encoded protocol name.
+     * @param inboundProtocolName URL encoded protocol name.
      * @return Populated CustomInboundProtocolMetaData object.
      */
-    public CustomInboundProtocolMetaData getCustomProtocolMetadata(String inboundProtocolId) {
+    public CustomInboundProtocolMetaData getCustomProtocolMetadata(String inboundProtocolName) {
 
-        String protocolName = base64URLDecode(inboundProtocolId);
+        String protocolName = URLDecoder.decode(inboundProtocolName);
         Map<String, AbstractInboundAuthenticatorConfig> allCustomAuthenticators =
                 ApplicationManagementServiceHolder.getInstance().getApplicationManagementService()
                         .getAllInboundAuthenticatorConfig();
@@ -238,12 +236,13 @@ public class ServerApplicationMetadataService {
             if (entry.getValue().getName().equals(protocolName)) {
                 return new CustomInboundProtocolMetaData()
                         .displayName(entry.getValue().getFriendlyName())
+                        .configName(entry.getValue().getConfigName())
                         .properties(getCustomInboundProtocolProperties(entry.getValue().getConfigurationProperties()));
             }
         }
 
         // Throw 404 error if the protocol not found
-        throw handleInvalidInboundProtocol(inboundProtocolId);
+        throw handleInvalidInboundProtocol(inboundProtocolName);
     }
 
     /**
