@@ -49,7 +49,7 @@ public class TenantsApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add tenant.", notes = "This API provides the capability to create new tenants.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants  <b>scope required:</b> * ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Add tenant.", notes = "This API provides the capability to create new tenants.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants/list  <b>scope required:</b> * internal_list_tenants ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -73,7 +73,7 @@ public class TenantsApi  {
     @Path("/{tenant-id}/owners")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve tenant's owners.", notes = "Retrieve owners of the tenant which are identified by the provided tenant id.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants  <b>scope required:</b> * ", response = OwnerResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve tenant's owners.", notes = "Retrieve owners of the tenant which are identified by the provided tenant id.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants/list  <b>scope required:</b> * internal_list_tenants ", response = OwnerResponse.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -97,7 +97,7 @@ public class TenantsApi  {
     @Path("/{tenant-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve tenant by tenant ID.", notes = "Retrieve tenant using the tenant ID.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants  <b>scope required:</b> * ", response = TenantResponseModel.class, authorizations = {
+    @ApiOperation(value = "Retrieve tenant by tenant ID.", notes = "Retrieve tenant using the tenant ID.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants/list  <b>scope required:</b> * internal_list_tenants ", response = TenantResponseModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -135,7 +135,7 @@ public class TenantsApi  {
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response retrieveTenants(    @Valid @Min(0)@ApiParam(value = "Maximum number of records to return.")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination.")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order in which the retrieved tenants should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Condition to filter the retrival of records. Supports 'sw', 'co', 'ew' and 'eq' operations and also complex queries with 'and' operations. E.g. /tenants?filter=domain+sw+\"wso2\". _<b>This option is not yet supported.<b>_ ")  @QueryParam("filter") String filter) {
+    public Response retrieveTenants(    @Valid @Min(0)@ApiParam(value = "Maximum number of records to return.")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination.")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order in which the retrieved tenants should be sorted.", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. Currently sorting through _<b>domainName<b>_ only supported.")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Condition to filter the retrival of records. Supports 'sw', 'co', 'ew' and 'eq' operations and also complex queries with 'and' operations. E.g. /tenants?filter=domain+sw+\"wso2\". _<b>This option is not yet supported.<b>_ ")  @QueryParam("filter") String filter) {
 
         return delegate.retrieveTenants(limit,  offset,  sortOrder,  sortBy,  filter );
     }
