@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants;
 import org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.AdditionalClaims;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.model.LifeCycleStatus;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Link;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerResponse;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantListItem;
@@ -117,10 +118,6 @@ public class ServerTenantManagementService {
 
         try {
             Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
-            if (tenant == null) {
-                throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
-                        ERROR_CODE_TENANT_NOT_FOUND, tenantUniqueID);
-            }
             return createTenantResponse(tenant);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
@@ -138,10 +135,6 @@ public class ServerTenantManagementService {
 
         try {
             User user = TenantManagementServiceHolder.getTenantMgtService().getOwner(tenantUniqueID);
-            if (user == null) {
-                throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
-                        ERROR_CODE_OWNER_NOT_FOUND, tenantUniqueID);
-            }
             return createOwnerResponse(user);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
@@ -188,7 +181,7 @@ public class ServerTenantManagementService {
         tenantResponseModel.setCreatedDate(tenant.getCreatedDate().toString());
         tenantResponseModel.setDomain(tenant.getDomain());
         tenantResponseModel.setId(tenant.getTenantUniqueID());
-        tenantResponseModel.setLifecycleStatus(tenant.isActive());
+        tenantResponseModel.setLifecycleStatus(getLifeCycleStatus(tenant.isActive()));
         tenantResponseModel.setOwners(getOwnerResponses(tenant));
         return tenantResponseModel;
     }
@@ -248,7 +241,7 @@ public class ServerTenantManagementService {
         List<TenantListItem> tenantListItems = new ArrayList<>();
         for (Tenant tenant : tenants) {
             TenantListItem listItem = new TenantListItem();
-            listItem.setLifecycleStatus(tenant.isActive());
+            listItem.setLifecycleStatus(getLifeCycleStatus(tenant.isActive()));
             listItem.setCreatedDate(tenant.getCreatedDate().toString());
             listItem.setDomain(tenant.getDomain());
             listItem.setId(tenant.getTenantUniqueID());
@@ -257,6 +250,13 @@ public class ServerTenantManagementService {
             tenantListItems.add(listItem);
         }
         return tenantListItems;
+    }
+
+    private LifeCycleStatus getLifeCycleStatus(boolean isActive) {
+
+        LifeCycleStatus lifeCycleStatus = new LifeCycleStatus();
+        lifeCycleStatus.setActivated(isActive);
+        return lifeCycleStatus;
     }
 
     private List<OwnerResponse> getOwnerResponses(Tenant tenant) {

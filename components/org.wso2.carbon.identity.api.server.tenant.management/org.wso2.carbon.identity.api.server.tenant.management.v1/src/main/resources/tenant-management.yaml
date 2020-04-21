@@ -12,9 +12,6 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-tags:
-  - name: Management
-    description: Secured Admin-only calls
 security:
   - OAuth2: []
   - BasicAuth: []
@@ -69,10 +66,10 @@ paths:
         This API provides the capability to create new tenants.
 
         <b>Permission required:</b>
-        * /permission/protected/manage/monitor/tenants
+        * /permission/protected/manage/monitor/tenants/list
 
         <b>scope required:</b>
-        *
+        * internal_list_tenants
       requestBody:
         content:
           application/json:
@@ -108,10 +105,10 @@ paths:
         Retrieve tenant using the tenant ID.
 
         <b>Permission required:</b>
-        * /permission/protected/manage/monitor/tenants
+        * /permission/protected/manage/monitor/tenants/list
 
         <b>scope required:</b>
-        *
+        * internal_list_tenants
       parameters:
         - $ref: '#/components/parameters/tenantIdPathParam'
       responses:
@@ -182,10 +179,10 @@ paths:
         Retrieve owners of the tenant which are identified by the provided tenant id.
 
         <b>Permission required:</b>
-        * /permission/protected/manage/monitor/tenants
+        * /permission/protected/manage/monitor/tenants/list
 
         <b>scope required:</b>
-        *
+        * internal_list_tenants
       parameters:
         - $ref: '#/components/parameters/tenantIdPathParam'
       responses:
@@ -210,10 +207,10 @@ paths:
           $ref: '#/components/responses/ServerError'
 
 servers:
-  - url: 'https://localhost:9443/t/carbon.super/api/server/v1'
+  - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
     variables:
-      tenant-id:
-        default: unknown
+      tenant-domain:
+        default: carbon.super
 
 components:
   parameters:
@@ -247,8 +244,7 @@ components:
       name: sortOrder
       required: false
       description: >-
-        Define the order in which the retrieved tenants should be sorted. _<b>This
-        option is not yet supported.<b>_
+        Define the order in which the retrieved tenants should be sorted.
       schema:
         type: string
         enum:
@@ -259,8 +255,8 @@ components:
       name: sortBy
       required: false
       description: >-
-        Attribute by which the retrieved records should be sorted. _<b>This
-        option is not yet supported.<b>_
+        Attribute by which the retrieved records should be sorted. Currently sorting through _<b>domainName<b>_ only
+        supported.
       schema:
         type: string
     filterQueryParam:
@@ -355,9 +351,7 @@ components:
           readOnly: true
           description: Tenant created time.
         lifecycle-status:
-          type: boolean
-          example: false
-          description: Lifecycle-status of the tenant.
+          $ref: '#/components/schemas/LifeCycleStatus'
         region:
           type: string
           example: "USA"
@@ -416,9 +410,7 @@ components:
           readOnly: true
           description: Tenant created time.
         lifecycle-status:
-          type: boolean
-          example: false
-          description: Lifecycle status of the tenant.
+          $ref: '#/components/schemas/LifeCycleStatus'
         region:
           type: string
           example: "USA"
@@ -487,6 +479,14 @@ components:
           type: string
           example: "+94 562 8723"
           description: Mobile number of the tenant owner.
+
+    LifeCycleStatus:
+      type: object
+      properties:
+        activated:
+          type: boolean
+          example: true
+          description: Status of the tenant life cycle
 
     Link:
       type: object
