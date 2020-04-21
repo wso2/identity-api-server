@@ -471,8 +471,10 @@ public class ServerEmailTemplatesService {
                             break;
                     }
                 }
-                // Email template's display name is used to search templateTypeMap key because
-                // Template's display name and Template type's display name are equal.
+                /*
+                  Email template's display name is used to search templateTypeMap key because
+                  Template's display name and Template type's display name are equal.
+                 */
                 templateTypeMap.get(emailTemplate.getTemplateDisplayName()).getTemplates().add(templateWithID);
             }
         }
