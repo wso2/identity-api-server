@@ -22,6 +22,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.email.mgt.constants.I18nMgtConstants;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtClientException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtInternalException;
@@ -86,6 +87,14 @@ public class ServerEmailTemplatesService {
                     .getAvailableTemplateTypes(getTenantDomainFromContext());
             if (StringUtils.isNotBlank(requiredAttributes)) {
                 requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
+                List<String> supportedAttributes =
+                        Arrays.asList(Constants.TEMPLATES, Constants.LOCALE, Constants.CONTENT_TYPE, Constants.SUBJECT,
+                                Constants.BODY, Constants.FOOTER);
+                for (String requestedAttribute : requestedAttributeList) {
+                    if (!supportedAttributes.contains(requestedAttribute)) {
+                        throw handleError(Constants.ErrorMessage.ERROR_ATTRIBUTE_NOT_SUPPORTED);
+                    }
+                }
                 allTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager()
                         .getAllEmailTemplates(getTenantDomainFromContext());
             }
@@ -119,6 +128,9 @@ public class ServerEmailTemplatesService {
                     getEmailTemplateType(decodedTemplateTypeId, getTenantDomainFromContext());
             return buildEmailTemplateTypeWithID(internalEmailTemplates, templateTypeId);
         } catch (I18nEmailMgtException e) {
+            if (StringUtils.equals(I18nMgtConstants.ErrorCodes.EMAIL_TEMPLATE_TYPE_NOT_FOUND, e.getErrorCode())) {
+                throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
+            }
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPE);
         }
     }
@@ -145,6 +157,9 @@ public class ServerEmailTemplatesService {
                     getEmailTemplateType(templateTypeDisplayName, getTenantDomainFromContext());
             return buildSimpleEmailTemplatesList(internalEmailTemplates, templateTypeId);
         } catch (I18nEmailMgtException e) {
+            if (StringUtils.equals(I18nMgtConstants.ErrorCodes.EMAIL_TEMPLATE_TYPE_NOT_FOUND, e.getErrorCode())) {
+                throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
+            }
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPE);
         }
     }
@@ -429,16 +444,36 @@ public class ServerEmailTemplatesService {
         // Populate optional email template information if exists.
         if (requestedAttributeList != null) {
             for (EmailTemplate emailTemplate : internalEmailTemplates) {
+                EmailTemplateWithID templateWithID = new EmailTemplateWithID();
                 for (String requestedAttribute : requestedAttributeList) {
-                    if (StringUtils.equals(Constants.LOCALE, requestedAttribute)) {
-                        EmailTemplateWithID templateWithID = new EmailTemplateWithID();
-                        templateWithID.setId(emailTemplate.getLocale());
-                        // Email template's display name is used to search templateTypeMap key because
-                        // Template's display name and Template type's display name are equal.
-                        templateTypeMap.get(emailTemplate.getTemplateDisplayName()).getTemplates()
-                                .add(templateWithID);
+                    switch (requestedAttribute) {
+                        case Constants.TEMPLATES:
+                            templateWithID.setContentType(emailTemplate.getEmailContentType());
+                            templateWithID.setSubject(emailTemplate.getSubject());
+                            templateWithID.setBody(emailTemplate.getBody());
+                            templateWithID.setFooter(emailTemplate.getFooter());
+                            templateWithID.setId(emailTemplate.getLocale());
+                            break;
+                        case Constants.LOCALE:
+                            templateWithID.setId(emailTemplate.getLocale());
+                            break;
+                        case Constants.CONTENT_TYPE:
+                            templateWithID.setContentType(emailTemplate.getEmailContentType());
+                            break;
+                        case Constants.SUBJECT:
+                            templateWithID.setSubject(emailTemplate.getSubject());
+                            break;
+                        case Constants.BODY:
+                            templateWithID.setBody(emailTemplate.getBody());
+                            break;
+                        case Constants.FOOTER:
+                            templateWithID.setFooter(emailTemplate.getFooter());
+                            break;
                     }
                 }
+                // Email template's display name is used to search templateTypeMap key because
+                // Template's display name and Template type's display name are equal.
+                templateTypeMap.get(emailTemplate.getTemplateDisplayName()).getTemplates().add(templateWithID);
             }
         }
 
