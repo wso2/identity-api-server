@@ -45,16 +45,12 @@ public class TenantManagementConstants {
         ERROR_CODE_ERROR_RETRIEVING_TENANT("TM-65003",
                 "Unable to retrieve tenant.", "Server encountered an error while retrieving the tenant for identifier" +
                 " %s."),
-        ERROR_CODE_TENANT_NOT_FOUND("TM-65004", "Resource not found.", "Unable to find a resource matching the " +
-                "provided tenant identifier %s."),
-        ERROR_CODE_OWNER_NOT_FOUND("TM-65005", "Resource not found.", "Unable to find a resource matching the " +
-                "provided tenant identifier %s."),
-        ERROR_CODE_UPDATE_LIFECYCLE_STATUS("TM-65006", "Error while updating the tenant.", "Server encountered an " +
+        ERROR_CODE_UPDATE_LIFECYCLE_STATUS("TM-65004", "Error while updating the tenant.", "Server encountered an " +
                 "error while the tenant life cycle status \"activated:\" %s ."),
 
-        ERROR_CODE_BUILDING_LINKS("TM-65007", "Error building page links", "Error occurred during building page links. "
+        ERROR_CODE_BUILDING_LINKS("TM-65005", "Error building page links", "Error occurred during building page links. "
                 + "%s"),
-        ERROR_CODE_FILTER_NOT_IMPLEMENTED("TM-65008", "Filtering not supported.", "Filtering capability is not " +
+        ERROR_CODE_FILTER_NOT_IMPLEMENTED("TM-65006", "Filtering not supported.", "Filtering capability is not " +
                 "supported in this version of the API.");
 
         private final String code;

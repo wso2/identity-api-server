@@ -118,10 +118,6 @@ public class ServerTenantManagementService {
 
         try {
             Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
-            if (tenant == null) {
-                throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
-                        ERROR_CODE_TENANT_NOT_FOUND, tenantUniqueID);
-            }
             return createTenantResponse(tenant);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
@@ -139,10 +135,6 @@ public class ServerTenantManagementService {
 
         try {
             User user = TenantManagementServiceHolder.getTenantMgtService().getOwner(tenantUniqueID);
-            if (user == null) {
-                throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
-                        ERROR_CODE_OWNER_NOT_FOUND, tenantUniqueID);
-            }
             return createOwnerResponse(user);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
