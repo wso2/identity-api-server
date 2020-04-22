@@ -1,0 +1,205 @@
+/*
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+package org.wso2.carbon.identity.api.server.configs.v1.model;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ProvisioningConfig;
+import javax.validation.constraints.*;
+
+
+import io.swagger.annotations.*;
+import java.util.Objects;
+import javax.validation.Valid;
+import javax.xml.bind.annotation.*;
+
+public class ServerConfig  {
+  
+    private List<String> homeRealmIdentifiers = null;
+
+    private String idleSessionTimeoutPeriod = "15";
+    private String rememberMePeriod = "20160";
+    private ProvisioningConfig provisioning;
+    private List<AuthenticatorListItem> authenticators = null;
+
+
+    /**
+    * The home realm identifier for the resident identity provider
+    **/
+    public ServerConfig homeRealmIdentifiers(List<String> homeRealmIdentifiers) {
+
+        this.homeRealmIdentifiers = homeRealmIdentifiers;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "The home realm identifier for the resident identity provider")
+    @JsonProperty("homeRealmIdentifiers")
+    @Valid
+    public List<String> getHomeRealmIdentifiers() {
+        return homeRealmIdentifiers;
+    }
+    public void setHomeRealmIdentifiers(List<String> homeRealmIdentifiers) {
+        this.homeRealmIdentifiers = homeRealmIdentifiers;
+    }
+
+    public ServerConfig addHomeRealmIdentifiersItem(String homeRealmIdentifiersItem) {
+        if (this.homeRealmIdentifiers == null) {
+            this.homeRealmIdentifiers = new ArrayList<>();
+        }
+        this.homeRealmIdentifiers.add(homeRealmIdentifiersItem);
+        return this;
+    }
+
+        /**
+    * The idle session timeout in minutes
+    **/
+    public ServerConfig idleSessionTimeoutPeriod(String idleSessionTimeoutPeriod) {
+
+        this.idleSessionTimeoutPeriod = idleSessionTimeoutPeriod;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "15", value = "The idle session timeout in minutes")
+    @JsonProperty("idleSessionTimeoutPeriod")
+    @Valid
+    public String getIdleSessionTimeoutPeriod() {
+        return idleSessionTimeoutPeriod;
+    }
+    public void setIdleSessionTimeoutPeriod(String idleSessionTimeoutPeriod) {
+        this.idleSessionTimeoutPeriod = idleSessionTimeoutPeriod;
+    }
+
+    /**
+    * The remember me period in minutes
+    **/
+    public ServerConfig rememberMePeriod(String rememberMePeriod) {
+
+        this.rememberMePeriod = rememberMePeriod;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "20160", value = "The remember me period in minutes")
+    @JsonProperty("rememberMePeriod")
+    @Valid
+    public String getRememberMePeriod() {
+        return rememberMePeriod;
+    }
+    public void setRememberMePeriod(String rememberMePeriod) {
+        this.rememberMePeriod = rememberMePeriod;
+    }
+
+    /**
+    **/
+    public ServerConfig provisioning(ProvisioningConfig provisioning) {
+
+        this.provisioning = provisioning;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("provisioning")
+    @Valid
+    public ProvisioningConfig getProvisioning() {
+        return provisioning;
+    }
+    public void setProvisioning(ProvisioningConfig provisioning) {
+        this.provisioning = provisioning;
+    }
+
+    /**
+    **/
+    public ServerConfig authenticators(List<AuthenticatorListItem> authenticators) {
+
+        this.authenticators = authenticators;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("authenticators")
+    @Valid
+    public List<AuthenticatorListItem> getAuthenticators() {
+        return authenticators;
+    }
+    public void setAuthenticators(List<AuthenticatorListItem> authenticators) {
+        this.authenticators = authenticators;
+    }
+
+    public ServerConfig addAuthenticatorsItem(AuthenticatorListItem authenticatorsItem) {
+        if (this.authenticators == null) {
+            this.authenticators = new ArrayList<>();
+        }
+        this.authenticators.add(authenticatorsItem);
+        return this;
+    }
+
+    
+
+    @Override
+    public boolean equals(java.lang.Object o) {
+
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ServerConfig serverConfig = (ServerConfig) o;
+        return Objects.equals(this.homeRealmIdentifiers, serverConfig.homeRealmIdentifiers) &&
+            Objects.equals(this.idleSessionTimeoutPeriod, serverConfig.idleSessionTimeoutPeriod) &&
+            Objects.equals(this.rememberMePeriod, serverConfig.rememberMePeriod) &&
+            Objects.equals(this.provisioning, serverConfig.provisioning) &&
+            Objects.equals(this.authenticators, serverConfig.authenticators);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(homeRealmIdentifiers, idleSessionTimeoutPeriod, rememberMePeriod, provisioning, authenticators);
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("class ServerConfig {\n");
+        
+        sb.append("    homeRealmIdentifiers: ").append(toIndentedString(homeRealmIdentifiers)).append("\n");
+        sb.append("    idleSessionTimeoutPeriod: ").append(toIndentedString(idleSessionTimeoutPeriod)).append("\n");
+        sb.append("    rememberMePeriod: ").append(toIndentedString(rememberMePeriod)).append("\n");
+        sb.append("    provisioning: ").append(toIndentedString(provisioning)).append("\n");
+        sb.append("    authenticators: ").append(toIndentedString(authenticators)).append("\n");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    /**
+    * Convert the given object to string with each line indented by 4 spaces
+    * (except the first line).
+    */
+    private String toIndentedString(java.lang.Object o) {
+
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n");
+    }
+}
+

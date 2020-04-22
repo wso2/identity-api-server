@@ -17,6 +17,7 @@
 package org.wso2.carbon.identity.api.server.configs.common;
 
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 
 /**
  * Service holder class for server configuration related services.
@@ -24,7 +25,8 @@ import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 public class ConfigsServiceHolder {
 
     private static ConfigsServiceHolder instance = new ConfigsServiceHolder();
-    private static ApplicationManagementService applicationManagementService;
+    private ApplicationManagementService applicationManagementService;
+    private IdentityProviderManager identityProviderManager;
 
     private ConfigsServiceHolder() {}
 
@@ -38,9 +40,9 @@ public class ConfigsServiceHolder {
      *
      * @return ApplicationManagementService
      */
-    public static ApplicationManagementService getApplicationManagementService() {
+    public ApplicationManagementService getApplicationManagementService() {
 
-        return applicationManagementService;
+        return ConfigsServiceHolder.getInstance().applicationManagementService;
     }
 
     /**
@@ -48,8 +50,28 @@ public class ConfigsServiceHolder {
      *
      * @param applicationManagementService ApplicationManagementService.
      */
-    public static void setApplicationManagementService(ApplicationManagementService applicationManagementService) {
+    public void setApplicationManagementService(ApplicationManagementService applicationManagementService) {
 
-        ConfigsServiceHolder.applicationManagementService = applicationManagementService;
+        ConfigsServiceHolder.getInstance().applicationManagementService = applicationManagementService;
+    }
+
+    /**
+     * Get IdentityProviderManager osgi service.
+     *
+     * @return IdentityProviderManager
+     */
+    public IdentityProviderManager getIdentityProviderManager() {
+
+        return ConfigsServiceHolder.getInstance().identityProviderManager;
+    }
+
+    /**
+     * Set IdentityProviderManager osgi service.
+     *
+     * @param identityProviderManager IdentityProviderManager.
+     */
+    public void setIdentityProviderManager(IdentityProviderManager identityProviderManager) {
+
+        ConfigsServiceHolder.getInstance().identityProviderManager = identityProviderManager;
     }
 }

@@ -19,6 +19,10 @@ package org.wso2.carbon.identity.api.server.configs.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
+
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -37,8 +41,34 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response getConfigs() {
+
+        return Response.ok().entity(configManagementService.getConfigs()).build();
+    }
+
+    @Override
+    public Response getInboundScimConfigs() {
+
+        return Response.ok().entity(configManagementService.getInboundScimConfig()).build();
+    }
+
+    @Override
     public Response listAuthenticators() {
 
         return Response.ok().entity(configManagementService.getAuthenticators()).build();
+    }
+
+    @Override
+    public Response patchConfigs(List<Patch> patch) {
+
+        configManagementService.patchConfigs(patch);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response updateInboundScimConfigs(ScimConfig scimConfig) {
+
+        configManagementService.updateInboundScimConfigs(scimConfig);
+        return Response.ok().build();
     }
 }

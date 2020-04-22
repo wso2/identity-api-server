@@ -29,6 +29,12 @@ public class Constants {
     public static final String CONFIGS_AUTHENTICATOR_PATH_COMPONENT = "/configs/authenticators";
     public static final String PATH_SEPERATOR = "/";
 
+    // Patch operation paths.
+    public static final String IDLE_SESSION_PATH = "/idleSessionTimeoutPeriod";
+    public static final String REMEMBER_ME_PATH = "/rememberMePeriod";
+    public static final String HOME_REALM_PATH_REGEX = "/homeRealmIdentifiers/[0-9]+";
+
+
     /**
      * Enum for error messages.
      */
@@ -41,7 +47,12 @@ public class Constants {
                 "Unable to retrieve authenticator.",
                 "Server encountered an error while retrieving the authenticator for the identifier %s."),
         ERROR_CODE_AUTHENTICATOR_NOT_FOUND("60002", "Resource not found.",
-                "Unable to find a resource matching the provided authenticator identifier %s.");
+                "Unable to find a resource matching the provided authenticator identifier %s."),
+        ERROR_CODE_INVALID_INPUT("60003", "Invalid input.", "One of the given inputs is invalid. %s."),
+        ERROR_CODE_ERROR_UPDATING_CONFIGS("65004", "Unable to update server configs.", "Server encountered an " +
+                "error while updating the server configs."),
+        ERROR_CODE_ERROR_RETRIEVING_CONFIGS("65005", "Unable to retrieve server configs.", "Server encountered an " +
+                "error while retrieving the server configs.");
 
         private final String code;
         private final String message;

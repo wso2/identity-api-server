@@ -17,15 +17,25 @@
 package org.wso2.carbon.identity.api.server.configs.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
 
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+
+import javax.validation.constraints.*;
 
 @Path("/configs")
 @Api(description = "The configs API")
@@ -49,14 +59,62 @@ public class ConfigsApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = Authenticator.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response getAuthenticator(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId) {
 
         return delegate.getAuthenticator(authenticatorId );
+    }
+
+    @Valid
+    @GET
+    
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve Server Configs", notes = "Retrieve Server Configs ", response = ServerConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Server Configs", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = ServerConfig.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getConfigs() {
+
+        return delegate.getConfigs();
+    }
+
+    @Valid
+    @GET
+    @Path("/provisioning/inbound/scim")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve Server Inbound SCIM configs", notes = "Retrieve Server Inbound SCIM Configs ", response = ScimConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Server Inbound SCIM", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = ScimConfig.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getInboundScimConfigs() {
+
+        return delegate.getInboundScimConfigs();
     }
 
     @Valid
@@ -69,12 +127,12 @@ public class ConfigsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Local Authenticators" })
+    }, tags={ "Local Authenticators", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = AuthenticatorListItem.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
@@ -82,6 +140,54 @@ public class ConfigsApi  {
     public Response listAuthenticators() {
 
         return delegate.listAuthenticators();
+    }
+
+    @Valid
+    @PATCH
+    
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch Server Configs", notes = "Patch Server Configs. Patch operation is supported only for primary attributes (homeRealmIdentifier, idleSessionTimeoutPeriod and rememberMePeriod) ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Server Configs", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchConfigs(@ApiParam(value = "" ,required=true) @Valid List<Patch> patch) {
+
+        return delegate.patchConfigs(patch );
+    }
+
+    @Valid
+    @PUT
+    @Path("/provisioning/inbound/scim")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update Server Inbound SCIM configs", notes = "Update Server Inbound SCIM configs ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Server Inbound SCIM" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateInboundScimConfigs(@ApiParam(value = "" ,required=true) @Valid ScimConfig scimConfig) {
+
+        return delegate.updateInboundScimConfigs(scimConfig );
     }
 
 }

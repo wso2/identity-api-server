@@ -16,6 +16,18 @@
 
 package org.wso2.carbon.identity.api.server.configs.v1;
 
+import org.wso2.carbon.identity.api.server.configs.v1.*;
+import org.wso2.carbon.identity.api.server.configs.v1.model.*;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
+import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
 import javax.ws.rs.core.Response;
 
 
@@ -23,5 +35,13 @@ public interface ConfigsApiService {
 
       public Response getAuthenticator(String authenticatorId);
 
+      public Response getConfigs();
+
+      public Response getInboundScimConfigs();
+
       public Response listAuthenticators();
+
+      public Response patchConfigs(List<Patch> patch);
+
+      public Response updateInboundScimConfigs(ScimConfig scimConfig);
 }
