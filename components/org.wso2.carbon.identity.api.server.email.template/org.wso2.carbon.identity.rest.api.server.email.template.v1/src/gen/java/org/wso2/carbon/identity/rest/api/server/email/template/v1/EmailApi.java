@@ -154,6 +154,7 @@ public class EmailApi  {
     }, tags={ "Email Template Types", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = EmailTemplateTypeWithoutTemplates.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
