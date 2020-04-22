@@ -20,6 +20,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateWithID;
 import javax.validation.constraints.*;
 
 
@@ -32,10 +35,12 @@ public class EmailTemplateTypeWithoutTemplates  {
   
     private String id;
     private String displayName;
+    private List<EmailTemplateWithID> templates = null;
+
     private String self;
 
     /**
-    * Unique id of the email template type.
+    * Unique ID of the email template type.
     **/
     public EmailTemplateTypeWithoutTemplates id(String id) {
 
@@ -43,7 +48,7 @@ public class EmailTemplateTypeWithoutTemplates  {
         return this;
     }
     
-    @ApiModelProperty(example = "YWNjb3VudGNvbmZpcm1hdGlvbg", required = true, value = "Unique id of the email template type.")
+    @ApiModelProperty(example = "YWNjb3VudGNvbmZpcm1hdGlvbg", required = true, value = "Unique ID of the email template type.")
     @JsonProperty("id")
     @Valid
     @NotNull(message = "Property id cannot be null.")
@@ -77,6 +82,33 @@ public class EmailTemplateTypeWithoutTemplates  {
     }
 
     /**
+    * Email templates for the template type.
+    **/
+    public EmailTemplateTypeWithoutTemplates templates(List<EmailTemplateWithID> templates) {
+
+        this.templates = templates;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Email templates for the template type.")
+    @JsonProperty("templates")
+    @Valid
+    public List<EmailTemplateWithID> getTemplates() {
+        return templates;
+    }
+    public void setTemplates(List<EmailTemplateWithID> templates) {
+        this.templates = templates;
+    }
+
+    public EmailTemplateTypeWithoutTemplates addTemplatesItem(EmailTemplateWithID templatesItem) {
+        if (this.templates == null) {
+            this.templates = new ArrayList<>();
+        }
+        this.templates.add(templatesItem);
+        return this;
+    }
+
+        /**
     * Location of the created/updated resource.
     **/
     public EmailTemplateTypeWithoutTemplates self(String self) {
@@ -111,12 +143,13 @@ public class EmailTemplateTypeWithoutTemplates  {
         EmailTemplateTypeWithoutTemplates emailTemplateTypeWithoutTemplates = (EmailTemplateTypeWithoutTemplates) o;
         return Objects.equals(this.id, emailTemplateTypeWithoutTemplates.id) &&
             Objects.equals(this.displayName, emailTemplateTypeWithoutTemplates.displayName) &&
+            Objects.equals(this.templates, emailTemplateTypeWithoutTemplates.templates) &&
             Objects.equals(this.self, emailTemplateTypeWithoutTemplates.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, displayName, self);
+        return Objects.hash(id, displayName, templates, self);
     }
 
     @Override
@@ -127,6 +160,7 @@ public class EmailTemplateTypeWithoutTemplates  {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+        sb.append("    templates: ").append(toIndentedString(templates)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();

@@ -34,6 +34,14 @@ public class Constants {
     public static final String EMAIL_TEMPLATES_PATH = "/templates";
     public static final String PATH_SEPARATOR = "/";
 
+    // Required attributes.
+    public static final String TEMPLATES = "templates";
+    public static final String LOCALE = "templates.id";
+    public static final String CONTENT_TYPE = "templates.contentType";
+    public static final String SUBJECT = "templates.subject";
+    public static final String BODY = "templates.body";
+    public static final String FOOTER = "templates.footer";
+
     private static final Map<String, ErrorMessage> ERROR_CODE_MAP = new HashMap<>();
 
     /**
@@ -88,7 +96,11 @@ public class Constants {
         ERROR_EMAIL_TEMPLATE_TYPE_ALREADY_EXISTS("50005", Status.CONFLICT,
                 "Email Template Type already exists in the system.",
                 "An email template type for the provided template display name already exists " +
-                        "in the system.");
+                        "in the system."),
+        ERROR_ATTRIBUTE_NOT_SUPPORTED("50006", Status.BAD_REQUEST, "Attribute type not found",
+                "Invalid attribute for email templates. Supported attributes are: 'templates', " +
+                        "'templates.id', 'templates.contentType', 'templates.subject', 'templates.body' " +
+                        "and 'templates.footer'.");
 
         private final String message;
         private final Status httpStatus;

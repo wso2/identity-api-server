@@ -20,6 +20,7 @@ import org.wso2.carbon.identity.rest.api.server.email.template.v1.*;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateType;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateTypeWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateTypeWithoutTemplates;
@@ -40,7 +41,7 @@ public interface EmailApiService {
 
       public Response deleteEmailTemplateType(String templateTypeId);
 
-      public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sortOrder, String sortBy);
+      public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sortOrder, String sortBy, String requiredAttributes);
 
       public Response getEmailTemplate(String templateTypeId, String templateId, Integer limit, Integer offset, String sortOrder, String sortBy);
 

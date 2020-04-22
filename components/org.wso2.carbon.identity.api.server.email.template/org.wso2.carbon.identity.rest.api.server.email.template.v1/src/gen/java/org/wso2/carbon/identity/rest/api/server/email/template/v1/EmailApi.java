@@ -17,6 +17,10 @@
 package org.wso2.carbon.identity.rest.api.server.email.template.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateType;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateTypeWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateTypeWithoutTemplates;
@@ -46,7 +50,7 @@ public class EmailApi  {
     @Path("/template-types/{template-type-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add a new email template to an existing email template type.", notes = "Adds a new email template an existing email template type in the system. The locale of the new email template should not already exists in the respective email template type.  <b>Permission required:</b> * /permission/admin/manage/identity/emailmgt/create ", response = SimpleEmailTemplate.class, authorizations = {
+    @ApiOperation(value = "Adds a new email template to an existing email template type.", notes = "Another email template with the same locale should not already exist in the respective email template type. <br>  <b>Permission required:</b> * /permission/admin/manage/identity/emailmgt/create<br> <b>Scopes required:</b> <br>* internal_email_mgt_create ", response = SimpleEmailTemplate.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -55,8 +59,8 @@ public class EmailApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Item Created", response = SimpleEmailTemplate.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 409, message = "Item Already Exists", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
@@ -70,7 +74,7 @@ public class EmailApi  {
     @Path("/template-types")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add a new email template type.", notes = "Adds a new email template type to the system. An email template type can have any number of email templates.  * Attribute _**displayName**_ of the template type should be unique.  <b>Permission required:</b> * /permission/admin/manage/identity/emailmgt/create ", response = EmailTemplateTypeWithoutTemplates.class, authorizations = {
+    @ApiOperation(value = "Adds a new email template type.", notes = "Adds a new email template type to the system. An email template type can have any number of email templates. <br>  * Attribute _**displayName**_ of the template type should be unique. <br>  <b>Permission required:</b> <br> * /permission/admin/manage/identity/emailmgt/create <br>  <b>Scopes required:</b>  <br>* internal_email_mgt_create ", response = EmailTemplateTypeWithoutTemplates.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -79,8 +83,8 @@ public class EmailApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Item Created", response = EmailTemplateTypeWithoutTemplates.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 409, message = "Item Already Exists", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
@@ -94,7 +98,7 @@ public class EmailApi  {
     @Path("/template-types/{template-type-id}/templates/{template-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Removes an email template.", notes = "Removes an email template identified by the template-type-id and the template-id.  <b>Permission required:</b>   * /permission/admin/manage/identity/emailmgt/delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Removes an email template.", notes = "Removes an email template identified by the template-type-id and the template-id. <br>  <b>Permission required:</b> <br>   * /permission/admin/manage/identity/emailmgt/delete <br>   <b>Scopes required:</b><br> * internal_email_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -103,8 +107,9 @@ public class EmailApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Item Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
     public Response deleteEmailTemplate(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Email template ID. This should be a valid locale.",required=true) @PathParam("template-id") String templateId) {
@@ -117,7 +122,7 @@ public class EmailApi  {
     @Path("/template-types/{template-type-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Removes an email template type.", notes = "Removes an existing email template type with all it's email templates from the system.  <b>Permission required:</b> * /permission/admin/manage/identity/emailmgt/delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Removes an email template type.", notes = "Removes an existing email template type with all its email templates from the system. <br>  <b>Permission required:</b><br> * /permission/admin/manage/identity/emailmgt/delete <br> <b>Scopes required:</b><br> * internal_email_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -126,8 +131,9 @@ public class EmailApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Item Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
     public Response deleteEmailTemplateType(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId) {
@@ -140,7 +146,7 @@ public class EmailApi  {
     @Path("/template-types")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the Email Template Types.", notes = "Retrieve all the Email Template Types in the system, with limited details of the email templates.  <b>Permission required:</b> * /permission/admin/manage/identity/emailmgt/view ", response = EmailTemplateTypeWithoutTemplates.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieves all the email template types.", notes = "Retrieves all the email template types in the system, with limited details of the email templates.  <b>Permission required:</b><br> * /permission/admin/manage/identity/emailmgt/view <br>  <b>Scopes required:</b>  <br>* internal_email_mgt_view ", response = EmailTemplateTypeWithoutTemplates.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -148,13 +154,13 @@ public class EmailApi  {
     }, tags={ "Email Template Types", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = EmailTemplateTypeWithoutTemplates.class, responseContainer = "List"),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getAllEmailTemplateTypes(    @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
+    public Response getAllEmailTemplateTypes(    @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Specifies the required parameters in the response.")  @QueryParam("requiredAttributes") String requiredAttributes) {
 
-        return delegate.getAllEmailTemplateTypes(limit,  offset,  sortOrder,  sortBy );
+        return delegate.getAllEmailTemplateTypes(limit,  offset,  sortOrder,  sortBy,  requiredAttributes );
     }
 
     @Valid
@@ -162,7 +168,7 @@ public class EmailApi  {
     @Path("/template-types/{template-type-id}/templates/{template-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves a single email template.", notes = "Retrieves the email template that matches to the template-type-id and the template-id  <b>Permission required:</b>   * /permission/admin/manage/identity/emailmgt/view ", response = EmailTemplateWithID.class, authorizations = {
+    @ApiOperation(value = "Retrieves a single email template.", notes = "Retrieves the email template that matches to the template-type-id and the template-id. <br>  <b>Permission required:</b> <br>   * /permission/admin/manage/identity/emailmgt/view <br>   <b>Scopes required:</b><br>* internal_email_mgt_view ", response = EmailTemplateWithID.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -171,12 +177,12 @@ public class EmailApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = EmailTemplateWithID.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getEmailTemplate(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Email template ID. This should be a valid locale.",required=true) @PathParam("template-id") String templateId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
+    public Response getEmailTemplate(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Email template ID. This should be a valid locale.",required=true) @PathParam("template-id") String templateId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
 
         return delegate.getEmailTemplate(templateTypeId,  templateId,  limit,  offset,  sortOrder,  sortBy );
     }
@@ -186,7 +192,7 @@ public class EmailApi  {
     @Path("/template-types/{template-type-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the email template type corresponds to the template type id.", notes = "Retrieve the email template type in the system identified by the template-type-id.  <b>Permission required:</b> * /permission/admin/manage/identity/emailmgt/view ", response = EmailTemplateTypeWithID.class, authorizations = {
+    @ApiOperation(value = "Retrieves the email template type corresponding to the template type id.", notes = "Retrieves the email template type in the system identified by the template-type-id. <br>  <b>Permission required:</b> <br> * /permission/admin/manage/identity/emailmgt/view <br><b>Scopes required:</b><br> * internal_email_mgt_view<br> ", response = EmailTemplateTypeWithID.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -195,12 +201,12 @@ public class EmailApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = EmailTemplateTypeWithID.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getEmailTemplateType(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
+    public Response getEmailTemplateType(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
 
         return delegate.getEmailTemplateType(templateTypeId,  limit,  offset,  sortOrder,  sortBy );
     }
@@ -210,7 +216,7 @@ public class EmailApi  {
     @Path("/template-types/{template-type-id}/templates")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the list of email templates in the template type id.", notes = "Retrieve the list of email templates in the template type id.  <b>Permission required:</b>   * /permission/admin/manage/identity/emailmgt/view ", response = SimpleEmailTemplate.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieves the list of email templates in the template type id.", notes = "Retrieves the list of email templates in the template type id. <br>   <b>Permission required:</b> <br>   * /permission/admin/manage/identity/emailmgt/view <br>   <b>Scopes required:</b><br>   * internal_email_mgt_view<br> ", response = SimpleEmailTemplate.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -219,12 +225,12 @@ public class EmailApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleEmailTemplate.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getTemplatesListOfEmailTemplateType(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
+    public Response getTemplatesListOfEmailTemplateType(@ApiParam(value = "Email Template Type ID",required=true) @PathParam("template-type-id") String templateTypeId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _<b>This option is not yet supported.<b>_")  @QueryParam("sortBy") String sortBy) {
 
         return delegate.getTemplatesListOfEmailTemplateType(templateTypeId,  limit,  offset,  sortOrder,  sortBy );
     }
@@ -234,7 +240,7 @@ public class EmailApi  {
     @Path("/template-types/{template-type-id}/templates/{template-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Replace an existing email template.", notes = "Replace the email template identified by the template-type-id and the template-id.  <b>Permission required:</b>   * /permission/admin/manage/identity/emailmgt/update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Replaces an existing email template.", notes = "Replaces the email template identified by the template-type-id and the template-id. <br>  <b>Permission required:</b> <br>   * /permission/admin/manage/identity/emailmgt/update <br>   <b>Scopes required:</b><br>   * internal_email_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -243,8 +249,8 @@ public class EmailApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Item Updated", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
@@ -258,7 +264,7 @@ public class EmailApi  {
     @Path("/template-types/{template-type-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Replace all email templates of the respective email template type", notes = "Replace all email templates of the respective email template type with the newly provided email templates.  <b>Permission required:</b> * /permission/admin/manage/identity/emailmgt/update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Replaces all email templates of the respective email template type", notes = "Replaces all email templates of the respective email template type with the newly provided email templates. <br>  <b>Permission required:</b> <br> * /permission/admin/manage/identity/emailmgt/update <br> <b>Scopes required:</b><br> * internal_email_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -267,8 +273,8 @@ public class EmailApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Item Updated", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
