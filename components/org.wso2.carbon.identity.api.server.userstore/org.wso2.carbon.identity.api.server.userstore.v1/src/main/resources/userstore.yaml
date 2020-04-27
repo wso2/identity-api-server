@@ -682,3 +682,16 @@ components:
         description:
           type: string
           example: Description of the property
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attribute'
+    Attribute:
+      type: object
+      properties:
+        name:
+          type: string
+          example: category
+        value:
+          type: string
+          example: basic

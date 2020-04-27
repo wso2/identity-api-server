@@ -20,6 +20,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.Attribute;
 import javax.validation.constraints.*;
 
 
@@ -33,6 +36,8 @@ public class PropertiesRes  {
     private String name;
     private String defaultValue;
     private String description;
+    private List<Attribute> attributes = null;
+
 
     /**
     **/
@@ -88,7 +93,33 @@ public class PropertiesRes  {
         this.description = description;
     }
 
+    /**
+    **/
+    public PropertiesRes attributes(List<Attribute> attributes) {
 
+        this.attributes = attributes;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("attributes")
+    @Valid
+    public List<Attribute> getAttributes() {
+        return attributes;
+    }
+    public void setAttributes(List<Attribute> attributes) {
+        this.attributes = attributes;
+    }
+
+    public PropertiesRes addAttributesItem(Attribute attributesItem) {
+        if (this.attributes == null) {
+            this.attributes = new ArrayList<>();
+        }
+        this.attributes.add(attributesItem);
+        return this;
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -102,12 +133,13 @@ public class PropertiesRes  {
         PropertiesRes propertiesRes = (PropertiesRes) o;
         return Objects.equals(this.name, propertiesRes.name) &&
             Objects.equals(this.defaultValue, propertiesRes.defaultValue) &&
-            Objects.equals(this.description, propertiesRes.description);
+            Objects.equals(this.description, propertiesRes.description) &&
+            Objects.equals(this.attributes, propertiesRes.attributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, defaultValue, description);
+        return Objects.hash(name, defaultValue, description, attributes);
     }
 
     @Override
@@ -119,6 +151,7 @@ public class PropertiesRes  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    defaultValue: ").append(toIndentedString(defaultValue)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("}");
         return sb.toString();
     }
