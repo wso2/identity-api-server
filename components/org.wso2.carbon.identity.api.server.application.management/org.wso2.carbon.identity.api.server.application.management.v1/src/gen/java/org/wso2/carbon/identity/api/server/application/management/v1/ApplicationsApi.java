@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ public class ApplicationsApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add application ", notes = "This API provides the capability to store the application information provided by users. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Add application ", notes = "This API provides the capability to store the application information that is provided by users.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/create <br>   <b>Scope required:</b> <br>       * internal_application_mgt_create ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -118,7 +118,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete application by ID ", notes = "This API provides the capability to delete an application by ID. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete application by ID ", notes = "This API provides the capability to delete an application by ID. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/delete <br>   <b>Scope required:</b> <br>       * internal_application_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -129,6 +129,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteApplication(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
@@ -165,7 +166,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete custom inbound authentication protocol parameters of application ", notes = "This API provides the capability to delete custom inbound authentication protocol of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete custom inbound authentication protocol parameters of application ", notes = "This API provides the capability to delete custom inbound authentication protocol of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/delete <br>   <b>Scope required:</b> <br>       * internal_application_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -176,6 +177,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteCustomInboundConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Inbound Authentication Protocol ID",required=true) @PathParam("inboundProtocolId") String inboundProtocolId) {
@@ -188,7 +190,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete OIDC authentication protocol parameters of application ", notes = "This API provides the capability to delete OIDC authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete OIDC authentication protocol parameters of application ", notes = "This API provides the capability to delete OIDC authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/delete <br>   <b>Scope required:</b> <br>       * internal_application_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -199,6 +201,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteInboundOAuthConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
@@ -211,7 +214,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/saml")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete SAML2 authentication protocol parameters of application ", notes = "This API provides the capability to delete SAML2 authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete SAML2 authentication protocol parameters of application ", notes = "This API provides the capability to delete SAML2 authentication protocol parameters of an application. <br>   <b>Permissi on required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/delete <br>   <b>Scope required:</b> <br>       * internal_application_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -222,6 +225,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteInboundSAMLConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
@@ -234,7 +238,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/passive-sts")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete Passive STS authentication protocol parameters of application ", notes = "This API provides the capability to delete Passive STS authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete Passive STS authentication protocol parameters of application ", notes = "This API provides the capability to delete Passive STS authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/delete <br>   <b>Scope required:</b> <br>       * internal_application_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -245,6 +249,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deletePassiveStsConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
@@ -257,7 +262,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/ws-trust")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete WS Trust authentication protocol parameters of application ", notes = "This API provides the capability to delete WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete WS Trust authentication protocol parameters of application ", notes = "This API provides the capability to delete WS Trust authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/delete <br>   <b>Scope required:</b> <br>       * internal_application_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -268,6 +273,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteWSTrustConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
@@ -280,7 +286,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/export")
     
     @Produces({ "application/octet-stream", "application/json" })
-    @ApiOperation(value = "Export application as an XML file ", notes = "This API provides the capability to retrieve the application as an XML file. ", response = Object.class, authorizations = {
+    @ApiOperation(value = "Export application as an XML file ", notes = "This API provides the capability to retrieve the application as an XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = Object.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -304,7 +310,7 @@ public class ApplicationsApi  {
     @Path("/meta/adaptive-auth-templates")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the sample adaptive authentication templates. ", notes = "This API provides the capability to retrieve the sample adaptive authentication templates. ", response = AdaptiveAuthTemplates.class, authorizations = {
+    @ApiOperation(value = "Retrieve the sample adaptive authentication templates. ", notes = "This API provides the capability to retrieve the sample adaptive authentication templates. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = AdaptiveAuthTemplates.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -355,7 +361,7 @@ public class ApplicationsApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List applications ", notes = "This API provides the capability to retrieve the list of applications. ", response = ApplicationListResponse.class, authorizations = {
+    @ApiOperation(value = "List applications ", notes = "This API provides the capability to retrieve the list of applications.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = ApplicationListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -380,7 +386,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}")
     
     @Produces({ "application/json", "application/xml",  })
-    @ApiOperation(value = "Retrieve application by ID ", notes = "This API provides the capability to retrieve the application information by ID. ", response = ApplicationResponseModel.class, authorizations = {
+    @ApiOperation(value = "Retrieve application by ID ", notes = "This API provides the capability to retrieve the application information by ID. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = ApplicationResponseModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -428,7 +434,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve custom Inbound authentication protocol parameters of application. ", notes = "This API provides the capability to retrieve custom inbound authentication protocol parameters of an application. ", response = CustomInboundProtocolConfiguration.class, authorizations = {
+    @ApiOperation(value = "Retrieve custom Inbound authentication protocol parameters of application. ", notes = "This API provides the capability to retrieve custom inbound authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = CustomInboundProtocolConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -452,7 +458,7 @@ public class ApplicationsApi  {
     @Path("/meta/inbound-protocols/{inboundProtocolId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the metadata related to the custom auth protocol identified by the inboundProtocolId ", notes = "This API provides the capability to retrieve all the metadata related to the custom auth protocol identified by the inboundProtocolId. ", response = CustomInboundProtocolMetaData.class, authorizations = {
+    @ApiOperation(value = "Retrieve all the metadata related to the custom auth protocol identified by the inboundProtocolId ", notes = "This API provides the capability to retrieve all the metadata related to the custom auth protocol identified by the inboundProtocolId. The URL encoded inbound protocol name is used as inboundProtocolId.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = CustomInboundProtocolMetaData.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -475,7 +481,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve inbound protocol configurations of application ", notes = "This API provides the capability to retrieve authentication protocol configurations of an application. ", response = InboundProtocolListItem.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve inbound protocol configurations of the application ", notes = "This API provides the capability to retrieve authentication protocol configurations of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = InboundProtocolListItem.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -499,7 +505,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve OIDC authentication protocol parameters of application ", notes = "This API provides the capability to retrieve OIDC authentication protocol parameters of an application. ", response = OpenIDConnectConfiguration.class, authorizations = {
+    @ApiOperation(value = "Retrieve OIDC authentication protocol parameters of application ", notes = "This API provides the capability to retrieve OIDC authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = OpenIDConnectConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -523,7 +529,7 @@ public class ApplicationsApi  {
     @Path("/meta/inbound-protocols")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the list of inbound authentication protocols available ", notes = "This API provides the capability to retrieve the list of inbound authentication protocols available. If the query parameter 'customOnly' is set to true, only custom inbound protocols will be listed. ", response = AuthProtocolMetadata.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve the list of inbound authentication protocols available ", notes = "This API provides the capability to retrieve the list of inbound authentication protocols available. If the query parameter 'customOnly' is set to true, only custom inbound protocols will be listed. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = AuthProtocolMetadata.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -546,7 +552,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/saml")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve SAML2 authentication protocol parameters of application ", notes = "This API provides the capability to retrieve SAML2 authentication protocol parameters of an application. ", response = SAML2ServiceProvider.class, authorizations = {
+    @ApiOperation(value = "Retrieve SAML2 authentication protocol parameters of application ", notes = "This API provides the capability to retrieve SAML2 authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = SAML2ServiceProvider.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -570,7 +576,7 @@ public class ApplicationsApi  {
     @Path("/meta/inbound-protocols/oidc")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the metadata related to the authentication protocol OAuth / OIDC ", notes = "This API provides the capability to retrieve all the metadata related to the authentication  protocol OAuth / OIDC. ", response = OIDCMetaData.class, authorizations = {
+    @ApiOperation(value = "Retrieve all the metadata related to the authentication protocol OAuth / OIDC ", notes = "This API provides the capability to retrieve all the metadata related to the authentication protocol OAuth / OIDC. <br>    <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = OIDCMetaData.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -593,7 +599,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/passive-sts")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve Passive STS authentication protocol parameters of application ", notes = "This API provides the capability to retrieve Passive STS authentication protocol parameters of an application. ", response = PassiveStsConfiguration.class, authorizations = {
+    @ApiOperation(value = "Retrieve Passive STS authentication protocol parameters of application ", notes = "This API provides the capability to retrieve Passive STS authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = PassiveStsConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -617,7 +623,7 @@ public class ApplicationsApi  {
     @Path("/resident")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get Resident application ", notes = "This API provides the capability to retrieve the resident application information. ", response = ResidentApplication.class, authorizations = {
+    @ApiOperation(value = "Get Resident application ", notes = "This API provides the capability to retrieve the resident application information. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = ResidentApplication.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -641,7 +647,7 @@ public class ApplicationsApi  {
     @Path("/meta/inbound-protocols/saml")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the metadata related to the auth protocol SAML ", notes = "This API provides the capability to retrieve all the metadata related to the auth protocol SAML. ", response = SAMLMetaData.class, authorizations = {
+    @ApiOperation(value = "Retrieve all the metadata related to the auth protocol SAML ", notes = "This API provides the capability to retrieve all the metadata related to the auth protocol SAML. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = SAMLMetaData.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -664,7 +670,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/ws-trust")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve WS Trust authentication protocol parameters of application ", notes = "This API provides the capability to retrieve Passive STS authentication protocol parameters of an application. ", response = WSTrustConfiguration.class, authorizations = {
+    @ApiOperation(value = "Retrieve WS Trust authentication protocol parameters of application ", notes = "This API provides the capability to retrieve Passive STS authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = WSTrustConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -688,7 +694,7 @@ public class ApplicationsApi  {
     @Path("/meta/inbound-protocols/ws-trust")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the metadata related to the auth protocol WS Trust ", notes = "This API provides the capability to retrieve all the metadata related to the auth protocol WS_Trust. ", response = WSTrustMetaData.class, authorizations = {
+    @ApiOperation(value = "Retrieve all the metadata related to the auth protocol WS Trust ", notes = "This API provides the capability to retrieve all the metadata related to the auth protocol WS_Trust. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = WSTrustMetaData.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -711,7 +717,7 @@ public class ApplicationsApi  {
     @Path("/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create application from an exported XML file ", notes = "This API provides the capability to store the application information, provided as a file. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Create application from an exported XML file ", notes = "This API provides the capability to store the application information, provided as a file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/create <br>   <b>Scope required:</b> <br>       * internal_application_mgt_create ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -735,7 +741,7 @@ public class ApplicationsApi  {
     @Path("/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update application from an exported XML file ", notes = "This API provides the capability to update an application from information that has been exported as an XML file. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update application from an exported XML file ", notes = "This API provides the capability to update an application from information that has been exported as an XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>       * internal_application_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -760,7 +766,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Partially update application by ID ", notes = "This API provides the capability to partially update an application by ID. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Partially update application by ID ", notes = "This API provides the capability to partially update an application by ID.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>       * internal_application_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -784,7 +790,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc/regenerate-secret")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Regenerate the OAuth2/OIDC client secret of application ", notes = "This API regenerates the OAuth2/OIDC client secret. ", response = OpenIDConnectConfiguration.class, authorizations = {
+    @ApiOperation(value = "Regenerate the OAuth2/OIDC client secret of application ", notes = "This API regenerates the OAuth2/OIDC client secret. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/create <br>   <b>Scope required:</b> <br>       * internal_application_mgt_create ", response = OpenIDConnectConfiguration.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -808,7 +814,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc/revoke")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Revoke the OAuth2/OIDC client of application ", notes = "This API revokes the OAuth2/OIDC client secret. To re-activate the client, the client secret needs to be regenerated. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Revoke the OAuth2/OIDC client of application ", notes = "This API revokes the OAuth2/OIDC client secret. To re-activate the client, the client secret needs to be regenerated. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/create <br>   <b>Scope required:</b> <br>       * internal_application_mgt_create ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -857,7 +863,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/{inboundProtocolId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the custom inbound authentication protocol parameters of application ", notes = "This API provides the capability to store custom inbound authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update the custom inbound authentication protocol parameters of application ", notes = "This API provides the capability to store custom inbound authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>       * internal_application_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -883,7 +889,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/oidc")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update OIDC authentication protocol parameters of application ", notes = "This API provides the capability to store OIDC authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update OIDC authentication protocol parameters of application ", notes = "This API provides the capability to store OIDC authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>       * internal_application_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -909,7 +915,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/saml")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update SAML2 authentication protocol parameters of application ", notes = "This API provides the capability to store SAML2 authentication protocol parameters of an application. - There are three methods to create/update SAML2 authentication protocol configuration.     1. Metadata File (by sending the Base64 encoded content of the metadata file.)     2. Metadata URL     3. Manual configuration ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update SAML2 authentication protocol parameters of application ", notes = "This API provides the capability to store SAML2 authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>       * internal_application_mgt_update  - There are three methods to create/update SAML2 authentication protocol configuration.     1. Metadata File (by sending the Base64 encoded content of the metadata file.)     2. Metadata URL     3. Manual configuration ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -935,7 +941,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/passive-sts")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update Passive STS authentication protocol parameters of application ", notes = "This API provides the capability to store passive STS authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update Passive STS authentication protocol parameters of application ", notes = "This API provides the capability to store passive STS authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>       * internal_application_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -961,7 +967,7 @@ public class ApplicationsApi  {
     @Path("/resident")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update Resident Application ", notes = "This API provides the capability to update Resident Application Configuration. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update Resident Application ", notes = "This API provides the capability to update the Resident Application Configuration. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>       * internal_application_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -987,7 +993,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/inbound-protocols/ws-trust")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update WS Trust authentication protocol parameters of application ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update WS Trust authentication protocol parameters of application ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>       * internal_application_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

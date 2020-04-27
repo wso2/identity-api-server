@@ -21,7 +21,7 @@ import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
 
 /**
  * Factory Beans serves as a factory for creating other beans within the IOC container. This factory bean is used to
- * instantiate the OAuthAdminServiceImpl type of object inside the container.
+ * instantiate the STSAdminServiceImpl type of object inside the container.
  */
 public class STSAdminOSGiServiceFactory extends AbstractFactoryBean<STSAdminServiceInterface> {
 
@@ -37,14 +37,18 @@ public class STSAdminOSGiServiceFactory extends AbstractFactoryBean<STSAdminServ
     protected STSAdminServiceInterface createInstance() throws Exception {
 
         if (this.stsAdminService == null) {
-            STSAdminServiceInterface stsAdminService =
-                    (STSAdminServiceInterface) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                            .getOSGiService(STSAdminServiceInterface.class, null);
+            try {
+                STSAdminServiceInterface stsAdminService =
+                        (STSAdminServiceInterface) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                                .getOSGiService(STSAdminServiceInterface.class, null);
 
-            if (stsAdminService != null) {
-                this.stsAdminService = stsAdminService;
-            } else {
-                throw new Exception("Unable to retrieve STSAdminService.");
+                if (stsAdminService != null) {
+                    this.stsAdminService = stsAdminService;
+                } else {
+                    throw new Exception("Unable to retrieve STSAdminService.");
+                }
+            } catch (Exception e) {
+
             }
         }
         return this.stsAdminService;

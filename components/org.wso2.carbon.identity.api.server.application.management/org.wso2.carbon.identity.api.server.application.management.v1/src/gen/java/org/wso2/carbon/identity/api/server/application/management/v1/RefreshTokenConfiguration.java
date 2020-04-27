@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public class RefreshTokenConfiguration  {
     }
 
     /**
-    * Decides whether the refresh token needs to renewed during refresh grant flow.
+    * Decides whether the refresh token needs to be renewed during refresh grant flow.
     **/
     public RefreshTokenConfiguration renewRefreshToken(Boolean renewRefreshToken) {
 
@@ -60,7 +60,7 @@ public class RefreshTokenConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "true", value = "Decides whether the refresh token needs to renewed during refresh grant flow.")
+    @ApiModelProperty(example = "true", value = "Decides whether the refresh token needs to be renewed during refresh grant flow.")
     @JsonProperty("renewRefreshToken")
     @Valid
     public Boolean getRenewRefreshToken() {

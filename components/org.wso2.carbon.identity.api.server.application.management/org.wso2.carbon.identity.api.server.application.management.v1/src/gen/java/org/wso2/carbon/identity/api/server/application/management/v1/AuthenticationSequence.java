@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ public enum TypeEnum {
     private Integer attributeStepId = 1;
 
     /**
-    *  - DEFAULT type indicates that the application will use the default authentication sequence specified at the tenant level. When DEFAULT type is used the information given other fields of the AuthenticationSequence will be ignored and overriden with values defined at the tenant level. - USER_DEFINED type indicates that the application will use a user defined authentication sequence.
+    *  - DEFAULT type indicates that the application will use the default authentication sequence specified at the tenant level. When the DEFAULT type is used, the information given in the other fields of the AuthenticationSequence will be ignored and overriden with values defined at the tenant level. - USER_DEFINED type indicates that the application will use a user-defined authentication sequence.
     **/
     public AuthenticationSequence type(TypeEnum type) {
 
@@ -84,7 +84,7 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(value = " - DEFAULT type indicates that the application will use the default authentication sequence specified at the tenant level. When DEFAULT type is used the information given other fields of the AuthenticationSequence will be ignored and overriden with values defined at the tenant level. - USER_DEFINED type indicates that the application will use a user defined authentication sequence.")
+    @ApiModelProperty(value = " - DEFAULT type indicates that the application will use the default authentication sequence specified at the tenant level. When the DEFAULT type is used, the information given in the other fields of the AuthenticationSequence will be ignored and overriden with values defined at the tenant level. - USER_DEFINED type indicates that the application will use a user-defined authentication sequence.")
     @JsonProperty("type")
     @Valid
     public TypeEnum getType() {

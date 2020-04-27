@@ -26,6 +26,7 @@ import org.wso2.carbon.security.sts.service.util.TrustedServiceData;
 import java.util.Arrays;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotFoundError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildServerError;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.WS_TRUST;
 
@@ -33,6 +34,9 @@ import static org.wso2.carbon.identity.application.authentication.framework.util
  * Helper functions for WSTrust inbound management.
  */
 public class WSTrustInboundFunctions {
+
+    private static final String ERROR_CODE = "60504";
+    private static final String ERROR_DESCRIPTION = "STS admin service is unavailable at the moment.";
 
     private WSTrustInboundFunctions() {
 
@@ -48,8 +52,13 @@ public class WSTrustInboundFunctions {
                     // We do not allow the inbound unique key to be changed during an update.
                     throw buildBadRequestError("Invalid audience value provided for update.");
                 }
-                ApplicationManagementServiceHolder.getInstance().getStsAdminService().removeTrustedService
-                        (inboundAuthKey);
+                if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
+                    ApplicationManagementServiceHolder.getInstance().getStsAdminService()
+                            .removeTrustedService(inboundAuthKey);
+                } else {
+                    throw buildNotFoundError(ERROR_CODE, "Error while creating/updating WSTrust inbound of application",
+                            ERROR_DESCRIPTION);
+                }
             }
 
             return createWsTrustInbound(wsTrustModel);
@@ -67,13 +76,19 @@ public class WSTrustInboundFunctions {
     public static InboundAuthenticationRequestConfig createWsTrustInbound(WSTrustConfiguration wsTrustConfiguration) {
 
         try {
-            ApplicationManagementServiceHolder.getInstance().getStsAdminService()
-                    .addTrustedService(wsTrustConfiguration.getAudience(), wsTrustConfiguration.getCertificateAlias());
 
-            InboundAuthenticationRequestConfig wsTrustInbound = new InboundAuthenticationRequestConfig();
-            wsTrustInbound.setInboundAuthType(WS_TRUST);
-            wsTrustInbound.setInboundAuthKey(wsTrustConfiguration.getAudience());
-            return wsTrustInbound;
+            if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
+                ApplicationManagementServiceHolder.getInstance().getStsAdminService()
+                        .addTrustedService(wsTrustConfiguration.getAudience(),
+                                wsTrustConfiguration.getCertificateAlias());
+
+                InboundAuthenticationRequestConfig wsTrustInbound = new InboundAuthenticationRequestConfig();
+                wsTrustInbound.setInboundAuthType(WS_TRUST);
+                wsTrustInbound.setInboundAuthKey(wsTrustConfiguration.getAudience());
+                return wsTrustInbound;
+            } else {
+                throw buildBadRequestError(ERROR_DESCRIPTION);
+            }
 
         } catch (SecurityConfigException e) {
             // Error while adding WS Trust, we can't continue
@@ -85,8 +100,16 @@ public class WSTrustInboundFunctions {
 
         String audience = inboundAuth.getInboundAuthKey();
         try {
-            TrustedServiceData[] trustedServices =
-                    ApplicationManagementServiceHolder.getInstance().getStsAdminService().getTrustedServices();
+
+            TrustedServiceData[] trustedServices;
+
+            if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
+                trustedServices =
+                        ApplicationManagementServiceHolder.getInstance().getStsAdminService().getTrustedServices();
+            } else {
+                throw buildNotFoundError(ERROR_CODE, "Error while retrieving WSTrust configuration." + audience,
+                        ERROR_DESCRIPTION);
+            }
 
             return Arrays.stream(trustedServices)
                     .filter(trustedServiceData -> StringUtils.equals(trustedServiceData.getServiceAddress(), audience))
@@ -105,8 +128,15 @@ public class WSTrustInboundFunctions {
 
         try {
             String trustedServiceAudience = inbound.getInboundAuthKey();
-            ApplicationManagementServiceHolder.getInstance().getStsAdminService().removeTrustedService
-                    (trustedServiceAudience);
+
+            if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
+                ApplicationManagementServiceHolder.getInstance().getStsAdminService()
+                        .removeTrustedService(trustedServiceAudience);
+            } else {
+                throw buildNotFoundError(ERROR_CODE, "Error while trying to rollback WSTrust configuration.",
+                        ERROR_DESCRIPTION);
+            }
+
         } catch (SecurityConfigException e) {
             throw buildServerError("Error while trying to rollback WSTrust configuration. " + e.getMessage(), e);
         }
