@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConfigServi
 import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants;
 
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AddUserStorePropertiesRes;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.Attribute;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStoreClassesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ConnectionEstablishedResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
@@ -523,9 +524,32 @@ public class ServerUserStoreService {
             propertiesRes.setName(property.getName());
             propertiesRes.setDefaultValue(property.getValue());
             propertiesRes.setDescription(property.getDescription());
+            propertiesRes.setAttributes(buildAttributes(property.getChildProperties()));
             propertiesToAdd.add(propertiesRes);
         }
         return propertiesToAdd;
+    }
+
+    /**
+     * Constructs attributes for individual properties.
+     *
+     * @param properties Array of user store properties.
+     * @return List<Attribute>
+     */
+    private List<Attribute> buildAttributes(Property[] properties) {
+
+        if (ArrayUtils.isEmpty(properties)) {
+            return null;
+        }
+
+        List<Attribute> attributes = new ArrayList<>();
+        for (Property property : properties) {
+            Attribute attribute = new Attribute();
+            attribute.setName(property.getName());
+            attribute.setValue(property.getValue());
+            attributes.add(attribute);
+        }
+        return attributes;
     }
 
     /**
