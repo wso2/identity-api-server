@@ -74,7 +74,7 @@ public class ApplicationManagementConstants {
                 "Inbound protocol not configured.",
                 "Inbound protocol: %s not configured for application id: %s."),
         ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND("60504",
-                "Error occurred while retrieving WS Trust Metadata.",
+                "WS-Trust protocol is not supported.",
                 "STS admin service is unavailable at the moment."),
 
         // Server Errors.

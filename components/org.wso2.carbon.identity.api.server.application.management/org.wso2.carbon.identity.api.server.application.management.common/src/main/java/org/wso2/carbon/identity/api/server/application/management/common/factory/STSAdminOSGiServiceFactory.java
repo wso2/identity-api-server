@@ -37,6 +37,8 @@ public class STSAdminOSGiServiceFactory extends AbstractFactoryBean<STSAdminServ
     protected STSAdminServiceInterface createInstance() throws Exception {
 
         if (this.stsAdminService == null) {
+            /* Try catch statement is included due to a NullPointerException which occurs at the server
+               startup when the STS functionality is not available in the product. */
             try {
                 STSAdminServiceInterface stsAdminService =
                         (STSAdminServiceInterface) PrivilegedCarbonContext.getThreadLocalCarbonContext()
@@ -47,8 +49,9 @@ public class STSAdminOSGiServiceFactory extends AbstractFactoryBean<STSAdminServ
                 } else {
                     throw new Exception("Unable to retrieve STSAdminService.");
                 }
-            } catch (Exception e) {
-
+            } catch (NullPointerException e) {
+                /* Catch block without implementation so that the STS Admin Service will be set to null
+                   in-turn helps in validating the rest API requests. */
             }
         }
         return this.stsAdminService;

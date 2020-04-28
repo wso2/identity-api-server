@@ -36,6 +36,7 @@ import static org.wso2.carbon.identity.application.authentication.framework.util
 public class WSTrustInboundFunctions {
 
     private static final String ERROR_CODE = "60504";
+    private static final String ERROR_MESSAGE = "WS-Trust protocol is not supported.";
     private static final String ERROR_DESCRIPTION = "STS admin service is unavailable at the moment.";
 
     private WSTrustInboundFunctions() {
@@ -52,12 +53,13 @@ public class WSTrustInboundFunctions {
                     // We do not allow the inbound unique key to be changed during an update.
                     throw buildBadRequestError("Invalid audience value provided for update.");
                 }
+                // Check if the STS functionality is deployed.
                 if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
                     ApplicationManagementServiceHolder.getInstance().getStsAdminService()
                             .removeTrustedService(inboundAuthKey);
                 } else {
-                    throw buildNotFoundError(ERROR_CODE, "Error while creating/updating WSTrust inbound of application",
-                            ERROR_DESCRIPTION);
+                    // Throw 404 error since the STS functionality is not available.
+                    throw buildNotFoundError(ERROR_CODE, ERROR_MESSAGE, ERROR_DESCRIPTION);
                 }
             }
 
@@ -76,7 +78,7 @@ public class WSTrustInboundFunctions {
     public static InboundAuthenticationRequestConfig createWsTrustInbound(WSTrustConfiguration wsTrustConfiguration) {
 
         try {
-
+            // Check if the STS functionality is deployed.
             if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
                 ApplicationManagementServiceHolder.getInstance().getStsAdminService()
                         .addTrustedService(wsTrustConfiguration.getAudience(),
@@ -87,6 +89,7 @@ public class WSTrustInboundFunctions {
                 wsTrustInbound.setInboundAuthKey(wsTrustConfiguration.getAudience());
                 return wsTrustInbound;
             } else {
+                // Throw 401 error since the STS functionality is not available.
                 throw buildBadRequestError(ERROR_DESCRIPTION);
             }
 
@@ -103,12 +106,13 @@ public class WSTrustInboundFunctions {
 
             TrustedServiceData[] trustedServices;
 
+            // Check if the STS functionality is deployed.
             if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
                 trustedServices =
                         ApplicationManagementServiceHolder.getInstance().getStsAdminService().getTrustedServices();
             } else {
-                throw buildNotFoundError(ERROR_CODE, "Error while retrieving WSTrust configuration." + audience,
-                        ERROR_DESCRIPTION);
+                // Throw 404 error since the STS functionality is not available.
+                throw buildNotFoundError(ERROR_CODE, ERROR_MESSAGE, ERROR_DESCRIPTION);
             }
 
             return Arrays.stream(trustedServices)
@@ -129,12 +133,13 @@ public class WSTrustInboundFunctions {
         try {
             String trustedServiceAudience = inbound.getInboundAuthKey();
 
+            // Check if the STS functionality is deployed.
             if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
                 ApplicationManagementServiceHolder.getInstance().getStsAdminService()
                         .removeTrustedService(trustedServiceAudience);
             } else {
-                throw buildNotFoundError(ERROR_CODE, "Error while trying to rollback WSTrust configuration.",
-                        ERROR_DESCRIPTION);
+                // Throw 404 error since the STS functionality is not available.
+                throw buildNotFoundError(ERROR_CODE, ERROR_MESSAGE, ERROR_DESCRIPTION);
             }
 
         } catch (SecurityConfigException e) {
