@@ -203,7 +203,11 @@ public class Constants {
                 "Error occurred while updating the IDP template with identifier %s."),
         ERROR_CODE_ERROR_RETRIEVING_IDP_TEMPLATE("65054", "Unable to retrieve IDP template.",
                 "Error occurred while retrieving the IDP template with identifier %s"),
-        ERROR_CODE_ERROR_INVALID_SEARCH_FILTER("65055", "Search request validation failed.", "Invalid search filter.");
+        ERROR_CODE_ERROR_INVALID_SEARCH_FILTER("65055", "Search request validation failed.", "Invalid search filter."),
+        ERROR_CODE_INVALID_DEFAULT_AUTHENTICATOR("60027", "Invalid default authenticator ID",
+                "Provided value for the default authenticator ID is invalid."),
+        ERROR_CODE_INVALID_DEFAULT_OUTBOUND_CONNECTOR("60027", "Invalid default outbound connector ID",
+                "Provided value for the default outbound connector ID is invalid.");
 
         private final String code;
         private final String message;
