@@ -27,8 +27,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAut
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.GrantType;
 import org.wso2.carbon.identity.api.server.application.management.v1.GrantTypeMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.GrantTypes;
 import org.wso2.carbon.identity.api.server.application.management.v1.MetadataProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
@@ -152,18 +152,18 @@ public class ServerApplicationMetadataService {
                 .getOAuthAdminService();
 
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
-        List<GrantTypes> supportedGrantTypeNames = new ArrayList<>();
+        List<GrantType> supportedGrantTypeNames = new ArrayList<>();
         // Iterate through the standard grant type names and add matching elements.
         for (String supportedGrantTypeName : supportedGrantTypes) {
-            GrantTypes grantTypes = new GrantTypes();
+            GrantType grantType = new GrantType();
             if (getOAuthGrantTypeNames().keySet().contains(supportedGrantTypeName)) {
-                grantTypes.setName(supportedGrantTypeName);
-                grantTypes.setDisplayName(getOAuthGrantTypeNames().get(supportedGrantTypeName));
+                grantType.setName(supportedGrantTypeName);
+                grantType.setDisplayName(getOAuthGrantTypeNames().get(supportedGrantTypeName));
             } else {
-                grantTypes.setName(supportedGrantTypeName);
-                grantTypes.setDisplayName(supportedGrantTypeName);
+                grantType.setName(supportedGrantTypeName);
+                grantType.setDisplayName(supportedGrantTypeName);
             }
-            supportedGrantTypeNames.add(grantTypes);
+            supportedGrantTypeNames.add(grantType);
         }
         // Set extracted grant types.
         oidcMetaData.setAllowedGrantTypes(

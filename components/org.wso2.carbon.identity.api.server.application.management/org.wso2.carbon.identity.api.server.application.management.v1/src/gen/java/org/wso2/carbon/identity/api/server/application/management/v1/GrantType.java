@@ -28,14 +28,14 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class GrantTypes  {
+public class GrantType  {
   
     private String name;
     private String displayName;
 
     /**
     **/
-    public GrantTypes name(String name) {
+    public GrantType name(String name) {
 
         this.name = name;
         return this;
@@ -53,7 +53,7 @@ public class GrantTypes  {
 
     /**
     **/
-    public GrantTypes displayName(String displayName) {
+    public GrantType displayName(String displayName) {
 
         this.displayName = displayName;
         return this;
@@ -80,9 +80,9 @@ public class GrantTypes  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        GrantTypes grantTypes = (GrantTypes) o;
-        return Objects.equals(this.name, grantTypes.name) &&
-            Objects.equals(this.displayName, grantTypes.displayName);
+        GrantType grantType = (GrantType) o;
+        return Objects.equals(this.name, grantType.name) &&
+            Objects.equals(this.displayName, grantType.displayName);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class GrantTypes  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class GrantTypes {\n");
+        sb.append("class GrantType {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");

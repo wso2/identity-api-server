@@ -2986,8 +2986,8 @@ components:
         options:
           type: array
           items:
-            $ref: '#/components/schemas/GrantTypes'
-    GrantTypes:
+            $ref: '#/components/schemas/GrantType'
+    GrantType:
       type: object
       properties:
         name:

@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.GrantTypes;
+import org.wso2.carbon.identity.api.server.application.management.v1.GrantType;
 import javax.validation.constraints.*;
 
 
@@ -33,12 +33,12 @@ import javax.xml.bind.annotation.*;
 
 public class GrantTypeMetaData  {
   
-    private List<GrantTypes> options = null;
+    private List<GrantType> options = null;
 
 
     /**
     **/
-    public GrantTypeMetaData options(List<GrantTypes> options) {
+    public GrantTypeMetaData options(List<GrantType> options) {
 
         this.options = options;
         return this;
@@ -47,14 +47,14 @@ public class GrantTypeMetaData  {
     @ApiModelProperty(value = "")
     @JsonProperty("options")
     @Valid
-    public List<GrantTypes> getOptions() {
+    public List<GrantType> getOptions() {
         return options;
     }
-    public void setOptions(List<GrantTypes> options) {
+    public void setOptions(List<GrantType> options) {
         this.options = options;
     }
 
-    public GrantTypeMetaData addOptionsItem(GrantTypes optionsItem) {
+    public GrantTypeMetaData addOptionsItem(GrantType optionsItem) {
         if (this.options == null) {
             this.options = new ArrayList<>();
         }
