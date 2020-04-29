@@ -455,6 +455,38 @@ public class ServerIdpManagementService {
     /**
      * Update federated authenticator of and IDP.
      *
+     * @param idpId                Identity Provider resource ID.
+     * @param authenticatorRequest Federated Authenticators Request.
+     * @return FederatedAuthenticatorListResponse.
+     */
+    public FederatedAuthenticatorListResponse updateFederatedAuthenticators(String idpId, FederatedAuthenticatorRequest
+            authenticatorRequest) {
+
+        try {
+            IdentityProvider idp =
+                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
+                            .getTenantDomainFromContext(), true);
+            if (idp == null) {
+                throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
+                        idpId);
+            }
+            // Need to create a clone, since modifying the fields of the original object, will modify the cached
+            // IDP object.
+            IdentityProvider idpToUpdate = createIdPClone(idp);
+            updateFederatedAuthenticatorConfig(idpToUpdate, authenticatorRequest);
+
+            IdentityProvider updatedIdp = IdentityProviderServiceHolder.getIdentityProviderManager()
+                    .updateIdPByResourceId(
+                            idpId, idpToUpdate, ContextLoader.getTenantDomainFromContext());
+            return createFederatedAuthenticatorResponse(updatedIdp);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
+        }
+    }
+
+    /**
+     * Update federated authenticator of and IDP.
+     *
      * @param idpId                    Identity Provider resource ID.
      * @param federatedAuthenticatorId Federated Authenticator ID.
      * @param authenticator            Federated Authenticator information.
@@ -583,6 +615,38 @@ public class ServerIdpManagementService {
                     Constants.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND_FOR_IDP, connectorId);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTOR, connectorId);
+        }
+    }
+
+    /**
+     * Update outbound provisioning connector config.
+     *
+     * @param idpId                    Identity Provider resource ID.
+     * @param outboundConnectorRequest Outbound provisioning connector request.
+     * @return OutboundConnectorListResponse.
+     */
+    public OutboundConnectorListResponse updateOutboundConnectors(String idpId, OutboundProvisioningRequest
+            outboundConnectorRequest) {
+
+        try {
+            IdentityProvider idp =
+                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
+                            .getTenantDomainFromContext(), true);
+            if (idp == null) {
+                throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
+                        idpId);
+            }
+            // Need to create a clone, since modifying the fields of the original object, will modify the cached
+            // IDP object.
+            IdentityProvider idpToUpdate = createIdPClone(idp);
+            updateOutboundConnectorConfig(idpToUpdate, outboundConnectorRequest);
+
+            IdentityProvider updatedIdp = IdentityProviderServiceHolder.getIdentityProviderManager()
+                    .updateIdPByResourceId(
+                            idpId, idpToUpdate, ContextLoader.getTenantDomainFromContext());
+            return createOutboundProvisioningResponse(updatedIdp);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
         }
     }
 
@@ -1339,10 +1403,12 @@ public class ServerIdpManagementService {
                 if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authConfig.getName())) {
                     validateSamlMetadata(authProperties);
                 }
-                List<Property> properties = authProperties.stream()
-                        .map(propertyToInternal)
-                        .collect(Collectors.toList());
-                authConfig.setProperties(properties.toArray(new Property[0]));
+                if (authProperties != null) {
+                    List<Property> properties = authProperties.stream()
+                            .map(propertyToInternal)
+                            .collect(Collectors.toList());
+                    authConfig.setProperties(properties.toArray(new Property[0]));
+                }
                 fedAuthConfigs.add(authConfig);
 
                 if (StringUtils.equals(defaultAuthenticator, authenticator.getAuthenticatorId())) {
@@ -1350,6 +1416,10 @@ public class ServerIdpManagementService {
                 }
             }
 
+            if (StringUtils.isNotBlank(defaultAuthenticator) && defaultAuthConfig == null) {
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_INVALID_DEFAULT_AUTHENTICATOR, null);
+            }
             idp.setFederatedAuthenticatorConfigs(fedAuthConfigs.toArray(new FederatedAuthenticatorConfig[0]));
             idp.setDefaultAuthenticatorConfig(defaultAuthConfig);
         }
@@ -1392,15 +1462,22 @@ public class ServerIdpManagementService {
                 connectorConfig.setName(base64URLDecode(connector.getConnectorId()));
                 connectorConfig.setEnabled(connector.getIsEnabled());
 
-                List<Property> properties = connector.getProperties().stream()
-                        .map(propertyToInternal)
-                        .collect(Collectors.toList());
-                connectorConfig.setProvisioningProperties(properties.toArray(new Property[0]));
+                if (connector.getProperties() != null) {
+                    List<Property> properties = connector.getProperties().stream()
+                            .map(propertyToInternal)
+                            .collect(Collectors.toList());
+                    connectorConfig.setProvisioningProperties(properties.toArray(new Property[0]));
+                }
                 connectorConfigs.add(connectorConfig);
 
                 if (StringUtils.equals(defaultConnectorId, connector.getConnectorId())) {
                     defaultConnectorConfig = connectorConfig;
                 }
+            }
+
+            if (StringUtils.isNotBlank(defaultConnectorId) && defaultConnectorConfig == null) {
+                throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                        .ERROR_CODE_INVALID_DEFAULT_OUTBOUND_CONNECTOR, null);
             }
 
             idp.setProvisioningConnectorConfigs(connectorConfigs.toArray(new ProvisioningConnectorConfig[0]));
@@ -1883,6 +1960,12 @@ public class ServerIdpManagementService {
 
         ProvisioningResponse provisioningResponse = new ProvisioningResponse();
         provisioningResponse.setJit(createJITResponse(idp));
+        provisioningResponse.setOutboundConnectors(createOutboundProvisioningResponse(idp));
+        return provisioningResponse;
+    }
+
+    private OutboundConnectorListResponse createOutboundProvisioningResponse(IdentityProvider idp) {
+
         ProvisioningConnectorConfig[] connectorConfigs = idp.getProvisioningConnectorConfigs();
         List<OutboundConnectorListItem> connectors = new ArrayList<>();
         if (connectorConfigs != null) {
@@ -1903,8 +1986,7 @@ public class ServerIdpManagementService {
         outboundConnectorListResponse.setDefaultConnectorId(idp.getDefaultProvisioningConnectorConfig() != null ?
                 base64URLEncode(idp.getDefaultProvisioningConnectorConfig().getName()) : null);
         outboundConnectorListResponse.setConnectors(connectors);
-        provisioningResponse.setOutboundConnectors(outboundConnectorListResponse);
-        return provisioningResponse;
+        return outboundConnectorListResponse;
     }
 
     private JustInTimeProvisioning createJITResponse(IdentityProvider idp) {
