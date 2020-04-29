@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesListItem;
+import org.wso2.carbon.identity.api.server.application.management.v1.GrantTypes;
 import javax.validation.constraints.*;
 
 
@@ -31,34 +31,34 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class ApplicationTemplatesList  {
+public class GrantTypeMetaData  {
   
-    private List<ApplicationTemplatesListItem> templates = null;
+    private List<GrantTypes> options = null;
 
 
     /**
     **/
-    public ApplicationTemplatesList templates(List<ApplicationTemplatesListItem> templates) {
+    public GrantTypeMetaData options(List<GrantTypes> options) {
 
-        this.templates = templates;
+        this.options = options;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("templates")
+    @JsonProperty("options")
     @Valid
-    public List<ApplicationTemplatesListItem> getTemplates() {
-        return templates;
+    public List<GrantTypes> getOptions() {
+        return options;
     }
-    public void setTemplates(List<ApplicationTemplatesListItem> templates) {
-        this.templates = templates;
+    public void setOptions(List<GrantTypes> options) {
+        this.options = options;
     }
 
-    public ApplicationTemplatesList addTemplatesItem(ApplicationTemplatesListItem templatesItem) {
-        if (this.templates == null) {
-            this.templates = new ArrayList<>();
+    public GrantTypeMetaData addOptionsItem(GrantTypes optionsItem) {
+        if (this.options == null) {
+            this.options = new ArrayList<>();
         }
-        this.templates.add(templatesItem);
+        this.options.add(optionsItem);
         return this;
     }
 
@@ -73,22 +73,22 @@ public class ApplicationTemplatesList  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ApplicationTemplatesList applicationTemplatesList = (ApplicationTemplatesList) o;
-        return Objects.equals(this.templates, applicationTemplatesList.templates);
+        GrantTypeMetaData grantTypeMetaData = (GrantTypeMetaData) o;
+        return Objects.equals(this.options, grantTypeMetaData.options);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(templates);
+        return Objects.hash(options);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ApplicationTemplatesList {\n");
+        sb.append("class GrantTypeMetaData {\n");
         
-        sb.append("    templates: ").append(toIndentedString(templates)).append("\n");
+        sb.append("    options: ").append(toIndentedString(options)).append("\n");
         sb.append("}");
         return sb.toString();
     }

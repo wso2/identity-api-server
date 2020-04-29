@@ -2980,6 +2980,22 @@ components:
         defaultValue:
           type: string
           example: 'Option 1'
+    GrantTypeMetaData:
+      type: object
+      properties:
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrantTypes'
+    GrantTypes:
+      type: object
+      properties:
+        name:
+          type: string
+          example: authorization_code
+        displayName:
+          type: string
+          example: Code
     SAMLMetaData:
       type: object
       properties:
@@ -3000,7 +3016,7 @@ components:
       type: object
       properties:
         allowedGrantTypes:
-          $ref: '#/components/schemas/MetadataProperty'
+          $ref: '#/components/schemas/GrantTypeMetaData'
         defaultUserAccessTokenExpiryTime:
           type: string
           example: '3600'
