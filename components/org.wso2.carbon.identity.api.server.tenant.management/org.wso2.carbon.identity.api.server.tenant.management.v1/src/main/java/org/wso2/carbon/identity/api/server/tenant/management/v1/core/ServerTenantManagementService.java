@@ -61,6 +61,7 @@ import static org.wso2.carbon.identity.api.server.tenant.management.common.Tenan
 public class ServerTenantManagementService {
 
     private static final Log log = LogFactory.getLog(ServerTenantManagementService.class);
+    private static final String INLINE_PASSWORD = "inline-password";
 
     /**
      * Add a tenant.
@@ -196,6 +197,18 @@ public class ServerTenantManagementService {
             tenant.setAdminFirstName(tenantModel.getOwners().get(0).getFirstname());
             tenant.setAdminLastName(tenantModel.getOwners().get(0).getLastname());
             tenant.setEmail(tenantModel.getOwners().get(0).getEmail());
+            String provisioningMethod = tenantModel.getOwners().get(0).getProvisioningMethod();
+            if (INLINE_PASSWORD.equalsIgnoreCase(provisioningMethod)) {
+                String password = tenantModel.getOwners().get(0).getPassword();
+                if (StringUtils.isBlank(password)) {
+                    throw new TenantManagementClientException(TenantConstants.ErrorMessage.
+                            ERROR_CODE_MISSING_REQUIRED_PARAMETER.getCode(), String.format(TenantConstants.ErrorMessage.
+                            ERROR_CODE_MISSING_REQUIRED_PARAMETER.getMessage(), "password"));
+                }
+                tenant.setAdminPassword(password);
+            }
+            tenant.setProvisioningMethod(provisioningMethod);
+
             List<AdditionalClaims> additionalClaimsList = tenantModel.getOwners().get(0).getAdditionalClaims();
             if (CollectionUtils.isNotEmpty(additionalClaimsList)) {
                 tenant.setClaimsMap(createClaimsMapping(additionalClaimsList));

@@ -34,9 +34,11 @@ import javax.xml.bind.annotation.*;
 public class Owner  {
   
     private String username;
+    private String password;
     private String email;
     private String firstname;
     private String lastname;
+    private String provisioningMethod;
     private List<AdditionalClaims> additionalClaims = null;
 
 
@@ -59,6 +61,25 @@ public class Owner  {
     }
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    /**
+    * Password of the owner.
+    **/
+    public Owner password(String password) {
+
+        this.password = password;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "kim123", value = "Password of the owner.")
+    @JsonProperty("password")
+    @Valid
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     /**
@@ -125,6 +146,27 @@ public class Owner  {
     }
 
     /**
+    * If the provisioning method is inline-password then a valid password should be sent in the request body, if the provisioning method is invite-via-email then password doesn&#39;t need to be send through request body, instead an emai link will be sent to the given email address to set the password.
+    **/
+    public Owner provisioningMethod(String provisioningMethod) {
+
+        this.provisioningMethod = provisioningMethod;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "inline-password", required = true, value = "If the provisioning method is inline-password then a valid password should be sent in the request body, if the provisioning method is invite-via-email then password doesn't need to be send through request body, instead an emai link will be sent to the given email address to set the password.")
+    @JsonProperty("provisioningMethod")
+    @Valid
+    @NotNull(message = "Property provisioningMethod cannot be null.")
+
+    public String getProvisioningMethod() {
+        return provisioningMethod;
+    }
+    public void setProvisioningMethod(String provisioningMethod) {
+        this.provisioningMethod = provisioningMethod;
+    }
+
+    /**
     **/
     public Owner additionalClaims(List<AdditionalClaims> additionalClaims) {
 
@@ -163,15 +205,17 @@ public class Owner  {
         }
         Owner owner = (Owner) o;
         return Objects.equals(this.username, owner.username) &&
+            Objects.equals(this.password, owner.password) &&
             Objects.equals(this.email, owner.email) &&
             Objects.equals(this.firstname, owner.firstname) &&
             Objects.equals(this.lastname, owner.lastname) &&
+            Objects.equals(this.provisioningMethod, owner.provisioningMethod) &&
             Objects.equals(this.additionalClaims, owner.additionalClaims);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, email, firstname, lastname, additionalClaims);
+        return Objects.hash(username, password, email, firstname, lastname, provisioningMethod, additionalClaims);
     }
 
     @Override
@@ -181,9 +225,11 @@ public class Owner  {
         sb.append("class Owner {\n");
         
         sb.append("    username: ").append(toIndentedString(username)).append("\n");
+        sb.append("    password: ").append(toIndentedString(password)).append("\n");
         sb.append("    email: ").append(toIndentedString(email)).append("\n");
         sb.append("    firstname: ").append(toIndentedString(firstname)).append("\n");
         sb.append("    lastname: ").append(toIndentedString(lastname)).append("\n");
+        sb.append("    provisioningMethod: ").append(toIndentedString(provisioningMethod)).append("\n");
         sb.append("    additionalClaims: ").append(toIndentedString(additionalClaims)).append("\n");
         sb.append("}");
         return sb.toString();
