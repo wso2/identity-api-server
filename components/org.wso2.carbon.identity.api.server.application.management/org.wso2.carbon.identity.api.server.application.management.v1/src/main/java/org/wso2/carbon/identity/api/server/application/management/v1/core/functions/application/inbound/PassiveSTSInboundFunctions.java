@@ -16,6 +16,7 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound;
 
 import org.apache.commons.lang.StringUtils;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
@@ -25,12 +26,17 @@ import org.wso2.carbon.identity.application.common.util.IdentityApplicationConst
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.arrayToStream;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotFoundError;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.PassiveSTS.PASSIVE_STS_REPLY_URL;
 
 /**
  * Helper functions for Passive STS inbound management.
  */
 public class PassiveSTSInboundFunctions {
+
+    private static final String ERROR_CODE = "60504";
+    private static final String ERROR_DESCRIPTION = "WS-Federation protocol is not supported.";
+    private static final String ERROR_MESSAGE = "Passive STS service is unavailable at the moment.";
 
     private PassiveSTSInboundFunctions() {
 
@@ -44,8 +50,12 @@ public class PassiveSTSInboundFunctions {
             // We do not allow the inbound unique key to be changed during an update.
             throw buildBadRequestError("Invalid realm value provided for update.");
         }
-
-        return createPassiveSTSInboundConfig(passiveSTSConfig);
+        if (ApplicationManagementServiceHolder.getInstance().getPassiveSTSService() != null) {
+            return createPassiveSTSInboundConfig(passiveSTSConfig);
+        } else {
+            // Throw 404 error since the Passive STS functionality is not available.
+            throw buildNotFoundError(ERROR_CODE, ERROR_MESSAGE, ERROR_DESCRIPTION);
+        }
     }
 
     private static boolean isRealmValueChanged(PassiveStsConfiguration passiveSTSConfig, String currentRealm) {
@@ -55,25 +65,37 @@ public class PassiveSTSInboundFunctions {
 
     public static InboundAuthenticationRequestConfig createPassiveSTSInboundConfig(PassiveStsConfiguration config) {
 
-        InboundAuthenticationRequestConfig passiveStsInbound = new InboundAuthenticationRequestConfig();
-        passiveStsInbound.setInboundAuthType(StandardInboundProtocols.PASSIVE_STS);
-        passiveStsInbound.setInboundAuthKey(config.getRealm());
+        if (ApplicationManagementServiceHolder.getInstance().getPassiveSTSService() != null) {
 
-        Property passiveStsReplyUrl = new Property();
-        passiveStsReplyUrl.setName(IdentityApplicationConstants.PassiveSTS.PASSIVE_STS_REPLY_URL);
-        passiveStsReplyUrl.setValue(config.getReplyTo());
+            InboundAuthenticationRequestConfig passiveStsInbound = new InboundAuthenticationRequestConfig();
+            passiveStsInbound.setInboundAuthType(StandardInboundProtocols.PASSIVE_STS);
+            passiveStsInbound.setInboundAuthKey(config.getRealm());
 
-        passiveStsInbound.setProperties(new Property[]{passiveStsReplyUrl});
-        return passiveStsInbound;
+            Property passiveStsReplyUrl = new Property();
+            passiveStsReplyUrl.setName(IdentityApplicationConstants.PassiveSTS.PASSIVE_STS_REPLY_URL);
+            passiveStsReplyUrl.setValue(config.getReplyTo());
+
+            passiveStsInbound.setProperties(new Property[]{passiveStsReplyUrl});
+            return passiveStsInbound;
+        } else {
+            // Throw 401 error since the Passive STS functionality is not available.
+            throw buildBadRequestError(ERROR_DESCRIPTION);
+        }
     }
 
     public static PassiveStsConfiguration getPassiveSTSConfiguration(InboundAuthenticationRequestConfig inboundAuth) {
 
-        String replyTo = arrayToStream(inboundAuth.getProperties())
-                .filter(property -> StringUtils.equals(property.getName(), PASSIVE_STS_REPLY_URL))
-                .findAny()
-                .map(Property::getValue).orElse(null);
+        if (ApplicationManagementServiceHolder.getInstance().getPassiveSTSService() != null) {
 
-        return new PassiveStsConfiguration().realm(inboundAuth.getInboundAuthKey()).replyTo(replyTo);
+            String replyTo = arrayToStream(inboundAuth.getProperties())
+                    .filter(property -> StringUtils.equals(property.getName(), PASSIVE_STS_REPLY_URL))
+                    .findAny()
+                    .map(Property::getValue).orElse(null);
+
+            return new PassiveStsConfiguration().realm(inboundAuth.getInboundAuthKey()).replyTo(replyTo);
+        } else {
+            // Throw 404 error since the Passive STS functionality is not available.
+            throw buildNotFoundError(ERROR_CODE, ERROR_MESSAGE, ERROR_DESCRIPTION);
+        }
     }
 }
