@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -28,46 +28,45 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class RefreshTokenConfiguration  {
+public class GrantType  {
   
-    private Long expiryInSeconds;
-    private Boolean renewRefreshToken;
+    private String name;
+    private String displayName;
 
     /**
     **/
-    public RefreshTokenConfiguration expiryInSeconds(Long expiryInSeconds) {
+    public GrantType name(String name) {
 
-        this.expiryInSeconds = expiryInSeconds;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "86400", value = "")
-    @JsonProperty("expiryInSeconds")
+    @ApiModelProperty(example = "authorization_code", value = "")
+    @JsonProperty("name")
     @Valid
-    public Long getExpiryInSeconds() {
-        return expiryInSeconds;
+    public String getName() {
+        return name;
     }
-    public void setExpiryInSeconds(Long expiryInSeconds) {
-        this.expiryInSeconds = expiryInSeconds;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
-    * Decides whether the refresh token needs to be renewed during refresh grant flow.
     **/
-    public RefreshTokenConfiguration renewRefreshToken(Boolean renewRefreshToken) {
+    public GrantType displayName(String displayName) {
 
-        this.renewRefreshToken = renewRefreshToken;
+        this.displayName = displayName;
         return this;
     }
     
-    @ApiModelProperty(example = "true", value = "Decides whether the refresh token needs to be renewed during refresh grant flow.")
-    @JsonProperty("renewRefreshToken")
+    @ApiModelProperty(example = "Code", value = "")
+    @JsonProperty("displayName")
     @Valid
-    public Boolean getRenewRefreshToken() {
-        return renewRefreshToken;
+    public String getDisplayName() {
+        return displayName;
     }
-    public void setRenewRefreshToken(Boolean renewRefreshToken) {
-        this.renewRefreshToken = renewRefreshToken;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
 
@@ -81,24 +80,24 @@ public class RefreshTokenConfiguration  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RefreshTokenConfiguration refreshTokenConfiguration = (RefreshTokenConfiguration) o;
-        return Objects.equals(this.expiryInSeconds, refreshTokenConfiguration.expiryInSeconds) &&
-            Objects.equals(this.renewRefreshToken, refreshTokenConfiguration.renewRefreshToken);
+        GrantType grantType = (GrantType) o;
+        return Objects.equals(this.name, grantType.name) &&
+            Objects.equals(this.displayName, grantType.displayName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(expiryInSeconds, renewRefreshToken);
+        return Objects.hash(name, displayName);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class RefreshTokenConfiguration {\n");
+        sb.append("class GrantType {\n");
         
-        sb.append("    expiryInSeconds: ").append(toIndentedString(expiryInSeconds)).append("\n");
-        sb.append("    renewRefreshToken: ").append(toIndentedString(renewRefreshToken)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("}");
         return sb.toString();
     }

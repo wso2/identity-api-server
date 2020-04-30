@@ -27,6 +27,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAut
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.GrantType;
+import org.wso2.carbon.identity.api.server.application.management.v1.GrantTypeMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.MetadataProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
@@ -150,20 +152,22 @@ public class ServerApplicationMetadataService {
                 .getOAuthAdminService();
 
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
-        List<String> supportedGrantTypeNames = new ArrayList<>();
+        List<GrantType> supportedGrantTypeNames = new ArrayList<>();
         // Iterate through the standard grant type names and add matching elements.
-        for (String grantType : getOAuthGrantTypeNames().keySet()) {
-            if (supportedGrantTypes.contains(grantType)) {
-                supportedGrantTypeNames.add(getOAuthGrantTypeNames().get(grantType));
-                supportedGrantTypes.remove(grantType);
+        for (String supportedGrantTypeName : supportedGrantTypes) {
+            GrantType grantType = new GrantType();
+            if (getOAuthGrantTypeNames().keySet().contains(supportedGrantTypeName)) {
+                grantType.setName(supportedGrantTypeName);
+                grantType.setDisplayName(getOAuthGrantTypeNames().get(supportedGrantTypeName));
+            } else {
+                grantType.setName(supportedGrantTypeName);
+                grantType.setDisplayName(supportedGrantTypeName);
             }
+            supportedGrantTypeNames.add(grantType);
         }
-        // Add any left grant types to the list.
-        supportedGrantTypeNames.addAll(supportedGrantTypes);
         // Set extracted grant types.
         oidcMetaData.setAllowedGrantTypes(
-                new MetadataProperty()
-                        .defaultValue(null)
+                new GrantTypeMetaData()
                         .options(supportedGrantTypeNames));
 
         oidcMetaData.setDefaultUserAccessTokenExpiryTime(
