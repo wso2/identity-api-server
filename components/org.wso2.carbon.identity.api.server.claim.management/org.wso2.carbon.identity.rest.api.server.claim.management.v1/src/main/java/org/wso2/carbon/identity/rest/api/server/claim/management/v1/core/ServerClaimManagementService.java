@@ -480,10 +480,6 @@ public class ServerClaimManagementService {
             List<ExternalClaim> externalClaimList = getClaimMetadataManagementService().getExternalClaims(
                     base64DecodeId(dialectId),
                     ContextLoader.getTenantDomainFromContext());
-            if (CollectionUtils.isEmpty(externalClaimList)) {
-                throw handleClaimManagementClientError(ERROR_CODE_CLAIMS_NOT_FOUND_FOR_DIALECT, NOT_FOUND, dialectId);
-            }
-
             return getExternalClaimResDTOs(externalClaimList);
 
         } catch (ClaimMetadataException e) {
@@ -618,8 +614,10 @@ public class ServerClaimManagementService {
 
         List<ExternalClaimResDTO> externalClaimResDTOList = new ArrayList<>();
 
-        for (ExternalClaim externalClaim : externalClaimList) {
-            externalClaimResDTOList.add(getExternalClaimResDTO(externalClaim));
+        if (CollectionUtils.isNotEmpty(externalClaimList)) {
+            for (ExternalClaim externalClaim : externalClaimList) {
+                externalClaimResDTOList.add(getExternalClaimResDTO(externalClaim));
+            }
         }
 
         return externalClaimResDTOList;

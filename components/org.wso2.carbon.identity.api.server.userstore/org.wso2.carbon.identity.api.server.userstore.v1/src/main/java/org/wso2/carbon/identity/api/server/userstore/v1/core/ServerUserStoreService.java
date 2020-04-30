@@ -191,9 +191,6 @@ public class ServerUserStoreService {
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         try {
             UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
-            if (userStoreDTOS.length == 0) {
-                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
-            }
             return buildUserStoreListResponse(userStoreDTOS, requiredAttributes);
 
         } catch (IdentityUserStoreMgtException e) {
@@ -444,20 +441,22 @@ public class ServerUserStoreService {
                                                                    String requiredAttributes) {
 
         List<UserStoreListResponse> userStoreListResponseToAdd = new ArrayList<>();
-        for (UserStoreDTO jsonObject : userStoreDTOS) {
-            UserStoreListResponse userStoreList = new UserStoreListResponse();
-            userStoreList.setDescription(jsonObject.getDescription());
-            userStoreList.setName(jsonObject.getDomainId());
-            userStoreList.setId(base64URLEncodeId(jsonObject.getDomainId()));
-            userStoreList.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
-                            UserStoreConstants.USER_STORE_PATH_COMPONENT + "/%s",
-                    base64URLEncodeId(jsonObject.getDomainId()))).toString());
+        if (ArrayUtils.isNotEmpty(userStoreDTOS)) {
+            for (UserStoreDTO jsonObject : userStoreDTOS) {
+                UserStoreListResponse userStoreList = new UserStoreListResponse();
+                userStoreList.setDescription(jsonObject.getDescription());
+                userStoreList.setName(jsonObject.getDomainId());
+                userStoreList.setId(base64URLEncodeId(jsonObject.getDomainId()));
+                userStoreList.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
+                                UserStoreConstants.USER_STORE_PATH_COMPONENT + "/%s",
+                        base64URLEncodeId(jsonObject.getDomainId()))).toString());
 
-            if (StringUtils.isNotBlank(requiredAttributes)) {
-                String[] requiredAttributesArray = requiredAttributes.split(REGEX_COMMA);
-                addUserstoreProperties(jsonObject, userStoreList, Arrays.asList(requiredAttributesArray));
+                if (StringUtils.isNotBlank(requiredAttributes)) {
+                    String[] requiredAttributesArray = requiredAttributes.split(REGEX_COMMA);
+                    addUserstoreProperties(jsonObject, userStoreList, Arrays.asList(requiredAttributesArray));
+                }
+                userStoreListResponseToAdd.add(userStoreList);
             }
-            userStoreListResponseToAdd.add(userStoreList);
         }
         return userStoreListResponseToAdd;
     }
