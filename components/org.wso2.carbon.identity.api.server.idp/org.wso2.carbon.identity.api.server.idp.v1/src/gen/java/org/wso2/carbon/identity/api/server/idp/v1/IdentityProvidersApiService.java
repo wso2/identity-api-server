@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.Error;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticator;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
@@ -42,6 +43,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.MetaOutboundConnectorLis
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnector;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnectorListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnectorPUTRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundProvisioningRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
@@ -98,11 +100,15 @@ public interface IdentityProvidersApiService {
 
       public Response updateFederatedAuthenticator(String identityProviderId, String federatedAuthenticatorId, FederatedAuthenticatorPUTRequest federatedAuthenticatorPUTRequest);
 
+      public Response updateFederatedAuthenticators(String identityProviderId, FederatedAuthenticatorRequest federatedAuthenticatorRequest);
+
       public Response updateIDPTemplate(String templateId, IdentityProviderTemplate identityProviderTemplate);
 
       public Response updateJITConfig(String identityProviderId, JustInTimeProvisioning justInTimeProvisioning);
 
       public Response updateOutboundConnector(String identityProviderId, String outboundProvisioningConnectorId, OutboundConnectorPUTRequest outboundConnectorPUTRequest);
+
+      public Response updateOutboundConnectors(String identityProviderId, OutboundProvisioningRequest outboundProvisioningRequest);
 
       public Response updateRoleConfig(String identityProviderId, Roles roles);
 }

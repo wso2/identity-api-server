@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.GrantTypeMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.MetadataProperty;
 import javax.validation.constraints.*;
 
@@ -31,7 +32,7 @@ import javax.xml.bind.annotation.*;
 
 public class OIDCMetaData  {
   
-    private MetadataProperty allowedGrantTypes;
+    private GrantTypeMetaData allowedGrantTypes;
     private String defaultUserAccessTokenExpiryTime;
     private String defaultApplicationAccessTokenExpiryTime;
     private String defaultRefreshTokenExpiryTime;
@@ -43,7 +44,7 @@ public class OIDCMetaData  {
 
     /**
     **/
-    public OIDCMetaData allowedGrantTypes(MetadataProperty allowedGrantTypes) {
+    public OIDCMetaData allowedGrantTypes(GrantTypeMetaData allowedGrantTypes) {
 
         this.allowedGrantTypes = allowedGrantTypes;
         return this;
@@ -52,10 +53,10 @@ public class OIDCMetaData  {
     @ApiModelProperty(value = "")
     @JsonProperty("allowedGrantTypes")
     @Valid
-    public MetadataProperty getAllowedGrantTypes() {
+    public GrantTypeMetaData getAllowedGrantTypes() {
         return allowedGrantTypes;
     }
-    public void setAllowedGrantTypes(MetadataProperty allowedGrantTypes) {
+    public void setAllowedGrantTypes(GrantTypeMetaData allowedGrantTypes) {
         this.allowedGrantTypes = allowedGrantTypes;
     }
 

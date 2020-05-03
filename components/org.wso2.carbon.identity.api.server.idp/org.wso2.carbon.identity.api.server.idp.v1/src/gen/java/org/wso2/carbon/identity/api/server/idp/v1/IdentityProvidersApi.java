@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.Error;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticator;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
@@ -42,6 +43,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.MetaOutboundConnectorLis
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnector;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnectorListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnectorPUTRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundProvisioningRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
@@ -644,6 +646,30 @@ public class IdentityProvidersApi  {
 
     @Valid
     @PUT
+    @Path("/{identity-provider-id}/federated-authenticators")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update Federated authenticators of an identity provider ", notes = "This API updates federated authenticators enabled for a specific identity provider identified by its ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = FederatedAuthenticatorListResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Federated Authenticators", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = FederatedAuthenticatorListResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateFederatedAuthenticators(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the federated authenticator to be updated" ,required=true) @Valid FederatedAuthenticatorRequest federatedAuthenticatorRequest) {
+
+        return delegate.updateFederatedAuthenticators(identityProviderId,  federatedAuthenticatorRequest );
+    }
+
+    @Valid
+    @PUT
     @Path("/templates/{template-id}")
     @Consumes({ "application/json", "application/xml" })
     @Produces({ "application/json", "application/xml",  })
@@ -713,6 +739,30 @@ public class IdentityProvidersApi  {
     public Response updateOutboundConnector(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "ID of the outbound provisioning connector.",required=true) @PathParam("outbound-provisioning-connector-id") String outboundProvisioningConnectorId, @ApiParam(value = "This represents the outbound provisioning connector to be updated" ,required=true) @Valid OutboundConnectorPUTRequest outboundConnectorPUTRequest) {
 
         return delegate.updateOutboundConnector(identityProviderId,  outboundProvisioningConnectorId,  outboundConnectorPUTRequest );
+    }
+
+    @Valid
+    @PUT
+    @Path("/{identity-provider-id}/provisioning/outbound-connectors")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update outbound provisioning connectors of an identity provider ", notes = "This API provides updates the list of outbound provisioning connectors enabled for an identity provider. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = OutboundConnectorListResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Provisioning", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = OutboundConnectorListResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateOutboundConnectors(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the outbound provisioning connector to be updated" ,required=true) @Valid OutboundProvisioningRequest outboundProvisioningRequest) {
+
+        return delegate.updateOutboundConnectors(identityProviderId,  outboundProvisioningRequest );
     }
 
     @Valid

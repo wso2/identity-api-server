@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConfigServi
 import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants;
 
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AddUserStorePropertiesRes;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.Attribute;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStoreClassesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ConnectionEstablishedResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
@@ -190,9 +191,6 @@ public class ServerUserStoreService {
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
         try {
             UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
-            if (userStoreDTOS.length == 0) {
-                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
-            }
             return buildUserStoreListResponse(userStoreDTOS, requiredAttributes);
 
         } catch (IdentityUserStoreMgtException e) {
@@ -443,20 +441,22 @@ public class ServerUserStoreService {
                                                                    String requiredAttributes) {
 
         List<UserStoreListResponse> userStoreListResponseToAdd = new ArrayList<>();
-        for (UserStoreDTO jsonObject : userStoreDTOS) {
-            UserStoreListResponse userStoreList = new UserStoreListResponse();
-            userStoreList.setDescription(jsonObject.getDescription());
-            userStoreList.setName(jsonObject.getDomainId());
-            userStoreList.setId(base64URLEncodeId(jsonObject.getDomainId()));
-            userStoreList.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
-                            UserStoreConstants.USER_STORE_PATH_COMPONENT + "/%s",
-                    base64URLEncodeId(jsonObject.getDomainId()))).toString());
+        if (ArrayUtils.isNotEmpty(userStoreDTOS)) {
+            for (UserStoreDTO jsonObject : userStoreDTOS) {
+                UserStoreListResponse userStoreList = new UserStoreListResponse();
+                userStoreList.setDescription(jsonObject.getDescription());
+                userStoreList.setName(jsonObject.getDomainId());
+                userStoreList.setId(base64URLEncodeId(jsonObject.getDomainId()));
+                userStoreList.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
+                                UserStoreConstants.USER_STORE_PATH_COMPONENT + "/%s",
+                        base64URLEncodeId(jsonObject.getDomainId()))).toString());
 
-            if (StringUtils.isNotBlank(requiredAttributes)) {
-                String[] requiredAttributesArray = requiredAttributes.split(REGEX_COMMA);
-                addUserstoreProperties(jsonObject, userStoreList, Arrays.asList(requiredAttributesArray));
+                if (StringUtils.isNotBlank(requiredAttributes)) {
+                    String[] requiredAttributesArray = requiredAttributes.split(REGEX_COMMA);
+                    addUserstoreProperties(jsonObject, userStoreList, Arrays.asList(requiredAttributesArray));
+                }
+                userStoreListResponseToAdd.add(userStoreList);
             }
-            userStoreListResponseToAdd.add(userStoreList);
         }
         return userStoreListResponseToAdd;
     }
@@ -523,9 +523,32 @@ public class ServerUserStoreService {
             propertiesRes.setName(property.getName());
             propertiesRes.setDefaultValue(property.getValue());
             propertiesRes.setDescription(property.getDescription());
+            propertiesRes.setAttributes(buildAttributes(property.getChildProperties()));
             propertiesToAdd.add(propertiesRes);
         }
         return propertiesToAdd;
+    }
+
+    /**
+     * Constructs attributes for individual properties.
+     *
+     * @param properties Array of user store properties.
+     * @return List<Attribute>
+     */
+    private List<Attribute> buildAttributes(Property[] properties) {
+
+        if (ArrayUtils.isEmpty(properties)) {
+            return null;
+        }
+
+        List<Attribute> attributes = new ArrayList<>();
+        for (Property property : properties) {
+            Attribute attribute = new Attribute();
+            attribute.setName(property.getName());
+            attribute.setValue(property.getValue());
+            attributes.add(attribute);
+        }
+        return attributes;
     }
 
     /**

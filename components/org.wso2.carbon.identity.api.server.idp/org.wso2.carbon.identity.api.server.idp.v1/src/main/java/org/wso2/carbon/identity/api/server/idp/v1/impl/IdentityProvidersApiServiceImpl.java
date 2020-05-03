@@ -25,11 +25,13 @@ import org.wso2.carbon.identity.api.server.idp.v1.IdentityProvidersApiService;
 import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementService;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.JustInTimeProvisioning;
 import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundConnectorPUTRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundProvisioningRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
 
@@ -218,6 +220,14 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     }
 
     @Override
+    public Response updateFederatedAuthenticators(String identityProviderId,
+                                                  FederatedAuthenticatorRequest federatedAuthenticatorRequest) {
+
+        return Response.ok().entity(idpManagementService.updateFederatedAuthenticators(identityProviderId,
+                federatedAuthenticatorRequest)).build();
+    }
+
+    @Override
     public Response updateIDPTemplate(String templateId, IdentityProviderTemplate
             identityProviderTemplatePOSTRequest) {
 
@@ -239,6 +249,14 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
         return Response.ok().entity(idpManagementService.updateOutboundConnector(identityProviderId,
                 outboundProvisioningConnectorId, outboundConnectorPUTRequest))
                 .build();
+    }
+
+    @Override
+    public Response updateOutboundConnectors(String identityProviderId,
+                                             OutboundProvisioningRequest outboundProvisioningRequest) {
+
+        return Response.ok().entity(idpManagementService.updateOutboundConnectors(identityProviderId,
+                outboundProvisioningRequest)).build();
     }
 
     @Override
