@@ -172,6 +172,8 @@ paths:
       operationId: listAuthenticators
       description: |
         List available local authenticators of the server
+      parameters:
+        - $ref: '#/components/parameters/typeQueryParam'
       responses:
         '200':
           description: Successful Response
@@ -268,6 +270,15 @@ components:
           authorizationUrl: 'https://localhost:9443/oauth2/authorize'
           tokenUrl: 'https://localhost:9443/oauth2/token'
           scopes: {}
+  parameters:
+    typeQueryParam:
+      in: query
+      name: type
+      required: false
+      description: |
+        Type of authenticators. Can be either 'LOCAL' or 'REQUEST_PATH'
+      schema:
+        type: string
   schemas:
     Error:
       type: object
@@ -351,6 +362,11 @@ components:
           type: boolean
           default: true
           example: true
+        type:
+          type: string
+          enum:
+            - LOCAL
+            - REQUEST_PATH
         self:
           type: string
           example: /t/carbon.super/api/server/v1/configs/authenticators/QmFzaWNBdXRoZW50aWNhdG9y
@@ -370,6 +386,11 @@ components:
         isEnabled:
           type: boolean
           default: true
+        type:
+          type: string
+          enum:
+            - LOCAL
+            - REQUEST_PATH
         properties:
           type: array
           items:
