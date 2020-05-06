@@ -18,20 +18,23 @@ package org.wso2.carbon.identity.api.server.common;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.jaxrs.impl.UriInfoImpl;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.core.ServiceURLBuilder;
+import org.wso2.carbon.identity.core.URLBuilderException;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import javax.ws.rs.core.UriInfo;
+
+import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.SERVER_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_CONTEXT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_NAME_FROM_CONTEXT;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
 
 /**
  * Load information from context.
@@ -69,13 +72,19 @@ public class ContextLoader {
      * Ex: /t/<tenant-domain>/api/users/<endpoint>
      *
      * @param endpoint relative endpoint path.
-     * @return Fully qualified URI.
+     * @return Relative URI.
      */
     public static URI buildURIForBody(String endpoint) {
 
-        String tenantQualifiedRelativePath =
-                String.format(TENANT_CONTEXT_PATH_COMPONENT, getTenantDomainFromContext()) + SERVER_API_PATH_COMPONENT;
-        String url = IdentityUtil.getEndpointURIPath(tenantQualifiedRelativePath + endpoint, true, true);
+        String url;
+        String context = getContext(endpoint);
+
+        try {
+            url = ServiceURLBuilder.create().addPath(context).build().getRelativePublicURL();
+        } catch (URLBuilderException e) {
+            String errorDescription = "Server encountered an error while building URL for response body.";
+            throw buildInternalServerError(e, errorDescription);
+        }
         return URI.create(url);
     }
 
@@ -88,24 +97,58 @@ public class ContextLoader {
      */
     public static URI buildURIForHeader(String endpoint) {
 
-        String tenantQualifiedRelativePath =
-                String.format(TENANT_CONTEXT_PATH_COMPONENT, getTenantDomainFromContext()) + SERVER_API_PATH_COMPONENT;
-        String url = IdentityUtil.getEndpointURIPath(tenantQualifiedRelativePath + endpoint, false, true);
+        URI loc;
+        String context = getContext(endpoint);
 
-        URI loc = URI.create(url);
-        if (!loc.isAbsolute()) {
-            Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
-            if (currentMessage != null) {
-                UriInfo ui = new UriInfoImpl(currentMessage.getExchange().getInMessage(), null);
-                try {
-                    return new URI(ui.getBaseUri().getScheme(), ui.getBaseUri().getAuthority(), url, null, null);
-                } catch (URISyntaxException e) {
-                    LOG.error("Server encountered an error while building the location URL with scheme: " +
-                            ui.getBaseUri().getScheme() + ", authority: " + ui.getBaseUri().getAuthority() +
-                            ", url: " + url, e);
-                }
-            }
+        try {
+            String url = ServiceURLBuilder.create().addPath(context).build().getAbsolutePublicURL();
+            loc = URI.create(url);
+        } catch (URLBuilderException e) {
+            String errorDescription = "Server encountered an error while building URL for response header.";
+            throw buildInternalServerError(e, errorDescription);
         }
         return loc;
+    }
+
+    /**
+     * Builds the API context on whether the tenant qualified url is enabled or not. In tenant qualified mode the
+     * ServiceURLBuilder appends the tenant domain to the URI as a path param automatically. But
+     * in non tenant qualified mode we need to append the tenant domain to the path manually.
+     *
+     * @param endpoint Relative endpoint path.
+     * @return Context of the API.
+     */
+    private static String getContext(String endpoint) {
+
+        String context;
+        if (IdentityTenantUtil.isTenantQualifiedUrlsEnabled()) {
+            context = SERVER_API_PATH_COMPONENT + endpoint;
+        } else {
+            context = String.format(TENANT_CONTEXT_PATH_COMPONENT, getTenantDomainFromContext()) +
+                    SERVER_API_PATH_COMPONENT + endpoint;
+        }
+        return context;
+    }
+
+    /**
+     * Builds APIError to be thrown if the URL building fails.
+     *
+     * @param e Exception occurred while building the URL.
+     * @param errorDescription Description of the error.
+     * @return APIError object which contains the error description.
+     */
+    private static APIError buildInternalServerError(Exception e, String errorDescription) {
+
+        String errorCode = UNEXPECTED_SERVER_ERROR.getCode();
+        String errorMessage = "Error while building response.";
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder().
+                withCode(errorCode)
+                .withMessage(errorMessage)
+                .withDescription(errorDescription)
+                .build(LOG, e, errorDescription);
+
+        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+        return new APIError(status, errorResponse);
     }
 }
