@@ -2496,18 +2496,19 @@ public class ServerIdpManagementService {
         for (Patch patch : patchRequest) {
             String path = patch.getPath();
             Patch.OperationEnum operation = patch.getOperation();
-            // We support only 'REPLACE' patch operation.
+            String value = patch.getValue();
+            // We support only 'ADD', 'REPLACE' and 'REMOVE' patch operations.
             if (operation == Patch.OperationEnum.REPLACE) {
-                String value = patch.getValue();
-                if (path.matches(Constants.CERTIFICATE_PATH_REGEX)) {
+                if (path.matches(Constants.CERTIFICATE_PATH_REGEX) && path.split(Constants.PATH_SEPERATOR).length ==
+                        4) {
                     List<String> certificates = new ArrayList<>();
                     int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
-                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index > 0)
-                            && (index <= idpToUpdate.getCertificateInfoArray().length)) {
+                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index >= 0)
+                            && (index < idpToUpdate.getCertificateInfoArray().length)) {
                         for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
                             certificates.add(certInfo.getCertValue());
                         }
-                        certificates.set(index - 1, value);
+                        certificates.set(index, value);
                         idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
                     } else {
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -2552,6 +2553,40 @@ public class ServerIdpManagementService {
                                     .ERROR_CODE_INVALID_INPUT, null);
                     }
                 }
+            } else if (operation == Patch.OperationEnum.ADD && path.matches(Constants.CERTIFICATE_PATH_REGEX) && path
+                    .split(Constants.PATH_SEPERATOR).length == 4) {
+                List<String> certificates = new ArrayList<>();
+                int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
+                if (index < 0) {
+                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                            .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+                }
+                if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
+                    if (index > idpToUpdate.getCertificateInfoArray().length) {
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+                    }
+                    for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
+                        certificates.add(certInfo.getCertValue());
+                    }
+                }
+                certificates.add(index, value);
+                idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
+            } else if (operation == Patch.OperationEnum.REMOVE && path.matches(Constants.CERTIFICATE_PATH_REGEX) &&
+                    path.split(Constants.PATH_SEPERATOR).length == 4) {
+                List<String> certificates = new ArrayList<>();
+                int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
+                if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index >= 0) && index <
+                        idpToUpdate.getCertificateInfoArray().length) {
+                    for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
+                        certificates.add(certInfo.getCertValue());
+                    }
+                    certificates.remove(index);
+                } else {
+                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                            .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+                }
+                idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
             } else {
                 // Throw an error if any other patch operations are sent in the request.
                 throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
