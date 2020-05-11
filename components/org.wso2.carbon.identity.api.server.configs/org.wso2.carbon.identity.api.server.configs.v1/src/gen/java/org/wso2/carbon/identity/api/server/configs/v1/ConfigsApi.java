@@ -137,9 +137,9 @@ public class ConfigsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response listAuthenticators() {
+    public Response listAuthenticators(    @Valid@ApiParam(value = "Type of authenticators. Can be either 'LOCAL' or 'REQUESTPATH' ")  @QueryParam("type") String type) {
 
-        return delegate.listAuthenticators();
+        return delegate.listAuthenticators(type );
     }
 
     @Valid

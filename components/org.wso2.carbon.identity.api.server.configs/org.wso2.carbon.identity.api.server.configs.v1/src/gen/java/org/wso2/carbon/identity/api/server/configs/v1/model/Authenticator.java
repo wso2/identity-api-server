@@ -37,6 +37,40 @@ public class Authenticator  {
     private String name;
     private String displayName;
     private Boolean isEnabled = true;
+
+@XmlType(name="TypeEnum")
+@XmlEnum(String.class)
+public enum TypeEnum {
+
+    @XmlEnumValue("LOCAL") LOCAL(String.valueOf("LOCAL")), @XmlEnumValue("REQUEST_PATH") REQUEST_PATH(String.valueOf("REQUEST_PATH"));
+
+
+    private String value;
+
+    TypeEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static TypeEnum fromValue(String value) {
+        for (TypeEnum b : TypeEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private TypeEnum type;
     private List<AuthenticatorProperty> properties = null;
 
 
@@ -118,6 +152,24 @@ public class Authenticator  {
 
     /**
     **/
+    public Authenticator type(TypeEnum type) {
+
+        this.type = type;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("type")
+    @Valid
+    public TypeEnum getType() {
+        return type;
+    }
+    public void setType(TypeEnum type) {
+        this.type = type;
+    }
+
+    /**
+    **/
     public Authenticator properties(List<AuthenticatorProperty> properties) {
 
         this.properties = properties;
@@ -158,12 +210,13 @@ public class Authenticator  {
             Objects.equals(this.name, authenticator.name) &&
             Objects.equals(this.displayName, authenticator.displayName) &&
             Objects.equals(this.isEnabled, authenticator.isEnabled) &&
+            Objects.equals(this.type, authenticator.type) &&
             Objects.equals(this.properties, authenticator.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, properties);
+        return Objects.hash(id, name, displayName, isEnabled, type, properties);
     }
 
     @Override
@@ -176,6 +229,7 @@ public class Authenticator  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();

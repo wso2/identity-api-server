@@ -46,6 +46,7 @@ import org.wso2.carbon.identity.application.common.model.IdentityProviderPropert
 import org.wso2.carbon.identity.application.common.model.InboundProvisioningConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.Property;
+import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationManagementUtil;
@@ -80,13 +81,22 @@ public class ServerConfigManagementService {
      *
      * @return List of authenticator basic information.
      */
-    public List<AuthenticatorListItem> getAuthenticators() {
+    public List<AuthenticatorListItem> getAuthenticators(String type) {
 
         try {
-            LocalAuthenticatorConfig[] authenticatorConfigs = ConfigsServiceHolder.getInstance()
-                    .getApplicationManagementService()
-                    .getAllLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
-            return buildAuthenticatorListResponse(authenticatorConfigs);
+            LocalAuthenticatorConfig[] localConfigs = null;
+            RequestPathAuthenticatorConfig[] requestPathConfigs = null;
+            if (StringUtils.isBlank(type) || type.equals(Authenticator.TypeEnum.LOCAL.value())) {
+                localConfigs = ConfigsServiceHolder.getInstance()
+                        .getApplicationManagementService()
+                        .getAllLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
+            }
+            if (StringUtils.isBlank(type) || type.equals(Authenticator.TypeEnum.REQUEST_PATH.value())) {
+                requestPathConfigs = ConfigsServiceHolder.getInstance()
+                        .getApplicationManagementService()
+                        .getAllRequestPathAuthenticators(ContextLoader.getTenantDomainFromContext());
+            }
+            return buildAuthenticatorListResponse(localConfigs, requestPathConfigs);
         } catch (IdentityApplicationManagementException e) {
             throw handleApplicationMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_AUTHENTICATORS,
                     null);
@@ -105,11 +115,19 @@ public class ServerConfigManagementService {
             LocalAuthenticatorConfig authenticatorConfig = getAuthenticatorById(
                     ConfigsServiceHolder.getInstance().getApplicationManagementService().getAllLocalAuthenticators(
                             ContextLoader.getTenantDomainFromContext()), authenticatorId);
-            if (authenticatorConfig == null) {
-                throw handleException(Response.Status.NOT_FOUND,
-                        Constants.ErrorMessage.ERROR_CODE_AUTHENTICATOR_NOT_FOUND, authenticatorId);
+            if (authenticatorConfig != null) {
+                return buildAuthenticatorResponse(authenticatorConfig);
             }
-            return buildAuthenticatorResponse(authenticatorConfig);
+
+            RequestPathAuthenticatorConfig requestPathConfig = getAuthenticatorById(ConfigsServiceHolder.getInstance
+                    ().getApplicationManagementService().getAllRequestPathAuthenticators(ContextLoader
+                    .getTenantDomainFromContext()), authenticatorId);
+            if (requestPathConfig != null) {
+                return buildAuthenticatorResponse(requestPathConfig);
+            }
+
+            throw handleException(Response.Status.NOT_FOUND,
+                    Constants.ErrorMessage.ERROR_CODE_AUTHENTICATOR_NOT_FOUND, authenticatorId);
         } catch (IdentityApplicationManagementException e) {
             throw handleApplicationMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_AUTHENTICATOR,
                     authenticatorId);
@@ -149,7 +167,7 @@ public class ServerConfigManagementService {
         serverConfig.setRememberMePeriod(rememberMePeriod);
         serverConfig.setHomeRealmIdentifiers(homeRealmIdentifiers);
         serverConfig.setProvisioning(buildProvisioningConfig());
-        serverConfig.setAuthenticators(getAuthenticators());
+        serverConfig.setAuthenticators(getAuthenticators(null));
         return serverConfig;
     }
 
@@ -229,17 +247,32 @@ public class ServerConfigManagementService {
     }
 
     private List<AuthenticatorListItem> buildAuthenticatorListResponse(
-            LocalAuthenticatorConfig[] authenticatorConfigs) {
+            LocalAuthenticatorConfig[] localConfigs, RequestPathAuthenticatorConfig[] requestPathConfigs) {
 
         List<AuthenticatorListItem> authenticatorListItems = new ArrayList<>();
-        if (authenticatorConfigs != null) {
-            for (LocalAuthenticatorConfig config : authenticatorConfigs) {
+        if (localConfigs != null) {
+            for (LocalAuthenticatorConfig config : localConfigs) {
                 AuthenticatorListItem authenticatorListItem = new AuthenticatorListItem();
                 String authenticatorId = base64URLEncode(config.getName());
                 authenticatorListItem.setId(authenticatorId);
                 authenticatorListItem.setName(config.getName());
                 authenticatorListItem.setDisplayName(config.getDisplayName());
                 authenticatorListItem.setIsEnabled(config.isEnabled());
+                authenticatorListItem.setType(AuthenticatorListItem.TypeEnum.LOCAL);
+                authenticatorListItem.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
+                        CONFIGS_AUTHENTICATOR_PATH_COMPONENT + PATH_SEPERATOR + "%s", authenticatorId)).toString());
+                authenticatorListItems.add(authenticatorListItem);
+            }
+        }
+        if (requestPathConfigs != null) {
+            for (RequestPathAuthenticatorConfig config : requestPathConfigs) {
+                AuthenticatorListItem authenticatorListItem = new AuthenticatorListItem();
+                String authenticatorId = base64URLEncode(config.getName());
+                authenticatorListItem.setId(authenticatorId);
+                authenticatorListItem.setName(config.getName());
+                authenticatorListItem.setDisplayName(config.getDisplayName());
+                authenticatorListItem.setIsEnabled(config.isEnabled());
+                authenticatorListItem.setType(AuthenticatorListItem.TypeEnum.REQUEST_PATH);
                 authenticatorListItem.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
                         CONFIGS_AUTHENTICATOR_PATH_COMPONENT + PATH_SEPERATOR + "%s", authenticatorId)).toString());
                 authenticatorListItems.add(authenticatorListItem);
@@ -258,7 +291,22 @@ public class ServerConfigManagementService {
             }
         }
         if (log.isDebugEnabled()) {
-            log.debug("Unable to find an authenticator with the name: " + authenticatorName);
+            log.debug("Unable to find a local authenticator with the name: " + authenticatorName);
+        }
+        return null;
+    }
+
+    private RequestPathAuthenticatorConfig getAuthenticatorById(RequestPathAuthenticatorConfig[] authenticatorConfigs,
+                                                          String authenticatorId) {
+
+        String authenticatorName = base64URLDecode(authenticatorId);
+        for (RequestPathAuthenticatorConfig config : authenticatorConfigs) {
+            if (StringUtils.equals(authenticatorName, config.getName())) {
+                return config;
+            }
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Unable to find a request path authenticator with the name: " + authenticatorName);
         }
         return null;
     }
@@ -270,6 +318,11 @@ public class ServerConfigManagementService {
         authenticator.setName(config.getName());
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setIsEnabled(config.isEnabled());
+        if (config instanceof RequestPathAuthenticatorConfig) {
+            authenticator.setType(Authenticator.TypeEnum.REQUEST_PATH);
+        } else {
+            authenticator.setType(Authenticator.TypeEnum.LOCAL);
+        }
         List<AuthenticatorProperty> authenticatorProperties =
                 Arrays.stream(config.getProperties()).map(propertyToExternal)
                         .collect(Collectors.toList());

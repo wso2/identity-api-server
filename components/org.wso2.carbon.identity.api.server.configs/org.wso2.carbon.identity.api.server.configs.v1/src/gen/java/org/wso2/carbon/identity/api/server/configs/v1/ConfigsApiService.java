@@ -39,7 +39,7 @@ public interface ConfigsApiService {
 
       public Response getInboundScimConfigs();
 
-      public Response listAuthenticators();
+      public Response listAuthenticators(String type);
 
       public Response patchConfigs(List<Patch> patch);
 
