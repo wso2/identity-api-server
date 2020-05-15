@@ -149,6 +149,12 @@ public class ServerApplicationManagementService {
     private static final String FILTER_CONTAINS = "co";
     private static final int DEFAULT_OFFSET = 0;
 
+    // WS-Trust and WS-Federation related constants.
+    private static final String WS_TRUST_TEMPLATE_ID = "061a3de4-8c08-4878-84a6-24245f11bf0e";
+    private static final String WS_FEDERATION_TEMPLATE_ID = "8ca3f88d-832e-451e-b421-d45b84abae80";
+    private static final String STS_TEMPLATE_NOT_FOUND_MESSAGE = "Request template with id: %s could " +
+            "not be found since the STS connector has not been configured.";
+
     static {
         SEARCH_SUPPORTED_FIELDS.add(APP_NAME);
     }
@@ -546,6 +552,8 @@ public class ServerApplicationManagementService {
             List<ApplicationTemplatesListItem> applicationTemplateList = templateList.stream().map(new
                     TemplateToApplicationTemplateListItem()).collect(Collectors.toList());
 
+            // Remove STS Templates if the STS functionality is not available.
+            removeSTSTemplates(applicationTemplateList);
             ApplicationTemplatesList applicationTemplates = new ApplicationTemplatesList();
             applicationTemplates.setTemplates(applicationTemplateList);
             return applicationTemplates;
@@ -693,6 +701,7 @@ public class ServerApplicationManagementService {
     public ApplicationTemplateModel getApplicationTemplateById(String templateId) {
 
         try {
+            validateSTSTemplateAvailability(templateId);
             return new TemplateToApplicationTemplate().apply(getTemplateManager().getTemplateById(templateId));
         } catch (TemplateManagementException e) {
             if (TemplateMgtConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode().equals(e.getErrorCode())) {
@@ -711,6 +720,7 @@ public class ServerApplicationManagementService {
     public void deleteApplicationTemplateById(String templateId) {
 
         try {
+            validateSTSTemplateAvailability(templateId);
             getTemplateManager().deleteTemplateById(templateId);
         } catch (TemplateManagementException e) {
             if (TemplateMgtConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode().equals(e.getErrorCode())) {
@@ -730,6 +740,7 @@ public class ServerApplicationManagementService {
     public void updateApplicationTemplateById(String templateId, ApplicationTemplateModel model) {
 
         try {
+            validateSTSTemplateAvailability(templateId);
             getTemplateManager().updateTemplateById(templateId,
                     new ApplicationTemplateApiModelToTemplate().apply(model));
         } catch (TemplateManagementException e) {
@@ -1056,6 +1067,63 @@ public class ServerApplicationManagementService {
             return String.format(description, formatData);
         } else {
             return description;
+        }
+    }
+
+    /**
+     * Check if the application templates list contains templates for WS-Trust or WS-Federation
+     * when STS functionality is not available and if templates exists then remove those.
+     */
+    private void removeSTSTemplates(List<ApplicationTemplatesListItem> applicationTemplateList) {
+
+        List<ApplicationTemplatesListItem> removableTemplate = new ArrayList<>();
+
+        for (ApplicationTemplatesListItem applicationTemplatesListItem : applicationTemplateList) {
+            if (applicationTemplatesListItem.getId().equals(WS_TRUST_TEMPLATE_ID) &&
+                    !isWSTrustAvailable() || applicationTemplatesListItem.getId().
+                    equals(WS_FEDERATION_TEMPLATE_ID) && !isWSFederationAvailable()) {
+                removableTemplate.add(applicationTemplatesListItem);
+            }
+        }
+
+        applicationTemplateList.removeAll(removableTemplate);
+    }
+
+    /**
+     * Check if the WS-Trust service is available.
+     *
+     * @return True if available, else false.
+     */
+    private boolean isWSTrustAvailable() {
+
+        return ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null;
+    }
+
+    /**
+     * Check if the WS-Federation service is available.
+     *
+     * @return True if available, else false.
+     */
+    private boolean isWSFederationAvailable() {
+
+        return ApplicationManagementServiceHolder.getInstance().getPassiveSTSService() != null;
+    }
+
+    /**
+     * Validates STS availability in application templates related operations.
+     *
+     * @param templateId Template Id of the template
+     * @throws TemplateManagementException If STS functionality is not available.
+     */
+    private void validateSTSTemplateAvailability(String templateId)
+            throws TemplateManagementException {
+
+        if (templateId.equals(WS_TRUST_TEMPLATE_ID) && !isWSTrustAvailable() ||
+                templateId.equals(WS_FEDERATION_TEMPLATE_ID) && !isWSFederationAvailable()) {
+
+            throw new TemplateManagementException(
+                    String.format(STS_TEMPLATE_NOT_FOUND_MESSAGE, templateId),
+                    TemplateMgtConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode());
         }
     }
 }
