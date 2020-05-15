@@ -61,6 +61,12 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     }
 
     @Override
+    public Response getPrimaryUserStore() {
+
+        return Response.ok().entity(serverUserStoreService.getPrimaryUserStore()).build();
+    }
+
+    @Override
     public Response getSecondaryUserStores(Integer limit, Integer offset, String filter, String sort,
                                            String requiredAttributes) {
 

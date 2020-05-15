@@ -17,21 +17,41 @@
 package org.wso2.carbon.identity.api.server.userstore.common;
 
 import org.wso2.carbon.identity.user.store.configuration.UserStoreConfigService;
+import org.wso2.carbon.user.core.service.RealmService;
 
 /**
  * Service holder class for User Store.
  */
 public class UserStoreConfigServiceHolder {
 
-    private static UserStoreConfigService userStoreConfigService;
+    private static UserStoreConfigServiceHolder instance = new UserStoreConfigServiceHolder();
+    private UserStoreConfigService userStoreConfigService;
+    private RealmService realmService;
 
-    public static UserStoreConfigService getUserStoreConfigService() {
+    private UserStoreConfigServiceHolder() {}
 
-        return userStoreConfigService;
+    public static UserStoreConfigServiceHolder getInstance() {
+
+        return instance;
     }
 
-    public static void setUserStoreConfigService(UserStoreConfigService userStoreConfigService) {
+    public UserStoreConfigService getUserStoreConfigService() {
 
-        UserStoreConfigServiceHolder.userStoreConfigService = userStoreConfigService;
+        return UserStoreConfigServiceHolder.getInstance().userStoreConfigService;
+    }
+
+    public void setUserStoreConfigService(UserStoreConfigService userStoreConfigService) {
+
+        UserStoreConfigServiceHolder.getInstance().userStoreConfigService = userStoreConfigService;
+    }
+
+    public RealmService getRealmService() {
+
+        return UserStoreConfigServiceHolder.getInstance().realmService;
+    }
+
+    public void setRealmService(RealmService realmService) {
+
+        UserStoreConfigServiceHolder.getInstance().realmService = realmService;
     }
 }
