@@ -53,9 +53,9 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
-    public Response listAuthenticators() {
+    public Response listAuthenticators(String type) {
 
-        return Response.ok().entity(configManagementService.getAuthenticators()).build();
+        return Response.ok().entity(configManagementService.getAuthenticators(type)).build();
     }
 
     @Override

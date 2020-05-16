@@ -34,6 +34,40 @@ public class AuthenticatorListItem  {
     private String name;
     private String displayName;
     private Boolean isEnabled = true;
+
+@XmlType(name="TypeEnum")
+@XmlEnum(String.class)
+public enum TypeEnum {
+
+    @XmlEnumValue("LOCAL") LOCAL(String.valueOf("LOCAL")), @XmlEnumValue("REQUEST_PATH") REQUEST_PATH(String.valueOf("REQUEST_PATH"));
+
+
+    private String value;
+
+    TypeEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static TypeEnum fromValue(String value) {
+        for (TypeEnum b : TypeEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private TypeEnum type;
     private String self;
 
     /**
@@ -110,6 +144,24 @@ public class AuthenticatorListItem  {
 
     /**
     **/
+    public AuthenticatorListItem type(TypeEnum type) {
+
+        this.type = type;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("type")
+    @Valid
+    public TypeEnum getType() {
+        return type;
+    }
+    public void setType(TypeEnum type) {
+        this.type = type;
+    }
+
+    /**
+    **/
     public AuthenticatorListItem self(String self) {
 
         this.self = self;
@@ -142,12 +194,13 @@ public class AuthenticatorListItem  {
             Objects.equals(this.name, authenticatorListItem.name) &&
             Objects.equals(this.displayName, authenticatorListItem.displayName) &&
             Objects.equals(this.isEnabled, authenticatorListItem.isEnabled) &&
+            Objects.equals(this.type, authenticatorListItem.type) &&
             Objects.equals(this.self, authenticatorListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, self);
+        return Objects.hash(id, name, displayName, isEnabled, type, self);
     }
 
     @Override
@@ -160,6 +213,7 @@ public class AuthenticatorListItem  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
