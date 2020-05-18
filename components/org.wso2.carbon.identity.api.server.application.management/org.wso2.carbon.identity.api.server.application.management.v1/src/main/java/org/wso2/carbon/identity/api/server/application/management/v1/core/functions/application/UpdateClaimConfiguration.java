@@ -172,7 +172,10 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
     private RoleMapping buildRoleMapping(
             org.wso2.carbon.identity.api.server.application.management.v1.RoleMapping roleMapping) {
 
-        return new RoleMapping(new LocalRole(roleMapping.getLocalRole()), roleMapping.getApplicationRole());
+        LocalRole localRole = new LocalRole();
+        localRole.setLocalRoleName(roleMapping.getLocalRole());
+
+        return new RoleMapping(localRole, roleMapping.getApplicationRole());
     }
 
     private PermissionsAndRoleConfig getPermissionAndRoleConfig(ServiceProvider application) {
