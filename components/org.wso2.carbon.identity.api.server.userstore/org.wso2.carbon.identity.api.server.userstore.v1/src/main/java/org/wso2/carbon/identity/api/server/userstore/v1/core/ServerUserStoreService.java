@@ -17,6 +17,7 @@
 package org.wso2.carbon.identity.api.server.userstore.v1.core;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -50,6 +51,9 @@ import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStore
 import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreServerException;
 import org.wso2.carbon.user.api.Properties;
 import org.wso2.carbon.user.api.Property;
+import org.wso2.carbon.user.api.RealmConfiguration;
+import org.wso2.carbon.user.core.UserCoreConstants;
+import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
 
 import java.nio.charset.StandardCharsets;
@@ -74,6 +78,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 public class ServerUserStoreService {
 
     private static final Log LOG = LogFactory.getLog(ServerUserStoreService.class);
+    private static UserStoreConfigurationsRes primaryUserstoreConfigs = null;
 
     /**
      * Add a userStore {@link UserStoreReq}.
@@ -85,7 +90,8 @@ public class ServerUserStoreService {
 
         try {
             validateMandatoryProperties(getUserStoreType(base64URLDecodeId(userStoreReq.getTypeId())), userStoreReq);
-            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
+            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
+                    .getUserStoreConfigService();
             userStoreConfigService.addUserStore(createUserStoreDTO(userStoreReq));
             return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
@@ -103,7 +109,7 @@ public class ServerUserStoreService {
     public void deleteUserStore(String userstoreDomainId) {
 
         try {
-            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.
+            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().getInstance().
                     getUserStoreConfigService();
             userStoreConfigService.deleteUserStore(base64URLDecodeId(userstoreDomainId));
         } catch (IdentityUserStoreClientException e) {
@@ -126,7 +132,7 @@ public class ServerUserStoreService {
      */
     public UserStoreResponse editUserStore(String domainId, UserStoreReq userStoreReq) {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.
+        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
                 getUserStoreConfigService();
         //domainName and typeName are not allowed to edit. iF domain name wanted to update then use
         // userStoreConfigService.updateUserStoreByDomainName(base64URLDecodeId(domainId),
@@ -148,7 +154,7 @@ public class ServerUserStoreService {
      */
     public List<AvailableUserStoreClassesRes> getAvailableUserStoreTypes() {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.
+        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
                 getUserStoreConfigService();
         Set<String> classNames;
         try {
@@ -188,7 +194,8 @@ public class ServerUserStoreService {
 
         handleNotImplementedBehaviour(limit, offset, filter, sort);
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
+        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
+                .getUserStoreConfigService();
         try {
             UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
             return buildUserStoreListResponse(userStoreDTOS, requiredAttributes);
@@ -201,6 +208,42 @@ public class ServerUserStoreService {
     }
 
     /**
+     * Retrieve primary user store.
+     *
+     * @return UserStoreConfigurationsRes.
+     */
+    public UserStoreConfigurationsRes getPrimaryUserStore() {
+
+        if (primaryUserstoreConfigs == null) {
+            RealmService realmService = UserStoreConfigServiceHolder.getInstance().getRealmService();
+            RealmConfiguration realmConfiguration = realmService.getBootstrapRealmConfiguration();
+            if (realmConfiguration == null) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
+                        ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE);
+            }
+            List<AddUserStorePropertiesRes> propertiesTobeAdd = new ArrayList<>();
+            primaryUserstoreConfigs = new UserStoreConfigurationsRes();
+            primaryUserstoreConfigs.setClassName(realmConfiguration.getUserStoreClass());
+            primaryUserstoreConfigs.setDescription(realmConfiguration.getDescription());
+            primaryUserstoreConfigs.setName(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME);
+            primaryUserstoreConfigs.setTypeId(base64URLEncodeId(Objects.requireNonNull
+                    (getUserStoreTypeName(realmConfiguration.getUserStoreClass()))));
+            primaryUserstoreConfigs.setTypeName(getUserStoreTypeName(realmConfiguration.getUserStoreClass()));
+            Map<String, String> userstoreProps = realmConfiguration.getUserStoreProperties();
+            if (MapUtils.isNotEmpty(userstoreProps)) {
+                for (String propKey : userstoreProps.keySet()) {
+                    AddUserStorePropertiesRes userStorePropertiesRes = new AddUserStorePropertiesRes();
+                    userStorePropertiesRes.setName(propKey);
+                    userStorePropertiesRes.setValue(userstoreProps.get(propKey));
+                    propertiesTobeAdd.add(userStorePropertiesRes);
+                }
+            }
+            primaryUserstoreConfigs.setProperties(propertiesTobeAdd);
+        }
+        return primaryUserstoreConfigs;
+    }
+
+    /**
      * Retrieve user store by its domain id.
      *
      * @param domainId the user store domain id.
@@ -208,7 +251,8 @@ public class ServerUserStoreService {
      */
     public UserStoreConfigurationsRes getUserStoreByDomainId(String domainId) {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
+        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
+                .getUserStoreConfigService();
         List<AddUserStorePropertiesRes> propertiesTobeAdd = new ArrayList<>();
         try {
             UserStoreDTO userStoreDTO = userStoreConfigService.getUserStore(base64URLDecodeId(domainId));
@@ -249,7 +293,8 @@ public class ServerUserStoreService {
 
     public MetaUserStoreType getUserStoreManagerProperties(String typeId) {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
+        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
+                .getUserStoreConfigService();
         Set<String> classNames;
         try {
             classNames = userStoreConfigService.getAvailableUserStoreClasses();
@@ -275,7 +320,8 @@ public class ServerUserStoreService {
      */
     public ConnectionEstablishedResponse testRDBMSConnection(RDBMSConnectionReq rdBMSConnectionReq) {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
+        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
+                .getUserStoreConfigService();
         ConnectionEstablishedResponse connectionEstablishedResponse = new ConnectionEstablishedResponse();
         boolean isConnectionEstablished;
         connectionEstablishedResponse.setConnection(false);
@@ -323,7 +369,8 @@ public class ServerUserStoreService {
      */
     private UserStoreResponse performPatchReplace(String domainId, String path, String value) {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
+        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
+                .getUserStoreConfigService();
         try {
             UserStoreDTO userStoreDTO = userStoreConfigService.getUserStore(base64URLDecodeId(domainId));
             if (userStoreDTO == null) {

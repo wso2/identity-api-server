@@ -26,7 +26,10 @@
     <bean id="userStoreConfigServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.userstore.common.UserStoreConfigServiceHolder">
         <property name="userStoreConfigService" ref="userStoreConfigServiceFactoryBean"/>
+        <property name="realmService" ref="RealmServiceFactoryBean"/>
     </bean>
     <bean id="userStoreConfigServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.userstore.common.factory.UserStoreConfigServiceFactory"/>
+    <bean id="RealmServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.userstore.common.factory.RealmServiceFactory"/>
 </beans>
