@@ -118,6 +118,28 @@ public class UserstoresApi  {
 
     @Valid
     @GET
+    @Path("/primary")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the configurations of primary userstore.", notes = "This API provides the capability to retrieve the configurations of primary user store.    <b>Permission required:</b> *_/permission/admin ", response = UserStoreConfigurationsRes.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "User Store", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response.", response = UserStoreConfigurationsRes.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response getPrimaryUserStore() {
+
+        return delegate.getPrimaryUserStore();
+    }
+
+    @Valid
+    @GET
     
     
     @Produces({ "application/json" })
@@ -182,7 +204,7 @@ public class UserstoresApi  {
     })
     public Response getUserStoreManagerProperties(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId) {
 
-        return delegate.getUserStoreManagerProperties(typeId);
+        return delegate.getUserStoreManagerProperties(typeId );
     }
 
     @Valid
