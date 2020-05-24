@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
@@ -28,6 +29,7 @@ import org.wso2.carbon.identity.application.common.model.LocalRole;
 import org.wso2.carbon.identity.application.common.model.PermissionsAndRoleConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 
 import java.util.Map;
 import java.util.Optional;
@@ -182,7 +184,17 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
     private RoleMapping buildRoleMapping(
             org.wso2.carbon.identity.api.server.application.management.v1.RoleMapping roleMapping) {
 
-        return new RoleMapping(new LocalRole(roleMapping.getLocalRole()), roleMapping.getApplicationRole());
+        String localRoleName = roleMapping.getLocalRole();
+        /*
+        For the local roles with userstore domain prepended to the role name, the domain name should not be
+        removed from the role name since userstore domain of a role is identified via the given role name. If the
+        domain name is not available in the role, the role's domain will be considered as PRIMARY.
+        */
+        if (localRoleName.contains(CarbonConstants.DOMAIN_SEPARATOR)) {
+            String userStoreId = IdentityUtil.extractDomainFromName(localRoleName);
+            return new RoleMapping(new LocalRole(userStoreId, localRoleName), roleMapping.getApplicationRole());
+        }
+        return new RoleMapping(new LocalRole(localRoleName), roleMapping.getApplicationRole());
     }
 
     private PermissionsAndRoleConfig getPermissionAndRoleConfig(ServiceProvider application) {
