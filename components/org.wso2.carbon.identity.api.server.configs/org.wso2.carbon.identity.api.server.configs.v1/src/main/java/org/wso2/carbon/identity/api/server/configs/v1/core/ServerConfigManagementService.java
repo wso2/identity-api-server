@@ -398,7 +398,7 @@ public class ServerConfigManagementService {
                 if (ArrayUtils.isNotEmpty(homeRealmArr) && (index >= 0) && index <= homeRealmArr.length) {
                     homeRealmIds = new ArrayList<>(Arrays.asList(homeRealmArr));
                     homeRealmIds.add(index, value);
-                } else if (homeRealmArr == null && index == 0) {
+                } else if (index == 0) {
                     homeRealmIds = new ArrayList<>();
                     homeRealmIds.add(value);
                 } else {
