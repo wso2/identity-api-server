@@ -68,18 +68,12 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
         }
     }
 
-    private boolean isRevertToDefaultSequence(AuthenticationSequence authSequenceApiModel,
-                                              LocalAndOutboundAuthenticationConfig localAndOutboundConfig) {
-
-        String currentAuthenticationType = localAndOutboundConfig.getAuthenticationType();
-        return authSequenceApiModel.getType() == AuthenticationSequence.TypeEnum.DEFAULT &&
-                !currentAuthenticationType.equalsIgnoreCase(AuthenticationSequence.TypeEnum.DEFAULT.toString());
-    }
-
     private void updateAdaptiveAuthenticationScript(AuthenticationSequence authSequenceApiModel,
                                                     LocalAndOutboundAuthenticationConfig localAndOutboundConfig) {
 
-        if (StringUtils.isNotBlank(authSequenceApiModel.getScript())) {
+        if (isRevertToDefaultSequence(authSequenceApiModel, localAndOutboundConfig)) {
+            localAndOutboundConfig.setAuthenticationScriptConfig(null);
+        } else if (StringUtils.isNotBlank(authSequenceApiModel.getScript())) {
             AuthenticationScriptConfig adaptiveScript = new AuthenticationScriptConfig();
             adaptiveScript.setContent(authSequenceApiModel.getScript());
 
@@ -204,5 +198,13 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
         }
 
         return application.getLocalAndOutBoundAuthenticationConfig();
+    }
+
+    private boolean isRevertToDefaultSequence(AuthenticationSequence authSequenceApiModel,
+                                              LocalAndOutboundAuthenticationConfig localAndOutboundConfig) {
+
+        String currentAuthenticationType = localAndOutboundConfig.getAuthenticationType();
+        return authSequenceApiModel.getType() == AuthenticationSequence.TypeEnum.DEFAULT &&
+                !currentAuthenticationType.equalsIgnoreCase(AuthenticationSequence.TypeEnum.DEFAULT.toString());
     }
 }
