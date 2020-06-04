@@ -58,11 +58,15 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
     private void updateAuthenticationSteps(AuthenticationSequence authSequenceApiModel,
                                            LocalAndOutboundAuthenticationConfig localAndOutboundConfig) {
 
-        if (authSequenceApiModel.getType() != AuthenticationSequence.TypeEnum.DEFAULT) {
+        String currentAuthenticationType = localAndOutboundConfig.getAuthenticationType();
+        if (authSequenceApiModel.getType() != AuthenticationSequence.TypeEnum.DEFAULT ||
+                !currentAuthenticationType.equalsIgnoreCase(AuthenticationSequence.TypeEnum.DEFAULT.toString())) {
 
             AuthenticationStep[] authenticationSteps = getAuthenticationSteps(authSequenceApiModel);
 
-            localAndOutboundConfig.setAuthenticationType(ApplicationConstants.AUTH_TYPE_FLOW);
+            localAndOutboundConfig.setAuthenticationType(
+                    authSequenceApiModel.getType() == AuthenticationSequence.TypeEnum.DEFAULT ?
+                            ApplicationConstants.AUTH_TYPE_DEFAULT : ApplicationConstants.AUTH_TYPE_FLOW);
             localAndOutboundConfig.setAuthenticationSteps(authenticationSteps);
         } else {
             // We don't have to worry about setting authentication steps and related configs
