@@ -58,19 +58,22 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
     private void updateAuthenticationSteps(AuthenticationSequence authSequenceApiModel,
                                            LocalAndOutboundAuthenticationConfig localAndOutboundConfig) {
 
-        String currentAuthenticationType = localAndOutboundConfig.getAuthenticationType();
-        if (authSequenceApiModel.getType() != AuthenticationSequence.TypeEnum.DEFAULT ||
-                !currentAuthenticationType.equalsIgnoreCase(AuthenticationSequence.TypeEnum.DEFAULT.toString())) {
-
-            AuthenticationStep[] authenticationSteps = getAuthenticationSteps(authSequenceApiModel);
-
-            localAndOutboundConfig.setAuthenticationType(
-                    authSequenceApiModel.getType() == AuthenticationSequence.TypeEnum.DEFAULT ?
-                            ApplicationConstants.AUTH_TYPE_DEFAULT : ApplicationConstants.AUTH_TYPE_FLOW);
-            localAndOutboundConfig.setAuthenticationSteps(authenticationSteps);
+        if (isRevertToDefaultSequence(authSequenceApiModel, localAndOutboundConfig)) {
+            localAndOutboundConfig.setAuthenticationType(ApplicationConstants.AUTH_TYPE_DEFAULT);
+            localAndOutboundConfig.setAuthenticationSteps(new AuthenticationStep[0]);
         } else {
-            // We don't have to worry about setting authentication steps and related configs
+            AuthenticationStep[] authenticationSteps = getAuthenticationSteps(authSequenceApiModel);
+            localAndOutboundConfig.setAuthenticationType(ApplicationConstants.AUTH_TYPE_FLOW);
+            localAndOutboundConfig.setAuthenticationSteps(authenticationSteps);
         }
+    }
+
+    private boolean isRevertToDefaultSequence(AuthenticationSequence authSequenceApiModel,
+                                              LocalAndOutboundAuthenticationConfig localAndOutboundConfig) {
+
+        String currentAuthenticationType = localAndOutboundConfig.getAuthenticationType();
+        return authSequenceApiModel.getType() == AuthenticationSequence.TypeEnum.DEFAULT &&
+                !currentAuthenticationType.equalsIgnoreCase(AuthenticationSequence.TypeEnum.DEFAULT.toString());
     }
 
     private void updateAdaptiveAuthenticationScript(AuthenticationSequence authSequenceApiModel,
