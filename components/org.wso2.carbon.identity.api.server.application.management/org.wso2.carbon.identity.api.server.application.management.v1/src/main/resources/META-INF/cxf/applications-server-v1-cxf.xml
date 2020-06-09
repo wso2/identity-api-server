@@ -34,10 +34,6 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
         <property name="stsAdminService" ref="stsAdminServiceFactoryBean"/>
     </bean>
-    <bean id="passiveSTSServiceHolderBean"
-          class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
-        <property name="passiveSTSService" ref="passiveSTSAdminServiceFactoryBean"/>
-    </bean>
     <bean id="samlSsoConfigServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
         <property name="samlssoConfigService" ref="samlSsoConfigServiceFactoryBean"/>
@@ -54,8 +50,6 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.OAuthAdminOSGiServiceFactory"/>
     <bean id="stsAdminServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.STSAdminOSGiServiceFactory"/>
-    <bean id="passiveSTSAdminServiceFactoryBean"
-          class="org.wso2.carbon.identity.api.server.application.management.common.factory.PassiveSTSOSGiServiceFactory"/>
     <bean id="samlSsoConfigServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.SAMLSSOConfigOSGiServiceFactory"/>
     <bean id="templateManagerServiceFactoryBean"

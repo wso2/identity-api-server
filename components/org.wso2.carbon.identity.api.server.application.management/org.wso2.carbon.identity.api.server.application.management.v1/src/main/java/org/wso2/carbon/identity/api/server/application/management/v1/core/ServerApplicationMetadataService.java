@@ -212,7 +212,7 @@ public class ServerApplicationMetadataService {
 
         WSTrustMetaData wsTrustMetaData = new WSTrustMetaData();
         try {
-            // Check if the STS functionality is deployed.
+            // Check if WS-Trust is deployed.
             if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
                 wsTrustMetaData.setCertificateAlias(new MetadataProperty()
                         .defaultValue(null)
@@ -223,7 +223,7 @@ public class ServerApplicationMetadataService {
             }
         } catch (SecurityConfigException e) {
             if (e.getMessage().equals(ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND.getDescription())) {
-                // Throw 404 error since the STS functionality is not available.
+                // Throw 404 error since the WS-Trust connector is not available.
                 throw handleNotFoundError(e);
             } else {
                 throw handleException(e);

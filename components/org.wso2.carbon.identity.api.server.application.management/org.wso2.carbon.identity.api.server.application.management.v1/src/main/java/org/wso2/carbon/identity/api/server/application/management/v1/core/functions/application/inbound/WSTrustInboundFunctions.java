@@ -53,12 +53,12 @@ public class WSTrustInboundFunctions {
                     // We do not allow the inbound unique key to be changed during an update.
                     throw buildBadRequestError("Invalid audience value provided for update.");
                 }
-                // Check if the STS functionality is deployed.
+                // Check if WS-Trust is deployed.
                 if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
                     ApplicationManagementServiceHolder.getInstance().getStsAdminService()
                             .removeTrustedService(inboundAuthKey);
                 } else {
-                    // Throw 404 error since the STS functionality is not available.
+                    // Throw 404 error since the WS-Trust connector is not available.
                     throw buildNotFoundError(ERROR_CODE, ERROR_MESSAGE, ERROR_DESCRIPTION);
                 }
             }
@@ -78,7 +78,7 @@ public class WSTrustInboundFunctions {
     public static InboundAuthenticationRequestConfig createWsTrustInbound(WSTrustConfiguration wsTrustConfiguration) {
 
         try {
-            // Check if the STS functionality is deployed.
+            // Check if WS-Trust is deployed.
             if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
                 ApplicationManagementServiceHolder.getInstance().getStsAdminService()
                         .addTrustedService(wsTrustConfiguration.getAudience(),
@@ -89,12 +89,12 @@ public class WSTrustInboundFunctions {
                 wsTrustInbound.setInboundAuthKey(wsTrustConfiguration.getAudience());
                 return wsTrustInbound;
             } else {
-                // Throw 401 error since the STS functionality is not available.
+                // Throw 401 error since the WS-Trust connector is not available.
                 throw buildBadRequestError(ERROR_DESCRIPTION);
             }
 
         } catch (SecurityConfigException e) {
-            // Error while adding WS Trust, we can't continue
+            // Error while adding WS Trust, we can't continue.
             throw buildServerError("Error while adding WSTrust configuration. " + e.getMessage(), e);
         }
     }
@@ -106,12 +106,12 @@ public class WSTrustInboundFunctions {
 
             TrustedServiceData[] trustedServices;
 
-            // Check if the STS functionality is deployed.
+            // Check if WS-Trust is deployed.
             if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
                 trustedServices =
                         ApplicationManagementServiceHolder.getInstance().getStsAdminService().getTrustedServices();
             } else {
-                // Throw 404 error since the STS functionality is not available.
+                // Throw 404 error since the WS-Trust connector is not available.
                 throw buildNotFoundError(ERROR_CODE, ERROR_MESSAGE, ERROR_DESCRIPTION);
             }
 
@@ -133,12 +133,12 @@ public class WSTrustInboundFunctions {
         try {
             String trustedServiceAudience = inbound.getInboundAuthKey();
 
-            // Check if the STS functionality is deployed.
+            // Check if WS-Trust is deployed.
             if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
                 ApplicationManagementServiceHolder.getInstance().getStsAdminService()
                         .removeTrustedService(trustedServiceAudience);
             } else {
-                // Throw 404 error since the STS functionality is not available.
+                // Throw 404 error since the WS-Trust connector is not available.
                 throw buildNotFoundError(ERROR_CODE, ERROR_MESSAGE, ERROR_DESCRIPTION);
             }
 
