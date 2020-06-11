@@ -1,0 +1,443 @@
+openapi: 3.0.0
+info:
+  version: 'v1'
+  title: 'WSO2 Identity Server - Media Service API'
+  description: 'This is the RESTful API for file upload/download in WSO2 Identity Server'
+  contact:
+    name: WSO2 Identity Server
+    url: 'https://wso2.com/identity-and-access-management'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: https://localhost:9443/t/{tenant-domain}/api/server/v1/
+    variables:
+      tenant-domain:
+        default: carbon.super
+
+paths:
+
+  /media/user/{type}:
+    post:
+      tags:
+        - Media
+      summary: A privileged user uploads a single resource file or multiple representations of a single resource and metadata associated with the resource file(s).
+      operationId: uploadFile
+      security:
+        - BasicAuth: []
+        - OAuth2: []
+      parameters:
+        - $ref: '#/components/parameters/typeParam'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResourceFiles'
+      responses:
+        '201':
+          description: File(s) uploaded successfully.
+          headers:
+            Location:
+              description: The location of the newly uploaded file. If multiple files uploaded then the base location of the uploaded files will be returned as the location header.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultipleFilesUploadResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
+  /media/me/{type}:
+    post:
+      tags:
+        - Media
+      summary: A user uploads a single resource file or multiple representations of a single resource and metadata associated with the resource file(s).
+      operationId: uploadMyFile
+      security:
+        - BasicAuth: []
+        - OAuth2: []
+      parameters:
+        - $ref: '#/components/parameters/typeParam'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResourceFiles'
+      responses:
+        '201':
+          description: File(s) uploaded successfully.
+          headers:
+            Location:
+              description: The location of the newly uploaded file. If multiple files uploaded then the base location of the uploaded files will be returned as the location header.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultipleFilesUploadResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
+  /media/user/{type}/{id}/data:
+    get:
+      tags:
+        - Media
+      summary: A privileged user downloads a file.
+      operationId: downloadFile
+      security:
+        - BasicAuth: []
+        - OAuth2: []
+      parameters:
+        - in: query
+          name: identifier
+          schema:
+            type: string
+          example: 'identifier'
+        - $ref: '#/components/parameters/typeParam'
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: File downloaded successfully.
+          headers:
+            Content-Type:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/DownloadFile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
+    delete:
+      tags:
+        - Media
+      summary: A privileged user deletes a resource file.
+      operationId: deleteFile
+      security:
+        - BasicAuth: []
+        - OAuth2: []
+      parameters:
+        - $ref: '#/components/parameters/typeParam'
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '204':
+          description: Resource file and metadata deleted successfully.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
+  /media/me/{type}/{id}/data:
+    get:
+      tags:
+        - Media
+      summary: A user downloads a file.
+      operationId: downloadMyFile
+      security:
+        - BasicAuth: []
+        - OAuth2: []
+      parameters:
+        - in: query
+          name: identifier
+          schema:
+            type: string
+          example: 'medium'
+        - $ref: '#/components/parameters/typeParam'
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: File downloaded successfully.
+          headers:
+            Content-Type:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/DownloadFile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
+    delete:
+      tags:
+        - Media
+      summary: A user deletes a file.
+      operationId: deleteMyFile
+      security:
+        - BasicAuth: []
+        - OAuth2: []
+      parameters:
+        - $ref: '#/components/parameters/typeParam'
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '204':
+          description: Resource file and metadata deleted successfully.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
+  /media/public/{type}/{id}/data:
+    get:
+      tags:
+        - Media
+      summary: Download a publically available file.
+      operationId: downloadPublicFile
+      parameters:
+        - in: query
+          name: identifier
+          schema:
+            type: string
+          example: 'medium'
+        - $ref: '#/components/parameters/typeParam'
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200':
+          description: File downloaded successfully.
+          headers:
+            Content-Type:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/DownloadFile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+
+components:
+  parameters:
+    idParam:
+      in: path
+      name: id
+      description: Unique identifier for the file.
+      required: true
+      schema:
+        type: string
+      example: 6e41cb95-c3b3-4e6c-928a-acb1b88e991d
+    typeParam:
+      in: path
+      name: type
+      description: The file type.
+      required: true
+      schema:
+        type: string
+      example: image
+
+  schemas:
+    # Multiple file uploads will not be supported in the first phase of the implementation.
+    ResourceFiles:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+        metadata:
+          type: object
+          properties:
+            fileTag:
+              $ref: '#/components/schemas/FileTag'
+            fileSecurity:
+              type: object
+              properties:
+                allowedAll:
+                  $ref: '#/components/schemas/AllowedAll'
+                allowedUsers:
+                  $ref: '#/components/schemas/AllowedUsers'
+                allowedScopes:
+                  $ref: '#/components/schemas/AllowedScopes'
+            fileIdentifiers:
+              $ref: '#/components/schemas/FileIdentifiers'
+      required:
+        - files
+
+    FileTag:
+      type: string
+      example: 'user'
+      description: The file tag.
+
+    AllowedAll:
+      type: boolean
+      description: Defines whether the file is publically available for access or has restricted access.
+      example: false
+
+    AllowedUsers:
+      type: array
+      description: The set of users entitled to access the file.
+      items:
+        type: string
+      example: ['user1', 'user2']
+
+    AllowedScopes:
+      type: array
+      description: Allowed set of scopes to access the file.
+      items:
+        type: string
+      example: ['internal_login']
+
+    FileIdentifiers:
+      type: array
+      items:
+        type: string
+      example: ['large', 'medium', 'small']
+
+    # Multiple file uploads will not be supported in the first phase of the implementation.
+    MultipleFilesUploadResponse:
+      type: object
+      description: Location of each file uploaded in a scenario where multiple representations of a single resource is uploaded.
+      properties:
+        links:
+          type: array
+          items:
+            type: string
+          example: ['https://localhost:9443/t/carbon.super/api/server/v1/media/image/6e41cb95-c3b3-4e6c-928a-acb1b88e991d/data?identifier=large', 'https://localhost:9443/t/carbon.super/api/server/v1/media/image/6e41cb95-c3b3-4e6c-928a-acb1b88e991d/data?identifier=medium']
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: MS0001
+          description: An error code.
+        message:
+          type: string
+          example: Some Error Message
+          description: An error message.
+        description:
+          type: string
+          example: Some Error Description
+          description: An error description.
+        traceId:
+          type: string
+          example: TR0001
+          description: An error trace identifier.
+    DownloadFile:
+      type: string
+      format: binary
+
+  #-----------------------------------------------------
+  # Descriptions of media service API responses.
+  #-----------------------------------------------------
+  responses:
+    BadRequest:
+      description: Invalid input in the request.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Requested resource is not found.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Authentication information is missing or invalid.
+    Forbidden:
+      description: Access forbidden.
+    ServerError:
+      description: Internal server error.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotImplemented:
+      description: Not implemented.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  #-----------------------------------------------------
+  # Applicable authentication mechanisms.
+  #-----------------------------------------------------
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth/authorize'
+          tokenUrl: 'https://localhost:9443/oauth/token'
+          scopes: {}
