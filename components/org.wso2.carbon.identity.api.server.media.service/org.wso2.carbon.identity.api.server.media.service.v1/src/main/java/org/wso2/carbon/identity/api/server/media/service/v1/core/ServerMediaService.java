@@ -62,15 +62,21 @@ public class ServerMediaService {
 
         if (resourceFilesMetadata != null) {
             mediaMetadata.setFileTag(resourceFilesMetadata.getFileTag());
-            FileSecurity fileSecurity;
+            FileSecurity fileSecurity = null;
             if (onlyEndUserAccess) {
                 ArrayList<String> users = new ArrayList<>();
                 users.add(ContextLoader.getUsernameFromContext());
                 fileSecurity = new FileSecurity(false, users, null);
             } else {
                 ResourceFilesMetadataFileSecurity fileSecurityMeta = resourceFilesMetadata.getFileSecurity();
-                fileSecurity = new FileSecurity(fileSecurityMeta.getAllowedAll(),
-                        fileSecurityMeta.getAllowedUsers(), fileSecurityMeta.getAllowedScopes());
+                if (fileSecurityMeta != null) {
+                    if (fileSecurityMeta.getAllowedAll()) {
+                        fileSecurity = new FileSecurity(true, null, null);
+                    } else {
+                        fileSecurity = new FileSecurity(false, fileSecurityMeta.getAllowedUsers(),
+                                fileSecurityMeta.getAllowedScopes());
+                    }
+                }
             }
             mediaMetadata.setFileSecurity(fileSecurity);
         }
@@ -91,13 +97,6 @@ public class ServerMediaService {
                                      Response.Status status) {
 
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, e, errorEnum.getDescription());
-        return new APIError(status, errorResponse);
-    }
-
-    private APIError handleBadRequestException(MediaServiceConstants.ErrorMessage error, String data) {
-
-        Response.Status status = Response.Status.BAD_REQUEST;
-        ErrorResponse errorResponse = getErrorBuilder(error, data).build(LOG, error.getDescription());
         return new APIError(status, errorResponse);
     }
 

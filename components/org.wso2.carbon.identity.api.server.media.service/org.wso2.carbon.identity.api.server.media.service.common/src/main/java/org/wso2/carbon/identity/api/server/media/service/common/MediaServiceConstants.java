@@ -23,6 +23,10 @@ import java.util.ArrayList;
  */
 public class MediaServiceConstants {
 
+    private MediaServiceConstants() {
+
+    }
+
     private static final String MEDIA_SERVICE = "MED-";
     public static final String MEDIA_SERVICE_PATH_COMPONENT = "/media";
     public static final String DATA_PATH_COMPONENT = "/data";
