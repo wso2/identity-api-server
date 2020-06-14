@@ -112,7 +112,7 @@ public class MediaApiServiceImpl implements MediaApiService {
     private URI getResourceLocation(String id, String type, String accessLevel) {
 
         return buildURIForHeader(String.format(V1_API_PATH_COMPONENT + MEDIA_SERVICE_PATH_COMPONENT + "/%s/%s/%s" +
-                DATA_PATH_COMPONENT, type, accessLevel, id));
+                DATA_PATH_COMPONENT, accessLevel, type, id));
     }
 
     private String getMediaAccessLevel(ResourceFilesMetadata metadata) {
