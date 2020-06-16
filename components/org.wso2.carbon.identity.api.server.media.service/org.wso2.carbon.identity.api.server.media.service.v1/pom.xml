@@ -171,5 +171,10 @@
             <artifactId>org.wso2.carbon.identity.api.server.media.service.common</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.auth.rest</groupId>
+            <artifactId>org.wso2.carbon.identity.auth.service</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

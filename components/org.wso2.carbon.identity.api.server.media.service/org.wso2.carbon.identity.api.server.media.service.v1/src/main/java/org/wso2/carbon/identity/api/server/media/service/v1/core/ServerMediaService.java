@@ -20,6 +20,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
@@ -27,6 +28,7 @@ import org.wso2.carbon.identity.api.server.media.service.common.MediaServiceCons
 import org.wso2.carbon.identity.api.server.media.service.common.MediaServiceDataHolder;
 import org.wso2.carbon.identity.api.server.media.service.v1.model.ResourceFilesMetadata;
 import org.wso2.carbon.identity.api.server.media.service.v1.model.ResourceFilesMetadataFileSecurity;
+import org.wso2.carbon.identity.media.DataContent;
 import org.wso2.carbon.identity.media.StorageSystemManager;
 import org.wso2.carbon.identity.media.exception.StorageSystemException;
 import org.wso2.carbon.identity.media.model.FileSecurity;
@@ -93,6 +95,38 @@ public class ServerMediaService {
         }
     }
 
+    /**
+     * Method to download the media from file system.
+     *
+     * @param id   Unique identifier for the uploaded media file.
+     * @param type The high level content-type of the resource (if media content-type is image/png then
+     *             type would be image).
+     * @return requested media file.
+     */
+    public DataContent downloadMedia(String type, String id) {
+
+        StorageSystemManager storageSystemManager = MediaServiceDataHolder.getStorageSystemManager();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            DataContent dataContent = storageSystemManager.readContent(id, tenantDomain, type);
+            if (dataContent == null) {
+                throw handleException(Response.Status.NOT_FOUND,
+                        MediaServiceConstants.ErrorMessage.ERROR_CODE_ERROR_DOWNLOADING_MEDIA_FILE_NOT_FOUND, id);
+            }
+            return dataContent;
+        } catch (StorageSystemException e) {
+            MediaServiceConstants.ErrorMessage errorMessage = MediaServiceConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_DOWNLOADING_MEDIA;
+            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            throw handleException(e, errorMessage, status);
+        }
+    }
+
+    private APIError handleException(Response.Status status, MediaServiceConstants.ErrorMessage error, String data) {
+
+        return new APIError(status, getErrorBuilder(error, data).build());
+    }
+
     private APIError handleException(Exception e, MediaServiceConstants.ErrorMessage errorEnum,
                                      Response.Status status) {
 
@@ -109,13 +143,8 @@ public class ServerMediaService {
     private String buildErrorDescription(MediaServiceConstants.ErrorMessage error, String... data) {
 
         String errorDescription;
-
         if (ArrayUtils.isNotEmpty(data)) {
-            if (data.length == 1) {
-                errorDescription = String.format(error.getDescription(), (Object) data);
-            } else {
-                errorDescription = String.format(error.getDescription(), (Object[]) data);
-            }
+            errorDescription = String.format(error.getDescription(), data);
         } else {
             errorDescription = error.getDescription();
         }

@@ -60,8 +60,20 @@ public class MediaServiceConstants {
      */
     public enum ErrorMessage {
 
+        // Client errors.
+        ERROR_CODE_ERROR_UPLOADING_MEDIA_INVALID_CONTENT_TYPE("60001", "Unable to upload the provided" +
+                " media.", "Unconventional file content type: %s passed as metadata while uploading the media."),
+        ERROR_CODE_ERROR_DOWNLOADING_MEDIA_FILE_NOT_FOUND("60002", "Unable to download the requested" +
+                " media.", "File with id: %s not found."),
+
+        // Server errors.
         ERROR_CODE_ERROR_UPLOADING_MEDIA("65001", "Unable to upload the provided media.",
-                "Server encountered an error while uploading the media.");
+                "Server encountered an error while uploading the media."),
+        ERROR_CODE_ERROR_EVALUATING_ACCESS_SECURITY("65002", "Unable to evaluate access security for " +
+                "the requested media.", "Server encountered an error while evaluating security access to " +
+                "the media."),
+        ERROR_CODE_ERROR_DOWNLOADING_MEDIA("65002", "Unable to download the specified media.",
+                "Server encountered an " + "error while downloading the media.");
 
         private final String code;
         private final String message;

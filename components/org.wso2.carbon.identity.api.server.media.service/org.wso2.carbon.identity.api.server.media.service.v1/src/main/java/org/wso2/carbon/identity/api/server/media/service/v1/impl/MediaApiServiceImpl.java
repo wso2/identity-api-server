@@ -16,15 +16,20 @@
 
 package org.wso2.carbon.identity.api.server.media.service.v1.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.media.service.v1.MediaApiService;
 import org.wso2.carbon.identity.api.server.media.service.v1.core.ServerMediaService;
 import org.wso2.carbon.identity.api.server.media.service.v1.model.ResourceFilesMetadata;
+import org.wso2.carbon.identity.media.DataContent;
+import org.wso2.carbon.identity.media.FileContent;
+import org.wso2.carbon.identity.media.StreamContent;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
@@ -59,19 +64,19 @@ public class MediaApiServiceImpl implements MediaApiService {
     @Override
     public Response downloadFile(String type, String id, String identifier) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return downloadMedia(type, id, identifier);
     }
 
     @Override
     public Response downloadMyFile(String type, String id, String identifier) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return downloadMedia(type, id, identifier);
     }
 
     @Override
     public Response downloadPublicFile(String type, String id, String identifier) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        return downloadMedia(type, id, identifier);
     }
 
     @Override
@@ -121,6 +126,28 @@ public class MediaApiServiceImpl implements MediaApiService {
             return ACCESS_LEVEL_PUBLIC_PATH_COMPONENT;
         }
         return ACCESS_LEVEL_USER_PATH_COMPONENT;
+    }
+
+    private Response downloadMedia(String type, String id, String identifier) {
+
+        // Retrieving a sub-representation of a media is not supported during the first phase of the implementation.
+        if (StringUtils.isNotBlank(identifier)) {
+            return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        }
+
+        DataContent resource = serverMediaService.downloadMedia(type, id);
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setMaxAge(86400);
+        cacheControl.setPrivate(true);
+
+        if (resource instanceof FileContent) {
+            return Response.ok(((FileContent) resource).getFile()).header("Content-Type", ((FileContent) resource)
+                    .getResponseContentType()).cacheControl(cacheControl).build();
+        } else if (resource instanceof StreamContent) {
+            return Response.ok().entity(((StreamContent) resource).getInputStream()).header("Content-Type",
+                    ((StreamContent) resource).getResponseContentType()).cacheControl(cacheControl).build();
+        }
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
 
 }
