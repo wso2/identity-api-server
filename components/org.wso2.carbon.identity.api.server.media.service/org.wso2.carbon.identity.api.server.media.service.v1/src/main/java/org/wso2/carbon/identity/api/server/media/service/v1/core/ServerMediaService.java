@@ -20,14 +20,13 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants;
 import org.wso2.carbon.identity.api.server.media.service.common.MediaServiceDataHolder;
 import org.wso2.carbon.identity.api.server.media.service.v1.model.ResourceFilesMetadata;
-import org.wso2.carbon.identity.api.server.media.service.v1.model.ResourceFilesMetadataFileSecurity;
+import org.wso2.carbon.identity.api.server.media.service.v1.model.ResourceFilesMetadataSecurity;
 import org.wso2.carbon.identity.media.DataContent;
 import org.wso2.carbon.identity.media.StorageSystemManager;
 import org.wso2.carbon.identity.media.exception.StorageSystemException;
@@ -49,28 +48,28 @@ public class ServerMediaService {
     /**
      * Upload media.
      *
-     * @param filesInputStream      The list of files to be uploaded as input streams.
-     * @param filesDetail           File details of the list of files to be uploaded.
-     * @param resourceFilesMetadata Metadata associated with the file upload.
-     * @param onlyEndUserAccess     If the resource is end-user protected.
+     * @param filesInputStream           The list of files to be uploaded as input streams.
+     * @param filesDetail                File details of the list of files to be uploaded.
+     * @param resourceFilesMetadata      Metadata associated with the file upload.
+     * @param isEndUserProtectedResource If the resource can be accessed only by the user uploading the media.
      * @return unique identifier of the uploaded media.
      */
     public String uploadMedia(List<InputStream> filesInputStream, List<Attachment> filesDetail,
-                              ResourceFilesMetadata resourceFilesMetadata, boolean onlyEndUserAccess) {
+                              ResourceFilesMetadata resourceFilesMetadata, boolean isEndUserProtectedResource) {
 
         MediaMetadata mediaMetadata = new MediaMetadata();
         mediaMetadata.setFileName(filesDetail.get(0).getContentDisposition().getFilename());
         mediaMetadata.setFileContentType(filesDetail.get(0).getContentType().toString());
 
         if (resourceFilesMetadata != null) {
-            mediaMetadata.setFileTag(resourceFilesMetadata.getFileTag());
+            mediaMetadata.setFileTag(resourceFilesMetadata.getTag());
             FileSecurity fileSecurity = null;
-            if (onlyEndUserAccess) {
+            if (isEndUserProtectedResource) {
                 ArrayList<String> users = new ArrayList<>();
                 users.add(ContextLoader.getUsernameFromContext());
                 fileSecurity = new FileSecurity(false, users, null);
             } else {
-                ResourceFilesMetadataFileSecurity fileSecurityMeta = resourceFilesMetadata.getFileSecurity();
+                ResourceFilesMetadataSecurity fileSecurityMeta = resourceFilesMetadata.getSecurity();
                 if (fileSecurityMeta != null) {
                     if (fileSecurityMeta.getAllowedAll()) {
                         fileSecurity = new FileSecurity(true, null, null);
@@ -106,7 +105,7 @@ public class ServerMediaService {
     public DataContent downloadMedia(String type, String id) {
 
         StorageSystemManager storageSystemManager = MediaServiceDataHolder.getStorageSystemManager();
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             DataContent dataContent = storageSystemManager.readContent(id, tenantDomain, type);
             if (dataContent == null) {

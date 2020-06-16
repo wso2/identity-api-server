@@ -311,9 +311,9 @@ components:
         metadata:
           type: object
           properties:
-            fileTag:
-              $ref: '#/components/schemas/FileTag'
-            fileSecurity:
+            tag:
+              $ref: '#/components/schemas/Tag'
+            security:
               type: object
               properties:
                 allowedAll:
@@ -322,12 +322,12 @@ components:
                   $ref: '#/components/schemas/AllowedUsers'
                 allowedScopes:
                   $ref: '#/components/schemas/AllowedScopes'
-            fileIdentifiers:
-              $ref: '#/components/schemas/FileIdentifiers'
+            identifiers:
+              $ref: '#/components/schemas/Identifiers'
       required:
         - files
 
-    FileTag:
+    Tag:
       type: string
       example: 'user'
       description: The file tag.
@@ -351,7 +351,7 @@ components:
         type: string
       example: ['internal_login']
 
-    FileIdentifiers:
+    Identifiers:
       type: array
       items:
         type: string

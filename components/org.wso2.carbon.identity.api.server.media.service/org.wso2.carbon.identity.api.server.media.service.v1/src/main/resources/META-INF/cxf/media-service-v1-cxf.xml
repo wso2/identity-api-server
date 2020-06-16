@@ -21,7 +21,7 @@
 
     <bean class="org.wso2.carbon.identity.api.server.media.service.v1.impl.MediaApiServiceImpl"/>
     <bean class="org.wso2.carbon.identity.api.server.media.service.v1.core.ServerMediaService"/>
-    <bean id="imageServiceHolderBean"
+    <bean id="mediaServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.media.service.common.MediaServiceDataHolder">
         <property name="storageSystemManager" ref="storageSystemfactoryFactoryBean"/>
     </bean>

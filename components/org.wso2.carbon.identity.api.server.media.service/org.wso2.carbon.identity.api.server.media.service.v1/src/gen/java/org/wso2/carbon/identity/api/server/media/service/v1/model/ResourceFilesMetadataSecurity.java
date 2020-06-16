@@ -17,20 +17,14 @@
 package org.wso2.carbon.identity.api.server.media.service.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.constraints.*;
-
-
-import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
 
-public class ResourceFilesMetadataFileSecurity  {
+public class ResourceFilesMetadataSecurity  {
   
     private Boolean allowedAll;
     private List<String> allowedUsers = null;
@@ -41,7 +35,7 @@ public class ResourceFilesMetadataFileSecurity  {
     /**
     * Defines whether the file is publically available for access or has restricted access.
     **/
-    public ResourceFilesMetadataFileSecurity allowedAll(Boolean allowedAll) {
+    public ResourceFilesMetadataSecurity allowedAll(Boolean allowedAll) {
 
         this.allowedAll = allowedAll;
         return this;
@@ -60,7 +54,7 @@ public class ResourceFilesMetadataFileSecurity  {
     /**
     * The set of users entitled to access the file.
     **/
-    public ResourceFilesMetadataFileSecurity allowedUsers(List<String> allowedUsers) {
+    public ResourceFilesMetadataSecurity allowedUsers(List<String> allowedUsers) {
 
         this.allowedUsers = allowedUsers;
         return this;
@@ -76,7 +70,7 @@ public class ResourceFilesMetadataFileSecurity  {
         this.allowedUsers = allowedUsers;
     }
 
-    public ResourceFilesMetadataFileSecurity addAllowedUsersItem(String allowedUsersItem) {
+    public ResourceFilesMetadataSecurity addAllowedUsersItem(String allowedUsersItem) {
         if (this.allowedUsers == null) {
             this.allowedUsers = new ArrayList<>();
         }
@@ -87,7 +81,7 @@ public class ResourceFilesMetadataFileSecurity  {
         /**
     * Allowed set of scopes to access the file.
     **/
-    public ResourceFilesMetadataFileSecurity allowedScopes(List<String> allowedScopes) {
+    public ResourceFilesMetadataSecurity allowedScopes(List<String> allowedScopes) {
 
         this.allowedScopes = allowedScopes;
         return this;
@@ -103,7 +97,7 @@ public class ResourceFilesMetadataFileSecurity  {
         this.allowedScopes = allowedScopes;
     }
 
-    public ResourceFilesMetadataFileSecurity addAllowedScopesItem(String allowedScopesItem) {
+    public ResourceFilesMetadataSecurity addAllowedScopesItem(String allowedScopesItem) {
         if (this.allowedScopes == null) {
             this.allowedScopes = new ArrayList<>();
         }
@@ -122,10 +116,10 @@ public class ResourceFilesMetadataFileSecurity  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ResourceFilesMetadataFileSecurity resourceFilesMetadataFileSecurity = (ResourceFilesMetadataFileSecurity) o;
-        return Objects.equals(this.allowedAll, resourceFilesMetadataFileSecurity.allowedAll) &&
-            Objects.equals(this.allowedUsers, resourceFilesMetadataFileSecurity.allowedUsers) &&
-            Objects.equals(this.allowedScopes, resourceFilesMetadataFileSecurity.allowedScopes);
+        ResourceFilesMetadataSecurity resourceFilesMetadataSecurity = (ResourceFilesMetadataSecurity) o;
+        return Objects.equals(this.allowedAll, resourceFilesMetadataSecurity.allowedAll) &&
+            Objects.equals(this.allowedUsers, resourceFilesMetadataSecurity.allowedUsers) &&
+            Objects.equals(this.allowedScopes, resourceFilesMetadataSecurity.allowedScopes);
     }
 
     @Override
@@ -137,7 +131,7 @@ public class ResourceFilesMetadataFileSecurity  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ResourceFilesMetadataFileSecurity {\n");
+        sb.append("class ResourceFilesMetadataSecurity {\n");
         
         sb.append("    allowedAll: ").append(toIndentedString(allowedAll)).append("\n");
         sb.append("    allowedUsers: ").append(toIndentedString(allowedUsers)).append("\n");

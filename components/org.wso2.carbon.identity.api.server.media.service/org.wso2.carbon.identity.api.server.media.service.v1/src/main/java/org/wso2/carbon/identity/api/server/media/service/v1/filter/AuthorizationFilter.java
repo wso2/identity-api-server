@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.media.service.v1.filter;
 
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -47,7 +48,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
 
-        if (containerRequestContext.getMethod().equals("GET")) {
+        if (containerRequestContext.getMethod().equals(HTTPConstants.HTTP_METHOD_GET)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Evaluating access based security for media download request.");
             }

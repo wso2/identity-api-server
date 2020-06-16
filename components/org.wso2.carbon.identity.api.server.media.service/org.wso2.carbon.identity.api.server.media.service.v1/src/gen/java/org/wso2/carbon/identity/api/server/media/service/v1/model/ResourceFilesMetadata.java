@@ -17,87 +17,80 @@
 package org.wso2.carbon.identity.api.server.media.service.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.media.service.v1.model.ResourceFilesMetadataFileSecurity;
-import javax.validation.constraints.*;
-
-
-import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
 
 public class ResourceFilesMetadata  {
   
-    private String fileTag;
-    private ResourceFilesMetadataFileSecurity fileSecurity;
-    private List<String> fileIdentifiers = null;
+    private String tag;
+    private ResourceFilesMetadataSecurity security;
+    private List<String> identifiers = null;
 
 
     /**
     * The file tag.
     **/
-    public ResourceFilesMetadata fileTag(String fileTag) {
+    public ResourceFilesMetadata tag(String tag) {
 
-        this.fileTag = fileTag;
+        this.tag = tag;
         return this;
     }
     
     @ApiModelProperty(example = "user", value = "The file tag.")
-    @JsonProperty("fileTag")
+    @JsonProperty("tag")
     @Valid
-    public String getFileTag() {
-        return fileTag;
+    public String getTag() {
+        return tag;
     }
-    public void setFileTag(String fileTag) {
-        this.fileTag = fileTag;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     /**
     **/
-    public ResourceFilesMetadata fileSecurity(ResourceFilesMetadataFileSecurity fileSecurity) {
+    public ResourceFilesMetadata security(ResourceFilesMetadataSecurity security) {
 
-        this.fileSecurity = fileSecurity;
+        this.security = security;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("fileSecurity")
+    @JsonProperty("security")
     @Valid
-    public ResourceFilesMetadataFileSecurity getFileSecurity() {
-        return fileSecurity;
+    public ResourceFilesMetadataSecurity getSecurity() {
+        return security;
     }
-    public void setFileSecurity(ResourceFilesMetadataFileSecurity fileSecurity) {
-        this.fileSecurity = fileSecurity;
+    public void setSecurity(ResourceFilesMetadataSecurity security) {
+        this.security = security;
     }
 
     /**
     **/
-    public ResourceFilesMetadata fileIdentifiers(List<String> fileIdentifiers) {
+    public ResourceFilesMetadata identifiers(List<String> identifiers) {
 
-        this.fileIdentifiers = fileIdentifiers;
+        this.identifiers = identifiers;
         return this;
     }
     
     @ApiModelProperty(example = "[\"large\",\"medium\",\"small\"]", value = "")
-    @JsonProperty("fileIdentifiers")
+    @JsonProperty("identifiers")
     @Valid
-    public List<String> getFileIdentifiers() {
-        return fileIdentifiers;
+    public List<String> getIdentifiers() {
+        return identifiers;
     }
-    public void setFileIdentifiers(List<String> fileIdentifiers) {
-        this.fileIdentifiers = fileIdentifiers;
+    public void setIdentifiers(List<String> identifiers) {
+        this.identifiers = identifiers;
     }
 
-    public ResourceFilesMetadata addFileIdentifiersItem(String fileIdentifiersItem) {
-        if (this.fileIdentifiers == null) {
-            this.fileIdentifiers = new ArrayList<>();
+    public ResourceFilesMetadata addIdentifiersItem(String identifiersItem) {
+        if (this.identifiers == null) {
+            this.identifiers = new ArrayList<>();
         }
-        this.fileIdentifiers.add(fileIdentifiersItem);
+        this.identifiers.add(identifiersItem);
         return this;
     }
 
@@ -113,14 +106,14 @@ public class ResourceFilesMetadata  {
             return false;
         }
         ResourceFilesMetadata resourceFilesMetadata = (ResourceFilesMetadata) o;
-        return Objects.equals(this.fileTag, resourceFilesMetadata.fileTag) &&
-            Objects.equals(this.fileSecurity, resourceFilesMetadata.fileSecurity) &&
-            Objects.equals(this.fileIdentifiers, resourceFilesMetadata.fileIdentifiers);
+        return Objects.equals(this.tag, resourceFilesMetadata.tag) &&
+            Objects.equals(this.security, resourceFilesMetadata.security) &&
+            Objects.equals(this.identifiers, resourceFilesMetadata.identifiers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fileTag, fileSecurity, fileIdentifiers);
+        return Objects.hash(tag, security, identifiers);
     }
 
     @Override
@@ -129,9 +122,9 @@ public class ResourceFilesMetadata  {
         StringBuilder sb = new StringBuilder();
         sb.append("class ResourceFilesMetadata {\n");
         
-        sb.append("    fileTag: ").append(toIndentedString(fileTag)).append("\n");
-        sb.append("    fileSecurity: ").append(toIndentedString(fileSecurity)).append("\n");
-        sb.append("    fileIdentifiers: ").append(toIndentedString(fileIdentifiers)).append("\n");
+        sb.append("    tag: ").append(toIndentedString(tag)).append("\n");
+        sb.append("    security: ").append(toIndentedString(security)).append("\n");
+        sb.append("    identifiers: ").append(toIndentedString(identifiers)).append("\n");
         sb.append("}");
         return sb.toString();
     }

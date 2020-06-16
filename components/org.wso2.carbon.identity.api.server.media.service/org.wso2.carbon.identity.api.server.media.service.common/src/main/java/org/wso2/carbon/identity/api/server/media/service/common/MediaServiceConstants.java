@@ -69,11 +69,10 @@ public class MediaServiceConstants {
         // Server errors.
         ERROR_CODE_ERROR_UPLOADING_MEDIA("65001", "Unable to upload the provided media.",
                 "Server encountered an error while uploading the media."),
-        ERROR_CODE_ERROR_EVALUATING_ACCESS_SECURITY("65002", "Unable to evaluate access security for " +
-                "the requested media.", "Server encountered an error while evaluating security access to " +
-                "the media."),
-        ERROR_CODE_ERROR_DOWNLOADING_MEDIA("65002", "Unable to download the specified media.",
-                "Server encountered an " + "error while downloading the media.");
+        ERROR_CODE_ERROR_EVALUATING_ACCESS_SECURITY("65002", "Unable to evaluate access security for the" +
+                " requested media.", "Server encountered an error while evaluating security access to the media."),
+        ERROR_CODE_ERROR_DOWNLOADING_MEDIA("65003", "Unable to download the specified media.",
+                "Server encountered an error while downloading the media.");
 
         private final String code;
         private final String message;

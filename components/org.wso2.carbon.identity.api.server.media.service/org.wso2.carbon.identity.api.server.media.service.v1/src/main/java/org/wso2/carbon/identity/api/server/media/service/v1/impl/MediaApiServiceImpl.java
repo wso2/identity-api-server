@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.media.service.v1.impl;
 
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,7 +123,7 @@ public class MediaApiServiceImpl implements MediaApiService {
 
     private String getMediaAccessLevel(ResourceFilesMetadata metadata) {
 
-        if (metadata != null && metadata.getFileSecurity() != null && metadata.getFileSecurity().getAllowedAll()) {
+        if (metadata != null && metadata.getSecurity() != null && metadata.getSecurity().getAllowedAll()) {
             return ACCESS_LEVEL_PUBLIC_PATH_COMPONENT;
         }
         return ACCESS_LEVEL_USER_PATH_COMPONENT;
@@ -141,11 +142,12 @@ public class MediaApiServiceImpl implements MediaApiService {
         cacheControl.setPrivate(true);
 
         if (resource instanceof FileContent) {
-            return Response.ok(((FileContent) resource).getFile()).header("Content-Type", ((FileContent) resource)
-                    .getResponseContentType()).cacheControl(cacheControl).build();
+            return Response.ok(((FileContent) resource).getFile()).header(HTTPConstants.HEADER_CONTENT_TYPE,
+                    ((FileContent) resource).getResponseContentType()).cacheControl(cacheControl).build();
         } else if (resource instanceof StreamContent) {
-            return Response.ok().entity(((StreamContent) resource).getInputStream()).header("Content-Type",
-                    ((StreamContent) resource).getResponseContentType()).cacheControl(cacheControl).build();
+            return Response.ok().entity(((StreamContent) resource).getInputStream()).header(
+                    HTTPConstants.HEADER_CONTENT_TYPE, ((StreamContent) resource).getResponseContentType())
+                    .cacheControl(cacheControl).build();
         }
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }

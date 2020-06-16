@@ -23,15 +23,35 @@ import org.wso2.carbon.identity.media.StorageSystemManager;
  */
 public class MediaServiceDataHolder {
 
-    private static StorageSystemManager storageSystemManager;
+    private static MediaServiceDataHolder instance = new MediaServiceDataHolder();
+    private StorageSystemManager storageSystemManager;
 
-    public static StorageSystemManager getStorageSystemManager() {
+    private MediaServiceDataHolder() {
 
-        return storageSystemManager;
     }
 
+    public static MediaServiceDataHolder getInstance() {
+
+        return instance;
+    }
+
+    /**
+     * Get StorageSystemManager osgi service.
+     *
+     * @return StorageSystemManager
+     */
+    public static StorageSystemManager getStorageSystemManager() {
+
+        return MediaServiceDataHolder.getInstance().storageSystemManager;
+    }
+
+    /**
+     * Set StorageSystemManager osgi service.
+     *
+     * @param storageSystemManager StorageSystemManager.
+     */
     public static void setStorageSystemManager(StorageSystemManager storageSystemManager) {
 
-        MediaServiceDataHolder.storageSystemManager = storageSystemManager;
+        MediaServiceDataHolder.getInstance().storageSystemManager = storageSystemManager;
     }
 }
