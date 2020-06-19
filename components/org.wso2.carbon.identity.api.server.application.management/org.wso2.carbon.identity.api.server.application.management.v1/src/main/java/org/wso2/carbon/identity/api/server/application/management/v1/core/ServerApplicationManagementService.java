@@ -867,8 +867,7 @@ public class ServerApplicationManagementService {
                     throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
                 }
             } catch (IOException | IdentityException e) {
-                throw buildClientError(ApplicationManagementConstants.ErrorMessage
-                        .ERROR_CODE_ERROR_INVALID_SEARCH_FILTER, null);
+                throw buildClientError(ApplicationManagementConstants.ErrorMessage.INVALID_FILTER_FORMAT, null);
             }
         } else {
             return null;
