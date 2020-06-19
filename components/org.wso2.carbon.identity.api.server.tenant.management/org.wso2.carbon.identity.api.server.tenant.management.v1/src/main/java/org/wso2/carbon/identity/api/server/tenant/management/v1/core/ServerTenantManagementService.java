@@ -45,7 +45,10 @@ import org.wso2.carbon.user.core.tenant.TenantSearchResult;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +56,10 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.TENANT_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants
+        .TENANT_MANAGEMENT_PATH_COMPONENT;
+
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
 /**
  * Call internal osgi services to perform server tenant management related operations.
@@ -179,7 +185,7 @@ public class ServerTenantManagementService {
     private TenantResponseModel createTenantResponse(Tenant tenant) {
 
         TenantResponseModel tenantResponseModel = new TenantResponseModel();
-        tenantResponseModel.setCreatedDate(tenant.getCreatedDate().toString());
+        tenantResponseModel.setCreatedDate(getISOFormatDate(tenant.getCreatedDate()));
         tenantResponseModel.setDomain(tenant.getDomain());
         tenantResponseModel.setId(tenant.getTenantUniqueID());
         tenantResponseModel.setLifecycleStatus(getLifeCycleStatus(tenant.isActive()));
@@ -255,7 +261,7 @@ public class ServerTenantManagementService {
         for (Tenant tenant : tenants) {
             TenantListItem listItem = new TenantListItem();
             listItem.setLifecycleStatus(getLifeCycleStatus(tenant.isActive()));
-            listItem.setCreatedDate(tenant.getCreatedDate().toString());
+            listItem.setCreatedDate(getISOFormatDate(tenant.getCreatedDate()));
             listItem.setDomain(tenant.getDomain());
             listItem.setId(tenant.getTenantUniqueID());
             listItem.setOwners(getOwnerResponses(tenant));
@@ -434,4 +440,16 @@ public class ServerTenantManagementService {
         }
     }
 
+    /**
+     * Convert {@link Date} instance to ISO-8601 format string.
+     *
+     * @param date Date instance to be converted.
+     * @return ISO-8601 representation of the date.
+     */
+    private String getISOFormatDate(Date date) {
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())
+                                                   .withZoneSameInstant(ZoneId.of("UTC"));
+        return ISO_OFFSET_DATE_TIME.format(zonedDateTime);
+    }
 }
