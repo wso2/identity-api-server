@@ -17,6 +17,7 @@
 package org.wso2.carbon.identity.api.server.media.service.common;
 
 import org.wso2.carbon.identity.media.StorageSystemManager;
+import org.wso2.carbon.user.core.service.RealmService;
 
 /**
  * OSGi service holder class for media service.
@@ -25,6 +26,7 @@ public class MediaServiceDataHolder {
 
     private static MediaServiceDataHolder instance = new MediaServiceDataHolder();
     private StorageSystemManager storageSystemManager;
+    private RealmService realmService;
 
     private MediaServiceDataHolder() {
 
@@ -40,7 +42,7 @@ public class MediaServiceDataHolder {
      *
      * @return StorageSystemManager
      */
-    public static StorageSystemManager getStorageSystemManager() {
+    public StorageSystemManager getStorageSystemManager() {
 
         return MediaServiceDataHolder.getInstance().storageSystemManager;
     }
@@ -50,8 +52,28 @@ public class MediaServiceDataHolder {
      *
      * @param storageSystemManager StorageSystemManager.
      */
-    public static void setStorageSystemManager(StorageSystemManager storageSystemManager) {
+    public void setStorageSystemManager(StorageSystemManager storageSystemManager) {
 
         MediaServiceDataHolder.getInstance().storageSystemManager = storageSystemManager;
+    }
+
+    /**
+     * Get RealmService osgi service.
+     *
+     * @return RealmService
+     */
+    public RealmService getRealmService() {
+
+        return MediaServiceDataHolder.getInstance().realmService;
+    }
+
+    /**
+     * Set RealmService osgi service.
+     *
+     * @param realmService RealmService.
+     */
+    public void setRealmService(RealmService realmService) {
+
+        MediaServiceDataHolder.getInstance().realmService = realmService;
     }
 }

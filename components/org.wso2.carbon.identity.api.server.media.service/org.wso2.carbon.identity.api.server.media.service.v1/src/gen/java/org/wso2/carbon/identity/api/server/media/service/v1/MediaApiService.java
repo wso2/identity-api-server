@@ -16,32 +16,30 @@
 
 package org.wso2.carbon.identity.api.server.media.service.v1;
 
-import org.wso2.carbon.identity.api.server.media.service.v1.*;
-import org.wso2.carbon.identity.api.server.media.service.v1.model.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import org.wso2.carbon.identity.api.server.media.service.v1.model.MyResourceFilesMetadata;
+import org.wso2.carbon.identity.api.server.media.service.v1.model.ResourceFilesMetadata;
+
 import java.io.InputStream;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.media.service.v1.model.Error;
-import java.io.File;
-import org.wso2.carbon.identity.api.server.media.service.v1.model.MultipleFilesUploadResponse;
-import org.wso2.carbon.identity.api.server.media.service.v1.model.ResourceFilesMetadata;
 import javax.ws.rs.core.Response;
 
 
 public interface MediaApiService {
 
-      public Response deleteFile(String type, String id);
+      public Response deleteMedia(String type, String id);
 
-      public Response deleteMyFile(String type, String id);
+      public Response deleteMyMedia(String type, String id);
 
-      public Response downloadFile(String type, String id, String identifier);
+      public Response downloadMedia(String type, String id, String identifier);
 
-      public Response downloadMyFile(String type, String id, String identifier);
+      public Response downloadPublicMedia(String type, String id, String identifier);
 
-      public Response downloadPublicFile(String type, String id, String identifier);
+      public Response listMediaInformation(String type, String id);
 
-      public Response uploadFile(String type, List<InputStream> filesInputStream, List<Attachment> filesDetail, ResourceFilesMetadata metadata);
+      public Response listMyMediaInformation(String type, String id);
 
-      public Response uploadMyFile(String type, List<InputStream> filesInputStream, List<Attachment> filesDetail, ResourceFilesMetadata metadata);
+      public Response uploadMedia(String type, List<InputStream> filesInputStream, List<Attachment> filesDetail, ResourceFilesMetadata metadata);
+
+      public Response uploadMyMedia(String type, List<InputStream> filesInputStream, List<Attachment> filesDetail, MyResourceFilesMetadata metadata);
 }

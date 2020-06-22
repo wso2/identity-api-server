@@ -19,27 +19,23 @@ package org.wso2.carbon.identity.api.server.media.service.v1.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 
-public class ResourceFilesMetadataSecurity  {
+public class MyResourceFilesMetadataSecurity  {
   
     private Boolean allowedAll;
-    private List<String> allowedUsers = null;
-
 
     /**
     * Defines whether the file is publically available for access or has restricted access.
     **/
-    public ResourceFilesMetadataSecurity allowedAll(Boolean allowedAll) {
+    public MyResourceFilesMetadataSecurity allowedAll(Boolean allowedAll) {
 
         this.allowedAll = allowedAll;
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Defines whether the file is publicly available for access or has restricted access.")
+    @ApiModelProperty(example = "false", value = "Defines whether the file is publically available for access or has restricted access.")
     @JsonProperty("allowedAll")
     @Valid
     public Boolean getAllowedAll() {
@@ -49,34 +45,7 @@ public class ResourceFilesMetadataSecurity  {
         this.allowedAll = allowedAll;
     }
 
-    /**
-    * The set of users entitled to access the file.
-    **/
-    public ResourceFilesMetadataSecurity allowedUsers(List<String> allowedUsers) {
 
-        this.allowedUsers = allowedUsers;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "[\"user1\",\"user2\"]", value = "The set of users entitled to access the file.")
-    @JsonProperty("allowedUsers")
-    @Valid
-    public List<String> getAllowedUsers() {
-        return allowedUsers;
-    }
-    public void setAllowedUsers(List<String> allowedUsers) {
-        this.allowedUsers = allowedUsers;
-    }
-
-    public ResourceFilesMetadataSecurity addAllowedUsersItem(String allowedUsersItem) {
-        if (this.allowedUsers == null) {
-            this.allowedUsers = new ArrayList<>();
-        }
-        this.allowedUsers.add(allowedUsersItem);
-        return this;
-    }
-
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -87,24 +56,22 @@ public class ResourceFilesMetadataSecurity  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ResourceFilesMetadataSecurity resourceFilesMetadataSecurity = (ResourceFilesMetadataSecurity) o;
-        return Objects.equals(this.allowedAll, resourceFilesMetadataSecurity.allowedAll) &&
-            Objects.equals(this.allowedUsers, resourceFilesMetadataSecurity.allowedUsers);
+        MyResourceFilesMetadataSecurity myResourceFilesMetadataSecurity = (MyResourceFilesMetadataSecurity) o;
+        return Objects.equals(this.allowedAll, myResourceFilesMetadataSecurity.allowedAll);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(allowedAll, allowedUsers);
+        return Objects.hash(allowedAll);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ResourceFilesMetadataSecurity {\n");
+        sb.append("class MyResourceFilesMetadataSecurity {\n");
         
         sb.append("    allowedAll: ").append(toIndentedString(allowedAll)).append("\n");
-        sb.append("    allowedUsers: ").append(toIndentedString(allowedUsers)).append("\n");
         sb.append("}");
         return sb.toString();
     }

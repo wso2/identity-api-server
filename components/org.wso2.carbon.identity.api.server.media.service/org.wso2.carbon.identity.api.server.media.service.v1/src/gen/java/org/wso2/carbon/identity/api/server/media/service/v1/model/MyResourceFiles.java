@@ -17,50 +17,65 @@
 package org.wso2.carbon.identity.api.server.media.service.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
-/**
- * Location of each file uploaded in a scenario where multiple representations of a single resource is uploaded.
- **/
-@ApiModel(description = "Location of each file uploaded in a scenario where multiple representations of a single resource is uploaded.")
-public class MultipleFilesUploadResponse  {
+public class MyResourceFiles  {
   
-    private List<MultipleFilesUploadResponseLinks> links = null;
+    private List<File> files = new ArrayList<>();
 
+    private MyResourceFilesMetadata metadata;
 
     /**
     **/
-    public MultipleFilesUploadResponse links(List<MultipleFilesUploadResponseLinks> links) {
+    public MyResourceFiles files(List<File> files) {
 
-        this.links = links;
+        this.files = files;
+        return this;
+    }
+    
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("files")
+    @Valid
+    @NotNull(message = "Property files cannot be null.")
+
+    public List<File> getFiles() {
+        return files;
+    }
+    public void setFiles(List<File> files) {
+        this.files = files;
+    }
+
+    public MyResourceFiles addFilesItem(File filesItem) {
+        this.files.add(filesItem);
+        return this;
+    }
+
+        /**
+    **/
+    public MyResourceFiles metadata(MyResourceFilesMetadata metadata) {
+
+        this.metadata = metadata;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("links")
+    @JsonProperty("metadata")
     @Valid
-    public List<MultipleFilesUploadResponseLinks> getLinks() {
-        return links;
+    public MyResourceFilesMetadata getMetadata() {
+        return metadata;
     }
-    public void setLinks(List<MultipleFilesUploadResponseLinks> links) {
-        this.links = links;
-    }
-
-    public MultipleFilesUploadResponse addLinksItem(MultipleFilesUploadResponseLinks linksItem) {
-        if (this.links == null) {
-            this.links = new ArrayList<>();
-        }
-        this.links.add(linksItem);
-        return this;
+    public void setMetadata(MyResourceFilesMetadata metadata) {
+        this.metadata = metadata;
     }
 
-    
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -71,22 +86,24 @@ public class MultipleFilesUploadResponse  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        MultipleFilesUploadResponse multipleFilesUploadResponse = (MultipleFilesUploadResponse) o;
-        return Objects.equals(this.links, multipleFilesUploadResponse.links);
+        MyResourceFiles myResourceFiles = (MyResourceFiles) o;
+        return Objects.equals(this.files, myResourceFiles.files) &&
+            Objects.equals(this.metadata, myResourceFiles.metadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(links);
+        return Objects.hash(files, metadata);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class MultipleFilesUploadResponse {\n");
+        sb.append("class MyResourceFiles {\n");
         
-        sb.append("    links: ").append(toIndentedString(links)).append("\n");
+        sb.append("    files: ").append(toIndentedString(files)).append("\n");
+        sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
         sb.append("}");
         return sb.toString();
     }

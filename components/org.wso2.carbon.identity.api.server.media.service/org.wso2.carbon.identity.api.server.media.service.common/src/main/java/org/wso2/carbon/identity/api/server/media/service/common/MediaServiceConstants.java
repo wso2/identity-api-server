@@ -16,8 +16,6 @@
 
 package org.wso2.carbon.identity.api.server.media.service.common;
 
-import java.util.ArrayList;
-
 /**
  * Contains the constants related to media service.
  */
@@ -29,31 +27,8 @@ public class MediaServiceConstants {
 
     private static final String MEDIA_SERVICE = "MED-";
     public static final String MEDIA_SERVICE_PATH_COMPONENT = "/media";
-    public static final String DATA_PATH_COMPONENT = "/data";
-    public static final String ACCESS_LEVEL_ME_PATH_COMPONENT = "me";
-    public static final String ACCESS_LEVEL_USER_PATH_COMPONENT = "user";
-    public static final String ACCESS_LEVEL_PUBLIC_PATH_COMPONENT = "public";
-
-    /**
-     * Contains the list of allowed content types of the files to be uploaded.
-     */
-    public static class AllowedContentTypes {
-
-        public static final ArrayList<String> ALLOWED_CONTENT_TYPES = new ArrayList<>();
-
-        static {
-            ALLOWED_CONTENT_TYPES.add("image/apng");
-            ALLOWED_CONTENT_TYPES.add("image/bmp");
-            ALLOWED_CONTENT_TYPES.add("image/gif");
-            ALLOWED_CONTENT_TYPES.add("image/x-icon");
-            ALLOWED_CONTENT_TYPES.add("image/jpeg");
-            ALLOWED_CONTENT_TYPES.add("image/png");
-            ALLOWED_CONTENT_TYPES.add("image/svg+xml");
-            ALLOWED_CONTENT_TYPES.add("image/tiff");
-            ALLOWED_CONTENT_TYPES.add("image/webp");
-            ALLOWED_CONTENT_TYPES.add("text/css");
-        }
-    }
+    public static final String CONTENT_PATH_COMPONENT = "content";
+    public static final String PUBLIC_PATH_COMPONENT = "public";
 
     /**
      * Enum for error messages related to media service.
@@ -61,10 +36,12 @@ public class MediaServiceConstants {
     public enum ErrorMessage {
 
         // Client errors.
-        ERROR_CODE_ERROR_UPLOADING_MEDIA_INVALID_CONTENT_TYPE("60001", "Unable to upload the provided" +
-                " media.", "Unconventional file content type: %s passed as metadata while uploading the media."),
-        ERROR_CODE_ERROR_DOWNLOADING_MEDIA_FILE_NOT_FOUND("60002", "Unable to download the requested" +
-                " media.", "File with id: %s not found."),
+        ERROR_CODE_ERROR_UPLOADING_MEDIA_CONTENT_TYPE_MISMATCH("60001", "Unable to upload the provided media.",
+                "Expected file content type: %s"),
+        ERROR_CODE_ERROR_UPLOADING_MEDIA_UNSUPPORTED_CONTENT_TYPE("60002", "Unable to upload the provided media.",
+                "Unsupported file content type."),
+        ERROR_CODE_ERROR_DOWNLOADING_MEDIA_FILE_NOT_FOUND("60003", "Unable to download the requested media.",
+                "File with id: %s not found."),
 
         // Server errors.
         ERROR_CODE_ERROR_UPLOADING_MEDIA("65001", "Unable to upload the provided media.",
@@ -72,7 +49,9 @@ public class MediaServiceConstants {
         ERROR_CODE_ERROR_EVALUATING_ACCESS_SECURITY("65002", "Unable to evaluate access security for the" +
                 " requested media.", "Server encountered an error while evaluating security access to the media."),
         ERROR_CODE_ERROR_DOWNLOADING_MEDIA("65003", "Unable to download the specified media.",
-                "Server encountered an error while downloading the media.");
+                "Server encountered an error while downloading the media."),
+        ERROR_CODE_ERROR_DELETING_MEDIA("65003", "Unable to delete the specified media.", "Server encountered " +
+                "an error while deleting the media.");
 
         private final String code;
         private final String message;

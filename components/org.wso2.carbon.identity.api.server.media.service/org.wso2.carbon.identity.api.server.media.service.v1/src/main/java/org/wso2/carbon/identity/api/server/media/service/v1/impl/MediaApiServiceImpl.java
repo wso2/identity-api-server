@@ -22,6 +22,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.media.service.v1.MediaApiService;
 import org.wso2.carbon.identity.api.server.media.service.v1.core.ServerMediaService;
+import org.wso2.carbon.identity.api.server.media.service.v1.model.MyResourceFilesMetadata;
 import org.wso2.carbon.identity.api.server.media.service.v1.model.ResourceFilesMetadata;
 import org.wso2.carbon.identity.media.DataContent;
 import org.wso2.carbon.identity.media.FileContent;
@@ -35,12 +36,9 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
-import static org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants.ACCESS_LEVEL_ME_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants.ACCESS_LEVEL_PUBLIC_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants.ACCESS_LEVEL_USER_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants.AllowedContentTypes.ALLOWED_CONTENT_TYPES;
-import static org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants.DATA_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants.CONTENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants.MEDIA_SERVICE_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants.PUBLIC_PATH_COMPONENT;
 
 /**
  * Implementation class of media service.
@@ -51,85 +49,94 @@ public class MediaApiServiceImpl implements MediaApiService {
     private ServerMediaService serverMediaService;
 
     @Override
-    public Response deleteFile(String type, String id) {
+    public Response deleteMedia(String type, String id) {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
 
     @Override
-    public Response deleteMyFile(String type, String id) {
+    public Response deleteMyMedia(String type, String id) {
 
         return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
 
     @Override
-    public Response downloadFile(String type, String id, String identifier) {
+    public Response downloadMedia(String type, String id, String identifier) {
 
-        return downloadMedia(type, id, identifier);
+        return downloadMediaFile(type, id, identifier);
     }
 
     @Override
-    public Response downloadMyFile(String type, String id, String identifier) {
+    public Response downloadPublicMedia(String type, String id, String identifier) {
 
-        return downloadMedia(type, id, identifier);
+        return downloadMediaFile(type, id, identifier);
     }
 
     @Override
-    public Response downloadPublicFile(String type, String id, String identifier) {
+    public Response listMediaInformation(String type, String id) {
 
-        return downloadMedia(type, id, identifier);
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
     }
 
     @Override
-    public Response uploadFile(String type, List<InputStream> filesInputStream, List<Attachment> filesDetail,
-                               ResourceFilesMetadata metadata) {
+    public Response listMyMediaInformation(String type, String id) {
 
-        // TODO: need to read the allowed content types from a configuration file.
-        if (!ALLOWED_CONTENT_TYPES.contains(filesDetail.get(0).getContentType().toString())) {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    @Override
+    public Response uploadMedia(String type, List<InputStream> filesInputStream, List<Attachment> filesDetail,
+                                ResourceFilesMetadata metadata) {
+
+        serverMediaService.validateMediaType(type, filesDetail.get(0).getContentType());
         // Only single file upload will be supported in the first phase of the implementation.
         if (filesInputStream.size() > 1) {
             return Response.status(Response.Status.NOT_IMPLEMENTED).build();
         } else {
-            String uuid = serverMediaService.uploadMedia(filesInputStream, filesDetail, metadata, false);
+            String uuid = serverMediaService.uploadMedia(filesInputStream, filesDetail, metadata);
             String mediaAccessLevel = getMediaAccessLevel(metadata);
             return Response.created(getResourceLocation(uuid, type, mediaAccessLevel)).build();
         }
     }
 
     @Override
-    public Response uploadMyFile(String type, List<InputStream> filesInputStream, List<Attachment> filesDetail,
-                                 ResourceFilesMetadata metadata) {
+    public Response uploadMyMedia(String type, List<InputStream> filesInputStream, List<Attachment> filesDetail,
+                                  MyResourceFilesMetadata metadata) {
 
-        // TODO: need to read the allowed content types from a configuration file.
-        if (!ALLOWED_CONTENT_TYPES.contains(filesDetail.get(0).getContentType().toString())) {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
+        serverMediaService.validateMediaType(type, filesDetail.get(0).getContentType());
         // Only single file upload will be supported in the first phase of the implementation.
         if (filesInputStream.size() > 1) {
             return Response.status(Response.Status.NOT_IMPLEMENTED).build();
         } else {
-            String uuid = serverMediaService.uploadMedia(filesInputStream, filesDetail, metadata, true);
-            return Response.created(getResourceLocation(uuid, type, ACCESS_LEVEL_ME_PATH_COMPONENT)).build();
+            String uuid = serverMediaService.uploadMyMedia(filesInputStream, filesDetail, metadata);
+            String mediaAccessLevel = getMediaAccessLevel(metadata);
+            return Response.created(getResourceLocation(uuid, type, mediaAccessLevel)).build();
         }
     }
 
     private URI getResourceLocation(String id, String type, String accessLevel) {
 
-        return buildURIForHeader(String.format(V1_API_PATH_COMPONENT + MEDIA_SERVICE_PATH_COMPONENT + "/%s/%s/%s" +
-                DATA_PATH_COMPONENT, accessLevel, type, id));
+        return buildURIForHeader(String.format(V1_API_PATH_COMPONENT + MEDIA_SERVICE_PATH_COMPONENT + "/%s/%s/%s",
+                accessLevel, type, id));
     }
 
     private String getMediaAccessLevel(ResourceFilesMetadata metadata) {
 
         if (metadata != null && metadata.getSecurity() != null && metadata.getSecurity().getAllowedAll()) {
-            return ACCESS_LEVEL_PUBLIC_PATH_COMPONENT;
+            return PUBLIC_PATH_COMPONENT;
         }
-        return ACCESS_LEVEL_USER_PATH_COMPONENT;
+        return CONTENT_PATH_COMPONENT;
     }
 
-    private Response downloadMedia(String type, String id, String identifier) {
+    private String getMediaAccessLevel(MyResourceFilesMetadata metadata) {
+
+        if (metadata != null && metadata.getSecurity() != null && metadata.getSecurity().getAllowedAll()) {
+            return PUBLIC_PATH_COMPONENT;
+        }
+        return CONTENT_PATH_COMPONENT;
+    }
+
+    private Response downloadMediaFile(String type, String id, String identifier) {
 
         // Retrieving a sub-representation of a media is not supported during the first phase of the implementation.
         if (StringUtils.isNotBlank(identifier)) {

@@ -17,50 +17,54 @@
 package org.wso2.carbon.identity.api.server.media.service.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 
-/**
- * Location of each file uploaded in a scenario where multiple representations of a single resource is uploaded.
- **/
-@ApiModel(description = "Location of each file uploaded in a scenario where multiple representations of a single resource is uploaded.")
-public class MultipleFilesUploadResponse  {
+public class MediaInformationResponseMetadata  {
   
-    private List<MultipleFilesUploadResponseLinks> links = null;
+    private String tag;
+    private ResourceFilesMetadataSecurity security;
 
+    /**
+    * The file tag.
+    **/
+    public MediaInformationResponseMetadata tag(String tag) {
+
+        this.tag = tag;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "user", value = "The file tag.")
+    @JsonProperty("tag")
+    @Valid
+    public String getTag() {
+        return tag;
+    }
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 
     /**
     **/
-    public MultipleFilesUploadResponse links(List<MultipleFilesUploadResponseLinks> links) {
+    public MediaInformationResponseMetadata security(ResourceFilesMetadataSecurity security) {
 
-        this.links = links;
+        this.security = security;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("links")
+    @JsonProperty("security")
     @Valid
-    public List<MultipleFilesUploadResponseLinks> getLinks() {
-        return links;
+    public ResourceFilesMetadataSecurity getSecurity() {
+        return security;
     }
-    public void setLinks(List<MultipleFilesUploadResponseLinks> links) {
-        this.links = links;
-    }
-
-    public MultipleFilesUploadResponse addLinksItem(MultipleFilesUploadResponseLinks linksItem) {
-        if (this.links == null) {
-            this.links = new ArrayList<>();
-        }
-        this.links.add(linksItem);
-        return this;
+    public void setSecurity(ResourceFilesMetadataSecurity security) {
+        this.security = security;
     }
 
-    
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -71,22 +75,24 @@ public class MultipleFilesUploadResponse  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        MultipleFilesUploadResponse multipleFilesUploadResponse = (MultipleFilesUploadResponse) o;
-        return Objects.equals(this.links, multipleFilesUploadResponse.links);
+        MediaInformationResponseMetadata mediaInformationResponseMetadata = (MediaInformationResponseMetadata) o;
+        return Objects.equals(this.tag, mediaInformationResponseMetadata.tag) &&
+            Objects.equals(this.security, mediaInformationResponseMetadata.security);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(links);
+        return Objects.hash(tag, security);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class MultipleFilesUploadResponse {\n");
+        sb.append("class MediaInformationResponseMetadata {\n");
         
-        sb.append("    links: ").append(toIndentedString(links)).append("\n");
+        sb.append("    tag: ").append(toIndentedString(tag)).append("\n");
+        sb.append("    security: ").append(toIndentedString(security)).append("\n");
         sb.append("}");
         return sb.toString();
     }

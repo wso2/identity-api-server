@@ -19,14 +19,22 @@ package org.wso2.carbon.identity.api.server.media.service.v1.filter;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants;
 import org.wso2.carbon.identity.api.server.media.service.common.MediaServiceDataHolder;
+import org.wso2.carbon.identity.application.common.model.User;
 import org.wso2.carbon.identity.auth.service.AuthenticationContext;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.media.StorageSystemManager;
 import org.wso2.carbon.identity.media.exception.StorageSystemException;
+import org.wso2.carbon.user.api.AuthorizationManager;
+import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.user.core.util.UserCoreUtil;
 
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
@@ -34,7 +42,8 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants.ACCESS_LEVEL_USER_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants.CONTENT_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.media.service.common.MediaServiceConstants.PUBLIC_PATH_COMPONENT;
 
 /**
  * Filter to evaluate access level security for media download requests.
@@ -42,8 +51,8 @@ import static org.wso2.carbon.identity.api.server.media.service.common.MediaServ
 public class AuthorizationFilter implements ContainerRequestFilter {
 
     private static final Log LOG = LogFactory.getLog(AuthorizationFilter.class);
-    private static final String OAUTH2_ALLOWED_SCOPES = "oauth2-allowed-scopes";
     private static final String AUTH_CONTEXT = "auth-context";
+    private static final String VIEW_PERMISSION = "permission/admin/manage/identity/media/view";
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
@@ -52,31 +61,58 @@ public class AuthorizationFilter implements ContainerRequestFilter {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Evaluating access based security for media download request.");
             }
+
             String accessLevel = containerRequestContext.getUriInfo().getPathSegments().get(1).getPath();
             String type = containerRequestContext.getUriInfo().getPathSegments().get(2).getPath();
             String uuid = containerRequestContext.getUriInfo().getPathSegments().get(3).getPath();
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
-            String[] oauth2AllowedScopes = null;
-            if (ACCESS_LEVEL_USER_PATH_COMPONENT.equals(accessLevel) && containerRequestContext.getSecurityContext()
-                    .getAuthenticationScheme().equalsIgnoreCase("Bearer")) {
-
-                if (containerRequestContext.getProperty(AUTH_CONTEXT) instanceof AuthenticationContext) {
+            AuthorizationManager authorizationManager = null;
+            StorageSystemManager storageSystemManager = MediaServiceDataHolder.getInstance().getStorageSystemManager();
+            boolean isUserAuthorized = false;
+            try {
+                if (accessLevel.equals(PUBLIC_PATH_COMPONENT)) {
+                    isUserAuthorized = storageSystemManager.evaluateDownloadSecurityForPublicMedia(uuid, type,
+                            tenantDomain);
+                    if (!isUserAuthorized) {
+                        Response response = Response.status(HttpServletResponse.SC_UNAUTHORIZED).build();
+                        containerRequestContext.abortWith(response);
+                    }
+                } else if (accessLevel.equals(CONTENT_PATH_COMPONENT)) {
                     AuthenticationContext authenticationContext = (AuthenticationContext) containerRequestContext
                             .getProperty(AUTH_CONTEXT);
-                    oauth2AllowedScopes = (String[]) authenticationContext.getParameter(OAUTH2_ALLOWED_SCOPES);
-                }
-            }
+                    User user = null;
+                    if (authenticationContext != null) {
+                        user = ((AuthenticationContext) containerRequestContext.getProperty(AUTH_CONTEXT)).getUser();
+                    }
+                    if (user != null) {
+                        RealmService realmService = MediaServiceDataHolder.getInstance().getRealmService();
+                        int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
+                        UserRealm tenantUserRealm = realmService.getTenantUserRealm(tenantId);
+                        if (tenantUserRealm != null) {
+                            authorizationManager = tenantUserRealm.getAuthorizationManager();
+                        }
+                        if (authorizationManager != null) {
+                            isUserAuthorized = authorizationManager.isUserAuthorized(UserCoreUtil.addDomainToName(
+                                    user.getUserName(), user.getUserStoreDomain()), VIEW_PERMISSION,
+                                    CarbonConstants.UI_PERMISSION_ACTION);
+                        }
+                    }
 
-            StorageSystemManager storageSystemManager = MediaServiceDataHolder.getStorageSystemManager();
-            String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            try {
-                boolean isAuthorized = storageSystemManager.evaluateSecurity(accessLevel, uuid, type, tenantDomain,
-                        oauth2AllowedScopes);
-                if (!isAuthorized) {
-                    Response response = Response.status(HttpServletResponse.SC_UNAUTHORIZED).build();
+                    if (!isUserAuthorized) {
+                        isUserAuthorized = storageSystemManager.evaluateDownloadSecurityForProtectedMedia(uuid, type,
+                                tenantDomain);
+                    }
+
+                    if (!isUserAuthorized) {
+                        Response response = Response.status(HttpServletResponse.SC_UNAUTHORIZED).build();
+                        containerRequestContext.abortWith(response);
+                    }
+                } else {
+                    Response response = Response.status(HttpServletResponse.SC_NOT_FOUND).build();
                     containerRequestContext.abortWith(response);
                 }
-            } catch (StorageSystemException e) {
+            } catch (UserStoreException | StorageSystemException e) {
                 MediaServiceConstants.ErrorMessage errorMessage = MediaServiceConstants.ErrorMessage.
                         ERROR_CODE_ERROR_EVALUATING_ACCESS_SECURITY;
                 throw handleServerException(e, errorMessage);

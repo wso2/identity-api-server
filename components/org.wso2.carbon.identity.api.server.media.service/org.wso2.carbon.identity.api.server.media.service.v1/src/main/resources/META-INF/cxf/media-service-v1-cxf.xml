@@ -24,8 +24,11 @@
     <bean id="mediaServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.media.service.common.MediaServiceDataHolder">
         <property name="storageSystemManager" ref="storageSystemfactoryFactoryBean"/>
+        <property name="realmService" ref="realmServiceFactoryBean"/>
     </bean>
     <bean id="storageSystemfactoryFactoryBean"
           class="org.wso2.carbon.identity.api.server.media.service.common.factory.OSGIServiceFactory"/>
+    <bean id="realmServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.media.service.common.factory.RealmServiceFactory"/>
 
 </beans>

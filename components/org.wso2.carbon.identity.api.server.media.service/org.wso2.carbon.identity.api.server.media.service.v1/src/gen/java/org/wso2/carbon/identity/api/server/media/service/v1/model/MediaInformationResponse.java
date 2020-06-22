@@ -26,33 +26,34 @@ import java.util.Objects;
 import javax.validation.Valid;
 
 /**
- * Location of each file uploaded in a scenario where multiple representations of a single resource is uploaded.
+ * Location(s) of media and metadata.
  **/
-@ApiModel(description = "Location of each file uploaded in a scenario where multiple representations of a single resource is uploaded.")
-public class MultipleFilesUploadResponse  {
+@ApiModel(description = "Location(s) of media and metadata.")
+public class MediaInformationResponse  {
   
-    private List<MultipleFilesUploadResponseLinks> links = null;
+    private List<String> links = null;
 
+    private MediaInformationResponseMetadata metadata;
 
     /**
     **/
-    public MultipleFilesUploadResponse links(List<MultipleFilesUploadResponseLinks> links) {
+    public MediaInformationResponse links(List<String> links) {
 
         this.links = links;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "[\"/t/carbon.super/api/server/v1/media/content/image/6e41cb95-c3b3-4e6c-928a-acb1b88e991d\"]", value = "")
     @JsonProperty("links")
     @Valid
-    public List<MultipleFilesUploadResponseLinks> getLinks() {
+    public List<String> getLinks() {
         return links;
     }
-    public void setLinks(List<MultipleFilesUploadResponseLinks> links) {
+    public void setLinks(List<String> links) {
         this.links = links;
     }
 
-    public MultipleFilesUploadResponse addLinksItem(MultipleFilesUploadResponseLinks linksItem) {
+    public MediaInformationResponse addLinksItem(String linksItem) {
         if (this.links == null) {
             this.links = new ArrayList<>();
         }
@@ -60,7 +61,25 @@ public class MultipleFilesUploadResponse  {
         return this;
     }
 
+        /**
+    **/
+    public MediaInformationResponse metadata(MediaInformationResponseMetadata metadata) {
+
+        this.metadata = metadata;
+        return this;
+    }
     
+    @ApiModelProperty(value = "")
+    @JsonProperty("metadata")
+    @Valid
+    public MediaInformationResponseMetadata getMetadata() {
+        return metadata;
+    }
+    public void setMetadata(MediaInformationResponseMetadata metadata) {
+        this.metadata = metadata;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -71,22 +90,24 @@ public class MultipleFilesUploadResponse  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        MultipleFilesUploadResponse multipleFilesUploadResponse = (MultipleFilesUploadResponse) o;
-        return Objects.equals(this.links, multipleFilesUploadResponse.links);
+        MediaInformationResponse mediaInformationResponse = (MediaInformationResponse) o;
+        return Objects.equals(this.links, mediaInformationResponse.links) &&
+            Objects.equals(this.metadata, mediaInformationResponse.metadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(links);
+        return Objects.hash(links, metadata);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class MultipleFilesUploadResponse {\n");
+        sb.append("class MediaInformationResponse {\n");
         
         sb.append("    links: ").append(toIndentedString(links)).append("\n");
+        sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
         sb.append("}");
         return sb.toString();
     }

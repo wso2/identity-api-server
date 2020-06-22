@@ -17,50 +17,55 @@
 package org.wso2.carbon.identity.api.server.media.service.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 
-/**
- * Location of each file uploaded in a scenario where multiple representations of a single resource is uploaded.
- **/
-@ApiModel(description = "Location of each file uploaded in a scenario where multiple representations of a single resource is uploaded.")
-public class MultipleFilesUploadResponse  {
+public class MultipleFilesUploadResponseLinks  {
   
-    private List<MultipleFilesUploadResponseLinks> links = null;
-
+    private String rel;
+    private String href;
 
     /**
+    * Identifier for the sub resource.
     **/
-    public MultipleFilesUploadResponse links(List<MultipleFilesUploadResponseLinks> links) {
+    public MultipleFilesUploadResponseLinks rel(String rel) {
 
-        this.links = links;
+        this.rel = rel;
         return this;
     }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("links")
+    @ApiModelProperty(example = "large", value = "Identifier for the sub resource.")
+    @JsonProperty("rel")
     @Valid
-    public List<MultipleFilesUploadResponseLinks> getLinks() {
-        return links;
+    public String getRel() {
+        return rel;
     }
-    public void setLinks(List<MultipleFilesUploadResponseLinks> links) {
-        this.links = links;
+    public void setRel(String rel) {
+        this.rel = rel;
     }
 
-    public MultipleFilesUploadResponse addLinksItem(MultipleFilesUploadResponseLinks linksItem) {
-        if (this.links == null) {
-            this.links = new ArrayList<>();
-        }
-        this.links.add(linksItem);
+    /**
+    * Location of the uploaded sub resource.
+    **/
+    public MultipleFilesUploadResponseLinks href(String href) {
+
+        this.href = href;
         return this;
     }
-
     
+    @ApiModelProperty(example = "/t/carbon.super/api/server/v1/media/content/image/6e41cb95-c3b3-4e6c-928a-acb1b88e991d?identifier=large", value = "Location of the uploaded sub resource.")
+    @JsonProperty("href")
+    @Valid
+    public String getHref() {
+        return href;
+    }
+    public void setHref(String href) {
+        this.href = href;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -71,22 +76,24 @@ public class MultipleFilesUploadResponse  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        MultipleFilesUploadResponse multipleFilesUploadResponse = (MultipleFilesUploadResponse) o;
-        return Objects.equals(this.links, multipleFilesUploadResponse.links);
+        MultipleFilesUploadResponseLinks multipleFilesUploadResponseLinks = (MultipleFilesUploadResponseLinks) o;
+        return Objects.equals(this.rel, multipleFilesUploadResponseLinks.rel) &&
+            Objects.equals(this.href, multipleFilesUploadResponseLinks.href);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(links);
+        return Objects.hash(rel, href);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class MultipleFilesUploadResponse {\n");
+        sb.append("class MultipleFilesUploadResponseLinks {\n");
         
-        sb.append("    links: ").append(toIndentedString(links)).append("\n");
+        sb.append("    rel: ").append(toIndentedString(rel)).append("\n");
+        sb.append("    href: ").append(toIndentedString(href)).append("\n");
         sb.append("}");
         return sb.toString();
     }
