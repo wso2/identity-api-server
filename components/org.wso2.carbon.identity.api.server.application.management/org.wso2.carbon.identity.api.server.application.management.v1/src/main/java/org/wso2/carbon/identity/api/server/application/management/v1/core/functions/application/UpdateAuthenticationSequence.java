@@ -203,8 +203,10 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
     private boolean isRevertToDefaultSequence(AuthenticationSequence authSequenceApiModel,
                                               LocalAndOutboundAuthenticationConfig localAndOutboundConfig) {
 
-        String currentAuthenticationType = localAndOutboundConfig.getAuthenticationType();
-        return authSequenceApiModel.getType() == AuthenticationSequence.TypeEnum.DEFAULT &&
-                !currentAuthenticationType.equalsIgnoreCase(AuthenticationSequence.TypeEnum.DEFAULT.toString());
+        String currentAuthenticationType = localAndOutboundConfig != null ?
+                localAndOutboundConfig.getAuthenticationType() : null;
+        return authSequenceApiModel != null &&
+                authSequenceApiModel.getType() == AuthenticationSequence.TypeEnum.DEFAULT &&
+                !AuthenticationSequence.TypeEnum.DEFAULT.toString().equalsIgnoreCase(currentAuthenticationType);
     }
 }
