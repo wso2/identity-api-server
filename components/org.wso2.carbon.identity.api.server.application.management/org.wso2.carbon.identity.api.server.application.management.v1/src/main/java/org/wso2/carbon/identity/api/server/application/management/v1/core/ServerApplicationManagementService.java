@@ -92,10 +92,14 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceSearchBean;
 import org.wso2.carbon.identity.configuration.mgt.core.search.ComplexCondition;
 import org.wso2.carbon.identity.configuration.mgt.core.search.Condition;
 import org.wso2.carbon.identity.configuration.mgt.core.search.PrimitiveCondition;
+import org.wso2.carbon.identity.core.model.ExpressionNode;
+import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
+import org.wso2.carbon.identity.core.model.Node;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
@@ -844,21 +848,26 @@ public class ServerApplicationManagementService {
     }
 
     private String buildFilter(String filter) {
-
         if (StringUtils.isNotBlank(filter)) {
-            String[] filterArgs = filter.split("\\s+");
-            if (filterArgs.length == 3) {
-                String searchField = filterArgs[0];
-                if (SEARCH_SUPPORTED_FIELDS.contains(searchField)) {
-                    String searchOperation = filterArgs[1];
-                    String searchValue = filterArgs[2];
-                    return generateFilterStringForBackend(searchField, searchOperation, searchValue);
-                } else {
-                    throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, searchField);
-                }
+            try {
 
-            } else {
-                throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
+                FilterTreeBuilder filterTreeBuilder = new FilterTreeBuilder(filter);
+                Node rootNode = filterTreeBuilder.buildTree();
+                if (rootNode instanceof ExpressionNode) {
+                    ExpressionNode expressionNode = (ExpressionNode) rootNode;
+                    if (SEARCH_SUPPORTED_FIELDS.contains(expressionNode.getAttributeValue())) {
+                        return generateFilterStringForBackend(expressionNode.getAttributeValue(), expressionNode
+                                .getOperation(), expressionNode.getValue());
+                    } else {
+                        throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, expressionNode
+                                .getAttributeValue());
+                    }
+
+                } else {
+                    throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
+                }
+            } catch (IOException | IdentityException e) {
+                throw buildClientError(ApplicationManagementConstants.ErrorMessage.INVALID_FILTER_FORMAT, null);
             }
         } else {
             return null;

@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.133-SNAPSHOT</version>
+    <version>1.0.140-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -398,11 +398,6 @@
                 <artifactId>org.wso2.carbon.identity.api.server.configs.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.identity.framework</groupId>
-                <artifactId>org.wso2.carbon.identity.template.mgt</artifactId>
-                <version>${carbon.identity.framework.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>

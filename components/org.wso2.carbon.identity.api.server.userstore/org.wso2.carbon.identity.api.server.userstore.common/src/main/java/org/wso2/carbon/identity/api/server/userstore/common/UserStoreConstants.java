@@ -86,7 +86,11 @@ public class UserStoreConstants {
         ERROR_CODE_MANDATORY_PROPERTIES_NOT_FOUND("60006", "Mandatory property is missing ",
                 " Required user store  property or its value is missing in the request "),
         ERROR_CODE_INVALID_INPUT("60004", "Invalid Input", "Provided Input is not valid.",
-                                 Response.Status.BAD_REQUEST);
+                                 Response.Status.BAD_REQUEST),
+        ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE("65011",
+                "Unable to get the primary user store.",
+                "Server Encountered an error while retrieving the primary user store.",
+                Response.Status.INTERNAL_SERVER_ERROR);
 
         private final String code;
         private final String message;
