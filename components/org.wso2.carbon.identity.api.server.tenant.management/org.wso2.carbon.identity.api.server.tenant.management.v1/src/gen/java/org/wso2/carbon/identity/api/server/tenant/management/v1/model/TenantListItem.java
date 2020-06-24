@@ -134,7 +134,7 @@ public class TenantListItem  {
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("lifecycle-status")
+    @JsonProperty("lifecycleStatus")
     @Valid
     public LifeCycleStatus getLifecycleStatus() {
         return lifecycleStatus;
