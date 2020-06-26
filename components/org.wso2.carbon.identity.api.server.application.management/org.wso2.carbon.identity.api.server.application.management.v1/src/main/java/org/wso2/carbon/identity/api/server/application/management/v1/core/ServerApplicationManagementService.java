@@ -555,8 +555,6 @@ public class ServerApplicationManagementService {
             List<ApplicationTemplatesListItem> applicationTemplateList = templateList.stream().map(new
                     TemplateToApplicationTemplateListItem()).collect(Collectors.toList());
 
-            // Remove WS-Trust template if the connector is not available.
-            removeWSTrustTemplate(applicationTemplateList);
             ApplicationTemplatesList applicationTemplates = new ApplicationTemplatesList();
             applicationTemplates.setTemplates(applicationTemplateList);
             return applicationTemplates;
@@ -704,7 +702,6 @@ public class ServerApplicationManagementService {
     public ApplicationTemplateModel getApplicationTemplateById(String templateId) {
 
         try {
-            validateWSTrustTemplateAvailability(templateId);
             return new TemplateToApplicationTemplate().apply(getTemplateManager().getTemplateById(templateId));
         } catch (TemplateManagementException e) {
             if (TemplateMgtConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode().equals(e.getErrorCode())) {
@@ -723,7 +720,6 @@ public class ServerApplicationManagementService {
     public void deleteApplicationTemplateById(String templateId) {
 
         try {
-            validateWSTrustTemplateAvailability(templateId);
             getTemplateManager().deleteTemplateById(templateId);
         } catch (TemplateManagementException e) {
             if (TemplateMgtConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode().equals(e.getErrorCode())) {
@@ -743,7 +739,6 @@ public class ServerApplicationManagementService {
     public void updateApplicationTemplateById(String templateId, ApplicationTemplateModel model) {
 
         try {
-            validateWSTrustTemplateAvailability(templateId);
             getTemplateManager().updateTemplateById(templateId,
                     new ApplicationTemplateApiModelToTemplate().apply(model));
         } catch (TemplateManagementException e) {
@@ -1075,51 +1070,6 @@ public class ServerApplicationManagementService {
             return String.format(description, formatData);
         } else {
             return description;
-        }
-    }
-
-    /**
-     * Check if the application templates list contains template for WS-Trust when
-     * WS-Trust functionality is not available and if it exists then remove it.
-     */
-    private void removeWSTrustTemplate(List<ApplicationTemplatesListItem> applicationTemplateList) {
-
-        List<ApplicationTemplatesListItem> removableTemplate = new ArrayList<>();
-
-        for (ApplicationTemplatesListItem applicationTemplatesListItem : applicationTemplateList) {
-            if (applicationTemplatesListItem.getId().equals(WS_TRUST_TEMPLATE_ID) &&
-                    !isWSTrustAvailable()) {
-                removableTemplate.add(applicationTemplatesListItem);
-            }
-        }
-
-        applicationTemplateList.removeAll(removableTemplate);
-    }
-
-    /**
-     * Check if the WS-Trust service is available.
-     *
-     * @return True if available, else false.
-     */
-    private boolean isWSTrustAvailable() {
-
-        return ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null;
-    }
-
-    /**
-     * Validates WS-Trust availability in application templates related operations.
-     *
-     * @param templateId Template Id of the template
-     * @throws TemplateManagementException If WS-Trust connector is not available.
-     */
-    private void validateWSTrustTemplateAvailability(String templateId)
-            throws TemplateManagementException {
-
-        if (templateId.equals(WS_TRUST_TEMPLATE_ID) && !isWSTrustAvailable()) {
-
-            throw new TemplateManagementException(
-                    String.format(STS_TEMPLATE_NOT_FOUND_MESSAGE, templateId),
-                    TemplateMgtConstants.ErrorMessages.ERROR_CODE_TEMPLATE_NOT_FOUND.getCode());
         }
     }
 }
