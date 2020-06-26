@@ -98,9 +98,9 @@ public class Utils {
         return buildServerError(errorCode, errorMessage, errorDescription, e);
     }
 
-    public static APIError buildServerError(String errorDescrption) {
+    public static APIError buildServerError(String errorDescription) {
 
-        return buildServerError(errorDescrption, null);
+        return buildServerError(errorDescription, null);
     }
 
     public static APIError buildNotImplementedError(String message) {
