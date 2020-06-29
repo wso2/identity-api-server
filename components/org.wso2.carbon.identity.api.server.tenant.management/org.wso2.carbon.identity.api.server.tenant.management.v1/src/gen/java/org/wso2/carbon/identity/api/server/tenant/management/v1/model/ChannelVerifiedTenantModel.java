@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Owner;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Purpose;
 import javax.validation.constraints.*;
 
 
@@ -35,7 +36,7 @@ public class ChannelVerifiedTenantModel  {
   
     private String domain;
     private String code;
-    private String purpose;
+    private Purpose purpose;
     private List<Owner> owners = new ArrayList<>();
 
 
@@ -82,23 +83,20 @@ public class ChannelVerifiedTenantModel  {
     }
 
     /**
-    * The purpose of the tenant creation. Personal or Organizational.
     **/
-    public ChannelVerifiedTenantModel purpose(String purpose) {
+    public ChannelVerifiedTenantModel purpose(Purpose purpose) {
 
         this.purpose = purpose;
         return this;
     }
     
-    @ApiModelProperty(example = "personal", required = true, value = "The purpose of the tenant creation. Personal or Organizational.")
+    @ApiModelProperty(value = "")
     @JsonProperty("purpose")
     @Valid
-    @NotNull(message = "Property purpose cannot be null.")
-
-    public String getPurpose() {
+    public Purpose getPurpose() {
         return purpose;
     }
-    public void setPurpose(String purpose) {
+    public void setPurpose(Purpose purpose) {
         this.purpose = purpose;
     }
 

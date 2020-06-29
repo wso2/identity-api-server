@@ -377,7 +377,6 @@ components:
       type: object
       required:
         - domain
-        - purpose
         - owners
         - code
       properties:
@@ -390,12 +389,7 @@ components:
           example: 3723dghdg32yt236734563236
           description: Tenant domain of the tenant.
         purpose:
-          type: string
-          enum:
-            - Personal
-            - Organization
-          example: personal
-          description: The purpose of the tenant creation. Personal or Organizational.
+          $ref: '#/components/schemas/Purpose'
         owners:
           type: array
           items:
@@ -447,13 +441,13 @@ components:
             $ref: '#/components/schemas/Link'
           example:
             [
-                {
-                    "href": "/t/carbon.super/api/server/v1/tenants?offset=50&limit=10",
-                    "rel": "next",
-                },  {
-                    "href": "/t/carbon.super/api/server/v1/tenants?offset=30&limit=10",
-                    "rel": "previous",
-                }
+            {
+              "href": "/t/carbon.super/api/server/v1/tenants?offset=50&limit=10",
+              "rel": "next",
+            },  {
+              "href": "/t/carbon.super/api/server/v1/tenants?offset=30&limit=10",
+              "rel": "previous",
+            }
             ]
         tenants:
           type: array
@@ -559,6 +553,31 @@ components:
           type: string
           example: "+94 562 8723"
           description: Mobile number of the tenant owner.
+
+    Attribute:
+      type: object
+      properties:
+        key:
+          type: string
+          example: "Organization Name"
+          description: Name of the organization.
+        value:
+          type: string
+          example: "Asgardio"
+          description: Name of the organization.
+
+    Purpose:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Personal
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attribute'
 
     LifeCycleStatus:
       type: object
