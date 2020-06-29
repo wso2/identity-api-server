@@ -521,7 +521,14 @@ public class ServerTenantManagementService {
             }
 
             claimsMap.put(CODE, channelVerifiedTenantModel.getCode());
-            claimsMap.put(PURPOSE, channelVerifiedTenantModel.getPurpose());
+
+            if (channelVerifiedTenantModel.getPurpose() != null) {
+                claimsMap.put(PURPOSE, channelVerifiedTenantModel.getPurpose().getName());
+                channelVerifiedTenantModel.getPurpose().getAttributes()
+                        .forEach(attribute ->
+                                claimsMap.put(PURPOSE + "_" + attribute.getKey(), attribute.getValue()));
+            }
+
             tenant.setClaimsMap(claimsMap);
             tenant.setAdminPassword(password);
 
