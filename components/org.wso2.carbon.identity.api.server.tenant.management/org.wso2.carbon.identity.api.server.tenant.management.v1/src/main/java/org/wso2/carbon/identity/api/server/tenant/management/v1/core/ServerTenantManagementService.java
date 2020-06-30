@@ -467,8 +467,8 @@ public class ServerTenantManagementService {
 
     /**
      * Validate details attached to the code sent in email verification with the sent in details.
-     * @param tenant
-     * @throws TenantManagementClientException
+     * @param tenant tenant
+     * @throws TenantManagementClientException error in validating code
      */
     private void validateInputAgainstCode(ChannelVerifiedTenantModel tenant) throws TenantManagementClientException {
 
@@ -484,11 +484,11 @@ public class ServerTenantManagementService {
         try {
             UserRecoveryData recoveryData = userRecoveryDataStore.load(code);
             if (recoveryData != null && recoveryData.getUser() != null && tenant.getOwners() != null &&
-                    tenant.getOwners().get(0) != null && tenant.getOwners().get(0).getEmail() != null &&
-                    tenant.getOwners().get(0).getEmail().equalsIgnoreCase(recoveryData.getUser().getUserName())) {
+                    tenant.getOwners().get(0) != null && tenant.getOwners().get(0).getUsername() != null &&
+                    tenant.getOwners().get(0).getUsername().equalsIgnoreCase(recoveryData.getUser().getUserName())) {
                 userRecoveryDataStore.invalidate(code);
-                return;
             } else { // the confirmed email using the code and submitted emails are different.
+                userRecoveryDataStore.invalidate(code);
                 log.warn("The confirmed email using the code and submitted emails are different.");
                 throw new TenantManagementClientException(ERROR_CODE_INVALID_EMAIL.getCode(),
                         String.format(ERROR_CODE_INVALID_EMAIL.getMessage(), CODE));
@@ -526,8 +526,6 @@ public class ServerTenantManagementService {
                         String.format(TenantConstants.ErrorMessage.
                                 ERROR_CODE_MISSING_REQUIRED_PARAMETER.getMessage(), "code"));
             }
-
-            claimsMap.put(CODE, channelVerifiedTenantModel.getCode());
 
             if (channelVerifiedTenantModel.getPurpose() != null) {
                 claimsMap.put(PURPOSE, channelVerifiedTenantModel.getPurpose().getName());
