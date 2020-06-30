@@ -184,5 +184,10 @@
             <artifactId>org.wso2.carbon.tenant.mgt</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.governance</groupId>
+            <artifactId>org.wso2.carbon.identity.recovery</artifactId>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
