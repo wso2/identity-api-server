@@ -441,13 +441,13 @@ components:
             $ref: '#/components/schemas/Link'
           example:
             [
-            {
-              "href": "/t/carbon.super/api/server/v1/tenants?offset=50&limit=10",
-              "rel": "next",
-            },  {
-              "href": "/t/carbon.super/api/server/v1/tenants?offset=30&limit=10",
-              "rel": "previous",
-            }
+                {
+                    "href": "/t/carbon.super/api/server/v1/tenants?offset=50&limit=10",
+                    "rel": "next",
+                },  {
+                    "href": "/t/carbon.super/api/server/v1/tenants?offset=30&limit=10",
+                    "rel": "previous",
+                }
             ]
         tenants:
           type: array
