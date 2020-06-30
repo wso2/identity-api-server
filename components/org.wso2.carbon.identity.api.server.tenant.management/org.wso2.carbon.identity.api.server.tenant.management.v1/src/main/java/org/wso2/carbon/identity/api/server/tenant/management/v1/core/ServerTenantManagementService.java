@@ -488,8 +488,8 @@ public class ServerTenantManagementService {
             }
 
         } catch (IdentityRecoveryException e) {
-            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, TenantManagementConstants.ErrorMessage
-                    .ERROR_CODE_ERROR_ADDING_TENANT, null);
+            throw handleException(Response.Status.UNAUTHORIZED, TenantManagementConstants.ErrorMessage
+                    .ERROR_CODE_ERROR_VALIDATING_TENANT_CODE, null);
         }
     }
 
