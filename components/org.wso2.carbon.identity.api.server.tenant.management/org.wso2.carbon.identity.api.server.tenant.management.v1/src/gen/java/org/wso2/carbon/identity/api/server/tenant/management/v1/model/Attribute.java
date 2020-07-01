@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package org.wso2.carbon.identity.api.server.application.management.v1;
+package org.wso2.carbon.identity.api.server.tenant.management.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -28,45 +28,47 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class SAMLResponseSigning  {
+public class Attribute  {
   
-    private Boolean enabled = true;
-    private String signingAlgorithm;
+    private String key;
+    private String value;
 
     /**
+    * Name of the organization.
     **/
-    public SAMLResponseSigning enabled(Boolean enabled) {
+    public Attribute key(String key) {
 
-        this.enabled = enabled;
+        this.key = key;
         return this;
     }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("enabled")
+    @ApiModelProperty(example = "Organization Name", value = "Name of the organization.")
+    @JsonProperty("key")
     @Valid
-    public Boolean getEnabled() {
-        return enabled;
+    public String getKey() {
+        return key;
     }
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     /**
+    * Name of the organization.
     **/
-    public SAMLResponseSigning signingAlgorithm(String signingAlgorithm) {
+    public Attribute value(String value) {
 
-        this.signingAlgorithm = signingAlgorithm;
+        this.value = value;
         return this;
     }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("signingAlgorithm")
+    @ApiModelProperty(example = "Asgardio", value = "Name of the organization.")
+    @JsonProperty("value")
     @Valid
-    public String getSigningAlgorithm() {
-        return signingAlgorithm;
+    public String getValue() {
+        return value;
     }
-    public void setSigningAlgorithm(String signingAlgorithm) {
-        this.signingAlgorithm = signingAlgorithm;
+    public void setValue(String value) {
+        this.value = value;
     }
 
 
@@ -80,24 +82,24 @@ public class SAMLResponseSigning  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SAMLResponseSigning saMLResponseSigning = (SAMLResponseSigning) o;
-        return Objects.equals(this.enabled, saMLResponseSigning.enabled) &&
-            Objects.equals(this.signingAlgorithm, saMLResponseSigning.signingAlgorithm);
+        Attribute attribute = (Attribute) o;
+        return Objects.equals(this.key, attribute.key) &&
+            Objects.equals(this.value, attribute.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabled, signingAlgorithm);
+        return Objects.hash(key, value);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class SAMLResponseSigning {\n");
+        sb.append("class Attribute {\n");
         
-        sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
-        sb.append("    signingAlgorithm: ").append(toIndentedString(signingAlgorithm)).append("\n");
+        sb.append("    key: ").append(toIndentedString(key)).append("\n");
+        sb.append("    value: ").append(toIndentedString(value)).append("\n");
         sb.append("}");
         return sb.toString();
     }

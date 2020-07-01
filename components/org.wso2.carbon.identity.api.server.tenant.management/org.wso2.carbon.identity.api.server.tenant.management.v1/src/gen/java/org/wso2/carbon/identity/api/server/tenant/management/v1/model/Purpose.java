@@ -14,12 +14,15 @@
 * limitations under the License.
 */
 
-package org.wso2.carbon.identity.api.server.application.management.v1;
+package org.wso2.carbon.identity.api.server.tenant.management.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Attribute;
 import javax.validation.constraints.*;
 
 
@@ -28,48 +31,59 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class SAMLResponseSigning  {
+public class Purpose  {
   
-    private Boolean enabled = true;
-    private String signingAlgorithm;
+    private String name;
+    private List<Attribute> attributes = null;
+
 
     /**
     **/
-    public SAMLResponseSigning enabled(Boolean enabled) {
+    public Purpose name(String name) {
 
-        this.enabled = enabled;
+        this.name = name;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Personal", required = true, value = "")
+    @JsonProperty("name")
+    @Valid
+    @NotNull(message = "Property name cannot be null.")
+
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+    **/
+    public Purpose attributes(List<Attribute> attributes) {
+
+        this.attributes = attributes;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("enabled")
+    @JsonProperty("attributes")
     @Valid
-    public Boolean getEnabled() {
-        return enabled;
+    public List<Attribute> getAttributes() {
+        return attributes;
     }
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    public void setAttributes(List<Attribute> attributes) {
+        this.attributes = attributes;
     }
 
-    /**
-    **/
-    public SAMLResponseSigning signingAlgorithm(String signingAlgorithm) {
-
-        this.signingAlgorithm = signingAlgorithm;
+    public Purpose addAttributesItem(Attribute attributesItem) {
+        if (this.attributes == null) {
+            this.attributes = new ArrayList<>();
+        }
+        this.attributes.add(attributesItem);
         return this;
     }
+
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("signingAlgorithm")
-    @Valid
-    public String getSigningAlgorithm() {
-        return signingAlgorithm;
-    }
-    public void setSigningAlgorithm(String signingAlgorithm) {
-        this.signingAlgorithm = signingAlgorithm;
-    }
-
-
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -80,24 +94,24 @@ public class SAMLResponseSigning  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SAMLResponseSigning saMLResponseSigning = (SAMLResponseSigning) o;
-        return Objects.equals(this.enabled, saMLResponseSigning.enabled) &&
-            Objects.equals(this.signingAlgorithm, saMLResponseSigning.signingAlgorithm);
+        Purpose purpose = (Purpose) o;
+        return Objects.equals(this.name, purpose.name) &&
+            Objects.equals(this.attributes, purpose.attributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabled, signingAlgorithm);
+        return Objects.hash(name, attributes);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class SAMLResponseSigning {\n");
+        sb.append("class Purpose {\n");
         
-        sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
-        sb.append("    signingAlgorithm: ").append(toIndentedString(signingAlgorithm)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("}");
         return sb.toString();
     }

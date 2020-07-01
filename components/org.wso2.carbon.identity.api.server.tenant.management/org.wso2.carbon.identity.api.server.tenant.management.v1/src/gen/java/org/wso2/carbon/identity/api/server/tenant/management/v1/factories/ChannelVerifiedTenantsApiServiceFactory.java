@@ -14,16 +14,16 @@
 * limitations under the License.
 */
 
-package org.wso2.carbon.identity.api.server.application.management.v1.factories;
+package org.wso2.carbon.identity.api.server.tenant.management.v1.factories;
 
-import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
-import org.wso2.carbon.identity.api.server.application.management.v1.impl.ApplicationsApiServiceImpl;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.ChannelVerifiedTenantsApiService;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.impl.ChannelVerifiedTenantsApiServiceImpl;
 
-public class ApplicationsApiServiceFactory {
+public class ChannelVerifiedTenantsApiServiceFactory {
 
-   private final static ApplicationsApiService service = new ApplicationsApiServiceImpl();
+   private final static ChannelVerifiedTenantsApiService service = new ChannelVerifiedTenantsApiServiceImpl();
 
-   public static ApplicationsApiService getApplicationsApi()
+   public static ChannelVerifiedTenantsApiService getChannelVerifiedTenantsApi()
    {
       return service;
    }

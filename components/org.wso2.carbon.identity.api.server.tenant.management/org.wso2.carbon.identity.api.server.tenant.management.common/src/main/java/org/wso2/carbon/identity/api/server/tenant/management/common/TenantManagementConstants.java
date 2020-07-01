@@ -51,7 +51,9 @@ public class TenantManagementConstants {
         ERROR_CODE_BUILDING_LINKS("TM-65005", "Error building page links", "Error occurred during building page links. "
                 + "%s"),
         ERROR_CODE_FILTER_NOT_IMPLEMENTED("TM-65006", "Filtering not supported.", "Filtering capability is not " +
-                "supported in this version of the API.");
+                "supported in this version of the API."),
+        ERROR_CODE_ERROR_VALIDATING_TENANT_CODE("TM-65007",
+                                               "Unable to add tenant.", "Error occurred in validating the code.");
 
         private final String code;
         private final String message;
