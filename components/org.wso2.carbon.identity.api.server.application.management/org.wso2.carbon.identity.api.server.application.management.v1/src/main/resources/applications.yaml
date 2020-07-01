@@ -3037,6 +3037,8 @@ components:
           $ref: '#/components/schemas/MetadataProperty'
         accessTokenType:
           $ref: '#/components/schemas/MetadataProperty'
+        accessTokenBindingType:
+          $ref: '#/components/schemas/MetadataProperty'
     WSTrustMetaData:
       type: object
       properties:
