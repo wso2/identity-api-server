@@ -33,7 +33,7 @@ public class AccessTokenConfiguration  {
     private String type;
     private Long userAccessTokenExpiryInSeconds;
     private Long applicationAccessTokenExpiryInSeconds;
-    private String bindingType;
+    private String bindingType = "None";
 
     /**
     **/
@@ -90,7 +90,7 @@ public class AccessTokenConfiguration  {
     }
 
     /**
-    * Access token binding type.
+    * OAuth2 access token and refresh token can be bound to an external attribute during the token generation so that it can be optionally validated during the API invocation.
     **/
     public AccessTokenConfiguration bindingType(String bindingType) {
 
@@ -98,7 +98,7 @@ public class AccessTokenConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"sso-session\",\"cookie\"]", value = "Access token binding type.")
+    @ApiModelProperty(example = "[\"sso-session\",\"cookie\"]", value = "OAuth2 access token and refresh token can be bound to an external attribute during the token generation so that it can be optionally validated during the API invocation.")
     @JsonProperty("bindingType")
     @Valid
     public String getBindingType() {

@@ -2796,7 +2796,9 @@ components:
           example: 3600
         bindingType:
           type: string
-          description: Access token binding type.
+          description: "OAuth2 access token and refresh token can be bound to an external attribute during the token
+          generation so that it can be optionally validated during the API invocation."
+          default: "None"
           example:
             - sso-session
             - cookie
