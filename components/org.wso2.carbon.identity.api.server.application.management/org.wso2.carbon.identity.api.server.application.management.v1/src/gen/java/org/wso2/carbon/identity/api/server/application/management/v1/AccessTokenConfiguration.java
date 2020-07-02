@@ -33,6 +33,7 @@ public class AccessTokenConfiguration  {
     private String type;
     private Long userAccessTokenExpiryInSeconds;
     private Long applicationAccessTokenExpiryInSeconds;
+    private String bindingType = "None";
 
     /**
     **/
@@ -88,6 +89,25 @@ public class AccessTokenConfiguration  {
         this.applicationAccessTokenExpiryInSeconds = applicationAccessTokenExpiryInSeconds;
     }
 
+    /**
+    * OAuth2 access token and refresh token can be bound to an external attribute during the token generation so that it can be optionally validated during the API invocation.
+    **/
+    public AccessTokenConfiguration bindingType(String bindingType) {
+
+        this.bindingType = bindingType;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"sso-session\",\"cookie\"]", value = "OAuth2 access token and refresh token can be bound to an external attribute during the token generation so that it can be optionally validated during the API invocation.")
+    @JsonProperty("bindingType")
+    @Valid
+    public String getBindingType() {
+        return bindingType;
+    }
+    public void setBindingType(String bindingType) {
+        this.bindingType = bindingType;
+    }
+
 
 
     @Override
@@ -102,12 +122,13 @@ public class AccessTokenConfiguration  {
         AccessTokenConfiguration accessTokenConfiguration = (AccessTokenConfiguration) o;
         return Objects.equals(this.type, accessTokenConfiguration.type) &&
             Objects.equals(this.userAccessTokenExpiryInSeconds, accessTokenConfiguration.userAccessTokenExpiryInSeconds) &&
-            Objects.equals(this.applicationAccessTokenExpiryInSeconds, accessTokenConfiguration.applicationAccessTokenExpiryInSeconds);
+            Objects.equals(this.applicationAccessTokenExpiryInSeconds, accessTokenConfiguration.applicationAccessTokenExpiryInSeconds) &&
+            Objects.equals(this.bindingType, accessTokenConfiguration.bindingType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds);
+        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType);
     }
 
     @Override
@@ -119,6 +140,7 @@ public class AccessTokenConfiguration  {
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    userAccessTokenExpiryInSeconds: ").append(toIndentedString(userAccessTokenExpiryInSeconds)).append("\n");
         sb.append("    applicationAccessTokenExpiryInSeconds: ").append(toIndentedString(applicationAccessTokenExpiryInSeconds)).append("\n");
+        sb.append("    bindingType: ").append(toIndentedString(bindingType)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -2771,12 +2771,6 @@ components:
             - RoleBasedScopeValidator
           items:
             type: string
-        accessTokenBindingType:
-          type: string
-          description: Access token binding type.
-          example:
-            - sso-session
-            - cookie
     OAuth2PKCEConfiguration:
       type: object
       properties:
@@ -2800,6 +2794,14 @@ components:
           type: integer
           format: int64
           example: 3600
+        bindingType:
+          type: string
+          description: "OAuth2 access token and refresh token can be bound to an external attribute during the token
+          generation so that it can be optionally validated during the API invocation."
+          default: "None"
+          example:
+            - sso-session
+            - cookie
     RefreshTokenConfiguration:
       type: object
       properties:
@@ -3036,6 +3038,8 @@ components:
         scopeValidators:
           $ref: '#/components/schemas/MetadataProperty'
         accessTokenType:
+          $ref: '#/components/schemas/MetadataProperty'
+        accessTokenBindingType:
           $ref: '#/components/schemas/MetadataProperty'
     WSTrustMetaData:
       type: object
