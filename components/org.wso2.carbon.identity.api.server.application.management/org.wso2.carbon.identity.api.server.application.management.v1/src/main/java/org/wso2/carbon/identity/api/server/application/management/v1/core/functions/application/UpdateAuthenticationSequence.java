@@ -61,11 +61,13 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
         if (isRevertToDefaultSequence(authSequenceApiModel, localAndOutboundConfig)) {
             localAndOutboundConfig.setAuthenticationType(ApplicationConstants.AUTH_TYPE_DEFAULT);
             localAndOutboundConfig.setAuthenticationSteps(new AuthenticationStep[0]);
-        } else {
+        } else if (authSequenceApiModel.getType() != AuthenticationSequence.TypeEnum.DEFAULT) {
             AuthenticationStep[] authenticationSteps = getAuthenticationSteps(authSequenceApiModel);
             localAndOutboundConfig.setAuthenticationType(ApplicationConstants.AUTH_TYPE_FLOW);
             localAndOutboundConfig.setAuthenticationSteps(authenticationSteps);
         }
+        // If the authSequenceApiModel.getType() = DEFAULT, we don't have to worry about setting authentication steps
+        // and related configs.
     }
 
     private void updateAdaptiveAuthenticationScript(AuthenticationSequence authSequenceApiModel,
@@ -201,10 +203,11 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
     }
 
     private boolean isRevertToDefaultSequence(AuthenticationSequence authSequenceApiModel,
-                                              LocalAndOutboundAuthenticationConfig localAndOutboundConfig) {
+            LocalAndOutboundAuthenticationConfig localAndOutboundConfig) {
 
         String currentAuthenticationType = localAndOutboundConfig.getAuthenticationType();
-        return authSequenceApiModel.getType() == AuthenticationSequence.TypeEnum.DEFAULT &&
-                !currentAuthenticationType.equalsIgnoreCase(AuthenticationSequence.TypeEnum.DEFAULT.toString());
+        return authSequenceApiModel.getType() == AuthenticationSequence.TypeEnum.DEFAULT
+                && StringUtils.isNotBlank(currentAuthenticationType)
+                && !AuthenticationSequence.TypeEnum.DEFAULT.toString().equalsIgnoreCase(currentAuthenticationType);
     }
 }

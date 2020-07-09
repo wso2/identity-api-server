@@ -153,6 +153,11 @@ public class ServerApplicationManagementService {
     private static final String FILTER_CONTAINS = "co";
     private static final int DEFAULT_OFFSET = 0;
 
+    // WS-Trust related constants.
+    private static final String WS_TRUST_TEMPLATE_ID = "061a3de4-8c08-4878-84a6-24245f11bf0e";
+    private static final String STS_TEMPLATE_NOT_FOUND_MESSAGE = "Request template with id: %s could " +
+            "not be found since the WS-Trust connector has not been configured.";
+
     static {
         SEARCH_SUPPORTED_FIELDS.add(APP_NAME);
     }

@@ -415,7 +415,7 @@ components:
           example: "2020-03-03T17:04:06.570+05:30"
           readOnly: true
           description: Tenant created time.
-        lifecycle-status:
+        lifecycleStatus:
           $ref: '#/components/schemas/LifeCycleStatus'
         region:
           type: string
@@ -471,10 +471,10 @@ components:
             $ref: '#/components/schemas/OwnerResponse'
         createdDate:
           type: string
-          example: "2020-03-03T17:04:06.570+05:30"
+          example: "2020-06-19T17:36:46.271Z"
           readOnly: true
-          description: Tenant created time.
-        lifecycle-status:
+          description: Tenant created time in ISO-8601 format.
+        lifecycleStatus:
           $ref: '#/components/schemas/LifeCycleStatus'
         region:
           type: string
@@ -485,7 +485,7 @@ components:
     TenantPutModel:
       type: object
       required:
-        - lifecycle-status
+        - lifecycleStatus
       properties:
         activated:
           type: boolean
