@@ -505,13 +505,12 @@ public class ServerTenantManagementService {
         Map<String, String> claimsMap = new HashMap<>();
 
         tenant.setActive(true);
-        tenant.setDomain(channelVerifiedTenantModel.getDomain());
+        tenant.setDomain(StringUtils.lowerCase(channelVerifiedTenantModel.getDomain()));
         if (channelVerifiedTenantModel.getOwners() != null && channelVerifiedTenantModel.getOwners().size() > 0
                 && channelVerifiedTenantModel.getOwners().get(0) != null) {
             tenant.setAdminName(channelVerifiedTenantModel.getOwners().get(0).getEmail());
             tenant.setAdminFirstName(channelVerifiedTenantModel.getOwners().get(0).getFirstname());
             tenant.setAdminLastName(channelVerifiedTenantModel.getOwners().get(0).getLastname());
-            tenant.setDomain(channelVerifiedTenantModel.getDomain());
             tenant.setEmail(channelVerifiedTenantModel.getOwners().get(0).getEmail());
 
             tenant.setProvisioningMethod(VERIFIED_LITE_USER);
