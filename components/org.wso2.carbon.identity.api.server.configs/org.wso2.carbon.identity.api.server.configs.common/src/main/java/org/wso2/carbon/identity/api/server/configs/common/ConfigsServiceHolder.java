@@ -17,6 +17,7 @@
 package org.wso2.carbon.identity.api.server.configs.common;
 
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 
 /**
@@ -25,8 +26,10 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 public class ConfigsServiceHolder {
 
     private static ConfigsServiceHolder instance = new ConfigsServiceHolder();
+
     private ApplicationManagementService applicationManagementService;
     private IdentityProviderManager identityProviderManager;
+    private CORSManagementService corsManagementService;
 
     private ConfigsServiceHolder() {}
 
@@ -73,5 +76,25 @@ public class ConfigsServiceHolder {
     public void setIdentityProviderManager(IdentityProviderManager identityProviderManager) {
 
         ConfigsServiceHolder.getInstance().identityProviderManager = identityProviderManager;
+    }
+
+    /**
+     * Get CORSManagementService osgi service.
+     *
+     * @return CORSManagementService
+     */
+    public CORSManagementService getCorsManagementService() {
+
+        return ConfigsServiceHolder.getInstance().corsManagementService;
+    }
+
+    /**
+     * Set CORSManagementService osgi service.
+     *
+     * @param corsManagementService CORSManagementService.
+     */
+    public void setCorsManagementService(CORSManagementService corsManagementService) {
+
+        ConfigsServiceHolder.getInstance().corsManagementService = corsManagementService;
     }
 }

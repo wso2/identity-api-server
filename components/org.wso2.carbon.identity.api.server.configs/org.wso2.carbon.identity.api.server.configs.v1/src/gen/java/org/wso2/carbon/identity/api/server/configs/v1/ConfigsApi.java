@@ -20,9 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
+import java.util.List;
 
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
@@ -67,6 +70,30 @@ public class ConfigsApi  {
     public Response getAuthenticator(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId) {
 
         return delegate.getAuthenticator(authenticatorId );
+    }
+
+    @Valid
+    @GET
+    @Path("/cors")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the tenant CORS configuration.", notes = "Retrieve the tenant CORS configuration.", response = CORSConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "CORS", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = CORSConfig.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getCORSConfiguration() {
+
+        return delegate.getCORSConfiguration();
     }
 
     @Valid
@@ -137,9 +164,33 @@ public class ConfigsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response listAuthenticators(    @Valid@ApiParam(value = "Type of authenticators. Can be either 'LOCAL' or 'REQUESTPATH' ")  @QueryParam("type") String type) {
+    public Response listAuthenticators(    @Valid@ApiParam(value = "Type of authenticators. Can be either 'LOCAL' or 'REQUEST_PATH' ")  @QueryParam("type") String type) {
 
         return delegate.listAuthenticators(type );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/cors")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch the tenant CORS configuration.", notes = "A JSONPatch as defined by RFC 6902.", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "CORS", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchCORSConfiguration(@ApiParam(value = "" ,required=true) @Valid List<CORSPatch> coRSPatch) {
+
+        return delegate.patchCORSConfiguration(coRSPatch );
     }
 
     @Valid
