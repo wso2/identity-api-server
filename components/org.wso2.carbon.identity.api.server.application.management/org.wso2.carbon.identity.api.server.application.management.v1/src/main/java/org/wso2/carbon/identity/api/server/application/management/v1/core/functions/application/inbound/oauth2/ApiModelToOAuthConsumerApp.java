@@ -113,9 +113,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
 
     private void updateAllowedOrigins(OAuthConsumerAppDTO consumerAppDTO, List<String> allowedOrigins) {
 
-        if (CollectionUtils.isNotEmpty(allowedOrigins)) {
-            throw Utils.buildNotImplementedError("Allowed origins are not supported for OAuth apps yet.");
-        }
+        // CORS are updated directly at the REST API level through the CORS Management OSGi service.
     }
 
     private void updateAccessTokenConfiguration(OAuthConsumerAppDTO consumerAppDTO,
