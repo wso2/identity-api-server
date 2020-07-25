@@ -70,6 +70,28 @@ public class TenantsApi  {
     }
 
     @Valid
+    @DELETE
+    @Path("/{tenant-id}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete tenant by tenant ID.", notes = "This API provides the capability to delete tenant by the tenant ID. <b>Permission required:</b> * /permission/protected/manage/modify/tenants <b>scope required:</b> * internal_modify_tenants ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Tenants", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "No Content", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public Response deleteTenant(@ApiParam(value = "tenant id",required=true) @PathParam("tenant-id") String tenantId) {
+
+        return delegate.deleteTenant(tenantId );
+    }
+
+    @Valid
     @GET
     @Path("/{tenant-id}/owners")
     

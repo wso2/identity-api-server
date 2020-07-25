@@ -53,7 +53,10 @@ public class TenantManagementConstants {
         ERROR_CODE_FILTER_NOT_IMPLEMENTED("TM-65006", "Filtering not supported.", "Filtering capability is not " +
                 "supported in this version of the API."),
         ERROR_CODE_ERROR_VALIDATING_TENANT_CODE("TM-65007",
-                                               "Unable to add tenant.", "Error occurred in validating the code.");
+                                               "Unable to add tenant.", "Error occurred in validating the code."),
+        ERROR_CODE_ERROR_DELETING_TENANT("TM-65008",
+                "Unable to delete the tenant.", "Server encountered an error while deleting the tenant for " +
+                "identifier %s.");
 
         private final String code;
         private final String message;

@@ -99,6 +99,21 @@ public class ServerTenantManagementService {
     }
 
     /**
+     * Delete a tenant identified by tenant unique id.
+     *
+     * @param tenantUniqueID tenant unique identifier.
+     */
+    public void deleteTenant(String tenantUniqueID) {
+
+        try {
+            TenantManagementServiceHolder.getTenantMgtService().deleteTenant(tenantUniqueID);
+        } catch (TenantMgtException e) {
+            throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_DELETING_TENANT, tenantUniqueID);
+        }
+    }
+
+    /**
      * Get tenant list.
      *
      * @param limit     Items per page.
