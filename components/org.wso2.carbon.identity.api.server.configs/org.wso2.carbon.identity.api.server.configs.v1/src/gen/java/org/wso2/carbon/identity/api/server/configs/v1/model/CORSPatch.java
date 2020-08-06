@@ -22,16 +22,13 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
-/**
- * A JSONPatch as defined by RFC 6902. Patch operation is supported only for root level attributes of ServerConfig.
- **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "A JSONPatch as defined by RFC 6902. Patch operation is supported only for root level attributes of ServerConfig.")
-public class Patch  {
+
+public class CORSPatch  {
   
 
 @XmlType(name="OperationEnum")
@@ -71,15 +68,15 @@ public enum OperationEnum {
     private String value;
 
     /**
-    * The operation to be performed
+    * The operation to be performed.
     **/
-    public Patch operation(OperationEnum operation) {
+    public CORSPatch operation(OperationEnum operation) {
 
         this.operation = operation;
         return this;
     }
     
-    @ApiModelProperty(example = "REPLACE", required = true, value = "The operation to be performed")
+    @ApiModelProperty(example = "ADD", required = true, value = "The operation to be performed.")
     @JsonProperty("operation")
     @Valid
     @NotNull(message = "Property operation cannot be null.")
@@ -94,13 +91,13 @@ public enum OperationEnum {
     /**
     * A JSON-Pointer
     **/
-    public Patch path(String path) {
+    public CORSPatch path(String path) {
 
         this.path = path;
         return this;
     }
     
-    @ApiModelProperty(example = "/idleSessionTimeoutPeriod", required = true, value = "A JSON-Pointer")
+    @ApiModelProperty(example = "/allowGenericHttpRequests", required = true, value = "A JSON-Pointer")
     @JsonProperty("path")
     @Valid
     @NotNull(message = "Property path cannot be null.")
@@ -113,17 +110,19 @@ public enum OperationEnum {
     }
 
     /**
-    * The value to be used within the operations
+    * The value to be used within the operations.
     **/
-    public Patch value(String value) {
+    public CORSPatch value(String value) {
 
         this.value = value;
         return this;
     }
     
-    @ApiModelProperty(example = "30", value = "The value to be used within the operations")
+    @ApiModelProperty(example = "30", required = true, value = "The value to be used within the operations.")
     @JsonProperty("value")
     @Valid
+    @NotNull(message = "Property value cannot be null.")
+
     public String getValue() {
         return value;
     }
@@ -142,10 +141,10 @@ public enum OperationEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Patch patch = (Patch) o;
-        return Objects.equals(this.operation, patch.operation) &&
-            Objects.equals(this.path, patch.path) &&
-            Objects.equals(this.value, patch.value);
+        CORSPatch coRSPatch = (CORSPatch) o;
+        return Objects.equals(this.operation, coRSPatch.operation) &&
+            Objects.equals(this.path, coRSPatch.path) &&
+            Objects.equals(this.value, coRSPatch.value);
     }
 
     @Override
@@ -157,7 +156,7 @@ public enum OperationEnum {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class Patch {\n");
+        sb.append("class CORSPatch {\n");
         
         sb.append("    operation: ").append(toIndentedString(operation)).append("\n");
         sb.append("    path: ").append(toIndentedString(path)).append("\n");
