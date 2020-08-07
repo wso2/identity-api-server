@@ -126,6 +126,8 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             consumerAppDTO.setUserAccessTokenExpiryTime(accessToken.getUserAccessTokenExpiryInSeconds());
             consumerAppDTO.setApplicationAccessTokenExpiryTime(accessToken.getApplicationAccessTokenExpiryInSeconds());
             consumerAppDTO.setTokenBindingType(accessToken.getBindingType());
+            consumerAppDTO.setTokenRevocationWithIDPSessionTerminationEnabled(accessToken
+                    .getRevokeTokensWhenIDPSessionTerminated());
         }
     }
 

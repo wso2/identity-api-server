@@ -34,6 +34,7 @@ public class AccessTokenConfiguration  {
     private Long userAccessTokenExpiryInSeconds;
     private Long applicationAccessTokenExpiryInSeconds;
     private String bindingType = "None";
+    private Boolean revokeTokensWhenIDPSessionTerminated;
 
     /**
     **/
@@ -108,6 +109,25 @@ public class AccessTokenConfiguration  {
         this.bindingType = bindingType;
     }
 
+    /**
+    * If enabled, when the IDP session is terminated, all the access tokens bound to the session will get revoked.
+    **/
+    public AccessTokenConfiguration revokeTokensWhenIDPSessionTerminated(Boolean revokeTokensWhenIDPSessionTerminated) {
+
+        this.revokeTokensWhenIDPSessionTerminated = revokeTokensWhenIDPSessionTerminated;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "If enabled, when the IDP session is terminated, all the access tokens bound to the session will get revoked.")
+    @JsonProperty("revokeTokensWhenIDPSessionTerminated")
+    @Valid
+    public Boolean getRevokeTokensWhenIDPSessionTerminated() {
+        return revokeTokensWhenIDPSessionTerminated;
+    }
+    public void setRevokeTokensWhenIDPSessionTerminated(Boolean revokeTokensWhenIDPSessionTerminated) {
+        this.revokeTokensWhenIDPSessionTerminated = revokeTokensWhenIDPSessionTerminated;
+    }
+
 
 
     @Override
@@ -123,12 +143,13 @@ public class AccessTokenConfiguration  {
         return Objects.equals(this.type, accessTokenConfiguration.type) &&
             Objects.equals(this.userAccessTokenExpiryInSeconds, accessTokenConfiguration.userAccessTokenExpiryInSeconds) &&
             Objects.equals(this.applicationAccessTokenExpiryInSeconds, accessTokenConfiguration.applicationAccessTokenExpiryInSeconds) &&
-            Objects.equals(this.bindingType, accessTokenConfiguration.bindingType);
+            Objects.equals(this.bindingType, accessTokenConfiguration.bindingType) &&
+            Objects.equals(this.revokeTokensWhenIDPSessionTerminated, accessTokenConfiguration.revokeTokensWhenIDPSessionTerminated);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType);
+        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated);
     }
 
     @Override
@@ -141,6 +162,7 @@ public class AccessTokenConfiguration  {
         sb.append("    userAccessTokenExpiryInSeconds: ").append(toIndentedString(userAccessTokenExpiryInSeconds)).append("\n");
         sb.append("    applicationAccessTokenExpiryInSeconds: ").append(toIndentedString(applicationAccessTokenExpiryInSeconds)).append("\n");
         sb.append("    bindingType: ").append(toIndentedString(bindingType)).append("\n");
+        sb.append("    revokeTokensWhenIDPSessionTerminated: ").append(toIndentedString(revokeTokensWhenIDPSessionTerminated)).append("\n");
         sb.append("}");
         return sb.toString();
     }
