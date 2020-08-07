@@ -44,7 +44,6 @@ public class Constants {
     public static final String CORS_CONFIG_EXPOSED_HEADERS_PATH_REGEX = "^/exposedHeaders$";
     public static final String CORS_CONFIG_SUPPORTS_CREDENTIALS_PATH_REGEX = "^/supportsCredentials$";
     public static final String CORS_CONFIG_MAX_AGE_PATH_REGEX = "^/maxAge$";
-    public static final String CORS_CONFIG_TAG_REQUESTS_PATH_REGEX = "^/tagRequests$";
 
     /**
      * Enum for error messages.

@@ -315,8 +315,6 @@ public class ServerConfigManagementService {
                         corsConfiguration.setSupportsCredentials(Boolean.parseBoolean(value));
                     } else if (path.matches(Constants.CORS_CONFIG_MAX_AGE_PATH_REGEX)) {
                         corsConfiguration.setMaxAge(Integer.parseInt(value));
-                    } else if (path.matches(Constants.CORS_CONFIG_TAG_REQUESTS_PATH_REGEX)) {
-                        corsConfiguration.setTagRequests(Boolean.parseBoolean(value));
                     } else {
                         // Throw an error if any other patch operations are sent in the request.
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
