@@ -547,10 +547,6 @@ components:
           type: number
           description: Indicates how long the results of a preflight request can be cached by the web client, in seconds. If -1 then unspecified.
           example: 3600
-        tagRequests:
-          type: boolean
-          description: Enables HTTP servlet request tagging to provide CORS information to downstream handlers.
-          example: false
     CORSPatchRequest:
       type: array
       items:
