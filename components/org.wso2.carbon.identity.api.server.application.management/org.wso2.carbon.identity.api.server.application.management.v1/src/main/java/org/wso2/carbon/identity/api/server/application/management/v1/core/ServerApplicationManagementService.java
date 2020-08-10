@@ -817,7 +817,6 @@ public class ServerApplicationManagementService {
                         .getApplicationBasicInfoByResourceId(applicationId, tenantDomain);
                 existingCORSOrigins = corsOriginDAO.getCORSOriginsByApplicationId(
                         applicationBasicInfo.getApplicationId(), tenantId);
-
                 corsOriginDAO.deleteCORSOrigins(applicationBasicInfo.getApplicationId(), existingCORSOrigins.stream()
                         .map(CORSOrigin::getId).collect(Collectors.toList()), tenantId);
             } catch (CORSManagementServiceServerException | IdentityApplicationManagementException e) {
