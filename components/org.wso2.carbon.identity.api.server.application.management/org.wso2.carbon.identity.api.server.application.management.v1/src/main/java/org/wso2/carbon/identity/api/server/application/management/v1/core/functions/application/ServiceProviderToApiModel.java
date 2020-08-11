@@ -80,6 +80,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .description(application.getDescription())
                     .imageUrl(application.getImageUrl())
                     .accessUrl(application.getAccessUrl())
+                    .templateId(application.getTemplateId())
                     .claimConfiguration(buildClaimConfiguration(application))
                     .inboundProtocols(buildInboundProtocols(application))
                     .advancedConfigurations(buildAdvancedAppConfiguration(application))

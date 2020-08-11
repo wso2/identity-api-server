@@ -731,7 +731,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response importApplication( @Multipart(value = "file", required = false) InputStream fileInputStream, @Multipart(value = "file" , required = false) Attachment fileDetail) {
+    public Response importApplication(@Multipart(value = "file", required = false) InputStream fileInputStream,@Multipart(value = "file" , required = false) Attachment fileDetail) {
 
         return delegate.importApplication(fileInputStream, fileDetail );
     }
@@ -756,7 +756,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response importApplicationForUpdate( @Multipart(value = "file", required = false) InputStream fileInputStream, @Multipart(value = "file" , required = false) Attachment fileDetail) {
+    public Response importApplicationForUpdate(@Multipart(value = "file", required = false) InputStream fileInputStream,@Multipart(value = "file" , required = false) Attachment fileDetail) {
 
         return delegate.importApplicationForUpdate(fileInputStream, fileDetail );
     }

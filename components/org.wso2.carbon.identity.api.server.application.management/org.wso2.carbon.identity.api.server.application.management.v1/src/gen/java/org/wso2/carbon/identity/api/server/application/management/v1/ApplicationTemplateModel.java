@@ -45,7 +45,7 @@ public class ApplicationTemplateModel  {
 @XmlEnum(String.class)
 public enum CategoryEnum {
 
-    @XmlEnumValue("DEFAULT") DEFAULT(String.valueOf("DEFAULT")), @XmlEnumValue("CUSTOM") CUSTOM(String.valueOf("CUSTOM"));
+    @XmlEnumValue("DEFAULT") DEFAULT(String.valueOf("DEFAULT")), @XmlEnumValue("VENDOR") VENDOR(String.valueOf("VENDOR"));
 
 
     private String value;
@@ -74,6 +74,7 @@ public enum CategoryEnum {
 }
 
     private CategoryEnum category;
+    private String templateGroup;
     private Integer displayOrder;
     private ApplicationModel application;
 
@@ -215,6 +216,24 @@ public enum CategoryEnum {
 
     /**
     **/
+    public ApplicationTemplateModel templateGroup(String templateGroup) {
+
+        this.templateGroup = templateGroup;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "web-application", value = "")
+    @JsonProperty("templateGroup")
+    @Valid
+    public String getTemplateGroup() {
+        return templateGroup;
+    }
+    public void setTemplateGroup(String templateGroup) {
+        this.templateGroup = templateGroup;
+    }
+
+    /**
+    **/
     public ApplicationTemplateModel displayOrder(Integer displayOrder) {
 
         this.displayOrder = displayOrder;
@@ -270,13 +289,14 @@ public enum CategoryEnum {
             Objects.equals(this.authenticationProtocol, applicationTemplateModel.authenticationProtocol) &&
             Objects.equals(this.types, applicationTemplateModel.types) &&
             Objects.equals(this.category, applicationTemplateModel.category) &&
+            Objects.equals(this.templateGroup, applicationTemplateModel.templateGroup) &&
             Objects.equals(this.displayOrder, applicationTemplateModel.displayOrder) &&
             Objects.equals(this.application, applicationTemplateModel.application);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, authenticationProtocol, types, category, displayOrder, application);
+        return Objects.hash(id, name, description, image, authenticationProtocol, types, category, templateGroup, displayOrder, application);
     }
 
     @Override
@@ -292,6 +312,7 @@ public enum CategoryEnum {
         sb.append("    authenticationProtocol: ").append(toIndentedString(authenticationProtocol)).append("\n");
         sb.append("    types: ").append(toIndentedString(types)).append("\n");
         sb.append("    category: ").append(toIndentedString(category)).append("\n");
+        sb.append("    templateGroup: ").append(toIndentedString(templateGroup)).append("\n");
         sb.append("    displayOrder: ").append(toIndentedString(displayOrder)).append("\n");
         sb.append("    application: ").append(toIndentedString(application)).append("\n");
         sb.append("}");
