@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.148-SNAPSHOT</version>
+    <version>1.0.150-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -400,6 +400,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.cors.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-rt-rs-extension-search</artifactId>
                 <version>${cxf.extensions.search.version}</version>
@@ -427,6 +433,12 @@
                 <groupId>org.wso2.carbon.multitenancy</groupId>
                 <artifactId>org.wso2.carbon.tenant.mgt</artifactId>
                 <version>${carbon.multitenancy.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.cors.mgt.core</artifactId>
+                <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>
@@ -540,6 +552,7 @@
         <module>components/org.wso2.carbon.identity.api.server.oidc.scope.management</module>
         <module>components/org.wso2.carbon.identity.api.server.configs</module>
         <module>components/org.wso2.carbon.identity.api.server.tenant.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.cors</module>
     </modules>
 
 </project>

@@ -43,7 +43,6 @@ public class CORSConfig  {
 
     private Boolean supportsCredentials;
     private BigDecimal maxAge;
-    private Boolean tagRequests;
 
     /**
     * If true generic HTTP requests must be allowed to pass through the filter, else only valid and accepted CORS requests must be allowed (strict CORS filtering).
@@ -202,25 +201,6 @@ public class CORSConfig  {
         this.maxAge = maxAge;
     }
 
-    /**
-    * Enables HTTP servlet request tagging to provide CORS information to downstream handlers.
-    **/
-    public CORSConfig tagRequests(Boolean tagRequests) {
-
-        this.tagRequests = tagRequests;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "false", value = "Enables HTTP servlet request tagging to provide CORS information to downstream handlers.")
-    @JsonProperty("tagRequests")
-    @Valid
-    public Boolean getTagRequests() {
-        return tagRequests;
-    }
-    public void setTagRequests(Boolean tagRequests) {
-        this.tagRequests = tagRequests;
-    }
-
 
 
     @Override
@@ -239,13 +219,12 @@ public class CORSConfig  {
             Objects.equals(this.supportedHeaders, coRSConfig.supportedHeaders) &&
             Objects.equals(this.exposedHeaders, coRSConfig.exposedHeaders) &&
             Objects.equals(this.supportsCredentials, coRSConfig.supportsCredentials) &&
-            Objects.equals(this.maxAge, coRSConfig.maxAge) &&
-            Objects.equals(this.tagRequests, coRSConfig.tagRequests);
+            Objects.equals(this.maxAge, coRSConfig.maxAge);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(allowGenericHttpRequests, allowSubdomains, supportedMethods, supportedHeaders, exposedHeaders, supportsCredentials, maxAge, tagRequests);
+        return Objects.hash(allowGenericHttpRequests, allowSubdomains, supportedMethods, supportedHeaders, exposedHeaders, supportsCredentials, maxAge);
     }
 
     @Override
@@ -261,7 +240,6 @@ public class CORSConfig  {
         sb.append("    exposedHeaders: ").append(toIndentedString(exposedHeaders)).append("\n");
         sb.append("    supportsCredentials: ").append(toIndentedString(supportsCredentials)).append("\n");
         sb.append("    maxAge: ").append(toIndentedString(maxAge)).append("\n");
-        sb.append("    tagRequests: ").append(toIndentedString(tagRequests)).append("\n");
         sb.append("}");
         return sb.toString();
     }

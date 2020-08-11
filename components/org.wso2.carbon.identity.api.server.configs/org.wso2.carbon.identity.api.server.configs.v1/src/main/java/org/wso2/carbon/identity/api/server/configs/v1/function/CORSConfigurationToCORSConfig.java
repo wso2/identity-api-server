@@ -42,7 +42,6 @@ public class CORSConfigurationToCORSConfig implements Function<CORSConfiguration
         corsConfig.setExposedHeaders(new ArrayList<>(corsConfiguration.getExposedHeaders()));
         corsConfig.setSupportsCredentials(corsConfiguration.isSupportsCredentials());
         corsConfig.setMaxAge(BigDecimal.valueOf(corsConfiguration.getMaxAge()));
-        corsConfig.setTagRequests(corsConfiguration.isTagRequests());
 
         return corsConfig;
     }

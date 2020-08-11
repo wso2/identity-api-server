@@ -140,6 +140,7 @@ public class ApplicationModel  {
     }
 
     /**
+     * Set template id
     **/
     public ApplicationModel templateId(String templateId) {
 
