@@ -162,6 +162,7 @@ public class ApplicationManagementConstants {
         public static final String TYPES = "types";
         public static final String CATEGORY = "category";
         public static final String DISPLAY_ORDER = "display-order";
+        public static final String TEMPLATE_GROUP = "templateGroup";
 
         // Application Template Search.
         public static final List<String> SEARCH_KEYS = Collections.unmodifiableList(Arrays.asList("description",

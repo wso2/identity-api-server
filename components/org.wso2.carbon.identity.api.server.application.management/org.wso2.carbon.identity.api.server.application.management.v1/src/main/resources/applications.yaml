@@ -2223,6 +2223,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        templateId:
+          type: string
+          example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocolConfiguration:
@@ -3147,11 +3150,14 @@ components:
               - angular
         category:
           type: string
-          enum: [DEFAULT, CUSTOM]
+          enum: [DEFAULT, VENDOR]
           example: 'DEFAULT'
         displayOrder:
           type: integer
           example: 2
+        templateGroup:
+          type: string
+          example: "web-application"
         self:
           type: string
           example: "/t/wso2.com/api/server/v1/applications/templates/85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
@@ -3184,8 +3190,11 @@ components:
             - angular
         category:
           type: string
-          enum: [DEFAULT, CUSTOM]
+          enum: [DEFAULT, VENDOR]
           example: 'DEFAULT'
+        templateGroup:
+          type: string
+          example: "web-application"
         displayOrder:
           type: integer
           example: 2

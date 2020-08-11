@@ -17,23 +17,13 @@
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
-import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
-import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import javax.validation.constraints.*;
 
-
-import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
 
 public class ApplicationResponseModel  {
   
@@ -42,6 +32,7 @@ public class ApplicationResponseModel  {
     private String description;
     private String imageUrl;
     private String accessUrl;
+    private String templateId;
     private ClaimConfiguration claimConfiguration;
     private List<InboundProtocolListItem> inboundProtocols = null;
 
@@ -139,6 +130,34 @@ public class ApplicationResponseModel  {
     }
     public void setAccessUrl(String accessUrl) {
         this.accessUrl = accessUrl;
+    }
+
+    @ApiModelProperty(example = "adwefi2429asdfdf94444rraf44", value = "")
+    @JsonProperty("templateId")
+    @Valid
+    public String getTemplateId() {
+
+        return templateId;
+    }
+
+    /**
+     * Set template id
+     * @param templateId template id
+     */
+    public void setTemplateId(String templateId) {
+
+        this.templateId = templateId;
+    }
+
+    /**
+     * Set template id
+     * @param templateId template id
+     * @return ApplicationResponseModel
+     */
+    public ApplicationResponseModel templateId(String templateId) {
+
+        this.templateId = templateId;
+        return this;
     }
 
     /**

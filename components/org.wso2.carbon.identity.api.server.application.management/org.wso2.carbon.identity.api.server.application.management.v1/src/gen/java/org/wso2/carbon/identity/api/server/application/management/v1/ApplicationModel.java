@@ -40,6 +40,7 @@ public class ApplicationModel  {
     private String description;
     private String imageUrl;
     private String accessUrl;
+    private String templateId;
     private ClaimConfiguration claimConfiguration;
     private InboundProtocols inboundProtocolConfiguration;
     private AuthenticationSequence authenticationSequence;
@@ -136,6 +137,24 @@ public class ApplicationModel  {
     }
     public void setAccessUrl(String accessUrl) {
         this.accessUrl = accessUrl;
+    }
+
+    /**
+    **/
+    public ApplicationModel templateId(String templateId) {
+
+        this.templateId = templateId;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "980b8tester24c64a8a09a0d80abf8c337bd2555", value = "")
+    @JsonProperty("templateId")
+    @Valid
+    public String getTemplateId() {
+        return templateId;
+    }
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
     }
 
     /**
@@ -245,6 +264,7 @@ public class ApplicationModel  {
             Objects.equals(this.description, applicationModel.description) &&
             Objects.equals(this.imageUrl, applicationModel.imageUrl) &&
             Objects.equals(this.accessUrl, applicationModel.accessUrl) &&
+            Objects.equals(this.templateId, applicationModel.templateId) &&
             Objects.equals(this.claimConfiguration, applicationModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocolConfiguration, applicationModel.inboundProtocolConfiguration) &&
             Objects.equals(this.authenticationSequence, applicationModel.authenticationSequence) &&
@@ -254,7 +274,7 @@ public class ApplicationModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -268,6 +288,7 @@ public class ApplicationModel  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
+        sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocolConfiguration: ").append(toIndentedString(inboundProtocolConfiguration)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
