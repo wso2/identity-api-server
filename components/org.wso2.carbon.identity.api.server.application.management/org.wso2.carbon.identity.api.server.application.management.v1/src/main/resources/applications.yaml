@@ -2805,6 +2805,10 @@ components:
           example:
             - sso-session
             - cookie
+        revokeTokensWhenIDPSessionTerminated:
+          type: boolean
+          description: "If enabled, when the IDP session is terminated, all the access tokens bound to the session
+          will get revoked."
     RefreshTokenConfiguration:
       type: object
       properties:
