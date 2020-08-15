@@ -2741,7 +2741,7 @@ components:
             type: string
         allowedOrigins:
           type: array
-          description: Authorized JavaScript origins
+          description: Authorized JavaScript origins. CORS requests will be allowed to these origins.
           example:
             - 'https://app.example.com/js'
           items:
