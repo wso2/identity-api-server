@@ -20,7 +20,12 @@ paths:
         - CORS origins
       summary: Retrieve the CORS origins.
       operationId: getCORSOrigins
-      description: Retrieve the CORS origins.
+      description: |
+        This API provides the capability to retrieve the list of the allowed CORS origins for the tenant.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/cors/origins/view <br>
+          <b>Scope required:</b> <br>
+              * internal_cors_origins_view
       responses:
         '200':
           description: Successful Response
@@ -56,7 +61,12 @@ paths:
         - Application associations
       summary: Retrieve the Applications associated with a CORS origin by ID.
       operationId: getAssociatedAppsByCORSOrigin
-      description: Retrieve the Applications associated with a CORS origin by ID.
+      description: |
+        This API provides the capability to retrieve the Applications associated with a CORS origin by ID.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/cors/origins/view <br>
+          <b>Scope required:</b> <br>
+              * internal_cors_origins_view
       parameters:
         - name: cors-origin-id
           in: path
