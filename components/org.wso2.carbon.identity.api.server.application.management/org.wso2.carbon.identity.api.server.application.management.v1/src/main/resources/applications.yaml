@@ -2684,7 +2684,7 @@ components:
         defaultAssertionConsumerUrl:
           type: string
           description: "If not provided, the first assertion consumer URL on the assertionConsumerUrls will be picked as the default assertion consumer URL."
-        idpEntityIdAlias  :
+        idpEntityIdAlias:
           type: string
           description: "Default value is the IdP Entity ID value specified in Resident IdP."
 
@@ -3203,7 +3203,7 @@ components:
           type: integer
           example: 2
         application:
-          $ref : '#/components/schemas/ApplicationModel'
+          $ref: '#/components/schemas/ApplicationModel'
       required:
         - name
         - application
