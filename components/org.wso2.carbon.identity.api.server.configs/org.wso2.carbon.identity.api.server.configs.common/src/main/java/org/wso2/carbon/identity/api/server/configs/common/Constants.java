@@ -38,8 +38,10 @@ public class Constants {
      * PATCH operation path for CORS configuration.
      */
     public static final String CORS_CONFIG_ALLOW_GENERIC_HTTP_PATH_REGEX = "^/allowGenericHttpRequests$";
+    public static final String CORS_CONFIG_ALLOW_ANY_ORIGIN_PATH_REGEX = "^/allowAnyOrigin";
     public static final String CORS_CONFIG_ALLOW_SUBDOMAINS_PATH_REGEX = "^/allowSubdomains$";
     public static final String CORS_CONFIG_SUPPORTED_METHODS_PATH_REGEX = "^/supportedMethods$";
+    public static final String CORS_CONFIG_SUPPORT_ANY_HEADER_PATH_REGEX = "^/supportAnyHeader";
     public static final String CORS_CONFIG_SUPPORTED_HEADERS_PATH_REGEX = "^/supportedHeaders$";
     public static final String CORS_CONFIG_EXPOSED_HEADERS_PATH_REGEX = "^/exposedHeaders$";
     public static final String CORS_CONFIG_SUPPORTS_CREDENTIALS_PATH_REGEX = "^/supportsCredentials$";

@@ -36,8 +36,10 @@ public class CORSConfigurationToCORSConfig implements Function<CORSConfiguration
 
         CORSConfig corsConfig = new CORSConfig();
         corsConfig.setAllowGenericHttpRequests(corsConfiguration.isAllowGenericHttpRequests());
+        corsConfig.setAllowAnyOrigin(corsConfiguration.isAllowAnyOrigin());
         corsConfig.setAllowSubdomains(corsConfiguration.isAllowSubdomains());
         corsConfig.setSupportedMethods(new ArrayList<>(corsConfiguration.getSupportedMethods()));
+        corsConfig.setSupportAnyHeader(corsConfiguration.isSupportAnyHeader());
         corsConfig.setSupportedHeaders(new ArrayList<>(corsConfiguration.getSupportedHeaders()));
         corsConfig.setExposedHeaders(new ArrayList<>(corsConfiguration.getExposedHeaders()));
         corsConfig.setSupportsCredentials(corsConfiguration.isSupportsCredentials());

@@ -34,9 +34,11 @@ import javax.xml.bind.annotation.*;
 public class CORSConfig  {
   
     private Boolean allowGenericHttpRequests;
+    private Boolean allowAnyOrigin;
     private Boolean allowSubdomains;
     private List<String> supportedMethods = null;
 
+    private Boolean supportAnyHeader;
     private List<String> supportedHeaders = null;
 
     private List<String> exposedHeaders = null;
@@ -45,7 +47,7 @@ public class CORSConfig  {
     private BigDecimal maxAge;
 
     /**
-    * If true generic HTTP requests must be allowed to pass through the filter, else only valid and accepted CORS requests must be allowed (strict CORS filtering).
+    * If true, generic HTTP requests must be allowed to pass through the filter. Else, only valid and accepted CORS must be allowed (strict CORS filtering).
     **/
     public CORSConfig allowGenericHttpRequests(Boolean allowGenericHttpRequests) {
 
@@ -53,7 +55,7 @@ public class CORSConfig  {
         return this;
     }
     
-    @ApiModelProperty(example = "true", value = "If true generic HTTP requests must be allowed to pass through the filter, else only valid and accepted CORS requests must be allowed (strict CORS filtering).")
+    @ApiModelProperty(example = "true", value = "If true, generic HTTP requests must be allowed to pass through the filter. Else, only valid and accepted CORS must be allowed (strict CORS filtering).")
     @JsonProperty("allowGenericHttpRequests")
     @Valid
     public Boolean getAllowGenericHttpRequests() {
@@ -64,7 +66,26 @@ public class CORSConfig  {
     }
 
     /**
-    * If true the CORS valve must allow requests from any origin which is a subdomain origin of the allowed origins.
+    * If true the CORS valve must allow requests from any origin, else the origin whitelist must be consulted.
+    **/
+    public CORSConfig allowAnyOrigin(Boolean allowAnyOrigin) {
+
+        this.allowAnyOrigin = allowAnyOrigin;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "If true the CORS valve must allow requests from any origin, else the origin whitelist must be consulted.")
+    @JsonProperty("allowAnyOrigin")
+    @Valid
+    public Boolean getAllowAnyOrigin() {
+        return allowAnyOrigin;
+    }
+    public void setAllowAnyOrigin(Boolean allowAnyOrigin) {
+        this.allowAnyOrigin = allowAnyOrigin;
+    }
+
+    /**
+    * If true, the CORS valve must allow requests from any origin which is a subdomain origin of the allowed origins.
     **/
     public CORSConfig allowSubdomains(Boolean allowSubdomains) {
 
@@ -72,7 +93,7 @@ public class CORSConfig  {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "If true the CORS valve must allow requests from any origin which is a subdomain origin of the allowed origins.")
+    @ApiModelProperty(example = "false", value = "If true, the CORS valve must allow requests from any origin which is a subdomain origin of the allowed origins.")
     @JsonProperty("allowSubdomains")
     @Valid
     public Boolean getAllowSubdomains() {
@@ -83,7 +104,7 @@ public class CORSConfig  {
     }
 
     /**
-    * The supported HTTP methods. Requests for methods not included here must be refused by the CORS filter with a HTTP 405 \\\&quot;Method not allowed\\\&quot; response.
+    * The supported HTTP methods. Requests for methods not included here must be refused by the CORS filter with an HTTP 405 \\\&quot;Method not allowed\\\&quot; response.
     **/
     public CORSConfig supportedMethods(List<String> supportedMethods) {
 
@@ -91,7 +112,7 @@ public class CORSConfig  {
         return this;
     }
     
-    @ApiModelProperty(value = "The supported HTTP methods. Requests for methods not included here must be refused by the CORS filter with a HTTP 405 \\\"Method not allowed\\\" response.")
+    @ApiModelProperty(value = "The supported HTTP methods. Requests for methods not included here must be refused by the CORS filter with an HTTP 405 \\\"Method not allowed\\\" response.")
     @JsonProperty("supportedMethods")
     @Valid
     public List<String> getSupportedMethods() {
@@ -110,6 +131,25 @@ public class CORSConfig  {
     }
 
         /**
+    * If true the CORS valve must support any requested header, else the supported headers list must be consulted.
+    **/
+    public CORSConfig supportAnyHeader(Boolean supportAnyHeader) {
+
+        this.supportAnyHeader = supportAnyHeader;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "If true the CORS valve must support any requested header, else the supported headers list must be consulted.")
+    @JsonProperty("supportAnyHeader")
+    @Valid
+    public Boolean getSupportAnyHeader() {
+        return supportAnyHeader;
+    }
+    public void setSupportAnyHeader(Boolean supportAnyHeader) {
+        this.supportAnyHeader = supportAnyHeader;
+    }
+
+    /**
     * The names of the supported author request headers.
     **/
     public CORSConfig supportedHeaders(List<String> supportedHeaders) {
@@ -214,8 +254,10 @@ public class CORSConfig  {
         }
         CORSConfig coRSConfig = (CORSConfig) o;
         return Objects.equals(this.allowGenericHttpRequests, coRSConfig.allowGenericHttpRequests) &&
+            Objects.equals(this.allowAnyOrigin, coRSConfig.allowAnyOrigin) &&
             Objects.equals(this.allowSubdomains, coRSConfig.allowSubdomains) &&
             Objects.equals(this.supportedMethods, coRSConfig.supportedMethods) &&
+            Objects.equals(this.supportAnyHeader, coRSConfig.supportAnyHeader) &&
             Objects.equals(this.supportedHeaders, coRSConfig.supportedHeaders) &&
             Objects.equals(this.exposedHeaders, coRSConfig.exposedHeaders) &&
             Objects.equals(this.supportsCredentials, coRSConfig.supportsCredentials) &&
@@ -224,7 +266,7 @@ public class CORSConfig  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(allowGenericHttpRequests, allowSubdomains, supportedMethods, supportedHeaders, exposedHeaders, supportsCredentials, maxAge);
+        return Objects.hash(allowGenericHttpRequests, allowAnyOrigin, allowSubdomains, supportedMethods, supportAnyHeader, supportedHeaders, exposedHeaders, supportsCredentials, maxAge);
     }
 
     @Override
@@ -234,8 +276,10 @@ public class CORSConfig  {
         sb.append("class CORSConfig {\n");
         
         sb.append("    allowGenericHttpRequests: ").append(toIndentedString(allowGenericHttpRequests)).append("\n");
+        sb.append("    allowAnyOrigin: ").append(toIndentedString(allowAnyOrigin)).append("\n");
         sb.append("    allowSubdomains: ").append(toIndentedString(allowSubdomains)).append("\n");
         sb.append("    supportedMethods: ").append(toIndentedString(supportedMethods)).append("\n");
+        sb.append("    supportAnyHeader: ").append(toIndentedString(supportAnyHeader)).append("\n");
         sb.append("    supportedHeaders: ").append(toIndentedString(supportedHeaders)).append("\n");
         sb.append("    exposedHeaders: ").append(toIndentedString(exposedHeaders)).append("\n");
         sb.append("    supportsCredentials: ").append(toIndentedString(supportsCredentials)).append("\n");

@@ -303,10 +303,14 @@ public class ServerConfigManagementService {
                 if (operation == CORSPatch.OperationEnum.REPLACE) {
                     if (path.matches(Constants.CORS_CONFIG_ALLOW_GENERIC_HTTP_PATH_REGEX)) {
                         corsConfiguration.setAllowGenericHttpRequests(Boolean.parseBoolean(value));
+                    } else if (path.matches(Constants.CORS_CONFIG_ALLOW_ANY_ORIGIN_PATH_REGEX)) {
+                        corsConfiguration.setAllowAnyOrigin(Boolean.parseBoolean(value));
                     } else if (path.matches(Constants.CORS_CONFIG_ALLOW_SUBDOMAINS_PATH_REGEX)) {
                         corsConfiguration.setAllowSubdomains(Boolean.parseBoolean(value));
                     } else if (path.matches(Constants.CORS_CONFIG_SUPPORTED_METHODS_PATH_REGEX)) {
                         corsConfiguration.setSupportedMethods(new HashSet<>(Collections.singletonList(value)));
+                    } else if (path.matches(Constants.CORS_CONFIG_SUPPORT_ANY_HEADER_PATH_REGEX)) {
+                        corsConfiguration.setSupportAnyHeader(Boolean.parseBoolean(value));
                     } else if (path.matches(Constants.CORS_CONFIG_SUPPORTED_HEADERS_PATH_REGEX)) {
                         corsConfiguration.setSupportedHeaders(new HashSet<>(Collections.singletonList(value)));
                     } else if (path.matches(Constants.CORS_CONFIG_EXPOSED_HEADERS_PATH_REGEX)) {

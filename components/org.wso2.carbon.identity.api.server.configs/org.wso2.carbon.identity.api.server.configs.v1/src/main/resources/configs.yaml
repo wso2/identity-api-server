@@ -515,18 +515,26 @@ components:
       properties:
         allowGenericHttpRequests:
           type: boolean
-          description: If true generic HTTP requests must be allowed to pass through the filter, else only valid and accepted CORS requests must be allowed (strict CORS filtering).
+          description: If true, generic HTTP requests must be allowed to pass through the filter. Else, only valid and accepted CORS must be allowed (strict CORS filtering).
           example: true
+        allowAnyOrigin:
+          type: boolean
+          description: If true the CORS valve must allow requests from any origin, else the origin whitelist must be consulted.
+          example: false
         allowSubdomains:
           type: boolean
-          description: If true the CORS valve must allow requests from any origin which is a subdomain origin of the allowed origins.
+          description: If true, the CORS valve must allow requests from any origin which is a subdomain origin of the allowed origins.
           example: false
         supportedMethods:
           type: array
-          description: The supported HTTP methods. Requests for methods not included here must be refused by the CORS filter with a HTTP 405 \"Method not allowed\" response.
+          description: The supported HTTP methods. Requests for methods not included here must be refused by the CORS filter with an HTTP 405 \"Method not allowed\" response.
           items:
             type: string
             example: GET
+        supportAnyHeader:
+          type: boolean
+          description: If true the CORS valve must support any requested header, else the supported headers list must be consulted.
+          example: false
         supportedHeaders:
           type: array
           description: The names of the supported author request headers.
