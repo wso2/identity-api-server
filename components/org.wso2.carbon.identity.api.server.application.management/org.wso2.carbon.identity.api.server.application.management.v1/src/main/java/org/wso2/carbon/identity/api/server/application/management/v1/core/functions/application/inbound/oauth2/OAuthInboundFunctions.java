@@ -20,7 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound
+        .InboundFunctions;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
@@ -220,6 +221,28 @@ public class OAuthInboundFunctions {
                     .updateConsumerAppState(clientId, OAuthConstants.OauthAppStates.APP_STATE_REVOKED);
         } catch (IdentityOAuthAdminException e) {
             throw buildServerError("Error while revoking oauth application.", e);
+        }
+    }
+
+    /**
+     * Set the CORS origins given in the OIDC configurations to the given application.
+     *
+     * @param applicationId   application id
+     * @param oidcConfigModel oidc configurations of the application.
+     */
+    public static void updateCorsOrigins(String applicationId, OpenIDConnectConfiguration oidcConfigModel) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+
+        // Update the CORS origins.
+        List<String> corsOrigins = oidcConfigModel.getAllowedOrigins();
+        try {
+            if (corsOrigins != null) {
+                ApplicationManagementServiceHolder.getInstance().getCorsManagementService()
+                        .setCORSOrigins(applicationId, corsOrigins, tenantDomain);
+            }
+        } catch (CORSManagementServiceException e) {
+            throw handleException(e);
         }
     }
 }
