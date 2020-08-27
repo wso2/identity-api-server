@@ -320,7 +320,14 @@ public class ServerApplicationManagementService {
 
         ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
         try {
-            return getApplicationManagementService().createApplication(application, tenantDomain, username);
+            String applicationId = getApplicationManagementService().createApplication(application, tenantDomain,
+                    username);
+            if (applicationModel.getInboundProtocolConfiguration() != null &&
+                    applicationModel.getInboundProtocolConfiguration().getOidc() != null) {
+                OAuthInboundFunctions.updateCorsOrigins(applicationId, applicationModel
+                        .getInboundProtocolConfiguration().getOidc());
+            }
+            return applicationId;
         } catch (IdentityApplicationManagementException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Error while creating application. Rolling back possibly created inbound config data.");
