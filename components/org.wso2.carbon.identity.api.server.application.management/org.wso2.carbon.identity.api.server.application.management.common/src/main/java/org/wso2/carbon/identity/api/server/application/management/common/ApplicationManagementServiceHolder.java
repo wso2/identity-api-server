@@ -30,13 +30,13 @@ public class ApplicationManagementServiceHolder {
 
     private static ApplicationManagementServiceHolder instance = new ApplicationManagementServiceHolder();
 
-    private static ApplicationManagementService applicationManagementService;
-    private static OAuthAdminServiceImpl oauthAdminService;
-    private static STSAdminServiceInterface stsAdminService;
-    private static SAMLSSOConfigServiceImpl samlssoConfigService;
-    private static OAuthServerConfiguration oAuthServerConfiguration;
-    private static TemplateManager templateManager;
-    private static CORSManagementService corsManagementService;
+    private ApplicationManagementService applicationManagementService;
+    private OAuthAdminServiceImpl oauthAdminService;
+    private STSAdminServiceInterface stsAdminService;
+    private SAMLSSOConfigServiceImpl samlssoConfigService;
+    private OAuthServerConfiguration oAuthServerConfiguration;
+    private TemplateManager templateManager;
+    private CORSManagementService corsManagementService;
 
     private ApplicationManagementServiceHolder(){
 
@@ -54,7 +54,7 @@ public class ApplicationManagementServiceHolder {
 
     public void setApplicationManagementService(ApplicationManagementService applicationManagementService) {
 
-        ApplicationManagementServiceHolder.applicationManagementService = applicationManagementService;
+        this.applicationManagementService = applicationManagementService;
     }
 
     public OAuthAdminServiceImpl getOAuthAdminService() {
@@ -64,7 +64,7 @@ public class ApplicationManagementServiceHolder {
 
     public void setOauthAdminService(OAuthAdminServiceImpl oauthAdminService) {
 
-        ApplicationManagementServiceHolder.oauthAdminService = oauthAdminService;
+        this.oauthAdminService = oauthAdminService;
     }
 
     public STSAdminServiceInterface getStsAdminService() {
@@ -74,7 +74,7 @@ public class ApplicationManagementServiceHolder {
 
     public void setStsAdminService(STSAdminServiceInterface stsAdminService) {
 
-        ApplicationManagementServiceHolder.stsAdminService = stsAdminService;
+        this.stsAdminService = stsAdminService;
     }
 
     public SAMLSSOConfigServiceImpl getSamlssoConfigService() {
@@ -84,7 +84,7 @@ public class ApplicationManagementServiceHolder {
 
     public void setSamlssoConfigService(SAMLSSOConfigServiceImpl samlssoConfigService) {
 
-        ApplicationManagementServiceHolder.samlssoConfigService = samlssoConfigService;
+        this.samlssoConfigService = samlssoConfigService;
     }
 
     public OAuthServerConfiguration getoAuthServerConfiguration() {
@@ -94,7 +94,7 @@ public class ApplicationManagementServiceHolder {
 
     public void setoAuthServerConfiguration(OAuthServerConfiguration oAuthServerConfiguration) {
 
-        ApplicationManagementServiceHolder.oAuthServerConfiguration = oAuthServerConfiguration;
+        this.oAuthServerConfiguration = oAuthServerConfiguration;
     }
 
     public TemplateManager getTemplateManager() {
@@ -104,7 +104,7 @@ public class ApplicationManagementServiceHolder {
 
     public void setTemplateManager(TemplateManager templateManager) {
 
-        ApplicationManagementServiceHolder.templateManager = templateManager;
+        this.templateManager = templateManager;
     }
 
     public CORSManagementService getCorsManagementService() {
@@ -114,6 +114,6 @@ public class ApplicationManagementServiceHolder {
 
     public void setCorsManagementService(CORSManagementService corsManagementService) {
 
-        ApplicationManagementServiceHolder.corsManagementService = corsManagementService;
+        this.corsManagementService = corsManagementService;
     }
 }

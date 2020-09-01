@@ -645,7 +645,7 @@ public class ServerApplicationManagementService {
     getPrimitiveOperatorFromOdata(org.apache.cxf.jaxrs.ext.search.ConditionType odataConditionType) {
 
         org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator
-                primitiveConditionType = null;
+                primitiveConditionType;
         switch (odataConditionType) {
             case EQUALS:
                 primitiveConditionType = EQUALS;
@@ -670,6 +670,8 @@ public class ServerApplicationManagementService {
                 primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
                         .ConditionType.PrimitiveOperator.LESS_THAN;
                 break;
+            default:
+                throw buildClientError(ErrorMessage.INVALID_FILTER_OPERATION, odataConditionType.name());
         }
         return primitiveConditionType;
     }
@@ -678,7 +680,7 @@ public class ServerApplicationManagementService {
     getComplexOperatorFromOdata(org.apache.cxf.jaxrs.ext.search.ConditionType odataConditionType) {
 
         org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.ComplexOperator
-                complexConditionType = null;
+                complexConditionType;
         switch (odataConditionType) {
             case OR:
                 complexConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType
@@ -688,6 +690,8 @@ public class ServerApplicationManagementService {
                 complexConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType
                         .ComplexOperator.AND;
                 break;
+            default:
+                throw buildClientError(ErrorMessage.INVALID_FILTER_OPERATION, odataConditionType.name());
         }
         return complexConditionType;
     }
