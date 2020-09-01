@@ -108,7 +108,7 @@ public class ServerUserStoreService {
     public void deleteUserStore(String userstoreDomainId) {
 
         try {
-            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().getInstance().
+            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
                     getUserStoreConfigService();
             userStoreConfigService.deleteUserStore(base64URLDecodeId(userstoreDomainId));
         } catch (IdentityUserStoreClientException e) {
@@ -229,10 +229,10 @@ public class ServerUserStoreService {
         primaryUserstoreConfigs.setTypeName(getUserStoreTypeName(realmConfiguration.getUserStoreClass()));
         Map<String, String> userstoreProps = realmConfiguration.getUserStoreProperties();
         if (MapUtils.isNotEmpty(userstoreProps)) {
-            for (String propKey : userstoreProps.keySet()) {
+            for (Map.Entry<String, String> entry : userstoreProps.entrySet()) {
                 AddUserStorePropertiesRes userStorePropertiesRes = new AddUserStorePropertiesRes();
-                userStorePropertiesRes.setName(propKey);
-                userStorePropertiesRes.setValue(userstoreProps.get(propKey));
+                userStorePropertiesRes.setName(entry.getKey());
+                userStorePropertiesRes.setValue(entry.getValue());
                 propertiesTobeAdd.add(userStorePropertiesRes);
             }
         }

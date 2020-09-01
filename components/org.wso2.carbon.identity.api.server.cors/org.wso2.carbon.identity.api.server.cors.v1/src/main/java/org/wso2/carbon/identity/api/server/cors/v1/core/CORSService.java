@@ -128,18 +128,6 @@ public class CORSService {
     }
 
     /**
-     * Handle exceptions generated in API.
-     *
-     * @param status HTTP Status.
-     * @param error  Error Message information.
-     * @return APIError.
-     */
-    private APIError handleException(Response.Status status, Constants.ErrorMessage error, String data) {
-
-        return new APIError(status, getErrorBuilder(error, data).build());
-    }
-
-    /**
      * Return error builder.
      *
      * @param errorMsg Error Message information.

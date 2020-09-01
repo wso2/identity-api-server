@@ -1062,6 +1062,9 @@ public class ServerIdpManagementService {
                 primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
                         .ConditionType.PrimitiveOperator.LESS_THAN;
                 break;
+            default:
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_ERROR_INVALID_SEARCH_FILTER, null);
         }
         return primitiveConditionType;
     }
@@ -1080,6 +1083,9 @@ public class ServerIdpManagementService {
                 complexConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType
                         .ComplexOperator.AND;
                 break;
+            default:
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_ERROR_INVALID_SEARCH_FILTER, null);
         }
         return complexConditionType;
     }
@@ -1178,8 +1184,8 @@ public class ServerIdpManagementService {
                                         + IDP_TEMPLATE_PATH_COMPONENT + "/%s",
                                 idpTemplate.getTemplateId())).toString());
                 if (idpTemplate.getPropertiesMap().containsKey(PROP_CATEGORY)) {
-                    if (idpTemplate.getPropertiesMap().get(PROP_CATEGORY) ==
-                            IdentityProviderTemplateListItem.CategoryEnum.CUSTOM.toString()) {
+                    if (IdentityProviderTemplateListItem.CategoryEnum.CUSTOM.toString()
+                            .equals(idpTemplate.getPropertiesMap().get(PROP_CATEGORY))) {
                         idpTemplateListItem.setCategory(IdentityProviderTemplateListItem.CategoryEnum.CUSTOM);
                     } else {
                         idpTemplateListItem.setCategory(IdentityProviderTemplateListItem.CategoryEnum.DEFAULT);
@@ -1201,8 +1207,8 @@ public class ServerIdpManagementService {
         } else {
             idpTemplateListResponse.setCount(0);
         }
-        limit = (limit == null) ? 0 : limit;
-        offset = (offset == null) ? 0 : offset;
+        limit = (limit == null) ? Integer.valueOf(0) : limit;
+        offset = (offset == null) ? Integer.valueOf(0) : offset;
         idpTemplateListResponse.setTotalResults(templateInfoList.size());
         idpTemplateListResponse.setStartIndex(offset + 1);
         idpTemplateListResponse.setLinks(createLinks(V1_API_PATH_COMPONENT + IDP_TEMPLATE_PATH_COMPONENT,
@@ -1218,8 +1224,8 @@ public class ServerIdpManagementService {
         idpTemplateResponse.setDescription(idpTemplate.getDescription());
         idpTemplateResponse.setImage(idpTemplate.getImageUrl());
         if (idpTemplate.getPropertiesMap().containsKey(PROP_CATEGORY)) {
-            if (idpTemplate.getPropertiesMap().get(PROP_CATEGORY) ==
-                    IdentityProviderTemplateListItem.CategoryEnum.CUSTOM.toString()) {
+            if (IdentityProviderTemplateListItem.CategoryEnum.CUSTOM.toString()
+                    .equals(idpTemplate.getPropertiesMap().get(PROP_CATEGORY))) {
                 idpTemplateResponse.setCategory(IdentityProviderTemplate.CategoryEnum.CUSTOM);
             } else {
                 idpTemplateResponse.setCategory(IdentityProviderTemplate.CategoryEnum.DEFAULT);
@@ -1760,6 +1766,11 @@ public class ServerIdpManagementService {
                         break;
                     case Constants.PROVISIONING:
                         identityProviderListItem.setProvisioning(createProvisioningResponse(idp));
+                        break;
+                    default:
+                        if (log.isDebugEnabled()) {
+                            log.debug("Unknown requested attribute: " + requestedAttribute);
+                        }
                         break;
                 }
             }

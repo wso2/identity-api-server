@@ -236,7 +236,7 @@ public class ServerConfigManagementService {
 
         ServiceProvider application = getResidentApplication();
 
-        if (scimConfig != null && application != null) {
+        if (scimConfig != null) {
             InboundProvisioningConfig inboundProvisioningConfig = new InboundProvisioningConfig();
             inboundProvisioningConfig.setDumbMode(scimConfig.getEnableProxyMode());
             if (!scimConfig.getEnableProxyMode()) {
