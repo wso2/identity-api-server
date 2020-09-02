@@ -65,6 +65,8 @@ public class ApiModelToSAMLSSOServiceProvider implements Function<SAML2ServicePr
     private void updateResponseSigningConfig(SAMLSSOServiceProviderDTO dto,
                                              SAMLResponseSigning responseSigning) {
 
+        // Regardless of the response signing configuration we always sign the assertions.
+        dto.setDoSignAssertions(true);
         if (responseSigning != null) {
             setIfNotNull(responseSigning.getEnabled(), dto::setDoSignResponse);
             dto.setSigningAlgorithmURI(responseSigning.getSigningAlgorithm());
