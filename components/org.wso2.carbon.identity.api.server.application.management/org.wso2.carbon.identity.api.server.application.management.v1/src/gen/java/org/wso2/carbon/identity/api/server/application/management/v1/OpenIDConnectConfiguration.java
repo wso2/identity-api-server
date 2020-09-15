@@ -196,7 +196,7 @@ public enum StateEnum {
     }
 
         /**
-    * Authorized JavaScript origins
+    * Authorized JavaScript origins. CORS requests will be allowed to these origins.
     **/
     public OpenIDConnectConfiguration allowedOrigins(List<String> allowedOrigins) {
 
@@ -204,7 +204,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"https://app.example.com/js\"]", value = "Authorized JavaScript origins")
+    @ApiModelProperty(example = "[\"https://app.example.com/js\"]", value = "Authorized JavaScript origins. CORS requests will be allowed to these origins.")
     @JsonProperty("allowedOrigins")
     @Valid
     public List<String> getAllowedOrigins() {

@@ -35,6 +35,7 @@ public class AccessTokenConfiguration  {
     private Long applicationAccessTokenExpiryInSeconds;
     private String bindingType = "None";
     private Boolean revokeTokensWhenIDPSessionTerminated;
+    private Boolean validateTokenBinding;
 
     /**
     **/
@@ -128,6 +129,25 @@ public class AccessTokenConfiguration  {
         this.revokeTokensWhenIDPSessionTerminated = revokeTokensWhenIDPSessionTerminated;
     }
 
+    /**
+    * If enabled, both access token and the token binding needs to be present for a successful API invocation
+    **/
+    public AccessTokenConfiguration validateTokenBinding(Boolean validateTokenBinding) {
+
+        this.validateTokenBinding = validateTokenBinding;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "If enabled, both access token and the token binding needs to be present for a successful API invocation")
+    @JsonProperty("validateTokenBinding")
+    @Valid
+    public Boolean getValidateTokenBinding() {
+        return validateTokenBinding;
+    }
+    public void setValidateTokenBinding(Boolean validateTokenBinding) {
+        this.validateTokenBinding = validateTokenBinding;
+    }
+
 
 
     @Override
@@ -144,12 +164,13 @@ public class AccessTokenConfiguration  {
             Objects.equals(this.userAccessTokenExpiryInSeconds, accessTokenConfiguration.userAccessTokenExpiryInSeconds) &&
             Objects.equals(this.applicationAccessTokenExpiryInSeconds, accessTokenConfiguration.applicationAccessTokenExpiryInSeconds) &&
             Objects.equals(this.bindingType, accessTokenConfiguration.bindingType) &&
-            Objects.equals(this.revokeTokensWhenIDPSessionTerminated, accessTokenConfiguration.revokeTokensWhenIDPSessionTerminated);
+            Objects.equals(this.revokeTokensWhenIDPSessionTerminated, accessTokenConfiguration.revokeTokensWhenIDPSessionTerminated) &&
+            Objects.equals(this.validateTokenBinding, accessTokenConfiguration.validateTokenBinding);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated);
+        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding);
     }
 
     @Override
@@ -163,6 +184,7 @@ public class AccessTokenConfiguration  {
         sb.append("    applicationAccessTokenExpiryInSeconds: ").append(toIndentedString(applicationAccessTokenExpiryInSeconds)).append("\n");
         sb.append("    bindingType: ").append(toIndentedString(bindingType)).append("\n");
         sb.append("    revokeTokensWhenIDPSessionTerminated: ").append(toIndentedString(revokeTokensWhenIDPSessionTerminated)).append("\n");
+        sb.append("    validateTokenBinding: ").append(toIndentedString(validateTokenBinding)).append("\n");
         sb.append("}");
         return sb.toString();
     }

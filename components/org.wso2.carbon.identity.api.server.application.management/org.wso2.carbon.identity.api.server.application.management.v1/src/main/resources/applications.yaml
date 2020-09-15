@@ -2258,6 +2258,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        templateId:
+          type: string
+          example: "adwefi2429asdfdf94444rraf44"
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocols:
@@ -2284,6 +2287,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        templateId:
+          type: string
+          example: "adwefi2429asdfdf94444rraf44"
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         authenticationSequence:
@@ -2809,6 +2815,10 @@ components:
           type: boolean
           description: "If enabled, when the IDP session is terminated, all the access tokens bound to the session
           will get revoked."
+        validateTokenBinding:
+          type: boolean
+          description: "If enabled, both access token and the token binding needs to be present for a successful API
+          invocation."
     RefreshTokenConfiguration:
       type: object
       properties:

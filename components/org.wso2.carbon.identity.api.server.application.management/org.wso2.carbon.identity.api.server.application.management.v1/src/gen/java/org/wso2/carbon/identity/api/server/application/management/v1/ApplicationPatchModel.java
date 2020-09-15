@@ -17,10 +17,20 @@
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
+import javax.validation.constraints.*;
 
+
+import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
+import javax.xml.bind.annotation.*;
 
 public class ApplicationPatchModel  {
   
@@ -106,32 +116,22 @@ public class ApplicationPatchModel  {
         this.accessUrl = accessUrl;
     }
 
-    @ApiModelProperty(example = "sdaf8829232224249dwdssff3242342", value = "")
+    /**
+    **/
+    public ApplicationPatchModel templateId(String templateId) {
+
+        this.templateId = templateId;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "adwefi2429asdfdf94444rraf44", value = "")
     @JsonProperty("templateId")
     @Valid
     public String getTemplateId() {
         return templateId;
     }
-
-    /**
-     * Set template id
-     * @param templateId template id
-     */
     public void setTemplateId(String templateId) {
-
         this.templateId = templateId;
-    }
-
-    /**
-     * Set template id
-     *
-     * @param templateId template id
-     * @return ApplicationPatchModel
-     */
-    public ApplicationPatchModel templateId(String templateId) {
-
-        this.templateId = templateId;
-        return this;
     }
 
     /**
@@ -222,6 +222,7 @@ public class ApplicationPatchModel  {
             Objects.equals(this.description, applicationPatchModel.description) &&
             Objects.equals(this.imageUrl, applicationPatchModel.imageUrl) &&
             Objects.equals(this.accessUrl, applicationPatchModel.accessUrl) &&
+            Objects.equals(this.templateId, applicationPatchModel.templateId) &&
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
             Objects.equals(this.authenticationSequence, applicationPatchModel.authenticationSequence) &&
             Objects.equals(this.advancedConfigurations, applicationPatchModel.advancedConfigurations) &&
@@ -230,7 +231,7 @@ public class ApplicationPatchModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, imageUrl, accessUrl, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, imageUrl, accessUrl, templateId, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -243,6 +244,7 @@ public class ApplicationPatchModel  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
+        sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
