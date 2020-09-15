@@ -2818,7 +2818,7 @@ components:
         validateTokenBinding:
           type: boolean
           description: "If enabled, both access token and the token binding needs to be present for a successful API
-          invocation"
+          invocation."
     RefreshTokenConfiguration:
       type: object
       properties:
