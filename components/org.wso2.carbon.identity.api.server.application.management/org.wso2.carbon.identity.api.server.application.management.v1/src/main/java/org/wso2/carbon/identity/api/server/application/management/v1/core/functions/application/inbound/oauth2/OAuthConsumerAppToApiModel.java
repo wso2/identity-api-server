@@ -84,7 +84,8 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .applicationAccessTokenExpiryInSeconds(oAuthConsumerAppDTO.getApplicationAccessTokenExpiryTime())
                 .bindingType(oAuthConsumerAppDTO.getTokenBindingType())
                 .revokeTokensWhenIDPSessionTerminated(oAuthConsumerAppDTO
-                        .isTokenRevocationWithIDPSessionTerminationEnabled());
+                        .isTokenRevocationWithIDPSessionTerminationEnabled())
+                .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled());
     }
 
     private RefreshTokenConfiguration buildRefreshTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
