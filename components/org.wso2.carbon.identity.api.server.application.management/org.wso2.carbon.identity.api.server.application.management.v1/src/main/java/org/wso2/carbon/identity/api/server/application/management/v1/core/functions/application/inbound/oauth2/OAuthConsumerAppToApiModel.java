@@ -53,8 +53,7 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .idToken(buildIdTokenConfiguration(oauthAppDTO))
                 .logout(buildLogoutConfiguration(oauthAppDTO))
                 .scopeValidators(getScopeValidators(oauthAppDTO))
-                .validateRequestObjectSignature(oauthAppDTO.isRequestObjectSignatureValidationEnabled())
-                .accessTokenBindingType(oauthAppDTO.getTokenBindingType());
+                .validateRequestObjectSignature(oauthAppDTO.isRequestObjectSignatureValidationEnabled());
     }
 
     private List<String> getScopeValidators(OAuthConsumerAppDTO oauthAppDTO) {
@@ -82,7 +81,11 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         return new AccessTokenConfiguration()
                 .type(oAuthConsumerAppDTO.getTokenType())
                 .userAccessTokenExpiryInSeconds(oAuthConsumerAppDTO.getUserAccessTokenExpiryTime())
-                .applicationAccessTokenExpiryInSeconds(oAuthConsumerAppDTO.getApplicationAccessTokenExpiryTime());
+                .applicationAccessTokenExpiryInSeconds(oAuthConsumerAppDTO.getApplicationAccessTokenExpiryTime())
+                .bindingType(oAuthConsumerAppDTO.getTokenBindingType())
+                .revokeTokensWhenIDPSessionTerminated(oAuthConsumerAppDTO
+                        .isTokenRevocationWithIDPSessionTerminationEnabled())
+                .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled());
     }
 
     private RefreshTokenConfiguration buildRefreshTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {

@@ -528,9 +528,11 @@ public class ServerTenantManagementService {
 
             if (channelVerifiedTenantModel.getPurpose() != null) {
                 claimsMap.put(PURPOSE, channelVerifiedTenantModel.getPurpose().getName());
-                channelVerifiedTenantModel.getPurpose().getAttributes()
-                        .forEach(attribute ->
-                                claimsMap.put(PURPOSE + "_" + attribute.getKey(), attribute.getValue()));
+                if (!CollectionUtils.isEmpty(channelVerifiedTenantModel.getPurpose().getAttributes())) {
+                    channelVerifiedTenantModel.getPurpose().getAttributes()
+                            .forEach(attribute ->
+                                    claimsMap.put(PURPOSE + "_" + attribute.getKey(), attribute.getValue()));
+                }
             }
 
             tenant.setClaimsMap(claimsMap);

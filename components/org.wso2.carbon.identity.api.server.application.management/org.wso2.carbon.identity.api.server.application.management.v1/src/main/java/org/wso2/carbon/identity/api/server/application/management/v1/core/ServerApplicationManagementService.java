@@ -26,6 +26,7 @@ import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
@@ -49,35 +50,21 @@ import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Config
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application
-        .ApiModelToServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application
-        .ApplicationBasicInfoToApiModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application
-        .ServiceProviderToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationBasicInfoToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound
-        .InboundAuthConfigToApiModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound
-        .PassiveSTSInboundFunctions;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound
-        .WSTrustInboundFunctions;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom
-        .CustomInboundFunctions;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound
-        .oauth2.OAuthInboundFunctions;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml
-        .SAMLInboundFunctions;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning
-        .BuildProvisioningConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning
-        .UpdateProvisioningConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.template
-        .ApplicationTemplateApiModelToTemplate;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.template
-        .TemplateToApplicationTemplate;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.template
-        .TemplateToApplicationTemplateListItem;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.template.ApplicationTemplateApiModelToTemplate;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.template.TemplateToApplicationTemplate;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.template.TemplateToApplicationTemplateListItem;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -100,7 +87,12 @@ import org.wso2.carbon.identity.configuration.mgt.core.search.PrimitiveCondition
 import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
 import org.wso2.carbon.identity.core.model.Node;
+import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.cors.mgt.core.dao.CORSOriginDAO;
+import org.wso2.carbon.identity.cors.mgt.core.dao.impl.CORSOriginDAOImpl;
+import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
+import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
 import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementClientException;
@@ -328,7 +320,14 @@ public class ServerApplicationManagementService {
 
         ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
         try {
-            return getApplicationManagementService().createApplication(application, tenantDomain, username);
+            String applicationId = getApplicationManagementService().createApplication(application, tenantDomain,
+                    username);
+            if (applicationModel.getInboundProtocolConfiguration() != null &&
+                    applicationModel.getInboundProtocolConfiguration().getOidc() != null) {
+                OAuthInboundFunctions.updateCorsOrigins(applicationId, applicationModel
+                        .getInboundProtocolConfiguration().getOidc());
+            }
+            return applicationId;
         } catch (IdentityApplicationManagementException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Error while creating application. Rolling back possibly created inbound config data.");
@@ -569,7 +568,7 @@ public class ServerApplicationManagementService {
      * @param templateType  Template type.
      * @param tenantDomain  Tenant domain.
      * @param searchContext Search context.
-     * @return  Condition.
+     * @return Condition.
      */
     private Condition getSearchCondition(String templateType, String tenantDomain, SearchContext searchContext) {
 
@@ -811,6 +810,33 @@ public class ServerApplicationManagementService {
 
             appToUpdate.getInboundAuthenticationConfig().setInboundAuthenticationRequestConfigs(filteredInbounds);
             updateServiceProvider(applicationId, appToUpdate);
+        }
+
+        // Delete the associated CORS origins if the inboundType is oauth2.
+        if (inboundType.equals(OAUTH2)) {
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
+            CORSOriginDAO corsOriginDAO = new CORSOriginDAOImpl();
+            List<CORSOrigin> existingCORSOrigins = null;
+            ApplicationBasicInfo applicationBasicInfo = null;
+            try {
+                applicationBasicInfo = ApplicationManagementService.getInstance()
+                        .getApplicationBasicInfoByResourceId(applicationId, tenantDomain);
+                existingCORSOrigins = corsOriginDAO.getCORSOriginsByApplicationId(
+                        applicationBasicInfo.getApplicationId(), tenantId);
+                corsOriginDAO.deleteCORSOrigins(applicationBasicInfo.getApplicationId(), existingCORSOrigins.stream()
+                        .map(CORSOrigin::getId).collect(Collectors.toList()), tenantId);
+            } catch (CORSManagementServiceServerException | IdentityApplicationManagementException e) {
+                if (applicationBasicInfo != null && existingCORSOrigins != null) {
+                    try {
+                        corsOriginDAO.addCORSOrigins(applicationBasicInfo.getApplicationId(), existingCORSOrigins,
+                                tenantId);
+                    } catch (CORSManagementServiceServerException corsManagementServiceServerException) {
+                        log.error("Error while trying to remove CORS origins associated with the application.", e);
+                    }
+                }
+                log.error("Error while trying to remove CORS origins associated with the application.", e);
+            }
         }
     }
 

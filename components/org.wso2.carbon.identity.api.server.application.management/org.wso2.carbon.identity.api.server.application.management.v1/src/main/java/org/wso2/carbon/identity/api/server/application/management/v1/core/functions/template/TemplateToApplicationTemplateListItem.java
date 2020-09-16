@@ -59,14 +59,17 @@ public class TemplateToApplicationTemplateListItem implements Function<Template,
                     listItem.setDisplayOrder(Integer.parseInt(value));
                 }
                 if (ApplicationManagementConstants.TemplateProperties.CATEGORY.equals(key)) {
-                    if (ApplicationTemplatesListItem.CategoryEnum.CUSTOM.value().equals(value)) {
-                        listItem.setCategory(ApplicationTemplatesListItem.CategoryEnum.CUSTOM);
+                    if (ApplicationTemplatesListItem.CategoryEnum.VENDOR.value().equals(value)) {
+                        listItem.setCategory(ApplicationTemplatesListItem.CategoryEnum.VENDOR);
                     } else {
                         listItem.setCategory(ApplicationTemplatesListItem.CategoryEnum.DEFAULT);
                     }
                 }
                 if (ApplicationManagementConstants.TemplateProperties.INBOUND_PROTOCOL.equals(key)) {
                     listItem.setAuthenticationProtocol(value);
+                }
+                if (ApplicationManagementConstants.TemplateProperties.TEMPLATE_GROUP.equals(key)) {
+                    listItem.setTemplateGroup(value);
                 }
             });
         }

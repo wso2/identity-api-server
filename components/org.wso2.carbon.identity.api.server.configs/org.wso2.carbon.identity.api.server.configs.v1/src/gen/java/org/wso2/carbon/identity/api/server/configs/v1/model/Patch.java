@@ -23,14 +23,14 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
 /**
- * A JSONPatch as defined by RFC 6902. Patch operation is supported only for root level attributes of an Identity Provider.
+ * A JSONPatch as defined by RFC 6902. Patch operation is supported only for root level attributes of ServerConfig.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "A JSONPatch as defined by RFC 6902. Patch operation is supported only for root level attributes of an Identity Provider.")
+@ApiModel(description = "A JSONPatch as defined by RFC 6902. Patch operation is supported only for root level attributes of ServerConfig.")
 public class Patch  {
   
 

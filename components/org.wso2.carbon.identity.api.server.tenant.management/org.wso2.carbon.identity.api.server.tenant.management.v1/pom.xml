@@ -18,7 +18,7 @@
     <parent>
         <artifactId>identity-api-server</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
-        <version>1.0.145-SNAPSHOT</version>
+        <version>1.0.158-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
@@ -187,7 +187,7 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.governance</groupId>
             <artifactId>org.wso2.carbon.identity.recovery</artifactId>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

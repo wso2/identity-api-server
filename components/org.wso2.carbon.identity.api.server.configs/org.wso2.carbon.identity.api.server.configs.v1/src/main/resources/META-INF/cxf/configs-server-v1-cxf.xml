@@ -22,10 +22,13 @@
           class="org.wso2.carbon.identity.api.server.configs.common.factory.ApplicationMgtOSGIServiceFactory"/>
     <bean id="IdPMgtServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.configs.common.factory.IdPMgtOSGIServiceFactory"/>
+    <bean id="CORSMgtServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.configs.common.factory.CORSMgtOGSiServiceFactory"/>
     <bean id="ConfigsServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder">
         <property name="applicationManagementService" ref="ApplicationMgtServiceFactoryBean"/>
         <property name="identityProviderManager" ref="IdPMgtServiceFactoryBean"/>
+        <property name="corsManagementService" ref="CORSMgtServiceFactoryBean"/>
     </bean>
 </beans>
 

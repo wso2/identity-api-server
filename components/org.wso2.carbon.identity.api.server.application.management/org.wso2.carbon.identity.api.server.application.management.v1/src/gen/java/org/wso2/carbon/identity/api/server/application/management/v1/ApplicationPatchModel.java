@@ -38,6 +38,7 @@ public class ApplicationPatchModel  {
     private String description;
     private String imageUrl;
     private String accessUrl;
+    private String templateId;
     private ClaimConfiguration claimConfiguration;
     private AuthenticationSequence authenticationSequence;
     private AdvancedApplicationConfiguration advancedConfigurations;
@@ -113,6 +114,24 @@ public class ApplicationPatchModel  {
     }
     public void setAccessUrl(String accessUrl) {
         this.accessUrl = accessUrl;
+    }
+
+    /**
+    **/
+    public ApplicationPatchModel templateId(String templateId) {
+
+        this.templateId = templateId;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "adwefi2429asdfdf94444rraf44", value = "")
+    @JsonProperty("templateId")
+    @Valid
+    public String getTemplateId() {
+        return templateId;
+    }
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
     }
 
     /**
@@ -203,6 +222,7 @@ public class ApplicationPatchModel  {
             Objects.equals(this.description, applicationPatchModel.description) &&
             Objects.equals(this.imageUrl, applicationPatchModel.imageUrl) &&
             Objects.equals(this.accessUrl, applicationPatchModel.accessUrl) &&
+            Objects.equals(this.templateId, applicationPatchModel.templateId) &&
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
             Objects.equals(this.authenticationSequence, applicationPatchModel.authenticationSequence) &&
             Objects.equals(this.advancedConfigurations, applicationPatchModel.advancedConfigurations) &&
@@ -211,7 +231,7 @@ public class ApplicationPatchModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, imageUrl, accessUrl, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, imageUrl, accessUrl, templateId, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -224,6 +244,7 @@ public class ApplicationPatchModel  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
+        sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");

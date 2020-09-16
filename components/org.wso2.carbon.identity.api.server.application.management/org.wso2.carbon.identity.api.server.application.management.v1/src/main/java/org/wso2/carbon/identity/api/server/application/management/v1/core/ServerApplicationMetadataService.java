@@ -40,6 +40,7 @@ import org.wso2.carbon.identity.application.mgt.AbstractInboundAuthenticatorConf
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
+import org.wso2.carbon.identity.oauth.dto.TokenBindingMetaDataDTO;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.security.SecurityConfigException;
 
@@ -199,7 +200,16 @@ public class ServerApplicationMetadataService {
                 new MetadataProperty()
                         .defaultValue(oAuthAdminService.getDefaultTokenType())
                         .options(oAuthAdminService.getSupportedTokenTypes()));
-
+        List<TokenBindingMetaDataDTO> supportedTokenBindings = oAuthAdminService.getSupportedTokenBindingsMetaData();
+        List<String> supportedTokenBindingTypes = new ArrayList<>();
+        supportedTokenBindingTypes.add("None");
+        for (TokenBindingMetaDataDTO tokenBindingDTO : supportedTokenBindings) {
+            supportedTokenBindingTypes.add(tokenBindingDTO.getTokenBindingType());
+        }
+        oidcMetaData.setAccessTokenBindingType(
+                new MetadataProperty()
+                        .defaultValue("None")
+                        .options(supportedTokenBindingTypes));
         return oidcMetaData;
     }
 
