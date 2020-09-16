@@ -487,6 +487,7 @@ public class ServerTenantManagementService {
                 userRecoveryDataStore.invalidate(code);
                 return;
             } else { // the confirmed email using the code and submitted emails are different.
+                userRecoveryDataStore.invalidate(code);
                 log.warn("The confirmed email using the code and submitted emails are different.");
                 throw new TenantManagementClientException(ERROR_CODE_INVALID_EMAIL.getCode(),
                         String.format(ERROR_CODE_INVALID_EMAIL.getMessage(), CODE));
