@@ -56,7 +56,6 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
 
         consumerAppDTO.setBypassClientCredentials(oidcModel.getPublicClient());
         consumerAppDTO.setRequestObjectSignatureValidationEnabled(oidcModel.getValidateRequestObjectSignature());
-        consumerAppDTO.setTokenBindingType(oidcModel.getAccessTokenBindingType());
 
         updateAllowedOrigins(consumerAppDTO, oidcModel.getAllowedOrigins());
         updatePkceConfigurations(consumerAppDTO, oidcModel.getPkce());
@@ -114,9 +113,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
 
     private void updateAllowedOrigins(OAuthConsumerAppDTO consumerAppDTO, List<String> allowedOrigins) {
 
-        if (CollectionUtils.isNotEmpty(allowedOrigins)) {
-            throw Utils.buildNotImplementedError("Allowed origins are not supported for OAuth apps yet.");
-        }
+        // CORS are updated directly at the REST API level through the CORS Management OSGi service.
     }
 
     private void updateAccessTokenConfiguration(OAuthConsumerAppDTO consumerAppDTO,
@@ -126,6 +123,18 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             consumerAppDTO.setTokenType(accessToken.getType());
             consumerAppDTO.setUserAccessTokenExpiryTime(accessToken.getUserAccessTokenExpiryInSeconds());
             consumerAppDTO.setApplicationAccessTokenExpiryTime(accessToken.getApplicationAccessTokenExpiryInSeconds());
+            consumerAppDTO.setTokenBindingType(accessToken.getBindingType());
+            if (accessToken.getRevokeTokensWhenIDPSessionTerminated() != null) {
+                consumerAppDTO.setTokenRevocationWithIDPSessionTerminationEnabled(accessToken
+                        .getRevokeTokensWhenIDPSessionTerminated());
+            } else {
+                consumerAppDTO.setTokenRevocationWithIDPSessionTerminationEnabled(false);
+            }
+            if (accessToken.getValidateTokenBinding() != null) {
+                consumerAppDTO.setTokenBindingValidationEnabled(accessToken.getValidateTokenBinding());
+            } else {
+                consumerAppDTO.setTokenBindingValidationEnabled(false);
+            }
         }
     }
 

@@ -61,6 +61,10 @@ public class ApplicationTemplateApiModelToTemplate implements Function<Applicati
             propertiesMap.put(ApplicationManagementConstants.TemplateProperties.DISPLAY_ORDER, Integer
                     .toString(applicationTemplate.getDisplayOrder()));
         }
+        if (applicationTemplate.getTemplateGroup() != null) {
+            propertiesMap.put(ApplicationManagementConstants.TemplateProperties.TEMPLATE_GROUP,
+                    applicationTemplate.getTemplateGroup());
+        }
 
         Template template = new Template();
         template.setTemplateType(TemplateMgtConstants.TemplateType.APPLICATION_TEMPLATE);

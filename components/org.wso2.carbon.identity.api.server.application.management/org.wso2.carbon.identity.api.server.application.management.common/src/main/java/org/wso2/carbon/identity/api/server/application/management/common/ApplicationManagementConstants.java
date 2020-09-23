@@ -73,6 +73,9 @@ public class ApplicationManagementConstants {
         INBOUND_NOT_CONFIGURED("60502",
                 "Inbound protocol not configured.",
                 "Inbound protocol: %s not configured for application id: %s."),
+        ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND("60504",
+                "WS-Trust protocol is not supported.",
+                "STS admin service is unavailable at the moment."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
@@ -159,10 +162,11 @@ public class ApplicationManagementConstants {
         public static final String TYPES = "types";
         public static final String CATEGORY = "category";
         public static final String DISPLAY_ORDER = "display-order";
+        public static final String TEMPLATE_GROUP = "template-group";
 
         // Application Template Search.
         public static final List<String> SEARCH_KEYS = Collections.unmodifiableList(Arrays.asList("description",
-                "image", "category", "displayOrder", "authenticationProtocol"));
+                "image", "category", "displayOrder", "authenticationProtocol", "templateGroup"));
         public static final String SEARCH_KEY_NAME = "name";
         public static final String SEARCH_KEY_NAME_INTERNAL = "resourceName";
         public static final String ATTR_KEY = "attributeKey";

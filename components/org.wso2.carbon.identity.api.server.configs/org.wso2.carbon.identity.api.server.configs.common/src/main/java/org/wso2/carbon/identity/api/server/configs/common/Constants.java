@@ -25,15 +25,27 @@ public class Constants {
 
     }
 
-    public static final String CONFIG_PREFIX = "CNF-";
+    public static final String CONFIG_ERROR_PREFIX = "CNF-";
     public static final String CONFIGS_AUTHENTICATOR_PATH_COMPONENT = "/configs/authenticators";
     public static final String PATH_SEPERATOR = "/";
 
-    // Patch operation paths.
+    // PATCH operation paths.
     public static final String IDLE_SESSION_PATH = "/idleSessionTimeoutPeriod";
     public static final String REMEMBER_ME_PATH = "/rememberMePeriod";
     public static final String HOME_REALM_PATH_REGEX = "/homeRealmIdentifiers/[0-9]+";
 
+    /**
+     * PATCH operation path for CORS configuration.
+     */
+    public static final String CORS_CONFIG_ALLOW_GENERIC_HTTP_PATH_REGEX = "^/allowGenericHttpRequests$";
+    public static final String CORS_CONFIG_ALLOW_ANY_ORIGIN_PATH_REGEX = "^/allowAnyOrigin";
+    public static final String CORS_CONFIG_ALLOW_SUBDOMAINS_PATH_REGEX = "^/allowSubdomains$";
+    public static final String CORS_CONFIG_SUPPORTED_METHODS_PATH_REGEX = "^/supportedMethods$";
+    public static final String CORS_CONFIG_SUPPORT_ANY_HEADER_PATH_REGEX = "^/supportAnyHeader";
+    public static final String CORS_CONFIG_SUPPORTED_HEADERS_PATH_REGEX = "^/supportedHeaders$";
+    public static final String CORS_CONFIG_EXPOSED_HEADERS_PATH_REGEX = "^/exposedHeaders$";
+    public static final String CORS_CONFIG_SUPPORTS_CREDENTIALS_PATH_REGEX = "^/supportsCredentials$";
+    public static final String CORS_CONFIG_MAX_AGE_PATH_REGEX = "^/maxAge$";
 
     /**
      * Enum for error messages.
@@ -46,13 +58,30 @@ public class Constants {
         ERROR_CODE_ERROR_RETRIEVING_AUTHENTICATOR("65003",
                 "Unable to retrieve authenticator.",
                 "Server encountered an error while retrieving the authenticator for the identifier %s."),
-        ERROR_CODE_AUTHENTICATOR_NOT_FOUND("60002", "Resource not found.",
+        ERROR_CODE_AUTHENTICATOR_NOT_FOUND("60002",
+                "Resource not found.",
                 "Unable to find a resource matching the provided authenticator identifier %s."),
-        ERROR_CODE_INVALID_INPUT("60003", "Invalid input.", "One of the given inputs is invalid. %s."),
-        ERROR_CODE_ERROR_UPDATING_CONFIGS("65004", "Unable to update server configs.", "Server encountered an " +
+        ERROR_CODE_INVALID_INPUT("60003",
+                "Invalid input.",
+                "One of the given inputs is invalid. %s."),
+        ERROR_CODE_ERROR_UPDATING_CONFIGS("65004",
+                "Unable to update server configs.",
+                "Server encountered an " +
                 "error while updating the server configs."),
-        ERROR_CODE_ERROR_RETRIEVING_CONFIGS("65005", "Unable to retrieve server configs.", "Server encountered an " +
-                "error while retrieving the server configs.");
+        ERROR_CODE_ERROR_RETRIEVING_CONFIGS("65005",
+                "Unable to retrieve server configs.",
+                "Server encountered an " +
+                "error while retrieving the server configs."),
+
+        /**
+         * CORS errors.
+         */
+        ERROR_CODE_CORS_CONFIG_RETRIEVE("65001",
+                "Unable to retrieve CORS configuration.",
+                "Server encountered an error while retrieving the CORS configuration."),
+        ERROR_CODE_CORS_CONFIG_UPDATE("65002",
+                "Unable to update CORS configuration.",
+                "Server encountered an error while updating the CORS configuration.");
 
         private final String code;
         private final String message;
@@ -67,7 +96,7 @@ public class Constants {
 
         public String code() {
 
-            return CONFIG_PREFIX + code;
+            return CONFIG_ERROR_PREFIX + code;
         }
 
         public String message() {

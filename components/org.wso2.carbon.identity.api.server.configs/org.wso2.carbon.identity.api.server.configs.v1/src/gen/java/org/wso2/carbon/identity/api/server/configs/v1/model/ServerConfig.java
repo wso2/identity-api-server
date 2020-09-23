@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ProvisioningConfig;
 import javax.validation.constraints.*;
 
@@ -41,6 +42,7 @@ public class ServerConfig  {
     private ProvisioningConfig provisioning;
     private List<AuthenticatorListItem> authenticators = null;
 
+    private CORSConfig cors;
 
     /**
     * The home realm identifier for the resident identity provider
@@ -151,7 +153,25 @@ public class ServerConfig  {
         return this;
     }
 
+        /**
+    **/
+    public ServerConfig cors(CORSConfig cors) {
+
+        this.cors = cors;
+        return this;
+    }
     
+    @ApiModelProperty(value = "")
+    @JsonProperty("cors")
+    @Valid
+    public CORSConfig getCors() {
+        return cors;
+    }
+    public void setCors(CORSConfig cors) {
+        this.cors = cors;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -167,12 +187,13 @@ public class ServerConfig  {
             Objects.equals(this.idleSessionTimeoutPeriod, serverConfig.idleSessionTimeoutPeriod) &&
             Objects.equals(this.rememberMePeriod, serverConfig.rememberMePeriod) &&
             Objects.equals(this.provisioning, serverConfig.provisioning) &&
-            Objects.equals(this.authenticators, serverConfig.authenticators);
+            Objects.equals(this.authenticators, serverConfig.authenticators) &&
+            Objects.equals(this.cors, serverConfig.cors);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(homeRealmIdentifiers, idleSessionTimeoutPeriod, rememberMePeriod, provisioning, authenticators);
+        return Objects.hash(homeRealmIdentifiers, idleSessionTimeoutPeriod, rememberMePeriod, provisioning, authenticators, cors);
     }
 
     @Override
@@ -186,6 +207,7 @@ public class ServerConfig  {
         sb.append("    rememberMePeriod: ").append(toIndentedString(rememberMePeriod)).append("\n");
         sb.append("    provisioning: ").append(toIndentedString(provisioning)).append("\n");
         sb.append("    authenticators: ").append(toIndentedString(authenticators)).append("\n");
+        sb.append("    cors: ").append(toIndentedString(cors)).append("\n");
         sb.append("}");
         return sb.toString();
     }

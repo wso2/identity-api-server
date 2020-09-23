@@ -19,6 +19,7 @@ package org.wso2.carbon.identity.api.server.configs.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 
@@ -41,6 +42,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response getCORSConfiguration() {
+
+        return Response.ok().entity(configManagementService.getCORSConfiguration()).build();
+    }
+
+    @Override
     public Response getConfigs() {
 
         return Response.ok().entity(configManagementService.getConfigs()).build();
@@ -56,6 +63,13 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response listAuthenticators(String type) {
 
         return Response.ok().entity(configManagementService.getAuthenticators(type)).build();
+    }
+
+    @Override
+    public Response patchCORSConfiguration(List<CORSPatch> coRSPatch) {
+
+        configManagementService.patchCORSConfig(coRSPatch);
+        return Response.ok().build();
     }
 
     @Override

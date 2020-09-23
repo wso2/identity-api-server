@@ -58,21 +58,24 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
     private void updateAuthenticationSteps(AuthenticationSequence authSequenceApiModel,
                                            LocalAndOutboundAuthenticationConfig localAndOutboundConfig) {
 
-        if (authSequenceApiModel.getType() != AuthenticationSequence.TypeEnum.DEFAULT) {
-
+        if (isRevertToDefaultSequence(authSequenceApiModel, localAndOutboundConfig)) {
+            localAndOutboundConfig.setAuthenticationType(ApplicationConstants.AUTH_TYPE_DEFAULT);
+            localAndOutboundConfig.setAuthenticationSteps(new AuthenticationStep[0]);
+        } else if (authSequenceApiModel.getType() != AuthenticationSequence.TypeEnum.DEFAULT) {
             AuthenticationStep[] authenticationSteps = getAuthenticationSteps(authSequenceApiModel);
-
             localAndOutboundConfig.setAuthenticationType(ApplicationConstants.AUTH_TYPE_FLOW);
             localAndOutboundConfig.setAuthenticationSteps(authenticationSteps);
-        } else {
-            // We don't have to worry about setting authentication steps and related configs
         }
+        // If the authSequenceApiModel.getType() = DEFAULT, we don't have to worry about setting authentication steps
+        // and related configs.
     }
 
     private void updateAdaptiveAuthenticationScript(AuthenticationSequence authSequenceApiModel,
                                                     LocalAndOutboundAuthenticationConfig localAndOutboundConfig) {
 
-        if (StringUtils.isNotBlank(authSequenceApiModel.getScript())) {
+        if (isRevertToDefaultSequence(authSequenceApiModel, localAndOutboundConfig)) {
+            localAndOutboundConfig.setAuthenticationScriptConfig(null);
+        } else if (StringUtils.isNotBlank(authSequenceApiModel.getScript())) {
             AuthenticationScriptConfig adaptiveScript = new AuthenticationScriptConfig();
             adaptiveScript.setContent(authSequenceApiModel.getScript());
 
@@ -197,5 +200,14 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
         }
 
         return application.getLocalAndOutBoundAuthenticationConfig();
+    }
+
+    private boolean isRevertToDefaultSequence(AuthenticationSequence authSequenceApiModel,
+            LocalAndOutboundAuthenticationConfig localAndOutboundConfig) {
+
+        String currentAuthenticationType = localAndOutboundConfig.getAuthenticationType();
+        return authSequenceApiModel.getType() == AuthenticationSequence.TypeEnum.DEFAULT
+                && StringUtils.isNotBlank(currentAuthenticationType)
+                && !AuthenticationSequence.TypeEnum.DEFAULT.toString().equalsIgnoreCase(currentAuthenticationType);
     }
 }

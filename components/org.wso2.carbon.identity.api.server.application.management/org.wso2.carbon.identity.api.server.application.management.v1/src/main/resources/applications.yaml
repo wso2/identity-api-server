@@ -2223,6 +2223,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        templateId:
+          type: string
+          example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocolConfiguration:
@@ -2255,6 +2258,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        templateId:
+          type: string
+          example: "adwefi2429asdfdf94444rraf44"
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocols:
@@ -2281,6 +2287,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        templateId:
+          type: string
+          example: "adwefi2429asdfdf94444rraf44"
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         authenticationSequence:
@@ -2681,7 +2690,7 @@ components:
         defaultAssertionConsumerUrl:
           type: string
           description: "If not provided, the first assertion consumer URL on the assertionConsumerUrls will be picked as the default assertion consumer URL."
-        idpEntityIdAlias  :
+        idpEntityIdAlias:
           type: string
           description: "Default value is the IdP Entity ID value specified in Resident IdP."
 
@@ -2738,7 +2747,7 @@ components:
             type: string
         allowedOrigins:
           type: array
-          description: Authorized JavaScript origins
+          description: Authorized JavaScript origins. CORS requests will be allowed to these origins.
           example:
             - 'https://app.example.com/js'
           items:
@@ -2771,12 +2780,6 @@ components:
             - RoleBasedScopeValidator
           items:
             type: string
-        accessTokenBindingType:
-          type: string
-          description: Access token binding type.
-          example:
-            - sso-session
-            - cookie
     OAuth2PKCEConfiguration:
       type: object
       properties:
@@ -2800,6 +2803,22 @@ components:
           type: integer
           format: int64
           example: 3600
+        bindingType:
+          type: string
+          description: "OAuth2 access token and refresh token can be bound to an external attribute during the token
+          generation so that it can be optionally validated during the API invocation."
+          default: "None"
+          example:
+            - sso-session
+            - cookie
+        revokeTokensWhenIDPSessionTerminated:
+          type: boolean
+          description: "If enabled, when the IDP session is terminated, all the access tokens bound to the session
+          will get revoked."
+        validateTokenBinding:
+          type: boolean
+          description: "If enabled, both access token and the token binding needs to be present for a successful API
+          invocation."
     RefreshTokenConfiguration:
       type: object
       properties:
@@ -3037,6 +3056,8 @@ components:
           $ref: '#/components/schemas/MetadataProperty'
         accessTokenType:
           $ref: '#/components/schemas/MetadataProperty'
+        accessTokenBindingType:
+          $ref: '#/components/schemas/MetadataProperty'
     WSTrustMetaData:
       type: object
       properties:
@@ -3143,11 +3164,14 @@ components:
               - angular
         category:
           type: string
-          enum: [DEFAULT, CUSTOM]
+          enum: [DEFAULT, VENDOR]
           example: 'DEFAULT'
         displayOrder:
           type: integer
           example: 2
+        templateGroup:
+          type: string
+          example: "web-application"
         self:
           type: string
           example: "/t/wso2.com/api/server/v1/applications/templates/85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
@@ -3180,13 +3204,16 @@ components:
             - angular
         category:
           type: string
-          enum: [DEFAULT, CUSTOM]
+          enum: [DEFAULT, VENDOR]
           example: 'DEFAULT'
+        templateGroup:
+          type: string
+          example: "web-application"
         displayOrder:
           type: integer
           example: 2
         application:
-          $ref : '#/components/schemas/ApplicationModel'
+          $ref: '#/components/schemas/ApplicationModel'
       required:
         - name
         - application

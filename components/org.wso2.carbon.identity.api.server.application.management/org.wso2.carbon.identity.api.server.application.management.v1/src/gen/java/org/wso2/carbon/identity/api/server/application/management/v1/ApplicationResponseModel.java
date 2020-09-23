@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ public class ApplicationResponseModel  {
     private String description;
     private String imageUrl;
     private String accessUrl;
+    private String templateId;
     private ClaimConfiguration claimConfiguration;
     private List<InboundProtocolListItem> inboundProtocols = null;
 
@@ -139,6 +140,24 @@ public class ApplicationResponseModel  {
     }
     public void setAccessUrl(String accessUrl) {
         this.accessUrl = accessUrl;
+    }
+
+    /**
+    **/
+    public ApplicationResponseModel templateId(String templateId) {
+
+        this.templateId = templateId;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "adwefi2429asdfdf94444rraf44", value = "")
+    @JsonProperty("templateId")
+    @Valid
+    public String getTemplateId() {
+        return templateId;
+    }
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
     }
 
     /**
@@ -256,6 +275,7 @@ public class ApplicationResponseModel  {
             Objects.equals(this.description, applicationResponseModel.description) &&
             Objects.equals(this.imageUrl, applicationResponseModel.imageUrl) &&
             Objects.equals(this.accessUrl, applicationResponseModel.accessUrl) &&
+            Objects.equals(this.templateId, applicationResponseModel.templateId) &&
             Objects.equals(this.claimConfiguration, applicationResponseModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocols, applicationResponseModel.inboundProtocols) &&
             Objects.equals(this.authenticationSequence, applicationResponseModel.authenticationSequence) &&
@@ -265,7 +285,7 @@ public class ApplicationResponseModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -279,6 +299,7 @@ public class ApplicationResponseModel  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
+        sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocols: ").append(toIndentedString(inboundProtocols)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");

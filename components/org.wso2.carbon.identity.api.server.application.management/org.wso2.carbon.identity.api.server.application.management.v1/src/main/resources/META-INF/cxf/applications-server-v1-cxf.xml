@@ -38,10 +38,13 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
         <property name="samlssoConfigService" ref="samlSsoConfigServiceFactoryBean"/>
     </bean>
-
     <bean id="templateManagerServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
         <property name="templateManager" ref="templateManagerServiceFactoryBean"/>
+    </bean>
+    <bean id="corsMgtServiceHolderBean"
+          class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
+        <property name="corsManagementService" ref="corsMgtServiceFactoryBean"/>
     </bean>
 
     <bean id="applicationManagementServiceFactoryBean"
@@ -54,4 +57,6 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.SAMLSSOConfigOSGiServiceFactory"/>
     <bean id="templateManagerServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.TemplateManagementOSGiServiceFactory"/>
+    <bean id="corsMgtServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.application.management.common.factory.CORSMgtOGSiServiceFactory"/>
 </beans>

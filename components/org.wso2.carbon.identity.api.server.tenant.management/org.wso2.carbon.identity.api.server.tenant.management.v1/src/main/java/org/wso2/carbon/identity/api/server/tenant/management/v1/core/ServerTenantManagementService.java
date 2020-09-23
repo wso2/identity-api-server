@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants;
 import org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.AdditionalClaims;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.model.ChannelVerifiedTenantModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.LifeCycleStatus;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Link;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerResponse;
@@ -33,6 +34,10 @@ import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantMode
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantPutModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantResponseModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantsListResponse;
+import org.wso2.carbon.identity.recovery.IdentityRecoveryException;
+import org.wso2.carbon.identity.recovery.model.UserRecoveryData;
+import org.wso2.carbon.identity.recovery.store.JDBCRecoveryDataStore;
+import org.wso2.carbon.identity.recovery.store.UserRecoveryDataStore;
 import org.wso2.carbon.stratos.common.constants.TenantConstants;
 import org.wso2.carbon.stratos.common.exception.TenantManagementClientException;
 import org.wso2.carbon.stratos.common.exception.TenantManagementServerException;
@@ -45,7 +50,10 @@ import org.wso2.carbon.user.core.tenant.TenantSearchResult;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +62,10 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.TENANT_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_INVALID_EMAIL;
+import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_MISSING_REQUIRED_PARAMETER;
+
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
 /**
  * Call internal osgi services to perform server tenant management related operations.
@@ -61,7 +73,10 @@ import static org.wso2.carbon.identity.api.server.tenant.management.common.Tenan
 public class ServerTenantManagementService {
 
     private static final Log log = LogFactory.getLog(ServerTenantManagementService.class);
+    private static final String VERIFIED_LITE_USER = "verified-lite-user";
     private static final String INLINE_PASSWORD = "inline-password";
+    private static final String CODE = "code";
+    private static final String PURPOSE = "purpose";
 
     /**
      * Add a tenant.
@@ -179,7 +194,7 @@ public class ServerTenantManagementService {
     private TenantResponseModel createTenantResponse(Tenant tenant) {
 
         TenantResponseModel tenantResponseModel = new TenantResponseModel();
-        tenantResponseModel.setCreatedDate(tenant.getCreatedDate().toString());
+        tenantResponseModel.setCreatedDate(getISOFormatDate(tenant.getCreatedDate()));
         tenantResponseModel.setDomain(tenant.getDomain());
         tenantResponseModel.setId(tenant.getTenantUniqueID());
         tenantResponseModel.setLifecycleStatus(getLifeCycleStatus(tenant.isActive()));
@@ -255,7 +270,7 @@ public class ServerTenantManagementService {
         for (Tenant tenant : tenants) {
             TenantListItem listItem = new TenantListItem();
             listItem.setLifecycleStatus(getLifeCycleStatus(tenant.isActive()));
-            listItem.setCreatedDate(tenant.getCreatedDate().toString());
+            listItem.setCreatedDate(getISOFormatDate(tenant.getCreatedDate()));
             listItem.setDomain(tenant.getDomain());
             listItem.setId(tenant.getTenantUniqueID());
             listItem.setOwners(getOwnerResponses(tenant));
@@ -434,4 +449,115 @@ public class ServerTenantManagementService {
         }
     }
 
+    public String addTenant(ChannelVerifiedTenantModel channelVerifiedTenantModel) {
+        String resourceId;
+        TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
+        try {
+            validateInputAgainstCode(channelVerifiedTenantModel);
+            Tenant tenant = createTenantInfoBean(channelVerifiedTenantModel);
+            resourceId = tenantMgtService.addTenant(tenant);
+        } catch (TenantMgtException e) {
+            throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage
+                    .ERROR_CODE_ERROR_ADDING_TENANT, null);
+        }
+        return resourceId;
+    }
+
+    /**
+     * Validate details attached to the code sent in email verification with the sent in details.
+     * @param tenant tenant
+     * @throws TenantManagementClientException error in validating code
+     */
+    private void validateInputAgainstCode(ChannelVerifiedTenantModel tenant) throws TenantManagementClientException {
+
+        String code = tenant.getCode();
+        if (StringUtils.isBlank(code)) {
+            throw new TenantManagementClientException(ERROR_CODE_MISSING_REQUIRED_PARAMETER.getCode(),
+                    String.format(ERROR_CODE_MISSING_REQUIRED_PARAMETER.getMessage(), CODE));
+        }
+
+        UserRecoveryDataStore userRecoveryDataStore = JDBCRecoveryDataStore.getInstance();
+
+        // If the code is validated, the load method will return data. Otherwise method will throw exceptions.
+        try {
+            UserRecoveryData recoveryData = userRecoveryDataStore.load(code);
+            if (recoveryData != null && recoveryData.getUser() != null && tenant.getOwners() != null &&
+                    tenant.getOwners().get(0) != null && tenant.getOwners().get(0).getUsername() != null &&
+                    tenant.getOwners().get(0).getUsername().equalsIgnoreCase(recoveryData.getUser().getUserName())) {
+                userRecoveryDataStore.invalidate(code);
+            } else { // the confirmed email using the code and submitted emails are different.
+                userRecoveryDataStore.invalidate(code);
+                log.warn("The confirmed email using the code and submitted emails are different.");
+                throw new TenantManagementClientException(ERROR_CODE_INVALID_EMAIL.getCode(),
+                        String.format(ERROR_CODE_INVALID_EMAIL.getMessage(), CODE));
+            }
+
+        } catch (IdentityRecoveryException e) {
+            throw handleException(Response.Status.UNAUTHORIZED, TenantManagementConstants.ErrorMessage
+                    .ERROR_CODE_ERROR_VALIDATING_TENANT_CODE, null);
+        }
+    }
+
+    private Tenant createTenantInfoBean(ChannelVerifiedTenantModel channelVerifiedTenantModel)
+            throws TenantManagementClientException {
+
+        Tenant tenant = new Tenant();
+        Map<String, String> claimsMap = new HashMap<>();
+
+        tenant.setActive(true);
+        tenant.setDomain(channelVerifiedTenantModel.getDomain());
+        if (channelVerifiedTenantModel.getOwners() != null && channelVerifiedTenantModel.getOwners().size() > 0
+                && channelVerifiedTenantModel.getOwners().get(0) != null) {
+            tenant.setAdminName(channelVerifiedTenantModel.getOwners().get(0).getEmail());
+            tenant.setAdminFirstName(channelVerifiedTenantModel.getOwners().get(0).getFirstname());
+            tenant.setAdminLastName(channelVerifiedTenantModel.getOwners().get(0).getLastname());
+            tenant.setDomain(channelVerifiedTenantModel.getDomain());
+            tenant.setEmail(channelVerifiedTenantModel.getOwners().get(0).getEmail());
+
+            tenant.setProvisioningMethod(VERIFIED_LITE_USER);
+            String password = channelVerifiedTenantModel.getOwners().get(0).getPassword();
+            String code = channelVerifiedTenantModel.getCode();
+
+            if (StringUtils.isBlank(code)) {
+                throw new TenantManagementClientException(TenantConstants.ErrorMessage.
+                        ERROR_CODE_MISSING_REQUIRED_PARAMETER.getCode(),
+                        String.format(TenantConstants.ErrorMessage.
+                                ERROR_CODE_MISSING_REQUIRED_PARAMETER.getMessage(), "code"));
+            }
+
+            if (channelVerifiedTenantModel.getPurpose() != null) {
+                claimsMap.put(PURPOSE, channelVerifiedTenantModel.getPurpose().getName());
+                if (!CollectionUtils.isEmpty(channelVerifiedTenantModel.getPurpose().getAttributes())) {
+                    channelVerifiedTenantModel.getPurpose().getAttributes()
+                            .forEach(attribute ->
+                                    claimsMap.put(PURPOSE + "_" + attribute.getKey(), attribute.getValue()));
+                }
+            }
+
+            tenant.setClaimsMap(claimsMap);
+            tenant.setAdminPassword(password);
+
+            List<AdditionalClaims> additionalClaimsList =
+                    channelVerifiedTenantModel.getOwners().get(0).getAdditionalClaims();
+            if (CollectionUtils.isNotEmpty(additionalClaimsList)) {
+                tenant.setClaimsMap(createClaimsMapping(additionalClaimsList));
+            }
+        } else {
+            throw new TenantManagementClientException(TenantConstants.ErrorMessage.ERROR_CODE_OWNER_REQUIRED);
+        }
+
+        return tenant;
+    }
+    /**
+     * Convert {@link Date} instance to ISO-8601 format string.
+     *
+     * @param date Date instance to be converted.
+     * @return ISO-8601 representation of the date.
+     */
+    private String getISOFormatDate(Date date) {
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())
+                                                   .withZoneSameInstant(ZoneId.of("UTC"));
+        return ISO_OFFSET_DATE_TIME.format(zonedDateTime);
+    }
 }

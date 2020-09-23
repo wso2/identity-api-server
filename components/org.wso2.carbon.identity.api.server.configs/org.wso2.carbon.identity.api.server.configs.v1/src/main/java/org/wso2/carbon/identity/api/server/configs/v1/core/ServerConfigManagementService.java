@@ -29,9 +29,12 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
+import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorProperty;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ProvisioningConfig;
@@ -51,6 +54,10 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationManagementUtil;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
+import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
+import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
+import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
+import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
@@ -58,9 +65,12 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
@@ -168,6 +178,7 @@ public class ServerConfigManagementService {
         serverConfig.setHomeRealmIdentifiers(homeRealmIdentifiers);
         serverConfig.setProvisioning(buildProvisioningConfig());
         serverConfig.setAuthenticators(getAuthenticators(null));
+        serverConfig.setCors(getCORSConfiguration());
         return serverConfig;
     }
 
@@ -246,6 +257,112 @@ public class ServerConfigManagementService {
         }
     }
 
+    /**
+     * Get the CORS config for a tenant.
+     */
+    public CORSConfig getCORSConfiguration() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            CORSConfiguration corsConfiguration = ConfigsServiceHolder.getInstance().getCorsManagementService()
+                    .getCORSConfiguration(tenantDomain);
+
+            return new CORSConfigurationToCORSConfig().apply(corsConfiguration);
+        } catch (CORSManagementServiceException e) {
+            throw handleCORSException(e, Constants.ErrorMessage.ERROR_CODE_CORS_CONFIG_RETRIEVE, null);
+        }
+    }
+
+    /**
+     * Patch the CORS config of a tenant.
+     *
+     * @param corsPatchList List of patch operations.
+     */
+    public void patchCORSConfig(List<CORSPatch> corsPatchList) {
+
+        if (CollectionUtils.isEmpty(corsPatchList)) {
+            return;
+        }
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        CORSConfiguration corsConfiguration;
+        try {
+            corsConfiguration = ConfigsServiceHolder.getInstance().getCorsManagementService()
+                    .getCORSConfiguration(tenantDomain);
+        } catch (CORSManagementServiceException e) {
+            throw handleCORSException(e, Constants.ErrorMessage.ERROR_CODE_CORS_CONFIG_RETRIEVE, null);
+        }
+
+        try {
+            for (CORSPatch corsPatch : corsPatchList) {
+                String path = corsPatch.getPath();
+                CORSPatch.OperationEnum operation = corsPatch.getOperation();
+                String value = corsPatch.getValue().trim();
+
+                // We support only 'REPLACE', 'ADD' and 'REMOVE' patch operations.
+                if (operation == CORSPatch.OperationEnum.REPLACE) {
+                    if (path.matches(Constants.CORS_CONFIG_ALLOW_GENERIC_HTTP_PATH_REGEX)) {
+                        corsConfiguration.setAllowGenericHttpRequests(Boolean.parseBoolean(value));
+                    } else if (path.matches(Constants.CORS_CONFIG_ALLOW_ANY_ORIGIN_PATH_REGEX)) {
+                        corsConfiguration.setAllowAnyOrigin(Boolean.parseBoolean(value));
+                    } else if (path.matches(Constants.CORS_CONFIG_ALLOW_SUBDOMAINS_PATH_REGEX)) {
+                        corsConfiguration.setAllowSubdomains(Boolean.parseBoolean(value));
+                    } else if (path.matches(Constants.CORS_CONFIG_SUPPORTED_METHODS_PATH_REGEX)) {
+                        corsConfiguration.setSupportedMethods(new HashSet<>(Collections.singletonList(value)));
+                    } else if (path.matches(Constants.CORS_CONFIG_SUPPORT_ANY_HEADER_PATH_REGEX)) {
+                        corsConfiguration.setSupportAnyHeader(Boolean.parseBoolean(value));
+                    } else if (path.matches(Constants.CORS_CONFIG_SUPPORTED_HEADERS_PATH_REGEX)) {
+                        corsConfiguration.setSupportedHeaders(new HashSet<>(Collections.singletonList(value)));
+                    } else if (path.matches(Constants.CORS_CONFIG_EXPOSED_HEADERS_PATH_REGEX)) {
+                        corsConfiguration.setExposedHeaders(new HashSet<>(Collections.singletonList(value)));
+                    } else if (path.matches(Constants.CORS_CONFIG_SUPPORTS_CREDENTIALS_PATH_REGEX)) {
+                        corsConfiguration.setSupportsCredentials(Boolean.parseBoolean(value));
+                    } else if (path.matches(Constants.CORS_CONFIG_MAX_AGE_PATH_REGEX)) {
+                        corsConfiguration.setMaxAge(Integer.parseInt(value));
+                    } else {
+                        // Throw an error if any other patch operations are sent in the request.
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                    }
+                } else if (operation == CORSPatch.OperationEnum.ADD) {
+                    if (path.matches(Constants.CORS_CONFIG_SUPPORTED_METHODS_PATH_REGEX)) {
+                        corsConfiguration.getSupportedMethods().add(value);
+                    } else if (path.matches(Constants.CORS_CONFIG_SUPPORTED_HEADERS_PATH_REGEX)) {
+                        corsConfiguration.getSupportedHeaders().add(value);
+                    } else if (path.matches(Constants.CORS_CONFIG_EXPOSED_HEADERS_PATH_REGEX)) {
+                        corsConfiguration.getExposedHeaders().add(value);
+                    } else {
+                        // Throw an error if any other patch operations are sent in the request.
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                    }
+                } else if (operation == CORSPatch.OperationEnum.REMOVE) {
+                    if (path.matches(Constants.CORS_CONFIG_SUPPORTED_METHODS_PATH_REGEX)) {
+                        corsConfiguration.getSupportedMethods().remove(value);
+                    } else if (path.matches(Constants.CORS_CONFIG_SUPPORTED_HEADERS_PATH_REGEX)) {
+                        corsConfiguration.getSupportedHeaders().remove(value);
+                    } else if (path.matches(Constants.CORS_CONFIG_EXPOSED_HEADERS_PATH_REGEX)) {
+                        corsConfiguration.getExposedHeaders().remove(value);
+                    } else {
+                        // Throw an error if any other patch operations are sent in the request.
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                    }
+                } else {
+                    // Throw an error if any other patch operations are sent in the request.
+                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                            .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                }
+            }
+
+            // Set the patched configuration object as the new CORS configuration for the tenant.
+            ConfigsServiceHolder.getInstance().getCorsManagementService()
+                    .setCORSConfiguration(corsConfiguration, tenantDomain);
+        } catch (CORSManagementServiceException e) {
+            throw handleCORSException(e, Constants.ErrorMessage.ERROR_CODE_CORS_CONFIG_UPDATE, null);
+        }
+    }
+
     private List<AuthenticatorListItem> buildAuthenticatorListResponse(
             LocalAuthenticatorConfig[] localConfigs, RequestPathAuthenticatorConfig[] requestPathConfigs) {
 
@@ -297,7 +414,7 @@ public class ServerConfigManagementService {
     }
 
     private RequestPathAuthenticatorConfig getAuthenticatorById(RequestPathAuthenticatorConfig[] authenticatorConfigs,
-                                                          String authenticatorId) {
+                                                                String authenticatorId) {
 
         String authenticatorName = base64URLDecode(authenticatorId);
         for (RequestPathAuthenticatorConfig config : authenticatorConfigs) {
@@ -545,7 +662,7 @@ public class ServerConfigManagementService {
                 String errorCode = e.getErrorCode();
                 errorCode =
                         errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
-                                errorCode : Constants.CONFIG_PREFIX + errorCode;
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
@@ -555,7 +672,7 @@ public class ServerConfigManagementService {
                 String errorCode = e.getErrorCode();
                 errorCode =
                         errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
-                                errorCode : Constants.CONFIG_PREFIX + errorCode;
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
@@ -586,7 +703,7 @@ public class ServerConfigManagementService {
                 String errorCode = e.getErrorCode();
                 errorCode =
                         errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
-                                errorCode : Constants.CONFIG_PREFIX + errorCode;
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
@@ -596,7 +713,40 @@ public class ServerConfigManagementService {
                 String errorCode = e.getErrorCode();
                 errorCode =
                         errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
-                                errorCode : Constants.CONFIG_PREFIX + errorCode;
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        } else {
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleCORSException(CORSManagementServiceException e,
+                                         Constants.ErrorMessage errorEnum, String data) {
+
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+
+        Response.Status status;
+
+        if (e instanceof CORSManagementServiceClientException) {
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.BAD_REQUEST;
+        } else if (e instanceof CORSManagementServiceServerException) {
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());

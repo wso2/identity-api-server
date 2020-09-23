@@ -60,14 +60,17 @@ public class TemplateToApplicationTemplate implements Function<Template, Applica
                     applicationTemplate.setDisplayOrder(Integer.parseInt(value));
                 }
                 if (ApplicationManagementConstants.TemplateProperties.CATEGORY.equals(key)) {
-                    if (ApplicationTemplateModel.CategoryEnum.CUSTOM.value().equals(value)) {
-                        applicationTemplate.setCategory(ApplicationTemplateModel.CategoryEnum.CUSTOM);
+                    if (ApplicationTemplateModel.CategoryEnum.VENDOR.value().equals(value)) {
+                        applicationTemplate.setCategory(ApplicationTemplateModel.CategoryEnum.VENDOR);
                     } else {
                         applicationTemplate.setCategory(ApplicationTemplateModel.CategoryEnum.DEFAULT);
                     }
                 }
                 if (ApplicationManagementConstants.TemplateProperties.INBOUND_PROTOCOL.equals(key)) {
                     applicationTemplate.setAuthenticationProtocol(value);
+                }
+                if (ApplicationManagementConstants.TemplateProperties.TEMPLATE_GROUP.equals(key)) {
+                    applicationTemplate.setTemplateGroup(value);
                 }
             });
         }

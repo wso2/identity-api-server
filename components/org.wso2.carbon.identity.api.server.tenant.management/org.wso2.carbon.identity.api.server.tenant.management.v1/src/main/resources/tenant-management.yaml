@@ -95,6 +95,49 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/ServerError'
+
+  /channel-verified-tenants:
+    post:
+      tags:
+        - Tenants
+      summary: Add tenant.
+      operationId: addChannelVerifiedTenant
+      description: |
+        This API provides the capability to create new channel verified tenants.
+
+        <b>Permission required:</b>
+        * /permission/protected/manage/monitor/tenants/list
+
+        <b>scope required:</b>
+        * internal_list_tenants
+
+        <b> cURL</b>
+        curl -k -v -X POST -H "Authorization: Basic YWRtaW5Ad3NvMi5jb206YWRtaW4=" -H "Content-Type: application/json" -d '{ "domain":"lanka.com", "purpose":"Personal", "code":"2d962a0b-9280-4394-8652-0137a25d9bac", "owners":[ { "username":"lanka@wso2.com", "email":"lanka@wso2.com","password":"Pass#word2", "firstname":"Lanka", "lastname":"Jaya", "provisioningMethod":"verified-lite-user", "additionalClaims":[ { "claim":"http://wso2.org/claims/telephone", "value":"+94 562 8723" } ] } ] }' "https://localhost:9443/t/carbon.super/api/server/v1/channel-verified-tenants"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelVerifiedTenantModel'
+        description: This represents the tenant to be created.
+        required: true
+      responses:
+        '201':
+          description: Item Created
+          headers:
+            location:
+              description: Location of the newly created tenant
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
   '/tenants/{tenant-id}':
     get:
       tags:
@@ -330,6 +373,28 @@ components:
           items:
             $ref: '#/components/schemas/Owner'
 
+    ChannelVerifiedTenantModel:
+      type: object
+      required:
+        - domain
+        - owners
+        - code
+      properties:
+        domain:
+          type: string
+          example: wso2.com
+          description: Tenant domain of the tenant.
+        code:
+          type: string
+          example: 3723dghdg32yt236734563236
+          description: Tenant domain of the tenant.
+        purpose:
+          $ref: '#/components/schemas/Purpose'
+        owners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Owner'
+
     TenantListItem:
       type: object
       properties:
@@ -350,7 +415,7 @@ components:
           example: "2020-03-03T17:04:06.570+05:30"
           readOnly: true
           description: Tenant created time.
-        lifecycle-status:
+        lifecycleStatus:
           $ref: '#/components/schemas/LifeCycleStatus'
         region:
           type: string
@@ -406,10 +471,10 @@ components:
             $ref: '#/components/schemas/OwnerResponse'
         createdDate:
           type: string
-          example: "2020-03-03T17:04:06.570+05:30"
+          example: "2020-06-19T17:36:46.271Z"
           readOnly: true
-          description: Tenant created time.
-        lifecycle-status:
+          description: Tenant created time in ISO-8601 format.
+        lifecycleStatus:
           $ref: '#/components/schemas/LifeCycleStatus'
         region:
           type: string
@@ -420,7 +485,7 @@ components:
     TenantPutModel:
       type: object
       required:
-        - lifecycle-status
+        - lifecycleStatus
       properties:
         activated:
           type: boolean
@@ -488,6 +553,31 @@ components:
           type: string
           example: "+94 562 8723"
           description: Mobile number of the tenant owner.
+
+    Attribute:
+      type: object
+      properties:
+        key:
+          type: string
+          example: "Organization Name"
+          description: Name of the organization.
+        value:
+          type: string
+          example: "Asgardio"
+          description: Name of the organization.
+
+    Purpose:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Personal
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attribute'
 
     LifeCycleStatus:
       type: object

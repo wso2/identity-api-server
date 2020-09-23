@@ -44,7 +44,7 @@ public class ApplicationTemplatesListItem  {
 @XmlEnum(String.class)
 public enum CategoryEnum {
 
-    @XmlEnumValue("DEFAULT") DEFAULT(String.valueOf("DEFAULT")), @XmlEnumValue("CUSTOM") CUSTOM(String.valueOf("CUSTOM"));
+    @XmlEnumValue("DEFAULT") DEFAULT(String.valueOf("DEFAULT")), @XmlEnumValue("VENDOR") VENDOR(String.valueOf("VENDOR"));
 
 
     private String value;
@@ -74,6 +74,7 @@ public enum CategoryEnum {
 
     private CategoryEnum category;
     private Integer displayOrder;
+    private String templateGroup;
     private String self;
 
     /**
@@ -230,6 +231,24 @@ public enum CategoryEnum {
 
     /**
     **/
+    public ApplicationTemplatesListItem templateGroup(String templateGroup) {
+
+        this.templateGroup = templateGroup;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "web-application", value = "")
+    @JsonProperty("templateGroup")
+    @Valid
+    public String getTemplateGroup() {
+        return templateGroup;
+    }
+    public void setTemplateGroup(String templateGroup) {
+        this.templateGroup = templateGroup;
+    }
+
+    /**
+    **/
     public ApplicationTemplatesListItem self(String self) {
 
         this.self = self;
@@ -266,12 +285,13 @@ public enum CategoryEnum {
             Objects.equals(this.types, applicationTemplatesListItem.types) &&
             Objects.equals(this.category, applicationTemplatesListItem.category) &&
             Objects.equals(this.displayOrder, applicationTemplatesListItem.displayOrder) &&
+            Objects.equals(this.templateGroup, applicationTemplatesListItem.templateGroup) &&
             Objects.equals(this.self, applicationTemplatesListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, authenticationProtocol, types, category, displayOrder, self);
+        return Objects.hash(id, name, description, image, authenticationProtocol, types, category, displayOrder, templateGroup, self);
     }
 
     @Override
@@ -288,6 +308,7 @@ public enum CategoryEnum {
         sb.append("    types: ").append(toIndentedString(types)).append("\n");
         sb.append("    category: ").append(toIndentedString(category)).append("\n");
         sb.append("    displayOrder: ").append(toIndentedString(displayOrder)).append("\n");
+        sb.append("    templateGroup: ").append(toIndentedString(templateGroup)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
