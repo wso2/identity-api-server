@@ -159,6 +159,21 @@ public class ServerTenantManagementService {
     }
 
     /**
+     * Delete the metadata of the tenant which is identified by tenant unique id.
+     *
+     * @param tenantUniqueID tenant unique identifier.
+     */
+    public void deleteTenantMetadata(String tenantUniqueID) {
+
+        try {
+            TenantManagementServiceHolder.getTenantMgtService().deleteTenantMetaData(tenantUniqueID);
+        } catch (TenantMgtException e) {
+            throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_DELETE_TENANT_METADATA, tenantUniqueID);
+        }
+    }
+
+    /**
      * Update tenant life-cycle status.
      *
      * @param tenantUniqueID tenant unique identifier.

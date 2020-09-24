@@ -44,6 +44,13 @@ public class TenantsApiServiceImpl implements TenantsApiService {
     }
 
     @Override
+    public Response deleteTenantMetadata(String tenantId) {
+
+        tenantManagementService.deleteTenantMetadata(tenantId);
+        return Response.noContent().build();
+    }
+
+    @Override
     public Response getOwners(String tenantUniqueIdentifier) {
 
         return Response.ok().entity(tenantManagementService.getOwners(tenantUniqueIdentifier)).build();
