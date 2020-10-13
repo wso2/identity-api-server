@@ -2272,6 +2272,11 @@ public class ServerIdpManagementService {
         connectorConfig.setEnabled(connector.getIsEnabled());
         connectorConfig.setBlocking(connector.getBlockingEnabled());
         connectorConfig.setRulesEnabled(connector.getRulesEnabled());
+
+        if (connector.getProperties() == null) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_OUTBOUND_PROVISIONING_CONFIG_NOT_FOUND, connectorName);
+        }
         List<Property> properties = connector.getProperties().stream()
                 .map(propertyToInternal)
                 .collect(Collectors.toList());
