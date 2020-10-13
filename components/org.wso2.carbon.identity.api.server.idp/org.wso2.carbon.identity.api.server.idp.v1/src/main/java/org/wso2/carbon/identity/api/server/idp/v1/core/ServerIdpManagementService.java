@@ -301,9 +301,9 @@ public class ServerIdpManagementService {
      */
     public MetaFederatedAuthenticator getMetaFederatedAuthenticator(String id) {
 
-        String authenticatorName = base64URLDecode(id);
         MetaFederatedAuthenticator authenticator = null;
         try {
+            String authenticatorName = decodeAuthenticatorID(id);
             FederatedAuthenticatorConfig[] authenticatorConfigs =
                     IdentityProviderServiceHolder.getIdentityProviderManager()
                             .getAllFederatedAuthenticators();
@@ -318,6 +318,26 @@ public class ServerIdpManagementService {
             return authenticator;
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_META_AUTHENTICATOR, id);
+        }
+    }
+
+    /**
+     * Decode authenticator ID.
+     *
+     * @param id Authenticator ID.
+     * @return Base64 URL decoded authenticator ID.
+     * @throws IdentityProviderManagementClientException IF an error occurred while decoding the authenticator ID.
+     */
+    private String decodeAuthenticatorID(String id) throws IdentityProviderManagementClientException {
+
+        try {
+            return base64URLDecode(id);
+        } catch (IllegalArgumentException e) {
+            if (StringUtils.isBlank(e.getLocalizedMessage())) {
+                throw new IdentityProviderManagementClientException("Invalid Authenticator ID: " + id, e);
+            }
+            throw new IdentityProviderManagementClientException(
+                    String.format("%s : Authenticator ID: %s", e.getMessage(), id), e);
         }
     }
 
