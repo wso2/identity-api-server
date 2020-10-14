@@ -133,10 +133,13 @@ public class ServerUserStoreService {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
                 getUserStoreConfigService();
-        //domainName and typeName are not allowed to edit. iF domain name wanted to update then use
-        // userStoreConfigService.updateUserStoreByDomainName(base64URLDecodeId(domainId),
-        //         createUserStoreDTO(userStoreReq, domainId));
+        /*
+        domainName and typeName are not allowed to edit. iF domain name wanted to update then use
+        userStoreConfigService.updateUserStoreByDomainName(base64URLDecodeId(domainId),
+        createUserStoreDTO(userStoreReq, domainId));
+         */
         try {
+            validateUserstoreUpdateRequest(domainId, userStoreReq);
             userStoreConfigService.updateUserStore(createUserStoreDTO(userStoreReq), false);
             return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
@@ -869,5 +872,37 @@ public class ServerUserStoreService {
         }
         errorResponse.setDescription(exception.getMessage());
         return new APIError(status, errorResponse);
+    }
+
+    /**
+     * Validate userstore update request.
+     *
+     * @param domainID     Userstore domain ID
+     * @param userStoreReq UserStoreReq object.
+     * @throws IdentityUserStoreClientException If request is invalid.
+     */
+    private void validateUserstoreUpdateRequest(String domainID, UserStoreReq userStoreReq)
+            throws IdentityUserStoreClientException {
+
+        if (StringUtils.isBlank(domainID)) {
+            throw new IdentityUserStoreClientException(
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_ID.getCode(),
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_ID.getMessage());
+        }
+        if (userStoreReq == null) {
+            throw new IdentityUserStoreClientException(
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_REQUEST_BODY_NOT_FOUND.getCode(),
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_REQUEST_BODY_NOT_FOUND.getMessage());
+        }
+        if (StringUtils.isBlank(userStoreReq.getName())) {
+            throw new IdentityUserStoreClientException(
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_NAME.getCode(),
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_NAME.getMessage());
+        }
+        if (!userStoreReq.getName().equals(base64URLDecodeId(domainID))) {
+            throw new IdentityUserStoreClientException(
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_NAME.getCode(),
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_NAME.getMessage());
+        }
     }
 }
