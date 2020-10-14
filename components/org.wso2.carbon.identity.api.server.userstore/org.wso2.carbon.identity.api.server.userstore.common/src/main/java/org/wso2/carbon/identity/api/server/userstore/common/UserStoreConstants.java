@@ -90,7 +90,15 @@ public class UserStoreConstants {
         ERROR_CODE_INVALID_INPUT("60004", "Invalid Input", "Provided Input is not valid.",
                 Response.Status.BAD_REQUEST),
         ERROR_CODE_MANDATORY_PROPERTIES_NOT_FOUND("60006", "Mandatory property is missing ",
-                " Required user store  property or its value is missing in the request ");
+                " Required user store  property or its value is missing in the request "),
+        ERROR_CODE_EMPTY_DOMAIN_ID("60007", "Userstore ID is not specified", "Userstore " +
+                "ID is either NULL or empty."),
+        ERROR_CODE_EMPTY_DOMAIN_NAME("60008", "Userstore domain name is not specified",
+                "Userstore domain name is either NULL or empty."),
+        ERROR_CODE_DOMAIN_ID_DOES_NOT_MATCH_WITH_NAME("60009", "Invalid userstore domain name or " +
+                "domainID", "Userstore domain name does not match with the userstore domain ID"),
+        ERROR_CODE_REQUEST_BODY_NOT_FOUND("60010", "Invalid userstore update request",
+                "Userstore update request is either NULL or empty");
 
         private final String code;
         private final String message;
