@@ -37,7 +37,7 @@ public class UserStoreConstants {
      */
     public enum ErrorMessage {
 
-        // For server errors,  allocated the error code range starting from 650
+        // Server Errors - 650xx
         ERROR_CODE_ERROR_ADDING_USER_STORE("65001",
                 "Unable to add the secondary user store.",
                 "Server Encountered an error while adding secondary user store.",
@@ -75,22 +75,22 @@ public class UserStoreConstants {
                 "Unable to get the user store by its domain id.",
                 "Server Encountered an error while retrieving the user store by its domain id.",
                 Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE("65011",
+                "Unable to get the primary user store.",
+                "Server Encountered an error while retrieving the primary user store.",
+                Response.Status.INTERNAL_SERVER_ERROR),
 
-        // For client errors,  allocated the error code range starting from 600
+        // Client Errors - 600xx
         ERROR_CODE_DOMAIN_ID_NOT_FOUND("60001",
                 "Resource not found.",
                 "Unable to find any user store's domain id with the provided identifier",
                 Response.Status.NOT_FOUND),
         ERROR_CODE_NOT_FOUND("60003", "Resource not found.",
                 "Unable to find a required resource for this request", Response.Status.NOT_FOUND),
-        ERROR_CODE_MANDATORY_PROPERTIES_NOT_FOUND("60006", "Mandatory property is missing ",
-                " Required user store  property or its value is missing in the request "),
         ERROR_CODE_INVALID_INPUT("60004", "Invalid Input", "Provided Input is not valid.",
-                                 Response.Status.BAD_REQUEST),
-        ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE("65011",
-                "Unable to get the primary user store.",
-                "Server Encountered an error while retrieving the primary user store.",
-                Response.Status.INTERNAL_SERVER_ERROR);
+                Response.Status.BAD_REQUEST),
+        ERROR_CODE_MANDATORY_PROPERTIES_NOT_FOUND("60006", "Mandatory property is missing ",
+                " Required user store  property or its value is missing in the request ");
 
         private final String code;
         private final String message;
