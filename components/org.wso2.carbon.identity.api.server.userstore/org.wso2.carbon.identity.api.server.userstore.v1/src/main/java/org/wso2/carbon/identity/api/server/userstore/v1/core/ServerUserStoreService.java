@@ -606,7 +606,6 @@ public class ServerUserStoreService {
 
         HashMap<String, String> userStoreMap = getHashMap();
         for (Map.Entry<String, String> stringEntry : userStoreMap.entrySet()) {
-            LOG.info(((Map.Entry) stringEntry).getKey() + " = " + ((Map.Entry) stringEntry).getValue());
             if (typeName.equals(((Map.Entry) stringEntry).getValue())) {
                 return (String) ((Map.Entry) stringEntry).getKey();
             }
@@ -624,7 +623,6 @@ public class ServerUserStoreService {
 
         HashMap<String, String> userStoreMap = getHashMap();
         for (Map.Entry<String, String> stringEntry : userStoreMap.entrySet()) {
-            LOG.info(((Map.Entry) stringEntry).getKey() + " = " + ((Map.Entry) stringEntry).getValue());
             if (className.equals(((Map.Entry) stringEntry).getKey())) {
                 return (String) ((Map.Entry) stringEntry).getValue();
             }
