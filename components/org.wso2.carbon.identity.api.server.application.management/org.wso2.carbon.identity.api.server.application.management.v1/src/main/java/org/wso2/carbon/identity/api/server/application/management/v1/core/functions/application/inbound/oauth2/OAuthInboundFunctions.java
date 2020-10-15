@@ -106,7 +106,7 @@ public class OAuthInboundFunctions {
              */
             try {
                 ApplicationManagementServiceHolder.getCorsManagementService().setCORSOrigins
-                        (String.valueOf(application.getApplicationID()), existingCORSOrigins, tenantDomain);
+                        (application.getApplicationResourceId(), existingCORSOrigins, tenantDomain);
             } catch (CORSManagementServiceException corsManagementServiceException) {
                 throw handleException(e);
             }
