@@ -96,7 +96,7 @@ public class UserStoreConstants {
         ERROR_CODE_EMPTY_DOMAIN_NAME("60008", "Userstore domain name is not specified",
                 "Userstore domain name is either NULL or empty."),
         ERROR_CODE_DOMAIN_ID_DOES_NOT_MATCH_WITH_NAME("60009", "Invalid userstore domain name or " +
-                "domainID", "Userstore domain name does not match with the userstore domain ID"),
+                "domain ID", "Userstore domain name does not match with the userstore domain ID"),
         ERROR_CODE_REQUEST_BODY_NOT_FOUND("60010", "Invalid userstore update request",
                 "Userstore update request is either NULL or empty");
 
