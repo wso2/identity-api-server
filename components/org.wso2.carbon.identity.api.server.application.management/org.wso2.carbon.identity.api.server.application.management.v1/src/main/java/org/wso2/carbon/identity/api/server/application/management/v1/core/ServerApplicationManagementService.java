@@ -1023,12 +1023,12 @@ public class ServerApplicationManagementService {
 
     private ApplicationManagementService getApplicationManagementService() {
 
-        return ApplicationManagementServiceHolder.getInstance().getApplicationManagementService();
+        return ApplicationManagementServiceHolder.getApplicationManagementService();
     }
 
     private TemplateManager getTemplateManager() {
 
-        return ApplicationManagementServiceHolder.getInstance().getTemplateManager();
+        return ApplicationManagementServiceHolder.getTemplateManager();
     }
 
     private APIError handleIdentityApplicationManagementException(IdentityApplicationManagementException e,
