@@ -28,92 +28,81 @@ import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
  */
 public class ApplicationManagementServiceHolder {
 
-    private static ApplicationManagementServiceHolder instance = new ApplicationManagementServiceHolder();
+    private static ApplicationManagementService applicationManagementService;
+    private static OAuthAdminServiceImpl oauthAdminService;
+    private static STSAdminServiceInterface stsAdminService;
+    private static SAMLSSOConfigServiceImpl samlssoConfigService;
+    private static OAuthServerConfiguration oAuthServerConfiguration;
+    private static TemplateManager templateManager;
+    private static CORSManagementService corsManagementService;
 
-    private ApplicationManagementService applicationManagementService;
-    private OAuthAdminServiceImpl oauthAdminService;
-    private STSAdminServiceInterface stsAdminService;
-    private SAMLSSOConfigServiceImpl samlssoConfigService;
-    private OAuthServerConfiguration oAuthServerConfiguration;
-    private TemplateManager templateManager;
-    private CORSManagementService corsManagementService;
-
-    private ApplicationManagementServiceHolder(){
-
-    }
-
-    public static ApplicationManagementServiceHolder getInstance() {
-
-        return instance;
-    }
-
-    public ApplicationManagementService getApplicationManagementService() {
+    public static ApplicationManagementService getApplicationManagementService() {
 
         return applicationManagementService;
     }
 
-    public void setApplicationManagementService(ApplicationManagementService applicationManagementService) {
+    public static void setApplicationManagementService(ApplicationManagementService applicationManagementService) {
 
-        this.applicationManagementService = applicationManagementService;
+        ApplicationManagementServiceHolder.applicationManagementService = applicationManagementService;
     }
 
-    public OAuthAdminServiceImpl getOAuthAdminService() {
+    public static OAuthAdminServiceImpl getOAuthAdminService() {
 
         return oauthAdminService;
     }
 
-    public void setOauthAdminService(OAuthAdminServiceImpl oauthAdminService) {
+    public static void setOauthAdminService(OAuthAdminServiceImpl oauthAdminService) {
 
-        this.oauthAdminService = oauthAdminService;
+        ApplicationManagementServiceHolder.oauthAdminService = oauthAdminService;
     }
 
-    public STSAdminServiceInterface getStsAdminService() {
+    public static STSAdminServiceInterface getStsAdminService() {
 
         return stsAdminService;
     }
 
-    public void setStsAdminService(STSAdminServiceInterface stsAdminService) {
+    public static void setStsAdminService(STSAdminServiceInterface stsAdminService) {
 
-        this.stsAdminService = stsAdminService;
+        ApplicationManagementServiceHolder.stsAdminService = stsAdminService;
     }
 
-    public SAMLSSOConfigServiceImpl getSamlssoConfigService() {
+    public static SAMLSSOConfigServiceImpl getSamlssoConfigService() {
 
         return samlssoConfigService;
     }
 
-    public void setSamlssoConfigService(SAMLSSOConfigServiceImpl samlssoConfigService) {
+    public static void setSamlssoConfigService(SAMLSSOConfigServiceImpl samlssoConfigService) {
 
-        this.samlssoConfigService = samlssoConfigService;
+        ApplicationManagementServiceHolder.samlssoConfigService = samlssoConfigService;
     }
 
-    public OAuthServerConfiguration getoAuthServerConfiguration() {
+    public static OAuthServerConfiguration getoAuthServerConfiguration() {
 
         return oAuthServerConfiguration;
     }
 
-    public void setoAuthServerConfiguration(OAuthServerConfiguration oAuthServerConfiguration) {
+    public static void setoAuthServerConfiguration(OAuthServerConfiguration oAuthServerConfiguration) {
 
-        this.oAuthServerConfiguration = oAuthServerConfiguration;
+        ApplicationManagementServiceHolder.oAuthServerConfiguration = oAuthServerConfiguration;
     }
 
-    public TemplateManager getTemplateManager() {
+    public static TemplateManager getTemplateManager() {
 
         return templateManager;
     }
 
-    public void setTemplateManager(TemplateManager templateManager) {
+    public static void setTemplateManager(TemplateManager templateManager) {
 
-        this.templateManager = templateManager;
+        ApplicationManagementServiceHolder.templateManager = templateManager;
     }
 
-    public CORSManagementService getCorsManagementService() {
+    public static CORSManagementService getCorsManagementService() {
 
         return corsManagementService;
     }
 
-    public void setCorsManagementService(CORSManagementService corsManagementService) {
+    public static void setCorsManagementService(CORSManagementService corsManagementService) {
 
-        this.corsManagementService = corsManagementService;
+        ApplicationManagementServiceHolder.corsManagementService = corsManagementService;
     }
 }
