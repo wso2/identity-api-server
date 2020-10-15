@@ -901,8 +901,8 @@ public class ServerUserStoreService {
         }
         if (!userStoreReq.getName().equals(base64URLDecodeId(domainID))) {
             throw new IdentityUserStoreClientException(
-                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_NAME.getCode(),
-                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_NAME.getMessage());
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_DOMAIN_ID_DOES_NOT_MATCH_WITH_NAME.getCode(),
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_DOMAIN_ID_DOES_NOT_MATCH_WITH_NAME.getMessage());
         }
     }
 }
