@@ -111,9 +111,9 @@ public class Constants {
         ERROR_CODE_INVALID_SAML_METADATA("60026", "Invalid SAML metadata.", "SAML metadata is invalid/empty."),
         ERROR_CODE_INVALID_DEFAULT_AUTHENTICATOR("60027", "Invalid default authenticator ID",
                 "Provided value for the default authenticator ID is invalid."),
-        ERROR_CODE_INVALID_DEFAULT_OUTBOUND_CONNECTOR("60027", "Invalid default outbound connector ID",
+        ERROR_CODE_INVALID_DEFAULT_OUTBOUND_CONNECTOR("60028", "Invalid default outbound connector ID",
                 "Provided value for the default outbound connector ID is invalid."),
-        ERROR_CODE_OUTBOUND_PROVISIONING_CONFIG_NOT_FOUND("60028", "Unable to update Outbound " +
+        ERROR_CODE_OUTBOUND_PROVISIONING_CONFIG_NOT_FOUND("60029", "Unable to update Outbound " +
                 "Provisioning Connector", "Outbound Provisioning Connector properties have not specified " +
                 "for connector : %s"),
 
