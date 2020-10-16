@@ -16,6 +16,7 @@
 package org.wso2.carbon.identity.api.server.application.management.common.factory;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
+import org.springframework.lang.Nullable;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
 
@@ -34,6 +35,7 @@ public class STSAdminOSGiServiceFactory extends AbstractFactoryBean<STSAdminServ
     }
 
     @Override
+    @Nullable
     protected STSAdminServiceInterface createInstance() throws Exception {
 
         if (this.stsAdminService == null) {

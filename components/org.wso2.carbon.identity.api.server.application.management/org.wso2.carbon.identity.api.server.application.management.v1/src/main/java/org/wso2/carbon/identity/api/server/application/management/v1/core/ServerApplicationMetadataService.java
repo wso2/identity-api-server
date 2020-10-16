@@ -78,7 +78,7 @@ public class ServerApplicationMetadataService {
 
         // Add custom inbound protocols
         Map<String, AbstractInboundAuthenticatorConfig> allCustomAuthenticators =
-                ApplicationManagementServiceHolder.getInstance().getApplicationManagementService()
+                ApplicationManagementServiceHolder.getApplicationManagementService()
                         .getAllInboundAuthenticatorConfig();
 
         for (Map.Entry<String, AbstractInboundAuthenticatorConfig> entry : allCustomAuthenticators
@@ -110,8 +110,7 @@ public class ServerApplicationMetadataService {
     public SAMLMetaData getSAMLMetadata() {
 
         SAMLMetaData samlMetaData = new SAMLMetaData();
-        SAMLSSOConfigServiceImpl samlSSOConfigService = ApplicationManagementServiceHolder.getInstance()
-                .getSamlssoConfigService();
+        SAMLSSOConfigServiceImpl samlSSOConfigService = ApplicationManagementServiceHolder.getSamlssoConfigService();
 
         samlMetaData.setDefaultNameIdFormat(DEFAULT_NAME_ID_FORMAT);
 
@@ -150,8 +149,7 @@ public class ServerApplicationMetadataService {
     public OIDCMetaData getOIDCMetadata() {
 
         OIDCMetaData oidcMetaData = new OIDCMetaData();
-        OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getInstance()
-                .getOAuthAdminService();
+        OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
 
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
         List<GrantType> supportedGrantTypeNames = new ArrayList<>();
@@ -223,10 +221,10 @@ public class ServerApplicationMetadataService {
         WSTrustMetaData wsTrustMetaData = new WSTrustMetaData();
         try {
             // Check if WS-Trust is deployed.
-            if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
+            if (ApplicationManagementServiceHolder.getStsAdminService() != null) {
                 wsTrustMetaData.setCertificateAlias(new MetadataProperty()
                         .defaultValue(null)
-                        .options(Arrays.asList(ApplicationManagementServiceHolder.getInstance().getStsAdminService()
+                        .options(Arrays.asList(ApplicationManagementServiceHolder.getStsAdminService()
                                 .getCertAliasOfPrimaryKeyStore())));
             } else {
                 throw new SecurityConfigException(ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND.getDescription());
@@ -252,7 +250,7 @@ public class ServerApplicationMetadataService {
 
         String protocolName = URLDecoder.decode(inboundProtocolName);
         Map<String, AbstractInboundAuthenticatorConfig> allCustomAuthenticators =
-                ApplicationManagementServiceHolder.getInstance().getApplicationManagementService()
+                ApplicationManagementServiceHolder.getApplicationManagementService()
                         .getAllInboundAuthenticatorConfig();
 
         // Loop through all custom inbound protocols and match the name.
@@ -315,8 +313,8 @@ public class ServerApplicationMetadataService {
     public AdaptiveAuthTemplates getAdaptiveAuthTemplates() {
 
         AdaptiveAuthTemplates adaptiveAuthTemplates = new AdaptiveAuthTemplates();
-        adaptiveAuthTemplates.setTemplatesJSON(ApplicationManagementServiceHolder.getInstance()
-                .getApplicationManagementService().getAuthenticationTemplatesJSON());
+        adaptiveAuthTemplates.setTemplatesJSON(ApplicationManagementServiceHolder.getApplicationManagementService()
+                .getAuthenticationTemplatesJSON());
         return adaptiveAuthTemplates;
     }
 

@@ -78,7 +78,6 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 public class ServerUserStoreService {
 
     private static final Log LOG = LogFactory.getLog(ServerUserStoreService.class);
-    private static UserStoreConfigurationsRes primaryUserstoreConfigs = null;
 
     /**
      * Add a userStore {@link UserStoreReq}.
@@ -109,7 +108,7 @@ public class ServerUserStoreService {
     public void deleteUserStore(String userstoreDomainId) {
 
         try {
-            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().getInstance().
+            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
                     getUserStoreConfigService();
             userStoreConfigService.deleteUserStore(base64URLDecodeId(userstoreDomainId));
         } catch (IdentityUserStoreClientException e) {
@@ -214,32 +213,31 @@ public class ServerUserStoreService {
      */
     public UserStoreConfigurationsRes getPrimaryUserStore() {
 
-        if (primaryUserstoreConfigs == null) {
-            RealmService realmService = UserStoreConfigServiceHolder.getInstance().getRealmService();
-            RealmConfiguration realmConfiguration = realmService.getBootstrapRealmConfiguration();
-            if (realmConfiguration == null) {
-                throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
-                        ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE);
-            }
-            List<AddUserStorePropertiesRes> propertiesTobeAdd = new ArrayList<>();
-            primaryUserstoreConfigs = new UserStoreConfigurationsRes();
-            primaryUserstoreConfigs.setClassName(realmConfiguration.getUserStoreClass());
-            primaryUserstoreConfigs.setDescription(realmConfiguration.getDescription());
-            primaryUserstoreConfigs.setName(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME);
-            primaryUserstoreConfigs.setTypeId(base64URLEncodeId(Objects.requireNonNull
-                    (getUserStoreTypeName(realmConfiguration.getUserStoreClass()))));
-            primaryUserstoreConfigs.setTypeName(getUserStoreTypeName(realmConfiguration.getUserStoreClass()));
-            Map<String, String> userstoreProps = realmConfiguration.getUserStoreProperties();
-            if (MapUtils.isNotEmpty(userstoreProps)) {
-                for (String propKey : userstoreProps.keySet()) {
-                    AddUserStorePropertiesRes userStorePropertiesRes = new AddUserStorePropertiesRes();
-                    userStorePropertiesRes.setName(propKey);
-                    userStorePropertiesRes.setValue(userstoreProps.get(propKey));
-                    propertiesTobeAdd.add(userStorePropertiesRes);
-                }
-            }
-            primaryUserstoreConfigs.setProperties(propertiesTobeAdd);
+        RealmService realmService = UserStoreConfigServiceHolder.getInstance().getRealmService();
+        RealmConfiguration realmConfiguration = realmService.getBootstrapRealmConfiguration();
+        if (realmConfiguration == null) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE);
         }
+        List<AddUserStorePropertiesRes> propertiesTobeAdd = new ArrayList<>();
+        UserStoreConfigurationsRes primaryUserstoreConfigs = new UserStoreConfigurationsRes();
+        primaryUserstoreConfigs.setClassName(realmConfiguration.getUserStoreClass());
+        primaryUserstoreConfigs.setDescription(realmConfiguration.getDescription());
+        primaryUserstoreConfigs.setName(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME);
+        primaryUserstoreConfigs.setTypeId(base64URLEncodeId(Objects.requireNonNull
+                (getUserStoreTypeName(realmConfiguration.getUserStoreClass()))));
+        primaryUserstoreConfigs.setTypeName(getUserStoreTypeName(realmConfiguration.getUserStoreClass()));
+        Map<String, String> userstoreProps = realmConfiguration.getUserStoreProperties();
+        if (MapUtils.isNotEmpty(userstoreProps)) {
+            for (Map.Entry<String, String> entry : userstoreProps.entrySet()) {
+                AddUserStorePropertiesRes userStorePropertiesRes = new AddUserStorePropertiesRes();
+                userStorePropertiesRes.setName(entry.getKey());
+                userStorePropertiesRes.setValue(entry.getValue());
+                propertiesTobeAdd.add(userStorePropertiesRes);
+            }
+        }
+        primaryUserstoreConfigs.setProperties(propertiesTobeAdd);
+
         return primaryUserstoreConfigs;
     }
 
@@ -608,7 +606,6 @@ public class ServerUserStoreService {
 
         HashMap<String, String> userStoreMap = getHashMap();
         for (Map.Entry<String, String> stringEntry : userStoreMap.entrySet()) {
-            LOG.info(((Map.Entry) stringEntry).getKey() + " = " + ((Map.Entry) stringEntry).getValue());
             if (typeName.equals(((Map.Entry) stringEntry).getValue())) {
                 return (String) ((Map.Entry) stringEntry).getKey();
             }
@@ -626,7 +623,6 @@ public class ServerUserStoreService {
 
         HashMap<String, String> userStoreMap = getHashMap();
         for (Map.Entry<String, String> stringEntry : userStoreMap.entrySet()) {
-            LOG.info(((Map.Entry) stringEntry).getKey() + " = " + ((Map.Entry) stringEntry).getValue());
             if (className.equals(((Map.Entry) stringEntry).getKey())) {
                 return (String) ((Map.Entry) stringEntry).getValue();
             }
