@@ -113,6 +113,9 @@ public class Constants {
                 "Provided value for the default authenticator ID is invalid."),
         ERROR_CODE_INVALID_DEFAULT_OUTBOUND_CONNECTOR("60027", "Invalid default outbound connector ID",
                 "Provided value for the default outbound connector ID is invalid."),
+        ERROR_CODE_OUTBOUND_PROVISIONING_CONFIG_NOT_FOUND("60028", "Unable to update Outbound " +
+                "Provisioning Connector", "Outbound Provisioning Connector properties have not specified " +
+                "for connector : %s"),
 
         // Server Error starting from 650xx.
         ERROR_CODE_ERROR_ADDING_IDP("65002",
