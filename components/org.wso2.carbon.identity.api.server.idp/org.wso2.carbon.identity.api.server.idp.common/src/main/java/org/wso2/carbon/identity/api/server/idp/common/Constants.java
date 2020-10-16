@@ -93,9 +93,31 @@ public class Constants {
      */
     public enum ErrorMessage {
 
+        // Client errors starting from 600xx.
+        ERROR_CODE_IDP_NOT_FOUND("60002", "Resource not found.", "Unable to find a resource matching the provided " +
+                "identity provider identifier %s."),
         ERROR_CODE_ERROR_LISTING_IDPS("60021",
                 "Unable to list existing identity providers.",
                 "Server encountered an error while listing the identity providers."),
+        ERROR_CODE_AUTHENTICATOR_NOT_FOUND_FOR_IDP("60022",
+                "Resource not found.",
+                "Unable to find federated authenticator with identifier %s."),
+        ERROR_CODE_CONNECTOR_NOT_FOUND_FOR_IDP("60023", "Resource not found.", "Unable to find outbound provisioning " +
+                "connector identifier %s."),
+        ERROR_CODE_INVALID_LOCAL_CLAIM_ID("60024",
+                "Invalid claim uri.",
+                "Invalid claim uri %s provided in claim config."),
+        ERROR_CODE_INVALID_INPUT("60025", "Invalid input.", "One of the given inputs is invalid."),
+        ERROR_CODE_INVALID_SAML_METADATA("60026", "Invalid SAML metadata.", "SAML metadata is invalid/empty."),
+        ERROR_CODE_INVALID_DEFAULT_AUTHENTICATOR("60027", "Invalid default authenticator ID",
+                "Provided value for the default authenticator ID is invalid."),
+        ERROR_CODE_INVALID_DEFAULT_OUTBOUND_CONNECTOR("60028", "Invalid default outbound connector ID",
+                "Provided value for the default outbound connector ID is invalid."),
+        ERROR_CODE_OUTBOUND_PROVISIONING_CONFIG_NOT_FOUND("60029", "Unable to update Outbound " +
+                "Provisioning Connector", "Outbound Provisioning Connector properties have not specified " +
+                "for connector : %s"),
+
+        // Server Error starting from 650xx.
         ERROR_CODE_ERROR_ADDING_IDP("65002",
                 "Unable to add identity provider.",
                 "Server encountered an error while adding the identity provider."),
@@ -167,13 +189,6 @@ public class Constants {
                 "Unable to update identity provider Just-In-Time provisioning.",
                 "Server encountered an error while updating the identity provider Just-In-Time provisioning config " +
                         "for identifier %s."),
-        ERROR_CODE_IDP_NOT_FOUND("60002", "Resource not found.", "Unable to find a resource matching the provided " +
-                "identity provider identifier %s."),
-        ERROR_CODE_AUTHENTICATOR_NOT_FOUND_FOR_IDP("60022",
-                "Resource not found.",
-                "Unable to find federated authenticator with identifier %s."),
-        ERROR_CODE_CONNECTOR_NOT_FOUND_FOR_IDP("60023", "Resource not found.", "Unable to find outbound provisioning " +
-                "connector identifier %s."),
         ERROR_CODE_PAGINATION_NOT_IMPLEMENTED("65038",
                 "Pagination not supported.",
                 "Pagination capabilities are not supported in this version of the API."),
@@ -186,11 +201,6 @@ public class Constants {
         ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED("65041",
                 "Attribute filtering not supported.",
                 "Attribute filtering capability is not supported in this version of the API."),
-        ERROR_CODE_INVALID_LOCAL_CLAIM_ID("60024",
-                "Invalid claim uri.",
-                "Invalid claim uri %s provided in claim config."),
-        ERROR_CODE_INVALID_INPUT("60025", "Invalid input.", "One of the given inputs is invalid."),
-        ERROR_CODE_INVALID_SAML_METADATA("60026", "Invalid SAML metadata.", "SAML metadata is invalid/empty."),
         ERROR_CODE_BUILDING_LINKS("65042", "Error building page links", "Error occurred during building page links. " +
                 "%s"),
         ERROR_CODE_ERROR_LISTING_IDP_TEMPLATES("65050", "Unable to list existing identity provider " +
@@ -203,11 +213,7 @@ public class Constants {
                 "Error occurred while updating the IDP template with identifier %s."),
         ERROR_CODE_ERROR_RETRIEVING_IDP_TEMPLATE("65054", "Unable to retrieve IDP template.",
                 "Error occurred while retrieving the IDP template with identifier %s"),
-        ERROR_CODE_ERROR_INVALID_SEARCH_FILTER("65055", "Search request validation failed.", "Invalid search filter."),
-        ERROR_CODE_INVALID_DEFAULT_AUTHENTICATOR("60027", "Invalid default authenticator ID",
-                "Provided value for the default authenticator ID is invalid."),
-        ERROR_CODE_INVALID_DEFAULT_OUTBOUND_CONNECTOR("60027", "Invalid default outbound connector ID",
-                "Provided value for the default outbound connector ID is invalid.");
+        ERROR_CODE_ERROR_INVALID_SEARCH_FILTER("65055", "Search request validation failed.", "Invalid search filter.");
 
         private final String code;
         private final String message;
