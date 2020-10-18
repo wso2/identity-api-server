@@ -1,0 +1,1073 @@
+openapi: 3.0.0
+info:
+  description: >
+    This document specifies an **Remote Fetch Configuration RESTful API** for
+    **WSO2 Identity Server**. This supports Restful APIs for reomtefetch
+    configuration management. The APIs provide the capability to
+    add/update/delete/patch remotefetch configurations in the identity server.
+    In addition, APIs are available to trigger revision deployement for given
+    remote fetch configuration.
+  version: "v1"
+  title: WSO2 Identity Server - Remotedetch Configuration Management API definition
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+security:
+  - OAuth2: []
+  - BasicAuth: []
+paths:
+  /remote-fetch:
+    get:
+      tags:
+        - Remote Fetch Configurations
+      summary: |
+        List remote fetch configurations
+      description:
+        This API provides the capability to retrieve the list of remotefetch
+        configurations.<br> <b>Permission required:</b> <br>
+        * None <br>
+        <b>Scope required:</b> <br>
+        * internal_login
+      operationId: getRemoteFetchConfigs
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoteFetchConfigurationListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Remote Fetch Configurations
+      summary: |
+        Add a new remotefetch configuration
+      description: >
+        This API provides the capability to create a new remotefetch
+        configuration. <br>
+
+        <b>Permission required:</b> <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: addRemoteFetch
+      responses:
+        '201':
+          description: Successfully created.
+          headers:
+            Location:
+              description: Location of the newly created remotefetch configuration.
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoteFetchConfigurationPOSTRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/RemoteFetchConfigurationPOSTRequest'
+        description: This represents the remotefetch configuration to be created.
+        required: true
+  '/remote-fetch/{id}':
+    get:
+      tags:
+        - Remote Fetch Configurations
+      summary: |
+        Retrieve remotefetch Configuration by remotefetch Configuration's ID
+      description: >
+        This API provides the capability to retrieve the Remote Fetch
+        Configuration details by using its ID.<br> <b>Permission required:</b>
+        <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: getRemoteFetch
+      parameters:
+        - name: id
+          in: path
+          description: ID of the remotefetch Configuration.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoteFetchConfigurationGetResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/RemoteFetchConfigurationGetResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Remote Fetch Configurations
+      summary: |
+        Patch a remotefetch Configuration property by ID.
+      description: >
+        This API provides the capability to update a remotefetch Configuration
+        property using patch request. Patch is supported only for key-value
+        pairs. <br> <b>Permission required:</b> <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: updateRemoteFetch
+      parameters:
+        - name: id
+          in: path
+          description: ID of the remotefetch Configuration.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully Updated
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoteFetchConfigurationPatchRequest'
+        required: true
+    delete:
+      tags:
+        - Remote Fetch Configurations
+      summary: >
+        Delete a remotefetch Configuration by using the remotefetch
+        Configuration's ID.
+      description: >
+        This API provides the capability to delete a remotefetch Configuration
+        by giving its ID. <br> <b>Permission required:</b> <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: deleteRemoteFetch
+      parameters:
+        - name: id
+          in: path
+          description: ID of the remotefetch Configuration
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully Deleted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/remote-fetch/{id}/trigger':
+    post:
+      tags:
+        - Remote fetch Configuration Trigger
+      summary: |
+        Trigger a remote fetch configuration.
+      description: >
+        This API pprovides the capability to trigger given remotefetch
+        configuration. <br> <b>Permission required:</b> <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: triggerRemoteFetch
+      parameters:
+        - name: id
+          in: path
+          description: ID of the remote fetch configuration.
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Accepted.
+          headers:
+            Location:
+              description: Location of the triggered remotefetch configuration.
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/remote-fetch/{id}/status':
+    get:
+      tags:
+        - Remote fetch Configuration Status
+      summary: |
+        Retrieve latest Deployment status of remotefetch configuration.
+      description: >
+        This API provides the status of remote fetch configuration. The status
+        hold deployment status and the deployment failure details . <br>
+        <b>Permission required:</b> <br>
+            * None <br>
+        <b>Scope required:</b> <br>
+            * internal_login
+      operationId: getStatus
+      parameters:
+        - name: id
+          in: path
+          description: ID of the remote fetch configuration.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/remote-fetch/webhook/sp':
+    post:
+      tags:
+        - Remote Fetch Webhook
+      summary: |
+        Web hook endpoint for remote fetch configuration.
+      description: >
+        This API provides the capability to handle web hook request from remote repository. <br>
+      operationId: handleWebHook
+      responses:
+        '202':
+          description: Successful Response
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushEventWebHookPOSTRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/PushEventWebHookPOSTRequest'
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Thumimku/Remotefetch/v1
+  - description: SwaggerHub API Auto Mocking
+    url: 'https://virtserver.swaggerhub.com/Thumimku/Remotedetch/v1'
+  - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
+    variables:
+      tenant-domain:
+        default: carbon.super
+components:
+  parameters:
+    limitQueryParam:
+      in: query
+      name: limit
+      required: false
+      description: |
+        Maximum number of records to return.
+      schema:
+        type: integer
+        format: int32
+    offsetQueryParam:
+      in: query
+      name: offset
+      required: false
+      description: |
+        Number of records to skip for pagination.
+      schema:
+        type: integer
+        format: int32
+    filterQueryParam:
+      in: query
+      name: filter
+      required: false
+      description: >
+        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew'
+        and 'eq' operations and also complex queries with 'and' operations. E.g.
+        /identity-providers?filter=name+sw+"google"+and+isEnabled+eq+"true"
+      schema:
+        type: string
+    sortQueryParam:
+      in: query
+      name: sortOrder
+      required: false
+      description: |
+        Defines the order in which the retrieved records should be sorted.
+        _This parameter is not supported yet_
+      schema:
+        type: string
+        enum:
+          - ASC
+          - DESC
+    sortByQueryParam:
+      in: query
+      name: sortBy
+      required: false
+      description: |
+        Attribute by which the retrieved records should be sorted.
+        _This parameter is not supported yet_
+      schema:
+        type: string
+    requiredAttributesQueryParam:
+      in: query
+      name: requiredAttributes
+      required: false
+      description: |
+        Specifies the required parameters in the response.
+        _This parameter is not supported yet_
+      schema:
+        type: string
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth/authorize'
+          tokenUrl: 'https://localhost:9443/oauth/token'
+          scopes: {}
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: RFE-00000
+        message:
+          type: string
+          example: Some Error Message
+        description:
+          type: string
+          example: Some Error Description
+        traceId:
+          type: string
+          example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
+    RemoteFetchConfigurationListResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 10
+        remotefetchConfigurations:
+          type: array
+          items:
+            $ref: '#/components/schemas/RemoteFetchConfigurationListItem'
+    StatusListResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 10
+        successfulDeployments:
+          type: integer
+          example: 1
+        failedDeployments:
+          type: integer
+          example: 1
+        lastSynchronizedTime:
+          type: string
+          example: '2020-03-29 07:36:08.0'
+        remoteFetchRevisionStatuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusListItem'
+    RemoteFetchConfigurationListItem:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 00000000-13e9-4ed5-afaf-000000000000
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+        name:
+          type: string
+          example: testSP
+        repositoryManagerType:
+          type: string
+          example: GIT
+        actionListenerType:
+          type: string
+          example: POOLING
+        configurationDeployerType:
+          type: string
+          example: SP
+        successfulDeployments:
+          type: integer
+          example: 1
+        failedDeployments:
+          type: integer
+          example: 1
+        lastDeployed:
+          type: string
+          example: 10-04-2020
+    StatusListItem:
+      type: object
+      properties:
+        itemName:
+          type: string
+          example: pickup
+        deployedTime:
+          type: string
+          example: '2020-03-29 07:36:08.0'
+        deployedStatus:
+          type: string
+          example: SUCCESS
+        deploymentErrorReport:
+          type: string
+          example: "Service Provider Deployment Error Occured"
+    RemoteFetchConfigurationPOSTRequest:
+      type: object
+      properties:
+        remoteFetchName:
+          type: string
+          example: testSP
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+        repositoryManager:
+          $ref: '#/components/schemas/RepositoryManager'
+        actionListener:
+          $ref: '#/components/schemas/ActionListener'
+        configurationDeployer:
+          $ref: '#/components/schemas/ConfigurationDeployer'
+    RemoteFetchConfigurationPatchRequest:
+      type: object
+      properties:
+        remoteFetchName:
+          type: string
+          example: testSP
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+    RepositoryManager:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The operation to be performed
+          enum:
+            - GIT
+          example: GIT
+        attributes:
+          $ref: '#/components/schemas/RepositoryManagerAttributes'
+    RepositoryManagerAttributes:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: sample access token
+        username:
+          type: string
+          example: Jhon Doe
+        uri:
+          type: string
+          example: 'https://github.com/TestUser/TestGit.git'
+        branch:
+          type: string
+          example: master
+        directory:
+          type: string
+          example: SP/
+    ActionListener:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The operation to be performed
+          enum:
+            - POLLING
+            - WEB HOOK
+          example: WEB HOOK
+        attributes:
+          $ref: '#/components/schemas/ActionListenerAttributes'
+    ActionListenerAttributes:
+      type: object
+      properties:
+        frequency:
+          type: string
+          example: 60
+    ConfigurationDeployer:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The operation to be performed
+          enum:
+            - SP
+          example: SP
+        attributes:
+          $ref: '#/components/schemas/ConfigurationDeployerAttributes'
+    ConfigurationDeployerAttributes:
+      type: object
+    RemoteFetchConfigurationGetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 00000000-13e9-4ed5-afaf-000000000000
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+        remoteFetchName:
+          type: string
+          example: testSP
+        repositoryManagerType:
+          type: string
+          example: GIT
+        actionListenerType:
+          type: string
+          example: POOLING
+        configurationDeployerType:
+          type: string
+          example: SP
+        repositoryManagerAttributes:
+          $ref: '#/components/schemas/RepositoryManagerAttributes'
+        actionListenerAttributes:
+          $ref: '#/components/schemas/ActionListenerAttributes'
+        configurationDeployerAttributes:
+          $ref: '#/components/schemas/ConfigurationDeployerAttributes'
+        status:
+          $ref: '#/components/schemas/StatusListResponse'
+    PushEventWebHookPOSTRequest:
+      type: object
+      properties:
+        ref:
+          type: string
+        before:
+          type: string
+        after:
+          type: string
+        created:
+          type: boolean
+        deleted:
+          type: boolean
+        forced:
+          type: boolean
+        base_ref:
+          type: string
+        compare:
+          type: string
+        pusher:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+        sender:
+          type: object
+          properties:
+            login:
+              type: string
+            id:
+              type: integer
+            node_id:
+              type: string
+            avatar_url:
+              type: string
+            gravatar_id:
+              type: string
+            url:
+              type: string
+            html_url:
+              type: string
+            followers_url:
+              type: string
+            following_url:
+              type: string
+            gists_url:
+              type: string
+            starred_url:
+              type: string
+            subscriptions_url:
+              type: string
+            organizations_url:
+              type: string
+            repos_url:
+              type: string
+            events_url:
+              type: string
+            received_events_url:
+              type: string
+            type:
+              type: string
+            site_admin:
+              type: boolean
+        commits:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              tree_id:
+                type: string
+              distinct:
+                type: boolean
+              message:
+                type: string
+              timestamp:
+                type: string
+              url:
+                type: string
+              author:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  name:
+                    type: string
+                  email:
+                    type: string
+              committer:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  username:
+                    type: string
+              added:
+                type: array
+                items:
+                  type: string
+              removed:
+                type: array
+                items:
+                  type: string
+              modified:
+                type: array
+                items:
+                  type: string
+        head_commit:
+          type: object
+          properties:
+            id:
+              type: string
+            tree_id:
+              type: string
+            distinct:
+              type: boolean
+            message:
+              type: string
+            timestamp:
+              type: string
+            url:
+              type: string
+            author:
+              type: object
+              properties:
+                username:
+                  type: string
+                name:
+                  type: string
+                email:
+                  type: string
+            committer:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                username:
+                  type: string
+            added:
+              type: array
+              items:
+                type: string
+            removed:
+              type: array
+              items:
+                type: string
+            modified:
+              type: array
+              items:
+                type: string
+        repository:
+          type: object
+          properties:
+            id:
+              type: integer
+            node_id:
+              type: string
+            name:
+              type: string
+            full_name:
+              type: string
+            private:
+              type: boolean
+            owner:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                login:
+                  type: string
+                id:
+                  type: integer
+                node_id:
+                  type: string
+                avatar_url:
+                  type: string
+                gravatar_id:
+                  type: string
+                url:
+                  type: string
+                html_url:
+                  type: string
+                followers_url:
+                  type: string
+                following_url:
+                  type: string
+                gists_url:
+                  type: string
+                starred_url:
+                  type: string
+                subscriptions_url:
+                  type: string
+                organizations_url:
+                  type: string
+                repos_url:
+                  type: string
+                events_url:
+                  type: string
+                received_events_url:
+                  type: string
+                type:
+                  type: string
+                site_admin:
+                  type: boolean
+            html_url:
+              type: string
+            description:
+              type: string
+            fork:
+              type: boolean
+            url:
+              type: string
+            forks_url:
+              type: string
+            keys_url:
+              type: string
+            collaborators_url:
+              type: string
+            teams_url:
+              type: string
+            hooks_url:
+              type: string
+            issue_events_url:
+              type: string
+            events_url:
+              type: string
+            assignees_url:
+              type: string
+            branches_url:
+              type: string
+            tags_url:
+              type: string
+            blobs_url:
+              type: string
+            git_tags_url:
+              type: string
+            git_refs_url:
+              type: string
+            trees_url:
+              type: string
+            statuses_url:
+              type: string
+            languages_url:
+              type: string
+            stargazers_url:
+              type: string
+            contributors_url:
+              type: string
+            subscribers_url:
+              type: string
+            subscription_url:
+              type: string
+            commits_url:
+              type: string
+            git_commits_url:
+              type: string
+            comments_url:
+              type: string
+            issue_comment_url:
+              type: string
+            contents_url:
+              type: string
+            compare_url:
+              type: string
+            merges_url:
+              type: string
+            archive_url:
+              type: string
+            downloads_url:
+              type: string
+            issues_url:
+              type: string
+            pulls_url:
+              type: string
+            milestones_url:
+              type: string
+            notifications_url:
+              type: string
+            labels_url:
+              type: string
+            releases_url:
+              type: string
+            deployments_url:
+              type: string
+            created_at:
+              type: integer
+            updated_at:
+              type: string
+            pushed_at:
+              type: integer
+            git_url:
+              type: string
+            ssh_url:
+              type: string
+            clone_url:
+              type: string
+            svn_url:
+              type: string
+            homepage:
+              type: string
+            size:
+              type: integer
+            stargazers_count:
+              type: integer
+            watchers_count:
+              type: integer
+            language:
+              type: string
+            has_issues:
+              type: boolean
+            has_projects:
+              type: boolean
+            has_downloads:
+              type: boolean
+            has_wiki:
+              type: boolean
+            has_pages:
+              type: boolean
+            forks_count:
+              type: integer
+            mirror_url:
+              type: string
+            archived:
+              type: boolean
+            disabled:
+              type: boolean
+            open_issues_count:
+              type: integer
+            license:
+              type: string
+            forks:
+              type: integer
+            open_issues:
+              type: integer
+            watchers:
+              type: integer
+            default_branch:
+              type: string
+            stargazers:
+              type: integer
+            master_branch:
+              type: string
