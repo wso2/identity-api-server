@@ -763,8 +763,8 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider idP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+                    createIdPClone(IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId,
+                            ContextLoader.getTenantDomainFromContext(), true));
             if (idP == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
