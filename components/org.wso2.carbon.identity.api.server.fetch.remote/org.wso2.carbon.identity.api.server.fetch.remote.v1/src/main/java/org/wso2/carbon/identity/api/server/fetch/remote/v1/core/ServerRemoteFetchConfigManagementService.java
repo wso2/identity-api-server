@@ -56,6 +56,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
 import javax.ws.rs.core.Response;
+import static org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchConfigurationConstants.ACCESS_TOKEN;
 import static org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchConfigurationConstants.ACTION_LISTENER;
 import static org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchConfigurationConstants.ACTION_LISTENER_ATTRIBUTES;
 import static org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchConfigurationConstants.BRANCH;
@@ -68,6 +69,7 @@ import static org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetc
 import static org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchConfigurationConstants.REPOSITORY_MANAGER;
 import static org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchConfigurationConstants.REPOSITORY_MANAGER_ATTRIBUTES;
 import static org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchConfigurationConstants.URI;
+import static org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchConfigurationConstants.USER_NAME;
 import static org.wso2.carbon.identity.api.server.fetch.remote.common.RemoteFetchConfigurationConstants.WEBHOOK_REQUEST;
 import static org.wso2.carbon.identity.api.server.fetch.remote.v1.core.RemoteFetchUtils.convertDateToStringIfNotNull;
 import static org.wso2.carbon.identity.api.server.fetch.remote.v1.core.RemoteFetchUtils.setIfNotNull;
@@ -238,11 +240,6 @@ public class ServerRemoteFetchConfigManagementService {
             throw handleException(Response.Status.BAD_REQUEST, RemoteFetchConfigurationConstants.
                     ErrorMessage.ERROR_CODE_INVALID_RE_CONFIG_INPUT, ACTION_LISTENER_ATTRIBUTES);
         }
-        if (StringUtils.isBlank(remoteFetchConfigurationPOSTRequest.getActionListener()
-                .getAttributes().getFrequency())) {
-            throw handleException(Response.Status.BAD_REQUEST, RemoteFetchConfigurationConstants.
-                    ErrorMessage.ERROR_CODE_INVALID_RE_CONFIG_INPUT, FREQUENCY);
-        }
         if (remoteFetchConfigurationPOSTRequest.getRepositoryManager() == null) {
             throw handleException(Response.Status.BAD_REQUEST, RemoteFetchConfigurationConstants.
                     ErrorMessage.ERROR_CODE_INVALID_RE_CONFIG_INPUT, REPOSITORY_MANAGER);
@@ -254,21 +251,6 @@ public class ServerRemoteFetchConfigManagementService {
         if (remoteFetchConfigurationPOSTRequest.getRepositoryManager().getAttributes() == null) {
             throw handleException(Response.Status.BAD_REQUEST, RemoteFetchConfigurationConstants.
                     ErrorMessage.ERROR_CODE_INVALID_RE_CONFIG_INPUT, REPOSITORY_MANAGER_ATTRIBUTES);
-        }
-        if (StringUtils.isBlank(remoteFetchConfigurationPOSTRequest.getRepositoryManager()
-                .getAttributes().getUri())) {
-            throw handleException(Response.Status.BAD_REQUEST, RemoteFetchConfigurationConstants.
-                    ErrorMessage.ERROR_CODE_INVALID_RE_CONFIG_INPUT, URI);
-        }
-        if (StringUtils.isBlank(remoteFetchConfigurationPOSTRequest.getRepositoryManager()
-                .getAttributes().getBranch())) {
-            throw handleException(Response.Status.BAD_REQUEST, RemoteFetchConfigurationConstants.
-                    ErrorMessage.ERROR_CODE_INVALID_RE_CONFIG_INPUT, BRANCH);
-        }
-        if (StringUtils.isBlank(remoteFetchConfigurationPOSTRequest.getRepositoryManager()
-                .getAttributes().getDirectory())) {
-            throw handleException(Response.Status.BAD_REQUEST, RemoteFetchConfigurationConstants.
-                    ErrorMessage.ERROR_CODE_INVALID_RE_CONFIG_INPUT, DIRECTORY);
         }
         if (remoteFetchConfigurationPOSTRequest.getConfigurationDeployer() == null) {
             throw handleException(Response.Status.BAD_REQUEST, RemoteFetchConfigurationConstants.
@@ -439,20 +421,20 @@ public class ServerRemoteFetchConfigManagementService {
             RepositoryManagerAttributes repositoryManagerAttributes =
                     remoteFetchConfigurationPOSTRequest.getRepositoryManager().getAttributes();
             if (!StringUtils.isEmpty(repositoryManagerAttributes.getAccessToken())) {
-                properties.put(RemoteFetchConfigurationConstants.ACCESS_TOKEN,
+                properties.put(ACCESS_TOKEN,
                         repositoryManagerAttributes.getAccessToken());
             }
             if (!StringUtils.isEmpty(repositoryManagerAttributes.getBranch())) {
                 properties.put(BRANCH, repositoryManagerAttributes.getBranch());
             }
             if (!StringUtils.isEmpty(repositoryManagerAttributes.getDirectory())) {
-                properties.put(RemoteFetchConfigurationConstants.DIRECTORY, repositoryManagerAttributes.getDirectory());
+                properties.put(DIRECTORY, repositoryManagerAttributes.getDirectory());
             }
             if (!StringUtils.isEmpty(repositoryManagerAttributes.getUri())) {
                 properties.put(URI, repositoryManagerAttributes.getUri());
             }
             if (!StringUtils.isEmpty(repositoryManagerAttributes.getUsername())) {
-                properties.put(RemoteFetchConfigurationConstants.USER_NAME, repositoryManagerAttributes.getUsername());
+                properties.put(USER_NAME, repositoryManagerAttributes.getUsername());
             }
         }
         return properties;
@@ -523,7 +505,7 @@ public class ServerRemoteFetchConfigManagementService {
 
         RepositoryManagerAttributes repositoryManagerAttributes = new RepositoryManagerAttributes();
         setIfNotNull((remoteFetchConfiguration
-                        .getRepositoryManagerAttributes().get(RemoteFetchConfigurationConstants.ACCESS_TOKEN)),
+                        .getRepositoryManagerAttributes().get(ACCESS_TOKEN)),
                 repositoryManagerAttributes::setAccessToken);
         setIfNotNull(remoteFetchConfiguration
                         .getRepositoryManagerAttributes().get(BRANCH),
@@ -535,7 +517,7 @@ public class ServerRemoteFetchConfigManagementService {
                         .getRepositoryManagerAttributes().get(URI),
                 repositoryManagerAttributes::setUri);
         setIfNotNull(remoteFetchConfiguration
-                        .getRepositoryManagerAttributes().get(RemoteFetchConfigurationConstants.USER_NAME),
+                        .getRepositoryManagerAttributes().get(USER_NAME),
                 repositoryManagerAttributes::setUsername);
         return repositoryManagerAttributes;
     }
