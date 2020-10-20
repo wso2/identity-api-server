@@ -763,8 +763,8 @@ public class ServerIdpManagementService {
 
         try {
             IdentityProvider idP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+                    createIdPClone(IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId,
+                            ContextLoader.getTenantDomainFromContext(), true));
             if (idP == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -1165,8 +1165,15 @@ public class ServerIdpManagementService {
         }
     }
 
-//  Private utility Methods.
-
+    /**
+     * Create the IDP template list response.
+     *
+     * @param templateInfoList  List of IDP templates.
+     * @param offset            Offset.
+     * @param limit             Limit.
+     * @param filter            IDP template filter.
+     * @return {@link IdentityProviderTemplateListResponse}
+     */
     private IdentityProviderTemplateListResponse createIDPTemplateListResponse(
             List<Template> templateInfoList, Integer offset, Integer limit, String filter) {
 
@@ -1216,6 +1223,13 @@ public class ServerIdpManagementService {
         return idpTemplateListResponse;
     }
 
+    /**
+     * Create IDP template response using retrieved IDP template.
+     *
+     * @param idpTemplate IDP template {@link Template}.
+     * @return {@link IdentityProviderTemplate}
+     * @throws IOException
+     */
     private IdentityProviderTemplate createIDPTemplateResponse(Template idpTemplate) throws IOException {
 
         IdentityProviderTemplate idpTemplateResponse = new IdentityProviderTemplate();
@@ -1244,6 +1258,13 @@ public class ServerIdpManagementService {
         return idpTemplateResponse;
     }
 
+    /**
+     * Create {@link Template} using the {@link IdentityProviderTemplate}.
+     *
+     * @param idpTemplate Identity provider template object created by the API request.
+     * @return IDPTemplate {@link Template}.
+     * @throws JsonProcessingException
+     */
     private Template generateIDPTemplate(IdentityProviderTemplate idpTemplate) throws JsonProcessingException {
 
         Template identityProviderTemplate = new Template();
@@ -1260,6 +1281,12 @@ public class ServerIdpManagementService {
         return identityProviderTemplate;
     }
 
+    /**
+     * Create the properties map for the IDP template.
+     *
+     * @param idpTemplate Identity provider template.
+     * @return Map of properties.
+     */
     private Map<String, String> createPropertiesMapForIdPTemplate(IdentityProviderTemplate idpTemplate) {
 
         Map<String, String> properties = new HashMap<>();
@@ -1277,6 +1304,12 @@ public class ServerIdpManagementService {
         return properties;
     }
 
+    /**
+     * Create services list for the IDP template.
+     *
+     * @param idp Identity provider template.
+     * @return List of services supported by the IDP.
+     */
     private ArrayList<String> createServicesListForIdP(IdentityProviderPOSTRequest idp) {
 
         ArrayList<String> services = new ArrayList<>();
@@ -1291,6 +1324,14 @@ public class ServerIdpManagementService {
         return services;
     }
 
+    /**
+     * Handle template management exceptions and return related API errors.
+     *
+     * @param e {@link TemplateManagementException}.
+     * @param errorEnum Error message with error code and description.
+     * @param data Additional information.
+     * @return API error.
+     */
     private APIError handleTemplateMgtException(TemplateManagementException e, Constants.ErrorMessage errorEnum,
                                                 String data) {
 
@@ -1323,6 +1364,13 @@ public class ServerIdpManagementService {
         return new APIError(status, errorResponse);
     }
 
+    /**
+     * Generate a JSON object using the Identity Provider template.
+     *
+     * @param idpTemplate Identity provider template.
+     * @return JSON object.
+     * @throws JsonProcessingException
+     */
     private String createIDPTemplateScript(IdentityProviderPOSTRequest idpTemplate) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
