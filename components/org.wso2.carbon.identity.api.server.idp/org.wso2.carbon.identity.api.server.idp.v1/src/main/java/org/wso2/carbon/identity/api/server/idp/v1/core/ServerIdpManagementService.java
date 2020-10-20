@@ -2835,7 +2835,7 @@ public class ServerIdpManagementService {
      *                                                   the claim mappings.
      */
     private void validateUserAndRoleClaims(String userClaimURI, String roleClaimURI,
-                                           List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> claimMappings)
+                                List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> claimMappings)
             throws IdentityProviderManagementClientException {
 
         boolean isValidUserClaimURI = false;
