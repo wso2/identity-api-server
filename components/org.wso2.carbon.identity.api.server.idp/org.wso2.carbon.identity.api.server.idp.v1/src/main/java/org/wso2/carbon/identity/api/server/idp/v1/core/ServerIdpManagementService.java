@@ -110,6 +110,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -2786,22 +2787,25 @@ public class ServerIdpManagementService {
      */
     private void validateClaims(String tenantDomain, Claims claims) throws IdentityProviderManagementException {
 
-        String userClaimURI = claims.getUserIdClaim().getUri();
-        String roleClaimURI = claims.getRoleClaim().getUri();
+        if (claims == null) {
+            return;
+        }
+        String userClaimURI = claims.getUserIdClaim() == null ? null : claims.getUserIdClaim().getUri();
+        String roleClaimURI = claims.getRoleClaim() == null ? null : claims.getRoleClaim().getUri();
         List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> claimMappings = claims.getMappings();
 
         // EMPTY claimMappings indicate that the IDP is using local claim dialect.
-        if (claimMappings == null || claimMappings.isEmpty()) {
+        if (CollectionUtils.isEmpty(claimMappings)) {
             List<LocalClaim> localClaimsList = getLocalClaimURIs(tenantDomain);
             Set<String> claimURIs = localClaimsList.stream().map(LocalClaim::getClaimURI).collect(Collectors.toSet());
             // Validate userClaimURI and roleClaimURI.
-            if (claimURIs.add(userClaimURI)) {
+            if (StringUtils.isNotBlank(userClaimURI) && claimURIs.contains(userClaimURI)) {
                 throw new IdentityProviderManagementClientException(
                         Constants.ErrorMessage.ERROR_CODE_NOT_EXISTING_USER_CLAIM_URI.getCode(),
                         String.format(Constants.ErrorMessage.ERROR_CODE_NOT_EXISTING_USER_CLAIM_URI.getDescription(),
                                 tenantDomain));
             }
-            if (claimURIs.add(roleClaimURI)) {
+            if (StringUtils.isNotBlank(roleClaimURI) && claimURIs.contains(roleClaimURI)) {
                 throw new IdentityProviderManagementClientException(
                         Constants.ErrorMessage.ERROR_CODE_NOT_EXISTING_ROLE_CLAIM_URI.getCode(),
                         String.format(Constants.ErrorMessage.ERROR_CODE_NOT_EXISTING_ROLE_CLAIM_URI.getDescription(),
@@ -2817,7 +2821,7 @@ public class ServerIdpManagementService {
         for (org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping claimMapping : claimMappings) {
 
             // If a claim URI can be added to the existing claimURIs, then that's a not existing URI.
-            if (claimURIs.add(claimMapping.getLocalClaim().getUri())) {
+            if (claimURIs.contains(claimMapping.getLocalClaim().getUri())) {
                 throw new IdentityProviderManagementClientException(
                         Constants.ErrorMessage.ERROR_CODE_NOT_EXISTING_CLAIM_URI.getCode(),
                         Constants.ErrorMessage.ERROR_CODE_NOT_EXISTING_CLAIM_URI.getDescription());
@@ -2835,26 +2839,29 @@ public class ServerIdpManagementService {
      *                                                   the claim mappings.
      */
     private void validateUserAndRoleClaims(String userClaimURI, String roleClaimURI,
-                                List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> claimMappings)
+                               List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> claimMappings)
             throws IdentityProviderManagementClientException {
 
+        boolean isUserClaimURISpecified = StringUtils.isNotBlank(userClaimURI);
+        boolean isRoleClaimURISpecified = StringUtils.isNotBlank(roleClaimURI);
         boolean isValidUserClaimURI = false;
         boolean isValidRoleClaimURI = false;
+
         for (org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping claimMapping : claimMappings) {
-            if (userClaimURI.equals(claimMapping.getIdpClaim())) {
+            if (isUserClaimURISpecified && userClaimURI.equals(claimMapping.getIdpClaim())) {
                 isValidUserClaimURI = true;
             }
-            if (roleClaimURI.equals(claimMapping.getIdpClaim())) {
+            if (isRoleClaimURISpecified && roleClaimURI.equals(claimMapping.getIdpClaim())) {
                 isValidRoleClaimURI = true;
             }
         }
-        if (!isValidUserClaimURI) {
+        if (isUserClaimURISpecified && !isValidUserClaimURI) {
             throw new IdentityProviderManagementClientException(
                     Constants.ErrorMessage.ERROR_CODE_INVALID_USER_CLAIM_URI.getCode(),
                     String.format(Constants.ErrorMessage.ERROR_CODE_INVALID_USER_CLAIM_URI.getDescription(),
                             userClaimURI));
         }
-        if (!isValidRoleClaimURI) {
+        if (isRoleClaimURISpecified && !isValidRoleClaimURI) {
             throw new IdentityProviderManagementClientException(
                     Constants.ErrorMessage.ERROR_CODE_INVALID_ROLE_CLAIM_URI.getCode(),
                     String.format(Constants.ErrorMessage.ERROR_CODE_INVALID_ROLE_CLAIM_URI.getMessage(), roleClaimURI));
@@ -2878,7 +2885,7 @@ public class ServerIdpManagementService {
                     log.debug("No local claims found for tenant:" + tenantDomain + ".Therefore, skipping " +
                             "local claim URI validation.");
                 }
-                return new ArrayList<>();
+                return Collections.emptyList();
             }
             return localClaimsList;
         } catch (ClaimMetadataException e) {

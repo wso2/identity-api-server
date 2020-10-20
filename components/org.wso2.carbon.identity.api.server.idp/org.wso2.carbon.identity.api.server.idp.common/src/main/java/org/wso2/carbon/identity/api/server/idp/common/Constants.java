@@ -124,7 +124,7 @@ public class Constants {
                 "One or more local claim URIs does not exist"),
         ERROR_CODE_NOT_EXISTING_USER_CLAIM_URI("IDP-60033", "Invlaid user ID claim URI",
                 "User ID claim URI is not a local claim for tenant: %s"),
-        ERROR_CODE_NOT_EXISTING_ROLE_CLAIM_URI("IDP-60033", "Invalid role claim URI",
+        ERROR_CODE_NOT_EXISTING_ROLE_CLAIM_URI("IDP-60034", "Invalid role claim URI",
                 "Role claim URI is not a local claim for tenant: %s"),
 
         // Server Error starting from 650xx.
@@ -225,7 +225,7 @@ public class Constants {
                 "Error occurred while retrieving the IDP template with identifier %s"),
         ERROR_CODE_ERROR_INVALID_SEARCH_FILTER("65055", "Search request validation failed.",
                 "Invalid search filter."),
-        ERROR_CODE_VALIDATING_LOCAL_CLAIM_URIS("IDP-65009", "Error while validation local claim URIs",
+        ERROR_CODE_VALIDATING_LOCAL_CLAIM_URIS("IDP-65056", "Error while validation local claim URIs",
                 "Error while validating claim URIs against local claims");
 
         private final String code;
