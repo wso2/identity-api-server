@@ -121,7 +121,7 @@ public class Constants {
         ERROR_CODE_INVALID_ROLE_CLAIM_URI("60031", "Invalid role claim URI",
                 "Role claim URI: %s does not match with the claim mappings"),
         ERROR_CODE_NOT_EXISTING_CLAIM_URI("IDP-60032", "Invalid claim URI",
-                "One or more local claim URIs does not exist"),
+                "One or more local claim URIs do not exist"),
         ERROR_CODE_NOT_EXISTING_USER_CLAIM_URI("IDP-60033", "Invlaid user ID claim URI",
                 "User ID claim URI is not a local claim for tenant: %s"),
         ERROR_CODE_NOT_EXISTING_ROLE_CLAIM_URI("IDP-60034", "Invalid role claim URI",
