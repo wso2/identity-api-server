@@ -2842,32 +2842,30 @@ public class ServerIdpManagementService {
                                List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> claimMappings)
             throws IdentityProviderManagementClientException {
 
-        /*
-         * Not defining the userId claim or role claim is a valid claim update scenario. Therefore, considering it as a
-         * valid claim URI. When the claims are defined, initial validation is considered as false (Invalid).
-         */
-        boolean isValidUserClaimURI = StringUtils.isBlank(userClaimURI);
-        boolean isValidRoleClaimURI = StringUtils.isBlank(roleClaimURI);
+        boolean isUserClaimURISpecified = StringUtils.isNotBlank(userClaimURI);
+        boolean isRoleClaimURISpecified = StringUtils.isNotBlank(roleClaimURI);
+        boolean isValidUserClaimURI = false;
+        boolean isValidRoleClaimURI = false;
 
         for (org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping claimMapping : claimMappings) {
             // If both claims are valid at the same time, no need to iterate.
             if (isValidRoleClaimURI && isValidUserClaimURI) {
                 return;
             }
-            if (!isValidUserClaimURI && userClaimURI.equals(claimMapping.getIdpClaim())) {
+            if (isUserClaimURISpecified && userClaimURI.equals(claimMapping.getIdpClaim())) {
                 isValidUserClaimURI = true;
             }
-            if (!isValidRoleClaimURI && roleClaimURI.equals(claimMapping.getIdpClaim())) {
+            if (isRoleClaimURISpecified && roleClaimURI.equals(claimMapping.getIdpClaim())) {
                 isValidRoleClaimURI = true;
             }
         }
-        if (!isValidUserClaimURI) {
+        if (isUserClaimURISpecified && !isValidUserClaimURI) {
             throw new IdentityProviderManagementClientException(
                     Constants.ErrorMessage.ERROR_CODE_INVALID_USER_CLAIM_URI.getCode(),
                     String.format(Constants.ErrorMessage.ERROR_CODE_INVALID_USER_CLAIM_URI.getDescription(),
                             userClaimURI));
         }
-        if (!isValidRoleClaimURI) {
+        if (isRoleClaimURISpecified && !isValidRoleClaimURI) {
             throw new IdentityProviderManagementClientException(
                     Constants.ErrorMessage.ERROR_CODE_INVALID_ROLE_CLAIM_URI.getCode(),
                     String.format(Constants.ErrorMessage.ERROR_CODE_INVALID_ROLE_CLAIM_URI.getMessage(), roleClaimURI));

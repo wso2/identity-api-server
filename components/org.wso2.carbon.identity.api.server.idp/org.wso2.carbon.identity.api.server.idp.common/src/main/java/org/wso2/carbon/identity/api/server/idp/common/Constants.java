@@ -116,9 +116,9 @@ public class Constants {
         ERROR_CODE_OUTBOUND_PROVISIONING_CONFIG_NOT_FOUND("60029", "Unable to update Outbound " +
                 "Provisioning Connector", "Outbound Provisioning Connector properties have not specified " +
                 "for connector : %s"),
-        ERROR_CODE_INVALID_USER_CLAIM_URI("60030", "Invalid user ID claim URI",
+        ERROR_CODE_INVALID_USER_CLAIM_URI("IDP-60030", "Invalid user ID claim URI",
                 "User ID claim URI: %s does not match with the claim mappings"),
-        ERROR_CODE_INVALID_ROLE_CLAIM_URI("60031", "Invalid role claim URI",
+        ERROR_CODE_INVALID_ROLE_CLAIM_URI("IDP-60031", "Invalid role claim URI",
                 "Role claim URI: %s does not match with the claim mappings"),
         ERROR_CODE_NOT_EXISTING_CLAIM_URI("IDP-60032", "Invalid claim URI",
                 "One or more local claim URIs do not exist"),
