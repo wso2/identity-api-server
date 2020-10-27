@@ -66,18 +66,18 @@ public class OAuthInboundFunctions {
             String currentClientId = InboundFunctions.getInboundAuthKey(application, StandardInboundProtocols.OAUTH2);
 
             // Retrieve the existing CORS origins for the application.
-            existingCORSOrigins = ApplicationManagementServiceHolder.getInstance().getCorsManagementService()
+            existingCORSOrigins = ApplicationManagementServiceHolder.getCorsManagementService()
                     .getApplicationCORSOrigins(application.getApplicationResourceId(), tenantDomain)
                     .stream().map(CORSOrigin::getOrigin).collect(Collectors.toList());
 
             // Update the CORS origins.
             List<String> corsOrigins = oidcConfigModel.getAllowedOrigins();
-            ApplicationManagementServiceHolder.getInstance().getCorsManagementService()
+            ApplicationManagementServiceHolder.getCorsManagementService()
                     .setCORSOrigins(application.getApplicationResourceId(), corsOrigins, tenantDomain);
 
             if (currentClientId != null) {
                 // Update an existing application.
-                OAuthConsumerAppDTO oauthApp = ApplicationManagementServiceHolder.getInstance().getOAuthAdminService
+                OAuthConsumerAppDTO oauthApp = ApplicationManagementServiceHolder.getOAuthAdminService
                         ().getOAuthApplicationData(currentClientId);
 
                 if (!StringUtils.equals(oauthApp.getOauthConsumerKey(), oidcConfigModel.getClientId())) {
@@ -90,8 +90,7 @@ public class OAuthInboundFunctions {
 
                 OAuthConsumerAppDTO appToUpdate = new ApiModelToOAuthConsumerApp().apply(application
                         .getApplicationName(), oidcConfigModel);
-                ApplicationManagementServiceHolder.getInstance().getOAuthAdminService().updateConsumerApplication
-                        (appToUpdate);
+                ApplicationManagementServiceHolder.getOAuthAdminService().updateConsumerApplication(appToUpdate);
 
                 String updatedClientId = appToUpdate.getOauthConsumerKey();
                 return createInboundAuthRequestConfig(updatedClientId);
@@ -106,9 +105,8 @@ public class OAuthInboundFunctions {
             update has failed. Therefore rollback the update on CORS origins.
              */
             try {
-                ApplicationManagementServiceHolder.getInstance()
-                        .getCorsManagementService().setCORSOrigins(String.valueOf(application.getApplicationID()),
-                        existingCORSOrigins, tenantDomain);
+                ApplicationManagementServiceHolder.getCorsManagementService().setCORSOrigins
+                        (application.getApplicationResourceId(), existingCORSOrigins, tenantDomain);
             } catch (CORSManagementServiceException corsManagementServiceException) {
                 throw handleException(e);
             }
@@ -145,8 +143,7 @@ public class OAuthInboundFunctions {
         // Build a consumer apps object.
         OAuthConsumerAppDTO consumerApp = new ApiModelToOAuthConsumerApp().apply(appName, oidcModel);
         try {
-            OAuthConsumerAppDTO createdOAuthApp = ApplicationManagementServiceHolder.getInstance()
-                    .getOAuthAdminService()
+            OAuthConsumerAppDTO createdOAuthApp = ApplicationManagementServiceHolder.getOAuthAdminService()
                     .registerAndRetrieveOAuthApplicationData(consumerApp);
 
             return createInboundAuthRequestConfig(createdOAuthApp.getOauthConsumerKey());
@@ -168,18 +165,16 @@ public class OAuthInboundFunctions {
         String clientId = inboundAuth.getInboundAuthKey();
         try {
             OAuthConsumerAppDTO oauthApp =
-                    ApplicationManagementServiceHolder.getInstance().getOAuthAdminService().getOAuthApplicationData
-                            (clientId);
+                    ApplicationManagementServiceHolder.getOAuthAdminService().getOAuthApplicationData(clientId);
 
             OpenIDConnectConfiguration openIDConnectConfiguration = new OAuthConsumerAppToApiModel().apply(oauthApp);
 
             // Set CORS origins as allowed domains.
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            String applicationResourceId = ApplicationManagementServiceHolder.getInstance()
-                    .getApplicationManagementService()
+            String applicationResourceId = ApplicationManagementServiceHolder.getApplicationManagementService()
                     .getServiceProviderByClientId(clientId, OAUTH2, tenantDomain).getApplicationResourceId();
-            List<CORSOrigin> corsOriginList = ApplicationManagementServiceHolder.getInstance()
-                    .getCorsManagementService().getApplicationCORSOrigins(applicationResourceId, tenantDomain);
+            List<CORSOrigin> corsOriginList = ApplicationManagementServiceHolder.getCorsManagementService()
+                    .getApplicationCORSOrigins(applicationResourceId, tenantDomain);
             openIDConnectConfiguration.setAllowedOrigins(corsOriginList.stream().map(CORSOrigin::getOrigin)
                     .collect(Collectors.toList()));
 
@@ -195,8 +190,7 @@ public class OAuthInboundFunctions {
 
         try {
             String consumerKey = inbound.getInboundAuthKey();
-            ApplicationManagementServiceHolder.getInstance().getOAuthAdminService().removeOAuthApplicationData
-                    (consumerKey);
+            ApplicationManagementServiceHolder.getOAuthAdminService().removeOAuthApplicationData(consumerKey);
         } catch (IdentityOAuthAdminException e) {
             throw buildServerError("Error while trying to rollback OAuth2/OpenIDConnect " +
                     "configuration." + e.getMessage(), e);
@@ -206,7 +200,7 @@ public class OAuthInboundFunctions {
     public static OpenIDConnectConfiguration regenerateClientSecret(String clientId) {
 
         try {
-            OAuthConsumerAppDTO oAuthConsumerAppDTO = ApplicationManagementServiceHolder.getInstance()
+            OAuthConsumerAppDTO oAuthConsumerAppDTO = ApplicationManagementServiceHolder
                     .getOAuthAdminService().updateAndRetrieveOauthSecretKey(clientId);
             return new OAuthConsumerAppToApiModel().apply(oAuthConsumerAppDTO);
         } catch (IdentityOAuthAdminException e) {
@@ -217,7 +211,7 @@ public class OAuthInboundFunctions {
     public static void revokeOAuthClient(String clientId) {
 
         try {
-            ApplicationManagementServiceHolder.getInstance().getOAuthAdminService()
+            ApplicationManagementServiceHolder.getOAuthAdminService()
                     .updateConsumerAppState(clientId, OAuthConstants.OauthAppStates.APP_STATE_REVOKED);
         } catch (IdentityOAuthAdminException e) {
             throw buildServerError("Error while revoking oauth application.", e);
@@ -238,7 +232,7 @@ public class OAuthInboundFunctions {
         List<String> corsOrigins = oidcConfigModel.getAllowedOrigins();
         try {
             if (corsOrigins != null) {
-                ApplicationManagementServiceHolder.getInstance().getCorsManagementService()
+                ApplicationManagementServiceHolder.getCorsManagementService()
                         .setCORSOrigins(applicationId, corsOrigins, tenantDomain);
             }
         } catch (CORSManagementServiceException e) {

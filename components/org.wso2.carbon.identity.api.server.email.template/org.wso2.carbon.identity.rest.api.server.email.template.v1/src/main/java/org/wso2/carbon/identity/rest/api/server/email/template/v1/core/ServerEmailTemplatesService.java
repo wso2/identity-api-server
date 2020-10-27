@@ -469,6 +469,11 @@ public class ServerEmailTemplatesService {
                         case Constants.FOOTER:
                             templateWithID.setFooter(emailTemplate.getFooter());
                             break;
+                        default:
+                            if (log.isDebugEnabled()) {
+                                log.debug("Unknown requested attribute: " + requestedAttribute);
+                            }
+                            break;
                     }
                 }
                 /*

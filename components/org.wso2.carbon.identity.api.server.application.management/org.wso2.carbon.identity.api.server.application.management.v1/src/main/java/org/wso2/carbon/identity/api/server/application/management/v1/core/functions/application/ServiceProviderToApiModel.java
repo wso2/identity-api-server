@@ -182,7 +182,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         ServiceProvider defaultSP;
         try {
-            defaultSP = ApplicationManagementServiceHolder.getInstance().getApplicationManagementService()
+            defaultSP = ApplicationManagementServiceHolder.getApplicationManagementService()
                     .getServiceProvider(IdentityApplicationConstants.DEFAULT_SP_CONFIG,
                             MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
         } catch (IdentityApplicationManagementException e) {

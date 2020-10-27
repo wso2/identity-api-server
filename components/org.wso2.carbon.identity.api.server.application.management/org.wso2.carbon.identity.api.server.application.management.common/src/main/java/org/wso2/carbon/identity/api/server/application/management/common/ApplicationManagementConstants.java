@@ -61,7 +61,8 @@ public class ApplicationManagementConstants {
         INVALID_FILTER_OPERATION("60004",
                 "Attempted filtering operation is invalid.",
                 "Attempted filtering operation '%s' is invalid. " +
-                        "Please use one of the supported filtering operations such as 'eq', 'co', 'sw' or 'ew'."),
+                        "Please use one of the supported filtering operations such as 'eq', 'co', 'sw', 'ew', 'and' " +
+                        "or 'or'."),
         APPLICATION_NOT_FOUND("60006",
                 "Application not found.",
                 "Application cannot be found for the provided id: %s in the tenantDomain: %s."),

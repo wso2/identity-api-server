@@ -54,8 +54,8 @@ public class WSTrustInboundFunctions {
                     throw buildBadRequestError("Invalid audience value provided for update.");
                 }
                 // Check if WS-Trust is deployed.
-                if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
-                    ApplicationManagementServiceHolder.getInstance().getStsAdminService()
+                if (ApplicationManagementServiceHolder.getStsAdminService() != null) {
+                    ApplicationManagementServiceHolder.getStsAdminService()
                             .removeTrustedService(inboundAuthKey);
                 } else {
                     // Throw 404 error since the WS-Trust connector is not available.
@@ -79,8 +79,8 @@ public class WSTrustInboundFunctions {
 
         try {
             // Check if WS-Trust is deployed.
-            if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
-                ApplicationManagementServiceHolder.getInstance().getStsAdminService()
+            if (ApplicationManagementServiceHolder.getStsAdminService() != null) {
+                ApplicationManagementServiceHolder.getStsAdminService()
                         .addTrustedService(wsTrustConfiguration.getAudience(),
                                 wsTrustConfiguration.getCertificateAlias());
 
@@ -107,9 +107,9 @@ public class WSTrustInboundFunctions {
             TrustedServiceData[] trustedServices;
 
             // Check if WS-Trust is deployed.
-            if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
+            if (ApplicationManagementServiceHolder.getStsAdminService() != null) {
                 trustedServices =
-                        ApplicationManagementServiceHolder.getInstance().getStsAdminService().getTrustedServices();
+                        ApplicationManagementServiceHolder.getStsAdminService().getTrustedServices();
             } else {
                 // Throw 404 error since the WS-Trust connector is not available.
                 throw buildNotFoundError(ERROR_CODE, ERROR_MESSAGE, ERROR_DESCRIPTION);
@@ -134,8 +134,8 @@ public class WSTrustInboundFunctions {
             String trustedServiceAudience = inbound.getInboundAuthKey();
 
             // Check if WS-Trust is deployed.
-            if (ApplicationManagementServiceHolder.getInstance().getStsAdminService() != null) {
-                ApplicationManagementServiceHolder.getInstance().getStsAdminService()
+            if (ApplicationManagementServiceHolder.getStsAdminService() != null) {
+                ApplicationManagementServiceHolder.getStsAdminService()
                         .removeTrustedService(trustedServiceAudience);
             } else {
                 // Throw 404 error since the WS-Trust connector is not available.

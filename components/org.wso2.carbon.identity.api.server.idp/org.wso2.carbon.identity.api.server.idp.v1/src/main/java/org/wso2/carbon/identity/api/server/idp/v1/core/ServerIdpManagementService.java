@@ -110,9 +110,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
@@ -301,9 +303,9 @@ public class ServerIdpManagementService {
      */
     public MetaFederatedAuthenticator getMetaFederatedAuthenticator(String id) {
 
-        String authenticatorName = base64URLDecode(id);
         MetaFederatedAuthenticator authenticator = null;
         try {
+            String authenticatorName = decodeAuthenticatorID(id);
             FederatedAuthenticatorConfig[] authenticatorConfigs =
                     IdentityProviderServiceHolder.getIdentityProviderManager()
                             .getAllFederatedAuthenticators();
@@ -318,6 +320,26 @@ public class ServerIdpManagementService {
             return authenticator;
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_META_AUTHENTICATOR, id);
+        }
+    }
+
+    /**
+     * Decode authenticator ID.
+     *
+     * @param id Authenticator ID.
+     * @return Base64 URL decoded authenticator ID.
+     * @throws IdentityProviderManagementClientException IF an error occurred while decoding the authenticator ID.
+     */
+    private String decodeAuthenticatorID(String id) throws IdentityProviderManagementClientException {
+
+        try {
+            return base64URLDecode(id);
+        } catch (IllegalArgumentException e) {
+            if (StringUtils.isBlank(e.getLocalizedMessage())) {
+                throw new IdentityProviderManagementClientException("Invalid Authenticator ID: " + id, e);
+            }
+            throw new IdentityProviderManagementClientException(
+                    String.format("%s : Authenticator ID: %s", e.getMessage(), id), e);
         }
     }
 
@@ -742,9 +764,11 @@ public class ServerIdpManagementService {
     public Claims updateClaimConfig(String idpId, Claims claims) {
 
         try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            validateClaims(tenantDomain, claims);
             IdentityProvider idP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+                    createIdPClone(IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId,
+                            tenantDomain, true));
             if (idP == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -752,7 +776,7 @@ public class ServerIdpManagementService {
             updateClaims(idP, claims);
             IdentityProvider updatedIdP =
                     IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(idpId,
-                            idP, ContextLoader.getTenantDomainFromContext());
+                            idP, tenantDomain);
             return createClaimResponse(updatedIdP.getClaimConfig());
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_CLAIMS, idpId);
@@ -1042,6 +1066,9 @@ public class ServerIdpManagementService {
                 primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
                         .ConditionType.PrimitiveOperator.LESS_THAN;
                 break;
+            default:
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_ERROR_INVALID_SEARCH_FILTER, null);
         }
         return primitiveConditionType;
     }
@@ -1060,6 +1087,9 @@ public class ServerIdpManagementService {
                 complexConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType
                         .ComplexOperator.AND;
                 break;
+            default:
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_ERROR_INVALID_SEARCH_FILTER, null);
         }
         return complexConditionType;
     }
@@ -1139,8 +1169,15 @@ public class ServerIdpManagementService {
         }
     }
 
-//  Private utility Methods.
-
+    /**
+     * Create the IDP template list response.
+     *
+     * @param templateInfoList  List of IDP templates.
+     * @param offset            Offset.
+     * @param limit             Limit.
+     * @param filter            IDP template filter.
+     * @return {@link IdentityProviderTemplateListResponse}
+     */
     private IdentityProviderTemplateListResponse createIDPTemplateListResponse(
             List<Template> templateInfoList, Integer offset, Integer limit, String filter) {
 
@@ -1158,8 +1195,8 @@ public class ServerIdpManagementService {
                                         + IDP_TEMPLATE_PATH_COMPONENT + "/%s",
                                 idpTemplate.getTemplateId())).toString());
                 if (idpTemplate.getPropertiesMap().containsKey(PROP_CATEGORY)) {
-                    if (idpTemplate.getPropertiesMap().get(PROP_CATEGORY) ==
-                            IdentityProviderTemplateListItem.CategoryEnum.CUSTOM.toString()) {
+                    if (IdentityProviderTemplateListItem.CategoryEnum.CUSTOM.toString()
+                            .equals(idpTemplate.getPropertiesMap().get(PROP_CATEGORY))) {
                         idpTemplateListItem.setCategory(IdentityProviderTemplateListItem.CategoryEnum.CUSTOM);
                     } else {
                         idpTemplateListItem.setCategory(IdentityProviderTemplateListItem.CategoryEnum.DEFAULT);
@@ -1181,8 +1218,8 @@ public class ServerIdpManagementService {
         } else {
             idpTemplateListResponse.setCount(0);
         }
-        limit = (limit == null) ? 0 : limit;
-        offset = (offset == null) ? 0 : offset;
+        limit = (limit == null) ? Integer.valueOf(0) : limit;
+        offset = (offset == null) ? Integer.valueOf(0) : offset;
         idpTemplateListResponse.setTotalResults(templateInfoList.size());
         idpTemplateListResponse.setStartIndex(offset + 1);
         idpTemplateListResponse.setLinks(createLinks(V1_API_PATH_COMPONENT + IDP_TEMPLATE_PATH_COMPONENT,
@@ -1190,6 +1227,13 @@ public class ServerIdpManagementService {
         return idpTemplateListResponse;
     }
 
+    /**
+     * Create IDP template response using retrieved IDP template.
+     *
+     * @param idpTemplate IDP template {@link Template}.
+     * @return {@link IdentityProviderTemplate}
+     * @throws IOException
+     */
     private IdentityProviderTemplate createIDPTemplateResponse(Template idpTemplate) throws IOException {
 
         IdentityProviderTemplate idpTemplateResponse = new IdentityProviderTemplate();
@@ -1198,8 +1242,8 @@ public class ServerIdpManagementService {
         idpTemplateResponse.setDescription(idpTemplate.getDescription());
         idpTemplateResponse.setImage(idpTemplate.getImageUrl());
         if (idpTemplate.getPropertiesMap().containsKey(PROP_CATEGORY)) {
-            if (idpTemplate.getPropertiesMap().get(PROP_CATEGORY) ==
-                    IdentityProviderTemplateListItem.CategoryEnum.CUSTOM.toString()) {
+            if (IdentityProviderTemplateListItem.CategoryEnum.CUSTOM.toString()
+                    .equals(idpTemplate.getPropertiesMap().get(PROP_CATEGORY))) {
                 idpTemplateResponse.setCategory(IdentityProviderTemplate.CategoryEnum.CUSTOM);
             } else {
                 idpTemplateResponse.setCategory(IdentityProviderTemplate.CategoryEnum.DEFAULT);
@@ -1218,6 +1262,13 @@ public class ServerIdpManagementService {
         return idpTemplateResponse;
     }
 
+    /**
+     * Create {@link Template} using the {@link IdentityProviderTemplate}.
+     *
+     * @param idpTemplate Identity provider template object created by the API request.
+     * @return IDPTemplate {@link Template}.
+     * @throws JsonProcessingException
+     */
     private Template generateIDPTemplate(IdentityProviderTemplate idpTemplate) throws JsonProcessingException {
 
         Template identityProviderTemplate = new Template();
@@ -1234,6 +1285,12 @@ public class ServerIdpManagementService {
         return identityProviderTemplate;
     }
 
+    /**
+     * Create the properties map for the IDP template.
+     *
+     * @param idpTemplate Identity provider template.
+     * @return Map of properties.
+     */
     private Map<String, String> createPropertiesMapForIdPTemplate(IdentityProviderTemplate idpTemplate) {
 
         Map<String, String> properties = new HashMap<>();
@@ -1251,6 +1308,12 @@ public class ServerIdpManagementService {
         return properties;
     }
 
+    /**
+     * Create services list for the IDP template.
+     *
+     * @param idp Identity provider template.
+     * @return List of services supported by the IDP.
+     */
     private ArrayList<String> createServicesListForIdP(IdentityProviderPOSTRequest idp) {
 
         ArrayList<String> services = new ArrayList<>();
@@ -1265,6 +1328,14 @@ public class ServerIdpManagementService {
         return services;
     }
 
+    /**
+     * Handle template management exceptions and return related API errors.
+     *
+     * @param e {@link TemplateManagementException}.
+     * @param errorEnum Error message with error code and description.
+     * @param data Additional information.
+     * @return API error.
+     */
     private APIError handleTemplateMgtException(TemplateManagementException e, Constants.ErrorMessage errorEnum,
                                                 String data) {
 
@@ -1297,6 +1368,13 @@ public class ServerIdpManagementService {
         return new APIError(status, errorResponse);
     }
 
+    /**
+     * Generate a JSON object using the Identity Provider template.
+     *
+     * @param idpTemplate Identity provider template.
+     * @return JSON object.
+     * @throws JsonProcessingException
+     */
     private String createIDPTemplateScript(IdentityProviderPOSTRequest idpTemplate) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -1740,6 +1818,11 @@ public class ServerIdpManagementService {
                         break;
                     case Constants.PROVISIONING:
                         identityProviderListItem.setProvisioning(createProvisioningResponse(idp));
+                        break;
+                    default:
+                        if (log.isDebugEnabled()) {
+                            log.debug("Unknown requested attribute: " + requestedAttribute);
+                        }
                         break;
                 }
             }
@@ -2272,6 +2355,11 @@ public class ServerIdpManagementService {
         connectorConfig.setEnabled(connector.getIsEnabled());
         connectorConfig.setBlocking(connector.getBlockingEnabled());
         connectorConfig.setRulesEnabled(connector.getRulesEnabled());
+
+        if (connector.getProperties() == null) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    Constants.ErrorMessage.ERROR_CODE_OUTBOUND_PROVISIONING_CONFIG_NOT_FOUND, connectorName);
+        }
         List<Property> properties = connector.getProperties().stream()
                 .map(propertyToInternal)
                 .collect(Collectors.toList());
@@ -2687,5 +2775,130 @@ public class ServerIdpManagementService {
             message = error.getDescription();
         }
         return message;
+    }
+
+    /**
+     * Validate the claim configs of an IDP.
+     *
+     * @param tenantDomain Tenant domain.
+     * @param claims       Claim configs.
+     * @throws IdentityProviderManagementException If an error while validating the claim configs or if an invalid
+     *                                             config is found.
+     */
+    private void validateClaims(String tenantDomain, Claims claims) throws IdentityProviderManagementException {
+
+        if (claims == null) {
+            return;
+        }
+        String userClaimURI = claims.getUserIdClaim() == null ? null : claims.getUserIdClaim().getUri();
+        String roleClaimURI = claims.getRoleClaim() == null ? null : claims.getRoleClaim().getUri();
+        List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> claimMappings = claims.getMappings();
+
+        // EMPTY claimMappings indicate that the IDP is using local claim dialect.
+        if (CollectionUtils.isEmpty(claimMappings)) {
+            List<LocalClaim> localClaimsList = getLocalClaimURIs(tenantDomain);
+            Set<String> claimURIs = localClaimsList.stream().map(LocalClaim::getClaimURI).collect(Collectors.toSet());
+            // Validate userClaimURI and roleClaimURI.
+            if (StringUtils.isNotBlank(userClaimURI) && !claimURIs.contains(userClaimURI)) {
+                throw new IdentityProviderManagementClientException(
+                        Constants.ErrorMessage.ERROR_CODE_NOT_EXISTING_USER_CLAIM_URI.getCode(),
+                        String.format(Constants.ErrorMessage.ERROR_CODE_NOT_EXISTING_USER_CLAIM_URI.getDescription(),
+                                tenantDomain));
+            }
+            if (StringUtils.isNotBlank(roleClaimURI) && !claimURIs.contains(roleClaimURI)) {
+                throw new IdentityProviderManagementClientException(
+                        Constants.ErrorMessage.ERROR_CODE_NOT_EXISTING_ROLE_CLAIM_URI.getCode(),
+                        String.format(Constants.ErrorMessage.ERROR_CODE_NOT_EXISTING_ROLE_CLAIM_URI.getDescription(),
+                                tenantDomain));
+            }
+            return;
+        }
+        validateUserAndRoleClaims(userClaimURI, roleClaimURI, claimMappings);
+
+        // Validate LocalClaim objects against local claim URIs.
+        List<LocalClaim> localClaimsList = getLocalClaimURIs(tenantDomain);
+        Set<String> claimURIs = localClaimsList.stream().map(LocalClaim::getClaimURI).collect(Collectors.toSet());
+        for (org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping claimMapping : claimMappings) {
+
+            // If a claim URI does not exist in claimURIs list, then that's a not existing URI.
+            if (!claimURIs.contains(claimMapping.getLocalClaim().getUri())) {
+                throw new IdentityProviderManagementClientException(
+                        Constants.ErrorMessage.ERROR_CODE_NOT_EXISTING_CLAIM_URI.getCode(),
+                        Constants.ErrorMessage.ERROR_CODE_NOT_EXISTING_CLAIM_URI.getDescription());
+            }
+        }
+    }
+
+    /**
+     * Validate whether the userClaimURI and the roleClaimURI align with the claim mappings.
+     *
+     * @param userClaimURI  User claim URI.
+     * @param roleClaimURI  Role claim URI.
+     * @param claimMappings List of claim mapping for the IDP.
+     * @throws IdentityProviderManagementClientException If the serClaimURI and the roleClaimURI does not match with
+     *                                                   the claim mappings.
+     */
+    private void validateUserAndRoleClaims(String userClaimURI, String roleClaimURI,
+                               List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> claimMappings)
+            throws IdentityProviderManagementClientException {
+
+        boolean isUserClaimURISpecified = StringUtils.isNotBlank(userClaimURI);
+        boolean isRoleClaimURISpecified = StringUtils.isNotBlank(roleClaimURI);
+        boolean isValidUserClaimURI = false;
+        boolean isValidRoleClaimURI = false;
+
+        for (org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping claimMapping : claimMappings) {
+            // If both claims are valid at the same time, no need to iterate.
+            if (isValidRoleClaimURI && isValidUserClaimURI) {
+                return;
+            }
+            if (isUserClaimURISpecified && userClaimURI.equals(claimMapping.getIdpClaim())) {
+                isValidUserClaimURI = true;
+            }
+            if (isRoleClaimURISpecified && roleClaimURI.equals(claimMapping.getIdpClaim())) {
+                isValidRoleClaimURI = true;
+            }
+        }
+        if (isUserClaimURISpecified && !isValidUserClaimURI) {
+            throw new IdentityProviderManagementClientException(
+                    Constants.ErrorMessage.ERROR_CODE_INVALID_USER_CLAIM_URI.getCode(),
+                    String.format(Constants.ErrorMessage.ERROR_CODE_INVALID_USER_CLAIM_URI.getDescription(),
+                            userClaimURI));
+        }
+        if (isRoleClaimURISpecified && !isValidRoleClaimURI) {
+            throw new IdentityProviderManagementClientException(
+                    Constants.ErrorMessage.ERROR_CODE_INVALID_ROLE_CLAIM_URI.getCode(),
+                    String.format(Constants.ErrorMessage.ERROR_CODE_INVALID_ROLE_CLAIM_URI.getMessage(), roleClaimURI));
+        }
+    }
+
+    /**
+     * Get the local claim URIs of the tenant.
+     *
+     * @param tenantDomain Tenant domain.
+     * @return List of local claim URIs.
+     * @throws IdentityProviderManagementServerException If an error occurred while getting the claims list.
+     */
+    private List<LocalClaim> getLocalClaimURIs(String tenantDomain) throws IdentityProviderManagementServerException {
+
+        try {
+            List<LocalClaim> localClaimsList =
+                    IdentityProviderServiceHolder.getClaimMetadataManagementService().getLocalClaims(tenantDomain);
+            if (localClaimsList.isEmpty()) {
+                if (log.isDebugEnabled()) {
+                    log.debug("No local claims found for tenant:" + tenantDomain + ".Therefore, skipping " +
+                            "local claim URI validation.");
+                }
+                return Collections.emptyList();
+            }
+            return localClaimsList;
+        } catch (ClaimMetadataException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error occurred while validating the local claim URIs for tenant: " + tenantDomain, e);
+            }
+            throw new IdentityProviderManagementServerException(
+                    Constants.ErrorMessage.ERROR_CODE_VALIDATING_LOCAL_CLAIM_URIS.getCode(),
+                    Constants.ErrorMessage.ERROR_CODE_VALIDATING_LOCAL_CLAIM_URIS.getDescription());
+        }
     }
 }

@@ -132,7 +132,7 @@ public class SAMLInboundFunctions {
 
         try {
             String issuer = inbound.getInboundAuthKey();
-            ApplicationManagementServiceHolder.getInstance().getSamlssoConfigService().removeServiceProvider(issuer);
+            ApplicationManagementServiceHolder.getSamlssoConfigService().removeServiceProvider(issuer);
         } catch (IdentityException e) {
             throw buildServerError("Error while trying to rollback SAML2 configuration. " + e.getMessage(), e);
         }
@@ -207,7 +207,7 @@ public class SAMLInboundFunctions {
 
     private static SAMLSSOConfigServiceImpl getSamlSsoConfigService() {
 
-        return ApplicationManagementServiceHolder.getInstance().getSamlssoConfigService();
+        return ApplicationManagementServiceHolder.getSamlssoConfigService();
     }
 
 }
