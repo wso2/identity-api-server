@@ -110,7 +110,8 @@ public class ServerClaimManagementService {
     private static final String REL_CLAIMS = "claims";
     private static final List<String> conflictErrorScenarios = Arrays.asList(
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_CLAIM_DIALECT.getCode(),
-            ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_EXTERNAL_CLAIM_URI.getCode()
+            ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_EXTERNAL_CLAIM_URI.getCode(),
+            ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_LOCAL_CLAIM_URI.getCode()
     );
 
     /**
