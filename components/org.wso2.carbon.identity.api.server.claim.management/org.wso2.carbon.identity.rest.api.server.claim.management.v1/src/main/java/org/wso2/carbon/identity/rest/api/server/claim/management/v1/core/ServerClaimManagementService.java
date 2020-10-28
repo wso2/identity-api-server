@@ -48,6 +48,7 @@ import org.wso2.carbon.user.core.UserStoreManager;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -107,6 +108,10 @@ public class ServerClaimManagementService {
 
     private static final Log LOG = LogFactory.getLog(ServerClaimManagementService.class);
     private static final String REL_CLAIMS = "claims";
+    private static final List<String> conflictErrorScenarios = Arrays.asList(
+            ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_CLAIM_DIALECT.getCode(),
+            ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_EXTERNAL_CLAIM_URI.getCode()
+    );
 
     /**
      * Add a claim dialect.
@@ -794,10 +799,7 @@ public class ServerClaimManagementService {
      */
     private boolean isConflictScenario(String errorCode) {
 
-        if (StringUtils.isBlank(errorCode)) {
-            return false;
-        }
-        return ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_CLAIM_DIALECT.getCode().equals(errorCode);
+        return !StringUtils.isBlank(errorCode) && conflictErrorScenarios.contains(errorCode);
     }
 
     private APIError handleClaimManagementClientError(Constant.ErrorMessage errorEnum, Response.Status status,
