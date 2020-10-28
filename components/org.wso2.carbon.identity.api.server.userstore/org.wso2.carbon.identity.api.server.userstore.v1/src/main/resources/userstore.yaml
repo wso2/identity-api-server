@@ -468,7 +468,7 @@ components:
         typeId:
           type: string
           description: The id of the user store manager class type.
-          example: SkRCQ1VzZXJTdG9yZU1hbmFnZXI
+          example: VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg
         description:
           type: string
           description: Description of the user store.
@@ -595,13 +595,13 @@ components:
       properties:
         typeName:
           type: string
-          example: JDBCUserStoreManager
+          example: UniqueIDJDBCUserStoreManager
         typeId:
           type: string
           example: b3JnLndzbzIuY2FyYm9uLnVzZXIuY29yZS5qZGJjLkpEQkNVc2VyU3RvcmVNYW5hZ2Vy
         className:
           type: string
-          example: org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager
+          example: org.wso2.carbon.user.core.jdbc.UniqueIDJDBCUserStoreManager
         properties:
           $ref: '#/components/schemas/UserStorePropertiesRes'
     UserStoreResponse:
@@ -617,10 +617,10 @@ components:
           description: domain name of the secondary user store
         typeName:
           type: string
-          example: JDBCUserStoreManager
+          example: UniqueIDJDBCUserStoreManager
         typeId:
           type: string
-          example: SkRCQ1VzZXJTdG9yZU1hbmFnZXI
+          example: VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg
         description:
           type: string
           example: Some description of the user store
@@ -635,26 +635,26 @@ components:
       properties:
         typeId:
           type: string
-          example: SkRCQ1VzZXJTdG9yZU1hbmFnZXI
+          example: VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg
         typeName:
           type: string
-          example: JDBCUserStoreManager
+          example: UniqueIDJDBCUserStoreManager
         className:
           type: string
-          example: org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager
+          example: org.wso2.carbon.user.core.jdbc.UniqueIDJDBCUserStoreManager
         self:
           type: string
-          example: /t/{tenant-domain}/api/server/v1/userstores/meta/types/SkRCQ1VzZXJTdG9yZU1hbmFnZXI
+          example: /t/{tenant-domain}/api/server/v1/userstores/meta/types/VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg
     UserStoreConfigurationsRes:
       type: object
       description: Available User Store Configurations Response.
       properties:
         typeName:
           type: string
-          example: JDBCUserStoreManager
+          example: UniqueIDJDBCUserStoreManager
         typeId:
           type: string
-          example: SkRCQ1VzZXJTdG9yZU1hbmFnZXI
+          example: VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg
         name:
           type: string
           example: JDBC-SECONDARY
@@ -663,7 +663,7 @@ components:
           example: Some description of the user store
         className:
           type: string
-          example: org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager
+          example: org.wso2.carbon.user.core.jdbc.UniqueIDJDBCUserStoreManager
         properties:
           type: array
           description: Configured user store property for the set
