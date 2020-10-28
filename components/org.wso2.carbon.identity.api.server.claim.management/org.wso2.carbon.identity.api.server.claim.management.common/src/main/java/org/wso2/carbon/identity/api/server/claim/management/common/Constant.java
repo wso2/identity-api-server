@@ -155,7 +155,13 @@ public class Constant {
         ERROR_CODE_EXISTING_LOCAL_CLAIM_URI("50039", "Unable to add local claim.",
                 "Local claim URI already exists. Local claim URI must be unique."),
         ERROR_CODE_INVALID_IDENTIFIER("CMT-60001", "Invalid identifier",
-                "Invalid Identifier: %s");
+                "Invalid Identifier: %s"),
+        ERROR_CODE_CLAIM_URI_NOT_SPECIFIED("CMT-60002", "Empty claim URI", "Claim URI is " +
+                "not specified in the request"),
+        ERROR_CODE_CLAIM_DISPLAY_NAME_NOT_SPECIFIED("CMT-60003", "Empty display name",
+                "Claim display name is not specified in the request"),
+        ERROR_CODE_CLAIM_DESCRIPTION_NOT_SPECIFIED("CMT-60004", "Empty description",
+                "Claim description is not specified in the request");
 
         private final String code;
         private final String message;

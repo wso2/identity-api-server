@@ -251,6 +251,20 @@ public class ServerClaimManagementService {
      */
     public String addLocalClaim(LocalClaimReqDTO localClaimReqDTO) {
 
+        // Validate mandatory attributes.
+        if (StringUtils.isBlank(localClaimReqDTO.getClaimURI())) {
+            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_URI_NOT_SPECIFIED,
+                    BAD_REQUEST, (String) null);
+        }
+        if (StringUtils.isBlank(localClaimReqDTO.getDisplayName())) {
+            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DISPLAY_NAME_NOT_SPECIFIED,
+                    BAD_REQUEST, (String) null);
+        }
+        if (StringUtils.isBlank(localClaimReqDTO.getDescription())) {
+            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DESCRIPTION_NOT_SPECIFIED,
+                    BAD_REQUEST, (String) null);
+        }
+
         try {
             for (AttributeMappingDTO attributeMappingDTO :
                     localClaimReqDTO.getAttributeMapping()) {
