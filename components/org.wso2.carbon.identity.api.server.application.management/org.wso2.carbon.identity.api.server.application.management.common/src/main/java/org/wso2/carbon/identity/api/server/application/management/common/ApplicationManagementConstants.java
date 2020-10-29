@@ -66,6 +66,9 @@ public class ApplicationManagementConstants {
         APPLICATION_NOT_FOUND("60006",
                 "Application not found.",
                 "Application cannot be found for the provided id: %s in the tenantDomain: %s."),
+        DISABLE_REDIRECT_OR_POST_BINDINGS("APP-60007",
+                "Disabling HTTP_POST or HTTP_REDIRECT is not allowed",
+                "HTTP_POST or HTTP_REDIRECT cannot be disabled"),
 
         // Client errors defined at API level.
         INVALID_INBOUND_PROTOCOL("60501",
@@ -118,6 +121,9 @@ public class ApplicationManagementConstants {
 
         public String getCode() {
 
+            if (code.contains(APPLICATION_MANAGEMENT_PREFIX)) {
+                return code;
+            }
             return APPLICATION_MANAGEMENT_PREFIX + code;
         }
 
