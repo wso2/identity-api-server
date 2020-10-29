@@ -88,7 +88,7 @@ public class ServerUserStoreService {
     public UserStoreResponse addUserStore(UserStoreReq userStoreReq) {
 
         try {
-            validateMandatoryProperties(getUserStoreType(base64URLDecodeId(userStoreReq.getTypeId())), userStoreReq);
+            validateMandatoryProperties(userStoreReq);
             UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
                     .getUserStoreConfigService();
             userStoreConfigService.addUserStore(createUserStoreDTO(userStoreReq));
@@ -806,14 +806,18 @@ public class ServerUserStoreService {
     /**
      * To check whether API request has all user store mandatory properties or not.
      *
-     * @param className the user store class name
      * @param userStoreReq {@link UserStoreReq}
      */
-    private void validateMandatoryProperties(String className, UserStoreReq userStoreReq) {
+    private void validateMandatoryProperties(UserStoreReq userStoreReq) {
 
+        String userStoreType = getUserStoreType(base64URLDecodeId(userStoreReq.getTypeId()));
+        if (StringUtils.isBlank(userStoreType)) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_INPUT);
+        }
         HashMap<String, String> hashMap = new HashMap<String, String>();
         Property[] mandatoryProperties = UserStoreManagerRegistry.
-                getUserStoreProperties(className).getMandatoryProperties();
+                getUserStoreProperties(userStoreType).getMandatoryProperties();
         for (org.wso2.carbon.identity.api.server.userstore.v1.model.Property property : userStoreReq.getProperties()) {
             hashMap.put(property.getName(), property.getValue());
         }
