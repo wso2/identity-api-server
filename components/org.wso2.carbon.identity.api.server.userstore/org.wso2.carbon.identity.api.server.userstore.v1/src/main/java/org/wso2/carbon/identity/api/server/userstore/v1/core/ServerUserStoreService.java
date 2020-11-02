@@ -334,9 +334,7 @@ public class ServerUserStoreService {
                 connectionEstablishedResponse.setConnection(true);
             }
         } catch (IdentityUserStoreMgtException e) {
-            UserStoreConstants.ErrorMessage errorEnum =
-                    UserStoreConstants.ErrorMessage.ERROR_CODE_DATASOURCE_CONNECTION;
-            throw handleIdentityUserStoreMgtException(e, errorEnum);
+            connectionEstablishedResponse.setConnection(false);
         }
         return connectionEstablishedResponse;
     }
