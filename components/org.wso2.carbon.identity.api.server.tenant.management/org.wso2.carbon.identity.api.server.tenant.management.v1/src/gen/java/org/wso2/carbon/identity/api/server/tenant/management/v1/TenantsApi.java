@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerResponse;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantAvailability;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantPutModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantResponseModel;
@@ -115,6 +116,30 @@ public class TenantsApi  {
     public Response getTenant(@ApiParam(value = "tenant id",required=true) @PathParam("tenant-id") String tenantId) {
 
         return delegate.getTenant(tenantId );
+    }
+
+    @Valid
+    @GET
+    @Path("/{tenant-domain}/istaken")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "See if a domain is taken or not.", notes = "Check if the domain is already taken.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants/list  <b>scope required:</b> * internal_list_tenants ", response = TenantAvailability.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Tenants", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = TenantAvailability.class),
+        @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public Response getTenantAvailability(@ApiParam(value = "tenant domain",required=true) @PathParam("tenant-domain") String tenantDomain) {
+
+        return delegate.getTenantAvailability(tenantDomain );
     }
 
     @Valid

@@ -69,6 +69,12 @@ public class TenantsApiServiceImpl implements TenantsApiService {
         return Response.ok().entity(getResourceLocation(resourceId)).build();
     }
 
+    @Override
+    public Response getTenantAvailability(String tenantDomain) {
+
+        return Response.ok().entity(tenantManagementService.isDomainTaken(tenantDomain)).build();
+    }
+
     private URI getResourceLocation(String resourceId) {
 
         return ContextLoader.buildURIForHeader(Constants.V1_API_PATH_COMPONENT +
