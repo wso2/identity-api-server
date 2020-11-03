@@ -41,7 +41,7 @@ public interface TenantsApiService {
 
       public Response getTenantByDomain(String tenantDomain);
 
-      public Response isDomainAvailable(String tenantDomain);
+      public Response isDomainExist(String tenantDomain);
 
       public Response retrieveTenants(Integer limit, Integer offset, String sortOrder, String sortBy, String filter);
 

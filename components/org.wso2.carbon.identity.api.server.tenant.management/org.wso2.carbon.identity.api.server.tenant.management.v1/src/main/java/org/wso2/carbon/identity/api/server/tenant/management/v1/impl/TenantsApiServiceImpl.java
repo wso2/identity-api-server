@@ -82,7 +82,7 @@ public class TenantsApiServiceImpl implements TenantsApiService {
     }
 
     @Override
-    public Response isDomainAvailable(String tenantDomain) {
+    public Response isDomainExist(String tenantDomain) {
 
         if (tenantManagementService.isDomainAvailable(tenantDomain)) {
             return Response.status(Response.Status.NOT_FOUND).build();

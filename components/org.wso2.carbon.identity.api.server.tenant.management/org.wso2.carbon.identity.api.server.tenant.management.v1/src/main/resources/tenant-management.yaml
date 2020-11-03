@@ -208,10 +208,10 @@ paths:
     head:
       tags:
         - Tenants
-      summary: Check domain availability.
-      operationId: isDomainAvailable
+      summary: Check domain Existence.
+      operationId: isDomainExist
       description: |
-        Get the tenant using domain.
+        Check the tenant existence using domain.
 
         <b>Permission required:</b>
         * /permission/protected/manage/monitor/tenants/list

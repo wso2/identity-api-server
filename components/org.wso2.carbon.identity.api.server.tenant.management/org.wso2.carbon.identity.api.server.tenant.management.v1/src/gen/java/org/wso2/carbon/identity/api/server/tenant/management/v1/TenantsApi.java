@@ -144,9 +144,9 @@ public class TenantsApi  {
     @Valid
     @HEAD
     @Path("/domain/{tenant-domain}")
-
+    
     @Produces({ "application/json" })
-    @ApiOperation(value = "Check domain availability.", notes = "Just a check if tenant domain is present.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants/list  <b>scope required:</b> * internal_list_tenants ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Check domain Existence.", notes = "Get the tenant using domain.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants/list  <b>scope required:</b> * internal_list_tenants ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -160,9 +160,9 @@ public class TenantsApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Void.class)
     })
-    public Response isDomainAvailable(@ApiParam(value = "tenant domain",required=true) @PathParam("tenant-domain") String tenantDomain) {
+    public Response isDomainExist(@ApiParam(value = "tenant domain",required=true) @PathParam("tenant-domain") String tenantDomain) {
 
-        return delegate.isDomainAvailable(tenantDomain );
+        return delegate.isDomainExist(tenantDomain );
     }
 
     @Valid
