@@ -208,7 +208,7 @@ paths:
     head:
       tags:
         - Tenants
-      summary: Get tenant by domain.
+      summary: Check domain availability.
       operationId: isDomainAvailable
       description: |
         Get the tenant using domain.

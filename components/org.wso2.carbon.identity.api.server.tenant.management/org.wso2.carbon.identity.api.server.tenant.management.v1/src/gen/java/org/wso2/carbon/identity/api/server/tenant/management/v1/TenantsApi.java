@@ -146,7 +146,7 @@ public class TenantsApi  {
     @Path("/domain/{tenant-domain}")
 
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get tenant by domain.", notes = "Just a check if tenant domain is present.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants/list  <b>scope required:</b> * internal_list_tenants ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Check domain availability.", notes = "Just a check if tenant domain is present.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants/list  <b>scope required:</b> * internal_list_tenants ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
