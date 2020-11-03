@@ -254,15 +254,15 @@ public class ServerClaimManagementService {
         // Validate mandatory attributes.
         if (StringUtils.isBlank(localClaimReqDTO.getClaimURI())) {
             throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_URI_NOT_SPECIFIED,
-                    BAD_REQUEST, (String) null);
+                    BAD_REQUEST);
         }
         if (StringUtils.isBlank(localClaimReqDTO.getDisplayName())) {
             throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DISPLAY_NAME_NOT_SPECIFIED,
-                    BAD_REQUEST, (String) null);
+                    BAD_REQUEST);
         }
         if (StringUtils.isBlank(localClaimReqDTO.getDescription())) {
             throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DESCRIPTION_NOT_SPECIFIED,
-                    BAD_REQUEST, (String) null);
+                    BAD_REQUEST);
         }
 
         try {
@@ -815,6 +815,11 @@ public class ServerClaimManagementService {
     private boolean isConflictScenario(String errorCode) {
 
         return !StringUtils.isBlank(errorCode) && conflictErrorScenarios.contains(errorCode);
+    }
+
+    private APIError handleClaimManagementClientError(Constant.ErrorMessage errorEnum, Response.Status status) {
+
+        return handleClaimManagementClientError(errorEnum, status, StringUtils.EMPTY);
     }
 
     private APIError handleClaimManagementClientError(Constant.ErrorMessage errorEnum, Response.Status status,
