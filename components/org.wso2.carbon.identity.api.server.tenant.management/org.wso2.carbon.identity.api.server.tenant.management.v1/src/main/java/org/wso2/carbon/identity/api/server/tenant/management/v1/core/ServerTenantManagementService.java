@@ -29,14 +29,11 @@ import org.wso2.carbon.identity.api.server.tenant.management.v1.model.ChannelVer
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.LifeCycleStatus;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Link;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerResponse;
-import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantAvailability;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantListItem;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantPutModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantResponseModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantsListResponse;
-import org.wso2.carbon.identity.base.IdentityRuntimeException;
-import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.recovery.IdentityRecoveryException;
 import org.wso2.carbon.identity.recovery.model.UserRecoveryData;
 import org.wso2.carbon.identity.recovery.store.JDBCRecoveryDataStore;
@@ -145,28 +142,36 @@ public class ServerTenantManagementService {
     }
 
     /**
+     * Get a tenant identified by tenant unique id.
+     *
+     * @param domain tenant domain.
+     * @return TenantResponseModel.
+     */
+    public TenantResponseModel getTenantByDomain(String domain) {
+
+        try {
+            Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenantByDomain(domain);
+            return createTenantResponse(tenant);
+        } catch (TenantMgtException e) {
+            throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_RETRIEVING_TENANT, domain);
+        }
+    }
+
+    /**
      * Get a tenant identified by tenant domain.
      *
      * @param tenantDomain tenant unique identifier.
      * @return taken or not.
      */
-    public TenantAvailability isDomainTaken(String tenantDomain) {
-        boolean isTaken = true;
-        ErrorResponse errorResponse;
-        Response.Status status;
-        try {
-            IdentityTenantUtil.getTenantId(tenantDomain);
-        } catch (IdentityRuntimeException e) {
-            if (e.getMessage().startsWith("Invalid tenant domain")) {
-                isTaken = false;
-            } else {
-                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
-                        TenantManagementConstants.ErrorMessage.ERROR_CODE_ERROR_CHECKING_TENANT_AVAILABILITY,
-                        tenantDomain);
-            }
-        }
+    public boolean isDomainAvailable(String tenantDomain) {
 
-        return createTenantAvailability(isTaken);
+        try {
+            return TenantManagementServiceHolder.getTenantMgtService().isDomainAvailable(tenantDomain);
+        } catch (TenantMgtException e) {
+            throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_RETRIEVING_TENANT, tenantDomain);
+        }
     }
 
     /**
@@ -228,13 +233,6 @@ public class ServerTenantManagementService {
         tenantResponseModel.setLifecycleStatus(getLifeCycleStatus(tenant.isActive()));
         tenantResponseModel.setOwners(getOwnerResponses(tenant));
         return tenantResponseModel;
-    }
-
-    private TenantAvailability createTenantAvailability(boolean isTaken) {
-
-        TenantAvailability tenantAvailability = new TenantAvailability();
-        tenantAvailability.setIsTaken(isTaken);
-        return tenantAvailability;
     }
 
     private Tenant createTenantInfoBean(TenantModel tenantModel) throws TenantManagementClientException {

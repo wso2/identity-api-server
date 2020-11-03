@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerResponse;
-import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantAvailability;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantPutModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantResponseModel;
@@ -40,7 +39,9 @@ public interface TenantsApiService {
 
       public Response getTenant(String tenantId);
 
-      public Response getTenantAvailability(String tenantDomain);
+      public Response getTenantByDomain(String tenantDomain);
+
+      public Response isDomainAvailable(String tenantDomain);
 
       public Response retrieveTenants(Integer limit, Integer offset, String sortOrder, String sortBy, String filter);
 

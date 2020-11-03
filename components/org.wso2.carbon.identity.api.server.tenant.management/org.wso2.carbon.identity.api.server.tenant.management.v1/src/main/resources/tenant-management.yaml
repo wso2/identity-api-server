@@ -171,14 +171,14 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-  '/tenants/{tenant-domain}/istaken':
+  '/tenants/domain/{tenant-domain}':
     get:
       tags:
         - Tenants
-      summary: See if a domain is taken or not.
-      operationId: getTenantAvailability
+      summary: Get tenant by domain.
+      operationId: getTenantByDomain
       description: |
-        Check if the domain is already taken.
+        Get the tenant using domain.
 
         <b>Permission required:</b>
         * /permission/protected/manage/monitor/tenants/list
@@ -193,7 +193,36 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/TenantAvailability'
+                $ref: '#/components/schemas/TenantResponseModel'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    head:
+      tags:
+        - Tenants
+      summary: Get tenant by domain.
+      operationId: isDomainAvailable
+      description: |
+        Get the tenant using domain.
+
+        <b>Permission required:</b>
+        * /permission/protected/manage/monitor/tenants/list
+
+        <b>scope required:</b>
+        * internal_list_tenants
+      parameters:
+        - $ref: '#/components/parameters/tenantDomainPathParam'
+      responses:
+        '200':
+          $ref: '#/components/responses/ResourceExist'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -365,6 +394,8 @@ components:
       description: Unauthorized
     Forbidden:
       description: Resource Forbidden
+    ResourceExist:
+      description: Requested Resource Exists
     ServerError:
       description: Internal Server Error
       content:
@@ -522,14 +553,6 @@ components:
           example: "USA"
           readOnly: true
           description: Region of the tenant.
-
-    TenantAvailability:
-      type: object
-      properties:
-        isTaken:
-          type: boolean
-          example: true
-          description: Tenant domain is taken or available.
 
     TenantPutModel:
       type: object
