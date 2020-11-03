@@ -17,9 +17,11 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.SingleSignOnProfile;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -36,6 +38,7 @@ import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 
 /**
  * Helper functions for SAML inbound management.
@@ -55,6 +58,7 @@ public class SAMLInboundFunctions {
         String currentIssuer = InboundFunctions.getInboundAuthKey(application, StandardInboundProtocols.SAML2);
         SAMLSSOServiceProviderDTO oldSAMLSp = null;
         try {
+            validateSingleSignOnProfileBindings(saml2Configuration);
             if (currentIssuer != null) {
                 // Delete the current app.
                 oldSAMLSp = getSamlSsoConfigService().getServiceProvider(currentIssuer);
@@ -70,6 +74,39 @@ public class SAMLInboundFunctions {
             // Try to rollback by recreating the previous SAML SP.
             rollbackSAMLSpRemoval(oldSAMLSp);
             throw error;
+        }
+    }
+
+    /**
+     * Validate whether the request is trying to disable either HTTP_POST or HTTP_REDIRECT or both.
+     *
+     * @param saml2Configuration SAML2Configuration.
+     * @throws IdentitySAML2ClientException If the request is trying to disable either HTTP_POST or HTTP_REDIRECT
+     *                                      or both.
+     */
+    private static void validateSingleSignOnProfileBindings(SAML2Configuration saml2Configuration) throws
+            IdentitySAML2ClientException {
+
+        if (saml2Configuration.getManualConfiguration() == null) {
+            return;
+        }
+        if (saml2Configuration.getManualConfiguration().getSingleSignOnProfile() == null) {
+            return;
+        }
+        if (saml2Configuration.getManualConfiguration().getSingleSignOnProfile().getBindings() == null) {
+            return;
+        }
+        List<SingleSignOnProfile.BindingsEnum> bindings =
+                saml2Configuration.getManualConfiguration().getSingleSignOnProfile().getBindings();
+        /*
+        Both HTTP_POST and HTTP_REDIRECT have to be there by default. Since the backend support is not there, http
+        bindings should not be allowed to change.
+         */
+        if (bindings.size() < 2 ||
+                (bindings.size() == 2 && bindings.contains(SingleSignOnProfile.BindingsEnum.ARTIFACT))) {
+            throw new IdentitySAML2ClientException(
+                    ApplicationManagementConstants.ErrorMessage.DISABLE_REDIRECT_OR_POST_BINDINGS.getCode(),
+                    ApplicationManagementConstants.ErrorMessage.DISABLE_REDIRECT_OR_POST_BINDINGS.getDescription());
         }
     }
 
