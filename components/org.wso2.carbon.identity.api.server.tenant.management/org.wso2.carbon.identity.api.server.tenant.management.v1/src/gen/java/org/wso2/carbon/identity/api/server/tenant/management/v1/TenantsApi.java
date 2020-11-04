@@ -119,6 +119,54 @@ public class TenantsApi  {
 
     @Valid
     @GET
+    @Path("/domain/{tenant-domain}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get tenant by domain.", notes = "Get the tenant using domain.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants/list  <b>scope required:</b> * internal_list_tenants ", response = TenantResponseModel.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Tenants", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = TenantResponseModel.class),
+        @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public Response getTenantByDomain(@ApiParam(value = "tenant domain",required=true) @PathParam("tenant-domain") String tenantDomain) {
+
+        return delegate.getTenantByDomain(tenantDomain );
+    }
+
+    @Valid
+    @HEAD
+    @Path("/domain/{tenant-domain}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Check domain Existence.", notes = "Check the tenant existence using domain.  <b>Permission required:</b> * /permission/protected/manage/monitor/tenants/list  <b>scope required:</b> * internal_list_tenants ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Tenants", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Requested Resource Exists", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid Input Request", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Void.class)
+    })
+    public Response isDomainExist(@ApiParam(value = "tenant domain",required=true) @PathParam("tenant-domain") String tenantDomain) {
+
+        return delegate.isDomainExist(tenantDomain );
+    }
+
+    @Valid
+    @GET
     
     
     @Produces({ "application/json" })

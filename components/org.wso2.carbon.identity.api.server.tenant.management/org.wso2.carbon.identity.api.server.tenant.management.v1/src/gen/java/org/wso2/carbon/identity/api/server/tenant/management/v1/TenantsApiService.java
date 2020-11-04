@@ -39,6 +39,10 @@ public interface TenantsApiService {
 
       public Response getTenant(String tenantId);
 
+      public Response getTenantByDomain(String tenantDomain);
+
+      public Response isDomainExist(String tenantDomain);
+
       public Response retrieveTenants(Integer limit, Integer offset, String sortOrder, String sortBy, String filter);
 
       public Response updateTenantStatus(String tenantId, TenantPutModel tenantPutModel);
