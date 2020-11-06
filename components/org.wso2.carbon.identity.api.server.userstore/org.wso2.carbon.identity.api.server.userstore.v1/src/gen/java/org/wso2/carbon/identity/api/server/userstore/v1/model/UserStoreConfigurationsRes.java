@@ -52,7 +52,7 @@ public class UserStoreConfigurationsRes  {
         return this;
     }
     
-    @ApiModelProperty(example = "JDBCUserStoreManager", value = "")
+    @ApiModelProperty(example = "UniqueIDJDBCUserStoreManager", value = "")
     @JsonProperty("typeName")
     @Valid
     public String getTypeName() {
@@ -70,7 +70,7 @@ public class UserStoreConfigurationsRes  {
         return this;
     }
     
-    @ApiModelProperty(example = "SkRCQ1VzZXJTdG9yZU1hbmFnZXI", value = "")
+    @ApiModelProperty(example = "VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg", value = "")
     @JsonProperty("typeId")
     @Valid
     public String getTypeId() {
@@ -124,7 +124,7 @@ public class UserStoreConfigurationsRes  {
         return this;
     }
     
-    @ApiModelProperty(example = "org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager", value = "")
+    @ApiModelProperty(example = "org.wso2.carbon.user.core.jdbc.UniqueIDJDBCUserStoreManager", value = "")
     @JsonProperty("className")
     @Valid
     public String getClassName() {

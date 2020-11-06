@@ -51,7 +51,7 @@ public class UserStoreReq  {
         return this;
     }
     
-    @ApiModelProperty(example = "SkRCQ1VzZXJTdG9yZU1hbmFnZXI", required = true, value = "The id of the user store manager class type.")
+    @ApiModelProperty(example = "VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg", required = true, value = "The id of the user store manager class type.")
     @JsonProperty("typeId")
     @Valid
     @NotNull(message = "Property typeId cannot be null.")
