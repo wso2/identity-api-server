@@ -578,6 +578,10 @@ components:
           type: string
           example: JDBC-SECONDARY
           description: domain name of the secondary user store
+        enabled:
+          type: boolean
+          example: true
+          description: Enabled status of the userstore.
         description:
           type: string
           example: Some description of the user store
