@@ -87,7 +87,7 @@ public class UserStoreResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "JDBCUserStoreManager", value = "")
+    @ApiModelProperty(example = "UniqueIDJDBCUserStoreManager", value = "")
     @JsonProperty("typeName")
     @Valid
     public String getTypeName() {
@@ -105,7 +105,7 @@ public class UserStoreResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "SkRCQ1VzZXJTdG9yZU1hbmFnZXI", value = "")
+    @ApiModelProperty(example = "VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg", value = "")
     @JsonProperty("typeId")
     @Valid
     public String getTypeId() {

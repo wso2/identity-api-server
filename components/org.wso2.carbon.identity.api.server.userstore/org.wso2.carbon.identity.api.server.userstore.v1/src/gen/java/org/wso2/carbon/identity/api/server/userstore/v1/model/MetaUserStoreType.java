@@ -44,7 +44,7 @@ public class MetaUserStoreType  {
         return this;
     }
     
-    @ApiModelProperty(example = "JDBCUserStoreManager", value = "")
+    @ApiModelProperty(example = "UniqueIDJDBCUserStoreManager", value = "")
     @JsonProperty("typeName")
     @Valid
     public String getTypeName() {
@@ -80,7 +80,7 @@ public class MetaUserStoreType  {
         return this;
     }
     
-    @ApiModelProperty(example = "org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager", value = "")
+    @ApiModelProperty(example = "org.wso2.carbon.user.core.jdbc.UniqueIDJDBCUserStoreManager", value = "")
     @JsonProperty("className")
     @Valid
     public String getClassName() {
