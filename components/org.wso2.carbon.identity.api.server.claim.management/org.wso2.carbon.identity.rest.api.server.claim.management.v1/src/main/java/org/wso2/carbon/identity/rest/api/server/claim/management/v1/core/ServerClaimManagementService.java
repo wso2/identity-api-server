@@ -376,6 +376,15 @@ public class ServerClaimManagementService {
                 throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_CONFLICT, CONFLICT,
                         base64DecodeId(claimId));
             }
+            if (StringUtils.isBlank(localClaimReqDTO.getDisplayName())) {
+                throw handleClaimManagementClientError(
+                        Constant.ErrorMessage.ERROR_CODE_CLAIM_DISPLAY_NAME_NOT_SPECIFIED,
+                        BAD_REQUEST);
+            }
+            if (StringUtils.isBlank(localClaimReqDTO.getDescription())) {
+                throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DESCRIPTION_NOT_SPECIFIED,
+                        BAD_REQUEST);
+            }
             for (AttributeMappingDTO attributeMappingDTO :
                     localClaimReqDTO.getAttributeMapping()) {
                 if (!isUserStoreExists(attributeMappingDTO.getUserstore())) {
