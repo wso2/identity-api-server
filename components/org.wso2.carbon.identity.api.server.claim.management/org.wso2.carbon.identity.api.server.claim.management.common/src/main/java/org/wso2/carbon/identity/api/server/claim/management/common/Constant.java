@@ -164,7 +164,7 @@ public class Constant {
                 "Claim description is not specified in the request"),
         ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS("CMT-60005", "Userstore not specified",
                 "Mapped userstore cannot be empty"),
-        ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("CMT-60005", "Attribute mapping not specified",
+        ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("CMT-60006", "Attribute mapping not specified",
                 "Attribute mapping cannot be empty");
 
         private final String code;
