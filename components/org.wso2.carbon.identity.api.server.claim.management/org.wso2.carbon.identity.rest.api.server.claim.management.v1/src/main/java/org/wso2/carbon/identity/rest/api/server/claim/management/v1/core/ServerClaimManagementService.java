@@ -955,6 +955,7 @@ public class ServerClaimManagementService {
                 throw handleClaimManagementClientError(ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS,
                         BAD_REQUEST, attributeMappingDTO.getUserstore());
             }
+            // Validating mapped attribute only the userstore is equal to the primary userstore domain name.
             if (StringUtils.isBlank(attributeMappingDTO.getMappedAttribute()) &&
                     primaryUserstoreDomainName.equals(attributeMappingDTO.getUserstore())) {
                 throw handleClaimManagementClientError(ERROR_CODE_EMPTY_MAPPED_ATTRIBUTES_IN_LOCAL_CLAIM,
