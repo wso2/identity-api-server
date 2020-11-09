@@ -957,7 +957,7 @@ public class ServerClaimManagementService {
             }
             // Validating mapped attribute only the userstore is equal to the primary userstore domain name.
             if (StringUtils.isBlank(attributeMappingDTO.getMappedAttribute()) &&
-                    primaryUserstoreDomainName.equals(attributeMappingDTO.getUserstore())) {
+                    primaryUserstoreDomainName.equalsIgnoreCase(attributeMappingDTO.getUserstore())) {
                 throw handleClaimManagementClientError(ERROR_CODE_EMPTY_MAPPED_ATTRIBUTES_IN_LOCAL_CLAIM,
                         BAD_REQUEST, attributeMappingDTO.getUserstore());
             }
