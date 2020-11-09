@@ -949,12 +949,14 @@ public class ServerClaimManagementService {
         if (attributeMappingDTOList == null) {
             throw handleClaimManagementClientError(ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS, BAD_REQUEST);
         }
+        String primaryUserstoreDomainName = IdentityUtil.getPrimaryDomainName();
         for (AttributeMappingDTO attributeMappingDTO : attributeMappingDTOList) {
             if (StringUtils.isBlank(attributeMappingDTO.getUserstore())) {
                 throw handleClaimManagementClientError(ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS,
                         BAD_REQUEST, attributeMappingDTO.getUserstore());
             }
-            if (StringUtils.isBlank(attributeMappingDTO.getMappedAttribute())) {
+            if (StringUtils.isBlank(attributeMappingDTO.getMappedAttribute()) &&
+                    primaryUserstoreDomainName.equals(attributeMappingDTO.getUserstore())) {
                 throw handleClaimManagementClientError(ERROR_CODE_EMPTY_MAPPED_ATTRIBUTES_IN_LOCAL_CLAIM,
                         BAD_REQUEST, attributeMappingDTO.getUserstore());
             }
