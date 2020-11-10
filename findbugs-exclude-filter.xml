@@ -73,6 +73,14 @@
             <Bug pattern="IMPROPER_UNICODE" />
         </Match>
     </FindBugsFilter>
+
+    <FindBugsFilter>
+        <Match>
+            <Class name="org.wso2.carbon.identity.rest.api.server.claim.management.v1.core.ServerClaimManagementService" />
+            <Method name="validateAttributeMappings" />
+            <Bug pattern="IMPROPER_UNICODE" />
+        </Match>
+    </FindBugsFilter>
     <FindBugsFilter>
         <Match>
             <Class name="org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils" />

@@ -61,6 +61,8 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_CLAIMS_NOT_FOUND_FOR_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_DIALECT_NOT_FOUND;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EMPTY_MAPPED_ATTRIBUTES_IN_LOCAL_CLAIM;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_ADDING_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_ADDING_EXTERNAL_CLAIM;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_ADDING_LOCAL_CLAIM;
@@ -85,6 +87,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_LOCAL_CLAIM_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DESCRIPTION;
@@ -266,16 +269,8 @@ public class ServerClaimManagementService {
         }
 
         try {
-            for (AttributeMappingDTO attributeMappingDTO :
-                    localClaimReqDTO.getAttributeMapping()) {
-                if (!isUserStoreExists(attributeMappingDTO.getUserstore())) {
-                    throw handleClaimManagementClientError(ERROR_CODE_INVALID_USERSTORE, BAD_REQUEST,
-                            attributeMappingDTO.getUserstore());
-                }
-            }
-
-            getClaimMetadataManagementService().addLocalClaim(
-                    createLocalClaim(localClaimReqDTO),
+            validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
+            getClaimMetadataManagementService().addLocalClaim(createLocalClaim(localClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_ADDING_LOCAL_CLAIM,
@@ -385,16 +380,8 @@ public class ServerClaimManagementService {
                 throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DESCRIPTION_NOT_SPECIFIED,
                         BAD_REQUEST);
             }
-            for (AttributeMappingDTO attributeMappingDTO :
-                    localClaimReqDTO.getAttributeMapping()) {
-                if (!isUserStoreExists(attributeMappingDTO.getUserstore())) {
-                    throw handleClaimManagementClientError(ERROR_CODE_INVALID_USERSTORE, BAD_REQUEST,
-                            attributeMappingDTO.getUserstore());
-                }
-            }
-
-            getClaimMetadataManagementService().updateLocalClaim(
-                    createLocalClaim(localClaimReqDTO),
+            validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
+            getClaimMetadataManagementService().updateLocalClaim(createLocalClaim(localClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_UPDATING_LOCAL_CLAIM, claimId);
@@ -954,5 +941,30 @@ public class ServerClaimManagementService {
             });
         }
         return propList;
+    }
+
+    private void validateAttributeMappings(List<AttributeMappingDTO> attributeMappingDTOList)
+            throws UserStoreException {
+
+        if (attributeMappingDTOList == null) {
+            throw handleClaimManagementClientError(ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS, BAD_REQUEST);
+        }
+        String primaryUserstoreDomainName = IdentityUtil.getPrimaryDomainName();
+        for (AttributeMappingDTO attributeMappingDTO : attributeMappingDTOList) {
+            if (StringUtils.isBlank(attributeMappingDTO.getUserstore())) {
+                throw handleClaimManagementClientError(ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS,
+                        BAD_REQUEST, attributeMappingDTO.getUserstore());
+            }
+            // Validating mapped attribute only the userstore is equal to the primary userstore domain name.
+            if (StringUtils.isBlank(attributeMappingDTO.getMappedAttribute()) &&
+                    primaryUserstoreDomainName.equalsIgnoreCase(attributeMappingDTO.getUserstore())) {
+                throw handleClaimManagementClientError(ERROR_CODE_EMPTY_MAPPED_ATTRIBUTES_IN_LOCAL_CLAIM,
+                        BAD_REQUEST, attributeMappingDTO.getUserstore());
+            }
+            if (!isUserStoreExists(attributeMappingDTO.getUserstore())) {
+                throw handleClaimManagementClientError(ERROR_CODE_INVALID_USERSTORE, BAD_REQUEST,
+                        attributeMappingDTO.getUserstore());
+            }
+        }
     }
 }
