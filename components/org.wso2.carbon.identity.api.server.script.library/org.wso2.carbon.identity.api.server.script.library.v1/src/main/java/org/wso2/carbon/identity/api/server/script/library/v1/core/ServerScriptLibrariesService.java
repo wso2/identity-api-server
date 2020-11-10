@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.functions.library.mgt.model.FunctionLibrary;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -280,12 +281,19 @@ public class ServerScriptLibrariesService {
      */
     private ScriptLibraryResponse createScriptLibraryResponse(FunctionLibrary scriptLibrary) {
 
+        String displayName;
+
         ScriptLibraryResponse scriptLibraryResponse = new ScriptLibraryResponse();
         scriptLibraryResponse.setName(scriptLibrary.getFunctionLibraryName());
         scriptLibraryResponse.setDescription(scriptLibrary.getDescription());
+
+
+        displayName = URLEncoder.encode(scriptLibrary.getFunctionLibraryName());
         scriptLibraryResponse.setContentRef(ContextLoader.buildURIForBody(String.format(
-                V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT + "/%s" + SCRIPT_LIBRARY_CONTENT_PATH,
-                scriptLibrary.getFunctionLibraryName())).toString());
+                V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT + "/" + displayName + SCRIPT_LIBRARY_CONTENT_PATH,
+                displayName)).toString().replace("+", "%20"));
+
+
         return scriptLibraryResponse;
     }
 

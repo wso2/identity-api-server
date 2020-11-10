@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibrary
 
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URLEncoder;
 
 import javax.ws.rs.core.Response;
 
@@ -46,7 +47,8 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
 
         serverScriptLibrariesService.addScriptLibrary(name, contentInputStream, description);
         URI location =
-                ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT + "/" + name);
+                ContextLoader.buildURIForHeader(
+                        V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT + "/" + URLEncoder.encode(name));
         return Response.created(location).build();
     }
 
