@@ -35,6 +35,40 @@ public class ApplicationListItem  {
     private String description;
     private String image;
     private String accessUrl;
+
+@XmlType(name="AccessEnum")
+@XmlEnum(String.class)
+public enum AccessEnum {
+
+    @XmlEnumValue("READ") READ(String.valueOf("READ")), @XmlEnumValue("WRITE") WRITE(String.valueOf("WRITE"));
+
+
+    private String value;
+
+    AccessEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static AccessEnum fromValue(String value) {
+        for (AccessEnum b : AccessEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private AccessEnum access = AccessEnum.READ;
     private String self;
 
     /**
@@ -129,6 +163,24 @@ public class ApplicationListItem  {
 
     /**
     **/
+    public ApplicationListItem access(AccessEnum access) {
+
+        this.access = access;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("access")
+    @Valid
+    public AccessEnum getAccess() {
+        return access;
+    }
+    public void setAccess(AccessEnum access) {
+        this.access = access;
+    }
+
+    /**
+    **/
     public ApplicationListItem self(String self) {
 
         this.self = self;
@@ -162,12 +214,13 @@ public class ApplicationListItem  {
             Objects.equals(this.description, applicationListItem.description) &&
             Objects.equals(this.image, applicationListItem.image) &&
             Objects.equals(this.accessUrl, applicationListItem.accessUrl) &&
+            Objects.equals(this.access, applicationListItem.access) &&
             Objects.equals(this.self, applicationListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, accessUrl, self);
+        return Objects.hash(id, name, description, image, accessUrl, access, self);
     }
 
     @Override
@@ -181,6 +234,7 @@ public class ApplicationListItem  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
+        sb.append("    access: ").append(toIndentedString(access)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
