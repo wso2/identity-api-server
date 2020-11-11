@@ -142,6 +142,39 @@ public class ServerTenantManagementService {
     }
 
     /**
+     * Get a tenant identified by tenant unique id.
+     *
+     * @param domain tenant domain.
+     * @return TenantResponseModel.
+     */
+    public TenantResponseModel getTenantByDomain(String domain) {
+
+        try {
+            Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenantByDomain(domain);
+            return createTenantResponse(tenant);
+        } catch (TenantMgtException e) {
+            throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_RETRIEVING_TENANT, domain);
+        }
+    }
+
+    /**
+     * Get a tenant identified by tenant domain.
+     *
+     * @param tenantDomain tenant unique identifier.
+     * @return taken or not.
+     */
+    public boolean isDomainAvailable(String tenantDomain) {
+
+        try {
+            return TenantManagementServiceHolder.getTenantMgtService().isDomainAvailable(tenantDomain);
+        } catch (TenantMgtException e) {
+            throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_RETRIEVING_TENANT, tenantDomain);
+        }
+    }
+
+    /**
      * Get owners of a tenant which is identified by tenant unique id.
      *
      * @param tenantUniqueID tenant unique identifier.

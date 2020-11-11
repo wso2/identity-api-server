@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
  */
 public class Constant {
 
-    private static final String CLAIM_MANAGEMENT_PREFIX = "CMT-";
+    public static final String CLAIM_MANAGEMENT_PREFIX = "CMT-";
     public static final String CMT_PATH_COMPONENT = "/claim-dialects";
     public static final String LOCAL_DIALECT_PATH = "local";
     public static final String LOCAL_DIALECT = "http://wso2.org/claims";
@@ -153,8 +153,19 @@ public class Constant {
         ERROR_CODE_EXISTING_EXTERNAL_CLAIM_URI("50038", "Unable to add external claim.",
                 "External claim URI already exists. External claim URI must be unique."),
         ERROR_CODE_EXISTING_LOCAL_CLAIM_URI("50039", "Unable to add local claim.",
-                "Local claim URI already exists. Local claim URI must be unique.")
-        ;
+                "Local claim URI already exists. Local claim URI must be unique."),
+        ERROR_CODE_INVALID_IDENTIFIER("CMT-60001", "Invalid identifier",
+                "Invalid Identifier: %s"),
+        ERROR_CODE_CLAIM_URI_NOT_SPECIFIED("CMT-60002", "Empty claim URI", "Claim URI is " +
+                "not specified in the request"),
+        ERROR_CODE_CLAIM_DISPLAY_NAME_NOT_SPECIFIED("CMT-60003", "Empty display name",
+                "Claim display name is not specified in the request"),
+        ERROR_CODE_CLAIM_DESCRIPTION_NOT_SPECIFIED("CMT-60004", "Empty description",
+                "Claim description is not specified in the request"),
+        ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS("CMT-60005", "Userstore not specified",
+                "Mapped userstore cannot be empty"),
+        ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("CMT-60006", "Attribute mapping not specified",
+                "Attribute mapping cannot be empty");
 
         private final String code;
         private final String message;
@@ -171,20 +182,27 @@ public class Constant {
         }
 
         ErrorMessage(String code, String message, String description) {
+
             this.code = code;
             this.message = message;
             this.description = description;
         }
 
         public String getCode() {
+
+            if (code.contains(CLAIM_MANAGEMENT_PREFIX)) {
+                return code;
+            }
             return CLAIM_MANAGEMENT_PREFIX + code;
         }
 
         public String getMessage() {
+
             return message;
         }
 
         public String getDescription() {
+
             return description;
         }
 

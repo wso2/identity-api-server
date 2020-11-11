@@ -32,6 +32,7 @@ import org.wso2.carbon.identity.claim.metadata.mgt.model.AttributeMapping;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.ClaimDialect;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
+import org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeMappingDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectReqDTO;
@@ -47,6 +48,7 @@ import org.wso2.carbon.user.core.UserStoreManager;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +61,8 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_CLAIMS_NOT_FOUND_FOR_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_DIALECT_NOT_FOUND;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EMPTY_MAPPED_ATTRIBUTES_IN_LOCAL_CLAIM;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_ADDING_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_ADDING_EXTERNAL_CLAIM;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_ADDING_LOCAL_CLAIM;
@@ -83,6 +87,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_LOCAL_CLAIM_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DESCRIPTION;
@@ -106,6 +111,11 @@ public class ServerClaimManagementService {
 
     private static final Log LOG = LogFactory.getLog(ServerClaimManagementService.class);
     private static final String REL_CLAIMS = "claims";
+    private static final List<String> conflictErrorScenarios = Arrays.asList(
+            ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_CLAIM_DIALECT.getCode(),
+            ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_EXTERNAL_CLAIM_URI.getCode(),
+            ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_LOCAL_CLAIM_URI.getCode()
+    );
 
     /**
      * Add a claim dialect.
@@ -244,17 +254,23 @@ public class ServerClaimManagementService {
      */
     public String addLocalClaim(LocalClaimReqDTO localClaimReqDTO) {
 
-        try {
-            for (AttributeMappingDTO attributeMappingDTO :
-                    localClaimReqDTO.getAttributeMapping()) {
-                if (!isUserStoreExists(attributeMappingDTO.getUserstore())) {
-                    throw handleClaimManagementClientError(ERROR_CODE_INVALID_USERSTORE, BAD_REQUEST,
-                            attributeMappingDTO.getUserstore());
-                }
-            }
+        // Validate mandatory attributes.
+        if (StringUtils.isBlank(localClaimReqDTO.getClaimURI())) {
+            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_URI_NOT_SPECIFIED,
+                    BAD_REQUEST);
+        }
+        if (StringUtils.isBlank(localClaimReqDTO.getDisplayName())) {
+            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DISPLAY_NAME_NOT_SPECIFIED,
+                    BAD_REQUEST);
+        }
+        if (StringUtils.isBlank(localClaimReqDTO.getDescription())) {
+            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DESCRIPTION_NOT_SPECIFIED,
+                    BAD_REQUEST);
+        }
 
-            getClaimMetadataManagementService().addLocalClaim(
-                    createLocalClaim(localClaimReqDTO),
+        try {
+            validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
+            getClaimMetadataManagementService().addLocalClaim(createLocalClaim(localClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_ADDING_LOCAL_CLAIM,
@@ -350,28 +366,28 @@ public class ServerClaimManagementService {
      */
     public void updateLocalClaim(String claimId, LocalClaimReqDTO localClaimReqDTO) {
 
-        if (!StringUtils.equals(base64DecodeId(claimId), localClaimReqDTO.getClaimURI())) {
-            throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_CONFLICT, CONFLICT, base64DecodeId(claimId));
-        }
-
         try {
-            for (AttributeMappingDTO attributeMappingDTO :
-                    localClaimReqDTO.getAttributeMapping()) {
-                if (!isUserStoreExists(attributeMappingDTO.getUserstore())) {
-                    throw handleClaimManagementClientError(ERROR_CODE_INVALID_USERSTORE, BAD_REQUEST,
-                            attributeMappingDTO.getUserstore());
-                }
+            if (!StringUtils.equals(base64DecodeId(claimId), localClaimReqDTO.getClaimURI())) {
+                throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_CONFLICT, CONFLICT,
+                        base64DecodeId(claimId));
             }
-
-            getClaimMetadataManagementService().updateLocalClaim(
-                    createLocalClaim(localClaimReqDTO),
+            if (StringUtils.isBlank(localClaimReqDTO.getDisplayName())) {
+                throw handleClaimManagementClientError(
+                        Constant.ErrorMessage.ERROR_CODE_CLAIM_DISPLAY_NAME_NOT_SPECIFIED,
+                        BAD_REQUEST);
+            }
+            if (StringUtils.isBlank(localClaimReqDTO.getDescription())) {
+                throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DESCRIPTION_NOT_SPECIFIED,
+                        BAD_REQUEST);
+            }
+            validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
+            getClaimMetadataManagementService().updateLocalClaim(createLocalClaim(localClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_UPDATING_LOCAL_CLAIM, claimId);
         } catch (UserStoreException e) {
             throw handleException(e, ERROR_CODE_ERROR_ADDING_LOCAL_CLAIM, localClaimReqDTO.getClaimURI());
         }
-
         getResourceId(localClaimReqDTO.getClaimURI());
     }
 
@@ -505,19 +521,17 @@ public class ServerClaimManagementService {
      */
     public void updateExternalClaim(String dialectId, String claimId, ExternalClaimReqDTO externalClaimReqDTO) {
 
-        if (!StringUtils.equals(base64DecodeId(claimId), externalClaimReqDTO.getClaimURI())) {
-            throw handleClaimManagementClientError(ERROR_CODE_EXTERNAL_CLAIM_CONFLICT, CONFLICT,
-                    base64DecodeId(claimId), dialectId);
-        }
-
         try {
+            if (!StringUtils.equals(base64DecodeId(claimId), externalClaimReqDTO.getClaimURI())) {
+                throw handleClaimManagementClientError(ERROR_CODE_EXTERNAL_CLAIM_CONFLICT, CONFLICT,
+                        base64DecodeId(claimId), dialectId);
+            }
             getClaimMetadataManagementService().updateExternalClaim(
                     createExternalClaim(dialectId, externalClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_UPDATING_EXTERNAL_CLAIM, claimId, dialectId);
         }
-
         getResourceId(externalClaimReqDTO.getClaimURI());
     }
 
@@ -564,7 +578,8 @@ public class ServerClaimManagementService {
         return new ClaimDialect(dialectURI);
     }
 
-    private ExternalClaim createExternalClaim(String dialectId, ExternalClaimReqDTO externalClaimReqDTO) {
+    private ExternalClaim createExternalClaim(String dialectId, ExternalClaimReqDTO externalClaimReqDTO)
+            throws ClaimMetadataClientException {
 
         return new ExternalClaim(
                 base64DecodeId(dialectId),
@@ -727,11 +742,16 @@ public class ServerClaimManagementService {
                 .encodeToString(id.getBytes(StandardCharsets.UTF_8));
     }
 
-    private String base64DecodeId(String id) {
+    private String base64DecodeId(String id) throws ClaimMetadataClientException {
 
-        return new String(
-                Base64.getUrlDecoder().decode(id),
-                StandardCharsets.UTF_8);
+        try {
+            return new String(
+                    Base64.getUrlDecoder().decode(id),
+                    StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            throw new ClaimMetadataClientException(Constant.ErrorMessage.ERROR_CODE_INVALID_IDENTIFIER.getCode(),
+                    String.format(Constant.ErrorMessage.ERROR_CODE_INVALID_IDENTIFIER.getDescription(), id));
+        }
     }
 
     private String getResourceId(String val) {
@@ -766,11 +786,36 @@ public class ServerClaimManagementService {
                                                     String... data) {
 
         if (e instanceof ClaimMetadataClientException) {
+            Response.Status status = BAD_REQUEST;
+            // Check for conflicting scenarios.
+            if (isConflictScenario(e.getErrorCode())) {
+                status = CONFLICT;
+            }
+            if (StringUtils.isNotBlank(e.getErrorCode()) &&
+                    e.getErrorCode().contains(Constant.CLAIM_MANAGEMENT_PREFIX)) {
+                return handleClaimManagementClientError(e.getErrorCode(), e.getMessage(), status, data);
+            }
             return handleClaimManagementClientError(Constant.ErrorMessage.getMappedErrorMessage(e.getErrorCode()),
-                    BAD_REQUEST, data);
+                    status, data);
         }
 
         return handleException(e, errorEnum, data);
+    }
+
+    /**
+     * Check for the conflicting (HTTP 409) request scenarios.
+     *
+     * @param errorCode Error code returned by the service.
+     * @return TRUE if the error is a conflict (409) scenario.
+     */
+    private boolean isConflictScenario(String errorCode) {
+
+        return !StringUtils.isBlank(errorCode) && conflictErrorScenarios.contains(errorCode);
+    }
+
+    private APIError handleClaimManagementClientError(Constant.ErrorMessage errorEnum, Response.Status status) {
+
+        return handleClaimManagementClientError(errorEnum, status, StringUtils.EMPTY);
     }
 
     private APIError handleClaimManagementClientError(Constant.ErrorMessage errorEnum, Response.Status status,
@@ -779,6 +824,14 @@ public class ServerClaimManagementService {
         ErrorResponse errorResponse = getErrorBuilder(errorEnum, data)
                 .build(LOG, buildErrorDescription(errorEnum, data));
 
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleClaimManagementClientError(String errorCode, String errorMessage,
+                                                      Response.Status status, String... data) {
+
+        ErrorResponse errorResponse = getErrorBuilder(errorCode, errorMessage, data).
+                build(LOG, buildErrorDescription(errorMessage, data));
         return new APIError(status, errorResponse);
     }
 
@@ -830,6 +883,12 @@ public class ServerClaimManagementService {
                 .withDescription(buildErrorDescription(errorEnum, data));
     }
 
+    private ErrorResponse.Builder getErrorBuilder(String errorCode, String errorMessage, String... data) {
+
+        return new ErrorResponse.Builder().withCode(errorCode).withMessage(errorMessage)
+                .withDescription(buildErrorDescription(errorMessage, data));
+    }
+
     private String buildErrorDescription(Constant.ErrorMessage errorEnum, String... data) {
 
         String errorDescription;
@@ -840,6 +899,17 @@ public class ServerClaimManagementService {
             errorDescription = errorEnum.getDescription();
         }
 
+        return errorDescription;
+    }
+
+    private String buildErrorDescription(String errorMessage, String... data) {
+
+        String errorDescription;
+        if (ArrayUtils.isNotEmpty(data)) {
+            errorDescription = String.format(errorMessage, data);
+        } else {
+            errorDescription = errorMessage;
+        }
         return errorDescription;
     }
 
@@ -871,5 +941,30 @@ public class ServerClaimManagementService {
             });
         }
         return propList;
+    }
+
+    private void validateAttributeMappings(List<AttributeMappingDTO> attributeMappingDTOList)
+            throws UserStoreException {
+
+        if (attributeMappingDTOList == null) {
+            throw handleClaimManagementClientError(ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS, BAD_REQUEST);
+        }
+        String primaryUserstoreDomainName = IdentityUtil.getPrimaryDomainName();
+        for (AttributeMappingDTO attributeMappingDTO : attributeMappingDTOList) {
+            if (StringUtils.isBlank(attributeMappingDTO.getUserstore())) {
+                throw handleClaimManagementClientError(ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS,
+                        BAD_REQUEST, attributeMappingDTO.getUserstore());
+            }
+            // Validating mapped attribute only the userstore is equal to the primary userstore domain name.
+            if (StringUtils.isBlank(attributeMappingDTO.getMappedAttribute()) &&
+                    primaryUserstoreDomainName.equalsIgnoreCase(attributeMappingDTO.getUserstore())) {
+                throw handleClaimManagementClientError(ERROR_CODE_EMPTY_MAPPED_ATTRIBUTES_IN_LOCAL_CLAIM,
+                        BAD_REQUEST, attributeMappingDTO.getUserstore());
+            }
+            if (!isUserStoreExists(attributeMappingDTO.getUserstore())) {
+                throw handleClaimManagementClientError(ERROR_CODE_INVALID_USERSTORE, BAD_REQUEST,
+                        attributeMappingDTO.getUserstore());
+            }
+        }
     }
 }

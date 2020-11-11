@@ -78,7 +78,7 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
         } else if (StringUtils.isNotBlank(authSequenceApiModel.getScript())) {
             AuthenticationScriptConfig adaptiveScript = new AuthenticationScriptConfig();
             adaptiveScript.setContent(authSequenceApiModel.getScript());
-
+            adaptiveScript.setEnabled(true);
             localAndOutboundConfig.setAuthenticationScriptConfig(adaptiveScript);
         }
     }

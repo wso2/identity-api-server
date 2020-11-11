@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package org.wso2.carbon.identity.api.server.userstore.v1.model;
+package org.wso2.carbon.identity.api.server.tenant.management.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -28,45 +28,27 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class Attribute  {
+public class TenantAvailability  {
   
-    private String name;
-    private String value;
+    private Boolean isTaken;
 
     /**
+    * Tenant domain is taken or available.
     **/
-    public Attribute name(String name) {
+    public TenantAvailability isTaken(Boolean isTaken) {
 
-        this.name = name;
+        this.isTaken = isTaken;
         return this;
     }
     
-    @ApiModelProperty(example = "category", value = "")
-    @JsonProperty("name")
+    @ApiModelProperty(example = "true", value = "Tenant domain is taken or available.")
+    @JsonProperty("isTaken")
     @Valid
-    public String getName() {
-        return name;
+    public Boolean getIsTaken() {
+        return isTaken;
     }
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-    **/
-    public Attribute value(String value) {
-
-        this.value = value;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "basic", value = "")
-    @JsonProperty("value")
-    @Valid
-    public String getValue() {
-        return value;
-    }
-    public void setValue(String value) {
-        this.value = value;
+    public void setIsTaken(Boolean isTaken) {
+        this.isTaken = isTaken;
     }
 
 
@@ -80,24 +62,22 @@ public class Attribute  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Attribute attribute = (Attribute) o;
-        return Objects.equals(this.name, attribute.name) &&
-            Objects.equals(this.value, attribute.value);
+        TenantAvailability tenantAvailability = (TenantAvailability) o;
+        return Objects.equals(this.isTaken, tenantAvailability.isTaken);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, value);
+        return Objects.hash(isTaken);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class Attribute {\n");
+        sb.append("class TenantAvailability {\n");
         
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    value: ").append(toIndentedString(value)).append("\n");
+        sb.append("    isTaken: ").append(toIndentedString(isTaken)).append("\n");
         sb.append("}");
         return sb.toString();
     }

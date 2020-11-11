@@ -54,6 +54,9 @@ public class TenantManagementConstants {
                 "supported in this version of the API."),
         ERROR_CODE_ERROR_VALIDATING_TENANT_CODE("TM-65007",
                                                "Unable to add tenant.", "Error occurred in validating the code."),
+        ERROR_CODE_ERROR_CHECKING_TENANT_AVAILABILITY("TM-65008",
+                                                        "Unable to check availability of domain.",
+                "Server encountered an error while checking for tenant domain"),
         ERROR_CODE_DELETE_TENANT_METADATA("TM-65008", "Error while deleting the tenant metadata.",
                 "Server encountered an error while deleting the tenant metadata identified by %s .");
 
