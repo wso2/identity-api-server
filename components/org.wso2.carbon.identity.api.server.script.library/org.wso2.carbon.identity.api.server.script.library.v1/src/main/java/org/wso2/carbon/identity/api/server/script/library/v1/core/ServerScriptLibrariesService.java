@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.functions.library.mgt.model.FunctionLibrary;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -281,20 +282,21 @@ public class ServerScriptLibrariesService {
      */
     private ScriptLibraryResponse createScriptLibraryResponse(FunctionLibrary scriptLibrary) {
 
-        String displayName;
-
         ScriptLibraryResponse scriptLibraryResponse = new ScriptLibraryResponse();
         scriptLibraryResponse.setName(scriptLibrary.getFunctionLibraryName());
         scriptLibraryResponse.setDescription(scriptLibrary.getDescription());
-
-
-        displayName = URLEncoder.encode(scriptLibrary.getFunctionLibraryName());
-        scriptLibraryResponse.setContentRef(ContextLoader.buildURIForBody(String.format(
-                V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT + "/" + displayName + SCRIPT_LIBRARY_CONTENT_PATH,
-                displayName)).toString().replace("+", "%20"));
-
-
-        return scriptLibraryResponse;
+        try {
+            String displayName =
+                    URLEncoder.encode(scriptLibrary.getFunctionLibraryName(), StandardCharsets.UTF_8.name());
+            scriptLibraryResponse.setContentRef(ContextLoader.buildURIForBody(String.format(
+                    V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT + "/%s" + SCRIPT_LIBRARY_CONTENT_PATH,
+                    displayName)).toString().replace("+", "%20"));
+            return scriptLibraryResponse;
+        } catch (UnsupportedEncodingException e) {
+            FunctionLibraryManagementException error = new FunctionLibraryManagementException(
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL.getMessage(), e);
+            throw handleScriptLibraryError(error, Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL);
+        }
     }
 
     /**
@@ -391,7 +393,8 @@ public class ServerScriptLibrariesService {
      * @param errorEnum Error Message information.
      * @return APIError.
      */
-    private APIError handleScriptLibraryError(FunctionLibraryManagementException e, Constants.ErrorMessage errorEnum) {
+    public static APIError handleScriptLibraryError(FunctionLibraryManagementException e,
+                                                    Constants.ErrorMessage errorEnum) {
 
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(log, e, errorEnum.getDescription());
         Response.Status status;
@@ -415,7 +418,7 @@ public class ServerScriptLibrariesService {
      * @param e             FunctionLibraryManagementException
      * @param errorResponse ErrorResponse
      */
-    private void createErrorResponse(FunctionLibraryManagementException e, ErrorResponse errorResponse) {
+    public static void createErrorResponse(FunctionLibraryManagementException e, ErrorResponse errorResponse) {
 
         if (e.getErrorCode() != null) {
             String errorCode = e.getErrorCode();
@@ -433,7 +436,7 @@ public class ServerScriptLibrariesService {
      * @param errorMsg Error Message information.
      * @return ErrorResponse.Builder.
      */
-    private ErrorResponse.Builder getErrorBuilder(Constants.ErrorMessage errorMsg) {
+    public static ErrorResponse.Builder getErrorBuilder(Constants.ErrorMessage errorMsg) {
 
         return new ErrorResponse.Builder().withCode(errorMsg.getCode()).withMessage(errorMsg.getMessage())
                 .withDescription(errorMsg.getDescription());

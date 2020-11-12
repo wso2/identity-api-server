@@ -51,7 +51,9 @@ public class Constants {
         ERROR_SCRIPT_LIBRARY_NAME_VALIDATION("60008", "Invalid script library name.",
                 "Script library name should include the .js extension."),
         ERROR_SCRIPT_LIBRARY_OFFSET_VALIDATION("60009", "Invalid offset.",
-                "Offset should be greater than or equal to 0");
+                "Offset should be greater than or equal to 0"),
+        ERROR_CODE_ERROR_ENCODING_URL("60010", "Error while encoding the script library name.",
+                "Server encountered an error while encoding the script library name %s.");
 
         private final String code;
         private final String message;
