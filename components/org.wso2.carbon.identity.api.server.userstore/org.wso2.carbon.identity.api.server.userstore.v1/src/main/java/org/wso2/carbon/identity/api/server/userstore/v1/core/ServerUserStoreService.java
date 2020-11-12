@@ -50,6 +50,7 @@ import org.wso2.carbon.user.api.Properties;
 import org.wso2.carbon.user.api.Property;
 import org.wso2.carbon.user.api.RealmConfiguration;
 import org.wso2.carbon.user.core.UserCoreConstants;
+import org.wso2.carbon.user.core.UserStoreConfigConstants;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
 
@@ -232,7 +233,11 @@ public class ServerUserStoreService {
             for (Map.Entry<String, String> entry : userstoreProps.entrySet()) {
                 AddUserStorePropertiesRes userStorePropertiesRes = new AddUserStorePropertiesRes();
                 userStorePropertiesRes.setName(entry.getKey());
-                userStorePropertiesRes.setValue(entry.getValue());
+                if (UserStoreConfigConstants.connectionPassword.equals(entry.getKey())) {
+                    userStorePropertiesRes.setValue(UserStoreConstants.USER_STORE_PROPERTY_MASK);
+                } else {
+                    userStorePropertiesRes.setValue(entry.getValue());
+                }
                 propertiesTobeAdd.add(userStorePropertiesRes);
             }
         }
