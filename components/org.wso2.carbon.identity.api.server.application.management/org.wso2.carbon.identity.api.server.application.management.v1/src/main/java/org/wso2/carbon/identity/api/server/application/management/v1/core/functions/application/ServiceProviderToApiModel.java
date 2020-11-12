@@ -36,6 +36,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConf
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
@@ -47,11 +48,13 @@ import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
+import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -64,6 +67,9 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
     private static final Log log = LogFactory.getLog(ServiceProviderToApiModel.class);
 
+    private static final Set<String> systemApplications = ApplicationManagementServiceHolder
+            .getApplicationManagementService().getSystemApplications();
+
     @Override
     public ApplicationResponseModel apply(ServiceProvider application) {
 
@@ -72,7 +78,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .id(application.getApplicationResourceId())
                     .name(application.getApplicationName())
                     .description(application.getDescription())
-                    .provisioningConfigurations(buildProvisioningConfiguration(application));
+                    .provisioningConfigurations(buildProvisioningConfiguration(application))
+                    .access(ApplicationResponseModel.AccessEnum.READ);
         } else {
             return new ApplicationResponseModel()
                     .id(application.getApplicationResourceId())
@@ -85,7 +92,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .inboundProtocols(buildInboundProtocols(application))
                     .advancedConfigurations(buildAdvancedAppConfiguration(application))
                     .provisioningConfigurations(buildProvisioningConfiguration(application))
-                    .authenticationSequence(buildAuthenticationSequence(application));
+                    .authenticationSequence(buildAuthenticationSequence(application))
+                    .access(getAccess(application.getApplicationName()));
         }
     }
 
@@ -357,5 +365,25 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         // TODO: will claim id and display name.
         return new Claim().uri(claimUri);
+    }
+
+    private ApplicationResponseModel.AccessEnum getAccess(String applicationName) {
+
+        String username = ContextLoader.getUsernameFromContext();
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+
+        try {
+            if (ApplicationConstants.LOCAL_SP.equals(applicationName) ||
+                    (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && systemApplications != null
+                            && systemApplications.stream().anyMatch(applicationName::equalsIgnoreCase)) ||
+                    !ApplicationMgtUtil.isUserAuthorized(applicationName, username)) {
+                return ApplicationResponseModel.AccessEnum.READ;
+            }
+        } catch (IdentityApplicationManagementException e) {
+            log.error("Failed to check user authorization for the application: " + applicationName, e);
+            return ApplicationResponseModel.AccessEnum.READ;
+        }
+
+        return ApplicationResponseModel.AccessEnum.WRITE;
     }
 }

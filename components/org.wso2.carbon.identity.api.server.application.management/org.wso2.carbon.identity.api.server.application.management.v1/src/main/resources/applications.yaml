@@ -2277,6 +2277,12 @@ components:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
           $ref: '#/components/schemas/ProvisioningConfiguration'
+        access:
+          type: string
+          enum:
+            - READ
+            - WRITE
+          default: READ
 
     ApplicationPatchModel:
       type: object
