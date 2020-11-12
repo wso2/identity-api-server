@@ -28,6 +28,7 @@ public class UserStoreConstants {
     public static final String USER_STORE_CLASS_NAME = "/className";
     public static final String USER_STORE_DOMAIN_NAME = "/domainName";
     public static final String USER_STORE_PROPERTIES = "/properties/";
+    public static final String USER_STORE_PROPERTY_MASK = "************";
 
     /**
      * Enum for user store related errors in the format of
