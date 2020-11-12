@@ -50,6 +50,40 @@ public class ApplicationResponseModel  {
     private AdvancedApplicationConfiguration advancedConfigurations;
     private ProvisioningConfiguration provisioningConfigurations;
 
+@XmlType(name="AccessEnum")
+@XmlEnum(String.class)
+public enum AccessEnum {
+
+    @XmlEnumValue("READ") READ(String.valueOf("READ")), @XmlEnumValue("WRITE") WRITE(String.valueOf("WRITE"));
+
+
+    private String value;
+
+    AccessEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static AccessEnum fromValue(String value) {
+        for (AccessEnum b : AccessEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private AccessEnum access = AccessEnum.READ;
+
     /**
     **/
     public ApplicationResponseModel id(String id) {
@@ -258,6 +292,24 @@ public class ApplicationResponseModel  {
         this.provisioningConfigurations = provisioningConfigurations;
     }
 
+    /**
+    **/
+    public ApplicationResponseModel access(AccessEnum access) {
+
+        this.access = access;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("access")
+    @Valid
+    public AccessEnum getAccess() {
+        return access;
+    }
+    public void setAccess(AccessEnum access) {
+        this.access = access;
+    }
+
 
 
     @Override
@@ -280,12 +332,13 @@ public class ApplicationResponseModel  {
             Objects.equals(this.inboundProtocols, applicationResponseModel.inboundProtocols) &&
             Objects.equals(this.authenticationSequence, applicationResponseModel.authenticationSequence) &&
             Objects.equals(this.advancedConfigurations, applicationResponseModel.advancedConfigurations) &&
-            Objects.equals(this.provisioningConfigurations, applicationResponseModel.provisioningConfigurations);
+            Objects.equals(this.provisioningConfigurations, applicationResponseModel.provisioningConfigurations) &&
+            Objects.equals(this.access, applicationResponseModel.access);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
     }
 
     @Override
@@ -305,6 +358,7 @@ public class ApplicationResponseModel  {
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
         sb.append("    provisioningConfigurations: ").append(toIndentedString(provisioningConfigurations)).append("\n");
+        sb.append("    access: ").append(toIndentedString(access)).append("\n");
         sb.append("}");
         return sb.toString();
     }
