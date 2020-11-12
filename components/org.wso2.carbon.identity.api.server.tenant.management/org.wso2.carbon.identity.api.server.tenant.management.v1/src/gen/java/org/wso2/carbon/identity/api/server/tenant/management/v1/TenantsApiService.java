@@ -35,6 +35,8 @@ public interface TenantsApiService {
 
       public Response addTenant(TenantModel tenantModel);
 
+      public Response deleteTenantMetadata(String tenantId);
+
       public Response getOwners(String tenantId);
 
       public Response getTenant(String tenantId);

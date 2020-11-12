@@ -70,6 +70,30 @@ public class TenantsApi  {
     }
 
     @Valid
+    @DELETE
+    @Path("/{tenant-id}/metadata")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete tenant's metadata by ID ", notes = "This API provides the capability to delete the tenant meta data(tenant specific data like tenant domain, tenant owner details). <br>   <b>Permission required:</b> <br>       * /permission/protected/manage/modify/tenants <br>   <b>Scope required:</b> <br>       * internal_modify_tenants ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Tenants", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteTenantMetadata(@ApiParam(value = "tenant id",required=true) @PathParam("tenant-id") String tenantId) {
+
+        return delegate.deleteTenantMetadata(tenantId );
+    }
+
+    @Valid
     @GET
     @Path("/{tenant-id}/owners")
     
