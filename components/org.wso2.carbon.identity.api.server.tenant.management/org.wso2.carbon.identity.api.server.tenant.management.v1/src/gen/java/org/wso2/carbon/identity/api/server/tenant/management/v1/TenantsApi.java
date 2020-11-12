@@ -74,7 +74,7 @@ public class TenantsApi  {
     @Path("/{tenant-id}/metadata")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete tenant's metadata by ID ", notes = "This API provides the capability to delete the tenant meta data(tenant specific data like tenant domain, tenant owner details). <br>   <b>Permission required:</b> <br>       * /permission/protected/manage/modify/tenants <br>   <b>Scope required:</b> <br>       * internal_tenant_metadata_delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete tenant's metadata by ID ", notes = "This API provides the capability to delete the tenant meta data(tenant specific data like tenant domain, tenant owner details). <br>   <b>Permission required:</b> <br>       * /permission/protected/manage/modify/tenants <br>   <b>Scope required:</b> <br>       * internal_modify_tenants ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
