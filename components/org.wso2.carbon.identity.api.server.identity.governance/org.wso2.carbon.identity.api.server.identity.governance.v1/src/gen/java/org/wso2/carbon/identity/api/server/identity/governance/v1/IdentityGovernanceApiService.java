@@ -25,6 +25,8 @@ import org.wso2.carbon.identity.api.server.identity.governance.v1.model.Category
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorsPatchReq;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.Error;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceSearchAttribute;
 import javax.ws.rs.core.Response;
 
 
@@ -37,6 +39,8 @@ public interface IdentityGovernanceApiService {
       public Response getConnectorCategory(String categoryId);
 
       public Response getConnectorsOfCategory(String categoryId);
+
+      public Response getPreferenceByPost(List<PreferenceSearchAttribute> preferenceSearchAttribute);
 
       public Response patchConnector(String categoryId, String connectorId, ConnectorsPatchReq connectorsPatchReq);
 }
