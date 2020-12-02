@@ -38,9 +38,6 @@ paths:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
         - $ref: '#/components/parameters/filterQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
-        - $ref: '#/components/parameters/sortByQueryParam'
-        - $ref: '#/components/parameters/requiredAttributesQueryParam'
       responses:
         '200':
           description: Successful Response
@@ -1424,9 +1421,9 @@ paths:
         List identity provider templates
       description: >
         This API provides the list of available identity provider templates.
-        <br> <b>Permission required:</b> <br>	
-          * /permission/admin/manage/identity/idpmgt/view	
-        <br> <b>Scope required:</b> <br>	
+        <br> <b>Permission required:</b> <br>  
+          * /permission/admin/manage/identity/idpmgt/view  
+        <br> <b>Scope required:</b> <br>  
           * internal_idp_view
       operationId: getIDPTemplates
       parameters:
@@ -1468,10 +1465,10 @@ paths:
       summary: |
         Create a new IdP template
       description: >
-        This API provides the capability to create a new IdP template.<br>	
-        <b>Permission required:</b> <br>	
-          * /permission/admin/manage/identity/idpmgt/create <br>	
-        <b>Scope required:</b> <br>	
+        This API provides the capability to create a new IdP template.<br>  
+        <b>Permission required:</b> <br>  
+          * /permission/admin/manage/identity/idpmgt/create <br>  
+        <b>Scope required:</b> <br>  
           * internal_idp_create
       operationId: addIDPTemplate
       responses:
@@ -1530,10 +1527,10 @@ paths:
       summary: |
         Retrieve identity provider template by ID
       description: >
-        This API provides the capability to retrieve an identity provider template using its ID. <br>	
-        <b>Permission required:</b> <br>	
-          * /permission/admin/manage/identity/idpmgt/view <br>	
-        <b>Scope required:</b> <br>	
+        This API provides the capability to retrieve an identity provider template using its ID. <br>  
+        <b>Permission required:</b> <br>  
+          * /permission/admin/manage/identity/idpmgt/view <br>  
+        <b>Scope required:</b> <br>  
           * internal_idp_view
       operationId: getIDPTemplate
       parameters:
@@ -1590,10 +1587,10 @@ paths:
       summary: |
         Update the IdP template of a given template ID.
       description: >
-        This API provides the capability to update the IdP template of a given template ID. <br>	
-        <b>Permission required:</b> <br>	
-          * /permission/admin/manage/identity/idpmgt/update <br>	
-        <b>Scope required:</b> <br>	
+        This API provides the capability to update the IdP template of a given template ID. <br>  
+        <b>Permission required:</b> <br>  
+          * /permission/admin/manage/identity/idpmgt/update <br>  
+        <b>Scope required:</b> <br>  
           * internal_idp_update
       operationId: updateIDPTemplate
       parameters:
@@ -1654,10 +1651,10 @@ paths:
         Delete an IdP template using the template ID.
       description: >
         This API provides the capability to delete an IdP template using the template ID.
-        <br>	
-        <b>Permission required:</b> <br>	
-           * /permission/admin/manage/identity/idpmgt/delete <br>	
-        <b>Scope required:</b> <br>	
+        <br>  
+        <b>Permission required:</b> <br>  
+           * /permission/admin/manage/identity/idpmgt/delete <br>  
+        <b>Scope required:</b> <br>  
            * internal_idp_delete
       operationId: deleteIDPTemplate
       parameters:
@@ -1725,36 +1722,6 @@ components:
         Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew'
         and 'eq' operations and also complex queries with 'and' operations. E.g.
         /identity-providers?filter=name+sw+"google"+and+isEnabled+eq+"true"
-      schema:
-        type: string
-    sortQueryParam:
-      in: query
-      name: sortOrder
-      required: false
-      description: |
-        Defines the order in which the retrieved records should be sorted.
-        _This parameter is not supported yet_
-      schema:
-        type: string
-        enum:
-          - ASC
-          - DESC
-    sortByQueryParam:
-      in: query
-      name: sortBy
-      required: false
-      description: |
-        Attribute by which the retrieved records should be sorted.
-        _This parameter is not supported yet_
-      schema:
-        type: string
-    requiredAttributesQueryParam:
-      in: query
-      name: requiredAttributes
-      required: false
-      description: |
-        Specifies the required parameters in the response.
-        _This parameter is not supported yet_
       schema:
         type: string
     forceQueryParam:
