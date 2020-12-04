@@ -16,15 +16,11 @@
 
 package org.wso2.carbon.identity.api.server.identity.governance.v1;
 
-import org.wso2.carbon.identity.api.server.identity.governance.v1.*;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.*;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoriesRes;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryRes;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorsPatchReq;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.model.Error;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceSearchAttribute;
+
+import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 
@@ -37,6 +33,8 @@ public interface IdentityGovernanceApiService {
       public Response getConnectorCategory(String categoryId);
 
       public Response getConnectorsOfCategory(String categoryId);
+
+      public Response getPreferenceByPost(List<PreferenceSearchAttribute> preferenceSearchAttribute);
 
       public Response patchConnector(String categoryId, String connectorId, ConnectorsPatchReq connectorsPatchReq);
 }

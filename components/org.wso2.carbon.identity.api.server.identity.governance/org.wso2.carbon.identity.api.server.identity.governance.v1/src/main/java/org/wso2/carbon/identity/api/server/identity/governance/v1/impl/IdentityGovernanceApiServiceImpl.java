@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.IdentityGovernanceApiService;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.core.ServerIdentityGovernanceService;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorsPatchReq;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceSearchAttribute;
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -61,5 +63,11 @@ public class IdentityGovernanceApiServiceImpl implements IdentityGovernanceApiSe
 
         identityGovernanceService.updateGovernanceConnectorProperty(categoryId, connectorId, governanceConnector);
         return Response.ok().build();
+    }
+
+    @Override
+    public Response getPreferenceByPost(List<PreferenceSearchAttribute> preferenceSearchAttribute) {
+
+        return Response.ok().entity(identityGovernanceService.getConfigPreference(preferenceSearchAttribute)).build();
     }
 }
