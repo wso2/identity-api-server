@@ -1339,7 +1339,7 @@ public class ServerIdpManagementService {
     private APIError handleTemplateMgtException(TemplateManagementException e, Constants.ErrorMessage errorEnum,
                                                 String data) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(errorEnum, data));
 
         Response.Status status;
 
@@ -2705,7 +2705,7 @@ public class ServerIdpManagementService {
     private APIError handleIdPException(IdentityProviderManagementException e,
                                         Constants.ErrorMessage errorEnum, String data) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(errorEnum, data));
 
         Response.Status status;
 
