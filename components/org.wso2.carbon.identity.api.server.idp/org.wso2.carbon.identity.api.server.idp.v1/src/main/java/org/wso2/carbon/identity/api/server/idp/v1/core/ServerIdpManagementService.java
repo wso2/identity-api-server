@@ -1482,6 +1482,11 @@ public class ServerIdpManagementService {
                     validateSamlMetadata(authProperties);
                 }
                 if (authProperties != null) {
+                    if (!areAllDistinct(authProperties)) {
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, " Duplicate properties are found in " +
+                                        "the request.");
+                    }
                     List<Property> properties = authProperties.stream()
                             .map(propertyToInternal)
                             .collect(Collectors.toList());
@@ -1540,8 +1545,15 @@ public class ServerIdpManagementService {
                 connectorConfig.setName(base64URLDecode(connector.getConnectorId()));
                 connectorConfig.setEnabled(connector.getIsEnabled());
 
-                if (connector.getProperties() != null) {
-                    List<Property> properties = connector.getProperties().stream()
+                List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> connectorProperties = connector
+                        .getProperties();
+                if (connectorProperties != null) {
+                    if (!areAllDistinct(connectorProperties)) {
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, " Duplicate properties are found in " +
+                                        "the request.");
+                    }
+                    List<Property> properties = connectorProperties.stream()
                             .map(propertyToInternal)
                             .collect(Collectors.toList());
                     connectorConfig.setProvisioningProperties(properties.toArray(new Property[0]));
@@ -2772,7 +2784,7 @@ public class ServerIdpManagementService {
         if (StringUtils.isNotBlank(data)) {
             message = String.format(error.getDescription(), data);
         } else {
-            message = error.getDescription();
+            message = String.format(error.getDescription(), "");
         }
         return message;
     }
@@ -2900,5 +2912,16 @@ public class ServerIdpManagementService {
                     Constants.ErrorMessage.ERROR_CODE_VALIDATING_LOCAL_CLAIM_URIS.getCode(),
                     Constants.ErrorMessage.ERROR_CODE_VALIDATING_LOCAL_CLAIM_URIS.getDescription());
         }
+    }
+
+    /**
+     * Check whether the keys of all the properties are distinct
+     * @param properties
+     * @return
+     */
+    boolean areAllDistinct(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties) {
+        return properties.stream()
+                .map(org.wso2.carbon.identity.api.server.idp.v1.model.Property::getKey)
+                .distinct().count() == properties.size();
     }
 }
