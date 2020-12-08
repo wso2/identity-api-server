@@ -25,6 +25,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ProvisioningConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.RealmConfig;
 import javax.validation.constraints.*;
 
 
@@ -37,6 +38,7 @@ public class ServerConfig  {
   
     private List<String> homeRealmIdentifiers = null;
 
+    private RealmConfig realmConfig;
     private String idleSessionTimeoutPeriod = "15";
     private String rememberMePeriod = "20160";
     private ProvisioningConfig provisioning;
@@ -72,6 +74,24 @@ public class ServerConfig  {
     }
 
         /**
+    **/
+    public ServerConfig realmConfig(RealmConfig realmConfig) {
+
+        this.realmConfig = realmConfig;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("realmConfig")
+    @Valid
+    public RealmConfig getRealmConfig() {
+        return realmConfig;
+    }
+    public void setRealmConfig(RealmConfig realmConfig) {
+        this.realmConfig = realmConfig;
+    }
+
+    /**
     * The idle session timeout in minutes
     **/
     public ServerConfig idleSessionTimeoutPeriod(String idleSessionTimeoutPeriod) {
@@ -184,6 +204,7 @@ public class ServerConfig  {
         }
         ServerConfig serverConfig = (ServerConfig) o;
         return Objects.equals(this.homeRealmIdentifiers, serverConfig.homeRealmIdentifiers) &&
+            Objects.equals(this.realmConfig, serverConfig.realmConfig) &&
             Objects.equals(this.idleSessionTimeoutPeriod, serverConfig.idleSessionTimeoutPeriod) &&
             Objects.equals(this.rememberMePeriod, serverConfig.rememberMePeriod) &&
             Objects.equals(this.provisioning, serverConfig.provisioning) &&
@@ -193,7 +214,7 @@ public class ServerConfig  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(homeRealmIdentifiers, idleSessionTimeoutPeriod, rememberMePeriod, provisioning, authenticators, cors);
+        return Objects.hash(homeRealmIdentifiers, realmConfig, idleSessionTimeoutPeriod, rememberMePeriod, provisioning, authenticators, cors);
     }
 
     @Override
@@ -203,6 +224,7 @@ public class ServerConfig  {
         sb.append("class ServerConfig {\n");
         
         sb.append("    homeRealmIdentifiers: ").append(toIndentedString(homeRealmIdentifiers)).append("\n");
+        sb.append("    realmConfig: ").append(toIndentedString(realmConfig)).append("\n");
         sb.append("    idleSessionTimeoutPeriod: ").append(toIndentedString(idleSessionTimeoutPeriod)).append("\n");
         sb.append("    rememberMePeriod: ").append(toIndentedString(rememberMePeriod)).append("\n");
         sb.append("    provisioning: ").append(toIndentedString(provisioning)).append("\n");

@@ -377,6 +377,9 @@ components:
           items:
             type: string
             example: "localhost"
+        realmConfig:
+          readOnly: true
+          $ref: '#/components/schemas/RealmConfig'
         idleSessionTimeoutPeriod:
           type: string
           description: "The idle session timeout in minutes"
@@ -393,6 +396,24 @@ components:
           $ref: '#/components/schemas/AuthenticatorListResponse'
         cors:
           $ref: '#/components/schemas/CORSConfig'
+    RealmConfig:
+      type: object
+      properties:
+        adminUser:
+            type: string
+            description: "Username of the super admin user in the system."
+            example: "admin"
+            readOnly: true
+        adminRole:
+            type: string
+            description: "Name of the super admin role in the system."
+            example: "Internal/admin"
+            readOnly: true
+        everyoneRole:
+            type: string
+            description: "Name of the everyone role in the system."
+            example: "Internal/everyone"
+            readOnly: true
     ProvisioningConfig:
       type: object
       properties:
