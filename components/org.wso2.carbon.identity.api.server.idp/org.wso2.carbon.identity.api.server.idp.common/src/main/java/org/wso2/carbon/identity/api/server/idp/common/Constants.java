@@ -107,7 +107,7 @@ public class Constants {
         ERROR_CODE_INVALID_LOCAL_CLAIM_ID("60024",
                 "Invalid claim uri.",
                 "Invalid claim uri %s provided in claim config."),
-        ERROR_CODE_INVALID_INPUT("60025", "Invalid input.", "One of the given inputs is invalid."),
+        ERROR_CODE_INVALID_INPUT("60025", "Invalid input.", "One of the given inputs is invalid.%s"),
         ERROR_CODE_INVALID_SAML_METADATA("60026", "Invalid SAML metadata.", "SAML metadata is invalid/empty."),
         ERROR_CODE_INVALID_DEFAULT_AUTHENTICATOR("60027", "Invalid default authenticator ID",
                 "Provided value for the default authenticator ID is invalid."),
