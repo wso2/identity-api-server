@@ -16,7 +16,6 @@
 
 package org.wso2.carbon.identity.api.server.identity.governance.v1.core;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -188,22 +187,17 @@ public class ServerIdentityGovernanceService {
             List<String> prefSearchAttrProperties = prefSearchAttr.getProperties();
             Property[] properties;
             try {
-                if (CollectionUtils.isNotEmpty(prefSearchAttrProperties)) {
-                    String[] propertiesArray =
-                            prefSearchAttrProperties.toArray(new String[prefSearchAttrProperties.size()]);
-                    properties = identityGovernanceService.getConfiguration(propertiesArray, tenantDomain);
-                } else {
-                    ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(tenantDomain,
-                            connectorName);
-                    if (connectorConfig == null) {
-                        Response.Status status = Response.Status.BAD_REQUEST;
-                        throw handleException(new IdentityGovernanceException(GovernanceConstants.ErrorMessage
-                                .ERROR_CODE_INCORRECT_CONNECTOR_NAME.getMessage()), GovernanceConstants.
-                                ErrorMessage.ERROR_CODE_INCORRECT_CONNECTOR_NAME, status, connectorName);
-                    }
-                    properties = connectorConfig.getProperties();
+                ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(tenantDomain,
+                        connectorName);
+                if (connectorConfig == null) {
+                    Response.Status status = Response.Status.BAD_REQUEST;
+                    throw handleException(new IdentityGovernanceException(GovernanceConstants.ErrorMessage
+                            .ERROR_CODE_INCORRECT_CONNECTOR_NAME.getMessage()), GovernanceConstants.
+                            ErrorMessage.ERROR_CODE_INCORRECT_CONNECTOR_NAME, status, connectorName);
                 }
-                PreferenceResp preferenceResp = buildPreferenceRespDTO(connectorName, properties);
+                properties = connectorConfig.getProperties();
+                PreferenceResp preferenceResp =
+                        buildPreferenceRespDTO(connectorName, properties, prefSearchAttrProperties);
                 preferenceRespList.add(preferenceResp);
             } catch (IdentityGovernanceException e) {
                 GovernanceConstants.ErrorMessage errorEnum =
@@ -215,21 +209,25 @@ public class ServerIdentityGovernanceService {
         return preferenceRespList;
     }
 
-    private PreferenceResp buildPreferenceRespDTO(String connectorName, Property[]
-            properties) {
+    private PreferenceResp buildPreferenceRespDTO(String connectorName, Property[] properties,
+                                                  List<String> prefSearchAttrProperties) {
 
         PreferenceResp preferenceResp = new PreferenceResp();
-        List<PropertyReq> propertyReqList = buildPropertyReqDTO(properties);
+        List<PropertyReq> propertyReqList = buildPropertyReqDTO(properties, prefSearchAttrProperties);
         preferenceResp.setProperties(propertyReqList);
         preferenceResp.setConnectorName(connectorName);
 
         return preferenceResp;
     }
 
-    private List<PropertyReq> buildPropertyReqDTO(Property[] properties) {
+    private List<PropertyReq> buildPropertyReqDTO(Property[] properties, List<String> prefSearchAttrProperties) {
 
         List<PropertyReq> propertyReqList = new ArrayList<>();
         for (Property property : properties) {
+            if (property.isConfidential() || (prefSearchAttrProperties != null && !prefSearchAttrProperties.contains
+                    (property.getName()))) {
+                continue;
+            }
             PropertyReq propertyReq = new PropertyReq();
             propertyReq.setName(property.getName());
             propertyReq.setValue(property.getValue());
