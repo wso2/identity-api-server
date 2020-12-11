@@ -184,7 +184,7 @@ public class ServerIdentityGovernanceService {
         List<PreferenceResp> preferenceRespList = new ArrayList<>();
         for (PreferenceSearchAttribute prefSearchAttr : preferenceSearchAttribute) {
             String connectorName = prefSearchAttr.getConnectorName();
-            List<String> prefSearchAttrProperties = prefSearchAttr.getProperties();
+            List<String> expectedProperties = prefSearchAttr.getProperties();
             Property[] properties;
             try {
                 ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(tenantDomain,
@@ -197,7 +197,7 @@ public class ServerIdentityGovernanceService {
                 }
                 properties = connectorConfig.getProperties();
                 PreferenceResp preferenceResp =
-                        buildPreferenceRespDTO(connectorName, properties, prefSearchAttrProperties);
+                        buildPreferenceRespDTO(connectorName, properties, expectedProperties);
                 preferenceRespList.add(preferenceResp);
             } catch (IdentityGovernanceException e) {
                 GovernanceConstants.ErrorMessage errorEnum =
@@ -210,30 +210,64 @@ public class ServerIdentityGovernanceService {
     }
 
     private PreferenceResp buildPreferenceRespDTO(String connectorName, Property[] properties,
-                                                  List<String> prefSearchAttrProperties) {
+                                                  List<String> expectedProperties) {
 
         PreferenceResp preferenceResp = new PreferenceResp();
-        List<PropertyReq> propertyReqList = buildPropertyReqDTO(properties, prefSearchAttrProperties);
+        List<PropertyReq> propertyReqList = buildPropertyReqDTO(properties, expectedProperties);
         preferenceResp.setProperties(propertyReqList);
         preferenceResp.setConnectorName(connectorName);
 
         return preferenceResp;
     }
 
-    private List<PropertyReq> buildPropertyReqDTO(Property[] properties, List<String> prefSearchAttrProperties) {
+    private List<PropertyReq> buildPropertyReqDTO(Property[] properties, List<String> expectedProperties) {
+
+        if (expectedProperties != null) {
+            return buildPropertyReqForExpectedAttributes(properties, expectedProperties);
+        }
+        return buildPropertyReqForAllProperties(properties);
+
+    }
+
+    private List<PropertyReq> buildPropertyReqForAllProperties(Property[] properties) {
 
         List<PropertyReq> propertyReqList = new ArrayList<>();
         for (Property property : properties) {
-            if (property.isConfidential() || (prefSearchAttrProperties != null && !prefSearchAttrProperties.contains
-                    (property.getName()))) {
+            if (property.isConfidential()) {
                 continue;
             }
-            PropertyReq propertyReq = new PropertyReq();
-            propertyReq.setName(property.getName());
-            propertyReq.setValue(property.getValue());
-            propertyReqList.add(propertyReq);
+            createPropertyRequest(propertyReqList, property);
         }
         return propertyReqList;
+    }
+
+    private List<PropertyReq> buildPropertyReqForExpectedAttributes(Property[] properties,
+                                                                    List<String> expectedProperties) {
+
+        List<PropertyReq> propertyReqList = new ArrayList<>();
+        Map<String, Property> propertyMap = new HashMap<>();
+        for (Property property : properties) {
+            propertyMap.put(property.getName(), property);
+        }
+        for (String expectedProperty : expectedProperties) {
+            Property property = propertyMap.get(expectedProperty);
+            if (property == null || property.isConfidential()) {
+                throw handleException(new IdentityGovernanceException(GovernanceConstants.ErrorMessage
+                                .ERROR_CODE_UNSUPPORTED_PROPERTY_NAME.getMessage()), GovernanceConstants.
+                                ErrorMessage.ERROR_CODE_UNSUPPORTED_PROPERTY_NAME, Response.Status.BAD_REQUEST,
+                        expectedProperty);
+            }
+            createPropertyRequest(propertyReqList, property);
+        }
+        return propertyReqList;
+    }
+
+    private void createPropertyRequest(List<PropertyReq> propertyReqList, Property property) {
+
+        PropertyReq propertyReq = new PropertyReq();
+        propertyReq.setName(property.getName());
+        propertyReq.setValue(property.getValue());
+        propertyReqList.add(propertyReq);
     }
 
     /**
