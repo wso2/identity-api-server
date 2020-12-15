@@ -112,7 +112,7 @@ paths:
         * internal_list_tenants
 
         <b> cURL</b>
-        curl -k -v -X POST -H "Authorization: Basic YWRtaW5Ad3NvMi5jb206YWRtaW4=" -H "Content-Type: application/json" -d '{ "domain":"lanka.com", "purpose":"Personal", "code":"2d962a0b-9280-4394-8652-0137a25d9bac", "owners":[ { "username":"lanka@wso2.com", "email":"lanka@wso2.com","password":"Pass#word2", "firstname":"Lanka", "lastname":"Jaya", "provisioningMethod":"verified-lite-user", "additionalClaims":[ { "claim":"http://wso2.org/claims/telephone", "value":"+94 562 8723" } ] } ] }' "https://localhost:9443/t/carbon.super/api/server/v1/channel-verified-tenants"
+        curl -k -v -X POST -H "Authorization: Basic YWRtaW5Ad3NvMi5jb206YWRtaW4=" -H "Content-Type: application/json" -d '{ "domain":"lanka.com", "purpose":"Personal", "code":"2d962a0b-9280-4394-8652-0137a25d9bac", "owners":[ { "username":"lanka@wso2.com", "email":"lanka@wso2.com","password":"Pass#word2", "firstname":"Lanka", "lastname":"Jaya", "provisioningMethod":"verified-lite-user", "additionalClaims":[ { "claim":"http://wso2.org/claims/telephone", "value":"+94 562 8723" } ] } ] }' "https://localhost:9443/api/server/v1/channel-verified-tenants"
       requestBody:
         content:
           application/json:
@@ -354,10 +354,7 @@ paths:
                   $ref: '#/components/schemas/Error'
 
 servers:
-  - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
-    variables:
-      tenant-domain:
-        default: carbon.super
+  - url: 'https://localhost:9443/api/server/v1'
 
 components:
   parameters:
@@ -555,10 +552,10 @@ components:
           example:
             [
                 {
-                    "href": "/t/carbon.super/api/server/v1/tenants?offset=50&limit=10",
+                    "href": "/api/server/v1/tenants?offset=50&limit=10",
                     "rel": "next",
                 },  {
-                    "href": "/t/carbon.super/api/server/v1/tenants?offset=30&limit=10",
+                    "href": "/api/server/v1/tenants?offset=30&limit=10",
                     "rel": "previous",
                 }
             ]
@@ -707,7 +704,7 @@ components:
           type: string
           description: Path to the target resource.
           example: >-
-            '/t/carbon.super/api/server/v1/tenants/394b8adcce24c64a8a09a8d80abf8c337bd253de'
+            '/api/server/v1/tenants/394b8adcce24c64a8a09a8d80abf8c337bd253de'
         rel:
           type: string
           description: Describes how the current context is related to the target resource
