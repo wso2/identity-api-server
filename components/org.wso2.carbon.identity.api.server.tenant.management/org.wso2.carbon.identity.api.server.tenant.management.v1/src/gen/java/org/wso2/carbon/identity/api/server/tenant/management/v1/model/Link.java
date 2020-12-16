@@ -42,7 +42,7 @@ public class Link  {
         return this;
     }
     
-    @ApiModelProperty(example = "'/t/carbon.super/api/server/v1/tenants/394b8adcce24c64a8a09a8d80abf8c337bd253de'", value = "Path to the target resource.")
+    @ApiModelProperty(example = "'/api/server/v1/tenants/394b8adcce24c64a8a09a8d80abf8c337bd253de'", value = "Path to the target resource.")
     @JsonProperty("href")
     @Valid
     public String getHref() {

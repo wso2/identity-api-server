@@ -104,7 +104,7 @@ public class TenantsListResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"href\":\"/t/carbon.super/api/server/v1/tenants?offset=50&limit=10\",\"rel\":\"next\"},{\"href\":\"/t/carbon.super/api/server/v1/tenants?offset=30&limit=10\",\"rel\":\"previous\"}]", value = "")
+    @ApiModelProperty(example = "[{\"href\":\"/api/server/v1/tenants?offset=50&limit=10\",\"rel\":\"next\"},{\"href\":\"/api/server/v1/tenants?offset=30&limit=10\",\"rel\":\"previous\"}]", value = "")
     @JsonProperty("links")
     @Valid
     public List<Link> getLinks() {
