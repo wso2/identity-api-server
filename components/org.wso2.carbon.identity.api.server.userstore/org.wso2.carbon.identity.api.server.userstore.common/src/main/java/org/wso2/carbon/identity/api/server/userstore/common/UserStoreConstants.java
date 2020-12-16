@@ -80,6 +80,10 @@ public class UserStoreConstants {
                 "Unable to get the primary user store.",
                 "Server Encountered an error while retrieving the primary user store.",
                 Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_ERROR_RETRIEVING_REALM_CONFIG("65012",
+                "Unable to get the realm configurations",
+                "Server Encountered an error while retrieving realm configuration for tenant: %s",
+                Response.Status.INTERNAL_SERVER_ERROR),
 
         // Client Errors - 600xx
         ERROR_CODE_DOMAIN_ID_NOT_FOUND("60001",

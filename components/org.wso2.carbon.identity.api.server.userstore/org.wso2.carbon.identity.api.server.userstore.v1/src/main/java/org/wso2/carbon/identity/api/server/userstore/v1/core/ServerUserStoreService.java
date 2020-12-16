@@ -22,6 +22,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
@@ -49,6 +50,7 @@ import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStore
 import org.wso2.carbon.user.api.Properties;
 import org.wso2.carbon.user.api.Property;
 import org.wso2.carbon.user.api.RealmConfiguration;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.UserStoreConfigConstants;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -215,7 +217,17 @@ public class ServerUserStoreService {
     public UserStoreConfigurationsRes getPrimaryUserStore() {
 
         RealmService realmService = UserStoreConfigServiceHolder.getInstance().getRealmService();
-        RealmConfiguration realmConfiguration = realmService.getBootstrapRealmConfiguration();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        RealmConfiguration realmConfiguration;
+        try {
+            realmConfiguration = realmService.getTenantUserRealm(tenantId).getRealmConfiguration();
+        } catch (UserStoreException exception) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error occurred while getting the RealmConfiguration for tenant: " + tenantId, exception);
+            }
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_RETRIEVING_REALM_CONFIG, Integer.toString(tenantId));
+        }
         if (realmConfiguration == null) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
                     ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE);
@@ -762,6 +774,19 @@ public class ServerUserStoreService {
     private APIError handleException(Response.Status status, UserStoreConstants.ErrorMessage error) {
 
         return new APIError(status, getErrorBuilder(error).build());
+    }
+
+    /**
+     * Handle exceptions generated in API.
+     *
+     * @param status HTTP Status.
+     * @param error  Error Message information.
+     * @param data   Additional data.
+     * @return APIError.
+     */
+    private APIError handleException(Response.Status status, UserStoreConstants.ErrorMessage error, String... data) {
+
+        return new APIError(status, getErrorBuilder(error, data).build());
     }
 
     /**
