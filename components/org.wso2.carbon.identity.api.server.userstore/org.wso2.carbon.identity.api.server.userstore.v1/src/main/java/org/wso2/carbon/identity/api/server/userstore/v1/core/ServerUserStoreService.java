@@ -226,7 +226,7 @@ public class ServerUserStoreService {
                 LOG.debug("Error occurred while getting the RealmConfiguration for tenant: " + tenantId, exception);
             }
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
-                    ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE);
+                    ERROR_CODE_ERROR_RETRIEVING_REALM_CONFIG, Integer.toString(tenantId));
         }
         if (realmConfiguration == null) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
@@ -774,6 +774,19 @@ public class ServerUserStoreService {
     private APIError handleException(Response.Status status, UserStoreConstants.ErrorMessage error) {
 
         return new APIError(status, getErrorBuilder(error).build());
+    }
+
+    /**
+     * Handle exceptions generated in API.
+     *
+     * @param status HTTP Status.
+     * @param error  Error Message information.
+     * @param data   Additional data.
+     * @return APIError.
+     */
+    private APIError handleException(Response.Status status, UserStoreConstants.ErrorMessage error, String... data) {
+
+        return new APIError(status, getErrorBuilder(error, data).build());
     }
 
     /**
