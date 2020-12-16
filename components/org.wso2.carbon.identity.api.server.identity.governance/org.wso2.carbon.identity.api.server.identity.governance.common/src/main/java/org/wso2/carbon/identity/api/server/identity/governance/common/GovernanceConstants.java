@@ -65,7 +65,9 @@ public class GovernanceConstants {
                 "Unable to get the identity governance preferences.",
                 "Server Encountered an error while retrieving identity governance connector preferences."),
         ERROR_CODE_INCORRECT_CONNECTOR_NAME("50011", "Invalid connector name",
-                "Unable to find the connector with the name %s.");
+                "Unable to find a connector with the name %s."),
+        ERROR_CODE_UNSUPPORTED_PROPERTY_NAME("50012", "Unsupported property is requested.",
+                "The property %s is not supported by this API.");
 
         private final String code;
         private final String message;
