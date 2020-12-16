@@ -38,6 +38,7 @@ paths:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
         - $ref: '#/components/parameters/filterQueryParam'
+        - $ref: '#/components/parameters/requiredAttributesQueryParam'
       responses:
         '200':
           description: Successful Response
@@ -1722,6 +1723,14 @@ components:
         Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew'
         and 'eq' operations and also complex queries with 'and' operations. E.g.
         /identity-providers?filter=name+sw+"google"+and+isEnabled+eq+"true"
+      schema:
+        type: string
+    requiredAttributesQueryParam:
+      in: query
+      name: requiredAttributes
+      required: false
+      description: |
+        Specifies the required parameters in the response.
       schema:
         type: string
     forceQueryParam:
