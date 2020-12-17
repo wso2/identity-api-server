@@ -522,12 +522,17 @@ components:
           example: 'true'
     RDBMSConnectionReq:
       required:
+        - domain
         - driverName
         - connectionURL
         - username
         - connectionPassword
       description: RDBMS Connection Request.
       properties:
+        domain:
+          type: string
+          description: User store domain name.
+          example: PRIMARY
         driverName:
           type: string
           description: Driver Name.
