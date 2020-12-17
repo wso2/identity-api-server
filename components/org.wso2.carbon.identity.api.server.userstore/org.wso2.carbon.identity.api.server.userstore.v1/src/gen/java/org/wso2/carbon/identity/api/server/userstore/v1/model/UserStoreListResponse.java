@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public class UserStoreListResponse  {
     }
 
     /**
-    * domain name of the secondary user store
+    * Domain name of the secondary user store.
     **/
     public UserStoreListResponse name(String name) {
 
@@ -69,7 +69,7 @@ public class UserStoreListResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "JDBC-SECONDARY", value = "domain name of the secondary user store")
+    @ApiModelProperty(example = "JDBC-SECONDARY", value = "Domain name of the secondary user store.")
     @JsonProperty("name")
     @Valid
     public String getName() {

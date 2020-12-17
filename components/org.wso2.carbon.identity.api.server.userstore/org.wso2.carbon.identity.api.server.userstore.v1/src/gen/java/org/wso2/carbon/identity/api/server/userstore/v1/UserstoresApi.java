@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
+import java.util.List;
 
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStoreClassesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ConnectionEstablishedResponse;
@@ -54,7 +55,7 @@ public class UserstoresApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add a secondary user store.", notes = "This API provides the capability to add a secondary user store.   <b>Permission required:</b>   *_/permission/admin ", response = UserStoreResponse.class, authorizations = {
+    @ApiOperation(value = "Add a secondary user store.", notes = "This API provides the capability to add a secondary user store.  **NOTE:**    To retrieve the available user store classes/types, use the **api/server/v1/userstores/meta/types** API.   <b>Permission required:</b>   - /permission/admin ", response = UserStoreResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -143,7 +144,7 @@ public class UserstoresApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve or List the configured secondary user stores.", notes = "This API provides the capability to list the configured secondary userstores. <b>Permission required:</b> *_/permission/admin ", response = UserStoreListResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve or list the configured secondary user stores.", notes = "This API provides the capability to list the configured secondary userstores. <b>Permission required:</b> *_/permission/admin ", response = UserStoreListResponse.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -156,7 +157,7 @@ public class UserstoresApi  {
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response getSecondaryUserStores(    @Valid@ApiParam(value = "maximum number of records to return")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrival of records.")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order how the retrieved records should be sorted.")  @QueryParam("sort") String sort,     @Valid@ApiParam(value = "Define set of user store attributes (as comma separated) to be returned.")  @QueryParam("requiredAttributes") String requiredAttributes) {
+    public Response getSecondaryUserStores(    @Valid@ApiParam(value = "maximum number of records to return")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "number of records to skip for pagination")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrieval of records.")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order of how the retrieved records should be sorted.")  @QueryParam("sort") String sort,     @Valid@ApiParam(value = "Define set of user store attributes (as comma separated) to be returned.")  @QueryParam("requiredAttributes") String requiredAttributes) {
 
         return delegate.getSecondaryUserStores(limit,  offset,  filter,  sort,  requiredAttributes );
     }
@@ -212,7 +213,7 @@ public class UserstoresApi  {
     @Path("/{userstore-domain-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Patch the secondary user store by it's domain id.", notes = "This API provides the capability to update the secondary user store's property using patch request by using it's domain id.   <b>Permission required:</b>  *_/permission/admin ", response = UserStoreResponse.class, authorizations = {
+    @ApiOperation(value = "Patch the secondary user store by it's domain id.", notes = "This API provides the capability to update the secondary user store's property using patch request by using its domain id.   <b>Permission required:</b>  *_/permission/admin ", response = UserStoreResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -272,7 +273,7 @@ public class UserstoresApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response updateUserStore(@ApiParam(value = "Current domain id of the user store",required=true) @PathParam("userstore-domain-id") String userstoreDomainId, @ApiParam(value = "The secondary user store values which are need to be edited of the given domain id." ) @Valid UserStoreReq userStoreReq) {
+    public Response updateUserStore(@ApiParam(value = "Current domain id of the user store",required=true) @PathParam("userstore-domain-id") String userstoreDomainId, @ApiParam(value = "The secondary user store values which are needed to be edited for a given domain id." ) @Valid UserStoreReq userStoreReq) {
 
         return delegate.updateUserStore(userstoreDomainId,  userStoreReq );
     }
