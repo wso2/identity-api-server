@@ -79,6 +79,8 @@ public class ServerUserStoreService {
 
     private static final Log LOG = LogFactory.getLog(ServerUserStoreService.class);
 
+    private static final String DUMMY_MESSAGE_ID = "DUMMY-MESSAGE-ID";
+
     /**
      * Add a userStore {@link UserStoreReq}.
      *
@@ -341,9 +343,9 @@ public class ServerUserStoreService {
         boolean isConnectionEstablished;
         connectionEstablishedResponse.setConnection(false);
         try {
-            isConnectionEstablished = userStoreConfigService.testRDBMSConnection("",
+            isConnectionEstablished = userStoreConfigService.testRDBMSConnection(rdBMSConnectionReq.getDomain(),
                     rdBMSConnectionReq.getDriverName(), rdBMSConnectionReq.getConnectionURL(),
-                    rdBMSConnectionReq.getUsername(), rdBMSConnectionReq.getConnectionPassword(), "");
+                    rdBMSConnectionReq.getUsername(), rdBMSConnectionReq.getConnectionPassword(), DUMMY_MESSAGE_ID);
             if (isConnectionEstablished) {
                 connectionEstablishedResponse.setConnection(true);
             }
