@@ -47,6 +47,7 @@ import static org.wso2.carbon.identity.api.server.notification.sender.common.Not
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ADAPTER_TYPE_EMAIL_VALUE;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ADAPTER_TYPE_HTTP_VALUE;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ADAPTER_TYPE_KEY;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.AUTH;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.CLIENT_HTTP_METHOD_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.CONSTANT_HTTP_POST;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.CUSTOM_MAPPING_KEY;
@@ -77,9 +78,14 @@ import static org.wso2.carbon.identity.api.server.notification.sender.common.Not
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PUBLISHER_NAME;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ROOT_ELEMENT;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMS_SEND_API_BODY_PROPERTY;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_AUTH_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_FROM_PROPERTY;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_HOST_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_PASSWORD_PROPERTY;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_PORT_PROPERTY;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_STARTTLS_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_USER_PROPERTY;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.STARTTLS;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.STATISTICS_KEY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.STREAM_NAME;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.STREAM_VERSION;
@@ -168,13 +174,25 @@ public class NotificationSenderUtils {
         if (StringUtils.isNotEmpty(emailSenderAdd.getUserName())) {
             adapterProperties.put(SMTP_USER_PROPERTY, emailSenderAdd.getUserName());
         }
+        if (StringUtils.isNotEmpty(emailSenderAdd.getSmtpServerHost())) {
+            adapterProperties.put(SMTP_HOST_PROPERTY, emailSenderAdd.getSmtpServerHost());
+        }
+        if (!"null".equals(String.valueOf(emailSenderAdd.getSmtpPort()))) {
+            adapterProperties.put(SMTP_PORT_PROPERTY, String.valueOf(emailSenderAdd.getSmtpPort()));
+        }
+        if (StringUtils.isNotEmpty(properties.get(STARTTLS))) {
+            adapterProperties.put(SMTP_STARTTLS_PROPERTY, properties.get(STARTTLS));
+        }
+        if (StringUtils.isNotEmpty(properties.get(AUTH))) {
+            adapterProperties.put(SMTP_AUTH_PROPERTY, properties.get(AUTH));
+        }
         // Add properties.
         for (Map.Entry<String, String> property : adapterProperties.entrySet()) {
             Element adapterProperty = document.createElement(ADAPTER_PROPERTY);
             Attr attribute = document.createAttribute(ADAPTER_PROPERTY_NAME);
             attribute.setValue(property.getKey());
             adapterProperty.setAttributeNode(attribute);
-            adapterProperty.appendChild(document.createTextNode(EMAIL_ADDRESS_VALUE));
+            adapterProperty.appendChild(document.createTextNode(property.getValue()));
             to.appendChild(adapterProperty);
         }
 
@@ -236,7 +254,7 @@ public class NotificationSenderUtils {
         // Inline element.
         Element inline = document.createElement(INLINE);
         String smsSendAPIBody;
-        // If body is given as an input we expected that contains all required attributes with values.
+        // If body is given as an input we expect that contains all required attributes with values.
         if (StringUtils.isNotEmpty(properties.get(SMS_SEND_API_BODY_PROPERTY))) {
             smsSendAPIBody = properties.get(SMS_SEND_API_BODY_PROPERTY);
         } else {
@@ -290,7 +308,7 @@ public class NotificationSenderUtils {
                     adapterProperty.setAttributeNode(encryptedAttribute);
                 }
                 adapterProperty.setAttributeNode(attribute);
-                adapterProperty.appendChild(document.createTextNode(EMAIL_ADDRESS_VALUE));
+                adapterProperty.appendChild(document.createTextNode(property.getValue()));
                 to.appendChild(adapterProperty);
             }
         }
@@ -303,7 +321,7 @@ public class NotificationSenderUtils {
     }
 
     private static String generateSmsSendAPIBody(String smsSendAPIBodyTemplate, SMSSenderAdd smsSenderAdd) {
-
+        //TODO
         String inlineBody = smsSendAPIBodyTemplate;
         return inlineBody;
     }

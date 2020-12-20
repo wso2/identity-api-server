@@ -73,6 +73,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EmailSenderAdd'
+            example:
+              fromAddres: iam@gmail.com
+              userName: iam
+              password: iam123
+              properties:
+                - key: encryption
+                  value: "true"
+                - key: startTLS
+                  value: true
       responses:
         "201":
           description: Successful Response
@@ -181,6 +190,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EmailSenderUpdateRequest'
+            example:
+              fromAddres: iam@gmail.com
+              userName: iam
+              password: iam123
+              properties:
+                - key: encryption
+                  value: "true"
+                - key: startTLS
+                  value: false
+        required: true
       responses:
         "200":
           description: Successful Response
@@ -319,6 +338,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SMSSenderAdd'
+            example:
+              provider: NEXMO
+              providerURL: https://rest.nexmo.com/sms/json
+              key: 4cb49374
+              secret: ba3EtqyPg4sgE93
+              sender: +94 775563324
+              properties:
+                - key: httpHeaders
+                  value: application/x-www-form-urlencoded
       responses:
         "201":
           description: Successful Response
@@ -427,6 +455,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SMSSenderUpdateRequest'
+            example:
+              provider: NEXMO
+              providerURL: https://rest.nexmo.com/sms/json
+              key: 4cb49374
+              secret: ba3EtqyPg4sgE93
+              sender: +94 775563324
+              properties:
+                - key: httpHeaders
+                  value: application/x-www-form-urlencoded
         required: true
       responses:
         "200":
@@ -536,7 +573,10 @@ components:
       properties:
         name:
           type: string
-          example: EmailPublisher
+        smtpServerHost:
+          type: string
+        smtpPort:
+          type: integer
         fromAddress:
           type: string
           example: iam@gmail.com
@@ -582,7 +622,7 @@ components:
         properties:
           type: array
           example:
-            - key: HTTPHeaders
+            - key: httpHeaders
               value: application/x-www-form-urlencoded
           items:
             $ref: '#/components/schemas/Properties'
@@ -651,7 +691,7 @@ components:
         properties:
           type: array
           example:
-            - key: HTTPHeaders
+            - key: httpHeaders
               value: application/x-www-form-urlencoded
           items:
             $ref: '#/components/schemas/Properties'
@@ -662,6 +702,12 @@ components:
         - userName
       type: object
       properties:
+        smtpServerHost:
+          type: string
+          example: smtp.gmail.com
+        smtpPort:
+          type: integer
+          example: 587
         fromAddress:
           type: string
           example: iam@gmail.com
@@ -704,7 +750,7 @@ components:
         properties:
           type: array
           example:
-            - key: HTTPHeaders
+            - key: httpHeaders
               value: application/x-www-form-urlencoded
           items:
             $ref: '#/components/schemas/Properties'

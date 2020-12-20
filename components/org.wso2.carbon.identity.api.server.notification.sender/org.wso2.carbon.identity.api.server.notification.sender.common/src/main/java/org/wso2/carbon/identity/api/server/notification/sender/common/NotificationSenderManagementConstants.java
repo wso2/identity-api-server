@@ -30,6 +30,7 @@ public class NotificationSenderManagementConstants {
     public static final String DEFAULT_EMAIL_PUBLISHER = "EmailPublisher";
     public static final String DEFAULT_SMS_PUBLISHER = "SMSPublisher";
     public static final String PUBLISHER_FILE_EXTENSION = ".xml";
+    public static final String RESOURCE_NOT_EXISTS_ERROR_CODE = "CONFIGM_00017";
 
     // Email Sender's main properties.
     public static final String SMTP_SERVER_HOST = "smtpServerHost";
@@ -37,6 +38,8 @@ public class NotificationSenderManagementConstants {
     public static final String FROM_ADDRESS = "fromAddress";
     public static final String USERNAME = "userName";
     public static final String PASSWORD = "password";
+    public static final String STARTTLS = "startTLS";
+    public static final String AUTH = "auth";
     public static final String EMAIL_PUBLISHER_TYPE = "email";
 
     // SMS Sender's main properties.
@@ -86,6 +89,10 @@ public class NotificationSenderManagementConstants {
     public static final String SMTP_PASSWORD_PROPERTY = "mail.smtp.password";
     public static final String SMTP_FROM_PROPERTY = "mail.smtp.from";
     public static final String SMTP_USER_PROPERTY = "mail.smtp.user";
+    public static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
+    public static final String SMTP_PORT_PROPERTY = "mail.smtp.port";
+    public static final String SMTP_STARTTLS_PROPERTY = "mail.smtp.starttls.enable";
+    public static final String SMTP_AUTH_PROPERTY = "mail.smtp.auth";
     public static final String HTTP_METHOD_PROPERTY = "http.client.method";
     public static final String HTTP_URL_PROPERTY = "http.url";
     public static final String HTTP_HEADERS_PROPERTY = "http.headers";
@@ -106,11 +113,11 @@ public class NotificationSenderManagementConstants {
         ERROR_CODE_CONFLICT_PUBLISHER("60002", "Notification sender already exists.",
                 "There exists a notification sender: %s in the tenant."),
         ERROR_CODE_SMS_PROVIDER_REQUIRED("60003", "Required attribute is missing",
-                "SMS provider is not defined for notification sender: %s"),
+                "SMS provider is not defined for notification sender."),
         ERROR_CODE_SMS_PAYLOAD_NOT_FOUND("60004", "SMS send API payload is not defined",
                 "SMS send API payload for provider: %s, is not defined in file or POST body properties."),
         ERROR_CODE_SMS_PROVIDER_URL_REQUIRED("60005", "Required attribute is missing",
-                "SMS provider url is not defined for notification sender: %s"),
+                "SMS provider url is not defined for notification sender."),
 
         // Server errors 650xx.
         ERROR_CODE_NO_ACTIVE_PUBLISHERS_FOUND("65001", "No active notification senders found.",

@@ -23,9 +23,9 @@
     <bean id="configurationManagerFactoryBean" class="org.wso2.carbon.identity.api.server.notification.sender.common.factory.ConfigurationMgtOSGiServiceFactory"/>
     <bean id="eventPublisherServiceFactoryBean" class="org.wso2.carbon.identity.api.server.notification.sender.common.factory.EventPublisherOSGiServiceFactory"/>
     <bean id="smsProviderPayloadTemplateManagerFactoryBean" class="org.wso2.carbon.identity.api.server.notification.sender.common.factory.SMSProviderPayloadTemplateMgtOSSGiServiceFactory"/>
-    <bean id="notificationSenderSServiceImplDataHolderBean" class="org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderServiceHolder">
-        <property name="configurationManager" ref="configurationManagerFactoryBean"/>
+    <bean id="notificationSenderServiceImplDataHolderBean" class="org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderServiceHolder">
+        <property name="notificationSenderConfigManager" ref="configurationManagerFactoryBean"/>
         <property name="eventPublisherService" ref="eventPublisherServiceFactoryBean"/>
-        <property name="smsProviderPayloadTemplateService" ref="smsProviderPayloadTemplateManagerFactoryBean"/>
+        <property name="smsProviderPayloadTemplateManager" ref="smsProviderPayloadTemplateManagerFactoryBean"/>
     </bean>
 </beans>

@@ -1,20 +1,18 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 package org.wso2.carbon.identity.api.server.notification.sender.v1;
 
@@ -65,6 +63,7 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response createEmailSender(@ApiParam(value = "" ) @Valid EmailSenderAdd emailSenderAdd) {
@@ -89,6 +88,7 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response createSMSSender(@ApiParam(value = "" ) @Valid SMSSenderAdd smSSenderAdd) {
@@ -113,6 +113,7 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteEmailSender(@ApiParam(value = "name of the email sender",required=true) @PathParam("sender-name") String senderName) {
@@ -137,6 +138,7 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteSMSSender(@ApiParam(value = "name of the SMS sender",required=true) @PathParam("sender-name") String senderName) {
@@ -161,6 +163,7 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response getEmailSender(@ApiParam(value = "name of the email sender",required=true) @PathParam("sender-name") String senderName) {
@@ -185,6 +188,7 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response getEmailSenders() {
@@ -209,6 +213,7 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response getSMSSender(@ApiParam(value = "name of the SMS sender",required=true) @PathParam("sender-name") String senderName) {
@@ -233,6 +238,7 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response getSMSSenders() {
@@ -257,9 +263,10 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateEmailSender(@ApiParam(value = "name of the email sender",required=true) @PathParam("sender-name") String senderName, @ApiParam(value = "" ) @Valid EmailSenderUpdateRequest emailSenderUpdateRequest) {
+    public Response updateEmailSender(@ApiParam(value = "name of the email sender",required=true) @PathParam("sender-name") String senderName, @ApiParam(value = "" ,required=true) @Valid EmailSenderUpdateRequest emailSenderUpdateRequest) {
 
         return delegate.updateEmailSender(senderName,  emailSenderUpdateRequest );
     }
@@ -281,6 +288,7 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response updateSMSSender(@ApiParam(value = "name of the SMS sender",required=true) @PathParam("sender-name") String senderName, @ApiParam(value = "" ,required=true) @Valid SMSSenderUpdateRequest smSSenderUpdateRequest) {

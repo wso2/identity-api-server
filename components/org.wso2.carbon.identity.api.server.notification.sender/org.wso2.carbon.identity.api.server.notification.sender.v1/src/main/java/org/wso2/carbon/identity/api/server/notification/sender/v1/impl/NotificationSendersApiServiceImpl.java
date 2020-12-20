@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.notification.sender.v1.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -46,6 +47,7 @@ import static org.wso2.carbon.identity.api.server.notification.sender.common.Not
  */
 public class NotificationSendersApiServiceImpl implements NotificationSendersApiService {
 
+    @Autowired
     private NotificationSenderManagementService notificationSenderManagementService;
 
     @Override

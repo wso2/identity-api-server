@@ -1,20 +1,18 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 package org.wso2.carbon.identity.api.server.notification.sender.v1.model;
 
@@ -36,6 +34,8 @@ import javax.xml.bind.annotation.*;
 public class EmailSenderAdd  {
   
     private String name;
+    private String smtpServerHost;
+    private Integer smtpPort;
     private String fromAddress;
     private String userName;
     private String password;
@@ -50,7 +50,7 @@ public class EmailSenderAdd  {
         return this;
     }
     
-    @ApiModelProperty(example = "EmailPublisher", value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("name")
     @Valid
     public String getName() {
@@ -58,6 +58,42 @@ public class EmailSenderAdd  {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+    **/
+    public EmailSenderAdd smtpServerHost(String smtpServerHost) {
+
+        this.smtpServerHost = smtpServerHost;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("smtpServerHost")
+    @Valid
+    public String getSmtpServerHost() {
+        return smtpServerHost;
+    }
+    public void setSmtpServerHost(String smtpServerHost) {
+        this.smtpServerHost = smtpServerHost;
+    }
+
+    /**
+    **/
+    public EmailSenderAdd smtpPort(Integer smtpPort) {
+
+        this.smtpPort = smtpPort;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("smtpPort")
+    @Valid
+    public Integer getSmtpPort() {
+        return smtpPort;
+    }
+    public void setSmtpPort(Integer smtpPort) {
+        this.smtpPort = smtpPort;
     }
 
     /**
@@ -159,6 +195,8 @@ public class EmailSenderAdd  {
         }
         EmailSenderAdd emailSenderAdd = (EmailSenderAdd) o;
         return Objects.equals(this.name, emailSenderAdd.name) &&
+            Objects.equals(this.smtpServerHost, emailSenderAdd.smtpServerHost) &&
+            Objects.equals(this.smtpPort, emailSenderAdd.smtpPort) &&
             Objects.equals(this.fromAddress, emailSenderAdd.fromAddress) &&
             Objects.equals(this.userName, emailSenderAdd.userName) &&
             Objects.equals(this.password, emailSenderAdd.password) &&
@@ -167,7 +205,7 @@ public class EmailSenderAdd  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, fromAddress, userName, password, properties);
+        return Objects.hash(name, smtpServerHost, smtpPort, fromAddress, userName, password, properties);
     }
 
     @Override
@@ -177,6 +215,8 @@ public class EmailSenderAdd  {
         sb.append("class EmailSenderAdd {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    smtpServerHost: ").append(toIndentedString(smtpServerHost)).append("\n");
+        sb.append("    smtpPort: ").append(toIndentedString(smtpPort)).append("\n");
         sb.append("    fromAddress: ").append(toIndentedString(fromAddress)).append("\n");
         sb.append("    userName: ").append(toIndentedString(userName)).append("\n");
         sb.append("    password: ").append(toIndentedString(password)).append("\n");
