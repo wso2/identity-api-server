@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.notification.sender.v1.core.utils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -33,10 +34,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -51,6 +54,7 @@ import static org.wso2.carbon.identity.api.server.notification.sender.common.Not
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.CLIENT_HTTP_METHOD_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.CONSTANT_HTTP_POST;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.CUSTOM_MAPPING_KEY;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.DEFAULT_MAX_CONNECTIONS_PER_HOST;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.DISABLE;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.EMAIL_ADDRESS_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.EMAIL_ADDRESS_VALUE;
@@ -62,28 +66,38 @@ import static org.wso2.carbon.identity.api.server.notification.sender.common.Not
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ENABLE;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.FROM;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.HTTP_HEADERS;
-import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.HTTP_HEADERS_PROPERTY;
-import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.HTTP_METHOD_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.HTTP_PASSWORD_PROPERTY;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.HTTP_PROXY_HOST;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.HTTP_PROXY_PORT;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.HTTP_URL_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.HTTP_USERNAME_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.INLINE;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.INLINE_BODY_PARAM_PREFIX;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.JOB_QUEUE_SIZE;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.JSON;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.KEEP_ALIVE_TIME_IN_MILLIS;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.KEY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.MAPPING;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.MAPPING_TYPE_KEY;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.MAX_THREAD;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.MAX_TOTAL_CONNECTIONS;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.MIN_THREAD;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PASSWORD;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PASSWORD_ENCRYPTED_ATTR_KEY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PASSWORD_ENCRYPTED_PROPERTY;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PLACEHOLDER_IDENTIFIER;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PROCESSING_KEY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PUBLISHER_NAME;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.REPLY_TO;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ROOT_ELEMENT;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SECRET;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SENDER;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SIGNATURE;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMS_SEND_API_BODY_PROPERTY;
-import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_AUTH_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_FROM_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_HOST_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_PASSWORD_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_PORT_PROPERTY;
-import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_STARTTLS_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_USER_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.STARTTLS;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.STATISTICS_KEY;
@@ -181,10 +195,29 @@ public class NotificationSenderUtils {
             adapterProperties.put(SMTP_PORT_PROPERTY, String.valueOf(emailSenderAdd.getSmtpPort()));
         }
         if (StringUtils.isNotEmpty(properties.get(STARTTLS))) {
-            adapterProperties.put(SMTP_STARTTLS_PROPERTY, properties.get(STARTTLS));
+            adapterProperties.put(STARTTLS, properties.get(STARTTLS));
         }
         if (StringUtils.isNotEmpty(properties.get(AUTH))) {
-            adapterProperties.put(SMTP_AUTH_PROPERTY, properties.get(AUTH));
+            adapterProperties.put(AUTH, properties.get(AUTH));
+        }
+        if (StringUtils.isNotEmpty(properties.get(SIGNATURE))) {
+            adapterProperties.put(SIGNATURE, properties.get(SIGNATURE));
+        }
+        if (StringUtils.isNotEmpty(properties.get(REPLY_TO))) {
+            adapterProperties.put(REPLY_TO, properties.get(REPLY_TO));
+        }
+        // Thread Pool Related Properties.
+        if (StringUtils.isNotEmpty(properties.get(MIN_THREAD))) {
+            adapterProperties.put(MIN_THREAD, properties.get(MIN_THREAD));
+        }
+        if (StringUtils.isNotEmpty(properties.get(MAX_THREAD))) {
+            adapterProperties.put(MAX_THREAD, properties.get(MAX_THREAD));
+        }
+        if (StringUtils.isNotEmpty(properties.get(KEEP_ALIVE_TIME_IN_MILLIS))) {
+            adapterProperties.put(KEEP_ALIVE_TIME_IN_MILLIS, properties.get(KEEP_ALIVE_TIME_IN_MILLIS));
+        }
+        if (StringUtils.isNotEmpty(properties.get(JOB_QUEUE_SIZE))) {
+            adapterProperties.put(JOB_QUEUE_SIZE, properties.get(JOB_QUEUE_SIZE));
         }
         // Add properties.
         for (Map.Entry<String, String> property : adapterProperties.entrySet()) {
@@ -199,7 +232,10 @@ public class NotificationSenderUtils {
         DOMSource xmlSource = new DOMSource(document);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Result outputTarget = new StreamResult(outputStream);
-        TransformerFactory.newInstance().newTransformer().transform(xmlSource, outputTarget);
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.transform(xmlSource, outputTarget);
         return new ByteArrayInputStream(outputStream.toByteArray());
     }
 
@@ -276,12 +312,12 @@ public class NotificationSenderUtils {
         Map<String, String> adapterProperties = new HashMap<>();
         adapterProperties.put(HTTP_URL_PROPERTY, smsSenderAdd.getProviderURL());
         if (StringUtils.isNotEmpty(properties.get(CLIENT_HTTP_METHOD_PROPERTY))) {
-            adapterProperties.put(HTTP_METHOD_PROPERTY, properties.get(CLIENT_HTTP_METHOD_PROPERTY));
+            adapterProperties.put(CLIENT_HTTP_METHOD_PROPERTY, properties.get(CLIENT_HTTP_METHOD_PROPERTY));
         } else {
-            adapterProperties.put(HTTP_METHOD_PROPERTY, CONSTANT_HTTP_POST);
+            adapterProperties.put(CLIENT_HTTP_METHOD_PROPERTY, CONSTANT_HTTP_POST);
         }
         if (StringUtils.isNotEmpty(properties.get(HTTP_HEADERS))) {
-            adapterProperties.put(HTTP_HEADERS_PROPERTY, properties.get(HTTP_HEADERS));
+            adapterProperties.put(HTTP_HEADERS, properties.get(HTTP_HEADERS));
         }
         if (StringUtils.isNotEmpty(properties.get(USERNAME))) {
             adapterProperties.put(HTTP_USERNAME_PROPERTY, properties.get(USERNAME));
@@ -292,6 +328,35 @@ public class NotificationSenderUtils {
         if (StringUtils.isNotEmpty(properties.get(PASSWORD_ENCRYPTED_PROPERTY))) {
             adapterProperties.put(PASSWORD_ENCRYPTED_ATTR_KEY, properties.get(PASSWORD_ENCRYPTED_PROPERTY));
         }
+        if (StringUtils.isNotEmpty(properties.get(HTTP_PROXY_HOST))) {
+            adapterProperties.put(HTTP_PROXY_HOST, properties.get(HTTP_PROXY_HOST));
+        }
+        if (StringUtils.isNotEmpty(properties.get(HTTP_PROXY_PORT))) {
+            adapterProperties.put(HTTP_PROXY_PORT, properties.get(HTTP_PROXY_PORT));
+        }
+
+        // Thread Pool Related Properties.
+        if (StringUtils.isNotEmpty(properties.get(MIN_THREAD))) {
+            adapterProperties.put(MIN_THREAD, properties.get(MIN_THREAD));
+        }
+        if (StringUtils.isNotEmpty(properties.get(MAX_THREAD))) {
+            adapterProperties.put(MAX_THREAD, properties.get(MAX_THREAD));
+        }
+        if (StringUtils.isNotEmpty(properties.get(KEEP_ALIVE_TIME_IN_MILLIS))) {
+            adapterProperties.put(KEEP_ALIVE_TIME_IN_MILLIS, properties.get(KEEP_ALIVE_TIME_IN_MILLIS));
+        }
+        if (StringUtils.isNotEmpty(properties.get(JOB_QUEUE_SIZE))) {
+            adapterProperties.put(JOB_QUEUE_SIZE, properties.get(JOB_QUEUE_SIZE));
+        }
+
+        // HTTP Client Pool Related Properties.
+        if (StringUtils.isNotEmpty(properties.get(DEFAULT_MAX_CONNECTIONS_PER_HOST))) {
+            adapterProperties.put(DEFAULT_MAX_CONNECTIONS_PER_HOST, properties.get(DEFAULT_MAX_CONNECTIONS_PER_HOST));
+        }
+        if (StringUtils.isNotEmpty(properties.get(MAX_TOTAL_CONNECTIONS))) {
+            adapterProperties.put(MAX_TOTAL_CONNECTIONS, properties.get(MAX_TOTAL_CONNECTIONS));
+        }
+
         // Add properties.
         for (Map.Entry<String, String> property : adapterProperties.entrySet()) {
             if (!PASSWORD_ENCRYPTED_ATTR_KEY.equals(property.getKey())) {
@@ -316,13 +381,39 @@ public class NotificationSenderUtils {
         DOMSource xmlSource = new DOMSource(document);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Result outputTarget = new StreamResult(outputStream);
-        TransformerFactory.newInstance().newTransformer().transform(xmlSource, outputTarget);
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.transform(xmlSource, outputTarget);
         return new ByteArrayInputStream(outputStream.toByteArray());
     }
 
     private static String generateSmsSendAPIBody(String smsSendAPIBodyTemplate, SMSSenderAdd smsSenderAdd) {
-        //TODO
+
         String inlineBody = smsSendAPIBodyTemplate;
+        Map<String, String> inlineBodyProperties = new HashMap<>();
+        /*
+        key, secret, sender inputs or any property defined with key value starting from "body." are considered
+        when generating the inline body of SMS publisher.
+         */
+        if (StringUtils.isNotEmpty(smsSenderAdd.getKey())) {
+            inlineBodyProperties.put(KEY, smsSenderAdd.getKey());
+        }
+        if (StringUtils.isNotEmpty(smsSenderAdd.getSecret())) {
+            inlineBodyProperties.put(SECRET, smsSenderAdd.getSecret());
+        }
+        if (StringUtils.isNotEmpty(smsSenderAdd.getSender())) {
+            inlineBodyProperties.put(SENDER, smsSenderAdd.getSender());
+        }
+        if (CollectionUtils.isNotEmpty(smsSenderAdd.getProperties())) {
+            smsSenderAdd.getProperties().stream()
+                    .filter(property -> property.getKey().startsWith(INLINE_BODY_PARAM_PREFIX))
+                    .forEach(property -> inlineBodyProperties.put(property.getKey(), property.getValue()));
+        }
+        for (Map.Entry property : inlineBodyProperties.entrySet()) {
+            inlineBody =
+                    inlineBody.replace(PLACEHOLDER_IDENTIFIER + property.getKey(), (CharSequence) property.getValue());
+        }
         return inlineBody;
     }
 }

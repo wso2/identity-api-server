@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.notification.sender.v1.core;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,6 +70,7 @@ import static org.wso2.carbon.identity.api.server.notification.sender.common.Not
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_NOTIFICATION_SENDERS_BY_TYPE;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_NOTIFICATION_SENDER;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_NO_ACTIVE_PUBLISHERS_FOUND;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_NO_RESOURCE_EXISTS;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_PARSER_CONFIG_EXCEPTION;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_PUBLISHER_NOT_EXISTS_IN_SUPER_TENANT;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_SERVER_ERRORS_GETTING_EVENT_PUBLISHER;
@@ -104,6 +106,12 @@ public class NotificationSenderManagementService {
 
     private static final Log log = LogFactory.getLog(NotificationSenderManagementService.class);
 
+    /**
+     * Create an email sender resource with a resource file.
+     *
+     * @param emailSenderAdd Email sender post request.
+     * @return Email sender.
+     */
     public EmailSender addEmailSender(EmailSenderAdd emailSenderAdd) {
 
         Integer tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -113,11 +121,16 @@ public class NotificationSenderManagementService {
         ResourceAdd emailSenderResourceAdd = null;
         try {
             InputStream inputStream = generateEmailPublisher(emailSenderAdd);
-            emailSenderResourceAdd = getResourceAddFromEmailSenderAdd(emailSenderAdd);
+            emailSenderResourceAdd = buildResourceAddFromEmailSenderAdd(emailSenderAdd);
+            /*
+            The input properties will be saved as the attributes of a resource to return in the notification-senders
+            API responses.
+            Also an event publisher file is generated with the input values and save it as a file of the resource.
+            It is used when loading tenant wise event publisher loading flow.
+             */
             NotificationSenderServiceHolder.getNotificationSenderConfigManager()
-                    .addResource(PUBLISHER_RESOURCE_TYPE, emailSenderResourceAdd);
-            NotificationSenderServiceHolder.getNotificationSenderConfigManager()
-                    .addFile(PUBLISHER_RESOURCE_TYPE, emailSenderAdd.getName(), emailSenderAdd.getName(), inputStream);
+                    .addResourceWithFile(PUBLISHER_RESOURCE_TYPE, emailSenderResourceAdd,
+                            emailSenderResourceAdd.getName(), inputStream);
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_ADDING_NOTIFICATION_SENDER,
                     emailSenderAdd.getName());
@@ -131,6 +144,12 @@ public class NotificationSenderManagementService {
         return buildEmailSenderFromEmailSenderResourceAdd(emailSenderResourceAdd);
     }
 
+    /**
+     * Create a sms sender resource with a resource file.
+     *
+     * @param smsSenderAdd SMS sender post request.
+     * @return SMS sender.
+     */
     public SMSSender addSMSSender(SMSSenderAdd smsSenderAdd) {
 
         Integer tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -140,11 +159,16 @@ public class NotificationSenderManagementService {
         ResourceAdd smsSenderResourceAdd = null;
         try {
             InputStream inputStream = generateSMSPublisher(smsSenderAdd);
-            smsSenderResourceAdd = getResourceAddFromSmsSenderAdd(smsSenderAdd);
+            smsSenderResourceAdd = buildResourceAddFromSmsSenderAdd(smsSenderAdd);
+            /*
+            The input properties will be saved as the attributes of a resource to return in the notification-senders
+            API responses.
+            Also an event publisher file is generated with the input values and save it as a file of the resource.
+            It is used when loading tenant wise event publisher loading flow.
+             */
             NotificationSenderServiceHolder.getNotificationSenderConfigManager()
-                    .addResource(PUBLISHER_RESOURCE_TYPE, smsSenderResourceAdd);
-            NotificationSenderServiceHolder.getNotificationSenderConfigManager()
-                    .addFile(PUBLISHER_RESOURCE_TYPE, smsSenderAdd.getName(), smsSenderAdd.getName(), inputStream);
+                    .addResourceWithFile(PUBLISHER_RESOURCE_TYPE, smsSenderResourceAdd, smsSenderResourceAdd.getName(),
+                            inputStream);
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_ADDING_NOTIFICATION_SENDER,
                     smsSenderAdd.getName());
@@ -158,6 +182,11 @@ public class NotificationSenderManagementService {
         return buildSmsSenderFromSmsSenderResourceAdd(smsSenderResourceAdd);
     }
 
+    /**
+     * Delete a SMS/Email sender by name.
+     *
+     * @param notificationSenderName Name of the notification sender.
+     */
     public void deleteNotificationSender(String notificationSenderName) {
 
         try {
@@ -169,28 +198,45 @@ public class NotificationSenderManagementService {
         }
     }
 
+    /**
+     * Retrieve the email sender details by name.
+     *
+     * @param senderName Email sender's name.
+     * @return Email sender.
+     */
     public EmailSender getEmailSender(String senderName) {
 
         try {
             Resource resource = NotificationSenderServiceHolder.getNotificationSenderConfigManager()
                     .getResource(PUBLISHER_RESOURCE_TYPE, senderName);
-            return getEmailSenderFromResource(resource);
+            return buildEmailSenderFromResource(resource);
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_GETTING_NOTIFICATION_SENDER, senderName);
         }
     }
 
+    /**
+     * Retrieve the sms sender details by name.
+     *
+     * @param senderName SMS sender's name.
+     * @return SMS sender.
+     */
     public SMSSender getSMSSender(String senderName) {
 
         try {
             Resource resource = NotificationSenderServiceHolder.getNotificationSenderConfigManager()
                     .getResource(PUBLISHER_RESOURCE_TYPE, senderName);
-            return getSmsSenderFromResource(resource);
+            return buildSmsSenderFromResource(resource);
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_GETTING_NOTIFICATION_SENDER, senderName);
         }
     }
 
+    /**
+     * Retrieve all email senders of the tenant.
+     *
+     * @return Email senders of the tenant.
+     */
     public List<EmailSender> getEmailSenders() {
 
         try {
@@ -200,7 +246,7 @@ public class NotificationSenderManagementService {
                     resource.getAttributes().stream().anyMatch(attribute ->
                             PUBLISHER_TYPE_PROPERTY.equals(attribute.getKey()) &&
                                     EMAIL_PUBLISHER_TYPE.equals(attribute.getValue()))).collect(Collectors.toList());
-            return emailPublisherResources.stream().map(resource -> getEmailSenderFromResource(resource)).collect(
+            return emailPublisherResources.stream().map(resource -> buildEmailSenderFromResource(resource)).collect(
                     Collectors.toList());
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_GETTING_NOTIFICATION_SENDERS_BY_TYPE,
@@ -208,6 +254,11 @@ public class NotificationSenderManagementService {
         }
     }
 
+    /**
+     * Retrieve all sms senders of the tenant.
+     *
+     * @return SMS senders of the tenant.
+     */
     public List<SMSSender> getSMSSenders() {
 
         try {
@@ -217,7 +268,7 @@ public class NotificationSenderManagementService {
                     resource.getAttributes().stream().anyMatch(attribute ->
                             PUBLISHER_TYPE_PROPERTY.equals(attribute.getKey()) &&
                                     SMS_PUBLISHER_TYPE.equals(attribute.getValue()))).collect(Collectors.toList());
-            return smsPublisherResources.stream().map(resource -> getSmsSenderFromResource(resource)).collect(
+            return smsPublisherResources.stream().map(resource -> buildSmsSenderFromResource(resource)).collect(
                     Collectors.toList());
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_GETTING_NOTIFICATION_SENDERS_BY_TYPE,
@@ -225,34 +276,79 @@ public class NotificationSenderManagementService {
         }
     }
 
+    /**
+     * Update email sender details by name.
+     *
+     * @param senderName               Email sender's name.
+     * @param emailSenderUpdateRequest Email sender's updated configurations.
+     * @return Updated email sender.
+     */
     public EmailSender updateEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest) {
 
         ResourceAdd emailSenderResourceAdd = null;
-        //TODO generate emailSenderAdd by emailSenderUpdateRequest
+        Integer tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        EventPublisherConfiguration publisherInSuperTenant =
+                validateEmailSenderUpdateRequestAndGetPublisherInSuperTenant(senderName, tenantId);
+        EmailSenderAdd emailSenderAdd =
+                buildEmailSenderAddFromEmailSenderUpdateRequest(senderName, emailSenderUpdateRequest);
+        addDefaultProperties(emailSenderAdd, publisherInSuperTenant);
         try {
+            InputStream inputStream = generateEmailPublisher(emailSenderAdd);
+            emailSenderResourceAdd = buildResourceAddFromEmailSenderAdd(emailSenderAdd);
             NotificationSenderServiceHolder.getNotificationSenderConfigManager()
-                    .replaceResource(senderName, emailSenderResourceAdd);
-            //TODO file replacement
+                    .replaceResourceWithFile(PUBLISHER_RESOURCE_TYPE, emailSenderResourceAdd, senderName, inputStream);
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_UPDATING_NOTIFICATION_SENDER, senderName);
+        } catch (ParserConfigurationException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_PARSER_CONFIG_EXCEPTION,
+                    e.getMessage());
+        } catch (TransformerException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_TRANSFORMER_EXCEPTION,
+                    e.getMessage());
         }
         return buildEmailSenderFromEmailSenderResourceAdd(emailSenderResourceAdd);
     }
 
+    /**
+     * Update sms sender details by name.
+     *
+     * @param senderName             SMS sender' name.
+     * @param smsSenderUpdateRequest SMS sender's updated configurations.
+     * @return Updated SMS sender.
+     */
     public SMSSender updateSMSSender(String senderName, SMSSenderUpdateRequest smsSenderUpdateRequest) {
 
         ResourceAdd smsSenderResourceAdd = null;
-        //TODO generate smsSenderResourceAdd by smsSenderUpdateRequest
+        Integer tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        EventPublisherConfiguration publisherInSuperTenant =
+                validateSmsSenderUpdateRequestAndGetPublisherInSuperTenant(senderName, smsSenderUpdateRequest,
+                        tenantId);
+        SMSSenderAdd smsSenderAdd = buildSMSSenderAddFromSMSSenderUpdateRequest(senderName, smsSenderUpdateRequest);
+        addDefaultProperties(smsSenderAdd, publisherInSuperTenant);
         try {
+            InputStream inputStream = generateSMSPublisher(smsSenderAdd);
+            smsSenderResourceAdd = buildResourceAddFromSmsSenderAdd(smsSenderAdd);
             NotificationSenderServiceHolder.getNotificationSenderConfigManager()
-                    .replaceResource(senderName, smsSenderResourceAdd);
-            //TODO file replacement
+                    .replaceResourceWithFile(PUBLISHER_RESOURCE_TYPE, smsSenderResourceAdd, senderName, inputStream);
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_UPDATING_NOTIFICATION_SENDER, senderName);
+        } catch (ParserConfigurationException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_PARSER_CONFIG_EXCEPTION,
+                    e.getMessage());
+        } catch (TransformerException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_TRANSFORMER_EXCEPTION,
+                    e.getMessage());
         }
         return buildSmsSenderFromSmsSenderResourceAdd(smsSenderResourceAdd);
     }
 
+    /**
+     * Validate the email Sender post request and get the corresponding super tenant's event publisher configuration.
+     *
+     * @param emailSenderAdd Email sender post request.
+     * @param tenantId       Tenant id.
+     * @return Corresponding super tenant's event publisher's configuration.
+     */
     private EventPublisherConfiguration validateEmailSenderAddAndGetPublisherInSuperTenant(
             EmailSenderAdd emailSenderAdd, int tenantId) {
 
@@ -301,6 +397,57 @@ public class NotificationSenderManagementService {
         return publisherInSuperTenant;
     }
 
+    /**
+     * Validate the email Sender put request and get the corresponding super tenant's event publisher configuration.
+     *
+     * @param senderName Email sender's name.
+     * @param tenantId   Tenant id.
+     * @return Corresponding super tenant's event publisher's configuration.
+     */
+    private EventPublisherConfiguration validateEmailSenderUpdateRequestAndGetPublisherInSuperTenant(
+            String senderName, int tenantId) {
+
+        EventPublisherService eventPublisherService = NotificationSenderServiceHolder.getEventPublisherService();
+        EventPublisherConfiguration publisherInSuperTenant = null;
+        try {
+            // Check whether a publisher exists to replace.
+            NotificationSenderServiceHolder.getNotificationSenderConfigManager()
+                    .getResource(PUBLISHER_RESOURCE_TYPE, senderName);
+            startSuperTenantFlow();
+            List<EventPublisherConfiguration> activeEventPublisherConfigurations =
+                    eventPublisherService.getAllActiveEventPublisherConfigurations();
+            if (activeEventPublisherConfigurations == null) {
+                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_NO_ACTIVE_PUBLISHERS_FOUND, "carbon.super");
+            }
+            startTenantFlow(tenantId);
+            // Check whether the super tenant has a publisher with the defined name.
+            publisherInSuperTenant = activeEventPublisherConfigurations.stream()
+                    .filter(publisher -> publisher.getEventPublisherName().equals(senderName)).findAny()
+                    .orElse(null);
+            if (publisherInSuperTenant == null) {
+                throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_PUBLISHER_NOT_EXISTS_IN_SUPER_TENANT,
+                        senderName);
+            }
+        } catch (EventPublisherConfigurationException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    ERROR_CODE_SERVER_ERRORS_GETTING_EVENT_PUBLISHER, e.getMessage());
+        } catch (ConfigurationManagementException e) {
+            // If resource not found by id.
+            if (RESOURCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                throw handleConfigurationMgtException(e, ERROR_CODE_NO_RESOURCE_EXISTS, senderName);
+            }
+            throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_UPDATING_NOTIFICATION_SENDER, senderName);
+        }
+        return publisherInSuperTenant;
+    }
+
+    /**
+     * Validate the SMS Sender post request and get the corresponding super tenant's event publisher configuration.
+     *
+     * @param smsSenderAdd SMS sender post request.
+     * @param tenantId     Tenant id.
+     * @return Corresponding super tenant's event publisher's configuration.
+     */
     private EventPublisherConfiguration validateSMSSenderAddAndGetPublisherInSuperTenant(SMSSenderAdd smsSenderAdd,
                                                                                          int tenantId) {
 
@@ -372,6 +519,80 @@ public class NotificationSenderManagementService {
         return publisherInSuperTenant;
     }
 
+    /**
+     * Validate the SMS Sender put request and get the corresponding super tenant's event publisher configuration.
+     *
+     * @param senderName             SMS sender's name.
+     * @param smsSenderUpdateRequest SMS Sender put request.
+     * @param tenantId               Tenant id.
+     * @return Corresponding super tenant's event publisher's configuration.
+     */
+    private EventPublisherConfiguration validateSmsSenderUpdateRequestAndGetPublisherInSuperTenant(String senderName,
+                                                               SMSSenderUpdateRequest smsSenderUpdateRequest,
+                                                               int tenantId) {
+
+        EventPublisherConfiguration publisherInSuperTenant = null;
+        EventPublisherService eventPublisherService = NotificationSenderServiceHolder.getEventPublisherService();
+        SMSProviderPayloadTemplateManager smsProviderPayloadTemplateManager =
+                NotificationSenderServiceHolder.getSmsProviderPayloadTemplateManager();
+        Map<String, String> properties = new HashMap<>();
+        if (smsSenderUpdateRequest.getProperties() != null) {
+            smsSenderUpdateRequest.getProperties().stream()
+                    .map(property -> properties.put(property.getKey(), property.getValue()))
+                    .collect(Collectors.toList());
+        }
+        try {
+            // Check whether a publisher exists to replace.
+            NotificationSenderServiceHolder.getNotificationSenderConfigManager()
+                    .getResource(PUBLISHER_RESOURCE_TYPE, senderName);
+            if (StringUtils.isEmpty(smsSenderUpdateRequest.getProvider())) {
+                throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_SMS_PROVIDER_REQUIRED, null);
+            }
+            if (StringUtils.isEmpty(properties.get(SMS_SEND_API_BODY_PROPERTY))) {
+                SMSProviderTemplate sendSmsAPIPayload = smsProviderPayloadTemplateManager
+                        .getSMSProviderPayloadTemplateByProvider(smsSenderUpdateRequest.getProvider());
+                if (sendSmsAPIPayload == null) {
+                    throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_SMS_PAYLOAD_NOT_FOUND,
+                            smsSenderUpdateRequest.getProvider());
+                }
+            }
+            if (StringUtils.isEmpty(smsSenderUpdateRequest.getProviderURL())) {
+                throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_SMS_PROVIDER_URL_REQUIRED, null);
+            }
+            startSuperTenantFlow();
+            List<EventPublisherConfiguration> activeEventPublisherConfigurations =
+                    eventPublisherService.getAllActiveEventPublisherConfigurations();
+            if (activeEventPublisherConfigurations == null) {
+                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_NO_ACTIVE_PUBLISHERS_FOUND, "carbon.super");
+            }
+            startTenantFlow(tenantId);
+            // Check whether the super tenant has a publisher with the defined name.
+            publisherInSuperTenant = activeEventPublisherConfigurations.stream()
+                    .filter(publisher -> publisher.getEventPublisherName().equals(senderName)).findAny()
+                    .orElse(null);
+            if (publisherInSuperTenant == null) {
+                throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_PUBLISHER_NOT_EXISTS_IN_SUPER_TENANT,
+                        senderName);
+            }
+        } catch (ConfigurationManagementException e) {
+            // If resource not found by id.
+            if (RESOURCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                throw handleConfigurationMgtException(e, ERROR_CODE_NO_RESOURCE_EXISTS, senderName);
+            }
+            throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_UPDATING_NOTIFICATION_SENDER, senderName);
+        } catch (EventPublisherConfigurationException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    ERROR_CODE_SERVER_ERRORS_GETTING_EVENT_PUBLISHER, e.getMessage());
+        }
+        return publisherInSuperTenant;
+    }
+
+    /**
+     * Set default properties to EmailSenderAdd object.
+     *
+     * @param emailSenderAdd         Email sender post body.
+     * @param publisherInSuperTenant Corresponding super tenant's event publisher's configuration.
+     */
     private void addDefaultProperties(EmailSenderAdd emailSenderAdd,
                                       EventPublisherConfiguration publisherInSuperTenant) {
 
@@ -399,6 +620,12 @@ public class NotificationSenderManagementService {
         emailSenderAdd.getProperties().add(typeProperty);
     }
 
+    /**
+     * Set default properties to SMSSenderAdd object.
+     *
+     * @param smsSenderAdd           SMS sender post body.
+     * @param publisherInSuperTenant Corresponding super tenant's event publisher's configuration.
+     */
     private void addDefaultProperties(SMSSenderAdd smsSenderAdd, EventPublisherConfiguration publisherInSuperTenant) {
 
         // Set the default publisher name if name is not defined.
@@ -425,7 +652,13 @@ public class NotificationSenderManagementService {
         smsSenderAdd.getProperties().add(typeProperty);
     }
 
-    private ResourceAdd getResourceAddFromEmailSenderAdd(EmailSenderAdd emailSenderAdd) {
+    /**
+     * Build EmailSender post body from ResourceAdd object.
+     *
+     * @param emailSenderAdd EmailSender post body.
+     * @return ResourceAdd object.
+     */
+    private ResourceAdd buildResourceAddFromEmailSenderAdd(EmailSenderAdd emailSenderAdd) {
 
         ResourceAdd resourceAdd = new ResourceAdd();
         resourceAdd.setName(emailSenderAdd.getName());
@@ -447,11 +680,18 @@ public class NotificationSenderManagementService {
         return resourceAdd;
     }
 
+    /**
+     * Build an email sender response body from email sender's resourceAdd object.
+     *
+     * @param emailSenderResourceAdd emailSender's ResourceAdd object.
+     * @return Email Sender response.
+     */
     private EmailSender buildEmailSenderFromEmailSenderResourceAdd(ResourceAdd emailSenderResourceAdd) {
 
         EmailSender emailSender = new EmailSender();
         emailSender.setName(emailSenderResourceAdd.getName());
         List<Properties> emailSenderProperties = new ArrayList<>();
+        // Skip STREAM_NAME, STREAM_VERSION and PUBLISHER_TYPE_PROPERTY properties which are stored for internal use.
         Map<String, String> attributesMap = emailSenderResourceAdd.getAttributes().stream()
                 .filter(attribute -> !(STREAM_NAME.equals(attribute.getKey()) ||
                         STREAM_VERSION.equals(attribute.getKey()) ||
@@ -474,10 +714,6 @@ public class NotificationSenderManagementService {
                 case PASSWORD:
                     emailSender.setPassword(attribute.getValue());
                     break;
-                case STREAM_NAME:
-                case STREAM_VERSION:
-                case PUBLISHER_TYPE_PROPERTY:
-                    break;
                 default:
                     Properties property = new Properties();
                     property.setKey(attribute.getKey());
@@ -485,15 +721,24 @@ public class NotificationSenderManagementService {
                     emailSenderProperties.add(property);
             }
         });
-        emailSender.setProperties(emailSenderProperties);
+        if (CollectionUtils.isNotEmpty(emailSenderProperties)) {
+            emailSender.setProperties(emailSenderProperties);
+        }
         return emailSender;
     }
 
-    private EmailSender getEmailSenderFromResource(Resource resource) {
+    /**
+     * Build an email sender response from email sender's resource object.
+     *
+     * @param resource Email sender resource object.
+     * @return Email Sender response.
+     */
+    private EmailSender buildEmailSenderFromResource(Resource resource) {
 
         EmailSender emailSender = new EmailSender();
         emailSender.setName(resource.getResourceName());
         List<Properties> emailSenderProperties = new ArrayList<>();
+        // Skip STREAM_NAME, STREAM_VERSION and PUBLISHER_TYPE_PROPERTY properties which are stored for internal use.
         Map<String, String> attributesMap =
                 resource.getAttributes().stream().filter(attribute -> !(STREAM_NAME.equals(attribute.getKey()) ||
                         STREAM_VERSION.equals(attribute.getKey()) ||
@@ -516,10 +761,6 @@ public class NotificationSenderManagementService {
                 case PASSWORD:
                     emailSender.setPassword(attribute.getValue());
                     break;
-                case STREAM_NAME:
-                case STREAM_VERSION:
-                case PUBLISHER_TYPE_PROPERTY:
-                    break;
                 default:
                     Properties property = new Properties();
                     property.setKey(attribute.getKey());
@@ -527,11 +768,40 @@ public class NotificationSenderManagementService {
                     emailSenderProperties.add(property);
             }
         });
-        emailSender.setProperties(emailSenderProperties);
+        if (CollectionUtils.isNotEmpty(emailSenderProperties)) {
+            emailSender.setProperties(emailSenderProperties);
+        }
         return emailSender;
     }
 
-    private ResourceAdd getResourceAddFromSmsSenderAdd(SMSSenderAdd smsSenderAdd) {
+    /**
+     * Build email sender add object from email sender update request.
+     *
+     * @param senderName               Email sender's name.
+     * @param emailSenderUpdateRequest Email sender's update request body.
+     * @return Email sender add object
+     */
+    private EmailSenderAdd buildEmailSenderAddFromEmailSenderUpdateRequest(
+            String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest) {
+
+        EmailSenderAdd emailSenderAdd = new EmailSenderAdd();
+        emailSenderAdd.setName(senderName);
+        emailSenderAdd.setSmtpServerHost(emailSenderUpdateRequest.getSmtpServerHost());
+        emailSenderAdd.setSmtpPort(emailSenderUpdateRequest.getSmtpPort());
+        emailSenderAdd.setFromAddress(emailSenderUpdateRequest.getFromAddress());
+        emailSenderAdd.setUserName(emailSenderUpdateRequest.getUserName());
+        emailSenderAdd.setPassword(emailSenderUpdateRequest.getPassword());
+        emailSenderAdd.setProperties(emailSenderUpdateRequest.getProperties());
+        return emailSenderAdd;
+    }
+
+    /**
+     * Build SMS Sender post body from ResourceAdd object.
+     *
+     * @param smsSenderAdd SMS sender post body.
+     * @return ResourceAdd object.
+     */
+    private ResourceAdd buildResourceAddFromSmsSenderAdd(SMSSenderAdd smsSenderAdd) {
 
         ResourceAdd resourceAdd = new ResourceAdd();
         resourceAdd.setName(smsSenderAdd.getName());
@@ -552,11 +822,18 @@ public class NotificationSenderManagementService {
         return resourceAdd;
     }
 
+    /**
+     * Build a SMS sender response body from SMS sender's resourceAdd object.
+     *
+     * @param smsSenderResourceAdd SMS sender's ResourceAdd object.
+     * @return SMS sender response.
+     */
     private SMSSender buildSmsSenderFromSmsSenderResourceAdd(ResourceAdd smsSenderResourceAdd) {
 
         SMSSender smsSender = new SMSSender();
         smsSender.setName(smsSenderResourceAdd.getName());
         List<Properties> smsSenderProperties = new ArrayList<>();
+        // Skip STREAM_NAME, STREAM_VERSION and PUBLISHER_TYPE_PROPERTY properties which are stored for internal use.
         Map<String, String> attributesMap = smsSenderResourceAdd.getAttributes().stream()
                 .filter(attribute -> !(STREAM_NAME.equals(attribute.getKey()) ||
                         STREAM_VERSION.equals(attribute.getKey()) ||
@@ -579,10 +856,6 @@ public class NotificationSenderManagementService {
                 case SENDER:
                     smsSender.setSender(attribute.getValue());
                     break;
-                case STREAM_NAME:
-                case STREAM_VERSION:
-                case PUBLISHER_TYPE_PROPERTY:
-                    break;
                 default:
                     Properties property = new Properties();
                     property.setKey(attribute.getKey());
@@ -590,15 +863,24 @@ public class NotificationSenderManagementService {
                     smsSenderProperties.add(property);
             }
         });
-        smsSender.setProperties(smsSenderProperties);
+        if (CollectionUtils.isNotEmpty(smsSenderProperties)) {
+            smsSender.setProperties(smsSenderProperties);
+        }
         return smsSender;
     }
 
-    private SMSSender getSmsSenderFromResource(Resource resource) {
+    /**
+     * Build a SMS sender response from SMS sender's resource object.
+     *
+     * @param resource SMS sender resource object.
+     * @return SMS sender response.
+     */
+    private SMSSender buildSmsSenderFromResource(Resource resource) {
 
         SMSSender smsSender = new SMSSender();
         smsSender.setName(resource.getResourceName());
         List<Properties> smsSenderProperties = new ArrayList<>();
+        // Skip STREAM_NAME, STREAM_VERSION and PUBLISHER_TYPE_PROPERTY properties which are stored for internal use.
         Map<String, String> attributesMap =
                 resource.getAttributes().stream().filter(attribute -> !(STREAM_NAME.equals(attribute.getKey()) ||
                         STREAM_VERSION.equals(attribute.getKey()) ||
@@ -621,10 +903,6 @@ public class NotificationSenderManagementService {
                 case SENDER:
                     smsSender.setSender(attribute.getValue());
                     break;
-                case STREAM_NAME:
-                case STREAM_VERSION:
-                case PUBLISHER_TYPE_PROPERTY:
-                    break;
                 default:
                     Properties property = new Properties();
                     property.setKey(attribute.getKey());
@@ -632,8 +910,31 @@ public class NotificationSenderManagementService {
                     smsSenderProperties.add(property);
             }
         });
-        smsSender.setProperties(smsSenderProperties);
+        if (CollectionUtils.isNotEmpty(smsSenderProperties)) {
+            smsSender.setProperties(smsSenderProperties);
+        }
         return smsSender;
+    }
+
+    /**
+     * Build SMS sender add object from SMS sender update request.
+     *
+     * @param senderName             SMS sender's name.
+     * @param smsSenderUpdateRequest SMS sender's update request body.
+     * @return SMS sender add object.
+     */
+    private SMSSenderAdd buildSMSSenderAddFromSMSSenderUpdateRequest(String senderName,
+                                                                     SMSSenderUpdateRequest smsSenderUpdateRequest) {
+
+        SMSSenderAdd smsSenderAdd = new SMSSenderAdd();
+        smsSenderAdd.setName(senderName);
+        smsSenderAdd.setProvider(smsSenderUpdateRequest.getProvider());
+        smsSenderAdd.setProviderURL(smsSenderUpdateRequest.getProviderURL());
+        smsSenderAdd.setKey(smsSenderUpdateRequest.getKey());
+        smsSenderAdd.setSecret(smsSenderUpdateRequest.getSecret());
+        smsSenderAdd.setSender(smsSenderUpdateRequest.getSender());
+        smsSenderAdd.setProperties(smsSenderUpdateRequest.getProperties());
+        return smsSenderAdd;
     }
 
     private void startSuperTenantFlow() {
