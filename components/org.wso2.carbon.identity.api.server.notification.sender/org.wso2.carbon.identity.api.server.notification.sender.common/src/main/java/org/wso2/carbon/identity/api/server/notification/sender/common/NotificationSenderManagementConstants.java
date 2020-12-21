@@ -137,6 +137,8 @@ public class NotificationSenderManagementConstants {
         ERROR_CODE_TRANSFORMER_EXCEPTION("65008", "Transformer Exception.", "Transformer Exception: %s ."),
         ERROR_CODE_PARSER_CONFIG_EXCEPTION("65009", "Parser Configuration Exception.",
                 "Parser Configuration Exception: %s."),
+        ERROR_CODE_IO_EXCEPTION("65009", "IO Exception.",
+                "Error while building xml file. IO Exception: %s."),
         ;
 
         private final String code;
