@@ -164,7 +164,7 @@ public class EmailSenderAdd  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"key\":\"encryption\",\"value\":\"true\"},{\"key\":\"startTLS\",\"value\":true}]", value = "")
+    @ApiModelProperty(example = "[{\"key\":\"body.scope\",\"value\":\"true\"},{\"key\":\"mail.smtp.starttls.enable\",\"value\":true}]", value = "")
     @JsonProperty("properties")
     @Valid
     public List<Properties> getProperties() {

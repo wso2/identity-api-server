@@ -87,7 +87,7 @@ public class SMSSenderUpdateRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "4cb49374", value = "")
+    @ApiModelProperty(example = "123**45", value = "")
     @JsonProperty("key")
     @Valid
     public String getKey() {
@@ -105,7 +105,7 @@ public class SMSSenderUpdateRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "Fba3EtqyPg4sgE93", value = "")
+    @ApiModelProperty(example = "5tg**ssd", value = "")
     @JsonProperty("secret")
     @Valid
     public String getSecret() {
@@ -141,7 +141,7 @@ public class SMSSenderUpdateRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"key\":\"httpHeaders\",\"value\":\"application/x-www-form-urlencoded\"}]", value = "")
+    @ApiModelProperty(example = "[{\"key\":\"http.headers\",\"value\":\"X-Version: 1, Authorization: bearer ,Accept: application/json ,Content-Type: application/json\"}]", value = "")
     @JsonProperty("properties")
     @Valid
     public List<Properties> getProperties() {

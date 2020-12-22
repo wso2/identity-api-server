@@ -78,9 +78,9 @@ paths:
               userName: iam
               password: iam123
               properties:
-                - key: encryption
+                - key: body.scope
                   value: "true"
-                - key: startTLS
+                - key: mail.smtp.starttls.enable
                   value: true
       responses:
         "201":
@@ -195,10 +195,10 @@ paths:
               userName: iam
               password: iam123
               properties:
-                - key: encryption
+                - key: body.scope
                   value: "true"
-                - key: startTLS
-                  value: false
+                - key: mail.smtp.starttls.enable
+                  value: true
         required: true
       responses:
         "200":
@@ -341,12 +341,12 @@ paths:
             example:
               provider: NEXMO
               providerURL: https://rest.nexmo.com/sms/json
-              key: 4cb49374
-              secret: ba3EtqyPg4sgE93
+              key: 123**45
+              secret: 5tg**ssd
               sender: +94 775563324
               properties:
-                - key: httpHeaders
-                  value: application/x-www-form-urlencoded
+                - key: http.headers
+                  value: "X-Version: 1, Authorization: bearer ,Accept: application/json ,Content-Type: application/json"
       responses:
         "201":
           description: Successful Response
@@ -458,12 +458,12 @@ paths:
             example:
               provider: NEXMO
               providerURL: https://rest.nexmo.com/sms/json
-              key: 4cb49374
-              secret: ba3EtqyPg4sgE93
+              key: 123**45
+              secret: 5tg**ssd
               sender: +94 775563324
               properties:
-                - key: httpHeaders
-                  value: application/x-www-form-urlencoded
+                - key: http.headers
+                  value: "X-Version: 1, Authorization: bearer ,Accept: application/json ,Content-Type: application/json"
         required: true
       responses:
         "200":
@@ -589,9 +589,9 @@ components:
         properties:
           type: array
           example:
-            - key: encryption
+            - key: body.scope
               value: "true"
-            - key: startTLS
+            - key: mail.smtp.starttls.enable
               value: true
           items:
             $ref: '#/components/schemas/Properties'
@@ -612,18 +612,18 @@ components:
           example: https://rest.nexmo.com/sms/json
         key:
           type: string
-          example: 4cb49374
+          example: 123**45
         secret:
           type: string
-          example: Fba3EtqyPg4sgE93
+          example: 5tg**ssd
         sender:
           type: string
           example: +94 775563324
         properties:
           type: array
           example:
-            - key: httpHeaders
-              value: application/x-www-form-urlencoded
+            - key: http.headers
+              value: "X-Version: 1, Authorization: bearer ,Accept: application/json ,Content-Type: application/json"
           items:
             $ref: '#/components/schemas/Properties'
     EmailSender:
@@ -657,9 +657,9 @@ components:
         properties:
           type: array
           example:
-            - key: encryption
+            - key: body.scope
               value: "true"
-            - key: startTLS
+            - key: mail.smtp.starttls.enable
               value: true
           items:
             $ref: '#/components/schemas/Properties'
@@ -681,18 +681,18 @@ components:
           example: https://rest.nexmo.com/sms/json
         key:
           type: string
-          example: 4cb49374
+          example: 123**45
         secret:
           type: string
-          example: Fba3EtqyPg4sgE93
+          example: 5tg**ssd
         sender:
           type: string
           example: +94 775563324
         properties:
           type: array
           example:
-            - key: httpHeaders
-              value: application/x-www-form-urlencoded
+            - key: http.headers
+              value: "X-Version: 1, Authorization: bearer ,Accept: application/json ,Content-Type: application/json"
           items:
             $ref: '#/components/schemas/Properties'
     EmailSenderUpdateRequest:
@@ -720,9 +720,9 @@ components:
         properties:
           type: array
           example:
-            - key: encryption
+            - key: body.scope
               value: "true"
-            - key: startTLS
+            - key: mail.smtp.starttls.enable
               value: true
           items:
             $ref: '#/components/schemas/Properties'
@@ -740,18 +740,18 @@ components:
           example: https://rest.nexmo.com/sms/json
         key:
           type: string
-          example: 4cb49374
+          example: 123**45
         secret:
           type: string
-          example: Fba3EtqyPg4sgE93
+          example: 5tg**ssd
         sender:
           type: string
           example: +94 775563324
         properties:
           type: array
           example:
-            - key: httpHeaders
-              value: application/x-www-form-urlencoded
+            - key: http.headers
+              value: "X-Version: 1, Authorization: bearer ,Accept: application/json ,Content-Type: application/json"
           items:
             $ref: '#/components/schemas/Properties'
     Properties:
