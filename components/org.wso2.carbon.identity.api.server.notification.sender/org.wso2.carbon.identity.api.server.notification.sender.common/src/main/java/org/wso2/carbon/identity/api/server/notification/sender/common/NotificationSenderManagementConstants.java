@@ -18,6 +18,10 @@
 
 package org.wso2.carbon.identity.api.server.notification.sender.common;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Notification sender management related constant class.
  */
@@ -33,6 +37,7 @@ public class NotificationSenderManagementConstants {
     public static final String RESOURCE_NOT_EXISTS_ERROR_CODE = "CONFIGM_00017";
     public static final String PLACEHOLDER_IDENTIFIER = "$";
     public static final String INLINE_BODY_PARAM_PREFIX = "body.";
+    public static final String INLINE_BODY_PROPERTY = "body";
 
     // Email Sender's main properties.
     public static final String SMTP_SERVER_HOST = "smtpServerHost";
@@ -40,10 +45,6 @@ public class NotificationSenderManagementConstants {
     public static final String FROM_ADDRESS = "fromAddress";
     public static final String USERNAME = "userName";
     public static final String PASSWORD = "password";
-    public static final String STARTTLS = "mail.smtp.starttls.enable";
-    public static final String AUTH = "mail.smtp.auth";
-    public static final String SIGNATURE = "mail.smtp.signature";
-    public static final String REPLY_TO = "mail.smtp.replyTo";
     public static final String EMAIL_PUBLISHER_TYPE = "email";
 
     // SMS Sender's main properties.
@@ -52,25 +53,8 @@ public class NotificationSenderManagementConstants {
     public static final String KEY = "key";
     public static final String SECRET = "secret";
     public static final String SENDER = "sender";
-    public static final String SMS_SEND_API_BODY_PROPERTY = "body";
     public static final String CLIENT_HTTP_METHOD_PROPERTY = "http.client.method";
-    public static final String HTTP_HEADERS = "http.headers";
-    public static final String HTTP_PROXY_HOST = "http.proxy.host";
-    public static final String HTTP_PROXY_PORT = "http.proxy.port";
-    public static final String HTTP_USERNAME_PROPERTY = "http.username";
-    public static final String HTTP_PASSWORD_PROPERTY = "http.password";
-    public static final String PASSWORD_ENCRYPTED_PROPERTY = "http.password.encrypted";
     public static final String SMS_PUBLISHER_TYPE = "sms";
-
-    // Thread Pool Related Properties.
-    public static final String MIN_THREAD = "minThread";
-    public static final String MAX_THREAD = "maxThread";
-    public static final String KEEP_ALIVE_TIME_IN_MILLIS = "keepAliveTimeInMillis";
-    public static final String JOB_QUEUE_SIZE = "jobQueueSize";
-
-    // HTTP Client Pool Related Properties.
-    public static final String DEFAULT_MAX_CONNECTIONS_PER_HOST = "defaultMaxConnectionsPerHost";
-    public static final String MAX_TOTAL_CONNECTIONS = "maxTotalConnections";
 
     // Constant for eventPublisher file generation.
     public static final String ROOT_ELEMENT = "eventPublisher";
@@ -110,8 +94,13 @@ public class NotificationSenderManagementConstants {
     public static final String SMTP_HOST_PROPERTY = "mail.smtp.host";
     public static final String SMTP_PORT_PROPERTY = "mail.smtp.port";
     public static final String HTTP_URL_PROPERTY = "http.url";
-    public static final String PASSWORD_ENCRYPTED_ATTR_KEY = "encrypted";
     public static final String CONSTANT_HTTP_POST = "HttpPost";
+
+    public static final List<String> INTERNAL_PROPERTIES =
+            Collections.unmodifiableList(Arrays.asList(STREAM_NAME, STREAM_VERSION, PUBLISHER_TYPE_PROPERTY));
+    public static final List<String> PROPERTIES_TO_SKIP_AT_ADAPTER_CONFIG =
+            Collections.unmodifiableList(
+                    Arrays.asList(STREAM_NAME, STREAM_VERSION, PUBLISHER_TYPE_PROPERTY, INLINE_BODY_PROPERTY));
 
     /**
      * Enums for error messages.

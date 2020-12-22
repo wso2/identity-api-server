@@ -79,6 +79,8 @@ import static org.wso2.carbon.identity.api.server.notification.sender.common.Not
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_SMS_PROVIDER_URL_REQUIRED;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_TRANSFORMER_EXCEPTION;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.FROM_ADDRESS;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.INLINE_BODY_PROPERTY;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.INTERNAL_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.KEY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.NOTIFICATION_SENDER_ERROR_PREFIX;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PASSWORD;
@@ -90,7 +92,6 @@ import static org.wso2.carbon.identity.api.server.notification.sender.common.Not
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SECRET;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SENDER;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMS_PUBLISHER_TYPE;
-import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMS_SEND_API_BODY_PROPERTY;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_PORT;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMTP_SERVER_HOST;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.STREAM_NAME;
@@ -114,7 +115,7 @@ public class NotificationSenderManagementService {
      */
     public EmailSender addEmailSender(EmailSenderAdd emailSenderAdd) {
 
-        Integer tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EventPublisherConfiguration publisherInSuperTenant =
                 validateEmailSenderAddAndGetPublisherInSuperTenant(emailSenderAdd, tenantId);
         addDefaultProperties(emailSenderAdd, publisherInSuperTenant);
@@ -152,7 +153,7 @@ public class NotificationSenderManagementService {
      */
     public SMSSender addSMSSender(SMSSenderAdd smsSenderAdd) {
 
-        Integer tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EventPublisherConfiguration publisherInSuperTenant =
                 validateSMSSenderAddAndGetPublisherInSuperTenant(smsSenderAdd, tenantId);
         addDefaultProperties(smsSenderAdd, publisherInSuperTenant);
@@ -286,7 +287,7 @@ public class NotificationSenderManagementService {
     public EmailSender updateEmailSender(String senderName, EmailSenderUpdateRequest emailSenderUpdateRequest) {
 
         ResourceAdd emailSenderResourceAdd = null;
-        Integer tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EventPublisherConfiguration publisherInSuperTenant =
                 validateEmailSenderUpdateRequestAndGetPublisherInSuperTenant(senderName, tenantId);
         EmailSenderAdd emailSenderAdd =
@@ -319,7 +320,7 @@ public class NotificationSenderManagementService {
     public SMSSender updateSMSSender(String senderName, SMSSenderUpdateRequest smsSenderUpdateRequest) {
 
         ResourceAdd smsSenderResourceAdd = null;
-        Integer tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         EventPublisherConfiguration publisherInSuperTenant =
                 validateSmsSenderUpdateRequestAndGetPublisherInSuperTenant(senderName, smsSenderUpdateRequest,
                         tenantId);
@@ -467,7 +468,7 @@ public class NotificationSenderManagementService {
             if (StringUtils.isEmpty(smsSenderAdd.getProvider())) {
                 throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_SMS_PROVIDER_REQUIRED, null);
             }
-            if (StringUtils.isEmpty(properties.get(SMS_SEND_API_BODY_PROPERTY))) {
+            if (StringUtils.isEmpty(properties.get(INLINE_BODY_PROPERTY))) {
                 SMSProviderTemplate sendSmsAPIPayload = smsProviderPayloadTemplateManager
                         .getSMSProviderPayloadTemplateByProvider(smsSenderAdd.getProvider());
                 if (sendSmsAPIPayload == null) {
@@ -548,7 +549,7 @@ public class NotificationSenderManagementService {
             if (StringUtils.isEmpty(smsSenderUpdateRequest.getProvider())) {
                 throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_SMS_PROVIDER_REQUIRED, null);
             }
-            if (StringUtils.isEmpty(properties.get(SMS_SEND_API_BODY_PROPERTY))) {
+            if (StringUtils.isEmpty(properties.get(INLINE_BODY_PROPERTY))) {
                 SMSProviderTemplate sendSmsAPIPayload = smsProviderPayloadTemplateManager
                         .getSMSProviderPayloadTemplateByProvider(smsSenderUpdateRequest.getProvider());
                 if (sendSmsAPIPayload == null) {
@@ -693,9 +694,7 @@ public class NotificationSenderManagementService {
         List<Properties> emailSenderProperties = new ArrayList<>();
         // Skip STREAM_NAME, STREAM_VERSION and PUBLISHER_TYPE_PROPERTY properties which are stored for internal use.
         Map<String, String> attributesMap = emailSenderResourceAdd.getAttributes().stream()
-                .filter(attribute -> !(STREAM_NAME.equals(attribute.getKey()) ||
-                        STREAM_VERSION.equals(attribute.getKey()) ||
-                        PUBLISHER_TYPE_PROPERTY.equals(attribute.getKey())))
+                .filter(attribute -> !INTERNAL_PROPERTIES.contains(attribute.getKey()))
                 .collect(Collectors.toMap(Attribute::getKey, Attribute::getValue));
         attributesMap.entrySet().forEach(attribute -> {
             switch (attribute.getKey()) {
@@ -740,9 +739,8 @@ public class NotificationSenderManagementService {
         List<Properties> emailSenderProperties = new ArrayList<>();
         // Skip STREAM_NAME, STREAM_VERSION and PUBLISHER_TYPE_PROPERTY properties which are stored for internal use.
         Map<String, String> attributesMap =
-                resource.getAttributes().stream().filter(attribute -> !(STREAM_NAME.equals(attribute.getKey()) ||
-                        STREAM_VERSION.equals(attribute.getKey()) ||
-                        PUBLISHER_TYPE_PROPERTY.equals(attribute.getKey())))
+                resource.getAttributes().stream()
+                        .filter(attribute -> !(INTERNAL_PROPERTIES.contains(attribute.getKey())))
                         .collect(Collectors.toMap(Attribute::getKey, Attribute::getValue));
         attributesMap.entrySet().forEach(attribute -> {
             switch (attribute.getKey()) {
@@ -835,9 +833,7 @@ public class NotificationSenderManagementService {
         List<Properties> smsSenderProperties = new ArrayList<>();
         // Skip STREAM_NAME, STREAM_VERSION and PUBLISHER_TYPE_PROPERTY properties which are stored for internal use.
         Map<String, String> attributesMap = smsSenderResourceAdd.getAttributes().stream()
-                .filter(attribute -> !(STREAM_NAME.equals(attribute.getKey()) ||
-                        STREAM_VERSION.equals(attribute.getKey()) ||
-                        PUBLISHER_TYPE_PROPERTY.equals(attribute.getKey())))
+                .filter(attribute -> !(INTERNAL_PROPERTIES.contains(attribute.getKey())))
                 .collect(Collectors.toMap(Attribute::getKey, Attribute::getValue));
         attributesMap.entrySet().forEach(attribute -> {
             switch (attribute.getKey()) {
@@ -882,9 +878,8 @@ public class NotificationSenderManagementService {
         List<Properties> smsSenderProperties = new ArrayList<>();
         // Skip STREAM_NAME, STREAM_VERSION and PUBLISHER_TYPE_PROPERTY properties which are stored for internal use.
         Map<String, String> attributesMap =
-                resource.getAttributes().stream().filter(attribute -> !(STREAM_NAME.equals(attribute.getKey()) ||
-                        STREAM_VERSION.equals(attribute.getKey()) ||
-                        PUBLISHER_TYPE_PROPERTY.equals(attribute.getKey())))
+                resource.getAttributes().stream()
+                        .filter(attribute -> !(INTERNAL_PROPERTIES.contains(attribute.getKey())))
                         .collect(Collectors.toMap(Attribute::getKey, Attribute::getValue));
         attributesMap.entrySet().forEach(attribute -> {
             switch (attribute.getKey()) {
