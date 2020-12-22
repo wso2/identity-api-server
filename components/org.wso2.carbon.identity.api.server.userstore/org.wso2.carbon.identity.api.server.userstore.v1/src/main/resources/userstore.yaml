@@ -522,7 +522,6 @@ components:
           example: 'true'
     RDBMSConnectionReq:
       required:
-        - domain
         - driverName
         - connectionURL
         - username

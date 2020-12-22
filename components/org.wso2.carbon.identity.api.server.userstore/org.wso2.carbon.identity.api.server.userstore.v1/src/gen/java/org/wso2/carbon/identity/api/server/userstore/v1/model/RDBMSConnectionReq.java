@@ -48,11 +48,9 @@ public class RDBMSConnectionReq  {
         return this;
     }
     
-    @ApiModelProperty(example = "PRIMARY", required = true, value = "User store domain name.")
+    @ApiModelProperty(example = "PRIMARY", value = "User store domain name.")
     @JsonProperty("domain")
     @Valid
-    @NotNull(message = "Property domain cannot be null.")
-
     public String getDomain() {
         return domain;
     }
