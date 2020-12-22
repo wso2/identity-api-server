@@ -70,11 +70,9 @@ public class EmailSender  {
         return this;
     }
     
-    @ApiModelProperty(example = "smtp.gmail.com", required = true, value = "")
+    @ApiModelProperty(example = "smtp.gmail.com", value = "")
     @JsonProperty("smtpServerHost")
     @Valid
-    @NotNull(message = "Property smtpServerHost cannot be null.")
-
     public String getSmtpServerHost() {
         return smtpServerHost;
     }
@@ -90,11 +88,9 @@ public class EmailSender  {
         return this;
     }
     
-    @ApiModelProperty(example = "587", required = true, value = "")
+    @ApiModelProperty(example = "587", value = "")
     @JsonProperty("smtpPort")
     @Valid
-    @NotNull(message = "Property smtpPort cannot be null.")
-
     public Integer getSmtpPort() {
         return smtpPort;
     }
@@ -170,7 +166,7 @@ public class EmailSender  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"key\":\"body.scope\",\"value\":\"true\"},{\"key\":\"mail.smtp.starttls.enable\",\"value\":true}]", value = "")
+    @ApiModelProperty(example = "[{\"key\":\"mail.smtp.starttls.enable\",\"value\":true}]", value = "")
     @JsonProperty("properties")
     @Valid
     public List<Properties> getProperties() {

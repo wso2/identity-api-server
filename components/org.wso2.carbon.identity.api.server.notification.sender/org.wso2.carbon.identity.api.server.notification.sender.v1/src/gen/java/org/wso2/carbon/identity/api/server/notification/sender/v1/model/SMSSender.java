@@ -90,9 +90,11 @@ public class SMSSender  {
         return this;
     }
     
-    @ApiModelProperty(example = "https://rest.nexmo.com/sms/json", value = "")
+    @ApiModelProperty(example = "https://rest.nexmo.com/sms/json", required = true, value = "")
     @JsonProperty("providerURL")
     @Valid
+    @NotNull(message = "Property providerURL cannot be null.")
+
     public String getProviderURL() {
         return providerURL;
     }
@@ -162,7 +164,7 @@ public class SMSSender  {
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"key\":\"http.headers\",\"value\":\"X-Version: 1, Authorization: bearer ,Accept: application/json ,Content-Type: application/json\"}]", value = "")
+    @ApiModelProperty(example = "[{\"key\":\"body.scope\",\"value\":\"internal\"},{\"key\":\"http.headers\",\"value\":\"X-Version: 1, Authorization: bearer ,Accept: application/json ,Content-Type: application/json\"}]", value = "")
     @JsonProperty("properties")
     @Valid
     public List<Properties> getProperties() {

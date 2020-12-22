@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class NotificationSenderManagementConstants {
 
-    public static final String NOTIFICATION_SENDER_ERROR_PREFIX = "NSC-";
+    public static final String NOTIFICATION_SENDER_ERROR_PREFIX = "NSM-";
     public static final String NOTIFICATION_SENDER_CONTEXT_PATH = "/notification-senders";
     public static final String PUBLISHER_RESOURCE_TYPE = "Publisher";
     public static final String PUBLISHER_TYPE_PROPERTY = "type";
