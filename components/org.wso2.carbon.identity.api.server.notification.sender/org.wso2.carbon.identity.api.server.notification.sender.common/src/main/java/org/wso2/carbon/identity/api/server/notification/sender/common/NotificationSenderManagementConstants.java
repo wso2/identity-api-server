@@ -25,7 +25,7 @@ public class NotificationSenderManagementConstants {
 
     public static final String NOTIFICATION_SENDER_ERROR_PREFIX = "NSC-";
     public static final String NOTIFICATION_SENDER_CONTEXT_PATH = "/notification-senders";
-    public static final String PUBLISHER_RESOURCE_TYPE = "PUBLISHER";
+    public static final String PUBLISHER_RESOURCE_TYPE = "Publisher";
     public static final String PUBLISHER_TYPE_PROPERTY = "type";
     public static final String DEFAULT_EMAIL_PUBLISHER = "EmailPublisher";
     public static final String DEFAULT_SMS_PUBLISHER = "SMSPublisher";
