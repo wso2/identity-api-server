@@ -122,6 +122,7 @@ paths:
       summary: Retrieve an email sender by name
       description: |
         This API provides the capability to retrieve an email sender by name.
+        The URL encoded email sender name is used as sender-name.
       operationId: getEmailSender
       parameters:
         - name: sender-name
@@ -173,6 +174,7 @@ paths:
       summary: Update an email sender
       description: |
         This API provides the capability to update an email sender by name.
+        The URL encoded email sender name is used as sender-name.
       operationId: updateEmailSender
       parameters:
         - name: sender-name
@@ -237,6 +239,7 @@ paths:
       summary: Delete an email sender by name
       description: |
         This API provides the capability to delete an email sender by name.
+        The URL encoded email sender name is used as sender-name.
       operationId: deleteEmailSender
       parameters:
         - name: sender-name
@@ -284,7 +287,7 @@ paths:
         - SMS Senders
       summary: Get a list of SMS senders
       description: |
-        This API provides the capability to retrive a list of SMS notification senders.
+        This API provides the capability to retrieve a list of SMS notification senders.
       operationId: getSMSSenders
       responses:
         "200":
@@ -386,7 +389,8 @@ paths:
         - SMS Senders
       summary: Get a SMS sender by name
       description: |
-        This API provides the capability to retrive a SMS notification sender by name.
+        This API provides the capability to retrieve a SMS notification sender by name.
+        The URL encoded SMS sender name is used as sender-name.
       operationId: getSMSSender
       parameters:
         - name: sender-name
@@ -438,6 +442,7 @@ paths:
       summary: Update a SMS sender
       description: |
         This API provides the capability to update a SMS Sender.
+        The URL encoded SMS sender name is used as sender-name.
       operationId: updateSMSSender
       parameters:
         - name: sender-name
@@ -506,6 +511,7 @@ paths:
       summary: Delete a SMS sender by name
       description: |
         This API provides the capability to delete a SMS sender by name.
+        The URL encoded SMS sender name is used as sender-name.
       operationId: deleteSMSSender
       parameters:
         - name: sender-name
