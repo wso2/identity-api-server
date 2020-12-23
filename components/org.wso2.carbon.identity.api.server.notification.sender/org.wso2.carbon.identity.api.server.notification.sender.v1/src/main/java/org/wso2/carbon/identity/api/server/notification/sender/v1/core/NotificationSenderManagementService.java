@@ -60,6 +60,7 @@ import javax.ws.rs.core.Response;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.CONFIG_MGT_ERROR_CODE_DELIMITER;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.DEFAULT_EMAIL_PUBLISHER;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.DEFAULT_SMS_PUBLISHER;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.EMAIL_PUBLISHER_TYPE;
@@ -881,9 +882,8 @@ public class NotificationSenderManagementService {
         if (e instanceof ConfigurationManagementClientException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
-                errorCode =
-                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
-                                errorCode : NOTIFICATION_SENDER_ERROR_PREFIX + errorCode;
+                errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
+                        NOTIFICATION_SENDER_ERROR_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
@@ -891,9 +891,8 @@ public class NotificationSenderManagementService {
         } else if (e instanceof ConfigurationManagementServerException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
-                errorCode =
-                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
-                                errorCode : NOTIFICATION_SENDER_ERROR_PREFIX + errorCode;
+                errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
+                        NOTIFICATION_SENDER_ERROR_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
