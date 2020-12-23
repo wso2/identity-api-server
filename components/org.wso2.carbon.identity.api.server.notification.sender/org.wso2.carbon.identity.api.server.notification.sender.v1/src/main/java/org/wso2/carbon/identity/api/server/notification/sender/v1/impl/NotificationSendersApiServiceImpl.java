@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.base.MultitenantConstants;
 
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.NotificationSendersApiService;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.core.NotificationSenderManagementService;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSender;
@@ -32,7 +34,10 @@ import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSende
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.SMSSenderUpdateRequest;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.core.Response;
 
@@ -40,7 +45,9 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.EMAIL_PUBLISHER_TYPE;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.NOTIFICATION_SENDER_CONTEXT_PATH;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.PLUS;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.SMS_PUBLISHER_TYPE;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.URL_ENCODED_SPACE;
 
 /**
  * Implementation of notification senders REST API.
@@ -57,10 +64,17 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
         EmailSender emailSender = notificationSenderManagementService.addEmailSender(emailSenderAdd);
-        URI location = ContextLoader
-                .buildURIForHeader(
-                        V1_API_PATH_COMPONENT + NOTIFICATION_SENDER_CONTEXT_PATH + "/" + EMAIL_PUBLISHER_TYPE + "/" +
-                                emailSender.getName());
+        URI location = null;
+        try {
+            location = ContextLoader.buildURIForHeader(
+                    V1_API_PATH_COMPONENT + NOTIFICATION_SENDER_CONTEXT_PATH + "/" + EMAIL_PUBLISHER_TYPE + "/" +
+                            URLEncoder.encode(emailSender.getName(), StandardCharsets.UTF_8.name())
+                                    .replace(PLUS, URL_ENCODED_SPACE));
+        } catch (UnsupportedEncodingException e) {
+            ErrorResponse errorResponse =
+                    new ErrorResponse.Builder().withMessage("Error due to unsupported encoding.").build();
+            throw new APIError(Response.Status.METHOD_NOT_ALLOWED, errorResponse);
+        }
         return Response.created(location).entity(emailSender).build();
     }
 
@@ -71,10 +85,17 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
             return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
         }
         SMSSender smsSender = notificationSenderManagementService.addSMSSender(smSSenderAdd);
-        URI location = ContextLoader
-                .buildURIForHeader(
-                        V1_API_PATH_COMPONENT + NOTIFICATION_SENDER_CONTEXT_PATH + "/" + SMS_PUBLISHER_TYPE + "/" +
-                                smsSender.getName());
+        URI location = null;
+        try {
+            location = ContextLoader.buildURIForHeader(
+                    V1_API_PATH_COMPONENT + NOTIFICATION_SENDER_CONTEXT_PATH + "/" + SMS_PUBLISHER_TYPE + "/" +
+                            URLEncoder.encode(smsSender.getName(), StandardCharsets.UTF_8.name())
+                                    .replace(PLUS, URL_ENCODED_SPACE));
+        } catch (UnsupportedEncodingException e) {
+            ErrorResponse errorResponse =
+                    new ErrorResponse.Builder().withMessage("Error due to unsupported encoding.").build();
+            throw new APIError(Response.Status.METHOD_NOT_ALLOWED, errorResponse);
+        }
         return Response.created(location).entity(smsSender).build();
     }
 

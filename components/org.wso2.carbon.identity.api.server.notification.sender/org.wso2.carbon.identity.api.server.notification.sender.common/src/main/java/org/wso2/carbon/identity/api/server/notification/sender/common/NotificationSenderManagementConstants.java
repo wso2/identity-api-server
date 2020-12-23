@@ -38,6 +38,8 @@ public class NotificationSenderManagementConstants {
     public static final String PLACEHOLDER_IDENTIFIER = "$";
     public static final String INLINE_BODY_PARAM_PREFIX = "body.";
     public static final String INLINE_BODY_PROPERTY = "body";
+    public static final String PLUS = "+";
+    public static final String URL_ENCODED_SPACE = "%20";
 
     // Email Sender's main properties.
     public static final String SMTP_SERVER_HOST = "smtpServerHost";
