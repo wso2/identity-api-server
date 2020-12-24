@@ -707,13 +707,13 @@ public class NotificationSenderManagementService {
         attributesMap.entrySet().forEach(attribute -> {
             switch (attribute.getKey()) {
                 case SMTP_SERVER_HOST:
-                    emailSender.setSmtpServerHost(attribute.getKey());
+                    emailSender.setSmtpServerHost(attribute.getValue());
                     break;
                 case SMTP_PORT:
-                    emailSender.setSmtpPort(Integer.valueOf(attribute.getKey()));
+                    emailSender.setSmtpPort(Integer.valueOf(attribute.getValue()));
                     break;
                 case FROM_ADDRESS:
-                    emailSender.setFromAddress(attribute.getKey());
+                    emailSender.setFromAddress(attribute.getValue());
                     break;
                 case USERNAME:
                     emailSender.setUserName(attribute.getValue());
@@ -809,7 +809,7 @@ public class NotificationSenderManagementService {
         attributesMap.entrySet().forEach(attribute -> {
             switch (attribute.getKey()) {
                 case PROVIDER:
-                    smsSender.setProvider(attribute.getKey());
+                    smsSender.setProvider(attribute.getValue());
                     break;
                 case PROVIDER_URL:
                     smsSender.setProviderURL(attribute.getValue());
