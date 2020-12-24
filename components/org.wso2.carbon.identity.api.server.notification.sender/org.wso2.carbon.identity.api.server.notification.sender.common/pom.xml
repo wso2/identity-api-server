@@ -57,10 +57,12 @@
         <dependency>
             <groupId>org.wso2.carbon.analytics-common</groupId>
             <artifactId>org.wso2.carbon.event.publisher.core</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.event.handler.notification</groupId>
             <artifactId>org.wso2.carbon.email.mgt</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
