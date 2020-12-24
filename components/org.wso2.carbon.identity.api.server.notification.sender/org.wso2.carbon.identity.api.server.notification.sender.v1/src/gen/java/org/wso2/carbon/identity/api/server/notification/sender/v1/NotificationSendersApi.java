@@ -64,6 +64,7 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response createEmailSender(@ApiParam(value = "" ) @Valid EmailSenderAdd emailSenderAdd) {
@@ -89,6 +90,7 @@ public class NotificationSendersApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response createSMSSender(@ApiParam(value = "" ) @Valid SMSSenderAdd smSSenderAdd) {

@@ -109,6 +109,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "500":
           description: Server Error
           content:
@@ -373,6 +379,12 @@ paths:
                 $ref: '#/components/schemas/Error'
         "405":
           description: Method Not Allowed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "409":
+          description: Conflict
           content:
             application/json:
               schema:
