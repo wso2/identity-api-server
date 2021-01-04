@@ -51,7 +51,7 @@ public class NotificationSendersApi  {
     @Path("/email")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create an email sender", notes = "This API provides the capability to create an email sender.  If the 'name' is not not defined, 'EmailPublisher' is taken as the default name.", response = EmailSender.class, authorizations = {
+    @ApiOperation(value = "Create an email sender", notes = "This API provides the capability to create an email sender.\\n\\nIf the 'name' is not not defined, 'EmailPublisher' is taken as the default name. <br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/add <br>   <b>Scope required:</b> <br>     * internal_config_mgt_add ", response = EmailSender.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -77,7 +77,7 @@ public class NotificationSendersApi  {
     @Path("/sms")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Create a SMS sender", notes = "This API provides the capability to create a SMS sender. If the 'name' is not not defined, 'SMSPublisher' is taken as the default name. ", response = SMSSender.class, authorizations = {
+    @ApiOperation(value = "Create a SMS sender", notes = "This API provides the capability to create a SMS sender. If the 'name' is not not defined, 'SMSPublisher' is taken as the default name.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/add <br>   <b>Scope required:</b> <br>     * internal_config_mgt_add ", response = SMSSender.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -103,7 +103,7 @@ public class NotificationSendersApi  {
     @Path("/email/{sender-name}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete an email sender by name", notes = "This API provides the capability to delete an email sender by name. The URL encoded email sender name is used as sender-name. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete an email sender by name", notes = "This API provides the capability to delete an email sender by name. The URL encoded email sender name is used as sender-name.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/delete <br>   <b>Scope required:</b> <br>     * internal_config_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -128,7 +128,7 @@ public class NotificationSendersApi  {
     @Path("/sms/{sender-name}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete a SMS sender by name", notes = "This API provides the capability to delete a SMS sender by name. The URL encoded SMS sender name is used as sender-name. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete a SMS sender by name", notes = "This API provides the capability to delete a SMS sender by name. The URL encoded SMS sender name is used as sender-name.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/delete <br>   <b>Scope required:</b> <br>     * internal_config_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -153,7 +153,7 @@ public class NotificationSendersApi  {
     @Path("/email/{sender-name}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve an email sender by name", notes = "This API provides the capability to retrieve an email sender by name. The URL encoded email sender name is used as sender-name. ", response = EmailSender.class, authorizations = {
+    @ApiOperation(value = "Retrieve an email sender by name", notes = "This API provides the capability to retrieve an email sender by name. The URL encoded email sender name is used as sender-name.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/view <br>   <b>Scope required:</b> <br>     * internal_config_mgt_view ", response = EmailSender.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -178,7 +178,7 @@ public class NotificationSendersApi  {
     @Path("/email")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get a list of email senders", notes = "This API provides the capability to retrieve the list of email senders. ", response = EmailSender.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Get a list of email senders", notes = "This API provides the capability to retrieve the list of email senders. <br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/view <br>   <b>Scope required:</b> <br>     * internal_config_mgt_view ", response = EmailSender.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -203,7 +203,7 @@ public class NotificationSendersApi  {
     @Path("/sms/{sender-name}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get a SMS sender by name", notes = "This API provides the capability to retrieve a SMS notification sender by name. The URL encoded SMS sender name is used as sender-name. ", response = SMSSender.class, authorizations = {
+    @ApiOperation(value = "Get a SMS sender by name", notes = "This API provides the capability to retrieve a SMS notification sender by name. The URL encoded SMS sender name is used as sender-name.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/view <br>   <b>Scope required:</b> <br>     * internal_config_mgt_view ", response = SMSSender.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -228,7 +228,7 @@ public class NotificationSendersApi  {
     @Path("/sms")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get a list of SMS senders", notes = "This API provides the capability to retrieve a list of SMS notification senders. ", response = SMSSender.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Get a list of SMS senders", notes = "This API provides the capability to retrieve a list of SMS notification senders.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/view <br>   <b>Scope required:</b> <br>     * internal_config_mgt_view ", response = SMSSender.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -253,7 +253,7 @@ public class NotificationSendersApi  {
     @Path("/email/{sender-name}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update an email sender", notes = "This API provides the capability to update an email sender by name. The URL encoded email sender name is used as sender-name. ", response = EmailSender.class, authorizations = {
+    @ApiOperation(value = "Update an email sender", notes = "This API provides the capability to update an email sender by name. The URL encoded email sender name is used as sender-name.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/update <br>   <b>Scope required:</b> <br>     * internal_config_mgt_update ", response = EmailSender.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -278,7 +278,7 @@ public class NotificationSendersApi  {
     @Path("/sms/{sender-name}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update a SMS sender", notes = "This API provides the capability to update a SMS Sender. The URL encoded SMS sender name is used as sender-name. ", response = SMSSender.class, authorizations = {
+    @ApiOperation(value = "Update a SMS sender", notes = "This API provides the capability to update a SMS Sender. The URL encoded SMS sender name is used as sender-name.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/update <br>   <b>Scope required:</b> <br>     * internal_config_mgt_update ", response = SMSSender.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
