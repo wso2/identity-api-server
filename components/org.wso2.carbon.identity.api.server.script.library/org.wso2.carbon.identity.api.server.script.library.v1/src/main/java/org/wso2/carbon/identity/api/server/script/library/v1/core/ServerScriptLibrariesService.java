@@ -393,8 +393,7 @@ public class ServerScriptLibrariesService {
      * @param errorEnum Error Message information.
      * @return APIError.
      */
-    private APIError handleScriptLibraryError(FunctionLibraryManagementException e,
-                                                    Constants.ErrorMessage errorEnum) {
+    private APIError handleScriptLibraryError(FunctionLibraryManagementException e, Constants.ErrorMessage errorEnum) {
 
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(log, e, errorEnum.getDescription());
         Response.Status status;
