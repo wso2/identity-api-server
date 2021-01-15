@@ -393,7 +393,7 @@ public class ServerScriptLibrariesService {
      * @param errorEnum Error Message information.
      * @return APIError.
      */
-    private static APIError handleScriptLibraryError(FunctionLibraryManagementException e,
+    private APIError handleScriptLibraryError(FunctionLibraryManagementException e,
                                                     Constants.ErrorMessage errorEnum) {
 
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(log, e, errorEnum.getDescription());
@@ -418,7 +418,7 @@ public class ServerScriptLibrariesService {
      * @param e             FunctionLibraryManagementException
      * @param errorResponse ErrorResponse
      */
-    public static void createErrorResponse(FunctionLibraryManagementException e, ErrorResponse errorResponse) {
+    private void createErrorResponse(FunctionLibraryManagementException e, ErrorResponse errorResponse) {
 
         if (e.getErrorCode() != null) {
             String errorCode = e.getErrorCode();
@@ -436,7 +436,7 @@ public class ServerScriptLibrariesService {
      * @param errorMsg Error Message information.
      * @return ErrorResponse.Builder.
      */
-    public static ErrorResponse.Builder getErrorBuilder(Constants.ErrorMessage errorMsg) {
+    private ErrorResponse.Builder getErrorBuilder(Constants.ErrorMessage errorMsg) {
 
         return new ErrorResponse.Builder().withCode(errorMsg.getCode()).withMessage(errorMsg.getMessage())
                 .withDescription(errorMsg.getDescription());
