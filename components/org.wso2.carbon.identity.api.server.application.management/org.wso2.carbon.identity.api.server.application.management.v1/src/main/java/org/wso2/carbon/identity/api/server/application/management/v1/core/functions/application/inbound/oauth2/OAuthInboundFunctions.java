@@ -20,8 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound
-        .InboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
@@ -223,20 +222,17 @@ public class OAuthInboundFunctions {
      *
      * @param applicationId   application id
      * @param oidcConfigModel oidc configurations of the application.
+     * @throws CORSManagementServiceException if CORS origin update fails.
      */
-    public static void updateCorsOrigins(String applicationId, OpenIDConnectConfiguration oidcConfigModel) {
+    public static void updateCorsOrigins(String applicationId, OpenIDConnectConfiguration oidcConfigModel)
+            throws CORSManagementServiceException {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-
         // Update the CORS origins.
         List<String> corsOrigins = oidcConfigModel.getAllowedOrigins();
-        try {
-            if (corsOrigins != null) {
-                ApplicationManagementServiceHolder.getCorsManagementService()
-                        .setCORSOrigins(applicationId, corsOrigins, tenantDomain);
-            }
-        } catch (CORSManagementServiceException e) {
-            throw handleException(e);
+        if (corsOrigins != null) {
+            ApplicationManagementServiceHolder.getCorsManagementService()
+                    .setCORSOrigins(applicationId, corsOrigins, tenantDomain);
         }
     }
 }
