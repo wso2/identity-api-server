@@ -1757,6 +1757,12 @@ public class ServerIdpManagementService {
             jwksProperty.setValue(idpJWKSUri);
             idpProperties.add(jwksProperty);
         }
+        if (StringUtils.isNotBlank(identityProviderPOSTRequest.getTemplateId())) {
+            IdentityProviderProperty templateIdProperty = new IdentityProviderProperty();
+            templateIdProperty.setName(Constants.TEMPLATE_ID);
+            templateIdProperty.setValue(identityProviderPOSTRequest.getTemplateId());
+            idpProperties.add(templateIdProperty);
+        }
         idp.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
         return idp;
     }
@@ -1896,6 +1902,7 @@ public class ServerIdpManagementService {
 
         IdentityProviderResponse idpResponse = new IdentityProviderResponse();
         populateIDPBasicInfo(idpResponse, identityProvider);
+        idpResponse.setTemplateId(identityProvider.getTemplateId());
         idpResponse.setCertificate(createIDPCertificate(identityProvider));
         idpResponse.setClaims(createClaimResponse(identityProvider.getClaimConfig()));
         idpResponse.setRoles(createRoleResponse(identityProvider));

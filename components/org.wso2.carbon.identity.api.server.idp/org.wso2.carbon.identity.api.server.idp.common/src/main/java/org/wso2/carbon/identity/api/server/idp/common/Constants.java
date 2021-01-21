@@ -30,6 +30,7 @@ public class Constants {
     public static final String IDP_TEMPLATE_PATH_COMPONENT = "/templates";
     public static final String PATH_SEPERATOR = "/";
     public static final String JWKS_URI = "jwksUri";
+    public static final String TEMPLATE_ID = "templateId";
     public static final String META_DATA_SAML = "meta_data_saml";
     public static final String SELECT_MODE = "SelectMode";
     public static final String SELECT_MODE_METADATA = "Metadata File Configuration";

@@ -38,6 +38,7 @@ public class IdentityProviderResponse  {
     private String id;
     private String name;
     private String description;
+    private String templateId;
     private Boolean isEnabled = true;
     private Boolean isPrimary = false;
     private String image;
@@ -102,6 +103,24 @@ public class IdentityProviderResponse  {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+    **/
+    public IdentityProviderResponse templateId(String templateId) {
+
+        this.templateId = templateId;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "8ea23303-49c0-4253-b81f-82c0fe6fb4a0", value = "")
+    @JsonProperty("templateId")
+    @Valid
+    public String getTemplateId() {
+        return templateId;
+    }
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
     }
 
     /**
@@ -317,6 +336,7 @@ public class IdentityProviderResponse  {
         return Objects.equals(this.id, identityProviderResponse.id) &&
             Objects.equals(this.name, identityProviderResponse.name) &&
             Objects.equals(this.description, identityProviderResponse.description) &&
+            Objects.equals(this.templateId, identityProviderResponse.templateId) &&
             Objects.equals(this.isEnabled, identityProviderResponse.isEnabled) &&
             Objects.equals(this.isPrimary, identityProviderResponse.isPrimary) &&
             Objects.equals(this.image, identityProviderResponse.image) &&
@@ -332,7 +352,7 @@ public class IdentityProviderResponse  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, isEnabled, isPrimary, image, isFederationHub, homeRealmIdentifier, certificate, alias, claims, roles, federatedAuthenticators, provisioning);
+        return Objects.hash(id, name, description, templateId, isEnabled, isPrimary, image, isFederationHub, homeRealmIdentifier, certificate, alias, claims, roles, federatedAuthenticators, provisioning);
     }
 
     @Override
@@ -344,6 +364,7 @@ public class IdentityProviderResponse  {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    isPrimary: ").append(toIndentedString(isPrimary)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
