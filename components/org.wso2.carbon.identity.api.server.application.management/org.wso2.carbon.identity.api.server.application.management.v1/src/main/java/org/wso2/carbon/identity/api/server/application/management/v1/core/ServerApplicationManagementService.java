@@ -330,12 +330,15 @@ public class ServerApplicationManagementService {
             return applicationId;
         } catch (IdentityApplicationManagementException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Error while creating application. Rolling back possibly created inbound config data.");
+                log.debug("Error while creating application. Rolling back possibly created inbound config data.", e);
             }
             rollbackInbounds(getConfiguredInbounds(application));
 
             String msg = "Error creating application.";
             throw handleIdentityApplicationManagementException(e, msg);
+        } catch (APIError e) {
+            rollbackInbounds(getConfiguredInbounds(application));
+            throw e;
         }
     }
 

@@ -121,6 +121,9 @@ public class OAuthInboundFunctions {
 
         String message = "Error while Creating/Updating OAuth2/OpenIDConnect configuration. " + e.getMessage();
         if (e instanceof IdentityOAuthClientException || e instanceof CORSManagementServiceClientException) {
+            if (log.isDebugEnabled()) {
+                log.debug(message, e);
+            }
             return buildBadRequestError(message);
         }
         return buildServerError(message, e);
