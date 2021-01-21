@@ -184,6 +184,20 @@ public class ServerConfigManagementService {
             rememberMePeriod = rememberMeProp.getValue();
         }
 
+        String signingKeyAlias = null;
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        IdentityProviderProperty signingKeyAliasProp =
+                IdentityApplicationManagementUtil.getProperty(residentIdP.getIdpProperties(),
+                        IdentityApplicationConstants.SIGNING_KEY_ALIAS);
+        if (signingKeyAliasProp != null) {
+            signingKeyAlias = signingKeyAliasProp.getValue();
+            if (StringUtils.isBlank(signingKeyAlias) || ("null".equals(signingKeyAlias))) {
+                signingKeyAlias = tenantDomain;
+            }
+        } else {
+            signingKeyAlias = tenantDomain;
+        }
+
         String homeRealmIdStr = residentIdP.getHomeRealmId();
         List<String> homeRealmIdentifiers = null;
         if (StringUtils.isNotBlank(homeRealmIdStr)) {
@@ -194,6 +208,7 @@ public class ServerConfigManagementService {
         serverConfig.setRealmConfig(realmConfig);
         serverConfig.setIdleSessionTimeoutPeriod(idleSessionTimeout);
         serverConfig.setRememberMePeriod(rememberMePeriod);
+        serverConfig.setSigningKeyAlias(signingKeyAlias);
         serverConfig.setHomeRealmIdentifiers(homeRealmIdentifiers);
         serverConfig.setProvisioning(buildProvisioningConfig());
         serverConfig.setAuthenticators(getAuthenticators(null));
@@ -538,6 +553,9 @@ public class ServerConfigManagementService {
                         case Constants.REMEMBER_ME_PATH:
                             updateIdPProperty(idpToUpdate, IdentityApplicationConstants.REMEMBER_ME_TIME_OUT, value);
                             break;
+                        case Constants.SIGNING_KEY_ALIAS:
+                            updateIdPProperty(idpToUpdate, IdentityApplicationConstants.SIGNING_KEY_ALIAS, value);
+                            break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                     .ERROR_CODE_INVALID_INPUT, "Unsupported value for 'path' attribute");
@@ -584,10 +602,18 @@ public class ServerConfigManagementService {
 
         List<IdentityProviderProperty> idPProperties = new ArrayList<>(Arrays.asList(identityProvider
                 .getIdpProperties()));
-        if (StringUtils.isBlank(value) || !StringUtils.isNumeric(value) || Integer.parseInt(value) <= 0) {
-            String message = "Value should be numeric and positive";
-            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
-                    message);
+        if (IdentityApplicationConstants.SIGNING_KEY_ALIAS.equals(key)) {
+            if (StringUtils.isBlank(value) || (StringUtils.equalsIgnoreCase(value, "null"))) {
+                String message = "Value should not be empty or null";
+                throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                        message);
+            }
+        } else {
+            if (StringUtils.isBlank(value) || !StringUtils.isNumeric(value) || Integer.parseInt(value) <= 0) {
+                String message = "Value should be numeric and positive";
+                throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                        message);
+            }
         }
         boolean isPropertyFound = false;
         if (CollectionUtils.isNotEmpty(idPProperties)) {

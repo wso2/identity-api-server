@@ -426,6 +426,10 @@ components:
           description: "The remember me period in minutes"
           example: "20160"
           default: "20160"
+        signingKeyAlias:
+          type: string
+          description: "Alias of the key used for signing"
+          example: "abc.com"
         provisioning:
           $ref: '#/components/schemas/ProvisioningConfig'
         authenticators:
@@ -436,20 +440,20 @@ components:
       type: object
       properties:
         adminUser:
-            type: string
-            description: "Username of the super admin user in the system."
-            example: "admin"
-            readOnly: true
+          type: string
+          description: "Username of the super admin user in the system."
+          example: "admin"
+          readOnly: true
         adminRole:
-            type: string
-            description: "Name of the super admin role in the system."
-            example: "Internal/admin"
-            readOnly: true
+          type: string
+          description: "Name of the super admin role in the system."
+          example: "Internal/admin"
+          readOnly: true
         everyoneRole:
-            type: string
-            description: "Name of the everyone role in the system."
-            example: "Internal/everyone"
-            readOnly: true
+          type: string
+          description: "Name of the everyone role in the system."
+          example: "Internal/everyone"
+          readOnly: true
     ProvisioningConfig:
       type: object
       properties:

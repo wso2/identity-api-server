@@ -41,6 +41,7 @@ public class ServerConfig  {
     private RealmConfig realmConfig;
     private String idleSessionTimeoutPeriod = "15";
     private String rememberMePeriod = "20160";
+    private String signingKeyAlias;
     private ProvisioningConfig provisioning;
     private List<AuthenticatorListItem> authenticators = null;
 
@@ -130,6 +131,25 @@ public class ServerConfig  {
     }
 
     /**
+    * Alias of the key used for signing
+    **/
+    public ServerConfig signingKeyAlias(String signingKeyAlias) {
+
+        this.signingKeyAlias = signingKeyAlias;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "abc.com", value = "Alias of the key used for signing")
+    @JsonProperty("signingKeyAlias")
+    @Valid
+    public String getSigningKeyAlias() {
+        return signingKeyAlias;
+    }
+    public void setSigningKeyAlias(String signingKeyAlias) {
+        this.signingKeyAlias = signingKeyAlias;
+    }
+
+    /**
     **/
     public ServerConfig provisioning(ProvisioningConfig provisioning) {
 
@@ -207,6 +227,7 @@ public class ServerConfig  {
             Objects.equals(this.realmConfig, serverConfig.realmConfig) &&
             Objects.equals(this.idleSessionTimeoutPeriod, serverConfig.idleSessionTimeoutPeriod) &&
             Objects.equals(this.rememberMePeriod, serverConfig.rememberMePeriod) &&
+            Objects.equals(this.signingKeyAlias, serverConfig.signingKeyAlias) &&
             Objects.equals(this.provisioning, serverConfig.provisioning) &&
             Objects.equals(this.authenticators, serverConfig.authenticators) &&
             Objects.equals(this.cors, serverConfig.cors);
@@ -214,7 +235,7 @@ public class ServerConfig  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(homeRealmIdentifiers, realmConfig, idleSessionTimeoutPeriod, rememberMePeriod, provisioning, authenticators, cors);
+        return Objects.hash(homeRealmIdentifiers, realmConfig, idleSessionTimeoutPeriod, rememberMePeriod, signingKeyAlias, provisioning, authenticators, cors);
     }
 
     @Override
@@ -227,6 +248,7 @@ public class ServerConfig  {
         sb.append("    realmConfig: ").append(toIndentedString(realmConfig)).append("\n");
         sb.append("    idleSessionTimeoutPeriod: ").append(toIndentedString(idleSessionTimeoutPeriod)).append("\n");
         sb.append("    rememberMePeriod: ").append(toIndentedString(rememberMePeriod)).append("\n");
+        sb.append("    signingKeyAlias: ").append(toIndentedString(signingKeyAlias)).append("\n");
         sb.append("    provisioning: ").append(toIndentedString(provisioning)).append("\n");
         sb.append("    authenticators: ").append(toIndentedString(authenticators)).append("\n");
         sb.append("    cors: ").append(toIndentedString(cors)).append("\n");
