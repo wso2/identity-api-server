@@ -55,6 +55,6 @@ public class KeystoreApiServiceImpl implements KeystoreApiService {
     public Response uploadPrivateKey(AddPrivateKeyRequest addPrivateKeyRequest) {
 
         return keyStoreMgtService.uploadPrivateKey(addPrivateKeyRequest.getAlias(),
-                addPrivateKeyRequest.getCertificate());
+                addPrivateKeyRequest.getPrivateKey(), addPrivateKeyRequest.getCertificateChain());
     }
 }

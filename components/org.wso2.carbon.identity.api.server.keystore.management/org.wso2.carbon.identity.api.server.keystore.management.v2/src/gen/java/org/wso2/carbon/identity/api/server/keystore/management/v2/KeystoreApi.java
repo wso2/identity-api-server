@@ -23,9 +23,9 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.api.server.keystore.management.v2.model.AddPrivateKeyRequest;
+import org.wso2.carbon.identity.api.server.keystore.management.v2.model.CertificateData;
 import org.wso2.carbon.identity.api.server.keystore.management.v2.model.ErrorResponse;
-import org.wso2.carbon.identity.api.server.keystore.management.v2.model.PrivateKeyDataObject;
-import org.wso2.carbon.identity.api.server.keystore.management.v2.model.PrivateKeysResponse;
+import org.wso2.carbon.identity.api.server.keystore.management.v2.model.KeysData;
 import org.wso2.carbon.identity.api.server.keystore.management.v2.KeystoreApiService;
 
 import javax.validation.Valid;
@@ -53,7 +53,7 @@ public class KeystoreApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Certificates", })
+    }, tags={ "Private Keys", })
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Successfully Deleted.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request.", response = ErrorResponse.class),
@@ -69,17 +69,17 @@ public class KeystoreApi  {
 
     @Valid
     @GET
-    @Path("/keys/{alias}")
+    @Path("/keys/{alias}/certificate")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the certificate of the provided alias", notes = "This REST API can be used to download the private key of specified alias from the keystore. <br> <b>Permission required:</b> <br>   * /permission/admin/manage/identity/keystoremgt/view <br> <b>Scope required:</b> <br>   * internal_keystore_view ", response = PrivateKeyDataObject.class, authorizations = {
+    @ApiOperation(value = "Retrieves the certificate of the provided alias", notes = "This REST API can be used to download the private key of specified alias from the keystore. <br> <b>Permission required:</b> <br>   * /permission/admin/manage/identity/keystoremgt/view <br> <b>Scope required:</b> <br>   * internal_keystore_view ", response = CertificateData.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Certificates", })
+    }, tags={ "Private Keys", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK.", response = PrivateKeyDataObject.class),
+        @ApiResponse(code = 200, message = "OK.", response = CertificateData.class),
         @ApiResponse(code = 400, message = "Bad Request.", response = ErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
@@ -96,14 +96,14 @@ public class KeystoreApi  {
     @Path("/keys")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the list of private key aliases", notes = "This REST API can be used to get the certificate aliases from the keystore.<br> <b>Permission required:</b> <br>   * /permission/admin/manage/identity/keystoremgt/view <br> <b>Scope required:</b> <br>   * internal_keystore_view ", response = PrivateKeysResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieves the list of private key aliases", notes = "This REST API can be used to get the certificate aliases from the keystore.<br> <b>Permission required:</b> <br>   * /permission/admin/manage/identity/keystoremgt/view <br> <b>Scope required:</b> <br>   * internal_keystore_view ", response = KeysData.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Certificates", })
+    }, tags={ "Keys", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK.", response = PrivateKeysResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "OK.", response = KeysData.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request.", response = ErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
@@ -125,7 +125,7 @@ public class KeystoreApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Certificates" })
+    }, tags={ "Private Keys" })
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Created.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request.", response = ErrorResponse.class),

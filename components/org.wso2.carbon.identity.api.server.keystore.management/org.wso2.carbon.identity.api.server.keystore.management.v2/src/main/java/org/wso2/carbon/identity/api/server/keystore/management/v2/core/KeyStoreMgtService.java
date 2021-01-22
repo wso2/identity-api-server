@@ -23,10 +23,10 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.keystore.management.v2.function.PrivateKeyDataToExternal;
-import org.wso2.carbon.identity.api.server.keystore.management.v2.function.PrivateKeysDataToExternal;
-import org.wso2.carbon.identity.api.server.keystore.management.v2.model.PrivateKeyDataObject;
-import org.wso2.carbon.identity.api.server.keystore.management.v2.model.PrivateKeysResponse;
+import org.wso2.carbon.identity.api.server.keystore.management.v2.function.CertificateDataToExternal;
+import org.wso2.carbon.identity.api.server.keystore.management.v2.function.KeysDataToExternal;
+import org.wso2.carbon.identity.api.server.keystore.management.v2.model.CertificateData;
+import org.wso2.carbon.identity.api.server.keystore.management.v2.model.KeysData;
 import org.wso2.carbon.security.keystore.KeyStoreManagementException;
 import org.wso2.carbon.security.keystore.KeyStoreManagementServerException;
 import org.wso2.carbon.security.keystore.service.KeyData;
@@ -49,12 +49,12 @@ public class KeyStoreMgtService {
      * @param alias Alias.
      * @return PrivateKeyDataObject.
      */
-    public PrivateKeyDataObject getPrivateKey(String alias) {
+    public CertificateData getPrivateKey(String alias) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             KeyData privateKeyData = getKeyStoreManager().getPrivateKeyData(alias, tenantDomain);
-            return new PrivateKeyDataToExternal().apply(privateKeyData);
+            return new CertificateDataToExternal().apply(privateKeyData);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Unable to get the certificate with alias: " + alias + " to the keystore.");
         }
@@ -67,11 +67,11 @@ public class KeyStoreMgtService {
      * @param key   Private Key.
      * @return Response.
      */
-    public Response uploadPrivateKey(String alias, String key) {
+    public Response uploadPrivateKey(String alias, String key, String certificateChain) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            getKeyStoreManager().addPrivateKey(alias, key, tenantDomain);
+            getKeyStoreManager().addPrivateKey(alias, key, certificateChain, tenantDomain);
             return Response.ok().build();
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Unable to upload the certificate with alias: " + alias + " to the keystore.");
@@ -100,12 +100,12 @@ public class KeyStoreMgtService {
      *
      * @return List of PrivateKeysResponse
      */
-    public List<PrivateKeysResponse> getAllPrivateKeys() {
+    public List<KeysData> getAllPrivateKeys() {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             List<KeyData> privateKeyData = getKeyStoreManager().getAllPrivateKeys(tenantDomain);
-            return new PrivateKeysDataToExternal().apply(privateKeyData);
+            return new KeysDataToExternal().apply(privateKeyData);
         } catch (KeyStoreManagementException e) {
             throw handleException(e,
                     "Unable to get all the private keys from the to the keystore of the tenant: " + tenantDomain);

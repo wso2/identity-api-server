@@ -23,9 +23,9 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.keystore.management.v2.model.AddPrivateKeyRequest;
+import org.wso2.carbon.identity.api.server.keystore.management.v2.model.CertificateData;
 import org.wso2.carbon.identity.api.server.keystore.management.v2.model.ErrorResponse;
-import org.wso2.carbon.identity.api.server.keystore.management.v2.model.PrivateKeyDataObject;
-import org.wso2.carbon.identity.api.server.keystore.management.v2.model.PrivateKeysResponse;
+import org.wso2.carbon.identity.api.server.keystore.management.v2.model.KeysData;
 import javax.ws.rs.core.Response;
 
 

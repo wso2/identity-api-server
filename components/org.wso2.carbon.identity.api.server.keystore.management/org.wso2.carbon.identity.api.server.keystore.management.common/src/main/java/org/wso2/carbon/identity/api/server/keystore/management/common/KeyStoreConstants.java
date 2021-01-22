@@ -31,6 +31,8 @@ public class KeyStoreConstants {
     // Constants related to v2
     public static final String KEYSTORE_API_PATH_COMPONENT = "/keystore";
     public static final String KEYS_PATH_COMPONENT = "/keys" + "/%s";
+    public static final String KEYS_CERTIFICATE_PATH_COMPONENT = "/certificate";
+
 
 
 
