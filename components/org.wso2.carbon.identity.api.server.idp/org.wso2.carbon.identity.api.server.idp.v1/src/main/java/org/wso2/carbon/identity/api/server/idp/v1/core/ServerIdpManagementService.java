@@ -1729,6 +1729,7 @@ public class ServerIdpManagementService {
         IdentityProvider idp = new IdentityProvider();
         idp.setIdentityProviderName(identityProviderPOSTRequest.getName());
         idp.setAlias(identityProviderPOSTRequest.getAlias());
+        idp.setTemplateId(identityProviderPOSTRequest.getTemplateId());
         idp.setPrimary(false);
         idp.setIdentityProviderDescription(identityProviderPOSTRequest.getDescription());
         idp.setHomeRealmId(identityProviderPOSTRequest.getHomeRealmIdentifier());
@@ -1756,12 +1757,6 @@ public class ServerIdpManagementService {
             jwksProperty.setName(Constants.JWKS_URI);
             jwksProperty.setValue(idpJWKSUri);
             idpProperties.add(jwksProperty);
-        }
-        if (StringUtils.isNotBlank(identityProviderPOSTRequest.getTemplateId())) {
-            IdentityProviderProperty templateIdProperty = new IdentityProviderProperty();
-            templateIdProperty.setName(Constants.TEMPLATE_ID);
-            templateIdProperty.setValue(identityProviderPOSTRequest.getTemplateId());
-            idpProperties.add(templateIdProperty);
         }
         idp.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
         return idp;
