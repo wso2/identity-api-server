@@ -72,7 +72,7 @@ public class KeystoreApi  {
     @Path("/keys/{alias}/certificate")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the certificate of the provided alias", notes = "This REST API can be used to download the private key of specified alias from the keystore. <br> <b>Permission required:</b> <br>   * /permission/admin/manage/identity/keystoremgt/view <br> <b>Scope required:</b> <br>   * internal_keystore_view ", response = CertificateData.class, authorizations = {
+    @ApiOperation(value = "Retrieves the certificate details of the provided alias of a private key", notes = "This REST API can be used to get the certificate details of the private key of specified alias from the keystore. <br> <b>Permission required:</b> <br>   * /permission/admin/manage/identity/keystoremgt/view <br> <b>Scope required:</b> <br>   * internal_keystore_view ", response = CertificateData.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -96,7 +96,7 @@ public class KeystoreApi  {
     @Path("/keys")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the list of private key aliases", notes = "This REST API can be used to get the certificate aliases from the keystore.<br> <b>Permission required:</b> <br>   * /permission/admin/manage/identity/keystoremgt/view <br> <b>Scope required:</b> <br>   * internal_keystore_view ", response = KeysData.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieves the list of private keys data", notes = "This REST API can be used to get the private keys data from the keystore.<br> <b>Permission required:</b> <br>   * /permission/admin/manage/identity/keystoremgt/view <br> <b>Scope required:</b> <br>   * internal_keystore_view ", response = KeysData.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -110,7 +110,7 @@ public class KeystoreApi  {
         @ApiResponse(code = 404, message = "Resource Not Found.", response = ErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = ErrorResponse.class)
     })
-    public Response getPrivateKeyAliases(    @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. E.g. keystores/certs?filter=alias+eq+wso2carbon")  @QueryParam("filter") String filter) {
+    public Response getPrivateKeyAliases(    @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. E.g. keystore/keys?filter=alias+eq+wso2carbon")  @QueryParam("filter") String filter) {
 
         return delegate.getPrivateKeyAliases(filter );
     }
@@ -120,7 +120,7 @@ public class KeystoreApi  {
     @Path("/keys")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Uploads the certificate with the given alias", notes = "This REST API can be used to upload the certificate to the tenant keystore. This API is not supported for super tenant. <br> <b>Permission required:</b> <br>   * /permission/admin/manage/identity/keystoremgt/update <br> <b>Scope required:</b> <br>   * internal_keystore_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Uploads the certificate with the given alias", notes = "This REST API can be used to upload the private key to the tenant keystore. This API is not supported for super tenant. <br> <b>Permission required:</b> <br>   * /permission/admin/manage/identity/keystoremgt/update <br> <b>Scope required:</b> <br>   * internal_keystore_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

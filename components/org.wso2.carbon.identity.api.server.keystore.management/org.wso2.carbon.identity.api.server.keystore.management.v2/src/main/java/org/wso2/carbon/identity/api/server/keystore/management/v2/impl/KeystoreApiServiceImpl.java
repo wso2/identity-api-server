@@ -48,7 +48,7 @@ public class KeystoreApiServiceImpl implements KeystoreApiService {
     @Override
     public Response getPrivateKeyAliases(String filter) {
 
-        return Response.ok().entity(keyStoreMgtService.getAllPrivateKeys()).build();
+        return Response.ok().entity(keyStoreMgtService.getAllPrivateKeys(filter)).build();
     }
 
     @Override

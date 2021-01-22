@@ -46,16 +46,18 @@ public class KeysDataToExternal implements Function<List<KeyData>, List<KeysData
     public List<KeysData> apply(List<KeyData> keysData) {
 
         List<KeysData> keysResponse = new ArrayList<>();
-        for (KeyData data : keysData) {
-            KeysData response = new KeysData();
-            response.setAlias(data.getAlias());
-            MinimumCertificateData certificate = new MinimumCertificateData();
-            certificate.setIssurDN(data.getIssuerDN());
-            certificate.setSubjectDN(data.getSubjectDN());
-            certificate.setNotAfter(data.getNotAfter());
-            response.setCertificate(certificate);
-            response.setSelf(getKeyReferencePath(data.getAlias()));
-            keysResponse.add(response);
+        if (keysData != null && !keysData.isEmpty()) {
+            for (KeyData data : keysData) {
+                KeysData response = new KeysData();
+                response.setAlias(data.getAlias());
+                MinimumCertificateData certificate = new MinimumCertificateData();
+                certificate.setIssurDN(data.getIssuerDN());
+                certificate.setSubjectDN(data.getSubjectDN());
+                certificate.setNotAfter(data.getNotAfter());
+                response.setCertificate(certificate);
+                response.setSelf(getKeyReferencePath(data.getAlias()));
+                keysResponse.add(response);
+            }
         }
         return keysResponse;
     }

@@ -35,31 +35,33 @@ public class CertificateDataToExternal implements Function<KeyData, CertificateD
     public CertificateData apply(KeyData keyData) {
 
         CertificateData response = new CertificateData();
-        response.setIssurDN(keyData.getIssuerDN());
-        response.setSubjectDN(keyData.getSubjectDN());
-        response.setSerialNumber(String.valueOf(String.valueOf(keyData.getSerialNumber())));
-        response.setNotAfter(keyData.getNotAfter());
-        response.setNotBefore(keyData.getNotBefore());
-        response.setVersion(keyData.getVersion());
-        Fingerprints fingerprints = new Fingerprints();
-        for (Map.Entry<String, String> entry : keyData.getFingerprint().entrySet()) {
-            switch (entry.getKey()) {
-                case ("MD5"):
-                    fingerprints.setMD5(entry.getValue());
-                    break;
-                case ("SHA1"):
-                    fingerprints.setSHA1(entry.getValue());
-                    break;
-                case ("SHA-256"):
-                    fingerprints.setSHA256(entry.getValue());
-                    break;
-                default:
-                    break;
+        if (keyData != null) {
+            response.setIssurDN(keyData.getIssuerDN());
+            response.setSubjectDN(keyData.getSubjectDN());
+            response.setSerialNumber(String.valueOf(String.valueOf(keyData.getSerialNumber())));
+            response.setNotAfter(keyData.getNotAfter());
+            response.setNotBefore(keyData.getNotBefore());
+            response.setVersion(keyData.getVersion());
+            Fingerprints fingerprints = new Fingerprints();
+            for (Map.Entry<String, String> entry : keyData.getFingerprint().entrySet()) {
+                switch (entry.getKey()) {
+                    case ("MD5"):
+                        fingerprints.setMD5(entry.getValue());
+                        break;
+                    case ("SHA1"):
+                        fingerprints.setSHA1(entry.getValue());
+                        break;
+                    case ("SHA-256"):
+                        fingerprints.setSHA256(entry.getValue());
+                        break;
+                    default:
+                        break;
+                }
             }
+            response.setCertificateFingerprints(fingerprints);
+            response.setSignatureAlgorithm(keyData.getSignatureAlgName());
+            response.setPublicKey(keyData.getPublicKey());
         }
-        response.setCertificateFingerprints(fingerprints);
-        response.setSignatureAlgorithm(keyData.getSignatureAlgName());
-        response.setPublicKey(keyData.getPublicKey());
         return response;
     }
 }

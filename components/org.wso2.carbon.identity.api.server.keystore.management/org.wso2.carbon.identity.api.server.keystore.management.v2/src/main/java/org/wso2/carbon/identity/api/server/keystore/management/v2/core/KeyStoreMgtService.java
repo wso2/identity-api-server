@@ -100,11 +100,11 @@ public class KeyStoreMgtService {
      *
      * @return List of PrivateKeysResponse
      */
-    public List<KeysData> getAllPrivateKeys() {
+    public List<KeysData> getAllPrivateKeys(String filter) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            List<KeyData> privateKeyData = getKeyStoreManager().getAllPrivateKeys(tenantDomain);
+            List<KeyData> privateKeyData = getKeyStoreManager().getAllPrivateKeys(filter, tenantDomain);
             return new KeysDataToExternal().apply(privateKeyData);
         } catch (KeyStoreManagementException e) {
             throw handleException(e,
