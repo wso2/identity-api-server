@@ -381,6 +381,22 @@ public class ServerConfigManagementService {
         }
     }
 
+    /**
+     * Get Home Realm Identifiers.
+     *
+     * @return List of home realm identifiers.
+     */
+    public List<String> getHomeRealmIdentifiers() {
+
+        IdentityProvider residentIdP = getResidentIdP();
+        String homeRealmIdStr = residentIdP.getHomeRealmId();
+        List<String> homeRealmIdentifiers = new ArrayList<>();
+        if (StringUtils.isNotBlank(homeRealmIdStr)) {
+            homeRealmIdentifiers = Arrays.stream(homeRealmIdStr.split(",")).collect(Collectors.toList());
+        }
+        return homeRealmIdentifiers;
+    }
+
     private List<AuthenticatorListItem> buildAuthenticatorListResponse(
             LocalAuthenticatorConfig[] localConfigs, RequestPathAuthenticatorConfig[] requestPathConfigs) {
 

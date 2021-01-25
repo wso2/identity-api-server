@@ -42,6 +42,8 @@ public interface ConfigsApiService {
 
       public Response getConfigs();
 
+      public Response getHomeRealmIdentifiers();
+
       public Response getInboundScimConfigs();
 
       public Response listAuthenticators(String type);
