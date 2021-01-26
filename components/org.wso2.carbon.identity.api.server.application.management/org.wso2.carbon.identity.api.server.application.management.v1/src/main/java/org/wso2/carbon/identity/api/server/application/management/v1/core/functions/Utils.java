@@ -58,6 +58,14 @@ public class Utils {
         }
     }
 
+    public static <T> void setIfNotNull(T value, Consumer<T> consumer) {
+
+        if (value != null) {
+            consumer.accept(value);
+        }
+    }
+
+
     public static <T> Stream<T> arrayToStream(T[] object) {
 
         return object != null ? Stream.of(object) : Stream.empty();
