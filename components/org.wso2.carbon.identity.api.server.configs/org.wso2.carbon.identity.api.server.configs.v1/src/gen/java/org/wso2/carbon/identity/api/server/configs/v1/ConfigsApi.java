@@ -122,7 +122,7 @@ public class ConfigsApi  {
 
     @Valid
     @GET
-    @Path("/homeRealmIdentifiers")
+    @Path("/home-realm-identifiers")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve the Home Realm Identifiers.", notes = "Retrieve the Home Realm Identifiers.", response = String.class, responseContainer = "List", authorizations = {

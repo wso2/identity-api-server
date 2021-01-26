@@ -326,7 +326,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /configs/homeRealmIdentifiers:
+  /configs/home-realm-identifiers:
     get:
       tags:
         - Home Realm Identifiers

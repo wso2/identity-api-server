@@ -187,7 +187,8 @@ public class ServerConfigManagementService {
         String homeRealmIdStr = residentIdP.getHomeRealmId();
         List<String> homeRealmIdentifiers = null;
         if (StringUtils.isNotBlank(homeRealmIdStr)) {
-            homeRealmIdentifiers = Arrays.stream(homeRealmIdStr.split(",")).collect(Collectors.toList());
+            homeRealmIdentifiers =
+                    Arrays.stream(homeRealmIdStr.trim().split("\\s*,\\s*")).collect(Collectors.toList());
         }
         ServerConfig serverConfig = new ServerConfig();
         serverConfig.setRealmConfig(realmConfig);
@@ -392,7 +393,8 @@ public class ServerConfigManagementService {
         String homeRealmIdStr = residentIdP.getHomeRealmId();
         List<String> homeRealmIdentifiers = new ArrayList<>();
         if (StringUtils.isNotBlank(homeRealmIdStr)) {
-            homeRealmIdentifiers = Arrays.stream(homeRealmIdStr.split(",")).collect(Collectors.toList());
+            homeRealmIdentifiers =
+                    Arrays.stream(homeRealmIdStr.trim().split("\\s*,\\s*")).collect(Collectors.toList());
         }
         return homeRealmIdentifiers;
     }
