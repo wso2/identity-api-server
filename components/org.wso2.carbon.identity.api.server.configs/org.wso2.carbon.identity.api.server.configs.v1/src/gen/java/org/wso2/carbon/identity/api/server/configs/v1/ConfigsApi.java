@@ -122,6 +122,30 @@ public class ConfigsApi  {
 
     @Valid
     @GET
+    @Path("/home-realm-identifiers")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the Home Realm Identifiers.", notes = "Retrieve the Home Realm Identifiers.", response = String.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Home Realm Identifiers", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = String.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getHomeRealmIdentifiers() {
+
+        return delegate.getHomeRealmIdentifiers();
+    }
+
+    @Valid
+    @GET
     @Path("/provisioning/inbound/scim")
     
     @Produces({ "application/json" })

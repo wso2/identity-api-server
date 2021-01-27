@@ -187,7 +187,8 @@ public class ServerConfigManagementService {
         String homeRealmIdStr = residentIdP.getHomeRealmId();
         List<String> homeRealmIdentifiers = null;
         if (StringUtils.isNotBlank(homeRealmIdStr)) {
-            homeRealmIdentifiers = Arrays.stream(homeRealmIdStr.split(",")).collect(Collectors.toList());
+            homeRealmIdentifiers =
+                    Arrays.stream(homeRealmIdStr.trim().split("\\s*,\\s*")).collect(Collectors.toList());
         }
         ServerConfig serverConfig = new ServerConfig();
         serverConfig.setRealmConfig(realmConfig);
@@ -379,6 +380,23 @@ public class ServerConfigManagementService {
         } catch (CORSManagementServiceException e) {
             throw handleCORSException(e, Constants.ErrorMessage.ERROR_CODE_CORS_CONFIG_UPDATE, null);
         }
+    }
+
+    /**
+     * Get Home Realm Identifiers.
+     *
+     * @return List of home realm identifiers.
+     */
+    public List<String> getHomeRealmIdentifiers() {
+
+        IdentityProvider residentIdP = getResidentIdP();
+        String homeRealmIdStr = residentIdP.getHomeRealmId();
+        List<String> homeRealmIdentifiers = new ArrayList<>();
+        if (StringUtils.isNotBlank(homeRealmIdStr)) {
+            homeRealmIdentifiers =
+                    Arrays.stream(homeRealmIdStr.trim().split("\\s*,\\s*")).collect(Collectors.toList());
+        }
+        return homeRealmIdentifiers;
     }
 
     private List<AuthenticatorListItem> buildAuthenticatorListResponse(

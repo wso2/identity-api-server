@@ -54,6 +54,11 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response getHomeRealmIdentifiers() {
+        return Response.ok().entity(configManagementService.getHomeRealmIdentifiers()).build();
+    }
+
+    @Override
     public Response getInboundScimConfigs() {
 
         return Response.ok().entity(configManagementService.getInboundScimConfig()).build();
