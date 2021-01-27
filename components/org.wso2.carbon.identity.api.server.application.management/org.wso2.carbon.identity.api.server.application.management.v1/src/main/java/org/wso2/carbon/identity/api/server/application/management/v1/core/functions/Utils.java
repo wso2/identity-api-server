@@ -90,6 +90,15 @@ public class Utils {
         return newObject;
     }
 
+    public static APIError buildBadRequestError(String errorCode, String description) {
+
+        if (errorCode == null) {
+            errorCode = INVALID_REQUEST.getCode();
+        }
+        String errorMessage = "Invalid Request.";
+        return buildClientError(errorCode, errorMessage, description);
+    }
+
     public static APIError buildBadRequestError(String description) {
 
         String errorCode = INVALID_REQUEST.getCode();
