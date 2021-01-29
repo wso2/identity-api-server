@@ -28,6 +28,9 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
+/**
+ * This class contains data needed for uploading a private key.
+ */
 public class AddPrivateKeyRequest  {
   
     private String alias;

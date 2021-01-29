@@ -35,7 +35,7 @@ import static org.wso2.carbon.identity.api.server.keystore.management.common.Key
 import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.KEYS_PATH_COMPONENT;
 
 /**
- * Converts list of CertData to PrivateKeys response.
+ * Converts list of KeyData object to a list of KeysData response.
  */
 public class KeysDataToExternal implements Function<List<KeyData>, List<KeysData>> {
 

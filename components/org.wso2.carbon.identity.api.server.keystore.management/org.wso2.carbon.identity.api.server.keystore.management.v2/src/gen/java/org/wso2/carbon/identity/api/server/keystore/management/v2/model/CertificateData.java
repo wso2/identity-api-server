@@ -29,6 +29,9 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
+/**
+ * This class contains all the data related to public certificate of a key.
+ */
 public class CertificateData  {
   
     private String subjectDN;

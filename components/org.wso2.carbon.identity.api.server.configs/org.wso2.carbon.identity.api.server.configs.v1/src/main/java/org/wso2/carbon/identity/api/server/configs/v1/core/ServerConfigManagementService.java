@@ -184,19 +184,7 @@ public class ServerConfigManagementService {
             rememberMePeriod = rememberMeProp.getValue();
         }
 
-        String signingKeyAlias = null;
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        IdentityProviderProperty signingKeyAliasProp =
-                IdentityApplicationManagementUtil.getProperty(residentIdP.getIdpProperties(),
-                        IdentityApplicationConstants.SIGNING_KEY_ALIAS);
-        if (signingKeyAliasProp != null) {
-            signingKeyAlias = signingKeyAliasProp.getValue();
-            if (StringUtils.isBlank(signingKeyAlias) || ("null".equals(signingKeyAlias))) {
-                signingKeyAlias = tenantDomain;
-            }
-        } else {
-            signingKeyAlias = tenantDomain;
-        }
+        String signingKeyAlias = getSigningKeyAlias(residentIdP);
 
         String homeRealmIdStr = residentIdP.getHomeRealmId();
         List<String> homeRealmIdentifiers = null;
@@ -214,6 +202,24 @@ public class ServerConfigManagementService {
         serverConfig.setAuthenticators(getAuthenticators(null));
         serverConfig.setCors(getCORSConfiguration());
         return serverConfig;
+    }
+
+    private String getSigningKeyAlias(IdentityProvider residentIdP) {
+
+        String signingKeyAlias = null;
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        IdentityProviderProperty signingKeyAliasProp =
+                IdentityApplicationManagementUtil.getProperty(residentIdP.getIdpProperties(),
+                        IdentityApplicationConstants.SIGNING_KEY_ALIAS);
+        if (signingKeyAliasProp != null) {
+            signingKeyAlias = signingKeyAliasProp.getValue();
+            if (StringUtils.isBlank(signingKeyAlias) || ("null".equals(signingKeyAlias))) {
+                signingKeyAlias = tenantDomain;
+            }
+        } else {
+            signingKeyAlias = tenantDomain;
+        }
+        return signingKeyAlias;
     }
 
     /**

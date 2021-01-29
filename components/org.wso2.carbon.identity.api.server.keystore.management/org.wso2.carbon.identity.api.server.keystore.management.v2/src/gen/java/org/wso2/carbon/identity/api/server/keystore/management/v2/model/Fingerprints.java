@@ -28,6 +28,9 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
+/**
+ * This class contains fingerprints of certificate.
+ */
 public class Fingerprints  {
   
     private String MD5;

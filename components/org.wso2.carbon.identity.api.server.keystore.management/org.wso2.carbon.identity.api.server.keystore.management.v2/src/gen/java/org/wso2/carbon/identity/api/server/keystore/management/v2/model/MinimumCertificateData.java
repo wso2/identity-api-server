@@ -17,17 +17,16 @@
 package org.wso2.carbon.identity.api.server.keystore.management.v2.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
 
-import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
 
+/**
+ * This class contains minimum data of public certificate of a key.
+ */
 public class MinimumCertificateData  {
   
     private String subjectDN;

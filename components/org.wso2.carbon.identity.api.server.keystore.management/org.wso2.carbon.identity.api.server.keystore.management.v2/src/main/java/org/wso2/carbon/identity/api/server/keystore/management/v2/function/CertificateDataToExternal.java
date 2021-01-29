@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Converts CertData to PrivateKeyData object.
+ * Converts CertData to CertificateData object.
  */
 public class CertificateDataToExternal implements Function<KeyData, CertificateData> {
 

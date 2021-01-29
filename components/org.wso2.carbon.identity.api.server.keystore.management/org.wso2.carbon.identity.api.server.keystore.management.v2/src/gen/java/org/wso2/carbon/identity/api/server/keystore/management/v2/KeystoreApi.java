@@ -38,6 +38,9 @@ import javax.validation.constraints.*;
 @Path("/keystore")
 @Api(description = "The keystore API")
 
+/*
+  REST API for managing keystore related functionalities.
+ */
 public class KeystoreApi  {
 
     @Autowired
