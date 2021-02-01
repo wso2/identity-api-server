@@ -44,6 +44,13 @@ public class TenantsApiServiceImpl implements TenantsApiService {
     }
 
     @Override
+    public Response deleteTenantMetadata(String tenantId) {
+
+        tenantManagementService.deleteTenantMetadata(tenantId);
+        return Response.noContent().build();
+    }
+
+    @Override
     public Response getOwners(String tenantUniqueIdentifier) {
 
         return Response.ok().entity(tenantManagementService.getOwners(tenantUniqueIdentifier)).build();
@@ -73,5 +80,21 @@ public class TenantsApiServiceImpl implements TenantsApiService {
 
         return ContextLoader.buildURIForHeader(Constants.V1_API_PATH_COMPONENT +
                 TenantManagementConstants.TENANT_MANAGEMENT_PATH_COMPONENT + "/" + resourceId);
+    }
+
+    @Override
+    public Response getTenantByDomain(String tenantDomain) {
+
+        return Response.ok().entity(tenantManagementService.getTenantByDomain(tenantDomain)).build();
+    }
+
+    @Override
+    public Response isDomainExist(String tenantDomain) {
+
+        if (tenantManagementService.isDomainAvailable(tenantDomain)) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        } else {
+            return Response.status(Response.Status.OK).build();
+        }
     }
 }

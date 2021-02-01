@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class AvailableUserStoreClassesRes  {
         return this;
     }
     
-    @ApiModelProperty(example = "SkRCQ1VzZXJTdG9yZU1hbmFnZXI", value = "")
+    @ApiModelProperty(example = "VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg", value = "")
     @JsonProperty("typeId")
     @Valid
     public String getTypeId() {
@@ -64,7 +64,7 @@ public class AvailableUserStoreClassesRes  {
         return this;
     }
     
-    @ApiModelProperty(example = "JDBCUserStoreManager", value = "")
+    @ApiModelProperty(example = "UniqueIDJDBCUserStoreManager", value = "")
     @JsonProperty("typeName")
     @Valid
     public String getTypeName() {
@@ -82,7 +82,7 @@ public class AvailableUserStoreClassesRes  {
         return this;
     }
     
-    @ApiModelProperty(example = "org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager", value = "")
+    @ApiModelProperty(example = "org.wso2.carbon.user.core.jdbc.UniqueIDJDBCUserStoreManager", value = "")
     @JsonProperty("className")
     @Valid
     public String getClassName() {
@@ -100,7 +100,7 @@ public class AvailableUserStoreClassesRes  {
         return this;
     }
     
-    @ApiModelProperty(example = "/t/{tenant-domain}/api/server/v1/userstores/meta/types/SkRCQ1VzZXJTdG9yZU1hbmFnZXI", value = "")
+    @ApiModelProperty(example = "/t/{tenant-domain}/api/server/v1/userstores/meta/types/VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg", value = "")
     @JsonProperty("self")
     @Valid
     public String getSelf() {

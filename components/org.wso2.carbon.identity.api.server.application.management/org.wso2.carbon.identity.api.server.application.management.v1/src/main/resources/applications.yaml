@@ -2198,6 +2198,12 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/app/login'
+        access:
+          type: string
+          enum:
+            - READ
+            - WRITE
+          default: READ
         self:
           type: string
           example: "/t/wso2.com/api/server/v1/applications/85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
@@ -2271,6 +2277,12 @@ components:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
           $ref: '#/components/schemas/ProvisioningConfiguration'
+        access:
+          type: string
+          enum:
+            - READ
+            - WRITE
+          default: READ
 
     ApplicationPatchModel:
       type: object

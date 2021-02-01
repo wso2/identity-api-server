@@ -130,7 +130,7 @@ public class AccessTokenConfiguration  {
     }
 
     /**
-    * If enabled, both access token and the token binding needs to be present for a successful API invocation
+    * If enabled, both access token and the token binding needs to be present for a successful API invocation.
     **/
     public AccessTokenConfiguration validateTokenBinding(Boolean validateTokenBinding) {
 
@@ -138,7 +138,7 @@ public class AccessTokenConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(value = "If enabled, both access token and the token binding needs to be present for a successful API invocation")
+    @ApiModelProperty(value = "If enabled, both access token and the token binding needs to be present for a successful API invocation.")
     @JsonProperty("validateTokenBinding")
     @Valid
     public Boolean getValidateTokenBinding() {

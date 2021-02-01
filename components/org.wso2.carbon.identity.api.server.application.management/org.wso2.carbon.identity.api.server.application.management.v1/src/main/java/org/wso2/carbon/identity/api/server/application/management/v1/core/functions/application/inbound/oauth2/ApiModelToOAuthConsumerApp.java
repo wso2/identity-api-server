@@ -31,6 +31,8 @@ import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 import java.util.List;
 import java.util.Optional;
 
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
+
 /**
  * Converts OpenIDConnectConfiguration api model to OAuthConsumerAppDTO.
  */
@@ -87,17 +89,26 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
     private void updateIdTokenConfiguration(OAuthConsumerAppDTO consumerAppDTO, IdTokenConfiguration idToken) {
 
         if (idToken != null) {
-            consumerAppDTO.setIdTokenExpiryTime(idToken.getExpiryInSeconds());
+            setIfNotNull(idToken.getExpiryInSeconds(), consumerAppDTO::setIdTokenExpiryTime);
             consumerAppDTO.setAudiences(Optional.ofNullable(idToken.getAudience())
                     .map(audiences -> audiences.toArray(new String[0]))
                     .orElse(new String[0])
             );
-            consumerAppDTO.setIdTokenEncryptionEnabled(idToken.getEncryption().getEnabled());
-            if (idToken.getEncryption().getEnabled()) {
-                consumerAppDTO.setIdTokenEncryptionAlgorithm(idToken.getEncryption().getAlgorithm());
-                consumerAppDTO.setIdTokenEncryptionMethod(idToken.getEncryption().getMethod());
+
+            if (idToken.getEncryption() != null) {
+                boolean idTokenEncryptionEnabled = isIdTokenEncryptionEnabled(idToken);
+                consumerAppDTO.setIdTokenEncryptionEnabled(idTokenEncryptionEnabled);
+                if (idTokenEncryptionEnabled) {
+                    consumerAppDTO.setIdTokenEncryptionAlgorithm(idToken.getEncryption().getAlgorithm());
+                    consumerAppDTO.setIdTokenEncryptionMethod(idToken.getEncryption().getMethod());
+                }
             }
         }
+    }
+
+    private boolean isIdTokenEncryptionEnabled(IdTokenConfiguration idToken) {
+
+        return idToken.getEncryption().getEnabled() != null && idToken.getEncryption().getEnabled();
     }
 
     private void updateRefreshTokenConfiguration(OAuthConsumerAppDTO consumerAppDTO,

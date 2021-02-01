@@ -28,6 +28,7 @@ public class UserStoreConstants {
     public static final String USER_STORE_CLASS_NAME = "/className";
     public static final String USER_STORE_DOMAIN_NAME = "/domainName";
     public static final String USER_STORE_PROPERTIES = "/properties/";
+    public static final String USER_STORE_PROPERTY_MASK = "************";
 
     /**
      * Enum for user store related errors in the format of
@@ -37,7 +38,7 @@ public class UserStoreConstants {
      */
     public enum ErrorMessage {
 
-        // For server errors,  allocated the error code range starting from 650
+        // Server Errors - 650xx
         ERROR_CODE_ERROR_ADDING_USER_STORE("65001",
                 "Unable to add the secondary user store.",
                 "Server Encountered an error while adding secondary user store.",
@@ -75,22 +76,34 @@ public class UserStoreConstants {
                 "Unable to get the user store by its domain id.",
                 "Server Encountered an error while retrieving the user store by its domain id.",
                 Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE("65011",
+                "Unable to get the primary user store.",
+                "Server Encountered an error while retrieving the primary user store.",
+                Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_ERROR_RETRIEVING_REALM_CONFIG("65012",
+                "Unable to get the realm configurations",
+                "Server Encountered an error while retrieving realm configuration for tenant: %s",
+                Response.Status.INTERNAL_SERVER_ERROR),
 
-        // For client errors,  allocated the error code range starting from 600
+        // Client Errors - 600xx
         ERROR_CODE_DOMAIN_ID_NOT_FOUND("60001",
                 "Resource not found.",
                 "Unable to find any user store's domain id with the provided identifier",
                 Response.Status.NOT_FOUND),
         ERROR_CODE_NOT_FOUND("60003", "Resource not found.",
                 "Unable to find a required resource for this request", Response.Status.NOT_FOUND),
+        ERROR_CODE_INVALID_INPUT("60004", "Invalid Input", "Provided Input is not valid.",
+                Response.Status.BAD_REQUEST),
         ERROR_CODE_MANDATORY_PROPERTIES_NOT_FOUND("60006", "Mandatory property is missing ",
                 " Required user store  property or its value is missing in the request "),
-        ERROR_CODE_INVALID_INPUT("60004", "Invalid Input", "Provided Input is not valid.",
-                                 Response.Status.BAD_REQUEST),
-        ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE("65011",
-                "Unable to get the primary user store.",
-                "Server Encountered an error while retrieving the primary user store.",
-                Response.Status.INTERNAL_SERVER_ERROR);
+        ERROR_CODE_EMPTY_DOMAIN_ID("60007", "Userstore ID is not specified", "Userstore " +
+                "ID is either NULL or empty."),
+        ERROR_CODE_EMPTY_DOMAIN_NAME("60008", "Userstore domain name is not specified",
+                "Userstore domain name is either NULL or empty."),
+        ERROR_CODE_DOMAIN_ID_DOES_NOT_MATCH_WITH_NAME("60009", "Invalid userstore domain name or " +
+                "domain ID", "Userstore domain name does not match with the userstore domain ID"),
+        ERROR_CODE_REQUEST_BODY_NOT_FOUND("60010", "Invalid userstore update request",
+                "Userstore update request is either NULL or empty");
 
         private final String code;
         private final String message;

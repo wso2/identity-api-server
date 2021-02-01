@@ -42,7 +42,6 @@ public enum CategoryEnum {
 
     @XmlEnumValue("DEFAULT") DEFAULT(String.valueOf("DEFAULT")), @XmlEnumValue("CUSTOM") CUSTOM(String.valueOf("CUSTOM"));
 
-
     private String value;
 
     CategoryEnum(String v) {
@@ -73,7 +72,11 @@ public enum CategoryEnum {
     private IdentityProviderPOSTRequest idp;
 
     /**
-    **/
+     * Set ID of the IDP in the identity provider template.
+     *
+     * @param id ID of the IDP.
+     * @return IdentityProviderTemplate.
+     */
     public IdentityProviderTemplate id(String id) {
 
         this.id = id;
@@ -91,7 +94,11 @@ public enum CategoryEnum {
     }
 
     /**
-    **/
+     * Set IDP name in IDP template object.
+     *
+     * @param name IDP name.
+     * @return IdentityProviderTemplate.
+     */
     public IdentityProviderTemplate name(String name) {
 
         this.name = name;
@@ -111,7 +118,11 @@ public enum CategoryEnum {
     }
 
     /**
-    **/
+     * Set IDP description in IDP template object.
+     *
+     * @param description A brief description about the IDP.
+     * @return IdentityProviderTemplate.
+     */
     public IdentityProviderTemplate description(String description) {
 
         this.description = description;
@@ -129,7 +140,11 @@ public enum CategoryEnum {
     }
 
     /**
-    **/
+     * Set IDP image in the IDP template.
+     *
+     * @param image IDP image.
+     * @return IdentityProviderTemplate.
+     */
     public IdentityProviderTemplate image(String image) {
 
         this.image = image;
@@ -147,7 +162,11 @@ public enum CategoryEnum {
     }
 
     /**
-    **/
+     * Set category attribute in the IDP template.
+     *
+     * @param category Category of the IDP.
+     * @return IdentityProviderTemplate.
+     */
     public IdentityProviderTemplate category(CategoryEnum category) {
 
         this.category = category;
@@ -165,7 +184,11 @@ public enum CategoryEnum {
     }
 
     /**
-    **/
+     * Set display order of the Identity provider in the template.
+     *
+     * @param displayOrder Display order of the IDP
+     * @return IdentityProviderTemplate.
+     */
     public IdentityProviderTemplate displayOrder(Integer displayOrder) {
 
         this.displayOrder = displayOrder;
@@ -183,7 +206,11 @@ public enum CategoryEnum {
     }
 
     /**
-    **/
+     * Set IDP to the IdentityProviderTemplate object.
+     *
+     * @param idp {@link IdentityProviderPOSTRequest} object.
+     * @return IdentityProviderTemplate.
+     */
     public IdentityProviderTemplate idp(IdentityProviderPOSTRequest idp) {
 
         this.idp = idp;
@@ -201,8 +228,6 @@ public enum CategoryEnum {
     public void setIdp(IdentityProviderPOSTRequest idp) {
         this.idp = idp;
     }
-
-
 
     @Override
     public boolean equals(java.lang.Object o) {

@@ -89,8 +89,10 @@ import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
 import org.wso2.carbon.identity.core.model.Node;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages;
 import org.wso2.carbon.identity.cors.mgt.core.dao.CORSOriginDAO;
 import org.wso2.carbon.identity.cors.mgt.core.dao.impl.CORSOriginDAOImpl;
+import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
@@ -318,10 +320,10 @@ public class ServerApplicationManagementService {
         String username = ContextLoader.getUsernameFromContext();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
+        String applicationId = null;
         ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
         try {
-            String applicationId = getApplicationManagementService().createApplication(application, tenantDomain,
-                    username);
+            applicationId = getApplicationManagementService().createApplication(application, tenantDomain, username);
             if (applicationModel.getInboundProtocolConfiguration() != null &&
                     applicationModel.getInboundProtocolConfiguration().getOidc() != null) {
                 OAuthInboundFunctions.updateCorsOrigins(applicationId, applicationModel
@@ -330,12 +332,22 @@ public class ServerApplicationManagementService {
             return applicationId;
         } catch (IdentityApplicationManagementException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Error while creating application. Rolling back possibly created inbound config data.");
+                log.debug("Error while creating application. Rolling back possibly created inbound config data.", e);
             }
             rollbackInbounds(getConfiguredInbounds(application));
-
-            String msg = "Error creating application.";
-            throw handleIdentityApplicationManagementException(e, msg);
+            throw handleIdentityApplicationManagementException(e, "Error creating application.");
+        } catch (CORSManagementServiceException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error while updating CORS origins. Rolling back created application data.", e);
+            }
+            if (applicationId != null) {
+                deleteApplication(applicationId);
+            }
+            if (ErrorMessages.ERROR_CODE_DUPLICATE_ORIGINS.getCode().equals(e.getErrorCode())) {
+                throw buildClientError(e,
+                        "Error creating application. Found duplicate allowed origin entries.");
+            }
+            throw buildClientError(e, "Error creating application. Allow CORS origins update failed.");
         }
     }
 
@@ -645,7 +657,7 @@ public class ServerApplicationManagementService {
     getPrimitiveOperatorFromOdata(org.apache.cxf.jaxrs.ext.search.ConditionType odataConditionType) {
 
         org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator
-                primitiveConditionType = null;
+                primitiveConditionType;
         switch (odataConditionType) {
             case EQUALS:
                 primitiveConditionType = EQUALS;
@@ -670,6 +682,8 @@ public class ServerApplicationManagementService {
                 primitiveConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant
                         .ConditionType.PrimitiveOperator.LESS_THAN;
                 break;
+            default:
+                throw buildClientError(ErrorMessage.INVALID_FILTER_OPERATION, odataConditionType.name());
         }
         return primitiveConditionType;
     }
@@ -678,7 +692,7 @@ public class ServerApplicationManagementService {
     getComplexOperatorFromOdata(org.apache.cxf.jaxrs.ext.search.ConditionType odataConditionType) {
 
         org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.ComplexOperator
-                complexConditionType = null;
+                complexConditionType;
         switch (odataConditionType) {
             case OR:
                 complexConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType
@@ -688,6 +702,8 @@ public class ServerApplicationManagementService {
                 complexConditionType = org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType
                         .ComplexOperator.AND;
                 break;
+            default:
+                throw buildClientError(ErrorMessage.INVALID_FILTER_OPERATION, odataConditionType.name());
         }
         return complexConditionType;
     }
@@ -1019,12 +1035,12 @@ public class ServerApplicationManagementService {
 
     private ApplicationManagementService getApplicationManagementService() {
 
-        return ApplicationManagementServiceHolder.getInstance().getApplicationManagementService();
+        return ApplicationManagementServiceHolder.getApplicationManagementService();
     }
 
     private TemplateManager getTemplateManager() {
 
-        return ApplicationManagementServiceHolder.getInstance().getTemplateManager();
+        return ApplicationManagementServiceHolder.getTemplateManager();
     }
 
     private APIError handleIdentityApplicationManagementException(IdentityApplicationManagementException e,
@@ -1079,7 +1095,18 @@ public class ServerApplicationManagementService {
         return Utils.buildClientError(errorCode, message, e.getMessage());
     }
 
+    private APIError buildClientError(CORSManagementServiceException e, String message) {
+
+        String errorCode = getErrorCode(e, INVALID_REQUEST.getCode());
+        return Utils.buildClientError(errorCode, message, e.getMessage());
+    }
+
     private String getErrorCode(TemplateManagementException e, String defaultErrorCode) {
+
+        return e.getErrorCode() != null ? e.getErrorCode() : defaultErrorCode;
+    }
+
+    private String getErrorCode(CORSManagementServiceException e, String defaultErrorCode) {
 
         return e.getErrorCode() != null ? e.getErrorCode() : defaultErrorCode;
     }

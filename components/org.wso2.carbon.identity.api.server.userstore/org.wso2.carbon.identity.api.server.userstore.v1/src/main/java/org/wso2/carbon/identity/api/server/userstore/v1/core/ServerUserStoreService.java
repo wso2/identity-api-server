@@ -22,13 +22,12 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConfigServiceHolder;
 import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants;
-
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AddUserStorePropertiesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.Attribute;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStoreClassesRes;
@@ -42,7 +41,6 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListRespo
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStorePropertiesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
-
 import org.wso2.carbon.identity.user.store.configuration.UserStoreConfigService;
 import org.wso2.carbon.identity.user.store.configuration.dto.PropertyDTO;
 import org.wso2.carbon.identity.user.store.configuration.dto.UserStoreDTO;
@@ -52,7 +50,9 @@ import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStore
 import org.wso2.carbon.user.api.Properties;
 import org.wso2.carbon.user.api.Property;
 import org.wso2.carbon.user.api.RealmConfiguration;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserCoreConstants;
+import org.wso2.carbon.user.core.UserStoreConfigConstants;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
 
@@ -78,7 +78,8 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 public class ServerUserStoreService {
 
     private static final Log LOG = LogFactory.getLog(ServerUserStoreService.class);
-    private static UserStoreConfigurationsRes primaryUserstoreConfigs = null;
+
+    private static final String DUMMY_MESSAGE_ID = "DUMMY-MESSAGE-ID";
 
     /**
      * Add a userStore {@link UserStoreReq}.
@@ -89,7 +90,7 @@ public class ServerUserStoreService {
     public UserStoreResponse addUserStore(UserStoreReq userStoreReq) {
 
         try {
-            validateMandatoryProperties(getUserStoreType(base64URLDecodeId(userStoreReq.getTypeId())), userStoreReq);
+            validateMandatoryProperties(userStoreReq);
             UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
                     .getUserStoreConfigService();
             userStoreConfigService.addUserStore(createUserStoreDTO(userStoreReq));
@@ -109,7 +110,7 @@ public class ServerUserStoreService {
     public void deleteUserStore(String userstoreDomainId) {
 
         try {
-            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().getInstance().
+            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
                     getUserStoreConfigService();
             userStoreConfigService.deleteUserStore(base64URLDecodeId(userstoreDomainId));
         } catch (IdentityUserStoreClientException e) {
@@ -134,10 +135,13 @@ public class ServerUserStoreService {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
                 getUserStoreConfigService();
-        //domainName and typeName are not allowed to edit. iF domain name wanted to update then use
-        // userStoreConfigService.updateUserStoreByDomainName(base64URLDecodeId(domainId),
-        //         createUserStoreDTO(userStoreReq, domainId));
+        /*
+        domainName and typeName are not allowed to edit. iF domain name wanted to update then use
+        userStoreConfigService.updateUserStoreByDomainName(base64URLDecodeId(domainId),
+        createUserStoreDTO(userStoreReq, domainId));
+         */
         try {
+            validateUserstoreUpdateRequest(domainId, userStoreReq);
             userStoreConfigService.updateUserStore(createUserStoreDTO(userStoreReq), false);
             return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
@@ -214,32 +218,45 @@ public class ServerUserStoreService {
      */
     public UserStoreConfigurationsRes getPrimaryUserStore() {
 
-        if (primaryUserstoreConfigs == null) {
-            RealmService realmService = UserStoreConfigServiceHolder.getInstance().getRealmService();
-            RealmConfiguration realmConfiguration = realmService.getBootstrapRealmConfiguration();
-            if (realmConfiguration == null) {
-                throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
-                        ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE);
+        RealmService realmService = UserStoreConfigServiceHolder.getInstance().getRealmService();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        RealmConfiguration realmConfiguration;
+        try {
+            realmConfiguration = realmService.getTenantUserRealm(tenantId).getRealmConfiguration();
+        } catch (UserStoreException exception) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Error occurred while getting the RealmConfiguration for tenant: " + tenantId, exception);
             }
-            List<AddUserStorePropertiesRes> propertiesTobeAdd = new ArrayList<>();
-            primaryUserstoreConfigs = new UserStoreConfigurationsRes();
-            primaryUserstoreConfigs.setClassName(realmConfiguration.getUserStoreClass());
-            primaryUserstoreConfigs.setDescription(realmConfiguration.getDescription());
-            primaryUserstoreConfigs.setName(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME);
-            primaryUserstoreConfigs.setTypeId(base64URLEncodeId(Objects.requireNonNull
-                    (getUserStoreTypeName(realmConfiguration.getUserStoreClass()))));
-            primaryUserstoreConfigs.setTypeName(getUserStoreTypeName(realmConfiguration.getUserStoreClass()));
-            Map<String, String> userstoreProps = realmConfiguration.getUserStoreProperties();
-            if (MapUtils.isNotEmpty(userstoreProps)) {
-                for (String propKey : userstoreProps.keySet()) {
-                    AddUserStorePropertiesRes userStorePropertiesRes = new AddUserStorePropertiesRes();
-                    userStorePropertiesRes.setName(propKey);
-                    userStorePropertiesRes.setValue(userstoreProps.get(propKey));
-                    propertiesTobeAdd.add(userStorePropertiesRes);
-                }
-            }
-            primaryUserstoreConfigs.setProperties(propertiesTobeAdd);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_RETRIEVING_REALM_CONFIG, Integer.toString(tenantId));
         }
+        if (realmConfiguration == null) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE);
+        }
+        List<AddUserStorePropertiesRes> propertiesTobeAdd = new ArrayList<>();
+        UserStoreConfigurationsRes primaryUserstoreConfigs = new UserStoreConfigurationsRes();
+        primaryUserstoreConfigs.setClassName(realmConfiguration.getUserStoreClass());
+        primaryUserstoreConfigs.setDescription(realmConfiguration.getDescription());
+        primaryUserstoreConfigs.setName(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME);
+        primaryUserstoreConfigs.setTypeId(base64URLEncodeId(Objects.requireNonNull
+                (getUserStoreTypeName(realmConfiguration.getUserStoreClass()))));
+        primaryUserstoreConfigs.setTypeName(getUserStoreTypeName(realmConfiguration.getUserStoreClass()));
+        Map<String, String> userstoreProps = realmConfiguration.getUserStoreProperties();
+        if (MapUtils.isNotEmpty(userstoreProps)) {
+            for (Map.Entry<String, String> entry : userstoreProps.entrySet()) {
+                AddUserStorePropertiesRes userStorePropertiesRes = new AddUserStorePropertiesRes();
+                userStorePropertiesRes.setName(entry.getKey());
+                if (UserStoreConfigConstants.connectionPassword.equals(entry.getKey())) {
+                    userStorePropertiesRes.setValue(UserStoreConstants.USER_STORE_PROPERTY_MASK);
+                } else {
+                    userStorePropertiesRes.setValue(entry.getValue());
+                }
+                propertiesTobeAdd.add(userStorePropertiesRes);
+            }
+        }
+        primaryUserstoreConfigs.setProperties(propertiesTobeAdd);
+
         return primaryUserstoreConfigs;
     }
 
@@ -326,16 +343,14 @@ public class ServerUserStoreService {
         boolean isConnectionEstablished;
         connectionEstablishedResponse.setConnection(false);
         try {
-            isConnectionEstablished = userStoreConfigService.testRDBMSConnection("",
+            isConnectionEstablished = userStoreConfigService.testRDBMSConnection(rdBMSConnectionReq.getDomain(),
                     rdBMSConnectionReq.getDriverName(), rdBMSConnectionReq.getConnectionURL(),
-                    rdBMSConnectionReq.getUsername(), rdBMSConnectionReq.getConnectionPassword(), "");
+                    rdBMSConnectionReq.getUsername(), rdBMSConnectionReq.getConnectionPassword(), DUMMY_MESSAGE_ID);
             if (isConnectionEstablished) {
                 connectionEstablishedResponse.setConnection(true);
             }
         } catch (IdentityUserStoreMgtException e) {
-            UserStoreConstants.ErrorMessage errorEnum =
-                    UserStoreConstants.ErrorMessage.ERROR_CODE_DATASOURCE_CONNECTION;
-            throw handleIdentityUserStoreMgtException(e, errorEnum);
+            connectionEstablishedResponse.setConnection(false);
         }
         return connectionEstablishedResponse;
     }
@@ -349,12 +364,18 @@ public class ServerUserStoreService {
      */
     public UserStoreResponse patchUserStore(String domainId, List<PatchDocument> patchDocument) {
 
+        List<PatchDocument> supportedPatchOperations = new ArrayList<>();
         for (PatchDocument patch : patchDocument) {
             //Only the Replace operation supported with PATCH request
             PatchDocument.OperationEnum operation = patch.getOperation();
             if (operation == PatchDocument.OperationEnum.REPLACE) {
-                return performPatchReplace(domainId, patch.getPath(), patch.getValue());
+                supportedPatchOperations.add(patch);
             }
+        }
+
+        if (CollectionUtils.isNotEmpty(supportedPatchOperations)) {
+            UserStoreDTO userStoreDTO = buildUserStoreForPatch(domainId, supportedPatchOperations);
+            return performPatchReplace(userStoreDTO);
         }
         return null;
     }
@@ -362,46 +383,66 @@ public class ServerUserStoreService {
     /**
      * To handle the patch REPLACE request.
      *
-     * @param domainId user store domain id.
-     * @param path     patch operation path
-     * @param value    property value
+     * @param userStoreDTO user store dto.
      * @return UserStoreResponse
      */
-    private UserStoreResponse performPatchReplace(String domainId, String path, String value) {
+    private UserStoreResponse performPatchReplace(UserStoreDTO userStoreDTO) {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
                 .getUserStoreConfigService();
         try {
-            UserStoreDTO userStoreDTO = userStoreConfigService.getUserStore(base64URLDecodeId(domainId));
-            if (userStoreDTO == null) {
-                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
-            }
-            if (StringUtils.isBlank(path)) {
-                throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
-                        .ERROR_CODE_INVALID_INPUT);
-            }
-            PropertyDTO[] propertyDTOS = userStoreDTO.getProperties();
-            if (path.startsWith(UserStoreConstants.USER_STORE_PROPERTIES)) {
-                String[] propertiesList = path.split("/");
-                for (PropertyDTO propertyDTO : propertyDTOS) {
-                    if (propertiesList[2].equals(propertyDTO.getName())) {
-                        propertyDTO.setValue(value);
-                    }
-                }
-            } else if (path.equals(UserStoreConstants.USER_STORE_DESCRIPTION)) {
-                userStoreDTO.setDescription(value);
-            } else {
-                throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
-                        .ERROR_CODE_INVALID_INPUT);
-            }
-            userStoreDTO.setProperties(propertyDTOS);
             userStoreConfigService.updateUserStore(userStoreDTO, false);
-            return buildResponseForPatchReplace(userStoreDTO, propertyDTOS);
+            return buildResponseForPatchReplace(userStoreDTO, userStoreDTO.getProperties());
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_USER_STORE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
+    }
+
+    private UserStoreDTO buildUserStoreForPatch(String domainId, List<PatchDocument> patchDocuments) {
+
+        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
+                .getUserStoreConfigService();
+        UserStoreDTO userStoreDTO;
+        try {
+            userStoreDTO = userStoreConfigService.getUserStore(base64URLDecodeId(domainId));
+            if (userStoreDTO == null) {
+                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
+            }
+
+            PropertyDTO[] propertyDTOS = userStoreDTO.getProperties();
+            for (PatchDocument patchDocument : patchDocuments) {
+                String path = patchDocument.getPath();
+                String value = patchDocument.getValue();
+                if (StringUtils.isBlank(path)) {
+                    throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
+                            .ERROR_CODE_INVALID_INPUT);
+                }
+                if (path.startsWith(UserStoreConstants.USER_STORE_PROPERTIES)) {
+                    String propName = extractPropertyName(path);
+                    if (StringUtils.isNotEmpty(propName)) {
+                        for (PropertyDTO propertyDTO : propertyDTOS) {
+                            if (propName.equals(propertyDTO.getName())) {
+                                propertyDTO.setValue(value);
+                            }
+                        }
+                    }
+                } else if (path.equals(UserStoreConstants.USER_STORE_DESCRIPTION)) {
+                    userStoreDTO.setDescription(value);
+                } else {
+                    throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
+                            .ERROR_CODE_INVALID_INPUT);
+                }
+            }
+            userStoreDTO.setProperties(propertyDTOS);
+        } catch (IdentityUserStoreMgtException e) {
+            UserStoreConstants.ErrorMessage errorEnum =
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_USER_STORE;
+            throw handleIdentityUserStoreMgtException(e, errorEnum);
+        }
+
+        return userStoreDTO;
     }
 
     /**
@@ -497,6 +538,7 @@ public class ServerUserStoreService {
                 userStoreList.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
                                 UserStoreConstants.USER_STORE_PATH_COMPONENT + "/%s",
                         base64URLEncodeId(jsonObject.getDomainId()))).toString());
+                userStoreList.setEnabled(jsonObject.getDisabled() != null && !jsonObject.getDisabled());
 
                 if (StringUtils.isNotBlank(requiredAttributes)) {
                     String[] requiredAttributesArray = requiredAttributes.split(REGEX_COMMA);
@@ -608,7 +650,6 @@ public class ServerUserStoreService {
 
         HashMap<String, String> userStoreMap = getHashMap();
         for (Map.Entry<String, String> stringEntry : userStoreMap.entrySet()) {
-            LOG.info(((Map.Entry) stringEntry).getKey() + " = " + ((Map.Entry) stringEntry).getValue());
             if (typeName.equals(((Map.Entry) stringEntry).getValue())) {
                 return (String) ((Map.Entry) stringEntry).getKey();
             }
@@ -626,7 +667,6 @@ public class ServerUserStoreService {
 
         HashMap<String, String> userStoreMap = getHashMap();
         for (Map.Entry<String, String> stringEntry : userStoreMap.entrySet()) {
-            LOG.info(((Map.Entry) stringEntry).getKey() + " = " + ((Map.Entry) stringEntry).getValue());
             if (className.equals(((Map.Entry) stringEntry).getKey())) {
                 return (String) ((Map.Entry) stringEntry).getValue();
             }
@@ -739,6 +779,19 @@ public class ServerUserStoreService {
     }
 
     /**
+     * Handle exceptions generated in API.
+     *
+     * @param status HTTP Status.
+     * @param error  Error Message information.
+     * @param data   Additional data.
+     * @return APIError.
+     */
+    private APIError handleException(Response.Status status, UserStoreConstants.ErrorMessage error, String... data) {
+
+        return new APIError(status, getErrorBuilder(error, data).build());
+    }
+
+    /**
      * Return error builder.
      *
      * @param errorMsg Error Message information.
@@ -807,14 +860,18 @@ public class ServerUserStoreService {
     /**
      * To check whether API request has all user store mandatory properties or not.
      *
-     * @param className the user store class name
      * @param userStoreReq {@link UserStoreReq}
      */
-    private void validateMandatoryProperties(String className, UserStoreReq userStoreReq) {
+    private void validateMandatoryProperties(UserStoreReq userStoreReq) {
 
+        String userStoreType = getUserStoreType(base64URLDecodeId(userStoreReq.getTypeId()));
+        if (StringUtils.isBlank(userStoreType)) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_INPUT);
+        }
         HashMap<String, String> hashMap = new HashMap<String, String>();
         Property[] mandatoryProperties = UserStoreManagerRegistry.
-                getUserStoreProperties(className).getMandatoryProperties();
+                getUserStoreProperties(userStoreType).getMandatoryProperties();
         for (org.wso2.carbon.identity.api.server.userstore.v1.model.Property property : userStoreReq.getProperties()) {
             hashMap.put(property.getName(), property.getValue());
         }
@@ -873,5 +930,47 @@ public class ServerUserStoreService {
         }
         errorResponse.setDescription(exception.getMessage());
         return new APIError(status, errorResponse);
+    }
+
+    /**
+     * Validate userstore update request.
+     *
+     * @param domainID     Userstore domain ID
+     * @param userStoreReq UserStoreReq object.
+     * @throws IdentityUserStoreClientException If request is invalid.
+     */
+    private void validateUserstoreUpdateRequest(String domainID, UserStoreReq userStoreReq)
+            throws IdentityUserStoreClientException {
+
+        if (StringUtils.isBlank(domainID)) {
+            throw new IdentityUserStoreClientException(
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_ID.getCode(),
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_ID.getMessage());
+        }
+        if (userStoreReq == null) {
+            throw new IdentityUserStoreClientException(
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_REQUEST_BODY_NOT_FOUND.getCode(),
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_REQUEST_BODY_NOT_FOUND.getMessage());
+        }
+        if (StringUtils.isBlank(userStoreReq.getName())) {
+            throw new IdentityUserStoreClientException(
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_NAME.getCode(),
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_NAME.getMessage());
+        }
+        if (!userStoreReq.getName().equals(base64URLDecodeId(domainID))) {
+            throw new IdentityUserStoreClientException(
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_DOMAIN_ID_DOES_NOT_MATCH_WITH_NAME.getCode(),
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_DOMAIN_ID_DOES_NOT_MATCH_WITH_NAME.getMessage());
+        }
+    }
+
+    private String extractPropertyName(String pathProp) {
+
+        String name = null;
+        String[] splittedPath = pathProp.split("/");
+        if (splittedPath.length > 2) {
+            name = splittedPath[2];
+        }
+        return name;
     }
 }

@@ -38,8 +38,6 @@ paths:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
         - $ref: '#/components/parameters/filterQueryParam'
-        - $ref: '#/components/parameters/sortQueryParam'
-        - $ref: '#/components/parameters/sortByQueryParam'
         - $ref: '#/components/parameters/requiredAttributesQueryParam'
       responses:
         '200':
@@ -1304,6 +1302,14 @@ paths:
         includes the ability to enable/disable JIT provisioning, change
         provisioning userstore and enable/disable user prompts for username,
         password and consent. <br>
+        The schemes supported for JIT provisioning are, <br>
+            <ol>
+              <li><code>PROVISION_SILENTLY</code> : Provision without any prompts</li>
+              <li><code>PROMPT_CONSENT</code> : Prompt user for consent when provisioning</li>
+              <li><code>PROMPT_PASSWORD_CONSENT</code> : Prompt user for password and consent when provisioning</li>
+              <li><code>PROMPT_USERNAME_PASSWORD_CONSENT</code> : Prompt user for username, password, and consent when
+                    provisioning</li>
+            </ol>
         <b>Permission required:</b> <br>
             * /permission/admin/manage/identity/idpmgt/update <br>
         <b>Scope required:</b> <br>
@@ -1416,6 +1422,10 @@ paths:
         List identity provider templates
       description: >
         This API provides the list of available identity provider templates.
+        <br> <b>Permission required:</b> <br>  
+          * /permission/admin/manage/identity/idpmgt/view  
+        <br> <b>Scope required:</b> <br>  
+          * internal_idp_view
       operationId: getIDPTemplates
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
@@ -1456,7 +1466,11 @@ paths:
       summary: |
         Create a new IdP template
       description: >
-        This API provides the capability to create a new IdP template.
+        This API provides the capability to create a new IdP template.<br>  
+        <b>Permission required:</b> <br>  
+          * /permission/admin/manage/identity/idpmgt/create <br>  
+        <b>Scope required:</b> <br>  
+          * internal_idp_create
       operationId: addIDPTemplate
       responses:
         '201':
@@ -1514,7 +1528,11 @@ paths:
       summary: |
         Retrieve identity provider template by ID
       description: >
-        This API provides the capability to retrieve an identity provider template using its ID.
+        This API provides the capability to retrieve an identity provider template using its ID. <br>  
+        <b>Permission required:</b> <br>  
+          * /permission/admin/manage/identity/idpmgt/view <br>  
+        <b>Scope required:</b> <br>  
+          * internal_idp_view
       operationId: getIDPTemplate
       parameters:
         - name: template-id
@@ -1570,7 +1588,11 @@ paths:
       summary: |
         Update the IdP template of a given template ID.
       description: >
-        This API provides the capability to update the IdP template of a given template ID.
+        This API provides the capability to update the IdP template of a given template ID. <br>  
+        <b>Permission required:</b> <br>  
+          * /permission/admin/manage/identity/idpmgt/update <br>  
+        <b>Scope required:</b> <br>  
+          * internal_idp_update
       operationId: updateIDPTemplate
       parameters:
         - name: template-id
@@ -1630,6 +1652,11 @@ paths:
         Delete an IdP template using the template ID.
       description: >
         This API provides the capability to delete an IdP template using the template ID.
+        <br>  
+        <b>Permission required:</b> <br>  
+           * /permission/admin/manage/identity/idpmgt/delete <br>  
+        <b>Scope required:</b> <br>  
+           * internal_idp_delete
       operationId: deleteIDPTemplate
       parameters:
         - name: template-id
@@ -1698,34 +1725,12 @@ components:
         /identity-providers?filter=name+sw+"google"+and+isEnabled+eq+"true"
       schema:
         type: string
-    sortQueryParam:
-      in: query
-      name: sortOrder
-      required: false
-      description: |
-        Defines the order in which the retrieved records should be sorted.
-        _This parameter is not supported yet_
-      schema:
-        type: string
-        enum:
-          - ASC
-          - DESC
-    sortByQueryParam:
-      in: query
-      name: sortBy
-      required: false
-      description: |
-        Attribute by which the retrieved records should be sorted.
-        _This parameter is not supported yet_
-      schema:
-        type: string
     requiredAttributesQueryParam:
       in: query
       name: requiredAttributes
       required: false
       description: |
         Specifies the required parameters in the response.
-        _This parameter is not supported yet_
       schema:
         type: string
     forceQueryParam:

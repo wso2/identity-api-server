@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ public class UserStoreListResponse  {
   
     private String id;
     private String name;
+    private Boolean enabled;
     private String description;
     private String self;
     private List<AddUserStorePropertiesRes> properties = null;
@@ -60,7 +61,7 @@ public class UserStoreListResponse  {
     }
 
     /**
-    * domain name of the secondary user store
+    * Domain name of the secondary user store.
     **/
     public UserStoreListResponse name(String name) {
 
@@ -68,7 +69,7 @@ public class UserStoreListResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "JDBC-SECONDARY", value = "domain name of the secondary user store")
+    @ApiModelProperty(example = "JDBC-SECONDARY", value = "Domain name of the secondary user store.")
     @JsonProperty("name")
     @Valid
     public String getName() {
@@ -76,6 +77,25 @@ public class UserStoreListResponse  {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+    * Enabled status of the userstore.
+    **/
+    public UserStoreListResponse enabled(Boolean enabled) {
+
+        this.enabled = enabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "Enabled status of the userstore.")
+    @JsonProperty("enabled")
+    @Valid
+    public Boolean getEnabled() {
+        return enabled;
+    }
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     /**
@@ -156,6 +176,7 @@ public class UserStoreListResponse  {
         UserStoreListResponse userStoreListResponse = (UserStoreListResponse) o;
         return Objects.equals(this.id, userStoreListResponse.id) &&
             Objects.equals(this.name, userStoreListResponse.name) &&
+            Objects.equals(this.enabled, userStoreListResponse.enabled) &&
             Objects.equals(this.description, userStoreListResponse.description) &&
             Objects.equals(this.self, userStoreListResponse.self) &&
             Objects.equals(this.properties, userStoreListResponse.properties);
@@ -163,7 +184,7 @@ public class UserStoreListResponse  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, self, properties);
+        return Objects.hash(id, name, enabled, description, self, properties);
     }
 
     @Override
@@ -174,6 +195,7 @@ public class UserStoreListResponse  {
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");

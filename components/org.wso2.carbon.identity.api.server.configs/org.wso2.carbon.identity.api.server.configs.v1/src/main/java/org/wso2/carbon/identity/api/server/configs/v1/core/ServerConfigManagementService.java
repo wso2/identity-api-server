@@ -24,6 +24,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
@@ -38,6 +39,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ProvisioningConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.RealmConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
@@ -61,6 +63,8 @@ import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
+import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.user.api.UserStoreException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -153,6 +157,19 @@ public class ServerConfigManagementService {
 
         IdentityProvider residentIdP = getResidentIdP();
 
+        UserRealm userRealm = CarbonContext.getThreadLocalCarbonContext().getUserRealm();
+        RealmConfig realmConfig = new RealmConfig();
+        try {
+            if (userRealm != null && userRealm.getRealmConfiguration() != null) {
+                realmConfig.adminUser(userRealm.getRealmConfiguration().getAdminUserName());
+                realmConfig.adminRole(userRealm.getRealmConfiguration().getAdminRoleName());
+                realmConfig.everyoneRole(userRealm.getRealmConfiguration().getEveryOneRoleName());
+            }
+        } catch (UserStoreException e) {
+            log.error("Error while retrieving user-realm information.", e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
+        }
         String idleSessionTimeout = null;
         IdentityProviderProperty idleSessionProp = IdentityApplicationManagementUtil.getProperty(
                 residentIdP.getIdpProperties(), IdentityApplicationConstants.SESSION_IDLE_TIME_OUT);
@@ -170,9 +187,11 @@ public class ServerConfigManagementService {
         String homeRealmIdStr = residentIdP.getHomeRealmId();
         List<String> homeRealmIdentifiers = null;
         if (StringUtils.isNotBlank(homeRealmIdStr)) {
-            homeRealmIdentifiers = Arrays.stream(homeRealmIdStr.split(",")).collect(Collectors.toList());
+            homeRealmIdentifiers =
+                    Arrays.stream(homeRealmIdStr.trim().split("\\s*,\\s*")).collect(Collectors.toList());
         }
         ServerConfig serverConfig = new ServerConfig();
+        serverConfig.setRealmConfig(realmConfig);
         serverConfig.setIdleSessionTimeoutPeriod(idleSessionTimeout);
         serverConfig.setRememberMePeriod(rememberMePeriod);
         serverConfig.setHomeRealmIdentifiers(homeRealmIdentifiers);
@@ -236,7 +255,7 @@ public class ServerConfigManagementService {
 
         ServiceProvider application = getResidentApplication();
 
-        if (scimConfig != null && application != null) {
+        if (scimConfig != null) {
             InboundProvisioningConfig inboundProvisioningConfig = new InboundProvisioningConfig();
             inboundProvisioningConfig.setDumbMode(scimConfig.getEnableProxyMode());
             if (!scimConfig.getEnableProxyMode()) {
@@ -361,6 +380,23 @@ public class ServerConfigManagementService {
         } catch (CORSManagementServiceException e) {
             throw handleCORSException(e, Constants.ErrorMessage.ERROR_CODE_CORS_CONFIG_UPDATE, null);
         }
+    }
+
+    /**
+     * Get Home Realm Identifiers.
+     *
+     * @return List of home realm identifiers.
+     */
+    public List<String> getHomeRealmIdentifiers() {
+
+        IdentityProvider residentIdP = getResidentIdP();
+        String homeRealmIdStr = residentIdP.getHomeRealmId();
+        List<String> homeRealmIdentifiers = new ArrayList<>();
+        if (StringUtils.isNotBlank(homeRealmIdStr)) {
+            homeRealmIdentifiers =
+                    Arrays.stream(homeRealmIdStr.trim().split("\\s*,\\s*")).collect(Collectors.toList());
+        }
+        return homeRealmIdentifiers;
     }
 
     private List<AuthenticatorListItem> buildAuthenticatorListResponse(

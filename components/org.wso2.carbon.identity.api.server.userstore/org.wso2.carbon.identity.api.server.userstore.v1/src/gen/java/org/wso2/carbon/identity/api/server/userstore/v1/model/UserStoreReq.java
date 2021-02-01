@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public class UserStoreReq  {
         return this;
     }
     
-    @ApiModelProperty(example = "SkRCQ1VzZXJTdG9yZU1hbmFnZXI", required = true, value = "The id of the user store manager class type.")
+    @ApiModelProperty(example = "VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg", required = true, value = "The id of the user store manager class type.")
     @JsonProperty("typeId")
     @Valid
     @NotNull(message = "Property typeId cannot be null.")

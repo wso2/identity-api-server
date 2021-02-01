@@ -35,9 +35,15 @@ public interface TenantsApiService {
 
       public Response addTenant(TenantModel tenantModel);
 
+      public Response deleteTenantMetadata(String tenantId);
+
       public Response getOwners(String tenantId);
 
       public Response getTenant(String tenantId);
+
+      public Response getTenantByDomain(String tenantDomain);
+
+      public Response isDomainExist(String tenantDomain);
 
       public Response retrieveTenants(Integer limit, Integer offset, String sortOrder, String sortBy, String filter);
 

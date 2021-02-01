@@ -29,6 +29,8 @@ import org.wso2.carbon.identity.api.server.identity.governance.v1.model.Category
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorsPatchReq;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceResp;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceSearchAttribute;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyReq;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyRes;
 import org.wso2.carbon.identity.application.common.model.Property;
@@ -170,6 +172,105 @@ public class ServerIdentityGovernanceService {
     }
 
     /**
+     * Get governance connector properties according to the search attribute.
+     *
+     * @param preferenceSearchAttribute Governance connector details.
+     * @return Governance connector properties for the given connector or properties.
+     */
+    public List<PreferenceResp> getConfigPreference(List<PreferenceSearchAttribute> preferenceSearchAttribute) {
+
+        IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        List<PreferenceResp> preferenceRespList = new ArrayList<>();
+        for (PreferenceSearchAttribute prefSearchAttr : preferenceSearchAttribute) {
+            String connectorName = prefSearchAttr.getConnectorName();
+            List<String> expectedProperties = prefSearchAttr.getProperties();
+            Property[] properties;
+            try {
+                ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(tenantDomain,
+                        connectorName);
+                if (connectorConfig == null) {
+                    Response.Status status = Response.Status.BAD_REQUEST;
+                    throw handleException(new IdentityGovernanceException(GovernanceConstants.ErrorMessage
+                            .ERROR_CODE_INCORRECT_CONNECTOR_NAME.getMessage()), GovernanceConstants.
+                            ErrorMessage.ERROR_CODE_INCORRECT_CONNECTOR_NAME, status, connectorName);
+                }
+                properties = connectorConfig.getProperties();
+                PreferenceResp preferenceResp =
+                        buildPreferenceRespDTO(connectorName, properties, expectedProperties);
+                preferenceRespList.add(preferenceResp);
+            } catch (IdentityGovernanceException e) {
+                GovernanceConstants.ErrorMessage errorEnum =
+                        GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CONNECTOR_PREFERENCES;
+                Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+                throw handleException(e, errorEnum, status);
+            }
+        }
+        return preferenceRespList;
+    }
+
+    private PreferenceResp buildPreferenceRespDTO(String connectorName, Property[] properties,
+                                                  List<String> expectedProperties) {
+
+        PreferenceResp preferenceResp = new PreferenceResp();
+        List<PropertyReq> propertyReqList = buildPropertyReqDTO(properties, expectedProperties);
+        preferenceResp.setProperties(propertyReqList);
+        preferenceResp.setConnectorName(connectorName);
+
+        return preferenceResp;
+    }
+
+    private List<PropertyReq> buildPropertyReqDTO(Property[] properties, List<String> expectedProperties) {
+
+        if (expectedProperties != null) {
+            return buildPropertyReqForExpectedAttributes(properties, expectedProperties);
+        }
+        return buildPropertyReqForAllProperties(properties);
+
+    }
+
+    private List<PropertyReq> buildPropertyReqForAllProperties(Property[] properties) {
+
+        List<PropertyReq> propertyReqList = new ArrayList<>();
+        for (Property property : properties) {
+            if (property.isConfidential()) {
+                continue;
+            }
+            createPropertyRequest(propertyReqList, property);
+        }
+        return propertyReqList;
+    }
+
+    private List<PropertyReq> buildPropertyReqForExpectedAttributes(Property[] properties,
+                                                                    List<String> expectedProperties) {
+
+        List<PropertyReq> propertyReqList = new ArrayList<>();
+        Map<String, Property> propertyMap = new HashMap<>();
+        for (Property property : properties) {
+            propertyMap.put(property.getName(), property);
+        }
+        for (String expectedProperty : expectedProperties) {
+            Property property = propertyMap.get(expectedProperty);
+            if (property == null || property.isConfidential()) {
+                throw handleException(new IdentityGovernanceException(GovernanceConstants.ErrorMessage
+                                .ERROR_CODE_UNSUPPORTED_PROPERTY_NAME.getMessage()), GovernanceConstants.
+                                ErrorMessage.ERROR_CODE_UNSUPPORTED_PROPERTY_NAME, Response.Status.BAD_REQUEST,
+                        expectedProperty);
+            }
+            createPropertyRequest(propertyReqList, property);
+        }
+        return propertyReqList;
+    }
+
+    private void createPropertyRequest(List<PropertyReq> propertyReqList, Property property) {
+
+        PropertyReq propertyReq = new PropertyReq();
+        propertyReq.setName(property.getName());
+        propertyReq.setValue(property.getValue());
+        propertyReqList.add(propertyReq);
+    }
+
+    /**
      * Update governance connector property.
      *
      * @param categoryId          Governance connector category id.
@@ -202,9 +303,11 @@ public class ServerIdentityGovernanceService {
         }
     }
 
-    private APIError handleException(Exception e, GovernanceConstants.ErrorMessage errorEnum, Response.Status status) {
+    private APIError handleException(Exception e, GovernanceConstants.ErrorMessage errorEnum, Response.Status status,
+                                     String... data) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, e, errorEnum.getDescription());
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(LOG, e, buildErrorDescription(errorEnum,
+                data));
         return new APIError(status, errorResponse);
     }
 
@@ -301,11 +404,7 @@ public class ServerIdentityGovernanceService {
         String errorDescription;
 
         if (ArrayUtils.isNotEmpty(data)) {
-            if (data.length == 1) {
-                errorDescription = String.format(errorEnum.getDescription(), (Object) data);
-            } else {
-                errorDescription = String.format(errorEnum.getDescription(), (Object[]) data);
-            }
+            errorDescription = String.format(errorEnum.getDescription(), data);
         } else {
             errorDescription = errorEnum.getDescription();
         }

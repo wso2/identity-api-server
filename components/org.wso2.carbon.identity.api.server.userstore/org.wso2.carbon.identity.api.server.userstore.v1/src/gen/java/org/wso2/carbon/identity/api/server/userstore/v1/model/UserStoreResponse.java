@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ public class UserStoreResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "JDBCUserStoreManager", value = "")
+    @ApiModelProperty(example = "UniqueIDJDBCUserStoreManager", value = "")
     @JsonProperty("typeName")
     @Valid
     public String getTypeName() {
@@ -105,7 +105,7 @@ public class UserStoreResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "SkRCQ1VzZXJTdG9yZU1hbmFnZXI", value = "")
+    @ApiModelProperty(example = "VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg", value = "")
     @JsonProperty("typeId")
     @Valid
     public String getTypeId() {

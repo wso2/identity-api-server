@@ -41,7 +41,7 @@ public class Attribute  {
         return this;
     }
     
-    @ApiModelProperty(example = "Category", value = "")
+    @ApiModelProperty(example = "category", value = "")
     @JsonProperty("name")
     @Valid
     public String getName() {
@@ -59,7 +59,7 @@ public class Attribute  {
         return this;
     }
     
-    @ApiModelProperty(example = "SQL", value = "")
+    @ApiModelProperty(example = "basic", value = "")
     @JsonProperty("value")
     @Valid
     public String getValue() {

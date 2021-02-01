@@ -27,8 +27,12 @@ paths:
       description: |
         This API provides the capability to add a secondary user store.
 
+        **NOTE:**
+
+          To retrieve the available user store classes/types, use the **api/server/v1/userstores/meta/types** API.
+
          <b>Permission required:</b>
-          */permission/admin
+          - /permission/admin
       responses:
         '201':
           description: Successful response
@@ -61,7 +65,7 @@ paths:
     get:
       tags:
         - User Store
-      summary: Retrieve or List the configured secondary user stores.
+      summary: Retrieve or list the configured secondary user stores.
       operationId: getSecondaryUserStores
       description: >
         This API provides the capability to list the configured secondary userstores.
@@ -209,7 +213,7 @@ paths:
               $ref: '#/components/schemas/UserStoreReq'
               # But not allowing to change the typeName and name in the PUT request.
         description: >-
-          The secondary user store values which are need to be edited of the
+          The secondary user store values which are needed to be edited for a
           given domain id.
     patch:
       tags:
@@ -218,7 +222,7 @@ paths:
       operationId: patchUserStore
       description: >
         This API provides the capability to update the secondary user store's
-        property using patch request by using it's domain id.
+        property using patch request by using its domain id.
 
          <b>Permission required:</b>
          */permission/admin
@@ -379,14 +383,14 @@ components:
       in: query
       name: filter
       required: false
-      description: Condition to filter the retrival of records.
+      description: Condition to filter the retrieval of records.
       schema:
         type: string
     sortQueryParam:
       in: query
       name: sort
       required: false
-      description: Define the order how the retrieved records should be sorted.
+      description: Define the order of how the retrieved records should be sorted.
       schema:
         type: string
     requiredAttributesQueryParam:
@@ -468,7 +472,7 @@ components:
         typeId:
           type: string
           description: The id of the user store manager class type.
-          example: SkRCQ1VzZXJTdG9yZU1hbmFnZXI
+          example: VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg
         description:
           type: string
           description: Description of the user store.
@@ -524,6 +528,10 @@ components:
         - connectionPassword
       description: RDBMS Connection Request.
       properties:
+        domain:
+          type: string
+          description: User store domain name.
+          example: PRIMARY
         driverName:
           type: string
           description: Driver Name.
@@ -577,7 +585,11 @@ components:
         name:
           type: string
           example: JDBC-SECONDARY
-          description: domain name of the secondary user store
+          description: Domain name of the secondary user store.
+        enabled:
+          type: boolean
+          example: true
+          description: Enabled status of the userstore.
         description:
           type: string
           example: Some description of the user store
@@ -595,13 +607,13 @@ components:
       properties:
         typeName:
           type: string
-          example: JDBCUserStoreManager
+          example: UniqueIDJDBCUserStoreManager
         typeId:
           type: string
           example: b3JnLndzbzIuY2FyYm9uLnVzZXIuY29yZS5qZGJjLkpEQkNVc2VyU3RvcmVNYW5hZ2Vy
         className:
           type: string
-          example: org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager
+          example: org.wso2.carbon.user.core.jdbc.UniqueIDJDBCUserStoreManager
         properties:
           $ref: '#/components/schemas/UserStorePropertiesRes'
     UserStoreResponse:
@@ -617,10 +629,10 @@ components:
           description: domain name of the secondary user store
         typeName:
           type: string
-          example: JDBCUserStoreManager
+          example: UniqueIDJDBCUserStoreManager
         typeId:
           type: string
-          example: SkRCQ1VzZXJTdG9yZU1hbmFnZXI
+          example: VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg
         description:
           type: string
           example: Some description of the user store
@@ -635,26 +647,26 @@ components:
       properties:
         typeId:
           type: string
-          example: SkRCQ1VzZXJTdG9yZU1hbmFnZXI
+          example: VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg
         typeName:
           type: string
-          example: JDBCUserStoreManager
+          example: UniqueIDJDBCUserStoreManager
         className:
           type: string
-          example: org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager
+          example: org.wso2.carbon.user.core.jdbc.UniqueIDJDBCUserStoreManager
         self:
           type: string
-          example: /t/{tenant-domain}/api/server/v1/userstores/meta/types/SkRCQ1VzZXJTdG9yZU1hbmFnZXI
+          example: /t/{tenant-domain}/api/server/v1/userstores/meta/types/VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg
     UserStoreConfigurationsRes:
       type: object
       description: Available User Store Configurations Response.
       properties:
         typeName:
           type: string
-          example: JDBCUserStoreManager
+          example: UniqueIDJDBCUserStoreManager
         typeId:
           type: string
-          example: SkRCQ1VzZXJTdG9yZU1hbmFnZXI
+          example: VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg
         name:
           type: string
           example: JDBC-SECONDARY
@@ -663,7 +675,7 @@ components:
           example: Some description of the user store
         className:
           type: string
-          example: org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager
+          example: org.wso2.carbon.user.core.jdbc.UniqueIDJDBCUserStoreManager
         properties:
           type: array
           description: Configured user store property for the set

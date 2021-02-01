@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -33,10 +33,30 @@ import javax.xml.bind.annotation.*;
 @ApiModel(description = "RDBMS Connection Request.")
 public class RDBMSConnectionReq  {
   
+    private String domain;
     private String driverName;
     private String connectionURL;
     private String username;
     private String connectionPassword;
+
+    /**
+    * User store domain name.
+    **/
+    public RDBMSConnectionReq domain(String domain) {
+
+        this.domain = domain;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "PRIMARY", value = "User store domain name.")
+    @JsonProperty("domain")
+    @Valid
+    public String getDomain() {
+        return domain;
+    }
+    public void setDomain(String domain) {
+        this.domain = domain;
+    }
 
     /**
     * Driver Name.
@@ -134,7 +154,8 @@ public class RDBMSConnectionReq  {
             return false;
         }
         RDBMSConnectionReq rdBMSConnectionReq = (RDBMSConnectionReq) o;
-        return Objects.equals(this.driverName, rdBMSConnectionReq.driverName) &&
+        return Objects.equals(this.domain, rdBMSConnectionReq.domain) &&
+            Objects.equals(this.driverName, rdBMSConnectionReq.driverName) &&
             Objects.equals(this.connectionURL, rdBMSConnectionReq.connectionURL) &&
             Objects.equals(this.username, rdBMSConnectionReq.username) &&
             Objects.equals(this.connectionPassword, rdBMSConnectionReq.connectionPassword);
@@ -142,7 +163,7 @@ public class RDBMSConnectionReq  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(driverName, connectionURL, username, connectionPassword);
+        return Objects.hash(domain, driverName, connectionURL, username, connectionPassword);
     }
 
     @Override
@@ -151,6 +172,7 @@ public class RDBMSConnectionReq  {
         StringBuilder sb = new StringBuilder();
         sb.append("class RDBMSConnectionReq {\n");
         
+        sb.append("    domain: ").append(toIndentedString(domain)).append("\n");
         sb.append("    driverName: ").append(toIndentedString(driverName)).append("\n");
         sb.append("    connectionURL: ").append(toIndentedString(connectionURL)).append("\n");
         sb.append("    username: ").append(toIndentedString(username)).append("\n");
