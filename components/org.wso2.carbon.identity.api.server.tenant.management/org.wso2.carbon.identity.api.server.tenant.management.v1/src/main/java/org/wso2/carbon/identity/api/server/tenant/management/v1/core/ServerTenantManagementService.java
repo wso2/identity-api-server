@@ -573,8 +573,6 @@ public class ServerTenantManagementService {
                                 ERROR_CODE_MISSING_REQUIRED_PARAMETER.getMessage(), "code"));
             }
 
-            claimsMap.put(CODE, channelVerifiedTenantModel.getCode());
-
             if (channelVerifiedTenantModel.getPurpose() != null) {
                 claimsMap.put(PURPOSE, channelVerifiedTenantModel.getPurpose().getName());
                 if (!CollectionUtils.isEmpty(channelVerifiedTenantModel.getPurpose().getAttributes())) {
