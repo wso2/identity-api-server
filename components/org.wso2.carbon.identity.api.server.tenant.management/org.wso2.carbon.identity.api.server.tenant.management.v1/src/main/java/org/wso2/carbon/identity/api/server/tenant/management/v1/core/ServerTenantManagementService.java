@@ -530,9 +530,10 @@ public class ServerTenantManagementService {
         try {
             UserRecoveryData recoveryData = userRecoveryDataStore.load(code);
             if (recoveryData != null && recoveryData.getUser() != null && tenant.getOwners() != null &&
-                    tenant.getOwners().get(0) != null && tenant.getOwners().get(0).getUsername() != null &&
-                    tenant.getOwners().get(0).getUsername().equalsIgnoreCase(recoveryData.getUser().getUserName())) {
+                    tenant.getOwners().get(0) != null && tenant.getOwners().get(0).getEmail() != null &&
+                    tenant.getOwners().get(0).getEmail().equalsIgnoreCase(recoveryData.getUser().getUserName())) {
                 userRecoveryDataStore.invalidate(code);
+                return;
             } else { // the confirmed email using the code and submitted emails are different.
                 userRecoveryDataStore.invalidate(code);
                 log.warn("The confirmed email using the code and submitted emails are different.");
@@ -553,13 +554,12 @@ public class ServerTenantManagementService {
         Map<String, String> claimsMap = new HashMap<>();
 
         tenant.setActive(true);
-        tenant.setDomain(channelVerifiedTenantModel.getDomain());
+        tenant.setDomain(StringUtils.lowerCase(channelVerifiedTenantModel.getDomain()));
         if (channelVerifiedTenantModel.getOwners() != null && channelVerifiedTenantModel.getOwners().size() > 0
                 && channelVerifiedTenantModel.getOwners().get(0) != null) {
             tenant.setAdminName(channelVerifiedTenantModel.getOwners().get(0).getEmail());
             tenant.setAdminFirstName(channelVerifiedTenantModel.getOwners().get(0).getFirstname());
             tenant.setAdminLastName(channelVerifiedTenantModel.getOwners().get(0).getLastname());
-            tenant.setDomain(channelVerifiedTenantModel.getDomain());
             tenant.setEmail(channelVerifiedTenantModel.getOwners().get(0).getEmail());
 
             tenant.setProvisioningMethod(VERIFIED_LITE_USER);
