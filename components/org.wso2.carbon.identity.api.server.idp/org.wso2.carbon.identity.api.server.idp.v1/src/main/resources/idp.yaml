@@ -1892,6 +1892,9 @@ components:
         image:
           type: string
           example: "google-logo-url"
+        templateId:
+          type: string
+          example: '8ea23303-49c0-4253-b81f-82c0fe6fb4a0'
         isPrimary:
           type: boolean
           default: false
@@ -1925,6 +1928,9 @@ components:
           example: google
         description:
           type: string
+        templateId:
+          type: string
+          example: '8ea23303-49c0-4253-b81f-82c0fe6fb4a0'
         isEnabled:
           type: boolean
           default: true

@@ -1729,6 +1729,7 @@ public class ServerIdpManagementService {
         IdentityProvider idp = new IdentityProvider();
         idp.setIdentityProviderName(identityProviderPOSTRequest.getName());
         idp.setAlias(identityProviderPOSTRequest.getAlias());
+        idp.setTemplateId(identityProviderPOSTRequest.getTemplateId());
         idp.setPrimary(false);
         idp.setIdentityProviderDescription(identityProviderPOSTRequest.getDescription());
         idp.setHomeRealmId(identityProviderPOSTRequest.getHomeRealmIdentifier());
@@ -1896,6 +1897,7 @@ public class ServerIdpManagementService {
 
         IdentityProviderResponse idpResponse = new IdentityProviderResponse();
         populateIDPBasicInfo(idpResponse, identityProvider);
+        idpResponse.setTemplateId(identityProvider.getTemplateId());
         idpResponse.setCertificate(createIDPCertificate(identityProvider));
         idpResponse.setClaims(createClaimResponse(identityProvider.getClaimConfig()));
         idpResponse.setRoles(createRoleResponse(identityProvider));

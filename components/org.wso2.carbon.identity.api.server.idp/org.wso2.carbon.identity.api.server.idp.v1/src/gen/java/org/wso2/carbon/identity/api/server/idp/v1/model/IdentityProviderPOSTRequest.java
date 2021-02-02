@@ -38,6 +38,7 @@ public class IdentityProviderPOSTRequest  {
     private String name;
     private String description;
     private String image;
+    private String templateId;
     private Boolean isPrimary = false;
     private Boolean isFederationHub = false;
     private String homeRealmIdentifier;
@@ -76,7 +77,7 @@ public class IdentityProviderPOSTRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "IDP for Google Federation", value = "")
+    @ApiModelProperty(example = "IdP for Google Federation", value = "")
     @JsonProperty("description")
     @Valid
     public String getDescription() {
@@ -102,6 +103,24 @@ public class IdentityProviderPOSTRequest  {
     }
     public void setImage(String image) {
         this.image = image;
+    }
+
+    /**
+    **/
+    public IdentityProviderPOSTRequest templateId(String templateId) {
+
+        this.templateId = templateId;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "8ea23303-49c0-4253-b81f-82c0fe6fb4a0", value = "")
+    @JsonProperty("templateId")
+    @Valid
+    public String getTemplateId() {
+        return templateId;
+    }
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
     }
 
     /**
@@ -281,6 +300,7 @@ public class IdentityProviderPOSTRequest  {
         return Objects.equals(this.name, identityProviderPOSTRequest.name) &&
             Objects.equals(this.description, identityProviderPOSTRequest.description) &&
             Objects.equals(this.image, identityProviderPOSTRequest.image) &&
+            Objects.equals(this.templateId, identityProviderPOSTRequest.templateId) &&
             Objects.equals(this.isPrimary, identityProviderPOSTRequest.isPrimary) &&
             Objects.equals(this.isFederationHub, identityProviderPOSTRequest.isFederationHub) &&
             Objects.equals(this.homeRealmIdentifier, identityProviderPOSTRequest.homeRealmIdentifier) &&
@@ -294,7 +314,7 @@ public class IdentityProviderPOSTRequest  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, image, isPrimary, isFederationHub, homeRealmIdentifier, certificate, alias, claims, roles, federatedAuthenticators, provisioning);
+        return Objects.hash(name, description, image, templateId, isPrimary, isFederationHub, homeRealmIdentifier, certificate, alias, claims, roles, federatedAuthenticators, provisioning);
     }
 
     @Override
@@ -306,6 +326,7 @@ public class IdentityProviderPOSTRequest  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
+        sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isPrimary: ").append(toIndentedString(isPrimary)).append("\n");
         sb.append("    isFederationHub: ").append(toIndentedString(isFederationHub)).append("\n");
         sb.append("    homeRealmIdentifier: ").append(toIndentedString(homeRealmIdentifier)).append("\n");
