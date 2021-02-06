@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.idp.v1.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -2239,13 +2240,9 @@ public class ServerIdpManagementService {
      */
     private IdentityProvider createIdPClone(IdentityProvider idP) {
 
-        try {
-            return (IdentityProvider) BeanUtils.cloneBean(idP);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException
-                e) {
-            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
-                    .ERROR_CODE_ERROR_UPDATING_IDP, idP.getResourceId());
-        }
+        Gson gson = new Gson();
+        IdentityProvider clonedIdentityProvider = gson.fromJson(gson.toJson(idP), IdentityProvider.class);
+        return clonedIdentityProvider;
     }
 
     /**
@@ -2608,10 +2605,13 @@ public class ServerIdpManagementService {
                     if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index >= 0)
                             && (index < idpToUpdate.getCertificateInfoArray().length)) {
                         for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
-                            certificates.add(certInfo.getCertValue());
+                            certificates.add(base64Decode(certInfo.getCertValue()));
+                        }
+                        if (!value.startsWith(IdentityUtil.PEM_BEGIN_CERTFICATE)) {
+                            value = base64Decode(value);
                         }
                         certificates.set(index, value);
-                        idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
+                        idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
                     } else {
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                 .ERROR_CODE_INVALID_INPUT, null);
@@ -2669,11 +2669,14 @@ public class ServerIdpManagementService {
                                 .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
                     }
                     for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
-                        certificates.add(certInfo.getCertValue());
+                        certificates.add(base64Decode(certInfo.getCertValue()));
                     }
                 }
+                if (!value.startsWith(IdentityUtil.PEM_BEGIN_CERTFICATE)) {
+                    value = base64Decode(value);
+                }
                 certificates.add(index, value);
-                idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
+                idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
             } else if (operation == Patch.OperationEnum.REMOVE && path.matches(Constants.CERTIFICATE_PATH_REGEX) &&
                     path.split(Constants.PATH_SEPERATOR).length == 4) {
                 List<String> certificates = new ArrayList<>();
@@ -2681,14 +2684,14 @@ public class ServerIdpManagementService {
                 if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index >= 0) && index <
                         idpToUpdate.getCertificateInfoArray().length) {
                     for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
-                        certificates.add(certInfo.getCertValue());
+                        certificates.add(base64Decode(certInfo.getCertValue()));
                     }
                     certificates.remove(index);
                 } else {
                     throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                             .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
                 }
-                idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
+                idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
             } else {
                 // Throw an error if any other patch operations are sent in the request.
                 throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -2706,6 +2709,18 @@ public class ServerIdpManagementService {
     private String base64Decode(String encodedContent) {
 
         return new String(Base64.getDecoder().decode(encodedContent), (StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Base64-encode content.
+     *
+     * @param content Message content to be encoded.
+     * @return Encoded value.
+     */
+    private String base64Encode(String content) {
+
+        return new String(Base64.getEncoder().encode(content.getBytes(StandardCharsets.UTF_8)),
+                (StandardCharsets.UTF_8));
     }
 
     /**
