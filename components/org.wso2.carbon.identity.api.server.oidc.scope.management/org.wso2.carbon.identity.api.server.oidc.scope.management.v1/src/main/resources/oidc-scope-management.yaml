@@ -63,7 +63,7 @@ paths:
       tags:
         - OIDC Scope Endpoint
       summary: Add a new OIDC Scope
-      description: This Rest API can be used to add a new OIDC scope. <br>	
+      description: This REST API can be used to add a new OIDC scope. <br>	
         <b>Permission required:</b> <br>	
               * /permission/admin/manage/identity/applicationmgt/create <br>	
         <b>Scope required:</b> <br>	
