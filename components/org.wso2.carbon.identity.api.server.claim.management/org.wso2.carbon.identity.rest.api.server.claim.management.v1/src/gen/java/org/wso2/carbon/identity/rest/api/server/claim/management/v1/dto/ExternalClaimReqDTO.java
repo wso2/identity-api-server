@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,66 +17,61 @@
 package org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto;
 
 import io.swagger.annotations.ApiModel;
-
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-
-
-/**
- * External claim request.
- **/
-
-
+    /**
+    * External claim request.
+    **/
 @ApiModel(description = "External claim request.")
-public class ExternalClaimReqDTO  {
-  
-  
-  @NotNull 
-  private String claimURI = null;
-  
-  @NotNull 
-  private String mappedLocalClaimURI = null;
+public class ExternalClaimReqDTO {
 
-  
-  /**
-   * Claim URI of the external claim.
-   **/
-  @ApiModelProperty(required = true, value = "Claim URI of the external claim.")
-  @JsonProperty("claimURI")
-  public String getClaimURI() {
-    return claimURI;
-  }
-  public void setClaimURI(String claimURI) {
-    this.claimURI = claimURI;
-  }
+    @Valid 
+    @NotNull(message = "Property claimURI cannot be null.") 
+    private String claimURI = null;
 
-  
-  /**
-   * The local claim URI to map with the external claim.
-   **/
-  @ApiModelProperty(required = true, value = "The local claim URI to map with the external claim.")
-  @JsonProperty("mappedLocalClaimURI")
-  public String getMappedLocalClaimURI() {
-    return mappedLocalClaimURI;
-  }
-  public void setMappedLocalClaimURI(String mappedLocalClaimURI) {
-    this.mappedLocalClaimURI = mappedLocalClaimURI;
-  }
+    @Valid 
+    @NotNull(message = "Property mappedLocalClaimURI cannot be null.") 
+    private String mappedLocalClaimURI = null;
 
-  
+    /**
+    * Claim URI of the external claim.
+    **/
+    @ApiModelProperty(required = true, value = "Claim URI of the external claim.")
+    @JsonProperty("claimURI")
+    public String getClaimURI() {
+        return claimURI;
+    }
+    public void setClaimURI(String claimURI) {
+        this.claimURI = claimURI;
+    }
 
-  @Override
-  public String toString()  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class ExternalClaimReqDTO {\n");
-    
-    sb.append("  claimURI: ").append(claimURI).append("\n");
-    sb.append("  mappedLocalClaimURI: ").append(mappedLocalClaimURI).append("\n");
-    sb.append("}\n");
-    return sb.toString();
-  }
+    /**
+    * The local claim URI to map with the external claim.
+    **/
+    @ApiModelProperty(required = true, value = "The local claim URI to map with the external claim.")
+    @JsonProperty("mappedLocalClaimURI")
+    public String getMappedLocalClaimURI() {
+        return mappedLocalClaimURI;
+    }
+    public void setMappedLocalClaimURI(String mappedLocalClaimURI) {
+        this.mappedLocalClaimURI = mappedLocalClaimURI;
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("class ExternalClaimReqDTO {\n");
+        
+        sb.append("    claimURI: ").append(claimURI).append("\n");
+        sb.append("    mappedLocalClaimURI: ").append(mappedLocalClaimURI).append("\n");
+        
+        sb.append("}\n");
+        return sb.toString();
+    }
 }

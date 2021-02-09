@@ -53,6 +53,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
@@ -111,6 +112,7 @@ public class ServerClaimManagementService {
 
     private static final Log LOG = LogFactory.getLog(ServerClaimManagementService.class);
     private static final String REL_CLAIMS = "claims";
+    private static final String IDENTITY_CLAIM_URI = "http://wso2.org/claims/identity/";
     private static final List<String> conflictErrorScenarios = Arrays.asList(
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_CLAIM_DIALECT.getCode(),
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_EXTERNAL_CLAIM_URI.getCode(),
@@ -335,21 +337,28 @@ public class ServerClaimManagementService {
     /**
      * Retrieve all claims belonging to the local dialect.
      *
-     * @param attributes attributes filter (optional).
-     * @param limit      limit (optional).
-     * @param offset     offset (optional).
-     * @param filter     filter (optional).
-     * @param sort       sort (optional).
+     * @param excludeIdentityClaims Exclude identity claims in the local dialect if this is set to true.
+     * @param attributes            attributes filter (optional).
+     * @param limit                 limit (optional).
+     * @param offset                offset (optional).
+     * @param filter                filter (optional).
+     * @param sort                  sort (optional).
      * @return List of local claims.
      */
-    public List<LocalClaimResDTO> getLocalClaims(String attributes, Integer limit, Integer offset,
-                                                 String filter, String sort) {
+    public List<LocalClaimResDTO> getLocalClaims(Boolean excludeIdentityClaims, String attributes, Integer limit,
+                                                 Integer offset, String filter, String sort) {
 
         handleNotImplementedCapabilities(attributes, limit, offset, filter, sort);
 
         try {
             List<LocalClaim> localClaimList = getClaimMetadataManagementService().getLocalClaims(
                     ContextLoader.getTenantDomainFromContext());
+
+            if (excludeIdentityClaims != null && excludeIdentityClaims) {
+                localClaimList = localClaimList.stream()
+                        .filter(claim -> !claim.getClaimURI().startsWith(IDENTITY_CLAIM_URI))
+                        .collect(Collectors.toList());
+            }
 
             return getLocalClaimResDTOs(localClaimList);
 
