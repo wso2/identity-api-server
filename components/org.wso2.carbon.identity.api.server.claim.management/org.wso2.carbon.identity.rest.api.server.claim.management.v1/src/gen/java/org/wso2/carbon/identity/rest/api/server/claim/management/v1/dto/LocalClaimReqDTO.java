@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,202 +21,191 @@ import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeMappingDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.PropertyDTO;
-
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-
-
-/**
- * Local claim request.
- **/
-
-
+    /**
+    * Local claim request.
+    **/
 @ApiModel(description = "Local claim request.")
-public class LocalClaimReqDTO  {
-  
-  
-  @NotNull 
-  private String claimURI = null;
-  
-  @NotNull 
-  private String description = null;
-  
-  
-  private Integer displayOrder = null;
-  
-  @NotNull 
-  private String displayName = null;
-  
-  
-  private Boolean readOnly = null;
-  
-  
-  private String regEx = null;
-  
-  
-  private Boolean required = null;
-  
-  
-  private Boolean supportedByDefault = null;
-  
-  @NotNull 
-  private List<AttributeMappingDTO> attributeMapping = new ArrayList<AttributeMappingDTO>();
-  
-  
-  private List<PropertyDTO> properties = new ArrayList<PropertyDTO>();
+public class LocalClaimReqDTO {
 
-  
-  /**
-   * A unique URI specific to the claim.
-   **/
-  @ApiModelProperty(required = true, value = "A unique URI specific to the claim.")
-  @JsonProperty("claimURI")
-  public String getClaimURI() {
-    return claimURI;
-  }
-  public void setClaimURI(String claimURI) {
-    this.claimURI = claimURI;
-  }
+    @Valid 
+    @NotNull(message = "Property claimURI cannot be null.") 
+    private String claimURI = null;
 
-  
-  /**
-   * Description of the claim.
-   **/
-  @ApiModelProperty(required = true, value = "Description of the claim.")
-  @JsonProperty("description")
-  public String getDescription() {
-    return description;
-  }
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    @Valid 
+    @NotNull(message = "Property description cannot be null.") 
+    private String description = null;
 
-  
-  /**
-   * The order in which the claim is displayed among other claims under the same dialect.
-   **/
-  @ApiModelProperty(value = "The order in which the claim is displayed among other claims under the same dialect.")
-  @JsonProperty("displayOrder")
-  public Integer getDisplayOrder() {
-    return displayOrder;
-  }
-  public void setDisplayOrder(Integer displayOrder) {
-    this.displayOrder = displayOrder;
-  }
+    @Valid 
+    private Integer displayOrder = null;
 
-  
-  /**
-   * Name of the claim to be displayed in the UI.
-   **/
-  @ApiModelProperty(required = true, value = "Name of the claim to be displayed in the UI.")
-  @JsonProperty("displayName")
-  public String getDisplayName() {
-    return displayName;
-  }
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
-  }
+    @Valid 
+    @NotNull(message = "Property displayName cannot be null.") 
+    private String displayName = null;
 
-  
-  /**
-   * Specifies if the claim is read-only.
-   **/
-  @ApiModelProperty(value = "Specifies if the claim is read-only.")
-  @JsonProperty("readOnly")
-  public Boolean getReadOnly() {
-    return readOnly;
-  }
-  public void setReadOnly(Boolean readOnly) {
-    this.readOnly = readOnly;
-  }
+    @Valid 
+    private Boolean readOnly = null;
 
-  
-  /**
-   * Regular expression used to validate inputs.
-   **/
-  @ApiModelProperty(value = "Regular expression used to validate inputs.")
-  @JsonProperty("regEx")
-  public String getRegEx() {
-    return regEx;
-  }
-  public void setRegEx(String regEx) {
-    this.regEx = regEx;
-  }
+    @Valid 
+    private String regEx = null;
 
-  
-  /**
-   * Specifies if the claim is required for user registration.
-   **/
-  @ApiModelProperty(value = "Specifies if the claim is required for user registration.")
-  @JsonProperty("required")
-  public Boolean getRequired() {
-    return required;
-  }
-  public void setRequired(Boolean required) {
-    this.required = required;
-  }
+    @Valid 
+    private Boolean required = null;
 
-  
-  /**
-   * Specifies if the claim will be prompted during user registration and displayed on the user profile.
-   **/
-  @ApiModelProperty(value = "Specifies if the claim will be prompted during user registration and displayed on the user profile.")
-  @JsonProperty("supportedByDefault")
-  public Boolean getSupportedByDefault() {
-    return supportedByDefault;
-  }
-  public void setSupportedByDefault(Boolean supportedByDefault) {
-    this.supportedByDefault = supportedByDefault;
-  }
+    @Valid 
+    private Boolean supportedByDefault = null;
 
-  
-  /**
-   * Userstore attribute mappings.
-   **/
-  @ApiModelProperty(required = true, value = "Userstore attribute mappings.")
-  @JsonProperty("attributeMapping")
-  public List<AttributeMappingDTO> getAttributeMapping() {
-    return attributeMapping;
-  }
-  public void setAttributeMapping(List<AttributeMappingDTO> attributeMapping) {
-    this.attributeMapping = attributeMapping;
-  }
+    @Valid 
+    @NotNull(message = "Property attributeMapping cannot be null.") 
+    private List<AttributeMappingDTO> attributeMapping = new ArrayList<AttributeMappingDTO>();
 
-  
-  /**
-   * Define any additional properties if required.
-   **/
-  @ApiModelProperty(value = "Define any additional properties if required.")
-  @JsonProperty("properties")
-  public List<PropertyDTO> getProperties() {
-    return properties;
-  }
-  public void setProperties(List<PropertyDTO> properties) {
-    this.properties = properties;
-  }
+    @Valid 
+    private List<PropertyDTO> properties = new ArrayList<PropertyDTO>();
 
-  
+    /**
+    * A unique URI specific to the claim.
+    **/
+    @ApiModelProperty(required = true, value = "A unique URI specific to the claim.")
+    @JsonProperty("claimURI")
+    public String getClaimURI() {
+        return claimURI;
+    }
+    public void setClaimURI(String claimURI) {
+        this.claimURI = claimURI;
+    }
 
-  @Override
-  public String toString()  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class LocalClaimReqDTO {\n");
-    
-    sb.append("  claimURI: ").append(claimURI).append("\n");
-    sb.append("  description: ").append(description).append("\n");
-    sb.append("  displayOrder: ").append(displayOrder).append("\n");
-    sb.append("  displayName: ").append(displayName).append("\n");
-    sb.append("  readOnly: ").append(readOnly).append("\n");
-    sb.append("  regEx: ").append(regEx).append("\n");
-    sb.append("  required: ").append(required).append("\n");
-    sb.append("  supportedByDefault: ").append(supportedByDefault).append("\n");
-    sb.append("  attributeMapping: ").append(attributeMapping).append("\n");
-    sb.append("  properties: ").append(properties).append("\n");
-    sb.append("}\n");
-    return sb.toString();
-  }
+    /**
+    * Description of the claim.
+    **/
+    @ApiModelProperty(required = true, value = "Description of the claim.")
+    @JsonProperty("description")
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+    * The order in which the claim is displayed among other claims under the same dialect.
+    **/
+    @ApiModelProperty(value = "The order in which the claim is displayed among other claims under the same dialect.")
+    @JsonProperty("displayOrder")
+    public Integer getDisplayOrder() {
+        return displayOrder;
+    }
+    public void setDisplayOrder(Integer displayOrder) {
+        this.displayOrder = displayOrder;
+    }
+
+    /**
+    * Name of the claim to be displayed in the UI.
+    **/
+    @ApiModelProperty(required = true, value = "Name of the claim to be displayed in the UI.")
+    @JsonProperty("displayName")
+    public String getDisplayName() {
+        return displayName;
+    }
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    /**
+    * Specifies if the claim is read-only.
+    **/
+    @ApiModelProperty(value = "Specifies if the claim is read-only.")
+    @JsonProperty("readOnly")
+    public Boolean getReadOnly() {
+        return readOnly;
+    }
+    public void setReadOnly(Boolean readOnly) {
+        this.readOnly = readOnly;
+    }
+
+    /**
+    * Regular expression used to validate inputs.
+    **/
+    @ApiModelProperty(value = "Regular expression used to validate inputs.")
+    @JsonProperty("regEx")
+    public String getRegEx() {
+        return regEx;
+    }
+    public void setRegEx(String regEx) {
+        this.regEx = regEx;
+    }
+
+    /**
+    * Specifies if the claim is required for user registration.
+    **/
+    @ApiModelProperty(value = "Specifies if the claim is required for user registration.")
+    @JsonProperty("required")
+    public Boolean getRequired() {
+        return required;
+    }
+    public void setRequired(Boolean required) {
+        this.required = required;
+    }
+
+    /**
+    * Specifies if the claim will be prompted during user registration and displayed on the user profile.
+    **/
+    @ApiModelProperty(value = "Specifies if the claim will be prompted during user registration and displayed on the user profile.")
+    @JsonProperty("supportedByDefault")
+    public Boolean getSupportedByDefault() {
+        return supportedByDefault;
+    }
+    public void setSupportedByDefault(Boolean supportedByDefault) {
+        this.supportedByDefault = supportedByDefault;
+    }
+
+    /**
+    * Userstore attribute mappings.
+    **/
+    @ApiModelProperty(required = true, value = "Userstore attribute mappings.")
+    @JsonProperty("attributeMapping")
+    public List<AttributeMappingDTO> getAttributeMapping() {
+        return attributeMapping;
+    }
+    public void setAttributeMapping(List<AttributeMappingDTO> attributeMapping) {
+        this.attributeMapping = attributeMapping;
+    }
+
+    /**
+    * Define any additional properties if required.
+    **/
+    @ApiModelProperty(value = "Define any additional properties if required.")
+    @JsonProperty("properties")
+    public List<PropertyDTO> getProperties() {
+        return properties;
+    }
+    public void setProperties(List<PropertyDTO> properties) {
+        this.properties = properties;
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("class LocalClaimReqDTO {\n");
+        
+        sb.append("    claimURI: ").append(claimURI).append("\n");
+        sb.append("    description: ").append(description).append("\n");
+        sb.append("    displayOrder: ").append(displayOrder).append("\n");
+        sb.append("    displayName: ").append(displayName).append("\n");
+        sb.append("    readOnly: ").append(readOnly).append("\n");
+        sb.append("    regEx: ").append(regEx).append("\n");
+        sb.append("    required: ").append(required).append("\n");
+        sb.append("    supportedByDefault: ").append(supportedByDefault).append("\n");
+        sb.append("    attributeMapping: ").append(attributeMapping).append("\n");
+        sb.append("    properties: ").append(properties).append("\n");
+        
+        sb.append("}\n");
+        return sb.toString();
+    }
 }

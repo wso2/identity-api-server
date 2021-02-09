@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,82 +18,74 @@ package org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto;
 
 import io.swagger.annotations.ApiModel;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LinkDTO;
-
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-
-
-/**
- * Claim dialect response.
- **/
-
-
+    /**
+    * Claim dialect response.
+    **/
 @ApiModel(description = "Claim dialect response.")
-public class ClaimDialectResDTO  {
-  
-  
-  
-  private String id = null;
-  
-  
-  private String dialectURI = null;
-  
-  
-  private LinkDTO link = null;
+public class ClaimDialectResDTO {
 
-  
-  /**
-   * Dialect id.
-   **/
-  @ApiModelProperty(value = "Dialect id.")
-  @JsonProperty("id")
-  public String getId() {
-    return id;
-  }
-  public void setId(String id) {
-    this.id = id;
-  }
+    @Valid 
+    private String id = null;
 
-  
-  /**
-   * URI of the claim dialect.
-   **/
-  @ApiModelProperty(value = "URI of the claim dialect.")
-  @JsonProperty("dialectURI")
-  public String getDialectURI() {
-    return dialectURI;
-  }
-  public void setDialectURI(String dialectURI) {
-    this.dialectURI = dialectURI;
-  }
+    @Valid 
+    private String dialectURI = null;
 
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("link")
-  public LinkDTO getLink() {
-    return link;
-  }
-  public void setLink(LinkDTO link) {
-    this.link = link;
-  }
+    @Valid 
+    private LinkDTO link = null;
 
-  
+    /**
+    * Dialect id.
+    **/
+    @ApiModelProperty(value = "Dialect id.")
+    @JsonProperty("id")
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  @Override
-  public String toString()  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class ClaimDialectResDTO {\n");
-    
-    sb.append("  id: ").append(id).append("\n");
-    sb.append("  dialectURI: ").append(dialectURI).append("\n");
-    sb.append("  link: ").append(link).append("\n");
-    sb.append("}\n");
-    return sb.toString();
-  }
+    /**
+    * URI of the claim dialect.
+    **/
+    @ApiModelProperty(value = "URI of the claim dialect.")
+    @JsonProperty("dialectURI")
+    public String getDialectURI() {
+        return dialectURI;
+    }
+    public void setDialectURI(String dialectURI) {
+        this.dialectURI = dialectURI;
+    }
+
+    /**
+    **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("link")
+    public LinkDTO getLink() {
+        return link;
+    }
+    public void setLink(LinkDTO link) {
+        this.link = link;
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("class ClaimDialectResDTO {\n");
+        
+        sb.append("    id: ").append(id).append("\n");
+        sb.append("    dialectURI: ").append(dialectURI).append("\n");
+        sb.append("    link: ").append(link).append("\n");
+        
+        sb.append("}\n");
+        return sb.toString();
+    }
 }

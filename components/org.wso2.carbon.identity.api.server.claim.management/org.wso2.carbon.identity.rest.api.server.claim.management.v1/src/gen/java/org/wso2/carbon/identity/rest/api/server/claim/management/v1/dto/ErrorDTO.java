@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,93 +16,86 @@
 
 package org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto;
 
-
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-
-
-
-
 @ApiModel(description = "")
-public class ErrorDTO  {
-  
-  
-  @NotNull 
-  private String code = null;
-  
-  @NotNull 
-  private String message = null;
-  
-  
-  private String description = null;
-  
-  
-  private String traceId = null;
+public class ErrorDTO {
 
-  
-  /**
-   **/
-  @ApiModelProperty(required = true, value = "")
-  @JsonProperty("code")
-  public String getCode() {
-    return code;
-  }
-  public void setCode(String code) {
-    this.code = code;
-  }
+    @Valid 
+    @NotNull(message = "Property code cannot be null.") 
+    private String code = null;
 
-  
-  /**
-   **/
-  @ApiModelProperty(required = true, value = "")
-  @JsonProperty("message")
-  public String getMessage() {
-    return message;
-  }
-  public void setMessage(String message) {
-    this.message = message;
-  }
+    @Valid 
+    @NotNull(message = "Property message cannot be null.") 
+    private String message = null;
 
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("description")
-  public String getDescription() {
-    return description;
-  }
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    @Valid 
+    private String description = null;
 
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("traceId")
-  public String getTraceId() {
-    return traceId;
-  }
-  public void setTraceId(String traceId) {
-    this.traceId = traceId;
-  }
+    @Valid 
+    private String traceId = null;
 
-  
+    /**
+    **/
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("code")
+    public String getCode() {
+        return code;
+    }
+    public void setCode(String code) {
+        this.code = code;
+    }
 
-  @Override
-  public String toString()  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class ErrorDTO {\n");
-    
-    sb.append("  code: ").append(code).append("\n");
-    sb.append("  message: ").append(message).append("\n");
-    sb.append("  description: ").append(description).append("\n");
-    sb.append("  traceId: ").append(traceId).append("\n");
-    sb.append("}\n");
-    return sb.toString();
-  }
+    /**
+    **/
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("message")
+    public String getMessage() {
+        return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    /**
+    **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("description")
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+    **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("traceId")
+    public String getTraceId() {
+        return traceId;
+    }
+    public void setTraceId(String traceId) {
+        this.traceId = traceId;
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("class ErrorDTO {\n");
+        
+        sb.append("    code: ").append(code).append("\n");
+        sb.append("    message: ").append(message).append("\n");
+        sb.append("    description: ").append(description).append("\n");
+        sb.append("    traceId: ").append(traceId).append("\n");
+        
+        sb.append("}\n");
+        return sb.toString();
+    }
 }
