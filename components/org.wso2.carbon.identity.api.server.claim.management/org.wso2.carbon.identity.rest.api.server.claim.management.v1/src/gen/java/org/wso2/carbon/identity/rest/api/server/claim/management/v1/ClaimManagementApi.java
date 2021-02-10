@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,23 +37,23 @@ import java.io.InputStream;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
+import javax.validation.Valid;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.*;
 
 @Path("/claim-dialects")
-
-
 @io.swagger.annotations.Api(value = "/claim-dialects", description = "the claim-dialects API")
 public class ClaimManagementApi  {
 
-   @Autowired
-   private ClaimManagementApiService delegate;
+    @Autowired
+    private ClaimManagementApiService delegate;
 
+    @Valid
     @POST
-    
     @Consumes({ "application/json" })
-    
-    @io.swagger.annotations.ApiOperation(value = "Add a claim dialect.", notes = "Add a new claim dialect.", response = void.class)
+    @io.swagger.annotations.ApiOperation(value = "Add a claim dialect.",
+            notes = "Add a new claim dialect. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/create <br> <b>Scope required:</b> <br> * internal_claim_meta_create",
+            response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 201, message = "Item Created."),
         
@@ -67,15 +67,18 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
-    public Response addClaimDialect(@ApiParam(value = "claim dialect to add."  ) ClaimDialectReqDTO claimDialect)
-    {
-    return delegate.addClaimDialect(claimDialect);
+    public Response addClaimDialect(@ApiParam(value = "claim dialect to add."  ) @Valid ClaimDialectReqDTO claimDialect) {
+
+        return delegate.addClaimDialect(claimDialect);
     }
+
+    @Valid
     @POST
     @Path("/{dialect-id}/claims")
     @Consumes({ "application/json" })
-    
-    @io.swagger.annotations.ApiOperation(value = "Add an external claim.", notes = "Add a new external claim.", response = void.class)
+    @io.swagger.annotations.ApiOperation(value = "Add an external claim.",
+            notes = "Add a new external claim. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/create <br> <b>Scope required:</b> <br> * internal_claim_meta_create",
+            response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 201, message = "Item Created."),
         
@@ -92,15 +95,18 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
     public Response addExternalClaim(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
-    @ApiParam(value = "External claim to add."  ) ExternalClaimReqDTO externalClaim)
-    {
-    return delegate.addExternalClaim(dialectId,externalClaim);
+    @ApiParam(value = "External claim to add."  ) @Valid ExternalClaimReqDTO externalClaim) {
+
+        return delegate.addExternalClaim(dialectId,externalClaim);
     }
+
+    @Valid
     @POST
     @Path("/local/claims")
     @Consumes({ "application/json" })
-    
-    @io.swagger.annotations.ApiOperation(value = "Add a local claim.", notes = "Add a new claim.", response = void.class)
+    @io.swagger.annotations.ApiOperation(value = "Add a local claim.",
+            notes = "Add a new claim. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/create <br> <b>Scope required:</b> <br> * internal_claim_meta_create",
+            response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 201, message = "Item Created."),
         
@@ -114,15 +120,17 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
-    public Response addLocalClaim(@ApiParam(value = "Local claim to add."  ) LocalClaimReqDTO localClaim)
-    {
-    return delegate.addLocalClaim(localClaim);
+    public Response addLocalClaim(@ApiParam(value = "Local claim to be added."  ) @Valid LocalClaimReqDTO localClaim) {
+
+        return delegate.addLocalClaim(localClaim);
     }
+
+    @Valid
     @DELETE
     @Path("/{dialect-id}")
-    
-    
-    @io.swagger.annotations.ApiOperation(value = "Delete a claim dialect.", notes = "Delete a claim dialect by claim id.", response = void.class)
+    @io.swagger.annotations.ApiOperation(value = "Delete a claim dialect.",
+            notes = "Delete a claim dialect by claim ID. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/delete <br> <b>Scope required:</b> <br> * internal_claim_meta_delete",
+            response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 204, message = "No Content."),
         
@@ -134,15 +142,17 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
-    public Response deleteClaimDialect(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId)
-    {
-    return delegate.deleteClaimDialect(dialectId);
+    public Response deleteClaimDialect(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId) {
+
+        return delegate.deleteClaimDialect(dialectId);
     }
+
+    @Valid
     @DELETE
     @Path("/{dialect-id}/claims/{claim-id}")
-    
-    
-    @io.swagger.annotations.ApiOperation(value = "Delete an external claim.", notes = "Delete a claim by dialect id and claim id.", response = void.class)
+    @io.swagger.annotations.ApiOperation(value = "Delete an external claim.",
+            notes = "Delete a claim by dialect ID and claim ID. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/delete <br> <b>Scope required:</b> <br> * internal_claim_meta_delete",
+            response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 204, message = "No Content."),
         
@@ -155,15 +165,17 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
     public Response deleteExternalClaim(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
-    @ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId)
-    {
-    return delegate.deleteExternalClaim(dialectId,claimId);
+    @ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId) {
+
+        return delegate.deleteExternalClaim(dialectId,claimId);
     }
+
+    @Valid
     @DELETE
     @Path("/local/claims/{claim-id}")
-    
-    
-    @io.swagger.annotations.ApiOperation(value = "Delete a local claim.", notes = "Delete a claim by claim id.", response = void.class)
+    @io.swagger.annotations.ApiOperation(value = "Delete a local claim.",
+            notes = "Delete a claim by claim ID. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/delete <br> <b>Scope required:</b> <br> * internal_claim_meta_delete",
+            response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 204, message = "No Content."),
         
@@ -175,15 +187,18 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
-    public Response deleteLocalClaim(@ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId)
-    {
-    return delegate.deleteLocalClaim(claimId);
+    public Response deleteLocalClaim(@ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId) {
+
+        return delegate.deleteLocalClaim(claimId);
     }
+
+    @Valid
     @GET
     @Path("/{dialect-id}")
-    
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Retrieve claim dialect.", notes = "Retrieve a claim dialect matching the given dialect id.", response = ClaimDialectResDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Retrieve claim dialect.",
+            notes = "Retrieve a claim dialect matching the given dialect id. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/view <br> <b>Scope required:</b> <br> * internal_claim_meta_view <br>",
+            response = ClaimDialectResDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "Requested claim dialect."),
         
@@ -197,15 +212,17 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
-    public Response getClaimDialect(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId)
-    {
-    return delegate.getClaimDialect(dialectId);
+    public Response getClaimDialect(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId) {
+
+        return delegate.getClaimDialect(dialectId);
     }
+
+    @Valid
     @GET
-    
-    
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Retrieve claim dialects.", notes = "Retrieve claim dialects.", response = ClaimDialectResDTO.class, responseContainer = "List")
+    @io.swagger.annotations.ApiOperation(value = "Retrieve claim dialects.",
+            notes = "Retrieve claim dialects. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/view <br> <b>Scope required:</b> <br> * internal_claim_meta_view",
+            response = ClaimDialectResDTO.class, responseContainer = "List")
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "Claim dialects."),
         
@@ -215,18 +232,21 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 501, message = "Not Implemented.") })
 
-    public Response getClaimDialects(@ApiParam(value = "maximum number of records to return") @QueryParam("limit")  Integer limit,
-    @ApiParam(value = "number of records to skip for pagination") @QueryParam("offset")  Integer offset,
-    @ApiParam(value = "Condition to filter the retrival of records.") @QueryParam("filter")  String filter,
-    @ApiParam(value = "Define the order how the retrieved records should be sorted.") @QueryParam("sort")  String sort)
-    {
-    return delegate.getClaimDialects(limit,offset,filter,sort);
+    public Response getClaimDialects(@ApiParam(value = "Maximum number of records to return.") @QueryParam("limit")  Integer limit,
+    @ApiParam(value = "Number of records to skip for pagination.") @QueryParam("offset")  Integer offset,
+    @ApiParam(value = "Condition to filter the retrieval of records.") @QueryParam("filter")  String filter,
+    @ApiParam(value = "Define the order by which the retrieved records should be sorted.") @QueryParam("sort")  String sort) {
+
+        return delegate.getClaimDialects(limit,offset,filter,sort);
     }
+
+    @Valid
     @GET
     @Path("/{dialect-id}/claims/{claim-id}")
-    
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Retrieve external claim.", notes = "Retrieve an external claim matching the given dialect id and claim id.", response = ExternalClaimResDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Retrieve external claim.",
+            notes = "Retrieve an external claim matching the given dialect ID and claim ID. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/view <br> <b>Scope required:</b> <br> * internal_claim_meta_view",
+            response = ExternalClaimResDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "Requested claim."),
         
@@ -241,15 +261,18 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
     public Response getExternalClaim(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
-    @ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId)
-    {
-    return delegate.getExternalClaim(dialectId,claimId);
+    @ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId) {
+
+        return delegate.getExternalClaim(dialectId,claimId);
     }
+
+    @Valid
     @GET
     @Path("/{dialect-id}/claims")
-    
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Retrieve external claims.", notes = "Retrieve External claims.", response = ExternalClaimResDTO.class, responseContainer = "List")
+    @io.swagger.annotations.ApiOperation(value = "Retrieve external claims.",
+            notes = "Retrieve External claims. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/view <br> <b>Scope required:</b> <br> * internal_claim_meta_view",
+            response = ExternalClaimResDTO.class, responseContainer = "List")
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "External claims."),
         
@@ -262,18 +285,21 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 501, message = "Not Implemented.") })
 
     public Response getExternalClaims(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
-    @ApiParam(value = "maximum number of records to return") @QueryParam("limit")  Integer limit,
-    @ApiParam(value = "number of records to skip for pagination") @QueryParam("offset")  Integer offset,
-    @ApiParam(value = "Condition to filter the retrival of records.") @QueryParam("filter")  String filter,
-    @ApiParam(value = "Define the order how the retrieved records should be sorted.") @QueryParam("sort")  String sort)
-    {
-    return delegate.getExternalClaims(dialectId,limit,offset,filter,sort);
+    @ApiParam(value = "Maximum number of records to return.") @QueryParam("limit")  Integer limit,
+    @ApiParam(value = "Number of records to skip for pagination.") @QueryParam("offset")  Integer offset,
+    @ApiParam(value = "Condition to filter the retrieval of records.") @QueryParam("filter")  String filter,
+    @ApiParam(value = "Define the order by which the retrieved records should be sorted.") @QueryParam("sort")  String sort) {
+
+        return delegate.getExternalClaims(dialectId,limit,offset,filter,sort);
     }
+
+    @Valid
     @GET
     @Path("/local/claims/{claim-id}")
-    
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Retrieve local claim.", notes = "Retrieve a local claim matching the given claim id.", response = LocalClaimResDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Retrieve local claim.",
+            notes = "Retrieve a local claim matching the given claim ID. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/view <br> <b>Scope required:</b> <br> * internal_claim_meta_view",
+            response = LocalClaimResDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "Requested claim."),
         
@@ -287,15 +313,18 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
-    public Response getLocalClaim(@ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId)
-    {
-    return delegate.getLocalClaim(claimId);
+    public Response getLocalClaim(@ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId) {
+
+        return delegate.getLocalClaim(claimId);
     }
+
+    @Valid
     @GET
     @Path("/local/claims")
-    
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Retrieve local claims.", notes = "Retrieve local claims.", response = LocalClaimResDTO.class, responseContainer = "List")
+    @io.swagger.annotations.ApiOperation(value = "Retrieve local claims.",
+            notes = "Retrieve local claims. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/view <br> <b>Scope required:</b> <br> * internal_claim_meta_view",
+            response = LocalClaimResDTO.class, responseContainer = "List")
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "Local claims."),
         
@@ -306,18 +335,22 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 501, message = "Not Implemented.") })
 
     public Response getLocalClaims(@ApiParam(value = "Define only the required attributes to be sent in the response object.") @QueryParam("attributes")  String attributes,
-    @ApiParam(value = "maximum number of records to return") @QueryParam("limit")  Integer limit,
-    @ApiParam(value = "number of records to skip for pagination") @QueryParam("offset")  Integer offset,
-    @ApiParam(value = "Condition to filter the retrival of records.") @QueryParam("filter")  String filter,
-    @ApiParam(value = "Define the order how the retrieved records should be sorted.") @QueryParam("sort")  String sort)
-    {
-    return delegate.getLocalClaims(attributes,limit,offset,filter,sort);
+    @ApiParam(value = "Maximum number of records to return.") @QueryParam("limit")  Integer limit,
+    @ApiParam(value = "Number of records to skip for pagination.") @QueryParam("offset")  Integer offset,
+    @ApiParam(value = "Condition to filter the retrieval of records.") @QueryParam("filter")  String filter,
+    @ApiParam(value = "Define the order by which the retrieved records should be sorted.") @QueryParam("sort")  String sort,
+    @ApiParam(value = "Exclude identity claims when listing local claims.") @QueryParam("exclude-identity-claims")  Boolean excludeIdentityClaims) {
+
+        return delegate.getLocalClaims(attributes,limit,offset,filter,sort,excludeIdentityClaims);
     }
+
+    @Valid
     @PUT
     @Path("/{dialect-id}")
     @Consumes({ "application/json" })
-    
-    @io.swagger.annotations.ApiOperation(value = "Update a claim dialect.", notes = "Update a claim dialect.", response = void.class)
+    @io.swagger.annotations.ApiOperation(value = "Update a claim dialect.",
+            notes = "Update a claim dialect. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/update <br> <b>Scope required:</b> <br> * internal_claim_meta_update",
+            response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK."),
         
@@ -330,15 +363,18 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
     public Response updateClaimDialect(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
-    @ApiParam(value = "Updated claim dialect."  ) ClaimDialectReqDTO claimDialect)
-    {
-    return delegate.updateClaimDialect(dialectId,claimDialect);
+    @ApiParam(value = "Updated claim dialect."  ) @Valid ClaimDialectReqDTO claimDialect) {
+
+        return delegate.updateClaimDialect(dialectId,claimDialect);
     }
+
+    @Valid
     @PUT
     @Path("/{dialect-id}/claims/{claim-id}")
     @Consumes({ "application/json" })
-    
-    @io.swagger.annotations.ApiOperation(value = "Update an external claim.", notes = "Update an external claim.", response = void.class)
+    @io.swagger.annotations.ApiOperation(value = "Update an external claim.",
+            notes = "Update an external claim. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/update <br> <b>Scope required:</b> <br> * internal_claim_meta_update",
+            response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK."),
         
@@ -354,15 +390,18 @@ public class ClaimManagementApi  {
 
     public Response updateExternalClaim(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
     @ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId,
-    @ApiParam(value = "Updated external claim."  ) ExternalClaimReqDTO externalClaim)
-    {
-    return delegate.updateExternalClaim(dialectId,claimId,externalClaim);
+    @ApiParam(value = "Updated external claim."  ) @Valid ExternalClaimReqDTO externalClaim) {
+
+        return delegate.updateExternalClaim(dialectId,claimId,externalClaim);
     }
+
+    @Valid
     @PUT
     @Path("/local/claims/{claim-id}")
     @Consumes({ "application/json" })
-    
-    @io.swagger.annotations.ApiOperation(value = "Update a local claim.", notes = "Update a local claim.", response = void.class)
+    @io.swagger.annotations.ApiOperation(value = "Update a local claim.",
+            notes = "Update a local claim. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/update <br> <b>Scope required:</b> <br> * internal_claim_meta_update",
+            response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK."),
         
@@ -377,9 +416,9 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
     public Response updateLocalClaim(@ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId,
-    @ApiParam(value = "Updated local claim."  ) LocalClaimReqDTO localClaim)
-    {
-    return delegate.updateLocalClaim(claimId,localClaim);
-    }
-}
+    @ApiParam(value = "Updated local claim."  ) @Valid LocalClaimReqDTO localClaim) {
 
+        return delegate.updateLocalClaim(claimId,localClaim);
+    }
+
+}

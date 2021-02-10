@@ -78,6 +78,7 @@ paths:
       - $ref : '#/parameters/offsetQueryParam'
       - $ref : '#/parameters/filterQueryParam'
       - $ref : '#/parameters/sortQueryParam'
+      - $ref : '#/parameters/excludeIdentityClaimsQueryParam'
       x-wso2-curl: |
       responses:
         200:
@@ -541,6 +542,12 @@ parameters:
     required: false
     description: Define only the required attributes to be sent in the response object.
     type: string
+  excludeIdentityClaimsQueryParam:
+    in: query
+    name: exclude-identity-claims
+    required: false
+    type: boolean
+    description: Exclude identity claims when listing local claims.
   dialectIdPathParam:
     in: path
     name: dialect-id

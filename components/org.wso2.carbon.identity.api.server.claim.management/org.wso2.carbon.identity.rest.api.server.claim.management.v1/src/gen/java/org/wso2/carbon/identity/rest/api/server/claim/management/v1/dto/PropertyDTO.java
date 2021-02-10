@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,61 +16,56 @@
 
 package org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto;
 
-
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-
-
-
-
 @ApiModel(description = "")
-public class PropertyDTO  {
-  
-  
-  @NotNull 
-  private String key = null;
-  
-  @NotNull 
-  private String value = null;
+public class PropertyDTO {
 
-  
-  /**
-   **/
-  @ApiModelProperty(required = true, value = "")
-  @JsonProperty("key")
-  public String getKey() {
-    return key;
-  }
-  public void setKey(String key) {
-    this.key = key;
-  }
+    @Valid 
+    @NotNull(message = "Property key cannot be null.") 
+    private String key = null;
 
-  
-  /**
-   **/
-  @ApiModelProperty(required = true, value = "")
-  @JsonProperty("value")
-  public String getValue() {
-    return value;
-  }
-  public void setValue(String value) {
-    this.value = value;
-  }
+    @Valid 
+    @NotNull(message = "Property value cannot be null.") 
+    private String value = null;
 
-  
+    /**
+    **/
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("key")
+    public String getKey() {
+        return key;
+    }
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-  @Override
-  public String toString()  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class PropertyDTO {\n");
-    
-    sb.append("  key: ").append(key).append("\n");
-    sb.append("  value: ").append(value).append("\n");
-    sb.append("}\n");
-    return sb.toString();
-  }
+    /**
+    **/
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("value")
+    public String getValue() {
+        return value;
+    }
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("class PropertyDTO {\n");
+        
+        sb.append("    key: ").append(key).append("\n");
+        sb.append("    value: ").append(value).append("\n");
+        
+        sb.append("}\n");
+        return sb.toString();
+    }
 }
