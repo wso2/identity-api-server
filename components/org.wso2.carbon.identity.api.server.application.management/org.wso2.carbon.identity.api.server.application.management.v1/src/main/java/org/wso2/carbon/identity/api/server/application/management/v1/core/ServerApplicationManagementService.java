@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -87,13 +88,10 @@ import org.wso2.carbon.identity.configuration.mgt.core.search.PrimitiveCondition
 import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
 import org.wso2.carbon.identity.core.model.Node;
-import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages;
-import org.wso2.carbon.identity.cors.mgt.core.dao.CORSOriginDAO;
-import org.wso2.carbon.identity.cors.mgt.core.dao.impl.CORSOriginDAOImpl;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
-import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
@@ -373,11 +371,26 @@ public class ServerApplicationManagementService {
 
         String username = ContextLoader.getUsernameFromContext();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        CORSManagementService corsManagementService = ApplicationManagementServiceHolder.getCorsManagementService();
         try {
+            // Delete CORS origins for OIDC Apps.
+            List<CORSOrigin> existingCORSOrigins =
+                    corsManagementService.getApplicationCORSOrigins(applicationId, tenantDomain);
+            if (!CollectionUtils.isEmpty(existingCORSOrigins)) {
+                ApplicationManagementServiceHolder.getCorsManagementService()
+                        .deleteCORSOrigins(applicationId,
+                                existingCORSOrigins.stream().map(CORSOrigin::getId).collect(Collectors.toList()),
+                                tenantDomain);
+            }
+
+            // Delete Application.
             getApplicationManagementService().deleteApplicationByResourceId(applicationId, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error deleting application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
+        } catch (CORSManagementServiceException e) {
+            String msg = "Error while trying to remove CORS origins associated with the application: " + applicationId;
+            throw Utils.buildServerError(msg, e);
         }
     }
 
@@ -831,26 +844,13 @@ public class ServerApplicationManagementService {
         // Delete the associated CORS origins if the inboundType is oauth2.
         if (inboundType.equals(OAUTH2)) {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            int tenantId = IdentityTenantUtil.getTenantId(tenantDomain);
-            CORSOriginDAO corsOriginDAO = new CORSOriginDAOImpl();
-            List<CORSOrigin> existingCORSOrigins = null;
-            ApplicationBasicInfo applicationBasicInfo = null;
+            CORSManagementService corsManagementService = ApplicationManagementServiceHolder.getCorsManagementService();
             try {
-                applicationBasicInfo = ApplicationManagementService.getInstance()
-                        .getApplicationBasicInfoByResourceId(applicationId, tenantDomain);
-                existingCORSOrigins = corsOriginDAO.getCORSOriginsByApplicationId(
-                        applicationBasicInfo.getApplicationId(), tenantId);
-                corsOriginDAO.deleteCORSOrigins(applicationBasicInfo.getApplicationId(), existingCORSOrigins.stream()
-                        .map(CORSOrigin::getId).collect(Collectors.toList()), tenantId);
-            } catch (CORSManagementServiceServerException | IdentityApplicationManagementException e) {
-                if (applicationBasicInfo != null && existingCORSOrigins != null) {
-                    try {
-                        corsOriginDAO.addCORSOrigins(applicationBasicInfo.getApplicationId(), existingCORSOrigins,
-                                tenantId);
-                    } catch (CORSManagementServiceServerException corsManagementServiceServerException) {
-                        log.error("Error while trying to remove CORS origins associated with the application.", e);
-                    }
-                }
+                List<CORSOrigin> existingCORSOrigins = corsManagementService
+                        .getApplicationCORSOrigins(applicationId, tenantDomain);
+                corsManagementService.deleteCORSOrigins(applicationId, existingCORSOrigins.stream()
+                        .map(CORSOrigin::getId).collect(Collectors.toList()), tenantDomain);
+            } catch (CORSManagementServiceException e) {
                 log.error("Error while trying to remove CORS origins associated with the application.", e);
             }
         }
