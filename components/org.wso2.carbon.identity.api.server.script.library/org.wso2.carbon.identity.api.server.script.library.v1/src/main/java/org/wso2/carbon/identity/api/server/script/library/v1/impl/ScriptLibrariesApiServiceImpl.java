@@ -19,13 +19,20 @@ package org.wso2.carbon.identity.api.server.script.library.v1.impl;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.script.library.common.Constants;
 import org.wso2.carbon.identity.api.server.script.library.v1.ScriptLibrariesApiService;
 import org.wso2.carbon.identity.api.server.script.library.v1.core.ServerScriptLibrariesService;
 import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibraryListResponse;
 import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibraryResponse;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
+
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.core.Response;
 
@@ -45,9 +52,20 @@ public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService 
                                      String description) {
 
         serverScriptLibrariesService.addScriptLibrary(name, contentInputStream, description);
-        URI location =
-                ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT + "/" + name);
-        return Response.created(location).build();
+        try {
+            URI location =
+                    ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT
+                            + "/" + URLEncoder.encode(name, StandardCharsets.UTF_8.name())
+                            .replace("+", "%20"));
+            return Response.created(location).build();
+        } catch (UnsupportedEncodingException e) {
+            ErrorResponse errorResponse =
+                    new ErrorResponse.Builder().withCode(Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL
+                            .getCode()).withMessage(Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL.getMessage())
+                            .withDescription(Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL.getDescription())
+                            .build();
+            throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponse);
+        }
     }
 
     @Override

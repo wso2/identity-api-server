@@ -41,6 +41,8 @@ import org.wso2.carbon.identity.functions.library.mgt.model.FunctionLibrary;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -283,10 +285,18 @@ public class ServerScriptLibrariesService {
         ScriptLibraryResponse scriptLibraryResponse = new ScriptLibraryResponse();
         scriptLibraryResponse.setName(scriptLibrary.getFunctionLibraryName());
         scriptLibraryResponse.setDescription(scriptLibrary.getDescription());
-        scriptLibraryResponse.setContentRef(ContextLoader.buildURIForBody(String.format(
-                V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT + "/%s" + SCRIPT_LIBRARY_CONTENT_PATH,
-                scriptLibrary.getFunctionLibraryName())).toString());
-        return scriptLibraryResponse;
+        try {
+            String displayName =
+                    URLEncoder.encode(scriptLibrary.getFunctionLibraryName(), StandardCharsets.UTF_8.name());
+            scriptLibraryResponse.setContentRef(ContextLoader.buildURIForBody(String.format(
+                    V1_API_PATH_COMPONENT + SCRIPT_LIBRARY_PATH_COMPONENT + "/%s" + SCRIPT_LIBRARY_CONTENT_PATH,
+                    displayName)).toString().replace("+", "%20"));
+            return scriptLibraryResponse;
+        } catch (UnsupportedEncodingException e) {
+            FunctionLibraryManagementException error = new FunctionLibraryManagementException(
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL.getMessage(), e);
+            throw handleScriptLibraryError(error, Constants.ErrorMessage.ERROR_CODE_ERROR_ENCODING_URL);
+        }
     }
 
     /**
