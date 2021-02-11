@@ -91,6 +91,7 @@ import org.wso2.carbon.identity.core.model.Node;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages;
+import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
@@ -127,6 +128,7 @@ import static org.wso2.carbon.identity.application.authentication.framework.util
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.INVALID_REQUEST;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
 import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
+import static org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages.ERROR_CODE_INVALID_APP_ID;
 
 /**
  * Calls internal osgi services to perform server application management related operations.
@@ -388,6 +390,17 @@ public class ServerApplicationManagementService {
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error deleting application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
+        } catch (CORSManagementServiceClientException e) {
+            /*
+             For not existing application scenarios the following error code will be returned. To preserve the behaviour
+             we need to return 204.
+             */
+            if (ERROR_CODE_INVALID_APP_ID.getCode().equals(e.getErrorCode())) {
+                log.error("Invalid application id: " + applicationId, e);
+                return;
+            }
+            String msg = "Error while trying to remove CORS origins associated with the application: " + applicationId;
+            throw Utils.buildClientError(e.getErrorCode(), msg, e.getMessage());
         } catch (CORSManagementServiceException e) {
             String msg = "Error while trying to remove CORS origins associated with the application: " + applicationId;
             throw Utils.buildServerError(msg, e);
