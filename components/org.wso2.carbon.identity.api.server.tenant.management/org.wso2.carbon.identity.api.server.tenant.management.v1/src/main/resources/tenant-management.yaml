@@ -607,8 +607,6 @@ components:
       required:
         - username
         - email
-        - firstname
-        - lastname
         - provisioningMethod
       properties:
         username:

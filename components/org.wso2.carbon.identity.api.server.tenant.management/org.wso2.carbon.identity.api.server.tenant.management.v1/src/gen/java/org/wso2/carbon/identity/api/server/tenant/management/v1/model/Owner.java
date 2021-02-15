@@ -112,11 +112,9 @@ public class Owner  {
         return this;
     }
     
-    @ApiModelProperty(example = "kim", required = true, value = "First name of the owner.")
+    @ApiModelProperty(example = "kim", value = "First name of the owner.")
     @JsonProperty("firstname")
     @Valid
-    @NotNull(message = "Property firstname cannot be null.")
-
     public String getFirstname() {
         return firstname;
     }
@@ -133,11 +131,9 @@ public class Owner  {
         return this;
     }
     
-    @ApiModelProperty(example = "kim", required = true, value = "Last name of the owner.")
+    @ApiModelProperty(example = "kim", value = "Last name of the owner.")
     @JsonProperty("lastname")
     @Valid
-    @NotNull(message = "Property lastname cannot be null.")
-
     public String getLastname() {
         return lastname;
     }
