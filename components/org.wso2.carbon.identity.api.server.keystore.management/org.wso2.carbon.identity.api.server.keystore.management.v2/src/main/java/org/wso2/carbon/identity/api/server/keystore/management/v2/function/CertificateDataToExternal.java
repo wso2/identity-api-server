@@ -60,7 +60,6 @@ public class CertificateDataToExternal implements Function<KeyData, CertificateD
             }
             response.setCertificateFingerprints(fingerprints);
             response.setSignatureAlgorithm(keyData.getSignatureAlgName());
-            response.setPublicKey(keyData.getPublicKey());
         }
         return response;
     }

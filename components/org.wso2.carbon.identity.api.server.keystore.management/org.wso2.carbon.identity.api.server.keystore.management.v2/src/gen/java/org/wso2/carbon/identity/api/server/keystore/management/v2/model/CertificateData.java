@@ -29,9 +29,6 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-/**
- * This class contains all the data related to public certificate of a key.
- */
 public class CertificateData  {
   
     private String subjectDN;
@@ -42,7 +39,6 @@ public class CertificateData  {
     private String notBefore;
     private String signatureAlgorithm;
     private Fingerprints certificateFingerprints;
-    private String publicKey;
 
     /**
     **/
@@ -188,24 +184,6 @@ public class CertificateData  {
         this.certificateFingerprints = certificateFingerprints;
     }
 
-    /**
-    **/
-    public CertificateData publicKey(String publicKey) {
-
-        this.publicKey = publicKey;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvgJ68OTTx7q3wP3JDH4jkfH9w9SkHb7mhP1Ual4V+BE1jP15J+tKw3NTK4ekPudiognmvAujJimnJRS36VvqMjUx/9Cp9lHg15SMrFfBA+60RtnUTwSjactGEXQ0/vHUj5F5xzvvY2gBJTbC88aWDdP7O0zqjF3O8grSayQJwaEYK73awEsM1H0hEkKXZIzeZvZY5QHPeG0i6WIdOd9N2fM+kHuU//2vKoDwXdClnxXr0+JviKM/GFrYQPu9ikeQlHF87ZMmcqagkHeyQ3Q0bzEBbsG1kMfiiYgRiMkK0AqD3zSnM0KGXz5ziU1v8Axxqk3B0y0UHDi3NgjmqsWLMwIDAQAB", value = "")
-    @JsonProperty("publicKey")
-    @Valid
-    public String getPublicKey() {
-        return publicKey;
-    }
-    public void setPublicKey(String publicKey) {
-        this.publicKey = publicKey;
-    }
-
 
 
     @Override
@@ -225,13 +203,12 @@ public class CertificateData  {
             Objects.equals(this.notAfter, certificateData.notAfter) &&
             Objects.equals(this.notBefore, certificateData.notBefore) &&
             Objects.equals(this.signatureAlgorithm, certificateData.signatureAlgorithm) &&
-            Objects.equals(this.certificateFingerprints, certificateData.certificateFingerprints) &&
-            Objects.equals(this.publicKey, certificateData.publicKey);
+            Objects.equals(this.certificateFingerprints, certificateData.certificateFingerprints);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(subjectDN, issurDN, serialNumber, version, notAfter, notBefore, signatureAlgorithm, certificateFingerprints, publicKey);
+        return Objects.hash(subjectDN, issurDN, serialNumber, version, notAfter, notBefore, signatureAlgorithm, certificateFingerprints);
     }
 
     @Override
@@ -248,7 +225,6 @@ public class CertificateData  {
         sb.append("    notBefore: ").append(toIndentedString(notBefore)).append("\n");
         sb.append("    signatureAlgorithm: ").append(toIndentedString(signatureAlgorithm)).append("\n");
         sb.append("    certificateFingerprints: ").append(toIndentedString(certificateFingerprints)).append("\n");
-        sb.append("    publicKey: ").append(toIndentedString(publicKey)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -38,9 +38,6 @@ import javax.validation.constraints.*;
 @Path("/keystore")
 @Api(description = "The keystore API")
 
-/*
-  REST API for managing keystore related functionalities.
- */
 public class KeystoreApi  {
 
     @Autowired
@@ -65,7 +62,7 @@ public class KeystoreApi  {
         @ApiResponse(code = 405, message = "Method Not Allowed.", response = ErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = ErrorResponse.class)
     })
-    public Response deletePrivateKey(@ApiParam(value = "alias of the certificate",required=true) @PathParam("alias") String alias) {
+    public Response deletePrivateKey(@ApiParam(value = "alias of the key",required=true) @PathParam("alias") String alias) {
 
         return delegate.deletePrivateKey(alias );
     }
@@ -89,9 +86,9 @@ public class KeystoreApi  {
         @ApiResponse(code = 404, message = "Resource Not Found.", response = ErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = ErrorResponse.class)
     })
-    public Response getPrivateKey(@ApiParam(value = "alias of the certificate",required=true) @PathParam("alias") String alias) {
+    public Response getCertificateDataOfTheKey(@ApiParam(value = "alias of the key",required=true) @PathParam("alias") String alias) {
 
-        return delegate.getPrivateKey(alias );
+        return delegate.getCertificateDataOfTheKey(alias );
     }
 
     @Valid
@@ -104,7 +101,7 @@ public class KeystoreApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Keys", })
+    }, tags={ "Private Keys", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK.", response = KeysData.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request.", response = ErrorResponse.class),

@@ -44,12 +44,12 @@ public class KeyStoreMgtService {
     private static final Log LOG = LogFactory.getLog(KeyStoreMgtService.class);
 
     /**
-     * Returns private key data for the given alias from the tenant keystore.
+     * Returns certificate data of the private key of the given alias from the tenant keystore.
      *
      * @param alias Alias.
      * @return PrivateKeyDataObject.
      */
-    public CertificateData getPrivateKey(String alias) {
+    public CertificateData getCertificateDataOfPrivateKey(String alias) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {

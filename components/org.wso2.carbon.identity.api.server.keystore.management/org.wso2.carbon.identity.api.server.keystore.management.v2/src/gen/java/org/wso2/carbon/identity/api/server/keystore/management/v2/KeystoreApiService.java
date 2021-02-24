@@ -16,17 +16,24 @@
 
 package org.wso2.carbon.identity.api.server.keystore.management.v2;
 
+import org.wso2.carbon.identity.api.server.keystore.management.v2.*;
+import org.wso2.carbon.identity.api.server.keystore.management.v2.model.*;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+import java.util.List;
 import org.wso2.carbon.identity.api.server.keystore.management.v2.model.AddPrivateKeyRequest;
+import org.wso2.carbon.identity.api.server.keystore.management.v2.model.CertificateData;
+import org.wso2.carbon.identity.api.server.keystore.management.v2.model.ErrorResponse;
+import org.wso2.carbon.identity.api.server.keystore.management.v2.model.KeysData;
 import javax.ws.rs.core.Response;
 
-/**
- * Interface for managing keystore related functionalities.
- */
+
 public interface KeystoreApiService {
 
       public Response deletePrivateKey(String alias);
 
-      public Response getPrivateKey(String alias);
+      public Response getCertificateDataOfTheKey(String alias);
 
       public Response getPrivateKeyAliases(String filter);
 

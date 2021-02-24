@@ -40,9 +40,9 @@ public class KeystoreApiServiceImpl implements KeystoreApiService {
     }
 
     @Override
-    public Response getPrivateKey(String alias) {
+    public Response getCertificateDataOfTheKey(String alias) {
 
-        return Response.ok().entity(keyStoreMgtService.getPrivateKey(alias)).build();
+        return Response.ok().entity(keyStoreMgtService.getCertificateDataOfPrivateKey(alias)).build();
     }
 
     @Override
