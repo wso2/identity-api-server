@@ -102,6 +102,9 @@ import org.wso2.carbon.identity.template.mgt.model.Template;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -317,6 +320,15 @@ public class ServerApplicationManagementService {
             throw buildNotImplementedError(errorCode, "Application creation with templates not supported.");
         }
 
+        /*
+         * CORS adding step should be moved to the service layer and the validation also should happen there.
+         * But for now we are handling the validation here.
+         */
+        if (applicationModel.getInboundProtocolConfiguration() != null &&
+                applicationModel.getInboundProtocolConfiguration().getOidc() != null) {
+            validateCORSOrigins(applicationModel.getInboundProtocolConfiguration().getOidc().getAllowedOrigins());
+        }
+
         String username = ContextLoader.getUsernameFromContext();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
@@ -526,6 +538,11 @@ public class ServerApplicationManagementService {
 
     public void putInboundOAuthConfiguration(String applicationId, OpenIDConnectConfiguration oidcConfigModel) {
 
+        /*
+         * CORS updating step should be moved to the service layer and the validation also should happen there.
+         * But for now we are handling the validation here.
+         */
+        validateCORSOrigins(oidcConfigModel.getAllowedOrigins());
         putInbound(applicationId, oidcConfigModel, OAuthInboundFunctions::putOAuthInbound);
     }
 
@@ -1136,6 +1153,32 @@ public class ServerApplicationManagementService {
             return String.format(description, formatData);
         } else {
             return description;
+        }
+    }
+
+    /**
+     * Validate the CORS Origins. This should be moved to the service layer with the CORS adding step on creating
+     * OIDC applications.
+     *
+     * @param corsOrigins List of the CORS Origins..
+     */
+    private static void validateCORSOrigins(List<String> corsOrigins) {
+
+        boolean isValidOrigin = true;
+        for (String origin : corsOrigins) {
+            try {
+                URL url = new URL(origin);
+                if (StringUtils.isNotEmpty(url.toURI().getPath())) {
+                    isValidOrigin = false;
+                }
+            } catch (IllegalArgumentException | MalformedURLException | URISyntaxException e) {
+                isValidOrigin = false;
+            }
+
+            if (!isValidOrigin) {
+                throw buildBadRequestError("Error creating application. Invalid Allowed Origin found: " +
+                        origin);
+            }
         }
     }
 }
