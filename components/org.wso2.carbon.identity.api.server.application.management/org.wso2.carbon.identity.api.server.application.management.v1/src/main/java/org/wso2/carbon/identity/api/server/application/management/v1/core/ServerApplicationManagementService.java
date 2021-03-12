@@ -1165,19 +1165,21 @@ public class ServerApplicationManagementService {
     private static void validateCORSOrigins(List<String> corsOrigins) {
 
         boolean isValidOrigin = true;
-        for (String origin : corsOrigins) {
-            try {
-                URL url = new URL(origin);
-                if (StringUtils.isNotEmpty(url.toURI().getPath())) {
+        if (!CollectionUtils.isEmpty(corsOrigins)) {
+            for (String origin : corsOrigins) {
+                try {
+                    URL url = new URL(origin);
+                    if (StringUtils.isNotEmpty(url.toURI().getPath())) {
+                        isValidOrigin = false;
+                    }
+                } catch (IllegalArgumentException | MalformedURLException | URISyntaxException e) {
                     isValidOrigin = false;
                 }
-            } catch (IllegalArgumentException | MalformedURLException | URISyntaxException e) {
-                isValidOrigin = false;
-            }
 
-            if (!isValidOrigin) {
-                throw buildBadRequestError("Error creating application. Invalid Allowed Origin found: " +
-                        origin);
+                if (!isValidOrigin) {
+                    throw buildBadRequestError("Error creating application. Invalid Allowed Origin found: " +
+                            origin);
+                }
             }
         }
     }
