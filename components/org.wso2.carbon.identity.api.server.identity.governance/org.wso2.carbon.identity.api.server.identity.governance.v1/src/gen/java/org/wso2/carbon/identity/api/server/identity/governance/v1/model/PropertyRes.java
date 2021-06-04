@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.MetaRes;
 import javax.validation.constraints.*;
 
 /**
@@ -37,6 +38,7 @@ public class PropertyRes  {
     private String value;
     private String displayName;
     private String description;
+    private MetaRes meta;
 
     /**
     * Property name.
@@ -114,6 +116,24 @@ public class PropertyRes  {
         this.description = description;
     }
 
+    /**
+    **/
+    public PropertyRes meta(MetaRes meta) {
+
+        this.meta = meta;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "boolean", value = "Data type of the property")
+    @JsonProperty("meta")
+    @Valid
+    public MetaRes getMeta() {
+        return meta;
+    }
+    public void setMeta(MetaRes meta) {
+        this.meta = meta;
+    }
+
 
 
     @Override
@@ -129,12 +149,13 @@ public class PropertyRes  {
         return Objects.equals(this.name, propertyRes.name) &&
             Objects.equals(this.value, propertyRes.value) &&
             Objects.equals(this.displayName, propertyRes.displayName) &&
-            Objects.equals(this.description, propertyRes.description);
+            Objects.equals(this.description, propertyRes.description) &&
+            Objects.equals(this.meta, propertyRes.meta);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, value, displayName, description);
+        return Objects.hash(name, value, displayName, description, meta);
     }
 
     @Override
@@ -147,6 +168,7 @@ public class PropertyRes  {
         sb.append("    value: ").append(toIndentedString(value)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    meta: ").append(toIndentedString(meta)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -3,7 +3,7 @@ info:
   description: >-
     This is the RESTful API for identity governance configurations in WSO2
     Identity Server
-  version: "v1"
+  version: v1
   title: WSO2 Identity Server - Governance connectors Admin API
   contact:
     name: WSO2 Identity Server
@@ -173,8 +173,10 @@ paths:
         - Management
       summary: Retrieve preferences of governance connector configurations.
       operationId: getPreferenceByPost
-      description: |
-        This API returns information about configuration preference of governance connectors. This API will accept
+      description: >
+        This API returns information about configuration preference of
+        governance connectors. This API will accept
+
         following keys.
           <table>
             <tr>
@@ -468,6 +470,7 @@ paths:
           </table>
 
         <b>scope required:</b>
+
         * internal_login
       requestBody:
         content:
@@ -475,17 +478,19 @@ paths:
             schema:
               type: array
               example:
-                  - connector-name: self-sign-up
-                    properties:
-                           - SelfRegistration.Enable
-                           - SelfRegistration.LockOnCreation
-                  - connector-name: user-email-verification
-                    properties:
-                           - EmailVerification.Enable
-                           - EmailVerification.LockOnCreation
+                - connector-name: self-sign-up
+                  properties:
+                    - SelfRegistration.Enable
+                    - SelfRegistration.LockOnCreation
+                - connector-name: user-email-verification
+                  properties:
+                    - EmailVerification.Enable
+                    - EmailVerification.LockOnCreation
               items:
                 $ref: '#/components/schemas/PreferenceSearchAttribute'
-        description: This represents the connector and the properties which preferences needs to be returned.
+        description: >-
+          This represents the connector and the properties which preferences
+          needs to be returned.
         required: true
       responses:
         '200':
@@ -497,20 +502,18 @@ paths:
                 example:
                   - connector-name: self-sign-up
                     properties:
-                             - name: SelfRegistration.Enable
-                               value: 'false'
-                             - name: SelfRegistration.LockOnCreation
-                               value: 'false'
+                      - name: SelfRegistration.Enable
+                        value: 'false'
+                      - name: SelfRegistration.LockOnCreation
+                        value: 'false'
                   - connector-name: user-email-verification
                     properties:
-                             - name: EmailVerification.Enable
-                               value: 'true'
-                             - name: EmailVerification.LockOnCreation
-                               value: 'false'
-
+                      - name: EmailVerification.Enable
+                        value: 'true'
+                      - name: EmailVerification.LockOnCreation
+                        value: 'false'
                 items:
                   $ref: '#/components/schemas/PreferenceResp'
-
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -519,9 +522,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-
 servers:
-  - url: https://localhost:9443/t/{tenant-domain}/api/server/v1/
+  - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1/'
 components:
   parameters:
     limitQueryParam:
@@ -626,7 +628,8 @@ components:
         self:
           type: string
           description: Path to retrieve the full connector information.
-          example: /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz
+          example: >-
+            /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz
         connectors:
           type: array
           description: Connectors of the category with minimal attributes.
@@ -643,7 +646,8 @@ components:
         self:
           type: string
           description: Path to retrieve the full connector information.
-          example: /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz/connectors/c3VzcGVuc2lvbi5ub3RpZmljYXRpb24
+          example: >-
+            /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz/connectors/c3VzcGVuc2lvbi5ub3RpZmljYXRpb24
     CategoryRes:
       type: object
       description: Governance connector category response.
@@ -710,6 +714,18 @@ components:
           type: string
           description: Property description.
           example: Enable account suspend notifications.
+        meta:
+          type: object
+          description: Meta data properties
+          $ref: '#/components/schemas/MetaRes'
+    MetaRes:
+      type: object
+      description: Meta data information
+      properties:
+        type:
+          type: string
+          description: Data type of the property
+          example: boolean
     ConnectorsPatchReq:
       type: object
       description: Governance connector property patch request.
