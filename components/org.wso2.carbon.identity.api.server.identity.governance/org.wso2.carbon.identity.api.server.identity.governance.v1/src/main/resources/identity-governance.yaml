@@ -725,6 +725,10 @@ components:
           type: string
           description: Data type of the property
           example: boolean
+        regex:
+          type: string
+          description: regular expression
+          example: "[a-zA-Z0-9]{6}"
     ConnectorsPatchReq:
       type: object
       description: Governance connector property patch request.

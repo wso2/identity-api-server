@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ public class PropertyRes  {
         return this;
     }
     
-    @ApiModelProperty(example = "boolean", value = "Data type of the property")
+    @ApiModelProperty(value = "")
     @JsonProperty("meta")
     @Valid
     public MetaRes getMeta() {

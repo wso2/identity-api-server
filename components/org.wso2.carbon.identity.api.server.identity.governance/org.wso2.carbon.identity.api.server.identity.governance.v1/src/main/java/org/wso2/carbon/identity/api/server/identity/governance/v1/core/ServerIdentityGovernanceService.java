@@ -389,6 +389,7 @@ public class ServerIdentityGovernanceService {
             propertyRes.setDescription(property.getDescription() != null ? property.getDescription() : "");
             MetaRes metaRes = new MetaRes();
             metaRes.setType(property.getType());
+            metaRes.setRegex(property.getRegex());
             propertyRes.setMeta(metaRes);
             properties.add(propertyRes);
         }

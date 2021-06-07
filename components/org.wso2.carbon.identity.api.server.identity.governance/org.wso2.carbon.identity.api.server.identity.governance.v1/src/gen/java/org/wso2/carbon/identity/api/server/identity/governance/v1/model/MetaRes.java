@@ -23,17 +23,18 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
 /**
- * Meta data information
+ * Meta Data related to each property
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Meta data information")
+@ApiModel(description = "Meta Data related to each property")
 public class MetaRes  {
   
     private String type;
+    private String regex;
 
     /**
     * Data type of the property
@@ -54,6 +55,25 @@ public class MetaRes  {
         this.type = type;
     }
 
+    /**
+    * regular expression
+    **/
+    public MetaRes regex(String regex) {
+
+        this.regex = regex;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[a-zA-Z0-9]{6}", value = "regular expression")
+    @JsonProperty("regex")
+    @Valid
+    public String getRegex() {
+        return regex;
+    }
+    public void setRegex(String regex) {
+        this.regex = regex;
+    }
+
 
 
     @Override
@@ -66,12 +86,13 @@ public class MetaRes  {
             return false;
         }
         MetaRes metaRes = (MetaRes) o;
-        return Objects.equals(this.type, metaRes.type);
+        return Objects.equals(this.type, metaRes.type) &&
+            Objects.equals(this.regex, metaRes.regex);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type);
+        return Objects.hash(type, regex);
     }
 
     @Override
@@ -81,6 +102,7 @@ public class MetaRes  {
         sb.append("class MetaRes {\n");
         
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    regex: ").append(toIndentedString(regex)).append("\n");
         sb.append("}");
         return sb.toString();
     }
