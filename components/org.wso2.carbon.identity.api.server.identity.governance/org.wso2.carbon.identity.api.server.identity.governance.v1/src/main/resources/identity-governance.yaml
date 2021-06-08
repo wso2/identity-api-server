@@ -3,7 +3,7 @@ info:
   description: >-
     This is the RESTful API for identity governance configurations in WSO2
     Identity Server
-  version: v1
+  version: "v1"
   title: WSO2 Identity Server - Governance connectors Admin API
   contact:
     name: WSO2 Identity Server
@@ -173,10 +173,8 @@ paths:
         - Management
       summary: Retrieve preferences of governance connector configurations.
       operationId: getPreferenceByPost
-      description: >
-        This API returns information about configuration preference of
-        governance connectors. This API will accept
-
+      description: |
+        This API returns information about configuration preference of governance connectors. This API will accept
         following keys.
           <table>
             <tr>
@@ -470,7 +468,6 @@ paths:
           </table>
 
         <b>scope required:</b>
-
         * internal_login
       requestBody:
         content:
@@ -488,9 +485,7 @@ paths:
                     - EmailVerification.LockOnCreation
               items:
                 $ref: '#/components/schemas/PreferenceSearchAttribute'
-        description: >-
-          This represents the connector and the properties which preferences
-          needs to be returned.
+        description: This represents the connector and the properties which preferences needs to be returned.
         required: true
       responses:
         '200':
@@ -512,8 +507,10 @@ paths:
                         value: 'true'
                       - name: EmailVerification.LockOnCreation
                         value: 'false'
+
                 items:
                   $ref: '#/components/schemas/PreferenceResp'
+
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -522,8 +519,9 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+
 servers:
-  - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1/'
+  - url: https://localhost:9443/t/{tenant-domain}/api/server/v1/
 components:
   parameters:
     limitQueryParam:
@@ -628,8 +626,7 @@ components:
         self:
           type: string
           description: Path to retrieve the full connector information.
-          example: >-
-            /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz
+          example: /t/carbon.super/api/server/v1/identity-governance/QWNjb3VudCBNYW5hZ2VtZW50IFBvbGljaWVz
         connectors:
           type: array
           description: Connectors of the category with minimal attributes.
