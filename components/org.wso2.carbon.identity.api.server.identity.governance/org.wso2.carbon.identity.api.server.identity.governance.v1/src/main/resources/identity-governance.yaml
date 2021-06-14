@@ -726,6 +726,10 @@ components:
           type: string
           description: regular expression
           example: "[a-zA-Z0-9]{6}"
+        groupID:
+          type: integer
+          description: Group id of the property if any
+          example: 0
     ConnectorsPatchReq:
       type: object
       description: Governance connector property patch request.

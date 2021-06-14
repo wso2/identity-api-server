@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ public class MetaRes  {
   
     private String type;
     private String regex;
+    private Integer groupID;
 
     /**
     * Data type of the property
@@ -74,6 +75,25 @@ public class MetaRes  {
         this.regex = regex;
     }
 
+    /**
+    * Group id of the property if any
+    **/
+    public MetaRes groupID(Integer groupID) {
+
+        this.groupID = groupID;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "0", value = "Group id of the property if any")
+    @JsonProperty("groupID")
+    @Valid
+    public Integer getGroupID() {
+        return groupID;
+    }
+    public void setGroupID(Integer groupID) {
+        this.groupID = groupID;
+    }
+
 
 
     @Override
@@ -87,12 +107,13 @@ public class MetaRes  {
         }
         MetaRes metaRes = (MetaRes) o;
         return Objects.equals(this.type, metaRes.type) &&
-            Objects.equals(this.regex, metaRes.regex);
+            Objects.equals(this.regex, metaRes.regex) &&
+            Objects.equals(this.groupID, metaRes.groupID);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, regex);
+        return Objects.hash(type, regex, groupID);
     }
 
     @Override
@@ -103,6 +124,7 @@ public class MetaRes  {
         
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    regex: ").append(toIndentedString(regex)).append("\n");
+        sb.append("    groupID: ").append(toIndentedString(groupID)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -390,6 +390,7 @@ public class ServerIdentityGovernanceService {
             MetaRes metaRes = new MetaRes();
             metaRes.setType(property.getType());
             metaRes.setRegex(property.getRegex());
+            metaRes.setGroupID(property.getGroupId());
             propertyRes.setMeta(metaRes);
             properties.add(propertyRes);
         }
