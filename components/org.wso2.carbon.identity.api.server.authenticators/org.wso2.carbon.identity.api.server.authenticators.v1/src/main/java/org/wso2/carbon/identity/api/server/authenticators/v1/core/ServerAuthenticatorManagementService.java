@@ -143,25 +143,11 @@ public class ServerAuthenticatorManagementService {
                     .getApplicationManagementService().getAllRequestPathAuthenticators(ContextLoader
                             .getTenantDomainFromContext());
 
-            List<String> requestedAttributeList = new ArrayList<>();
-            requestedAttributeList.add(Constants.FEDERATED_AUTHENTICATORS);
+            FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
+                    .getIdentityProviderManager().getAllFederatedAuthenticators();
 
-            int limit;
-            int offSet = 0;
-            int totalIdpCount;
-
-            List<IdentityProvider> identityProviders = new ArrayList<>();
-            do {
-                IdpSearchResult idpSearchResult = AuthenticatorsServiceHolder.getInstance().getIdentityProviderManager()
-                        .getIdPs(IdentityUtil.getMaximumItemPerPage(), offSet, null, null, null,
-                                ContextLoader.getTenantDomainFromContext(), requestedAttributeList);
-                identityProviders.addAll(idpSearchResult.getIdPs());
-                limit = idpSearchResult.getLimit();
-                totalIdpCount = idpSearchResult.getTotalIDPCount();
-                offSet = idpSearchResult.getOffSet() + limit;
-            } while (limit > 0 && offSet >= 0 && totalIdpCount > offSet);
-
-            return buildTagsListResponse(localAuthenticatorConfigs, requestPathAuthenticatorConfigs, identityProviders);
+            return buildTagsListResponse(localAuthenticatorConfigs, requestPathAuthenticatorConfigs,
+                    federatedAuthenticatorConfigs);
         } catch (IdentityApplicationManagementException e) {
             throw handleApplicationMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_AUTHENTICATORS,
                     null);
@@ -420,7 +406,7 @@ public class ServerAuthenticatorManagementService {
 
     private List<String> buildTagsListResponse(LocalAuthenticatorConfig[] localAuthenticatorConfigs,
                                                RequestPathAuthenticatorConfig[] requestPathAuthenticatorConfigs,
-                                               List<IdentityProvider> identityProviders) {
+                                               FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs) {
 
         ArrayList<String> tagsList = new ArrayList<>();
         if (localAuthenticatorConfigs != null) {
@@ -439,23 +425,11 @@ public class ServerAuthenticatorManagementService {
                 }
             }
         }
-        if (identityProviders != null) {
-            for (IdentityProvider identityProvider : identityProviders) {
-                FederatedAuthenticatorConfig[] fedAuthConfigs = identityProvider.getFederatedAuthenticatorConfigs();
-                if (fedAuthConfigs != null) {
-                    for (FederatedAuthenticatorConfig config : fedAuthConfigs) {
-                        if (config.isEnabled()) {
-                            FederatedAuthenticatorConfig federatedAuthenticatorConfig =
-                                    ApplicationAuthenticatorService.getInstance()
-                                            .getFederatedAuthenticatorByName(config.getName());
-                            if (federatedAuthenticatorConfig != null) {
-                                String[] tags = federatedAuthenticatorConfig.getTags();
-                                if (ArrayUtils.isNotEmpty(tags)) {
-                                    tagsList.addAll(Arrays.asList(tags));
-                                }
-                            }
-                        }
-                    }
+        if (ArrayUtils.isNotEmpty(federatedAuthenticatorConfigs)) {
+            for (FederatedAuthenticatorConfig config : federatedAuthenticatorConfigs) {
+                String[] tags = config.getTags();
+                if (ArrayUtils.isNotEmpty(tags)) {
+                    tagsList.addAll(Arrays.asList(tags));
                 }
             }
         }
