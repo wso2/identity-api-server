@@ -69,6 +69,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningClaim;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
+import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.common.model.CertificateInfo;
 import org.wso2.carbon.identity.application.common.model.ClaimConfig;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
@@ -425,6 +426,15 @@ public class ServerIdpManagementService {
                     listItem.setAuthenticatorId(fedAuthId);
                     listItem.setName(config.getName());
                     listItem.setIsEnabled(config.isEnabled());
+                    FederatedAuthenticatorConfig federatedAuthenticatorConfig =
+                            ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
+                                    config.getName());
+                    if (federatedAuthenticatorConfig != null) {
+                        String[] tags = federatedAuthenticatorConfig.getTags();
+                        if (ArrayUtils.isNotEmpty(tags)) {
+                            listItem.setTags(Arrays.asList(tags));
+                        }
+                    }
                     listItem.setSelf(
                             ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT +
                                     "/%s/federated-authenticators/%s", idpId, fedAuthId)).toString());
@@ -1418,6 +1428,14 @@ public class ServerIdpManagementService {
         String authenticatorId = base64URLEncode(authenticatorConfig.getName());
         metaFederatedAuthenticator.setName(authenticatorConfig.getName());
         metaFederatedAuthenticator.setAuthenticatorId(authenticatorId);
+        FederatedAuthenticatorConfig federatedAuthenticatorConfig = ApplicationAuthenticatorService.getInstance()
+                .getFederatedAuthenticatorByName(authenticatorConfig.getName());
+        if (federatedAuthenticatorConfig != null) {
+            String[] tags = federatedAuthenticatorConfig.getTags();
+            if (ArrayUtils.isNotEmpty(tags)) {
+                metaFederatedAuthenticator.setTags(Arrays.asList(tags));
+            }
+        }
         metaFederatedAuthenticator.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
                 IDP_PATH_COMPONENT + "/meta/federated-authenticators/%s", authenticatorId)).toString());
         return metaFederatedAuthenticator;
@@ -1430,6 +1448,14 @@ public class ServerIdpManagementService {
         metaFederatedAuthenticator.setName(authenticatorConfig.getName());
         metaFederatedAuthenticator.setAuthenticatorId(base64URLEncode(authenticatorConfig.getName()));
         metaFederatedAuthenticator.setDisplayName(authenticatorConfig.getDisplayName());
+        FederatedAuthenticatorConfig federatedAuthenticatorConfig = ApplicationAuthenticatorService.getInstance()
+                .getFederatedAuthenticatorByName(authenticatorConfig.getName());
+        if (federatedAuthenticatorConfig != null) {
+            String[] tags = federatedAuthenticatorConfig.getTags();
+            if (ArrayUtils.isNotEmpty(tags)) {
+                metaFederatedAuthenticator.setTags(Arrays.asList(tags));
+            }
+        }
         Property[] properties = authenticatorConfig.getProperties();
         List<MetaProperty> metaProperties = Arrays.stream(properties).map(propertyToExternalMeta).collect(Collectors
                 .toList());
@@ -2041,6 +2067,15 @@ public class ServerIdpManagementService {
             fedAuthListItem.setAuthenticatorId(base64URLEncode(fedAuthConfig.getName()));
             fedAuthListItem.setName(fedAuthConfig.getName());
             fedAuthListItem.setIsEnabled(fedAuthConfig.isEnabled());
+            FederatedAuthenticatorConfig federatedAuthenticatorConfig =
+                    ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
+                            fedAuthConfig.getName());
+            if (federatedAuthenticatorConfig != null) {
+                String[] tags = federatedAuthenticatorConfig.getTags();
+                if (ArrayUtils.isNotEmpty(tags)) {
+                    fedAuthListItem.setTags(Arrays.asList(tags));
+                }
+            }
             fedAuthListItem.setSelf(
                     ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT +
                                     "/%s/federated-authenticators/%s", idp.getResourceId(),
@@ -2530,6 +2565,15 @@ public class ServerIdpManagementService {
             federatedAuthenticator.setName(config.getName());
             federatedAuthenticator.setIsEnabled(config.isEnabled());
             federatedAuthenticator.setIsDefault(isDefaultAuthenticator);
+            FederatedAuthenticatorConfig federatedAuthenticatorConfig =
+                    ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
+                            config.getName());
+            if (federatedAuthenticatorConfig != null) {
+                String[] tags = federatedAuthenticatorConfig.getTags();
+                if (ArrayUtils.isNotEmpty(tags)) {
+                    federatedAuthenticator.setTags(Arrays.asList(tags));
+                }
+            }
             List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties =
                     Arrays.stream(config.getProperties()).map(propertyToExternal).collect(Collectors.toList());
             federatedAuthenticator.setProperties(properties);
