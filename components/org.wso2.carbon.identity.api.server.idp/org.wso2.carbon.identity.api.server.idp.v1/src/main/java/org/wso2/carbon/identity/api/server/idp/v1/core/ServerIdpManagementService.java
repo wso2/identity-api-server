@@ -1740,7 +1740,25 @@ public class ServerIdpManagementService {
             idpJWKSUri = identityProviderPOSTRequest.getCertificate().getJwksUri();
         } else if (identityProviderPOSTRequest.getCertificate() != null && identityProviderPOSTRequest.getCertificate()
                 .getCertificates() != null) {
-            idp.setCertificate(StringUtils.join(identityProviderPOSTRequest.getCertificate().getCertificates(), ""));
+            List<String> certificates = new ArrayList<>();
+            for (int certificateNo = 0; certificateNo < identityProviderPOSTRequest.getCertificate()
+                    .getCertificates().size(); certificateNo++) {
+                if (identityProviderPOSTRequest.getCertificate()
+                        .getCertificates().get(certificateNo).startsWith(IdentityUtil.PEM_BEGIN_CERTFICATE)) {
+                    certificates.add(identityProviderPOSTRequest.getCertificate()
+                            .getCertificates().get(certificateNo));
+                } else {
+                    try {
+                        certificates.add(base64Decode(identityProviderPOSTRequest.getCertificate()
+                                .getCertificates().get(certificateNo)));
+                    } catch (IllegalArgumentException e) {
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_INVALID_CERTIFICATE_FORMAT, null);
+                    }
+
+                }
+            }
+            idp.setCertificate(base64Encode(StringUtils.join(certificates, "")));
         }
         idp.setFederationHub(identityProviderPOSTRequest.getIsFederationHub());
 
@@ -2608,7 +2626,12 @@ public class ServerIdpManagementService {
                             certificates.add(base64Decode(certInfo.getCertValue()));
                         }
                         if (!value.startsWith(IdentityUtil.PEM_BEGIN_CERTFICATE)) {
-                            value = base64Decode(value);
+                            try {
+                                value = base64Decode(value);
+                            } catch (IllegalArgumentException e) {
+                                throw handleException(Response.Status.BAD_REQUEST,
+                                        Constants.ErrorMessage.ERROR_CODE_INVALID_CERTIFICATE_FORMAT, null);
+                            }
                         }
                         certificates.set(index, value);
                         idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
@@ -2673,7 +2696,12 @@ public class ServerIdpManagementService {
                     }
                 }
                 if (!value.startsWith(IdentityUtil.PEM_BEGIN_CERTFICATE)) {
-                    value = base64Decode(value);
+                    try {
+                        value = base64Decode(value);
+                    } catch (IllegalArgumentException e) {
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_INVALID_CERTIFICATE_FORMAT, null);
+                    }
                 }
                 certificates.add(index, value);
                 idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
