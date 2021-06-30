@@ -31,9 +31,9 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
     private ServerAuthenticatorManagementService authenticatorManagementService;
 
     @Override
-    public Response authenticatorsGet(String filter) {
+    public Response authenticatorsGet(String filter, Integer limit, Integer offset) {
 
-        return Response.ok().entity(authenticatorManagementService.getAuthenticators(filter)).build();
+        return Response.ok().entity(authenticatorManagementService.getAuthenticators(filter, limit, offset)).build();
     }
 
     @Override

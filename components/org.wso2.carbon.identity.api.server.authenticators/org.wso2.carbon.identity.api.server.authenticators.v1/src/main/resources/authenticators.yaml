@@ -28,6 +28,8 @@ paths:
       description: List all authenticators in the server
       parameters:
         - $ref: '#/components/parameters/filterQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/offsetQueryParam'
       responses:
         '200':
           description: Successful response
@@ -45,6 +47,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
   /authenticators/meta/tags:
     get:
       tags:
@@ -84,6 +88,26 @@ components:
         E.g. /configs/authenticators?filter=name+sw+fi+and+(tag+eq+2FA+or+tag+eq+MFA)
       schema:
         type: string
+    limitQueryParam:
+      in: query
+      name: limit
+      description: >
+        Maximum number of records to return. _<b>This option is not yet
+        supported.<b>_
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+    offsetQueryParam:
+      in: query
+      name: offset
+      description: >
+        Number of records to skip for pagination. _<b>This option is not yet
+        supported.<b>_
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
   schemas:
     Error:
       type: object
@@ -175,7 +199,12 @@ components:
         'application/json':
           schema:
             $ref: '#/components/schemas/Error'
-
+    NotImplemented:
+      description: Not Implemented.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
   #-----------------------------------------------------
   # Applicable authentication mechanisms.
   #-----------------------------------------------------

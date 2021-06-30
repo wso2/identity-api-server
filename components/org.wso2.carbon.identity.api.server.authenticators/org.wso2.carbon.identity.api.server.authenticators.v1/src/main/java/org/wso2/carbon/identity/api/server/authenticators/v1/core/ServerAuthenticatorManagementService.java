@@ -68,10 +68,14 @@ public class ServerAuthenticatorManagementService {
     /**
      * Retrieves the list of available authenticators.
      *
-     * @param filter The filter string
+     * @param filter The filter string.
+     * @param limit  The items per page. **Not supported at the moment.**
+     * @param offset The offset to be used with the limit parameter. **Not supported at the moment.**
      * @return The list of authenticators
      */
-    public List<Authenticator> getAuthenticators(String filter) {
+    public List<Authenticator> getAuthenticators(String filter, Integer limit, Integer offset) {
+
+        handleNotImplementedCapabilities(limit, offset);
 
         try {
             String filterAuthenticatorName = null;
@@ -835,5 +839,18 @@ public class ServerAuthenticatorManagementService {
 
         Response.Status status = Response.Status.BAD_REQUEST;
         return new APIError(status, errorResponse);
+    }
+
+    private void handleNotImplementedCapabilities(Integer limit, Integer offset) {
+
+        Constants.ErrorMessage errorEnum = null;
+        if (limit != null || offset != null) {
+            errorEnum = Constants.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
+        }
+        if (errorEnum != null) {
+            ErrorResponse errorResponse = getErrorBuilder(errorEnum, null).build(log, errorEnum.getDescription());
+            Response.Status status = Response.Status.NOT_IMPLEMENTED;
+            throw new APIError(status, errorResponse);
+        }
     }
 }

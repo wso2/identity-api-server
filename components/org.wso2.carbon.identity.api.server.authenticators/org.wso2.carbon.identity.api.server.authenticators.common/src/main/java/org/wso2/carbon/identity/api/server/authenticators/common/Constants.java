@@ -81,7 +81,9 @@ public class Constants {
                 "supported."),
         ERROR_CODE_UNSUPPORTED_COMPLEX_QUERY_OPERATION_FOR_TAG("65008", "Unsupported complex query " +
                 "operation in filter.", "Complex query with '%s' operation for filter attribute 'tag' is not " +
-                "supported.");
+                "supported."),
+        ERROR_CODE_PAGINATION_NOT_IMPLEMENTED("65009", "Pagination not supported.", "Pagination " +
+                "capabilities are not supported in this version of the API.");
 
         private final String code;
         private final String message;

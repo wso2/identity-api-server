@@ -58,11 +58,12 @@ public class AuthenticatorsApi  {
         @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
         @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
         @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response authenticatorsGet(    @Valid@ApiParam(value = "Condition to filter the retrieval of records. Only supports filtering based on the 'tag' and 'name' attribute. For local authenticators and request path authenticators, the 'displayName' is considered as the 'name' attribute during filtering. The 'name' attribute only supports 'eq' and 'sw operations. Filtering with multiple 'name' attributes is not supported. The 'tag' attribute only supports 'eq' operation. Filtering with multiple 'tag' attributes is supported with only 'or' as the complex query operation. E.g. /configs/authenticators?filter=name+sw+fi+and+(tag+eq+2FA+or+tag+eq+MFA) ")  @QueryParam("filter") String filter) {
+    public Response authenticatorsGet(    @Valid@ApiParam(value = "Condition to filter the retrieval of records. Only supports filtering based on the 'tag' and 'name' attribute. For local authenticators and request path authenticators, the 'displayName' is considered as the 'name' attribute during filtering. The 'name' attribute only supports 'eq' and 'sw operations. Filtering with multiple 'name' attributes is not supported. The 'tag' attribute only supports 'eq' operation. Filtering with multiple 'tag' attributes is supported with only 'or' as the complex query operation. E.g. /configs/authenticators?filter=name+sw+fi+and+(tag+eq+2FA+or+tag+eq+MFA) ")  @QueryParam("filter") String filter,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_ ")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_ ")  @QueryParam("offset") Integer offset) {
 
-        return delegate.authenticatorsGet(filter );
+        return delegate.authenticatorsGet(filter,  limit,  offset );
     }
 
     @Valid

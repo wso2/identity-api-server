@@ -29,7 +29,7 @@ import javax.ws.rs.core.Response;
 
 public interface AuthenticatorsApiService {
 
-      public Response authenticatorsGet(String filter);
+      public Response authenticatorsGet(String filter, Integer limit, Integer offset);
 
       public Response authenticatorsMetaTagsGet();
 }
