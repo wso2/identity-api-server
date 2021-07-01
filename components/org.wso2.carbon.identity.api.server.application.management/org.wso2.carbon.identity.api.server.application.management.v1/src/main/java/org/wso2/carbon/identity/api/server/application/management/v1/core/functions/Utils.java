@@ -185,4 +185,16 @@ public class Utils {
         Response.Status status = Response.Status.NOT_FOUND;
         return new APIError(status, errorResponse);
     }
+
+    public static APIError buildForbiddenError(String errorCode, String message, String description) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorCode)
+                .withMessage(message)
+                .withDescription(description)
+                .build(log, description);
+
+        Response.Status status = Response.Status.FORBIDDEN;
+        return new APIError(status, errorResponse);
+    }
 }
