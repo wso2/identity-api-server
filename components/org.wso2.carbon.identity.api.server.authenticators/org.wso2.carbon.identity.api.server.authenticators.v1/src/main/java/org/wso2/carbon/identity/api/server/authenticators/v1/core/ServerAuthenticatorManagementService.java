@@ -100,7 +100,11 @@ public class ServerAuthenticatorManagementService {
 
             int localAuthenticatorsCount = localAuthenticatorConfigs.length;
             RequestPathAuthenticatorConfig[] requestPathAuthenticatorConfigs = new RequestPathAuthenticatorConfig[0];
-            if (localAuthenticatorsCount < maximumItemPerPage) {
+
+            /* If there is no filter string available in the request, the request path authenticators are required to
+            be fetched only if the  no. of local authenticators retrieved are less than the maximum items per page
+            count as the no. of items returned in the response will be capped at the maximum items per page count. */
+            if (StringUtils.isBlank(filter) && localAuthenticatorsCount < maximumItemPerPage) {
                 requestPathAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
                         .getApplicationManagementService().getAllRequestPathAuthenticators(ContextLoader
                                 .getTenantDomainFromContext());
@@ -113,6 +117,10 @@ public class ServerAuthenticatorManagementService {
                     requestPathAuthenticatorConfigs.length);
             List<IdentityProvider> identityProviders = null;
 
+            /* If there is no filter string available in the request, the identity providers are required to
+            be fetched only if the total of local authenticators and request path authenticators retrieved above is
+            less than the maximum items per page count as the no. of items returned in the response will be capped
+            at the maximum items per page count. */
             if (idPCountToBeRetrieved > 0 && StringUtils.isBlank(filter)) {
                 IdpSearchResult idpSearchResult = AuthenticatorsServiceHolder.getInstance().getIdentityProviderManager()
                         .getIdPs(idPCountToBeRetrieved, null, null, null, null,
