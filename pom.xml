@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.229-SNAPSHOT</version>
+    <version>1.0.230-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -66,11 +66,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
                 <version>${spring-web.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.ws.rs</groupId>
@@ -483,7 +478,6 @@
         <spring-web.version>5.1.1.RELEASE</spring-web.version>
         <swagger-jaxrs.version>1.6.2</swagger-jaxrs.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
-        <junit.version>4.12</junit.version>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.4.75</identity.governance.version>
