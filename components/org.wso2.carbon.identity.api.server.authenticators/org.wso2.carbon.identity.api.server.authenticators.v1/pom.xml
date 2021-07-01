@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.authenticators</artifactId>
-        <version>1.0.229-SNAPSHOT</version>
+        <version>1.0.230-SNAPSHOT</version>
     </parent>
 
     <artifactId>org.wso2.carbon.identity.api.server.authenticators.v1</artifactId>
@@ -110,11 +110,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
