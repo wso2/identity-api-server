@@ -127,6 +127,9 @@ public class Constants {
                 "User ID claim URI is not a local claim for tenant: %s"),
         ERROR_CODE_NOT_EXISTING_ROLE_CLAIM_URI("IDP-60034", "Invalid role claim URI",
                 "Role claim URI is not a local claim for tenant: %s"),
+        ERROR_CODE_IDP_LIMIT_REACHED("60035",
+                "Unable to create an identity provider.",
+                "Maximum number of allowed identity providers have been reached."),
 
         // Server Error starting from 650xx.
         ERROR_CODE_ERROR_ADDING_IDP("65002",

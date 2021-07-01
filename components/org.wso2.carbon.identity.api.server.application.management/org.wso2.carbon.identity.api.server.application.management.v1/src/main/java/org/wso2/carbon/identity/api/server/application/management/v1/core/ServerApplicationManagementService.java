@@ -116,6 +116,7 @@ import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
@@ -124,6 +125,7 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.rollbackInbound;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.rollbackInbounds;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.updateOrInsertInbound;
+import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.OAUTH2;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.PASSIVE_STS;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.SAML2;
@@ -1091,7 +1093,18 @@ public class ServerApplicationManagementService {
     private APIError buildClientError(IdentityApplicationManagementException e, String message) {
 
         String errorCode = getErrorCode(e, INVALID_REQUEST.getCode());
+        if (ERROR_CODE_RESOURCE_LIMIT_REACHED.equals(errorCode)) {
+            return handleResourceLimitReached();
+        }
         return Utils.buildClientError(errorCode, message, e.getMessage());
+    }
+
+    private APIError handleResourceLimitReached() {
+
+        String code = ERROR_APPLICATION_LIMIT_REACHED.getCode();
+        String message = ERROR_APPLICATION_LIMIT_REACHED.getMessage();
+        String description = ERROR_APPLICATION_LIMIT_REACHED.getDescription();
+        return Utils.buildForbiddenError(code, message, description);
     }
 
     private String getErrorCode(IdentityApplicationManagementException e, String defaultErrorCode) {
