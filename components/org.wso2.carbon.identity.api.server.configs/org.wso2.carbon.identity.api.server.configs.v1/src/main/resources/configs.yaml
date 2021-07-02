@@ -499,6 +499,12 @@ components:
           enum:
             - LOCAL
             - REQUEST_PATH
+        tags:
+          type: array
+          items:
+            type: string
+          example: [2FA,MFA]
+          readOnly: true
         self:
           type: string
           example: /t/carbon.super/api/server/v1/configs/authenticators/QmFzaWNBdXRoZW50aWNhdG9y
@@ -523,6 +529,12 @@ components:
           enum:
             - LOCAL
             - REQUEST_PATH
+        tags:
+          type: array
+          items:
+            type: string
+          example: [2FA,MFA]
+          readOnly: true
         properties:
           type: array
           items:

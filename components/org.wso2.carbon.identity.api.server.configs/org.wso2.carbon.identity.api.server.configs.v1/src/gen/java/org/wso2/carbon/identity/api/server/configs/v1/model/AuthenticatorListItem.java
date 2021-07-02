@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 
 
@@ -68,6 +70,8 @@ public enum TypeEnum {
 }
 
     private TypeEnum type;
+    private List<String> tags = null;
+
     private String self;
 
     /**
@@ -162,6 +166,32 @@ public enum TypeEnum {
 
     /**
     **/
+    public AuthenticatorListItem tags(List<String> tags) {
+
+        this.tags = tags;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"2FA\",\"MFA\"]", value = "")
+    @JsonProperty("tags")
+    @Valid
+    public List<String> getTags() {
+        return tags;
+    }
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public AuthenticatorListItem addTagsItem(String tagsItem) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.add(tagsItem);
+        return this;
+    }
+
+        /**
+    **/
     public AuthenticatorListItem self(String self) {
 
         this.self = self;
@@ -195,12 +225,13 @@ public enum TypeEnum {
             Objects.equals(this.displayName, authenticatorListItem.displayName) &&
             Objects.equals(this.isEnabled, authenticatorListItem.isEnabled) &&
             Objects.equals(this.type, authenticatorListItem.type) &&
+            Objects.equals(this.tags, authenticatorListItem.tags) &&
             Objects.equals(this.self, authenticatorListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, type, self);
+        return Objects.hash(id, name, displayName, isEnabled, type, tags, self);
     }
 
     @Override
@@ -214,6 +245,7 @@ public enum TypeEnum {
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
