@@ -121,9 +121,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.ErrorMessage.ERROR_CODE_IDP_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPLATE_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_CATEGORY;
@@ -2783,6 +2785,9 @@ public class ServerIdpManagementService {
         Response.Status status;
 
         if (e instanceof IdentityProviderManagementClientException) {
+            if (ERROR_CODE_RESOURCE_LIMIT_REACHED.equals(e.getErrorCode())) {
+                return handleResourceLimitReached();
+            }
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -2805,6 +2810,15 @@ public class ServerIdpManagementService {
         } else {
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleResourceLimitReached() {
+
+        ErrorResponse errorResponse = getErrorBuilder(ERROR_CODE_IDP_LIMIT_REACHED, null)
+                .build(log, ERROR_CODE_IDP_LIMIT_REACHED.getDescription());
+
+        Response.Status status = Response.Status.FORBIDDEN;
         return new APIError(status, errorResponse);
     }
 

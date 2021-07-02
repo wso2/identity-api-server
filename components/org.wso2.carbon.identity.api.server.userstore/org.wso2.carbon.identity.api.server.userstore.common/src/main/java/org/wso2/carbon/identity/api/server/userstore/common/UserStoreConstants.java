@@ -103,7 +103,9 @@ public class UserStoreConstants {
         ERROR_CODE_DOMAIN_ID_DOES_NOT_MATCH_WITH_NAME("60009", "Invalid userstore domain name or " +
                 "domain ID", "Userstore domain name does not match with the userstore domain ID"),
         ERROR_CODE_REQUEST_BODY_NOT_FOUND("60010", "Invalid userstore update request",
-                "Userstore update request is either NULL or empty");
+                "Userstore update request is either NULL or empty"),
+        ERROR_CODE_USER_STORE_LIMIT_REACHED("60011", "Unable to create a user store.",
+                "Maximum number of allowed user stores have been reached.");
 
         private final String code;
         private final String message;

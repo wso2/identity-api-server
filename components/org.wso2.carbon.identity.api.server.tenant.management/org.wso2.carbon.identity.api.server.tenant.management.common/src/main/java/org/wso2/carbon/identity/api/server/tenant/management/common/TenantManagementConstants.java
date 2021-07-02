@@ -37,6 +37,12 @@ public class TenantManagementConstants {
      */
     public enum ErrorMessage {
 
+        /* Adding the client error TM-60019 to align with
+         the same client error defined in
+         org.wso2.carbon.stratos.common.constants.TenantConstants */
+        ERROR_CODE_TENANT_LIMIT_REACHED("TM-60019",
+                "Unable to create a tenant.",
+                "Maximum number of allowed tenants have been reached."),
         ERROR_CODE_ERROR_LISTING_TENANTS("TM-65001",
                 "Unable to list existing tenants.",
                 "Server encountered an error while listing the tenants."),

@@ -69,8 +69,10 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.common.Constants.REGEX_COMMA;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.ErrorMessage.ERROR_CODE_USER_STORE_LIMIT_REACHED;
 
 /**
  * Call internal osgi services to perform user store related operations.
@@ -901,6 +903,9 @@ public class ServerUserStoreService {
             status = Response.Status.INTERNAL_SERVER_ERROR;
             return handleIdentityUserStoreException(exception, errorResponse, status);
         } else if (exception instanceof IdentityUserStoreClientException) {
+            if (ERROR_CODE_RESOURCE_LIMIT_REACHED.equals(exception.getErrorCode())) {
+                return handleResourceLimitReached();
+            }
             // Send client error with specific error code or as a BAD request.
             status = Response.Status.BAD_REQUEST;
             return handleIdentityUserStoreException(exception, errorResponse, status);
@@ -909,6 +914,15 @@ public class ServerUserStoreService {
             status = Response.Status.INTERNAL_SERVER_ERROR;
             return new APIError(status, errorResponse);
         }
+    }
+
+    private APIError handleResourceLimitReached() {
+
+        ErrorResponse errorResponse = getErrorBuilder(ERROR_CODE_USER_STORE_LIMIT_REACHED)
+                .build(LOG, ERROR_CODE_USER_STORE_LIMIT_REACHED.getDescription());
+
+        Response.Status status = Response.Status.FORBIDDEN;
+        return new APIError(status, errorResponse);
     }
 
     /**

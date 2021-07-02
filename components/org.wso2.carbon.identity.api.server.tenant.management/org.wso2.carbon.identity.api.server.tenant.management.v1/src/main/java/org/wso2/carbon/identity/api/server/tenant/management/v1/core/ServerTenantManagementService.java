@@ -60,7 +60,9 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_TENANT_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.TENANT_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_INVALID_EMAIL;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_MISSING_REQUIRED_PARAMETER;
@@ -425,6 +427,9 @@ public class ServerTenantManagementService {
         Response.Status status;
 
         if (e instanceof TenantManagementClientException) {
+            if (ERROR_CODE_RESOURCE_LIMIT_REACHED.equals(e.getErrorCode())) {
+                return handleResourceLimitReached();
+            }
             errorResponse = getErrorBuilder(errorEnum, data).build(log, errorEnum.getDescription());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
@@ -444,6 +449,15 @@ public class ServerTenantManagementService {
             errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleResourceLimitReached() {
+
+        ErrorResponse errorResponse = getErrorBuilder(ERROR_CODE_TENANT_LIMIT_REACHED, null)
+                .build(log, ERROR_CODE_TENANT_LIMIT_REACHED.getDescription());
+
+        Response.Status status = Response.Status.FORBIDDEN;
         return new APIError(status, errorResponse);
     }
 
