@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 
 
@@ -33,6 +35,8 @@ public class FederatedAuthenticatorListItem  {
     private String authenticatorId;
     private String name;
     private Boolean isEnabled = false;
+    private List<String> tags = null;
+
     private String self;
 
     /**
@@ -91,6 +95,32 @@ public class FederatedAuthenticatorListItem  {
 
     /**
     **/
+    public FederatedAuthenticatorListItem tags(List<String> tags) {
+
+        this.tags = tags;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"Social Login\",\"OIDC\"]", value = "")
+    @JsonProperty("tags")
+    @Valid
+    public List<String> getTags() {
+        return tags;
+    }
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public FederatedAuthenticatorListItem addTagsItem(String tagsItem) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.add(tagsItem);
+        return this;
+    }
+
+        /**
+    **/
     public FederatedAuthenticatorListItem self(String self) {
 
         this.self = self;
@@ -122,12 +152,13 @@ public class FederatedAuthenticatorListItem  {
         return Objects.equals(this.authenticatorId, federatedAuthenticatorListItem.authenticatorId) &&
             Objects.equals(this.name, federatedAuthenticatorListItem.name) &&
             Objects.equals(this.isEnabled, federatedAuthenticatorListItem.isEnabled) &&
+            Objects.equals(this.tags, federatedAuthenticatorListItem.tags) &&
             Objects.equals(this.self, federatedAuthenticatorListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, isEnabled, self);
+        return Objects.hash(authenticatorId, name, isEnabled, tags, self);
     }
 
     @Override
@@ -139,6 +170,7 @@ public class FederatedAuthenticatorListItem  {
         sb.append("    authenticatorId: ").append(toIndentedString(authenticatorId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();

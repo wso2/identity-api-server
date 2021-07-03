@@ -412,6 +412,10 @@ public class ServerConfigManagementService {
                 authenticatorListItem.setDisplayName(config.getDisplayName());
                 authenticatorListItem.setIsEnabled(config.isEnabled());
                 authenticatorListItem.setType(AuthenticatorListItem.TypeEnum.LOCAL);
+                String[] tags = config.getTags();
+                if (ArrayUtils.isNotEmpty(tags)) {
+                    authenticatorListItem.setTags(Arrays.asList(tags));
+                }
                 authenticatorListItem.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
                         CONFIGS_AUTHENTICATOR_PATH_COMPONENT + PATH_SEPERATOR + "%s", authenticatorId)).toString());
                 authenticatorListItems.add(authenticatorListItem);
@@ -426,6 +430,10 @@ public class ServerConfigManagementService {
                 authenticatorListItem.setDisplayName(config.getDisplayName());
                 authenticatorListItem.setIsEnabled(config.isEnabled());
                 authenticatorListItem.setType(AuthenticatorListItem.TypeEnum.REQUEST_PATH);
+                String[] tags = config.getTags();
+                if (ArrayUtils.isNotEmpty(tags)) {
+                    authenticatorListItem.setTags(Arrays.asList(tags));
+                }
                 authenticatorListItem.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
                         CONFIGS_AUTHENTICATOR_PATH_COMPONENT + PATH_SEPERATOR + "%s", authenticatorId)).toString());
                 authenticatorListItems.add(authenticatorListItem);
@@ -475,6 +483,10 @@ public class ServerConfigManagementService {
             authenticator.setType(Authenticator.TypeEnum.REQUEST_PATH);
         } else {
             authenticator.setType(Authenticator.TypeEnum.LOCAL);
+        }
+        String[] tags = config.getTags();
+        if (ArrayUtils.isNotEmpty(tags)) {
+            authenticator.setTags(Arrays.asList(tags));
         }
         List<AuthenticatorProperty> authenticatorProperties =
                 Arrays.stream(config.getProperties()).map(propertyToExternal)

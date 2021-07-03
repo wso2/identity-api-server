@@ -80,6 +80,9 @@ public class ApplicationManagementConstants {
         ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND("60504",
                 "WS-Trust protocol is not supported.",
                 "STS admin service is unavailable at the moment."),
+        ERROR_APPLICATION_LIMIT_REACHED("60503",
+                "Unable to create an application.",
+                "Maximum number of allowed applications have been reached."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",

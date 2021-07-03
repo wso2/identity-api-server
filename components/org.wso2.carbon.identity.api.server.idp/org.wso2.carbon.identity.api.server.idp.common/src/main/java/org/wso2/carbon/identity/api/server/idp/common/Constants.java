@@ -127,7 +127,10 @@ public class Constants {
                 "User ID claim URI is not a local claim for tenant: %s"),
         ERROR_CODE_NOT_EXISTING_ROLE_CLAIM_URI("60034", "Invalid role claim URI",
                 "Role claim URI is not a local claim for tenant: %s"),
-        ERROR_CODE_INVALID_CERTIFICATE_FORMAT("60035", "Invalid IDP certificate format.",
+        ERROR_CODE_IDP_LIMIT_REACHED("60035",
+                "Unable to create an identity provider.",
+                "Maximum number of allowed identity providers have been reached."),
+        ERROR_CODE_INVALID_CERTIFICATE_FORMAT("60036", "Invalid IDP certificate format.",
                 "One or more IDP certificate formats are invalid"),
 
         // Server Error starting from 650xx.

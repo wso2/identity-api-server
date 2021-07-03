@@ -37,6 +37,8 @@ public class FederatedAuthenticator  {
     private String name;
     private Boolean isEnabled = false;
     private Boolean isDefault = false;
+    private List<String> tags = null;
+
     private List<Property> properties = null;
 
 
@@ -116,6 +118,32 @@ public class FederatedAuthenticator  {
 
     /**
     **/
+    public FederatedAuthenticator tags(List<String> tags) {
+
+        this.tags = tags;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"Social Login\",\"OIDC\"]", value = "")
+    @JsonProperty("tags")
+    @Valid
+    public List<String> getTags() {
+        return tags;
+    }
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public FederatedAuthenticator addTagsItem(String tagsItem) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.add(tagsItem);
+        return this;
+    }
+
+        /**
+    **/
     public FederatedAuthenticator properties(List<Property> properties) {
 
         this.properties = properties;
@@ -156,12 +184,13 @@ public class FederatedAuthenticator  {
             Objects.equals(this.name, federatedAuthenticator.name) &&
             Objects.equals(this.isEnabled, federatedAuthenticator.isEnabled) &&
             Objects.equals(this.isDefault, federatedAuthenticator.isDefault) &&
+            Objects.equals(this.tags, federatedAuthenticator.tags) &&
             Objects.equals(this.properties, federatedAuthenticator.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, isEnabled, isDefault, properties);
+        return Objects.hash(authenticatorId, name, isEnabled, isDefault, tags, properties);
     }
 
     @Override
@@ -174,6 +203,7 @@ public class FederatedAuthenticator  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    isDefault: ").append(toIndentedString(isDefault)).append("\n");
+        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();

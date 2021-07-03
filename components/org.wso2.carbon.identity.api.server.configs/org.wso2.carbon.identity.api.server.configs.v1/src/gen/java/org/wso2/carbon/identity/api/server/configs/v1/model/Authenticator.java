@@ -71,6 +71,8 @@ public enum TypeEnum {
 }
 
     private TypeEnum type;
+    private List<String> tags = null;
+
     private List<AuthenticatorProperty> properties = null;
 
 
@@ -170,6 +172,32 @@ public enum TypeEnum {
 
     /**
     **/
+    public Authenticator tags(List<String> tags) {
+
+        this.tags = tags;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"2FA\",\"MFA\"]", value = "")
+    @JsonProperty("tags")
+    @Valid
+    public List<String> getTags() {
+        return tags;
+    }
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public Authenticator addTagsItem(String tagsItem) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.add(tagsItem);
+        return this;
+    }
+
+        /**
+    **/
     public Authenticator properties(List<AuthenticatorProperty> properties) {
 
         this.properties = properties;
@@ -211,12 +239,13 @@ public enum TypeEnum {
             Objects.equals(this.displayName, authenticator.displayName) &&
             Objects.equals(this.isEnabled, authenticator.isEnabled) &&
             Objects.equals(this.type, authenticator.type) &&
+            Objects.equals(this.tags, authenticator.tags) &&
             Objects.equals(this.properties, authenticator.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, type, properties);
+        return Objects.hash(id, name, displayName, isEnabled, type, tags, properties);
     }
 
     @Override
@@ -230,6 +259,7 @@ public enum TypeEnum {
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
