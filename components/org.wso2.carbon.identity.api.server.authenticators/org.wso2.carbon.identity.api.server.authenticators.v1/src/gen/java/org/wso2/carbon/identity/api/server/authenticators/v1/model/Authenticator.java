@@ -71,6 +71,7 @@ public enum TypeEnum {
 
     private TypeEnum type;
     private String image;
+    private String description;
     private List<String> tags = null;
 
     private String self;
@@ -185,6 +186,24 @@ public enum TypeEnum {
 
     /**
     **/
+    public Authenticator description(String description) {
+
+        this.description = description;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "The basic authenticator.", value = "")
+    @JsonProperty("description")
+    @Valid
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+    **/
     public Authenticator tags(List<String> tags) {
 
         this.tags = tags;
@@ -245,13 +264,14 @@ public enum TypeEnum {
             Objects.equals(this.isEnabled, authenticator.isEnabled) &&
             Objects.equals(this.type, authenticator.type) &&
             Objects.equals(this.image, authenticator.image) &&
+            Objects.equals(this.description, authenticator.description) &&
             Objects.equals(this.tags, authenticator.tags) &&
             Objects.equals(this.self, authenticator.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, type, image, tags, self);
+        return Objects.hash(id, name, displayName, isEnabled, type, image, description, tags, self);
     }
 
     @Override
@@ -266,6 +286,7 @@ public enum TypeEnum {
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
+        sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");

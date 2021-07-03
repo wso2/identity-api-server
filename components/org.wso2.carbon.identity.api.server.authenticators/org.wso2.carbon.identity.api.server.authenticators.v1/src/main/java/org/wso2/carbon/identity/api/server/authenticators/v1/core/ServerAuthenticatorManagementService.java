@@ -310,12 +310,14 @@ public class ServerAuthenticatorManagementService {
         authenticator.setName(identityProvider.getIdentityProviderName());
         String displayName = identityProvider.getDisplayName();
         if (StringUtils.isNotBlank(displayName)) {
-            authenticator.setDisplayName(identityProvider.getIdentityProviderName());
-        } else {
             authenticator.setDisplayName(identityProvider.getDisplayName());
+        } else {
+            authenticator.setDisplayName(identityProvider.getIdentityProviderName());
         }
         authenticator.setIsEnabled(identityProvider.isEnable());
         authenticator.setType(Authenticator.TypeEnum.FEDERATED);
+        authenticator.setImage(identityProvider.getImageUrl());
+        authenticator.setDescription(identityProvider.getIdentityProviderDescription());
         if (CollectionUtils.isNotEmpty(configTagsListDistinct)) {
             authenticator.setTags(configTagsListDistinct);
         }
