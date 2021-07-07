@@ -104,7 +104,8 @@ public class ServerAuthenticatorManagementService {
             /* If there is no filter string available in the request, the request path authenticators are required to
             be fetched only if the  no. of local authenticators retrieved are less than the maximum items per page
             count as the no. of items returned in the response will be capped at the maximum items per page count. */
-            if (StringUtils.isBlank(filter) && localAuthenticatorsCount < maximumItemPerPage) {
+            if (StringUtils.isNotBlank(filter) || (StringUtils.isBlank(filter) && localAuthenticatorsCount <
+                    maximumItemPerPage)) {
                 requestPathAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
                         .getApplicationManagementService().getAllRequestPathAuthenticators(ContextLoader
                                 .getTenantDomainFromContext());
