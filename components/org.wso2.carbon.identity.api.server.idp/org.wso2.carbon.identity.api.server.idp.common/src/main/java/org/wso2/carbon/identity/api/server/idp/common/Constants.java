@@ -123,13 +123,15 @@ public class Constants {
                 "Role claim URI: %s does not match with the claim mappings"),
         ERROR_CODE_NOT_EXISTING_CLAIM_URI("60032", "Invalid claim URI",
                 "One or more local claim URIs do not exist"),
-        ERROR_CODE_NOT_EXISTING_USER_CLAIM_URI("60033", "Invlaid user ID claim URI",
+        ERROR_CODE_NOT_EXISTING_USER_CLAIM_URI("60033", "Invalid user ID claim URI",
                 "User ID claim URI is not a local claim for tenant: %s"),
         ERROR_CODE_NOT_EXISTING_ROLE_CLAIM_URI("60034", "Invalid role claim URI",
                 "Role claim URI is not a local claim for tenant: %s"),
         ERROR_CODE_IDP_LIMIT_REACHED("60035",
                 "Unable to create an identity provider.",
                 "Maximum number of allowed identity providers have been reached."),
+        ERROR_CODE_INVALID_CERTIFICATE_FORMAT("60036", "Invalid IDP certificate format.",
+                "One or more IDP certificate formats are invalid"),
 
         // Server Error starting from 650xx.
         ERROR_CODE_ERROR_ADDING_IDP("65002",
