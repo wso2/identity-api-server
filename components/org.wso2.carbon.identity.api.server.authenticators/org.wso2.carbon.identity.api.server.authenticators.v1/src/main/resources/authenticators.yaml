@@ -164,6 +164,9 @@ components:
         image:
           type: string
           example: basic-authenticator-logo-url
+        description:
+          type: string
+          example: The basic authenticator.
         tags:
           type: array
           items:

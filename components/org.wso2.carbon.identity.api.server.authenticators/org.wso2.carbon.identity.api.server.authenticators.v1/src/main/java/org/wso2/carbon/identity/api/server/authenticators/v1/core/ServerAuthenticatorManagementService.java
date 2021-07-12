@@ -104,7 +104,8 @@ public class ServerAuthenticatorManagementService {
             /* If there is no filter string available in the request, the request path authenticators are required to
             be fetched only if the  no. of local authenticators retrieved are less than the maximum items per page
             count as the no. of items returned in the response will be capped at the maximum items per page count. */
-            if (StringUtils.isBlank(filter) && localAuthenticatorsCount < maximumItemPerPage) {
+            if (StringUtils.isNotBlank(filter) || (StringUtils.isBlank(filter) && localAuthenticatorsCount <
+                    maximumItemPerPage)) {
                 requestPathAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
                         .getApplicationManagementService().getAllRequestPathAuthenticators(ContextLoader
                                 .getTenantDomainFromContext());
@@ -310,12 +311,14 @@ public class ServerAuthenticatorManagementService {
         authenticator.setName(identityProvider.getIdentityProviderName());
         String displayName = identityProvider.getDisplayName();
         if (StringUtils.isNotBlank(displayName)) {
-            authenticator.setDisplayName(identityProvider.getIdentityProviderName());
-        } else {
             authenticator.setDisplayName(identityProvider.getDisplayName());
+        } else {
+            authenticator.setDisplayName(identityProvider.getIdentityProviderName());
         }
         authenticator.setIsEnabled(identityProvider.isEnable());
         authenticator.setType(Authenticator.TypeEnum.FEDERATED);
+        authenticator.setImage(identityProvider.getImageUrl());
+        authenticator.setDescription(identityProvider.getIdentityProviderDescription());
         if (CollectionUtils.isNotEmpty(configTagsListDistinct)) {
             authenticator.setTags(configTagsListDistinct);
         }
