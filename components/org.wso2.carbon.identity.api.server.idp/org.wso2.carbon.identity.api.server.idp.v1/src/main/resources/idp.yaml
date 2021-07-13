@@ -2043,6 +2043,12 @@ components:
         name:
           type: string
           example: SAML2Authenticator
+        tags:
+          type: array
+          items:
+            type: string
+          example: [Social Login,OIDC]
+          readOnly: true
         self:
           type: string
           example: /t/carbon.super/api/server/v1/identity-providers/meta/federated-authenticators/U0FNTFNTT0F1dGhlbnRpY2F0b3I
@@ -2058,6 +2064,12 @@ components:
         displayName:
           type: string
           example: 'SAML2 Web SSO Configuration'
+        tags:
+          type: array
+          items:
+            type: string
+          example: [Social Login,OIDC]
+          readOnly: true
         properties:
           type: array
           items:
@@ -2100,6 +2112,12 @@ components:
         isDefault:
           type: boolean
           default: false
+        tags:
+          type: array
+          items:
+            type: string
+          example: [Social Login,OIDC]
+          readOnly: true
         properties:
           type: array
           items:
@@ -2150,6 +2168,12 @@ components:
           type: boolean
           default: false
           example: true
+        tags:
+          type: array
+          items:
+            type: string
+          example: [Social Login,OIDC]
+          readOnly: true
         self:
           type: string
           example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000/federated-authenticators/U0FNTDJBdXRoZW50aWNhdG9y

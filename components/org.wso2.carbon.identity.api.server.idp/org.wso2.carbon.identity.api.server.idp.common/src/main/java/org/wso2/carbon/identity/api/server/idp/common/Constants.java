@@ -117,16 +117,21 @@ public class Constants {
         ERROR_CODE_OUTBOUND_PROVISIONING_CONFIG_NOT_FOUND("60029", "Unable to update Outbound " +
                 "Provisioning Connector", "Outbound Provisioning Connector properties have not specified " +
                 "for connector : %s"),
-        ERROR_CODE_INVALID_USER_CLAIM_URI("IDP-60030", "Invalid user ID claim URI",
+        ERROR_CODE_INVALID_USER_CLAIM_URI("60030", "Invalid user ID claim URI",
                 "User ID claim URI: %s does not match with the claim mappings"),
-        ERROR_CODE_INVALID_ROLE_CLAIM_URI("IDP-60031", "Invalid role claim URI",
+        ERROR_CODE_INVALID_ROLE_CLAIM_URI("60031", "Invalid role claim URI",
                 "Role claim URI: %s does not match with the claim mappings"),
-        ERROR_CODE_NOT_EXISTING_CLAIM_URI("IDP-60032", "Invalid claim URI",
+        ERROR_CODE_NOT_EXISTING_CLAIM_URI("60032", "Invalid claim URI",
                 "One or more local claim URIs do not exist"),
-        ERROR_CODE_NOT_EXISTING_USER_CLAIM_URI("IDP-60033", "Invlaid user ID claim URI",
+        ERROR_CODE_NOT_EXISTING_USER_CLAIM_URI("60033", "Invalid user ID claim URI",
                 "User ID claim URI is not a local claim for tenant: %s"),
-        ERROR_CODE_NOT_EXISTING_ROLE_CLAIM_URI("IDP-60034", "Invalid role claim URI",
+        ERROR_CODE_NOT_EXISTING_ROLE_CLAIM_URI("60034", "Invalid role claim URI",
                 "Role claim URI is not a local claim for tenant: %s"),
+        ERROR_CODE_IDP_LIMIT_REACHED("60035",
+                "Unable to create an identity provider.",
+                "Maximum number of allowed identity providers have been reached."),
+        ERROR_CODE_INVALID_CERTIFICATE_FORMAT("60036", "Invalid IDP certificate format.",
+                "One or more IDP certificate formats are invalid"),
 
         // Server Error starting from 650xx.
         ERROR_CODE_ERROR_ADDING_IDP("65002",
@@ -226,7 +231,7 @@ public class Constants {
                 "Error occurred while retrieving the IDP template with identifier %s"),
         ERROR_CODE_ERROR_INVALID_SEARCH_FILTER("65055", "Search request validation failed.",
                 "Invalid search filter."),
-        ERROR_CODE_VALIDATING_LOCAL_CLAIM_URIS("IDP-65056", "Error while validation local claim URIs",
+        ERROR_CODE_VALIDATING_LOCAL_CLAIM_URIS("65056", "Error while validation local claim URIs",
                 "Error while validating claim URIs against local claims");
 
         private final String code;

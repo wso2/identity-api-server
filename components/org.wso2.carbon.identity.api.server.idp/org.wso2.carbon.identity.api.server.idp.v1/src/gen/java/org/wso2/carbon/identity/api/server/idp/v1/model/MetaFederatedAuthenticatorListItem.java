@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 
 
@@ -32,6 +34,8 @@ public class MetaFederatedAuthenticatorListItem  {
   
     private String authenticatorId;
     private String name;
+    private List<String> tags = null;
+
     private String self;
 
     /**
@@ -72,6 +76,32 @@ public class MetaFederatedAuthenticatorListItem  {
 
     /**
     **/
+    public MetaFederatedAuthenticatorListItem tags(List<String> tags) {
+
+        this.tags = tags;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"Social Login\",\"OIDC\"]", value = "")
+    @JsonProperty("tags")
+    @Valid
+    public List<String> getTags() {
+        return tags;
+    }
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public MetaFederatedAuthenticatorListItem addTagsItem(String tagsItem) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.add(tagsItem);
+        return this;
+    }
+
+        /**
+    **/
     public MetaFederatedAuthenticatorListItem self(String self) {
 
         this.self = self;
@@ -102,12 +132,13 @@ public class MetaFederatedAuthenticatorListItem  {
         MetaFederatedAuthenticatorListItem metaFederatedAuthenticatorListItem = (MetaFederatedAuthenticatorListItem) o;
         return Objects.equals(this.authenticatorId, metaFederatedAuthenticatorListItem.authenticatorId) &&
             Objects.equals(this.name, metaFederatedAuthenticatorListItem.name) &&
+            Objects.equals(this.tags, metaFederatedAuthenticatorListItem.tags) &&
             Objects.equals(this.self, metaFederatedAuthenticatorListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, self);
+        return Objects.hash(authenticatorId, name, tags, self);
     }
 
     @Override
@@ -118,6 +149,7 @@ public class MetaFederatedAuthenticatorListItem  {
         
         sb.append("    authenticatorId: ").append(toIndentedString(authenticatorId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();

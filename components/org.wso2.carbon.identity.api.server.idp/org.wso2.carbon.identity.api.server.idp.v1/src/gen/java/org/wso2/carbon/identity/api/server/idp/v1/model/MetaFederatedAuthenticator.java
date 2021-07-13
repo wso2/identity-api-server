@@ -36,6 +36,8 @@ public class MetaFederatedAuthenticator  {
     private String authenticatorId;
     private String name;
     private String displayName;
+    private List<String> tags = null;
+
     private List<MetaProperty> properties = null;
 
 
@@ -95,6 +97,32 @@ public class MetaFederatedAuthenticator  {
 
     /**
     **/
+    public MetaFederatedAuthenticator tags(List<String> tags) {
+
+        this.tags = tags;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"Social Login\",\"OIDC\"]", value = "")
+    @JsonProperty("tags")
+    @Valid
+    public List<String> getTags() {
+        return tags;
+    }
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public MetaFederatedAuthenticator addTagsItem(String tagsItem) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.add(tagsItem);
+        return this;
+    }
+
+        /**
+    **/
     public MetaFederatedAuthenticator properties(List<MetaProperty> properties) {
 
         this.properties = properties;
@@ -134,12 +162,13 @@ public class MetaFederatedAuthenticator  {
         return Objects.equals(this.authenticatorId, metaFederatedAuthenticator.authenticatorId) &&
             Objects.equals(this.name, metaFederatedAuthenticator.name) &&
             Objects.equals(this.displayName, metaFederatedAuthenticator.displayName) &&
+            Objects.equals(this.tags, metaFederatedAuthenticator.tags) &&
             Objects.equals(this.properties, metaFederatedAuthenticator.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, displayName, properties);
+        return Objects.hash(authenticatorId, name, displayName, tags, properties);
     }
 
     @Override
@@ -151,6 +180,7 @@ public class MetaFederatedAuthenticator  {
         sb.append("    authenticatorId: ").append(toIndentedString(authenticatorId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
