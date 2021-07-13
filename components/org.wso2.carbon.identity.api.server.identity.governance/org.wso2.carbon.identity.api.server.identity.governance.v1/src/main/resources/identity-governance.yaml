@@ -475,14 +475,14 @@ paths:
             schema:
               type: array
               example:
-                  - connector-name: self-sign-up
-                    properties:
-                           - SelfRegistration.Enable
-                           - SelfRegistration.LockOnCreation
-                  - connector-name: user-email-verification
-                    properties:
-                           - EmailVerification.Enable
-                           - EmailVerification.LockOnCreation
+                - connector-name: self-sign-up
+                  properties:
+                    - SelfRegistration.Enable
+                    - SelfRegistration.LockOnCreation
+                - connector-name: user-email-verification
+                  properties:
+                    - EmailVerification.Enable
+                    - EmailVerification.LockOnCreation
               items:
                 $ref: '#/components/schemas/PreferenceSearchAttribute'
         description: This represents the connector and the properties which preferences needs to be returned.
@@ -497,16 +497,16 @@ paths:
                 example:
                   - connector-name: self-sign-up
                     properties:
-                             - name: SelfRegistration.Enable
-                               value: 'false'
-                             - name: SelfRegistration.LockOnCreation
-                               value: 'false'
+                      - name: SelfRegistration.Enable
+                        value: 'false'
+                      - name: SelfRegistration.LockOnCreation
+                        value: 'false'
                   - connector-name: user-email-verification
                     properties:
-                             - name: EmailVerification.Enable
-                               value: 'true'
-                             - name: EmailVerification.LockOnCreation
-                               value: 'false'
+                      - name: EmailVerification.Enable
+                        value: 'true'
+                      - name: EmailVerification.LockOnCreation
+                        value: 'false'
 
                 items:
                   $ref: '#/components/schemas/PreferenceResp'
@@ -710,6 +710,26 @@ components:
           type: string
           description: Property description.
           example: Enable account suspend notifications.
+        meta:
+          type: object
+          description: Meta data properties
+          $ref: '#/components/schemas/MetaRes'
+    MetaRes:
+      type: object
+      description: Meta Data related to each property
+      properties:
+        type:
+          type: string
+          description: Data type of the property
+          example: boolean
+        regex:
+          type: string
+          description: regular expression
+          example: "[a-zA-Z0-9]{6}"
+        groupID:
+          type: integer
+          description: Group id of the property if any
+          example: 0
     ConnectorsPatchReq:
       type: object
       description: Governance connector property patch request.
@@ -786,3 +806,4 @@ components:
         traceId:
           type: string
           example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
+
