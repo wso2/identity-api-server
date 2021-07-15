@@ -315,6 +315,45 @@ paths:
           $ref: '#/components/responses/ServerError'
         '501':
           $ref: '#/components/responses/NotImplemented'
+  '/userstores/meta/attributes/{type-id}':
+    get:
+      tags:
+        - Meta
+      summary: >-
+        Retrieve the meta attributes of a user store of a given user store type.
+      operationId: getUserStoreAttributeMappings
+      description: >
+        This API provides the capability to retrieve the attribute mappings
+        of a given user store type
+         <b>Permission required:</b>
+
+        */permission/admin
+      parameters:
+        - in: path
+          name: type-id
+          required: true
+          description: Id of the user store type
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserStoreAttributeMapping'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
   /userstores/test-connection:
     post:
       tags:
