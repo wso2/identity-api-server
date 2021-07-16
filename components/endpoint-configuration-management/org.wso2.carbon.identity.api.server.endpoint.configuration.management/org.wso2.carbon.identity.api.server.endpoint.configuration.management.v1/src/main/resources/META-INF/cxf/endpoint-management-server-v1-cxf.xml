@@ -1,0 +1,9 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    <bean class="org.wso2.carbon.identity.api.server.endpoint.configuration.management.v1.core.ConfigurationManagementService"/>
+    <bean class="org.wso2.carbon.identity.api.server.endpoint.configuration.management.v1.impl.EndpointConfigurationsApiServiceImpl"/>
+    <bean id="configurationManagerFactoryBean" class="org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.factory.ConfigurationMgtOSGiServiceFactory"/>
+    <bean id="EndpointConfigurationServiceImplDataHolderBean" class="org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.EndpointConfigurationManagementDataHolder">
+        <property name="configurationConfigManager" ref="configurationManagerFactoryBean"/>
+    </bean>
+</beans>

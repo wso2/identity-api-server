@@ -517,6 +517,7 @@
         <module>components/org.wso2.carbon.identity.api.server.fetch.remote</module>
         <module>components/org.wso2.carbon.identity.api.server.notification.sender</module>
         <module>components/org.wso2.carbon.identity.api.server.authenticators</module>
+        <module>components/endpoint-configuration-management</module>
     </modules>
 
 </project>
