@@ -36,6 +36,7 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PropertiesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConfigurationsRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStorePropertiesRes;
@@ -44,6 +45,8 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
 import org.wso2.carbon.identity.user.store.configuration.UserStoreConfigService;
 import org.wso2.carbon.identity.user.store.configuration.dto.PropertyDTO;
 import org.wso2.carbon.identity.user.store.configuration.dto.UserStoreDTO;
+import org.wso2.carbon.identity.user.store.configuration.model.UserStoreAttributeDO;
+import org.wso2.carbon.identity.user.store.configuration.model.UserStoreAttributeMappings;
 import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreClientException;
 import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreMgtException;
 import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreServerException;
@@ -66,7 +69,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
@@ -1019,5 +1021,71 @@ public class ServerUserStoreService {
             name = splittedPath[2];
         }
         return name;
+    }
+
+    /**
+     * Get user store attributes mappings for a given user store type id.
+     *
+     * @param typeId String user store type id.
+     * @return UserStoreAttributeMapping user store attribute mappings.
+     */
+    public UserStoreAttributeMapping getUserStoreMappingAttributes(String typeId) {
+
+        Set<String> classNames;
+        String userStoreName = getUserStoreType(base64URLDecodeId(typeId));
+        if (StringUtils.isBlank(userStoreName)) {
+            throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage.
+                    ERROR_CODE_INVALID_INPUT);
+        }
+        try {
+            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
+                    .getUserStoreConfigService();
+            classNames = userStoreConfigService.getAvailableUserStoreClasses();
+            if (CollectionUtils.isEmpty(classNames) ||
+                    !classNames.contains(userStoreName)) {
+                throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.
+                        ERROR_CODE_NOT_FOUND);
+            }
+        } catch (IdentityUserStoreMgtException e) {
+            UserStoreConstants.ErrorMessage errorEnum =
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_USER_STORE;
+            throw handleIdentityUserStoreMgtException(e, errorEnum);
+        }
+        UserStoreAttributeMapping userStoreAttributeMapping = new UserStoreAttributeMapping();
+        List<UserStoreAttributeDO> attributeMappings = getAttributeMappings(userStoreName);
+        userStoreAttributeMapping = userStoreAttributeMapping
+                .attributeMapping(attributeMappings)
+                .typeId(typeId)
+                .typeName(userStoreName);
+        try {
+            boolean isLocal = UserStoreManagerRegistry.isLocalUserStore(userStoreName);
+            userStoreAttributeMapping.setIsLocal(isLocal);
+        } catch (UserStoreException e) {
+            LOG.error(String.format("Userstore type is not found for %s", userStoreName), e);
+        }
+        return userStoreAttributeMapping;
+    }
+
+    /**
+     * Get user store attribute mappings for a given user store typeId.
+     *
+     * @param userStoreName String user store name (base64 decoded user store id).
+     * @return List of user store attribute mappings for the given typeId.
+     */
+    private List<UserStoreAttributeDO> getAttributeMappings(String userStoreName) {
+
+        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
+                getUserStoreConfigService();
+        try {
+            UserStoreAttributeMappings userStoreAttributeMappings = userStoreConfigService.
+                    getUserStoreAttributeMappings();
+            Map<String, UserStoreAttributeDO> mapping = userStoreAttributeMappings
+                    .getUserStoreAttributeMappings(userStoreName);
+            return new ArrayList<>(mapping.values());
+        } catch (IdentityUserStoreMgtException e) {
+            LOG.error("Error occurred while retrieving user store attribute metadata", e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_RETRIEVING_USER_STORE_ATTRIBUTE_METADATA);
+        }
     }
 }

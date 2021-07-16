@@ -84,6 +84,10 @@ public class UserStoreConstants {
                 "Unable to get the realm configurations",
                 "Server Encountered an error while retrieving realm configuration for tenant: %s",
                 Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_ERROR_RETRIEVING_USER_STORE_ATTRIBUTE_METADATA("65013",
+                "Unable to retrieve user store attribute metadata",
+                "Server Encountered an error while retrieving user store attribute metadata",
+                Response.Status.INTERNAL_SERVER_ERROR),
 
         // Client Errors - 600xx
         ERROR_CODE_DOMAIN_ID_NOT_FOUND("60001",

@@ -315,6 +315,42 @@ paths:
           $ref: '#/components/responses/ServerError'
         '501':
           $ref: '#/components/responses/NotImplemented'
+  '/userstores/meta/types/{type-id}/attributes':
+    get:
+      tags:
+        - Meta
+      summary: >-
+        Retrieve the meta attributes of a user store of a given user store type.
+      operationId: getUserStoreAttributeMappings
+      description: >
+        This API provides the capability to retrieve the attribute mappings
+        of a given user store type
+
+         <b>Permission required:</b>
+
+        */permission/admin
+      parameters:
+        - in: path
+          name: type-id
+          required: true
+          description: Id of the user store type
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStoreAttributeMapping'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
   /userstores/test-connection:
     post:
       tags:
@@ -749,3 +785,35 @@ components:
         value:
           type: string
           example: basic
+    UserStoreAttributeMapping:
+      type: object
+      properties:
+        typeName:
+          type: string
+          example: org.wso2.carbon.user.core.ldap.UniqueIDActiveDirectoryUserStoreManager
+        typeId:
+          type: string
+          example: b3JnLndzbzIuY2FyYm9uLnVzZXIuY29yZS5qZGJjLkpEQkNVc2VyU3RvcmVNYW5hZ2Vy
+        isLocal:
+          type: boolean
+          description: Is the userstore is a local userstore or not
+          example: true
+        attributeMappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserStoreAttribute'
+    UserStoreAttribute:
+      type: object
+      properties:
+        claimId:
+          type: string
+          example: bzIuY2FyYm9uLnVzZXIuY29yZS5qZG
+        claimURI:
+          type: string
+          example: http://wso2.org/claims/givenname
+        mappedAttribute:
+          type: string
+          example: givenName
+        displayName:
+          type: string
+          example: First Name
