@@ -406,6 +406,12 @@
                 <version>${org.wso2.carbon.event.publisher.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.endpoint.configuration.management.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -517,7 +523,7 @@
         <module>components/org.wso2.carbon.identity.api.server.fetch.remote</module>
         <module>components/org.wso2.carbon.identity.api.server.notification.sender</module>
         <module>components/org.wso2.carbon.identity.api.server.authenticators</module>
-        <module>components/endpoint-configuration-management</module>
+        <module>components/org.wso2.carbon.identity.api.server.endpoint.configuration.management</module>
     </modules>
 
 </project>
