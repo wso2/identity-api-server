@@ -17,8 +17,7 @@
  */
 
 package org.wso2.carbon.identity.api.server.endpoint.configuration.management.v1.core;
-
-import com.google.common.base.Charsets;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,7 +54,7 @@ import static org.wso2.carbon.identity.api.server.endpoint.configuration.managem
 import static org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.EndpointConfigurationManagementConstants.ERROR_PREFIX;
 import static org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.EndpointConfigurationManagementConstants.ErrorMessage.ERROR_CODE_AUTH_TYPE_URI_NOT_SPECIFIED;
 import static org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.EndpointConfigurationManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_CONFIGURATION;
-import static org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.EndpointConfigurationManagementConstants.ErrorMessage.ERROR_CODE_END_POINT_URI_NOT_SPECIFIED;
+import static org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.EndpointConfigurationManagementConstants.ErrorMessage.ERROR_CODE_ENDPOINT_URI_NOT_SPECIFIED;
 import static org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.EndpointConfigurationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_ENDPOINT_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.EndpointConfigurationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_ENDPOINT_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.EndpointConfigurationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_ENDPOINT_CONFIGURATION;
@@ -79,7 +78,6 @@ public class ConfigurationManagementService {
      */
     public EndpointConfiguration addEndpointConfiguration(EndpointConfigurationAdd endpointConfigurationAdd) {
 
-       // int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         validateEndpointConfigurationAdd(endpointConfigurationAdd);
         Resource endpointConfigurationResource;
         try {
@@ -127,7 +125,7 @@ public class ConfigurationManagementService {
                     null);
         }
         if (StringUtils.isBlank(endpointConfigurationAdd.getUrl())) {
-            throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_END_POINT_URI_NOT_SPECIFIED,
+            throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_ENDPOINT_URI_NOT_SPECIFIED,
                     null);
         }
         if (StringUtils.isBlank(endpointConfigurationAdd.getUrl())) {
@@ -387,4 +385,3 @@ public class ConfigurationManagementService {
                 cipherText), Charsets.UTF_8);
     }
 }
-

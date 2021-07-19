@@ -42,7 +42,8 @@ public class APIErrorExceptionMapper implements ExceptionMapper<WebApplicationEx
         try {
             String statusCodeValue = resourceBundle.getString(errorCode);
             mappedStatus = Response.Status.fromStatusCode(Integer.parseInt(statusCodeValue));
-        } catch (Throwable ignored) {
+        } catch (Throwable e) {
+            //Ignore if error mapping has invalid input
         }
         return mappedStatus != null ? mappedStatus : defaultStatus;
     }

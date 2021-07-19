@@ -34,7 +34,7 @@ public class Utils {
      *
      * @return Correlation-id.
      */
-    public static String getCorrelation() {
+    public static String getCorrelationID() {
 
         if (isCorrelationIDPresent()) {
 

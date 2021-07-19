@@ -40,11 +40,11 @@ public class ConfigurationMgtOSGiServiceFactory extends AbstractFactoryBean<Conf
     protected ConfigurationManager createInstance() throws Exception {
 
         if (this.configurationManager == null) {
-            ConfigurationManager taskOperationService = (ConfigurationManager) PrivilegedCarbonContext.
+            ConfigurationManager configurationManagementService = (ConfigurationManager) PrivilegedCarbonContext.
                     getThreadLocalCarbonContext().getOSGiService(ConfigurationManager.class, null);
 
-            if (taskOperationService != null) {
-                this.configurationManager = taskOperationService;
+            if (configurationManagementService != null) {
+                this.configurationManager = configurationManagementService;
             } else {
                 throw new Exception("Unable to retrieve ConfigurationManager service.");
             }
@@ -52,4 +52,3 @@ public class ConfigurationMgtOSGiServiceFactory extends AbstractFactoryBean<Conf
         return this.configurationManager;
     }
 }
-

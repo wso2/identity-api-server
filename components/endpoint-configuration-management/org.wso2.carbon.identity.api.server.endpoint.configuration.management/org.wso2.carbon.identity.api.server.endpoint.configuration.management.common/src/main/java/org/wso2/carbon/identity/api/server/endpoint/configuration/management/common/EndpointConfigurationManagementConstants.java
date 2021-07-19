@@ -48,10 +48,10 @@ public class EndpointConfigurationManagementConstants {
      */
     public enum ErrorMessage {
 
-        ERROR_CODE_END_POINT_URI_NOT_SPECIFIED("CMT-60001", "Empty end point URI", "End point URI is " +
+        ERROR_CODE_ENDPOINT_URI_NOT_SPECIFIED("CMT-60001", "Empty endpoint URI", "Endpoint URI is " +
                 "not specified in the request"),
         ERROR_CODE_REFERENCE_NAME_NOT_SPECIFIED("CMT-60002", "Empty reference name",
-                "End point reference name is not specified in the request"),
+                "Endpoint reference name is not specified in the request"),
         ERROR_CODE_AUTH_TYPE_URI_NOT_SPECIFIED("CMT-60003", "Empty auth type", "Auth type is " +
                 "not specified in the request"),
         // Client errors 600xx.
@@ -60,7 +60,7 @@ public class EndpointConfigurationManagementConstants {
 
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_ENDPOINT_CONFIGURATION("65003", "Error while getting endpoint configurations.",
-                "Error while retrieving endpoint configurations resource: %s."),
+                "Error while retrieving endpoint configurations for resource: %s."),
         ERROR_CODE_ERROR_ADDING_ENDPOINT_CONFIGURATION("65004", "Unable to add endpoint configuration.",
                 "Server encountered an error while adding the endpoint configuration: %s"),
         ERROR_CODE_ERROR_DELETING_ENDPOINT_CONFIGURATION("65005", "Unable to delete endpoint configuration.",
@@ -102,5 +102,4 @@ public class EndpointConfigurationManagementConstants {
             return code + " | " + message;
         }
     }
-
 }

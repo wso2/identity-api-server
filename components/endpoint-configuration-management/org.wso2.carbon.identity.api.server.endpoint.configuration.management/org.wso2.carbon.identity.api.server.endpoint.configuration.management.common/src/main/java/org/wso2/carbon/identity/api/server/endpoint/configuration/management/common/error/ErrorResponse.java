@@ -66,7 +66,7 @@ public class ErrorResponse extends ErrorDTO {
             error.setCode(this.code);
             error.setMessage(this.message);
             error.setDescription(this.description);
-            error.setRef(Utils.getCorrelation());
+            error.setRef(Utils.getCorrelationID());
             return error;
         }
 

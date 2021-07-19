@@ -24,7 +24,7 @@
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>identity-api-server</artifactId>
         <version>1.0.237-SNAPSHOT</version>
-        <relativePath>../..</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>endpoint-configuration-management</artifactId>
@@ -34,7 +34,6 @@
     <modules>
         <module>org.wso2.carbon.identity.api.server.endpoint.configuration.management</module>
         <module>org.wso2.carbon.identity.api.server.endpoint.configuration.dispatcher</module>
-
     </modules>
 
 </project>
