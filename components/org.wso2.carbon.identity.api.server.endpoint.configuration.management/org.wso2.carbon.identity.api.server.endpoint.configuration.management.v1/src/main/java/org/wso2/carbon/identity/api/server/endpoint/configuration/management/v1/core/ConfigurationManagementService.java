@@ -17,6 +17,7 @@
  */
 
 package org.wso2.carbon.identity.api.server.endpoint.configuration.management.v1.core;
+
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -341,7 +342,7 @@ public class ConfigurationManagementService {
         return message;
     }
 
-    public String getEncryptedSecret(String clientSecret) {
+    private String getEncryptedSecret(String clientSecret) {
 
         try {
             return encrypt(clientSecret);
@@ -351,7 +352,7 @@ public class ConfigurationManagementService {
         }
     }
 
-    public String getDecryptedSecret(String clientSecret) {
+    private String getDecryptedSecret(String clientSecret) {
 
         try {
             return decrypt(clientSecret);
