@@ -66,7 +66,7 @@ paths:
     post:
       tags:
         - Configuration
-      summary: Create an endpoint Configuration
+      summary: Create an endpoint configuration
       description: |
         This API provides the capability to create an endpoint configuration
       operationId: createEndpointConfiguration

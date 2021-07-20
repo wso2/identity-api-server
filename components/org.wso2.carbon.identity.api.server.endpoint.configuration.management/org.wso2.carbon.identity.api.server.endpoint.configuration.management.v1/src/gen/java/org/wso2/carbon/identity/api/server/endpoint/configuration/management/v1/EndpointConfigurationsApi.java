@@ -42,7 +42,7 @@ public class EndpointConfigurationsApi {
 
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @ApiOperation(value = "Create an endpoint Configuration", notes = "This API provides the capability to create an endpoint configuration ", response = EndpointConfiguration.class, authorizations = {
+    @ApiOperation(value = "Create an endpoint configuration", notes = "This API provides the capability to create an endpoint configuration ", response = EndpointConfiguration.class, authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
 

@@ -18,7 +18,7 @@ package org.wso2.carbon.identity.api.server.endpoint.configuration.management.v1
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.endpoint.configuration.management.v1.EndpointConfigurationsApiService;
 import org.wso2.carbon.identity.api.server.endpoint.configuration.management.v1.core.ConfigurationManagementService;
 import org.wso2.carbon.identity.api.server.endpoint.configuration.management.v1.model.EndpointConfiguration;

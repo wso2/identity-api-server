@@ -26,10 +26,10 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.core.util.CryptoUtil;
 
+import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.EndpointConfigurationManagementConstants;
 import org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.EndpointConfigurationManagementDataHolder;
-import org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.error.APIError;
-import org.wso2.carbon.identity.api.server.endpoint.configuration.management.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.endpoint.configuration.management.v1.model.EndpointConfiguration;
 import org.wso2.carbon.identity.api.server.endpoint.configuration.management.v1.model.EndpointConfigurationAdd;
 import org.wso2.carbon.identity.api.server.endpoint.configuration.management.v1.model.EndpointConfigurationUpdateRequest;
