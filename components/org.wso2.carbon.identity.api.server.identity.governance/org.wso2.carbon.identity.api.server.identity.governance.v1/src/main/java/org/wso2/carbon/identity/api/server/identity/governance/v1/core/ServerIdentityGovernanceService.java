@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019 , WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.identity.governance.v1.model.Category
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorsPatchReq;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.MetaRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceResp;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceSearchAttribute;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyReq;
@@ -386,9 +387,13 @@ public class ServerIdentityGovernanceService {
             propertyRes.setValue(property.getValue());
             propertyRes.setDisplayName(property.getDisplayName());
             propertyRes.setDescription(property.getDescription() != null ? property.getDescription() : "");
+            MetaRes metaRes = new MetaRes();
+            metaRes.setType(property.getType());
+            metaRes.setRegex(property.getRegex());
+            metaRes.setGroupID(property.getGroupId());
+            propertyRes.setMeta(metaRes);
             properties.add(propertyRes);
         }
-
         connectorsResDTO.setProperties(properties);
         return connectorsResDTO;
     }
