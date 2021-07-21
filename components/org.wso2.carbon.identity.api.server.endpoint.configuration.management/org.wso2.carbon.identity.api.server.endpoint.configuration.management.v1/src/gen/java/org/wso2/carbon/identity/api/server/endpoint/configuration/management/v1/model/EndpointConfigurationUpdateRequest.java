@@ -89,7 +89,7 @@ public class EndpointConfigurationUpdateRequest {
     }
 
     @ApiModelProperty(required = true, value = "")
-    @JsonProperty("auth-type")
+    @JsonProperty("authType")
     @Valid
     @NotNull(message = "Property authType cannot be null.")
 

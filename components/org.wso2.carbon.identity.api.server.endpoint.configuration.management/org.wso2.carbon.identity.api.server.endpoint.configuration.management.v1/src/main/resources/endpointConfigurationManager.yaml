@@ -78,7 +78,7 @@ paths:
             example:
               referenceName: sample-configuration
               url: 'https://sample.configuration'
-              auth-type: gdxhgddgcgtsf
+              authType: gdxhgddgcgtsf
               secret:
                 - key: api-key
                   value: jbbrbrbgtrgjklth
@@ -312,7 +312,7 @@ components:
       required:
         - referenceName
         - url
-        - auth-type
+        - authType
         - secret
       type: object
       properties:
@@ -320,7 +320,7 @@ components:
           type: string
         url:
           type: string
-        auth-type:
+        authType:
           type: string
         secret:
           $ref: '#/components/schemas/Secret'
@@ -329,7 +329,7 @@ components:
       required:
         - referenceName
         - url
-        - auth-type
+        - authType
         - secret
       type: object
       properties:
@@ -337,7 +337,7 @@ components:
           type: string
         url:
           type: string
-        auth-type:
+        authType:
           type: string
         secret:
           $ref: '#/components/schemas/Secret'
@@ -347,14 +347,14 @@ components:
       required:
         - referenceName
         - url
-        - auth-type
+        - authType
       type: object
       properties:
         referenceName:
           type: string
         url:
           type: string
-        auth-type:
+        authType:
           type: string
         secret:
           $ref: '#/components/schemas/Secret'
