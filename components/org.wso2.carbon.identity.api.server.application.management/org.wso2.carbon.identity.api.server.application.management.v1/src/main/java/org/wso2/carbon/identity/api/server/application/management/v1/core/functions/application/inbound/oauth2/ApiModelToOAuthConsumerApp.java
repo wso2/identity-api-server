@@ -24,7 +24,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.OIDCLogoutC
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RefreshTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
-import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
@@ -51,7 +50,6 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         consumerAppDTO.setCallbackUrl(getCallbackUrl(oidcModel.getCallbackURLs()));
 
         consumerAppDTO.setOAuthVersion(OAuthConstants.OAuthVersions.VERSION_2);
-        consumerAppDTO.setUsername(ContextLoader.getUsernameFromContext());
 
         consumerAppDTO.setGrantTypes(getGrantTypes(oidcModel));
         consumerAppDTO.setScopeValidators(getScopeValidators(oidcModel));
