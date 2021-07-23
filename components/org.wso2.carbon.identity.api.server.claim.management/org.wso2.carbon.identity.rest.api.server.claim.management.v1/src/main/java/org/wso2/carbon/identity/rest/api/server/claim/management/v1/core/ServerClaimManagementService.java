@@ -265,10 +265,6 @@ public class ServerClaimManagementService {
             throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DISPLAY_NAME_NOT_SPECIFIED,
                     BAD_REQUEST);
         }
-        if (StringUtils.isBlank(localClaimReqDTO.getDescription())) {
-            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DESCRIPTION_NOT_SPECIFIED,
-                    BAD_REQUEST);
-        }
 
         try {
             validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
@@ -383,10 +379,6 @@ public class ServerClaimManagementService {
             if (StringUtils.isBlank(localClaimReqDTO.getDisplayName())) {
                 throw handleClaimManagementClientError(
                         Constant.ErrorMessage.ERROR_CODE_CLAIM_DISPLAY_NAME_NOT_SPECIFIED,
-                        BAD_REQUEST);
-            }
-            if (StringUtils.isBlank(localClaimReqDTO.getDescription())) {
-                throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DESCRIPTION_NOT_SPECIFIED,
                         BAD_REQUEST);
             }
             validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
@@ -666,7 +658,8 @@ public class ServerClaimManagementService {
 
         Map<String, String> claimProperties = new HashMap<>(localClaim.getClaimProperties());
 
-        localClaimResDTO.setDescription(claimProperties.remove(PROP_DESCRIPTION));
+        String description = claimProperties.remove(PROP_DESCRIPTION);
+        localClaimResDTO.setDescription(description != null ? description : "");
 
         String propDisplayOrder = claimProperties.remove(PROP_DISPLAY_ORDER);
         if (StringUtils.isNumeric(propDisplayOrder)) {

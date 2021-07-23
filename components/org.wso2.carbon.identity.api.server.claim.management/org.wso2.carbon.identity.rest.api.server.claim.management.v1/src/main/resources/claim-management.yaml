@@ -572,7 +572,6 @@ definitions:
     type: object
     required:
     - claimURI
-    - description
     - displayName
     - attributeMapping
     description: Local claim request.
