@@ -659,7 +659,11 @@ public class ServerClaimManagementService {
         Map<String, String> claimProperties = new HashMap<>(localClaim.getClaimProperties());
 
         String description = claimProperties.remove(PROP_DESCRIPTION);
-        localClaimResDTO.setDescription(description != null ? description : "");
+        if (description != null) {
+            localClaimResDTO.setDescription(description);
+        } else {
+            localClaimResDTO.setDescription(StringUtils.EMPTY);
+        }
 
         String propDisplayOrder = claimProperties.remove(PROP_DISPLAY_ORDER);
         if (StringUtils.isNumeric(propDisplayOrder)) {
@@ -671,7 +675,11 @@ public class ServerClaimManagementService {
         localClaimResDTO.setDisplayName(claimProperties.remove(PROP_DISPLAY_NAME));
         localClaimResDTO.setReadOnly(Boolean.valueOf(claimProperties.remove(PROP_READ_ONLY)));
         String regEx = claimProperties.remove(PROP_REG_EX);
-        localClaimResDTO.setRegEx(regEx != null ? regEx : "");
+        if (regEx != null) {
+            localClaimResDTO.setRegEx(regEx);
+        } else {
+            localClaimResDTO.setRegEx(StringUtils.EMPTY);
+        }
         localClaimResDTO.setRequired(Boolean.valueOf(claimProperties.remove(PROP_REQUIRED)));
         localClaimResDTO.setSupportedByDefault(Boolean.valueOf(claimProperties.remove(PROP_SUPPORTED_BY_DEFAULT)));
 
