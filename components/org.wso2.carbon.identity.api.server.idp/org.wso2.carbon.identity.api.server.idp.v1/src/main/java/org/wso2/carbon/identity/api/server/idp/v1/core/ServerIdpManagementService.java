@@ -2729,13 +2729,11 @@ public class ServerIdpManagementService {
                         case Constants.ALIAS_PATH:
                             idpToUpdate.setAlias(value);
                             break;
+                        case Constants.IDP_ISSUER_NAME_PATH:
+                            patchIdpProperties(idpToUpdate, Constants.IDP_ISSUER_NAME, value);
+                            break;
                         case Constants.CERTIFICATE_JWKSURI_PATH:
-                            IdentityProviderProperty[] propertyDTOS = idpToUpdate.getIdpProperties();
-                            for (IdentityProviderProperty propertyDTO : propertyDTOS) {
-                                if (Constants.JWKS_URI.equals(propertyDTO.getName())) {
-                                    propertyDTO.setValue(value);
-                                }
-                            }
+                            patchIdpProperties(idpToUpdate, Constants.JWKS_URI, value);
                             break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -2788,6 +2786,16 @@ public class ServerIdpManagementService {
                 // Throw an error if any other patch operations are sent in the request.
                 throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                         .ERROR_CODE_INVALID_INPUT, null);
+            }
+        }
+    }
+
+    private void patchIdpProperties(IdentityProvider identityProvider, String propertyName, String propertyValue) {
+
+        IdentityProviderProperty[] propertyDTOS = identityProvider.getIdpProperties();
+        for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+            if (propertyName.equals(propertyDTO.getName())) {
+                propertyDTO.setValue(propertyValue);
             }
         }
     }
