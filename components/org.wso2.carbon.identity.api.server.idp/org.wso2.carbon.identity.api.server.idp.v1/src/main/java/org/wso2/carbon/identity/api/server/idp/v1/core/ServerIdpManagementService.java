@@ -1805,6 +1805,12 @@ public class ServerIdpManagementService {
             jwksProperty.setValue(idpJWKSUri);
             idpProperties.add(jwksProperty);
         }
+        if (StringUtils.isNotEmpty(identityProviderPOSTRequest.getIdpIssuerName())) {
+            IdentityProviderProperty idpIssuerProperty = new IdentityProviderProperty();
+            idpIssuerProperty.setName(Constants.IDP_ISSUER_NAME);
+            idpIssuerProperty.setValue(identityProviderPOSTRequest.getIdpIssuerName());
+            idpProperties.add(idpIssuerProperty);
+        }
         idp.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
         return idp;
     }
@@ -1961,9 +1967,21 @@ public class ServerIdpManagementService {
         idpResponse.setName(identityProvider.getIdentityProviderName());
         idpResponse.setDescription(identityProvider.getIdentityProviderDescription());
         idpResponse.setAlias(identityProvider.getAlias());
+        idpResponse.setIdpIssuerName(getIDPIssuerName(identityProvider));
         idpResponse.setImage(identityProvider.getImageUrl());
         idpResponse.setIsFederationHub(identityProvider.isFederationHub());
         idpResponse.setHomeRealmIdentifier(identityProvider.getHomeRealmId());
+    }
+
+    private String getIDPIssuerName(IdentityProvider identityProvider) {
+
+        IdentityProviderProperty[] idpProperties = identityProvider.getIdpProperties();
+        for (IdentityProviderProperty property : idpProperties) {
+            if (Constants.IDP_ISSUER_NAME.equals(property.getName())) {
+                return property.getValue();
+            }
+        }
+        return null;
     }
 
     private Certificate createIDPCertificate(IdentityProvider identityProvider) {
@@ -2712,12 +2730,12 @@ public class ServerIdpManagementService {
                             idpToUpdate.setAlias(value);
                             break;
                         case Constants.CERTIFICATE_JWKSURI_PATH:
-                            List<IdentityProviderProperty> idpProperties = new ArrayList<>();
-                            IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
-                            jwksProperty.setName(Constants.JWKS_URI);
-                            jwksProperty.setValue(value);
-                            idpProperties.add(jwksProperty);
-                            idpToUpdate.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
+                            IdentityProviderProperty[] propertyDTOS = idpToUpdate.getIdpProperties();
+                            for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+                                if (Constants.JWKS_URI.equals(propertyDTO.getName())) {
+                                    propertyDTO.setValue(value);
+                                }
+                            }
                             break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
