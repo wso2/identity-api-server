@@ -659,9 +659,8 @@ public class ServerClaimManagementService {
         Map<String, String> claimProperties = new HashMap<>(localClaim.getClaimProperties());
 
         String description = claimProperties.remove(PROP_DESCRIPTION);
-        if (description != null) {
-            localClaimResDTO.setDescription(description);
-        } else {
+        localClaimResDTO.setDescription(description);
+        if (description == null) {
             localClaimResDTO.setDescription(StringUtils.EMPTY);
         }
 
@@ -675,9 +674,8 @@ public class ServerClaimManagementService {
         localClaimResDTO.setDisplayName(claimProperties.remove(PROP_DISPLAY_NAME));
         localClaimResDTO.setReadOnly(Boolean.valueOf(claimProperties.remove(PROP_READ_ONLY)));
         String regEx = claimProperties.remove(PROP_REG_EX);
-        if (regEx != null) {
-            localClaimResDTO.setRegEx(regEx);
-        } else {
+        localClaimResDTO.setRegEx(regEx);
+        if (regEx == null) {
             localClaimResDTO.setRegEx(StringUtils.EMPTY);
         }
         localClaimResDTO.setRequired(Boolean.valueOf(claimProperties.remove(PROP_REQUIRED)));
