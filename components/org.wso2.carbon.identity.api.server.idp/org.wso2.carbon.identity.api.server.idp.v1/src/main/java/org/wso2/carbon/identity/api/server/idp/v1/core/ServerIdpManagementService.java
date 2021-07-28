@@ -1726,7 +1726,24 @@ public class ServerIdpManagementService {
             idpJWKSUri = identityProviderPOSTRequest.getCertificate().getJwksUri();
         } else if (identityProviderPOSTRequest.getCertificate() != null && identityProviderPOSTRequest.getCertificate()
                 .getCertificates() != null) {
-            idp.setCertificate(StringUtils.join(identityProviderPOSTRequest.getCertificate().getCertificates(), ""));
+            List<String> certificates = new ArrayList<>();
+            for (int certificateNo = 0; certificateNo < identityProviderPOSTRequest.getCertificate()
+                    .getCertificates().size(); certificateNo++) {
+                if (identityProviderPOSTRequest.getCertificate()
+                        .getCertificates().get(certificateNo).startsWith(IdentityUtil.PEM_BEGIN_CERTFICATE)) {
+                    certificates.add(identityProviderPOSTRequest.getCertificate()
+                            .getCertificates().get(certificateNo));
+                } else {
+                    try {
+                        certificates.add(base64Decode(identityProviderPOSTRequest.getCertificate()
+                                .getCertificates().get(certificateNo)));
+                    } catch (IllegalArgumentException e) {
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_INVALID_CERTIFICATE_FORMAT, null);
+                    }
+                }
+            }
+            idp.setCertificate(base64Encode(StringUtils.join(certificates, "")));
         }
         idp.setFederationHub(identityProviderPOSTRequest.getIsFederationHub());
 
@@ -1744,6 +1761,12 @@ public class ServerIdpManagementService {
             jwksProperty.setName(Constants.JWKS_URI);
             jwksProperty.setValue(idpJWKSUri);
             idpProperties.add(jwksProperty);
+        }
+        if (StringUtils.isNotEmpty(identityProviderPOSTRequest.getIdpIssuerName())) {
+            IdentityProviderProperty idpIssuerProperty = new IdentityProviderProperty();
+            idpIssuerProperty.setName(Constants.IDP_ISSUER_NAME);
+            idpIssuerProperty.setValue(identityProviderPOSTRequest.getIdpIssuerName());
+            idpProperties.add(idpIssuerProperty);
         }
         idp.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
         return idp;
@@ -1900,9 +1923,21 @@ public class ServerIdpManagementService {
         idpResponse.setName(identityProvider.getIdentityProviderName());
         idpResponse.setDescription(identityProvider.getIdentityProviderDescription());
         idpResponse.setAlias(identityProvider.getAlias());
+        idpResponse.setIdpIssuerName(getIDPIssuerName(identityProvider));
         idpResponse.setImage(identityProvider.getImageUrl());
         idpResponse.setIsFederationHub(identityProvider.isFederationHub());
         idpResponse.setHomeRealmIdentifier(identityProvider.getHomeRealmId());
+    }
+
+    private String getIDPIssuerName(IdentityProvider identityProvider) {
+
+        IdentityProviderProperty[] idpProperties = identityProvider.getIdpProperties();
+        for (IdentityProviderProperty property : idpProperties) {
+            if (Constants.IDP_ISSUER_NAME.equals(property.getName())) {
+                return property.getValue();
+            }
+        }
+        return null;
     }
 
     private Certificate createIDPCertificate(IdentityProvider identityProvider) {
@@ -2594,10 +2629,18 @@ public class ServerIdpManagementService {
                     if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index >= 0)
                             && (index < idpToUpdate.getCertificateInfoArray().length)) {
                         for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
-                            certificates.add(certInfo.getCertValue());
+                            certificates.add(base64Decode(certInfo.getCertValue()));
+                        }
+                        if (!value.startsWith(IdentityUtil.PEM_BEGIN_CERTFICATE)) {
+                            try {
+                                value = base64Decode(value);
+                            } catch (IllegalArgumentException e) {
+                                throw handleException(Response.Status.BAD_REQUEST,
+                                        Constants.ErrorMessage.ERROR_CODE_INVALID_CERTIFICATE_FORMAT, null);
+                            }
                         }
                         certificates.set(index, value);
-                        idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
+                        idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
                     } else {
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                 .ERROR_CODE_INVALID_INPUT, null);
@@ -2628,13 +2671,11 @@ public class ServerIdpManagementService {
                         case Constants.ALIAS_PATH:
                             idpToUpdate.setAlias(value);
                             break;
+                        case Constants.IDP_ISSUER_NAME_PATH:
+                            patchIdpProperties(idpToUpdate, Constants.IDP_ISSUER_NAME, value);
+                            break;
                         case Constants.CERTIFICATE_JWKSURI_PATH:
-                            List<IdentityProviderProperty> idpProperties = new ArrayList<>();
-                            IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
-                            jwksProperty.setName(Constants.JWKS_URI);
-                            jwksProperty.setValue(value);
-                            idpProperties.add(jwksProperty);
-                            idpToUpdate.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
+                            patchIdpProperties(idpToUpdate, Constants.JWKS_URI, value);
                             break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -2694,6 +2735,28 @@ public class ServerIdpManagementService {
         return new String(Base64.getDecoder().decode(encodedContent), (StandardCharsets.UTF_8));
     }
 
+    /**
+     * Base64-encode content.
+     *
+     * @param content Message content to be encoded.
+     * @return Encoded value.
+     */
+    private String base64Encode(String content) {
+
+        return new String(Base64.getEncoder().encode(content.getBytes(StandardCharsets.UTF_8)),
+                (StandardCharsets.UTF_8));
+    }
+
+
+    private void patchIdpProperties(IdentityProvider identityProvider, String propertyName, String propertyValue) {
+
+        IdentityProviderProperty[] propertyDTOS = identityProvider.getIdpProperties();
+        for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+            if (propertyName.equals(propertyDTO.getName())) {
+                propertyDTO.setValue(propertyValue);
+            }
+        }
+    }
     /**
      * Handle IdentityProviderManagementException, extract error code, error description and status code to be sent
      * in the response.

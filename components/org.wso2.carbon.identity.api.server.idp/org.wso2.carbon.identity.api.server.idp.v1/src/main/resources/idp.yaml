@@ -1901,6 +1901,9 @@ components:
         alias:
           type: string
           example: 'https://localhost:9444/oauth2/token'
+        idpIssuerName:
+          type: string
+          example: 'https://www.idp.com'
         claims:
           $ref: '#/components/schemas/Claims'
         roles:
@@ -1941,6 +1944,9 @@ components:
         alias:
           type: string
           example: 'https://localhost:9444/oauth2/token'
+        idpIssuerName:
+          type: string
+          example: 'https://www.idp.com'
         claims:
           $ref: '#/components/schemas/Claims'
         roles:
