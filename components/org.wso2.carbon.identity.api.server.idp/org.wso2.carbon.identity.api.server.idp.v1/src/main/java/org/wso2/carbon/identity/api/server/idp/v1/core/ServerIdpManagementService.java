@@ -2751,9 +2751,11 @@ public class ServerIdpManagementService {
     private void patchIdpProperties(IdentityProvider identityProvider, String propertyName, String propertyValue) {
 
         IdentityProviderProperty[] propertyDTOS = identityProvider.getIdpProperties();
-        for (IdentityProviderProperty propertyDTO : propertyDTOS) {
-            if (propertyName.equals(propertyDTO.getName())) {
-                propertyDTO.setValue(propertyValue);
+        if (ArrayUtils.isNotEmpty(propertyDTOS)) {
+            for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+                if (propertyName.equals(propertyDTO.getName())) {
+                    propertyDTO.setValue(propertyValue);
+                }
             }
         }
     }
