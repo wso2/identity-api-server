@@ -265,10 +265,6 @@ public class ServerClaimManagementService {
             throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DISPLAY_NAME_NOT_SPECIFIED,
                     BAD_REQUEST);
         }
-        if (StringUtils.isBlank(localClaimReqDTO.getDescription())) {
-            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DESCRIPTION_NOT_SPECIFIED,
-                    BAD_REQUEST);
-        }
 
         try {
             validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
@@ -383,10 +379,6 @@ public class ServerClaimManagementService {
             if (StringUtils.isBlank(localClaimReqDTO.getDisplayName())) {
                 throw handleClaimManagementClientError(
                         Constant.ErrorMessage.ERROR_CODE_CLAIM_DISPLAY_NAME_NOT_SPECIFIED,
-                        BAD_REQUEST);
-            }
-            if (StringUtils.isBlank(localClaimReqDTO.getDescription())) {
-                throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_DESCRIPTION_NOT_SPECIFIED,
                         BAD_REQUEST);
             }
             validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
@@ -666,7 +658,11 @@ public class ServerClaimManagementService {
 
         Map<String, String> claimProperties = new HashMap<>(localClaim.getClaimProperties());
 
-        localClaimResDTO.setDescription(claimProperties.remove(PROP_DESCRIPTION));
+        String description = claimProperties.remove(PROP_DESCRIPTION);
+        localClaimResDTO.setDescription(description);
+        if (description == null) {
+            localClaimResDTO.setDescription(StringUtils.EMPTY);
+        }
 
         String propDisplayOrder = claimProperties.remove(PROP_DISPLAY_ORDER);
         if (StringUtils.isNumeric(propDisplayOrder)) {
@@ -678,7 +674,10 @@ public class ServerClaimManagementService {
         localClaimResDTO.setDisplayName(claimProperties.remove(PROP_DISPLAY_NAME));
         localClaimResDTO.setReadOnly(Boolean.valueOf(claimProperties.remove(PROP_READ_ONLY)));
         String regEx = claimProperties.remove(PROP_REG_EX);
-        localClaimResDTO.setRegEx(regEx != null ? regEx : "");
+        localClaimResDTO.setRegEx(regEx);
+        if (regEx == null) {
+            localClaimResDTO.setRegEx(StringUtils.EMPTY);
+        }
         localClaimResDTO.setRequired(Boolean.valueOf(claimProperties.remove(PROP_REQUIRED)));
         localClaimResDTO.setSupportedByDefault(Boolean.valueOf(claimProperties.remove(PROP_SUPPORTED_BY_DEFAULT)));
 

@@ -38,8 +38,7 @@ public class LocalClaimReqDTO {
     @NotNull(message = "Property claimURI cannot be null.") 
     private String claimURI = null;
 
-    @Valid 
-    @NotNull(message = "Property description cannot be null.") 
+    @Valid
     private String description = null;
 
     @Valid 
@@ -83,7 +82,7 @@ public class LocalClaimReqDTO {
     /**
     * Description of the claim.
     **/
-    @ApiModelProperty(required = true, value = "Description of the claim.")
+    @ApiModelProperty(value = "Description of the claim.")
     @JsonProperty("description")
     public String getDescription() {
         return description;
