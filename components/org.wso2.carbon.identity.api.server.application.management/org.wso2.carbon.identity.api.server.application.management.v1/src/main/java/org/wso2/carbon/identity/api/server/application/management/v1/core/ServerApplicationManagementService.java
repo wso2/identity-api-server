@@ -169,7 +169,7 @@ public class ServerApplicationManagementService {
 
         handleNotImplementedCapabilities(sortOrder, sortBy, requiredAttributes);
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        boolean isEqual = false;
+        boolean isEqualFilterUsed = false;
 
         limit = validateAndGetLimit(limit);
         offset = validateAndGetOffset(offset);
@@ -180,7 +180,7 @@ public class ServerApplicationManagementService {
         if (expressionNode != null) {
             // Handle eq operation as special case, there will be only one application with a given name in tenant.
             if (isEqualOperation(expressionNode)) {
-                isEqual = true;
+                isEqualFilterUsed = true;
             }
             formattedFilter = generateFilterStringForBackend(expressionNode.getAttributeValue(), expressionNode
                     .getOperation(), expressionNode.getValue());
@@ -192,7 +192,7 @@ public class ServerApplicationManagementService {
                     .getCountOfApplications(tenantDomain, username, formattedFilter);
 
             ApplicationBasicInfo[] filteredAppList;
-            if (isEqual) {
+            if (isEqualFilterUsed) {
                 ApplicationBasicInfo applicationBasicInfo = getApplicationManagementService()
                         .getApplicationBasicInfoByName(expressionNode.getValue(), tenantDomain);
                 if (applicationBasicInfo == null) {
