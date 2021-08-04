@@ -166,6 +166,7 @@ public class ServerUserStoreService {
         try {
             classNames = userStoreConfigService.getAvailableUserStoreClasses();
             List<AvailableUserStoreClassesRes> propertiesToAdd = new ArrayList<>();
+            Map<String, Boolean> userStoreManagersType = UserStoreManagerRegistry.getUserStoreManagersType();
             for (String className : classNames) {
                 AvailableUserStoreClassesRes availableUserStoreClassesResDTO = new AvailableUserStoreClassesRes();
                 String typeId = base64URLEncodeId(Objects.
@@ -175,7 +176,13 @@ public class ServerUserStoreService {
                 availableUserStoreClassesResDTO.setTypeId(typeId);
                 availableUserStoreClassesResDTO.setSelf(
                         ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
-                        UserStoreConstants.USER_STORE_PATH_COMPONENT + "/meta/types/%s", typeId)).toString());
+                                UserStoreConstants.USER_STORE_PATH_COMPONENT + "/meta/types/%s", typeId)).toString());
+
+                if (userStoreManagersType.containsKey(className)) {
+                    availableUserStoreClassesResDTO
+                            .setIsLocal(userStoreManagersType.get(className));
+                }
+
                 propertiesToAdd.add(availableUserStoreClassesResDTO);
             }
             return propertiesToAdd;
@@ -258,7 +265,14 @@ public class ServerUserStoreService {
             }
         }
         primaryUserstoreConfigs.setProperties(propertiesTobeAdd);
+        try {
+            primaryUserstoreConfigs.setIsLocal(UserStoreManagerRegistry.
+                    isLocalUserStore(realmConfiguration.getUserStoreClass()));
 
+        } catch (UserStoreException e) {
+            LOG.error(String.format("Cannot found user store manager type for user store manager: %s",
+                    getUserStoreType(realmConfiguration.getUserStoreClass())), e);
+        }
         return primaryUserstoreConfigs;
     }
 
@@ -294,6 +308,13 @@ public class ServerUserStoreService {
                 propertiesTobeAdd.add(userStorePropertiesRes);
             }
             userStoreConfigurations.setProperties(propertiesTobeAdd);
+            try {
+                userStoreConfigurations
+                        .setIsLocal(UserStoreManagerRegistry.isLocalUserStore(userStoreDTO.getClassName()));
+            } catch (UserStoreException e) {
+                LOG.error(String.format("Cannot found user store manager type for user store manager: %s",
+                        getUserStoreType(userStoreDTO.getClassName())), e);
+            }
             return userStoreConfigurations;
 
         } catch (IdentityUserStoreMgtException e) {
@@ -531,6 +552,7 @@ public class ServerUserStoreService {
                                                                    String requiredAttributes) {
 
         List<UserStoreListResponse> userStoreListResponseToAdd = new ArrayList<>();
+        Map<String, Boolean> userStoreManagersType = UserStoreManagerRegistry.getUserStoreManagersType();
         if (ArrayUtils.isNotEmpty(userStoreDTOS)) {
             for (UserStoreDTO jsonObject : userStoreDTOS) {
                 UserStoreListResponse userStoreList = new UserStoreListResponse();
@@ -546,6 +568,11 @@ public class ServerUserStoreService {
                     String[] requiredAttributesArray = requiredAttributes.split(REGEX_COMMA);
                     addUserstoreProperties(jsonObject, userStoreList, Arrays.asList(requiredAttributesArray));
                 }
+
+                if (userStoreManagersType.containsKey(jsonObject.getClassName())) {
+                    userStoreList.setIsLocal(userStoreManagersType.get(jsonObject.getClassName()));
+                }
+
                 userStoreListResponseToAdd.add(userStoreList);
             }
         }
@@ -582,6 +609,7 @@ public class ServerUserStoreService {
     private MetaUserStoreType buildUserStoreMetaResponse(String typeId) {
 
         String typeName = base64URLDecodeId(typeId);
+
         Properties properties = UserStoreManagerRegistry.getUserStoreProperties(
                 getUserStoreType(typeName));
         MetaUserStoreType metaUserStore = new MetaUserStoreType();
@@ -595,7 +623,12 @@ public class ServerUserStoreService {
         metaUserStore.setTypeId(typeId);
         metaUserStore.setTypeName(typeName);
         metaUserStore.setClassName(getUserStoreType(typeName));
-
+        try {
+            metaUserStore.setIsLocal(UserStoreManagerRegistry.isLocalUserStore(getUserStoreType(typeName)));
+        } catch (UserStoreException e) {
+            LOG.error(String.format("Cannot found user store manager type for user store manager: %s",
+                    getUserStoreType(typeName)), e);
+        }
         return metaUserStore;
     }
 

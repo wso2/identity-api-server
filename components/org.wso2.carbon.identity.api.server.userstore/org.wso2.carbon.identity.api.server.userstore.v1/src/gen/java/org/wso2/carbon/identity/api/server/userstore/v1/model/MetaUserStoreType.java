@@ -34,6 +34,7 @@ public class MetaUserStoreType  {
     private String typeName;
     private String typeId;
     private String className;
+    private boolean isLocal;
     private UserStorePropertiesRes properties;
 
     /**
@@ -97,18 +98,49 @@ public class MetaUserStoreType  {
         this.properties = properties;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("properties")
     @Valid
     public UserStorePropertiesRes getProperties() {
+
         return properties;
     }
+
     public void setProperties(UserStorePropertiesRes properties) {
+
         this.properties = properties;
     }
 
+    @ApiModelProperty(example = "true", value = "")
+    @JsonProperty("isLocal")
+    @Valid
+    public boolean getIsLocal() {
 
+        return isLocal;
+    }
+
+    /**
+     * Set isLocalUserStore.
+     *
+     * @param isLocal Boolean is local user store or not.
+     */
+    public void setIsLocal(boolean isLocal) {
+
+        this.isLocal = isLocal;
+    }
+
+    /**
+     * Set is local user store or not and get the object.
+     *
+     * @param isLocal Boolean is local user store or not.
+     * @return This object.
+     */
+    public MetaUserStoreType isLocal(boolean isLocal) {
+
+        this.isLocal = isLocal;
+        return this;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {

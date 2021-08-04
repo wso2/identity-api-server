@@ -33,6 +33,7 @@ import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
+
 @ApiModel(description = "Available User Store Configurations Response.")
 public class UserStoreConfigurationsRes  {
   
@@ -41,6 +42,7 @@ public class UserStoreConfigurationsRes  {
     private String name;
     private String description;
     private String className;
+    private boolean isLocal;
     private List<AddUserStorePropertiesRes> properties = null;
 
 
@@ -154,6 +156,7 @@ public class UserStoreConfigurationsRes  {
     }
 
     public UserStoreConfigurationsRes addPropertiesItem(AddUserStorePropertiesRes propertiesItem) {
+
         if (this.properties == null) {
             this.properties = new ArrayList<>();
         }
@@ -161,7 +164,35 @@ public class UserStoreConfigurationsRes  {
         return this;
     }
 
-    
+    @ApiModelProperty(example = "true", value = "")
+    @JsonProperty("isLocal")
+    @Valid
+    public boolean getIsLocal() {
+
+        return isLocal;
+    }
+
+    /**
+     * Set isLocalUserStore.
+     *
+     * @param isLocal Boolean is local user store or not.
+     */
+    public void setIsLocal(boolean isLocal) {
+
+        this.isLocal = isLocal;
+    }
+
+    /**
+     * Set is local user store or not and get the object.
+     *
+     * @param isLocal Boolean is local user store or not.
+     * @return This object.
+     */
+    public UserStoreConfigurationsRes isLocal(boolean isLocal) {
+
+        this.isLocal = isLocal;
+        return this;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {

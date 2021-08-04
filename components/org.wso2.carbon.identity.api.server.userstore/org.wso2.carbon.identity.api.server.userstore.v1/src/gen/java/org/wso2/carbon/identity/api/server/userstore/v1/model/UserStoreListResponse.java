@@ -37,6 +37,7 @@ public class UserStoreListResponse  {
     private String name;
     private Boolean enabled;
     private String description;
+    private boolean isLocal;
     private String self;
     private List<AddUserStorePropertiesRes> properties = null;
 
@@ -155,6 +156,7 @@ public class UserStoreListResponse  {
     }
 
     public UserStoreListResponse addPropertiesItem(AddUserStorePropertiesRes propertiesItem) {
+
         if (this.properties == null) {
             this.properties = new ArrayList<>();
         }
@@ -162,7 +164,35 @@ public class UserStoreListResponse  {
         return this;
     }
 
-    
+    @ApiModelProperty(example = "true", value = "")
+    @JsonProperty("isLocal")
+    @Valid
+    public boolean getIsLocal() {
+
+        return isLocal;
+    }
+
+    /**
+     * Set isLocalUserStore.
+     *
+     * @param isLocal Boolean is local user store or not.
+     */
+    public void setIsLocal(boolean isLocal) {
+
+        this.isLocal = isLocal;
+    }
+
+    /**
+     * Set is local user store or not and get the object.
+     *
+     * @param isLocal Boolean is local user store or not.
+     * @return This object.
+     */
+    public UserStoreListResponse isLocal(boolean isLocal) {
+
+        this.isLocal = isLocal;
+        return this;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {
