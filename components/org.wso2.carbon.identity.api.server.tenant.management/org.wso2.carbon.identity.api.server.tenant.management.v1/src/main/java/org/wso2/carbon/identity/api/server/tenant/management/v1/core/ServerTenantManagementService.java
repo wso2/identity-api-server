@@ -425,7 +425,7 @@ public class ServerTenantManagementService {
         ErrorResponse errorResponse;
 
         Response.Status status;
-
+        log.error("TENANT CREATION ERROR :",e);
         if (e instanceof TenantManagementClientException) {
             if (ERROR_CODE_RESOURCE_LIMIT_REACHED.equals(e.getErrorCode())) {
                 return handleResourceLimitReached();
