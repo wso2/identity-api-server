@@ -22,6 +22,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -31,6 +32,7 @@ import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AddUserStorePropertiesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.Attribute;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStoreClassesRes;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ConnectionEstablishedResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
@@ -41,6 +43,12 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListRespo
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStorePropertiesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
+import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
+import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataClientException;
+import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
+import org.wso2.carbon.identity.claim.metadata.mgt.model.AttributeMapping;
+import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.user.store.configuration.UserStoreConfigService;
 import org.wso2.carbon.identity.user.store.configuration.dto.PropertyDTO;
 import org.wso2.carbon.identity.user.store.configuration.dto.UserStoreDTO;
@@ -53,6 +61,7 @@ import org.wso2.carbon.user.api.RealmConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.UserStoreConfigConstants;
+import org.wso2.carbon.user.core.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
 
@@ -93,9 +102,24 @@ public class ServerUserStoreService {
 
         try {
             validateMandatoryProperties(userStoreReq);
+
+            String userstoreDomain = userStoreReq.getName();
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+
+            List<LocalClaim> localClaimList =  createLocalClaimList(userstoreDomain,
+                    userStoreReq.getClaimAttributeMappings());
+            validateClaimMappings(tenantDomain, localClaimList);
+
             UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
                     .getUserStoreConfigService();
-            userStoreConfigService.addUserStore(createUserStoreDTO(userStoreReq));
+            UserStoreDTO userStoreDTO = createUserStoreDTO(userStoreReq);
+            userStoreConfigService.addUserStore(userStoreDTO);
+
+            List<ClaimAttributeMapping> claimAttributeMappingList = userStoreReq.getClaimAttributeMappings();
+            if (claimAttributeMappingList != null) {
+                updateClaimMappings(userstoreDomain, tenantDomain, localClaimList);
+            }
+
             return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
@@ -404,6 +428,55 @@ public class ServerUserStoreService {
     }
 
     /**
+     * To make a partial update single or multiple claim attribute mappings of a specific user store.
+     *
+     * @param userstoreDomainId     user store domain id
+     * @param claimAttributeMapping list of claim attribute mappings in patch request
+     */
+    public void patchClaimAttributeMapping(String userstoreDomainId,
+                                           List<ClaimAttributeMapping> claimAttributeMapping) {
+
+        if (claimAttributeMapping == null) {
+            throw handleClaimManagementClientError(UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS,
+                    Response.Status.BAD_REQUEST);
+        }
+
+        try {
+            String userstoreDomain = base64URLDecodeId(userstoreDomainId);
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+
+            validateUserstore(userstoreDomainId);
+            List<LocalClaim> localClaimList =  createLocalClaimList(userstoreDomain, claimAttributeMapping);
+            validateClaimMappings(tenantDomain, localClaimList);
+            updateClaimMappings(userstoreDomain, tenantDomain, localClaimList);
+        }  catch (UserStoreException e) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_ID);
+        } catch (IdentityUserStoreClientException e) {
+            throw handleIdentityUserStoreMgtException(e, UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_USERSTORE);
+        }
+    }
+
+    /**
+     * To check whether user store is exist.
+     *
+     * @param userStoreDomain     user store domain name
+     * @return boolean
+     */
+    private boolean isUserStoreExists(String userStoreDomain) throws UserStoreException {
+
+        UserStoreManager userStoreManager;
+        if (IdentityUtil.getPrimaryDomainName().equals(userStoreDomain)) {
+            return true;
+        } else {
+            userStoreManager = ((UserStoreManager) CarbonContext.getThreadLocalCarbonContext().getUserRealm()
+                    .getUserStoreManager()).getSecondaryUserStoreManager(userStoreDomain);
+        }
+
+        return userStoreManager != null;
+    }
+
+    /**
      * To handle the patch REPLACE request.
      *
      * @param userStoreDTO user store dto.
@@ -509,6 +582,44 @@ public class ServerUserStoreService {
     }
 
     /**
+     * To update claim attribute mappings in bulk for specific user store.
+     *
+     * @param userstoreDomain user store domain name
+     * @param tenantDomain tenant domain name
+     * @param localClaimList list of claim attribute mappings
+     */
+    private void updateClaimMappings(String userstoreDomain, String tenantDomain, List<LocalClaim> localClaimList) {
+
+        ClaimMetadataManagementService claimMetadataManagementService = UserStoreConfigServiceHolder.getInstance()
+                .getClaimMetadataManagementService();
+        try {
+            claimMetadataManagementService.validateClaimAttributeMapping(localClaimList, tenantDomain);
+            claimMetadataManagementService.updateLocalClaimMappings(localClaimList, tenantDomain, userstoreDomain);
+        } catch (ClaimMetadataException e) {
+            throw handleClaimManagementException(e,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_CLAIM_MAPPING);
+        }
+    }
+
+    /**
+     * To validate claim existence of claim attribute mappings.
+     *
+     * @param tenantDomain tenant domain name
+     * @param localClaimList list of claim attribute mappings
+     */
+    private void validateClaimMappings(String tenantDomain, List<LocalClaim> localClaimList) {
+
+        ClaimMetadataManagementService claimMetadataManagementService = UserStoreConfigServiceHolder.getInstance()
+                .getClaimMetadataManagementService();
+        try {
+            claimMetadataManagementService.validateClaimAttributeMapping(localClaimList, tenantDomain);
+        } catch (ClaimMetadataException e) {
+            throw handleClaimManagementException(e,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_CLAIM_MAPPING);
+        }
+    }
+
+    /**
      * To construct properties list for patch request.
      *
      * @param propertyDTOS array of {@link PropertyDTO}
@@ -540,6 +651,27 @@ public class ServerUserStoreService {
         userStoreDTO.setDescription(userStoreReq.getDescription());
         userStoreDTO.setProperties(createPropertyListDTO(userStoreReq));
         return userStoreDTO;
+    }
+
+    /**
+     * To create Local claim list from a claim attribute mapping list.
+     *
+     * @param userStoreId user store domain Id.
+     * @param claimAttributeMappingList list of claim attribute mappings.
+     * @return List<LocalClaim>.
+     */
+    private List<LocalClaim> createLocalClaimList(String userStoreId,
+                                                  List<ClaimAttributeMapping> claimAttributeMappingList) {
+        List<LocalClaim> localClaimList = new ArrayList<>();
+
+        for (ClaimAttributeMapping claimAttributeMapping : claimAttributeMappingList) {
+            AttributeMapping attributeMapping = new AttributeMapping(userStoreId,
+                    claimAttributeMapping.getMappedAttribute());
+            LocalClaim localClaim = new LocalClaim(claimAttributeMapping.getClaimURI());
+            localClaim.setMappedAttribute(attributeMapping);
+            localClaimList.add(localClaim);
+        }
+        return localClaimList;
     }
 
     /**
@@ -980,6 +1112,36 @@ public class ServerUserStoreService {
     }
 
     /**
+     * Handle ClaimManagementException, extract the error code and the error message from the corresponding
+     * exception and set it to the API Error Response.
+     *
+     * @param exception     Exception thrown
+     * @param errorEnum     Corresponding error enum
+     * @return API Error object.
+     */
+    private APIError handleClaimManagementException(ClaimMetadataException exception,
+                                                    UserStoreConstants.ErrorMessage errorEnum) {
+
+        Response.Status status;
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
+        if (exception instanceof ClaimMetadataClientException) {
+            status = Response.Status.BAD_REQUEST;
+            return handleClaimManagementClientError(errorEnum, status);
+        } else {
+            // Internal Server error
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+            return new APIError(status, errorResponse);
+        }
+    }
+
+    private APIError handleClaimManagementClientError(UserStoreConstants.ErrorMessage errorEnum,
+                                                      Response.Status status) {
+
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, errorEnum.getDescription());
+        return new APIError(status, errorResponse);
+    }
+
+    /**
      * Validate userstore update request.
      *
      * @param domainID     Userstore domain ID
@@ -1008,6 +1170,26 @@ public class ServerUserStoreService {
             throw new IdentityUserStoreClientException(
                     UserStoreConstants.ErrorMessage.ERROR_CODE_DOMAIN_ID_DOES_NOT_MATCH_WITH_NAME.getCode(),
                     UserStoreConstants.ErrorMessage.ERROR_CODE_DOMAIN_ID_DOES_NOT_MATCH_WITH_NAME.getMessage());
+        }
+    }
+
+    /**
+     * Validate userstore domain Id.
+     *
+     * @param userstoreDomainId    Userstore domain ID
+     * @throws IdentityUserStoreClientException If request is invalid.
+     */
+    private void validateUserstore(String userstoreDomainId) throws UserStoreException,
+            IdentityUserStoreClientException {
+
+        if (StringUtils.isBlank(userstoreDomainId)) {
+            throw new IdentityUserStoreClientException(
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_ID.getCode(),
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_ID.getMessage());
+        }
+        if (!isUserStoreExists(base64URLDecodeId(userstoreDomainId))) {
+            throw handleClaimManagementClientError(UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_USERSTORE,
+                    Response.Status.BAD_REQUEST);
         }
     }
 

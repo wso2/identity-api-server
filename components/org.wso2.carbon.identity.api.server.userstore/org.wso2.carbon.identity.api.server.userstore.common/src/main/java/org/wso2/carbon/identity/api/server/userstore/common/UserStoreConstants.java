@@ -105,7 +105,13 @@ public class UserStoreConstants {
         ERROR_CODE_REQUEST_BODY_NOT_FOUND("60010", "Invalid userstore update request",
                 "Userstore update request is either NULL or empty"),
         ERROR_CODE_USER_STORE_LIMIT_REACHED("60011", "Unable to create a user store.",
-                "Maximum number of allowed user stores have been reached.");
+                "Maximum number of allowed user stores have been reached."),
+        ERROR_CODE_ERROR_ADDING_CLAIM_MAPPING("60012", "Unable to add local claims",
+                                                "Error occurred while adding local claims"),
+        ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("60013", "Attribute mapping not specified",
+                "Attribute mapping cannot be empty"),
+        ERROR_CODE_INVALID_USERSTORE("60014", "Invalid attribute mapping.",
+                "Invalid userstore provided for attribute mapping");
 
         private final String code;
         private final String message;

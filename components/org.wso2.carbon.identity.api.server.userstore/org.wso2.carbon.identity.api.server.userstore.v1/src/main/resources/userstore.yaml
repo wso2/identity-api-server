@@ -251,6 +251,38 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchRequest'
         required: true
+
+  /userstores/{userstore-domain-id}/attribute-mappings:
+    patch:
+      tags:
+        - User Store
+      summary: Patch the secondary user store attribute mappings by it's domain id.
+      operationId: patchAttributeMappings
+      description: >
+        This API provides the capability to update the secondary user store's attribute mappings using patch request by using its domain id.
+         <b>Permission required:</b>
+         */permission/admin
+      parameters:
+        - $ref: '#/components/parameters/domainNamePathParam'
+      responses:
+        '200':
+          $ref: '#/components/responses/OK'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttributeMappingsReq'
+        required: true
   /userstores/meta/types:
     get:
       tags:
@@ -488,6 +520,11 @@ components:
             connection password etc.
           items:
             $ref: '#/components/schemas/Property'
+        claimAttributeMappings:
+          type: array
+          description: Claim attribute mappings.
+          items:
+            $ref: '#/components/schemas/ClaimAttributeMapping'
     PatchRequest:
       type: array
       items:
@@ -548,6 +585,25 @@ components:
           type: string
           description: The password.
           example: root
+    ClaimAttributeMapping:
+      type: object
+      required:
+        - claimURI
+        - mappedAttribute
+      properties:
+        claimURI:
+          type: string
+          description: A unique URI specific to the claim.
+          example: "http://wso2.org/claims/username"
+        mappedAttribute:
+          type: string
+          description: Userstore attribute to be mapped to.
+          example: "username"
+    AttributeMappingsReq:
+      type: array
+      description: Array of ClaimURI attribute mappings.
+      items:
+        $ref: '#/components/schemas/ClaimAttributeMapping'
     Error:
       type: object
       required:

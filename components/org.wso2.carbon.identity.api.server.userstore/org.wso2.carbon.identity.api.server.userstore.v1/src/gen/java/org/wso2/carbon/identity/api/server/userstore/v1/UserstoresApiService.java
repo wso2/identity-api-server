@@ -23,6 +23,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStoreClassesRes;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ConnectionEstablishedResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.Error;
 import java.util.List;
@@ -51,6 +52,8 @@ public interface UserstoresApiService {
       public Response getUserStoreByDomainId(String userstoreDomainId);
 
       public Response getUserStoreManagerProperties(String typeId);
+
+      public Response patchAttributeMappings(String userstoreDomainId, List<ClaimAttributeMapping> claimAttributeMapping);
 
       public Response patchUserStore(String userstoreDomainId, List<PatchDocument> patchDocument);
 
