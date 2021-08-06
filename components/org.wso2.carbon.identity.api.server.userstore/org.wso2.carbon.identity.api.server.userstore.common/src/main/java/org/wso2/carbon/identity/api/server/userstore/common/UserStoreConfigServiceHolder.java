@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.userstore.common;
 
+import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.user.store.configuration.UserStoreConfigService;
 import org.wso2.carbon.user.core.service.RealmService;
 
@@ -27,6 +28,7 @@ public class UserStoreConfigServiceHolder {
     private static UserStoreConfigServiceHolder instance = new UserStoreConfigServiceHolder();
     private UserStoreConfigService userStoreConfigService;
     private RealmService realmService;
+    private ClaimMetadataManagementService claimMetadataManagementService;
 
     private UserStoreConfigServiceHolder() {}
 
@@ -53,5 +55,15 @@ public class UserStoreConfigServiceHolder {
     public void setRealmService(RealmService realmService) {
 
         UserStoreConfigServiceHolder.getInstance().realmService = realmService;
+    }
+
+    public ClaimMetadataManagementService getClaimMetadataManagementService() {
+
+        return UserStoreConfigServiceHolder.getInstance().claimMetadataManagementService;
+    }
+
+    public void setClaimMetadataManagementService(ClaimMetadataManagementService claimMetadataManagementService) {
+
+        UserStoreConfigServiceHolder.getInstance().claimMetadataManagementService = claimMetadataManagementService;
     }
 }
