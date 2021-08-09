@@ -105,17 +105,20 @@ public class ServerUserStoreService {
 
             String userstoreDomain = userStoreReq.getName();
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            List<LocalClaim> localClaimList = new ArrayList<>();
 
-            List<LocalClaim> localClaimList =  createLocalClaimList(userstoreDomain,
-                    userStoreReq.getClaimAttributeMappings());
-            validateClaimMappings(tenantDomain, localClaimList);
+            List<ClaimAttributeMapping> claimAttributeMappingList = userStoreReq.getClaimAttributeMappings();
+            if (claimAttributeMappingList != null) {
+                localClaimList =  createLocalClaimList(userstoreDomain,
+                        claimAttributeMappingList);
+                validateClaimMappings(tenantDomain, localClaimList);
+            }
 
             UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
                     .getUserStoreConfigService();
             UserStoreDTO userStoreDTO = createUserStoreDTO(userStoreReq);
             userStoreConfigService.addUserStore(userStoreDTO);
 
-            List<ClaimAttributeMapping> claimAttributeMappingList = userStoreReq.getClaimAttributeMappings();
             if (claimAttributeMappingList != null) {
                 updateClaimMappings(userstoreDomain, tenantDomain, localClaimList);
             }
