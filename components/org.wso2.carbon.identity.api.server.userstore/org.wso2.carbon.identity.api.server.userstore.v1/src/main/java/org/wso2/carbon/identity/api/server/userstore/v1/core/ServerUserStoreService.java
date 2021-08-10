@@ -295,6 +295,9 @@ public class ServerUserStoreService {
         try {
             primaryUserstoreConfigs.setIsLocal(UserStoreManagerRegistry.
                     isLocalUserStore(realmConfiguration.getUserStoreClass()));
+            List<ClaimAttributeMapping> claimAttributeMappings = getClaimAttributeMappings(
+                    ContextLoader.getTenantDomainFromContext(), UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME);
+            primaryUserstoreConfigs.setClaimAttributeMappings(claimAttributeMappings);
 
         } catch (UserStoreException e) {
             LOG.error(String.format("Cannot found user store manager type for user store manager: %s",
@@ -320,6 +323,9 @@ public class ServerUserStoreService {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.
                         ERROR_CODE_NOT_FOUND);
             }
+            List<ClaimAttributeMapping> claimAttributeMappings = getClaimAttributeMappings(
+                    ContextLoader.getTenantDomainFromContext(), base64URLDecodeId(domainId));
+
             UserStoreConfigurationsRes userStoreConfigurations = new UserStoreConfigurationsRes();
             userStoreConfigurations.setClassName(userStoreDTO.getClassName());
             userStoreConfigurations.setDescription(userStoreDTO.getDescription());
@@ -338,6 +344,7 @@ public class ServerUserStoreService {
             try {
                 userStoreConfigurations
                         .setIsLocal(UserStoreManagerRegistry.isLocalUserStore(userStoreDTO.getClassName()));
+                userStoreConfigurations.setClaimAttributeMappings(claimAttributeMappings);
             } catch (UserStoreException e) {
                 LOG.error(String.format("Cannot found user store manager type for user store manager: %s",
                         getUserStoreType(userStoreDTO.getClassName())), e);
@@ -440,8 +447,8 @@ public class ServerUserStoreService {
                                            List<ClaimAttributeMapping> claimAttributeMapping) {
 
         if (claimAttributeMapping == null) {
-            throw handleClaimManagementClientError(UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS,
-                    Response.Status.BAD_REQUEST);
+            throw handleException(Response.Status.BAD_REQUEST,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS);
         }
 
         try {
@@ -456,7 +463,7 @@ public class ServerUserStoreService {
             throw handleException(Response.Status.BAD_REQUEST,
                     UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_ID);
         } catch (IdentityUserStoreClientException e) {
-            throw handleIdentityUserStoreMgtException(e, UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_USERSTORE);
+            throw handleIdentityUserStoreMgtException(e, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
         }
     }
 
@@ -496,6 +503,35 @@ public class ServerUserStoreService {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_USER_STORE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
+        }
+    }
+
+    /**
+     * To list the claim attribute mappings for specific user store domain.
+     *
+     * @param tenantDomain        the tenant domain.
+     * @param userstoreDomainName the user store domain name.
+     * @return List<ClaimAttributeMapping>.
+     */
+    private List<ClaimAttributeMapping> getClaimAttributeMappings(String tenantDomain, String userstoreDomainName) {
+
+        ClaimMetadataManagementService claimMetadataManagementService = UserStoreConfigServiceHolder.getInstance()
+                .getClaimMetadataManagementService();
+        List<ClaimAttributeMapping> claimAttributeMappingList = new ArrayList<>();
+        try {
+            List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(tenantDomain);
+            for (LocalClaim localClaim : localClaimList) {
+                if (localClaim.getMappedAttribute(userstoreDomainName) != null) {
+                    ClaimAttributeMapping mapping = new ClaimAttributeMapping();
+                    mapping.setClaimURI(localClaim.getClaimURI());
+                    mapping.setMappedAttribute(localClaim.getMappedAttribute(userstoreDomainName));
+                    claimAttributeMappingList.add(mapping);
+                }
+            }
+            return claimAttributeMappingList;
+        } catch (ClaimMetadataException e) {
+            throw handleClaimManagementException(e,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CLAIM_MAPPING);
         }
     }
 
@@ -600,7 +636,7 @@ public class ServerUserStoreService {
             claimMetadataManagementService.updateLocalClaimMappings(localClaimList, tenantDomain, userstoreDomain);
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e,
-                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_CLAIM_MAPPING);
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CLAIM_MAPPING);
         }
     }
 
@@ -618,7 +654,7 @@ public class ServerUserStoreService {
             claimMetadataManagementService.validateClaimAttributeMapping(localClaimList, tenantDomain);
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e,
-                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_CLAIM_MAPPING);
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CLAIM_MAPPING);
         }
     }
 
@@ -1129,7 +1165,7 @@ public class ServerUserStoreService {
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
         if (exception instanceof ClaimMetadataClientException) {
             status = Response.Status.BAD_REQUEST;
-            return handleClaimManagementClientError(errorEnum, status);
+            return handleClaimManagementClientException(exception, errorResponse, status);
         } else {
             // Internal Server error
             status = Response.Status.INTERNAL_SERVER_ERROR;
@@ -1137,10 +1173,25 @@ public class ServerUserStoreService {
         }
     }
 
-    private APIError handleClaimManagementClientError(UserStoreConstants.ErrorMessage errorEnum,
-                                                      Response.Status status) {
+    /**
+     * Handle ClaimManagementException, extract the error code and the error message from the corresponding
+     * exception and set it to the API Error Response.
+     *
+     * @param exception     Exception thrown
+     * @param errorResponse Corresponding error response
+     * @param status        Corresponding status response
+     * @return API Error object.
+     */
+    private APIError handleClaimManagementClientException(ClaimMetadataException  exception,
+                                                          ErrorResponse errorResponse, Response.Status status) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, errorEnum.getDescription());
+        if (exception.getErrorCode() != null) {
+            String errorCode = exception.getErrorCode();
+            errorCode = errorCode.contains(UserStoreConstants.CLAIM_MANAGEMENT_PREFIX) ?
+                    errorCode : UserStoreConstants.CLAIM_MANAGEMENT_PREFIX + errorCode;
+            errorResponse.setCode(errorCode);
+        }
+        errorResponse.setDescription(exception.getMessage());
         return new APIError(status, errorResponse);
     }
 
@@ -1191,8 +1242,7 @@ public class ServerUserStoreService {
                     UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_ID.getMessage());
         }
         if (!isUserStoreExists(base64URLDecodeId(userstoreDomainId))) {
-            throw handleClaimManagementClientError(UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_USERSTORE,
-                    Response.Status.BAD_REQUEST);
+            throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.ERROR_CODE_NOT_FOUND);
         }
     }
 
