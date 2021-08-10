@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AddUserStorePropertiesRes;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import javax.validation.constraints.*;
 
 /**
@@ -35,13 +36,14 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 @ApiModel(description = "Available User Store Configurations Response.")
 public class UserStoreConfigurationsRes  {
-  
+
     private String typeName;
     private String typeId;
     private String name;
     private String description;
     private String className;
     private List<AddUserStorePropertiesRes> properties = null;
+    private List<ClaimAttributeMapping> claimAttributeMappings = null;
 
 
     /**
@@ -51,7 +53,7 @@ public class UserStoreConfigurationsRes  {
         this.typeName = typeName;
         return this;
     }
-    
+
     @ApiModelProperty(example = "UniqueIDJDBCUserStoreManager", value = "")
     @JsonProperty("typeName")
     @Valid
@@ -69,7 +71,7 @@ public class UserStoreConfigurationsRes  {
         this.typeId = typeId;
         return this;
     }
-    
+
     @ApiModelProperty(example = "VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg", value = "")
     @JsonProperty("typeId")
     @Valid
@@ -87,7 +89,7 @@ public class UserStoreConfigurationsRes  {
         this.name = name;
         return this;
     }
-    
+
     @ApiModelProperty(example = "JDBC-SECONDARY", value = "")
     @JsonProperty("name")
     @Valid
@@ -105,7 +107,7 @@ public class UserStoreConfigurationsRes  {
         this.description = description;
         return this;
     }
-    
+
     @ApiModelProperty(example = "Some description of the user store", value = "")
     @JsonProperty("description")
     @Valid
@@ -123,7 +125,7 @@ public class UserStoreConfigurationsRes  {
         this.className = className;
         return this;
     }
-    
+
     @ApiModelProperty(example = "org.wso2.carbon.user.core.jdbc.UniqueIDJDBCUserStoreManager", value = "")
     @JsonProperty("className")
     @Valid
@@ -142,7 +144,7 @@ public class UserStoreConfigurationsRes  {
         this.properties = properties;
         return this;
     }
-    
+
     @ApiModelProperty(value = "Configured user store property for the set")
     @JsonProperty("properties")
     @Valid
@@ -161,7 +163,34 @@ public class UserStoreConfigurationsRes  {
         return this;
     }
 
-    
+    /**
+     * Requested configured user store claim attribute mappings
+     **/
+    public UserStoreConfigurationsRes claimAttributeMappings(List<ClaimAttributeMapping> claimAttributeMappings) {
+
+        this.claimAttributeMappings = claimAttributeMappings;
+        return this;
+    }
+
+    @ApiModelProperty(value = "Requested configured user store claim attribute mappings")
+    @JsonProperty("claimAttributeMappings")
+    @Valid
+    public List<ClaimAttributeMapping> getClaimAttributeMappings() {
+        return claimAttributeMappings;
+    }
+    public void setClaimAttributeMappings(List<ClaimAttributeMapping> claimAttributeMappings) {
+        this.claimAttributeMappings = claimAttributeMappings;
+    }
+
+    public UserStoreConfigurationsRes addClaimAttributeMappingsItem(ClaimAttributeMapping claimAttributeMappingsItem) {
+        if (this.claimAttributeMappings == null) {
+            this.claimAttributeMappings = new ArrayList<>();
+        }
+        this.claimAttributeMappings.add(claimAttributeMappingsItem);
+        return this;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -178,12 +207,13 @@ public class UserStoreConfigurationsRes  {
             Objects.equals(this.name, userStoreConfigurationsRes.name) &&
             Objects.equals(this.description, userStoreConfigurationsRes.description) &&
             Objects.equals(this.className, userStoreConfigurationsRes.className) &&
-            Objects.equals(this.properties, userStoreConfigurationsRes.properties);
+            Objects.equals(this.properties, userStoreConfigurationsRes.properties) &&
+            Objects.equals(this.claimAttributeMappings, userStoreConfigurationsRes.claimAttributeMappings);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(typeName, typeId, name, description, className, properties);
+        return Objects.hash(typeName, typeId, name, description, className, properties, claimAttributeMappings);
     }
 
     @Override
@@ -191,13 +221,14 @@ public class UserStoreConfigurationsRes  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class UserStoreConfigurationsRes {\n");
-        
+
         sb.append("    typeName: ").append(toIndentedString(typeName)).append("\n");
         sb.append("    typeId: ").append(toIndentedString(typeId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    className: ").append(toIndentedString(className)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+        sb.append("    claimAttributeMappings: ").append(toIndentedString(claimAttributeMappings)).append("\n");
         sb.append("}");
         return sb.toString();
     }

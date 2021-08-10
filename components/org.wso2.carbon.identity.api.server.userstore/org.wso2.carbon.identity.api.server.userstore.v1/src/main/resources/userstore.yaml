@@ -737,6 +737,11 @@ components:
           description: Configured user store property for the set
           items:
             $ref: '#/components/schemas/AddUserStorePropertiesRes'
+        claimAttributeMappings:
+          type: array
+          description: Requested configured user store claim attribute mappings
+          items:
+            $ref: '#/components/schemas/ClaimAttributeMapping'
     AddUserStorePropertiesRes:
       type: object
       description: Available User Store Properties.
