@@ -22,65 +22,66 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 import javax.validation.Valid;
 
-public class Error {
+public class SecretType {
 
-    private String code;
-    private String message;
+    private String name;
+    private String id;
     private String description;
-    private String traceId;
 
     /**
      *
      **/
-    public Error code(String code) {
+    public SecretType name(String name) {
 
-        this.code = code;
+        this.name = name;
         return this;
     }
 
-    @ApiModelProperty(example = "NSM-00000", value = "")
-    @JsonProperty("code")
+    @ApiModelProperty(value = "")
+    @JsonProperty("name")
     @Valid
-    public String getCode() {
+    public String getName() {
 
-        return code;
+        return name;
     }
 
-    public void setCode(String code) {
+    public void setName(String name) {
 
-        this.code = code;
+        this.name = name;
     }
 
     /**
+     *
      **/
-    public Error message(String message) {
+    public SecretType id(String id) {
 
-        this.message = message;
+        this.id = id;
         return this;
     }
 
-    @ApiModelProperty(example = "Some Error Message", value = "")
-    @JsonProperty("message")
+    @ApiModelProperty(value = "")
+    @JsonProperty("id")
     @Valid
-    public String getMessage() {
+    public String getId() {
 
-        return message;
+        return id;
     }
 
-    public void setMessage(String message) {
+    public void setId(String id) {
 
-        this.message = message;
+        this.id = id;
     }
 
     /**
+     *
      **/
-    public Error description(String description) {
+    public SecretType description(String description) {
 
         this.description = description;
         return this;
     }
 
-    @ApiModelProperty(example = "Some Error Description", value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("description")
     @Valid
     public String getDescription() {
@@ -93,27 +94,6 @@ public class Error {
         this.description = description;
     }
 
-    /**
-     **/
-    public Error traceId(String traceId) {
-
-        this.traceId = traceId;
-        return this;
-    }
-
-    @ApiModelProperty(example = "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047", value = "")
-    @JsonProperty("traceId")
-    @Valid
-    public String getTraceId() {
-
-        return traceId;
-    }
-
-    public void setTraceId(String traceId) {
-
-        this.traceId = traceId;
-    }
-
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -123,29 +103,27 @@ public class Error {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Error error = (Error) o;
-        return Objects.equals(this.code, error.code) &&
-                Objects.equals(this.message, error.message) &&
-                Objects.equals(this.description, error.description) &&
-                Objects.equals(this.traceId, error.traceId);
+        SecretType secretType = (SecretType) o;
+        return Objects.equals(this.name, secretType.name) &&
+                Objects.equals(this.id, secretType.id) &&
+                Objects.equals(this.description, secretType.description);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(code, message, description, traceId);
+        return Objects.hash(name, id, description);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class Error {\n");
+        sb.append("class SecretType {\n");
 
-        sb.append("    code: ").append(toIndentedString(code)).append("\n");
-        sb.append("    message: ").append(toIndentedString(message)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
-        sb.append("    traceId: ").append(toIndentedString(traceId)).append("\n");
         sb.append("}");
         return sb.toString();
     }

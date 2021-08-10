@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ public class Secret {
     private String secretName;
     private String created;
     private String lastModified;
+    private String type;
+    private String description;
 
     /**
      *
@@ -56,7 +58,6 @@ public class Secret {
     }
 
     /**
-     *
      **/
     public Secret secretName(String secretName) {
 
@@ -80,7 +81,6 @@ public class Secret {
     }
 
     /**
-     *
      **/
     public Secret created(String created) {
 
@@ -104,7 +104,6 @@ public class Secret {
     }
 
     /**
-     *
      **/
     public Secret lastModified(String lastModified) {
 
@@ -127,6 +126,52 @@ public class Secret {
         this.lastModified = lastModified;
     }
 
+    /**
+     *
+     **/
+    public Secret type(String type) {
+
+        this.type = type;
+        return this;
+    }
+
+    @ApiModelProperty(example = "adaptive", required = true, value = "")
+    @JsonProperty("type")
+    @Valid
+    @NotNull(message = "Property type cannot be null.")
+
+    public String getType() {
+
+        return type;
+    }
+
+    public void setType(String type) {
+
+        this.type = type;
+    }
+
+    /**
+     *
+     **/
+    public Secret description(String description) {
+
+        this.description = description;
+        return this;
+    }
+
+    @ApiModelProperty(example = "sample_description", value = "")
+    @JsonProperty("description")
+    @Valid
+    public String getDescription() {
+
+        return description;
+    }
+
+    public void setDescription(String description) {
+
+        this.description = description;
+    }
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -140,13 +185,15 @@ public class Secret {
         return Objects.equals(this.secretId, secret.secretId) &&
                 Objects.equals(this.secretName, secret.secretName) &&
                 Objects.equals(this.created, secret.created) &&
-                Objects.equals(this.lastModified, secret.lastModified);
+                Objects.equals(this.lastModified, secret.lastModified) &&
+                Objects.equals(this.type, secret.type) &&
+                Objects.equals(this.description, secret.description);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(secretId, secretName, created, lastModified);
+        return Objects.hash(secretId, secretName, created, lastModified, type, description);
     }
 
     @Override
@@ -159,6 +206,8 @@ public class Secret {
         sb.append("    secretName: ").append(toIndentedString(secretName)).append("\n");
         sb.append("    created: ").append(toIndentedString(created)).append("\n");
         sb.append("    lastModified: ").append(toIndentedString(lastModified)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -166,7 +215,7 @@ public class Secret {
     /**
      * Convert the given object to string with each line indented by 4 spaces
      * (except the first line).
-     */
+    */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

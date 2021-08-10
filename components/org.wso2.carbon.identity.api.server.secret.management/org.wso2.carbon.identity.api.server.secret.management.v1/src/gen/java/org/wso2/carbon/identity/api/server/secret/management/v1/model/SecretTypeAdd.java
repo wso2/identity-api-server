@@ -22,65 +22,43 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 import javax.validation.Valid;
 
-public class Error {
+public class SecretTypeAdd {
 
-    private String code;
-    private String message;
+    private String name;
     private String description;
-    private String traceId;
 
     /**
      *
      **/
-    public Error code(String code) {
+    public SecretTypeAdd name(String name) {
 
-        this.code = code;
+        this.name = name;
         return this;
     }
 
-    @ApiModelProperty(example = "NSM-00000", value = "")
-    @JsonProperty("code")
+    @ApiModelProperty(value = "")
+    @JsonProperty("name")
     @Valid
-    public String getCode() {
+    public String getName() {
 
-        return code;
+        return name;
     }
 
-    public void setCode(String code) {
+    public void setName(String name) {
 
-        this.code = code;
+        this.name = name;
     }
 
     /**
+     *
      **/
-    public Error message(String message) {
-
-        this.message = message;
-        return this;
-    }
-
-    @ApiModelProperty(example = "Some Error Message", value = "")
-    @JsonProperty("message")
-    @Valid
-    public String getMessage() {
-
-        return message;
-    }
-
-    public void setMessage(String message) {
-
-        this.message = message;
-    }
-
-    /**
-     **/
-    public Error description(String description) {
+    public SecretTypeAdd description(String description) {
 
         this.description = description;
         return this;
     }
 
-    @ApiModelProperty(example = "Some Error Description", value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("description")
     @Valid
     public String getDescription() {
@@ -93,27 +71,6 @@ public class Error {
         this.description = description;
     }
 
-    /**
-     **/
-    public Error traceId(String traceId) {
-
-        this.traceId = traceId;
-        return this;
-    }
-
-    @ApiModelProperty(example = "e0fbcfeb-3617-43c4-8dd0-7b7d38e13047", value = "")
-    @JsonProperty("traceId")
-    @Valid
-    public String getTraceId() {
-
-        return traceId;
-    }
-
-    public void setTraceId(String traceId) {
-
-        this.traceId = traceId;
-    }
-
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -123,29 +80,25 @@ public class Error {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Error error = (Error) o;
-        return Objects.equals(this.code, error.code) &&
-                Objects.equals(this.message, error.message) &&
-                Objects.equals(this.description, error.description) &&
-                Objects.equals(this.traceId, error.traceId);
+        SecretTypeAdd secretTypeAdd = (SecretTypeAdd) o;
+        return Objects.equals(this.name, secretTypeAdd.name) &&
+                Objects.equals(this.description, secretTypeAdd.description);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(code, message, description, traceId);
+        return Objects.hash(name, description);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class Error {\n");
+        sb.append("class SecretTypeAdd {\n");
 
-        sb.append("    code: ").append(toIndentedString(code)).append("\n");
-        sb.append("    message: ").append(toIndentedString(message)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
-        sb.append("    traceId: ").append(toIndentedString(traceId)).append("\n");
         sb.append("}");
         return sb.toString();
     }

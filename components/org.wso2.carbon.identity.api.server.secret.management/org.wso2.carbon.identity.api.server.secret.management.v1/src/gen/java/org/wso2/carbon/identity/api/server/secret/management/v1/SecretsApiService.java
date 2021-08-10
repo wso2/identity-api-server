@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,16 @@
 
 package org.wso2.carbon.identity.api.server.secret.management.v1;
 
+import org.wso2.carbon.identity.api.server.secret.management.v1.*;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.*;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+
+import java.io.InputStream;
+import java.util.List;
+
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.Error;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.Secret;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretAdd;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretUpdateRequest;
 
@@ -23,13 +33,13 @@ import javax.ws.rs.core.Response;
 
 public interface SecretsApiService {
 
-      public Response createSecret(SecretAdd secretAdd);
+      public Response createSecret(String secretType, SecretAdd secretAdd);
 
-      public Response deleteSecret(String name);
+      public Response deleteSecret(String secretType, String name);
 
-      public Response getSecret(String name);
+      public Response getSecret(String secretType, String name);
 
-      public Response getSecretsList();
+      public Response getSecretsList(String secretType);
 
-      public Response updateSecret(String name, SecretUpdateRequest secretUpdateRequest);
+      public Response updateSecret(String secretType, String name, SecretUpdateRequest secretUpdateRequest);
 }

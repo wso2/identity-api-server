@@ -16,12 +16,9 @@
 
 package org.wso2.carbon.identity.api.server.secret.management.v1.core;
 
-import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.core.util.CryptoException;
-import org.wso2.carbon.core.util.CryptoUtil;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants;
@@ -54,13 +51,13 @@ public class SecretManagementService {
      * @param secretAdd secret post request.
      * @return secret.
      */
-    public Secret addSecret(SecretAdd secretAdd) {
+    public Secret addSecret(String secretType, SecretAdd secretAdd) {
 
         validateSecretAdd(secretAdd);
         org.wso2.carbon.identity.secret.mgt.core.model.Secret requestDTO, responseDTO;
         try {
             requestDTO = buildSecretRequestDTOFromSecretAdd(secretAdd);
-            responseDTO = SecretManagementServiceHolder.getSecretConfigManager().addSecret(requestDTO);
+            responseDTO = SecretManagementServiceHolder.getSecretConfigManager().addSecret(secretType, requestDTO);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_SECRET,
                     secretAdd.getName());
@@ -81,6 +78,8 @@ public class SecretManagementService {
         secret.setCreated(secretReq.getCreatedTime());
         secret.setLastModified(secretReq.getLastModified());
         secret.setSecretId(secretReq.getSecretId());
+        secret.setType(secretReq.getSecretType());
+        secret.setDescription(secretReq.getDescription());
         return secret;
     }
 
@@ -100,17 +99,6 @@ public class SecretManagementService {
             throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_SECRET_VALUE_NOT_SPECIFIED, null);
         }
-        try {
-            org.wso2.carbon.identity.secret.mgt.core.model.Secret secret =
-                    SecretManagementServiceHolder.getSecretConfigManager().getSecret(secretAddName);
-            if (secret != null) {
-                throw handleException(Response.Status.CONFLICT, SecretManagementConstants.ErrorMessage.
-                        ERROR_CODE_CONFLICT_SECRET, secretAddName);
-            }
-        } catch (SecretManagementException e) {
-            throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
-                    ERROR_CODE_ERROR_GETTING_SECRET, secretAddName);
-        }
     }
 
     /**
@@ -125,7 +113,8 @@ public class SecretManagementService {
         org.wso2.carbon.identity.secret.mgt.core.model.Secret requestDTO = new org.wso2.carbon.identity.secret.mgt.core.
                 model.Secret();
         requestDTO.setSecretName(secretAdd.getName());
-        requestDTO.setValue(getEncryptedSecret(secretAdd.getValue()));
+        requestDTO.setSecretValue(secretAdd.getValue());
+        requestDTO.setDescription(secretAdd.getDescription());
         return requestDTO;
     }
 
@@ -134,10 +123,10 @@ public class SecretManagementService {
      *
      * @param name Name of the secret.
      */
-    public void deleteSecret(String name) {
+    public void deleteSecret(String secretType, String name) {
 
         try {
-            SecretManagementServiceHolder.getSecretConfigManager().deleteSecret(name);
+            SecretManagementServiceHolder.getSecretConfigManager().deleteSecret(secretType, name);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_DELETING_SECRET, name);
@@ -150,12 +139,19 @@ public class SecretManagementService {
      * @param name secret name.
      * @return secret.
      */
-    public Secret getSecret(String name) {
+    public Secret getSecret(String secretType, String name) {
 
         try {
             org.wso2.carbon.identity.secret.mgt.core.model.Secret responseDTO = SecretManagementServiceHolder.
-                    getSecretConfigManager().getSecret(name);
-            return buildSecretFromResponseDTO(responseDTO);
+                    getSecretConfigManager().getSecret(secretType, name);
+            Secret secret = new Secret();
+            secret.secretName(responseDTO.getSecretName());
+            secret.setCreated(responseDTO.getCreatedTime());
+            secret.setLastModified(responseDTO.getLastModified());
+            secret.setSecretId(responseDTO.getSecretId());
+            secret.setType(responseDTO.getSecretType());
+            secret.setDescription(responseDTO.getDescription());
+            return secret;
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_GETTING_SECRET, name);
@@ -168,18 +164,18 @@ public class SecretManagementService {
      * @return secrets of the tenant.
      */
 
-    public List<Secret> getSecretsList() {
+    public List<Secret> getSecretsList(String secretType) {
 
         try {
             Secrets secrets = SecretManagementServiceHolder.getSecretConfigManager()
-                    .getSecrets();
+                    .getSecrets(secretType);
             List<org.wso2.carbon.identity.secret.mgt.core.model.Secret> secretsList =
                     secrets.getSecrets();
             return secretsList.stream().map(secret ->
                     buildSecretFromResponseDTO(secret)).collect(Collectors.toList());
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
-                    ERROR_CODE_ERROR_GETTING_SECRETS, null);
+                    ERROR_CODE_ERROR_GETTING_SECRET, null);
         }
     }
 
@@ -190,14 +186,14 @@ public class SecretManagementService {
      * @param secretUpdateRequest secret's updated details.
      * @return Updated secret.
      */
-    public Secret updateSecret(String name, SecretUpdateRequest secretUpdateRequest) {
+    public Secret updateSecret(String secretType, String name, SecretUpdateRequest secretUpdateRequest) {
 
         org.wso2.carbon.identity.secret.mgt.core.model.Secret requestDTO, responseDTO;
         SecretAdd secretAdd =
                 buildSecretAddFromSecretUpdateRequest(name, secretUpdateRequest);
         try {
             requestDTO = buildSecretRequestDTOFromSecretAdd(secretAdd);
-            responseDTO = SecretManagementServiceHolder.getSecretConfigManager().replaceSecret(requestDTO);
+            responseDTO = SecretManagementServiceHolder.getSecretConfigManager().replaceSecret(secretType, requestDTO);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
                     name);
@@ -218,6 +214,9 @@ public class SecretManagementService {
         SecretAdd secretAdd = new SecretAdd();
         secretAdd.setName(name);
         secretAdd.setValue(secretUpdateRequest.getValue());
+        if (!StringUtils.isEmpty(secretUpdateRequest.getDescription())) {
+            secretAdd.setDescription(secretUpdateRequest.getDescription());
+        }
         return secretAdd;
     }
 
@@ -292,28 +291,5 @@ public class SecretManagementService {
             message = error.getDescription();
         }
         return message;
-    }
-
-    private String getEncryptedSecret(String clientSecret) {
-
-        try {
-            return encrypt(clientSecret);
-        } catch (CryptoException e) {
-            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, SecretManagementConstants.ErrorMessage.
-                            ERROR_CODE_ERROR_ADDING_SECRET,
-                    null);
-        }
-    }
-
-    /**
-     * Encrypt secret.
-     *
-     * @param plainText plain text secret.
-     * @return encrypted secret.
-     */
-    private String encrypt(String plainText) throws CryptoException {
-
-        return CryptoUtil.getDefaultCryptoUtil().encryptAndBase64Encode(
-                plainText.getBytes(Charsets.UTF_8));
     }
 }

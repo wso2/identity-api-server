@@ -39,9 +39,9 @@ public class SecretsApiServiceImpl implements SecretsApiService {
     private SecretManagementService secretManagementService;
 
     @Override
-    public Response createSecret(SecretAdd secretAdd) {
+    public Response createSecret(String secretType, SecretAdd secretAdd) {
 
-        Secret secret = secretManagementService.addSecret(secretAdd);
+        Secret secret = secretManagementService.addSecret(secretType, secretAdd);
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + SECRET_CONTEXT_PATH + "/"
                 + secret.getSecretName());
         return Response.created(location).entity(secret).build();
@@ -49,28 +49,28 @@ public class SecretsApiServiceImpl implements SecretsApiService {
     }
 
     @Override
-    public Response deleteSecret(String name) {
+    public Response deleteSecret(String secretType, String name) {
 
-        secretManagementService.deleteSecret(name);
+        secretManagementService.deleteSecret(secretType, name);
         return Response.noContent().build();
     }
 
     @Override
-    public Response getSecret(String name) {
+    public Response getSecret(String secretType, String name) {
 
-        return Response.ok().entity(secretManagementService.getSecret(name)).build();
+        return Response.ok().entity(secretManagementService.getSecret(secretType, name)).build();
     }
 
     @Override
-    public Response getSecretsList() {
+    public Response getSecretsList(String secretType) {
 
-        return Response.ok().entity(secretManagementService.getSecretsList()).build();
+        return Response.ok().entity(secretManagementService.getSecretsList(secretType)).build();
     }
 
     @Override
-    public Response updateSecret(String name, SecretUpdateRequest secretUpdateRequest) {
+    public Response updateSecret(String secretType, String name, SecretUpdateRequest secretUpdateRequest) {
 
         return Response.ok()
-                .entity(secretManagementService.updateSecret(name, secretUpdateRequest)).build();
+                .entity(secretManagementService.updateSecret(secretType, name, secretUpdateRequest)).build();
     }
 }

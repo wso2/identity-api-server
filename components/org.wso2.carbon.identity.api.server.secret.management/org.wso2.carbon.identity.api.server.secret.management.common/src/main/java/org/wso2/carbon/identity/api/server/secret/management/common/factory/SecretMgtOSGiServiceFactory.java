@@ -19,6 +19,8 @@
 
 package org.wso2.carbon.identity.api.server.secret.management.common.factory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
@@ -29,6 +31,7 @@ import org.wso2.carbon.identity.secret.mgt.core.SecretManager;
 public class SecretMgtOSGiServiceFactory extends AbstractFactoryBean<SecretManager> {
 
     private SecretManager secretManager;
+    private static final Log log = LogFactory.getLog(SecretMgtOSGiServiceFactory.class);
 
     @Override
     public Class<?> getObjectType() {
@@ -40,6 +43,7 @@ public class SecretMgtOSGiServiceFactory extends AbstractFactoryBean<SecretManag
     protected SecretManager createInstance() throws Exception {
 
         if (this.secretManager == null) {
+
             SecretManager secretManager = (SecretManager) PrivilegedCarbonContext.
                     getThreadLocalCarbonContext().getOSGiService(SecretManager.class, null);
 
