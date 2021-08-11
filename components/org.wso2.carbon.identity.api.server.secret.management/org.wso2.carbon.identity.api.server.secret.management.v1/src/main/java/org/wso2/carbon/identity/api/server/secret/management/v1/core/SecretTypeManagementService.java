@@ -130,7 +130,9 @@ public class SecretTypeManagementService {
     public SecretTypeResponse getSecretType(String secretTypeName) {
 
         try {
-            SecretType responseDTO = SecretManagementServiceHolder.getSecretConfigManager().getSecretType(secretTypeName);
+
+            SecretType responseDTO = SecretManagementServiceHolder.getSecretConfigManager().getSecretType
+                    (secretTypeName);
             SecretTypeResponse secretTypeResponse = new SecretTypeResponse();
             secretTypeResponse.setId(responseDTO.getId());
             secretTypeResponse.setName(responseDTO.getName());
