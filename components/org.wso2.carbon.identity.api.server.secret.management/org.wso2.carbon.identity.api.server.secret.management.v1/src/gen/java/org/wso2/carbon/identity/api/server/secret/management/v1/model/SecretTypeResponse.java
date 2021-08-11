@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Objects;
 import javax.validation.Valid;
 
-public class SecretType {
+public class SecretTypeResponse {
 
     private String name;
     private String id;
@@ -31,7 +31,7 @@ public class SecretType {
     /**
      *
      **/
-    public SecretType name(String name) {
+    public SecretTypeResponse name(String name) {
 
         this.name = name;
         return this;
@@ -53,7 +53,7 @@ public class SecretType {
     /**
      *
      **/
-    public SecretType id(String id) {
+    public SecretTypeResponse id(String id) {
 
         this.id = id;
         return this;
@@ -75,7 +75,7 @@ public class SecretType {
     /**
      *
      **/
-    public SecretType description(String description) {
+    public SecretTypeResponse description(String description) {
 
         this.description = description;
         return this;
@@ -103,10 +103,10 @@ public class SecretType {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SecretType secretType = (SecretType) o;
-        return Objects.equals(this.name, secretType.name) &&
-                Objects.equals(this.id, secretType.id) &&
-                Objects.equals(this.description, secretType.description);
+        SecretTypeResponse secretTypeResponse = (SecretTypeResponse) o;
+        return Objects.equals(this.name, secretTypeResponse.name) &&
+                Objects.equals(this.id, secretTypeResponse.id) &&
+                Objects.equals(this.description, secretTypeResponse.description);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class SecretType {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class SecretType {\n");
+        sb.append("class SecretTypeResponse {\n");
 
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    id: ").append(toIndentedString(id)).append("\n");

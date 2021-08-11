@@ -16,24 +16,14 @@
 
 package org.wso2.carbon.identity.api.server.secret.management.v1;
 
-import org.wso2.carbon.identity.api.server.secret.management.v1.*;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.*;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-
-import java.io.InputStream;
-import java.util.List;
-
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.Error;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.Secret;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretAdd;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretAddRequest;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretUpdateRequest;
-
 import javax.ws.rs.core.Response;
+
 
 public interface SecretsApiService {
 
-      public Response createSecret(String secretType, SecretAdd secretAdd);
+      public Response createSecret(String secretType, SecretAddRequest secretAddRequest);
 
       public Response deleteSecret(String secretType, String name);
 

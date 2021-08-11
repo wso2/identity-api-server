@@ -18,31 +18,27 @@ package org.wso2.carbon.identity.api.server.secret.management.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
 
 import java.util.Objects;
 import javax.validation.Valid;
 
-public class SecretAdd {
+public class SecretTypeAddRequest {
 
     private String name;
-    private String value;
     private String description;
 
     /**
      *
      **/
-    public SecretAdd name(String name) {
+    public SecretTypeAddRequest name(String name) {
 
         this.name = name;
         return this;
     }
 
-    @ApiModelProperty(example = "choreo-riskScore", required = true, value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("name")
     @Valid
-    @NotNull(message = "Property name cannot be null.")
-
     public String getName() {
 
         return name;
@@ -54,38 +50,15 @@ public class SecretAdd {
     }
 
     /**
-     **/
-    public SecretAdd value(String value) {
-
-        this.value = value;
-        return this;
-    }
-
-    @ApiModelProperty(example = "bgtehaldhjdevch", required = true, value = "")
-    @JsonProperty("value")
-    @Valid
-    @NotNull(message = "Property value cannot be null.")
-
-    public String getValue() {
-
-        return value;
-    }
-
-    public void setValue(String value) {
-
-        this.value = value;
-    }
-
-    /**
      *
      **/
-    public SecretAdd description(String description) {
+    public SecretTypeAddRequest description(String description) {
 
         this.description = description;
         return this;
     }
 
-    @ApiModelProperty(example = "Some Error Description", value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("description")
     @Valid
     public String getDescription() {
@@ -107,26 +80,24 @@ public class SecretAdd {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SecretAdd secretAdd = (SecretAdd) o;
-        return Objects.equals(this.name, secretAdd.name) &&
-                Objects.equals(this.value, secretAdd.value) &&
-                Objects.equals(this.description, secretAdd.description);
+        SecretTypeAddRequest secretTypeAddRequest = (SecretTypeAddRequest) o;
+        return Objects.equals(this.name, secretTypeAddRequest.name) &&
+                Objects.equals(this.description, secretTypeAddRequest.description);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(name, value);
+        return Objects.hash(name, description);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class SecretAdd {\n");
+        sb.append("class SecretTypeAddRequest {\n");
 
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    value: ").append(toIndentedString(value)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("}");
         return sb.toString();
@@ -135,7 +106,7 @@ public class SecretAdd {
     /**
      * Convert the given object to string with each line indented by 4 spaces
      * (except the first line).
-    */
+     */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {

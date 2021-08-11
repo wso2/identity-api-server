@@ -23,12 +23,13 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants;
 import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementServiceHolder;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretType;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeAdd;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeAddRequest;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeResponse;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeUpdateRequest;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementClientException;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementException;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementServerException;
+import org.wso2.carbon.identity.secret.mgt.core.model.SecretType;
 
 import javax.ws.rs.core.Response;
 
@@ -45,47 +46,46 @@ public class SecretTypeManagementService {
     /**
      * Create a secret Type.
      *
-     * @param secretTypeAdd secret post request.
+     * @param secretTypeAddRequest secret post request.
      * @return secret.
      */
-    public SecretType addSecretType(SecretTypeAdd secretTypeAdd) {
+    public SecretTypeResponse addSecretType(SecretTypeAddRequest secretTypeAddRequest) {
 
-        validateSecretTypeAdd(secretTypeAdd);
-        org.wso2.carbon.identity.secret.mgt.core.model.SecretType requestDTO, responseDTO;
+        validateSecretTypeAddRequest(secretTypeAddRequest);
+        SecretType requestDTO, responseDTO;
         try {
-            requestDTO = buildSecretTypeRequestDTOFromSecretTypeAdd(secretTypeAdd);
+            requestDTO = buildSecretTypeRequestDTOFromSecretTypeAddRequest(secretTypeAddRequest);
             responseDTO = SecretManagementServiceHolder.getSecretConfigManager().addSecretType(requestDTO);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_SECRET,
-                    secretTypeAdd.getName());
+                    secretTypeAddRequest.getName());
         }
-        return buildSecretTypeFromResponseDTO(responseDTO);
+        return buildSecretTypeResponseFromResponseDTO(responseDTO);
     }
 
     /**
      * To create Secret Response object for the post request
      *
      * @param secretTypeReq secret object.
-     * @return {@link SecretType} .
+     * @return {@link SecretTypeResponse} .
      */
-    private SecretType buildSecretTypeFromResponseDTO(org.wso2.carbon.identity.secret.mgt.core.model.SecretType
-                                                              secretTypeReq) {
+    private SecretTypeResponse buildSecretTypeResponseFromResponseDTO(SecretType secretTypeReq) {
 
-        SecretType secretType = new SecretType();
-        secretType.setId(secretTypeReq.getId());
-        secretType.setName(secretTypeReq.getName());
-        secretType.setDescription(secretTypeReq.getDescription());
-        return secretType;
+        SecretTypeResponse secretTypeResponse = new SecretTypeResponse();
+        secretTypeResponse.setId(secretTypeReq.getId());
+        secretTypeResponse.setName(secretTypeReq.getName());
+        secretTypeResponse.setDescription(secretTypeReq.getDescription());
+        return secretTypeResponse;
     }
 
     /**
      * Validate the secret post request.
      *
-     * @param secretAdd secret post request.
+     * @param secretTypeAddRequest secret post request.
      */
-    private void validateSecretTypeAdd(SecretTypeAdd secretAdd) {
+    private void validateSecretTypeAddRequest(SecretTypeAddRequest secretTypeAddRequest) {
 
-        String secretAddName = secretAdd.getName();
+        String secretAddName = secretTypeAddRequest.getName();
         if (StringUtils.isBlank(secretAddName)) {
             throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_REFERENCE_NAME_NOT_SPECIFIED, null);
@@ -95,16 +95,14 @@ public class SecretTypeManagementService {
     /**
      * Build secret requestDTO by secret body request.
      *
-     * @param secretTypeAdd secret type post body.
+     * @param secretTypeAddRequest secret type post body.
      * @return Secret requestDTO object.
      */
-    private org.wso2.carbon.identity.secret.mgt.core.model.SecretType buildSecretTypeRequestDTOFromSecretTypeAdd
-    (SecretTypeAdd secretTypeAdd) {
+    private SecretType buildSecretTypeRequestDTOFromSecretTypeAddRequest(SecretTypeAddRequest secretTypeAddRequest) {
 
-        org.wso2.carbon.identity.secret.mgt.core.model.SecretType requestDTO = new org.wso2.carbon.identity.secret.mgt
-                .core.model.SecretType();
-        requestDTO.setName(secretTypeAdd.getName());
-        requestDTO.setDescription(secretTypeAdd.getDescription());
+        SecretType requestDTO = new SecretType();
+        requestDTO.setName(secretTypeAddRequest.getName());
+        requestDTO.setDescription(secretTypeAddRequest.getDescription());
         return requestDTO;
     }
 
@@ -129,16 +127,15 @@ public class SecretTypeManagementService {
      * @param secretTypeName secret name.
      * @return secret.
      */
-    public SecretType getSecretType(String secretTypeName) {
+    public SecretTypeResponse getSecretType(String secretTypeName) {
 
         try {
-            org.wso2.carbon.identity.secret.mgt.core.model.SecretType responseDTO = SecretManagementServiceHolder.
-                    getSecretConfigManager().getSecretType(secretTypeName);
-            SecretType secretType = new SecretType();
-            secretType.setId(responseDTO.getId());
-            secretType.setName(responseDTO.getName());
-            secretType.description(responseDTO.getDescription());
-            return secretType;
+            SecretType responseDTO = SecretManagementServiceHolder.getSecretConfigManager().getSecretType(secretTypeName);
+            SecretTypeResponse secretTypeResponse = new SecretTypeResponse();
+            secretTypeResponse.setId(responseDTO.getId());
+            secretTypeResponse.setName(responseDTO.getName());
+            secretTypeResponse.description(responseDTO.getDescription());
+            return secretTypeResponse;
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_GETTING_SECRET, secretTypeName);
@@ -152,19 +149,18 @@ public class SecretTypeManagementService {
      * @param secretUpdateRequest secret's updated details.
      * @return Updated secret.
      */
-    public SecretType updateTypeSecret(String name, SecretTypeUpdateRequest secretUpdateRequest) {
+    public SecretTypeResponse updateTypeSecret(String name, SecretTypeUpdateRequest secretUpdateRequest) {
 
-        org.wso2.carbon.identity.secret.mgt.core.model.SecretType requestDTO, responseDTO;
-        SecretTypeAdd secretAdd =
-                buildSecretTypeAddFromSecretTypeUpdateRequest(name, secretUpdateRequest);
+        SecretType requestDTO, responseDTO;
+        SecretTypeAddRequest secretAdd = buildSecretTypeAddFromSecretTypeUpdateRequest(name, secretUpdateRequest);
         try {
-            requestDTO = buildSecretTypeRequestDTOFromSecretTypeAdd(secretAdd);
+            requestDTO = buildSecretTypeRequestDTOFromSecretTypeAddRequest(secretAdd);
             responseDTO = SecretManagementServiceHolder.getSecretConfigManager().replaceSecretType(requestDTO);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
                     name);
         }
-        return buildSecretTypeFromResponseDTO(responseDTO);
+        return buildSecretTypeResponseFromResponseDTO(responseDTO);
     }
 
     /**
@@ -174,10 +170,10 @@ public class SecretTypeManagementService {
      * @param secretTypeUpdateRequest secret type's update request body.
      * @return secretTypeAdd object
      */
-    private SecretTypeAdd buildSecretTypeAddFromSecretTypeUpdateRequest(String name, SecretTypeUpdateRequest
+    private SecretTypeAddRequest buildSecretTypeAddFromSecretTypeUpdateRequest(String name, SecretTypeUpdateRequest
             secretTypeUpdateRequest) {
 
-        SecretTypeAdd secretTypeAdd = new SecretTypeAdd();
+        SecretTypeAddRequest secretTypeAdd = new SecretTypeAddRequest();
         secretTypeAdd.setName(name);
         secretTypeAdd.setDescription(secretTypeUpdateRequest.getDescription());
         return secretTypeAdd;

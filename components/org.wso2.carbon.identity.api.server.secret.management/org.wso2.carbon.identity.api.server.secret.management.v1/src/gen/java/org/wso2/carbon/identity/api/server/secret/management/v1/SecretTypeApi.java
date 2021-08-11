@@ -19,9 +19,9 @@ package org.wso2.carbon.identity.api.server.secret.management.v1;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.Error;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.Secret;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretType;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeAdd;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretResponse;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeAddRequest;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeResponse;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeUpdateRequest;
 
 import javax.validation.Valid;
@@ -43,14 +43,14 @@ public class SecretTypeApi {
 
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @ApiOperation(value = "Create secret type ", notes = "This API is used to create a new secret type. ", response = Secret.class, authorizations = {
+    @ApiOperation(value = "Create secret type ", notes = "This API is used to create a new secret type. ", response = SecretResponse.class, authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
 
             })
     }, tags = {"Secret Type",})
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successful Response", response = Secret.class),
+            @ApiResponse(code = 201, message = "Successful Response", response = SecretResponse.class),
             @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
             @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
             @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -59,9 +59,9 @@ public class SecretTypeApi {
             @ApiResponse(code = 409, message = "Conflict", response = Error.class),
             @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response createSecretType(@ApiParam(value = "") @Valid SecretTypeAdd secretTypeAdd) {
+    public Response createSecretType(@ApiParam(value = "") @Valid SecretTypeAddRequest secretTypeAddRequest) {
 
-        return delegate.createSecretType(secretTypeAdd);
+        return delegate.createSecretType(secretTypeAddRequest);
     }
 
     @Valid
@@ -94,14 +94,14 @@ public class SecretTypeApi {
     @Path("/{name}")
 
     @Produces({"application/json"})
-    @ApiOperation(value = "Retrieve secret type by name", notes = "This API provides the capability to retrieve a secret type. ", response = SecretType.class, authorizations = {
+    @ApiOperation(value = "Retrieve secret type by name", notes = "This API provides the capability to retrieve a secret type. ", response = SecretTypeResponse.class, authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
 
             })
     }, tags = {"Secret Type",})
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful Response", response = SecretType.class),
+            @ApiResponse(code = 200, message = "Successful Response", response = SecretTypeResponse.class),
             @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
             @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
             @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -119,14 +119,14 @@ public class SecretTypeApi {
     @Path("/{name}")
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @ApiOperation(value = "Update a secret type", notes = "This API provides the capability to update a secret type by name. ", response = SecretType.class, authorizations = {
+    @ApiOperation(value = "Update a secret type", notes = "This API provides the capability to update a secret type by name. ", response = SecretTypeResponse.class, authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
 
             })
     }, tags = {"Secret Type"})
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful Response", response = SecretType.class),
+            @ApiResponse(code = 200, message = "Successful Response", response = SecretTypeResponse.class),
             @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
             @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
             @ApiResponse(code = 403, message = "Forbidden", response = Void.class),

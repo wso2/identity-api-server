@@ -19,26 +19,31 @@ package org.wso2.carbon.identity.api.server.secret.management.v1.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.*;
+
 import java.util.Objects;
 import javax.validation.Valid;
 
-public class SecretTypeAdd {
+public class SecretAddRequest {
 
     private String name;
+    private String value;
     private String description;
 
     /**
      *
      **/
-    public SecretTypeAdd name(String name) {
+    public SecretAddRequest name(String name) {
 
         this.name = name;
         return this;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "choreo-riskScore", required = true, value = "")
     @JsonProperty("name")
     @Valid
+    @NotNull(message = "Property name cannot be null.")
+
     public String getName() {
 
         return name;
@@ -52,13 +57,37 @@ public class SecretTypeAdd {
     /**
      *
      **/
-    public SecretTypeAdd description(String description) {
+    public SecretAddRequest value(String value) {
+
+        this.value = value;
+        return this;
+    }
+
+    @ApiModelProperty(example = "bgtehaldhjdevch", required = true, value = "")
+    @JsonProperty("value")
+    @Valid
+    @NotNull(message = "Property value cannot be null.")
+
+    public String getValue() {
+
+        return value;
+    }
+
+    public void setValue(String value) {
+
+        this.value = value;
+    }
+
+    /**
+     *
+     **/
+    public SecretAddRequest description(String description) {
 
         this.description = description;
         return this;
     }
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "Some Error Description", value = "")
     @JsonProperty("description")
     @Valid
     public String getDescription() {
@@ -80,24 +109,26 @@ public class SecretTypeAdd {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SecretTypeAdd secretTypeAdd = (SecretTypeAdd) o;
-        return Objects.equals(this.name, secretTypeAdd.name) &&
-                Objects.equals(this.description, secretTypeAdd.description);
+        SecretAddRequest secretAddRequest = (SecretAddRequest) o;
+        return Objects.equals(this.name, secretAddRequest.name) &&
+                Objects.equals(this.value, secretAddRequest.value) &&
+                Objects.equals(this.description, secretAddRequest.description);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(name, description);
+        return Objects.hash(name, value, description);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class SecretTypeAdd {\n");
+        sb.append("class SecretAddRequest {\n");
 
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    value: ").append(toIndentedString(value)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("}");
         return sb.toString();

@@ -20,8 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.secret.management.v1.SecretTypeApiService;
 import org.wso2.carbon.identity.api.server.secret.management.v1.core.SecretTypeManagementService;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretType;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeAdd;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeAddRequest;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeResponse;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeUpdateRequest;
 
 import java.net.URI;
@@ -39,9 +39,9 @@ public class SecretTypeApiServiceImpl implements SecretTypeApiService {
     private SecretTypeManagementService secretTypeManagementService;
 
     @Override
-    public Response createSecretType(SecretTypeAdd secretTypeAdd) {
+    public Response createSecretType(SecretTypeAddRequest secretTypeAddRequest) {
 
-        SecretType secretType = secretTypeManagementService.addSecretType(secretTypeAdd);
+        SecretTypeResponse secretType = secretTypeManagementService.addSecretType(secretTypeAddRequest);
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + SECRET_CONTEXT_PATH + "/"
                 + secretType.getName());
         return Response.created(location).entity(secretType).build();

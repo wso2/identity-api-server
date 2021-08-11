@@ -16,14 +16,14 @@
 
 package org.wso2.carbon.identity.api.server.secret.management.v1;
 
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeAdd;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeAddRequest;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretTypeUpdateRequest;
 import javax.ws.rs.core.Response;
 
 
 public interface SecretTypeApiService {
 
-      public Response createSecretType(SecretTypeAdd secretTypeAdd);
+      public Response createSecretType(SecretTypeAddRequest secretTypeAddRequest);
 
       public Response deleteSecretType(String name);
 

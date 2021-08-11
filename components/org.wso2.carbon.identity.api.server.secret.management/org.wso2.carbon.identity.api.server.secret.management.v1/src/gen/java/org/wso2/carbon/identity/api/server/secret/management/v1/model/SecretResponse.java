@@ -24,7 +24,7 @@ import javax.validation.constraints.*;
 import java.util.Objects;
 import javax.validation.Valid;
 
-public class Secret {
+public class SecretResponse {
 
     private String secretId;
     private String secretName;
@@ -36,7 +36,7 @@ public class Secret {
     /**
      *
      **/
-    public Secret secretId(String secretId) {
+    public SecretResponse secretId(String secretId) {
 
         this.secretId = secretId;
         return this;
@@ -58,8 +58,9 @@ public class Secret {
     }
 
     /**
+     *
      **/
-    public Secret secretName(String secretName) {
+    public SecretResponse secretName(String secretName) {
 
         this.secretName = secretName;
         return this;
@@ -81,8 +82,9 @@ public class Secret {
     }
 
     /**
+     *
      **/
-    public Secret created(String created) {
+    public SecretResponse created(String created) {
 
         this.created = created;
         return this;
@@ -104,8 +106,9 @@ public class Secret {
     }
 
     /**
+     *
      **/
-    public Secret lastModified(String lastModified) {
+    public SecretResponse lastModified(String lastModified) {
 
         this.lastModified = lastModified;
         return this;
@@ -129,7 +132,7 @@ public class Secret {
     /**
      *
      **/
-    public Secret type(String type) {
+    public SecretResponse type(String type) {
 
         this.type = type;
         return this;
@@ -153,7 +156,7 @@ public class Secret {
     /**
      *
      **/
-    public Secret description(String description) {
+    public SecretResponse description(String description) {
 
         this.description = description;
         return this;
@@ -181,13 +184,13 @@ public class Secret {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Secret secret = (Secret) o;
-        return Objects.equals(this.secretId, secret.secretId) &&
-                Objects.equals(this.secretName, secret.secretName) &&
-                Objects.equals(this.created, secret.created) &&
-                Objects.equals(this.lastModified, secret.lastModified) &&
-                Objects.equals(this.type, secret.type) &&
-                Objects.equals(this.description, secret.description);
+        SecretResponse secretResponse = (SecretResponse) o;
+        return Objects.equals(this.secretId, secretResponse.secretId) &&
+                Objects.equals(this.secretName, secretResponse.secretName) &&
+                Objects.equals(this.created, secretResponse.created) &&
+                Objects.equals(this.lastModified, secretResponse.lastModified) &&
+                Objects.equals(this.type, secretResponse.type) &&
+                Objects.equals(this.description, secretResponse.description);
     }
 
     @Override
@@ -200,7 +203,7 @@ public class Secret {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class Secret {\n");
+        sb.append("class SecretResponse {\n");
 
         sb.append("    secretId: ").append(toIndentedString(secretId)).append("\n");
         sb.append("    secretName: ").append(toIndentedString(secretName)).append("\n");
@@ -215,7 +218,7 @@ public class Secret {
     /**
      * Convert the given object to string with each line indented by 4 spaces
      * (except the first line).
-    */
+     */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
