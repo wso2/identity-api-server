@@ -37,16 +37,18 @@ public class ClaimMetadataManagementServiceFactory extends AbstractFactoryBean<C
     @Override
     protected ClaimMetadataManagementService createInstance() throws Exception {
 
-        if (this.claimMetadataManagementService == null) {
+        if (this.claimMetadataManagementService != null) {
+            return this.claimMetadataManagementService;
+        } else {
             ClaimMetadataManagementService claimMetadataManagementService = (ClaimMetadataManagementService)
                     PrivilegedCarbonContext.getThreadLocalCarbonContext()
                             .getOSGiService(ClaimMetadataManagementService.class, null);
             if (claimMetadataManagementService != null) {
                 this.claimMetadataManagementService = claimMetadataManagementService;
+                return this.claimMetadataManagementService;
             } else {
                 throw new Exception("Unable to retrieve Claim Metadata Management Service.");
             }
         }
-        return this.claimMetadataManagementService;
     }
 }
