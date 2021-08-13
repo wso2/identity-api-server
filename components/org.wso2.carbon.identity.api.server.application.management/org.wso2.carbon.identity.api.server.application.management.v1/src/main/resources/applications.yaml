@@ -2753,14 +2753,15 @@ components:
           type: array
           description: Authorized redirect URIs
           example:
-            - 'regexp=(https://app.example.com/callback1|https://app.example.com/callback2)'
+            - 'https://app.example.com/callback1'
+            - 'https://app.example.com/callback2'
           items:
             type: string
         allowedOrigins:
           type: array
           description: Authorized JavaScript origins. CORS requests will be allowed to these origins.
           example:
-            - 'https://app.example.com'
+            - 'https://app.example.com/js'
           items:
             type: string
         publicClient:
@@ -2787,8 +2788,8 @@ components:
         scopeValidators:
           type: array
           example:
-            - Role based scope validator
-            - XACML Scope Validator
+            - XACMLScopeValidator
+            - RoleBasedScopeValidator
           items:
             type: string
     OAuth2PKCEConfiguration:
@@ -2819,7 +2820,9 @@ components:
           description: "OAuth2 access token and refresh token can be bound to an external attribute during the token
           generation so that it can be optionally validated during the API invocation."
           default: "None"
-          example: cookie
+          example:
+            - sso-session
+            - cookie
         revokeTokensWhenIDPSessionTerminated:
           type: boolean
           description: "If enabled, when the IDP session is terminated, all the access tokens bound to the session

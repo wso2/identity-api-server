@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.244-SNAPSHOT</version>
+    <version>1.0.240-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -395,18 +395,6 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.secret.management.common</artifactId>
-                <version>${project.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.identity.framework</groupId>
-                <artifactId>org.wso2.carbon.identity.secret.mgt.core</artifactId>
-                <version>${carbon.identity.framework.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.configuration.mgt.core</artifactId>
                 <version>${carbon.identity.framework.version}</version>
@@ -529,7 +517,6 @@
         <module>components/org.wso2.carbon.identity.api.server.fetch.remote</module>
         <module>components/org.wso2.carbon.identity.api.server.notification.sender</module>
         <module>components/org.wso2.carbon.identity.api.server.authenticators</module>
-        <module>components/org.wso2.carbon.identity.api.server.secret.management</module>
     </modules>
 
 </project>

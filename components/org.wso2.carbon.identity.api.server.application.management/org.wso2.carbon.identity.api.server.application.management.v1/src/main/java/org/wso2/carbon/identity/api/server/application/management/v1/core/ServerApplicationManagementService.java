@@ -168,42 +168,20 @@ public class ServerApplicationManagementService {
                                                       String sortBy, String requiredAttributes) {
 
         handleNotImplementedCapabilities(sortOrder, sortBy, requiredAttributes);
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        boolean isEqualFilterUsed = false;
 
         limit = validateAndGetLimit(limit);
         offset = validateAndGetOffset(offset);
 
         // Format the filter to a value that can be interpreted by the backend.
-        ExpressionNode expressionNode = buildFilterNode(filter);
-        String formattedFilter = null;
-        if (expressionNode != null) {
-            // Handle eq operation as special case, there will be only one application with a given name in tenant.
-            if (isEqualOperation(expressionNode)) {
-                isEqualFilterUsed = true;
-            }
-            formattedFilter = generateFilterStringForBackend(expressionNode.getAttributeValue(), expressionNode
-                    .getOperation(), expressionNode.getValue());
-        }
-
+        String formattedFilter = buildFilter(filter);
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         String username = ContextLoader.getUsernameFromContext();
         try {
             int totalResults = getApplicationManagementService()
                     .getCountOfApplications(tenantDomain, username, formattedFilter);
 
-            ApplicationBasicInfo[] filteredAppList;
-            if (isEqualFilterUsed) {
-                ApplicationBasicInfo applicationBasicInfo = getApplicationManagementService()
-                        .getApplicationBasicInfoByName(expressionNode.getValue(), tenantDomain);
-                if (applicationBasicInfo == null) {
-                    filteredAppList = new ApplicationBasicInfo[0];
-                } else {
-                    filteredAppList = new ApplicationBasicInfo[]{applicationBasicInfo};
-                }
-            } else {
-                filteredAppList = getApplicationManagementService()
-                        .getApplicationBasicInfo(tenantDomain, username, formattedFilter, offset, limit);
-            }
+            ApplicationBasicInfo[] filteredAppList = getApplicationManagementService()
+                    .getApplicationBasicInfo(tenantDomain, username, formattedFilter, offset, limit);
             int resultsInCurrentPage = filteredAppList.length;
 
             return new ApplicationListResponse()
@@ -948,16 +926,17 @@ public class ServerApplicationManagementService {
                 .collect(Collectors.toList());
     }
 
-    private ExpressionNode buildFilterNode(String filter) {
-
+    private String buildFilter(String filter) {
         if (StringUtils.isNotBlank(filter)) {
             try {
+
                 FilterTreeBuilder filterTreeBuilder = new FilterTreeBuilder(filter);
                 Node rootNode = filterTreeBuilder.buildTree();
                 if (rootNode instanceof ExpressionNode) {
                     ExpressionNode expressionNode = (ExpressionNode) rootNode;
                     if (SEARCH_SUPPORTED_FIELDS.contains(expressionNode.getAttributeValue())) {
-                        return expressionNode;
+                        return generateFilterStringForBackend(expressionNode.getAttributeValue(), expressionNode
+                                .getOperation(), expressionNode.getValue());
                     } else {
                         throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, expressionNode
                                 .getAttributeValue());
@@ -997,14 +976,6 @@ public class ServerApplicationManagementService {
         }
 
         return formattedFilter;
-    }
-
-    private boolean isEqualOperation(ExpressionNode expressionNode) {
-
-        if (FILTER_EQUALS.equals(expressionNode.getOperation())) {
-            return true;
-        }
-        return false;
     }
 
     /**

@@ -44,7 +44,6 @@ public class IdentityProviderPOSTRequest  {
     private String homeRealmIdentifier;
     private Certificate certificate;
     private String alias;
-    private String idpIssuerName;
     private Claims claims;
     private Roles roles;
     private FederatedAuthenticatorRequest federatedAuthenticators;
@@ -216,24 +215,6 @@ public class IdentityProviderPOSTRequest  {
 
     /**
     **/
-    public IdentityProviderPOSTRequest idpIssuerName(String idpIssuerName) {
-
-        this.idpIssuerName = idpIssuerName;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "https://www.idp.com", value = "")
-    @JsonProperty("idpIssuerName")
-    @Valid
-    public String getIdpIssuerName() {
-        return idpIssuerName;
-    }
-    public void setIdpIssuerName(String idpIssuerName) {
-        this.idpIssuerName = idpIssuerName;
-    }
-
-    /**
-    **/
     public IdentityProviderPOSTRequest claims(Claims claims) {
 
         this.claims = claims;
@@ -325,7 +306,6 @@ public class IdentityProviderPOSTRequest  {
             Objects.equals(this.homeRealmIdentifier, identityProviderPOSTRequest.homeRealmIdentifier) &&
             Objects.equals(this.certificate, identityProviderPOSTRequest.certificate) &&
             Objects.equals(this.alias, identityProviderPOSTRequest.alias) &&
-            Objects.equals(this.idpIssuerName, identityProviderPOSTRequest.idpIssuerName) &&
             Objects.equals(this.claims, identityProviderPOSTRequest.claims) &&
             Objects.equals(this.roles, identityProviderPOSTRequest.roles) &&
             Objects.equals(this.federatedAuthenticators, identityProviderPOSTRequest.federatedAuthenticators) &&
@@ -334,7 +314,7 @@ public class IdentityProviderPOSTRequest  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, image, templateId, isPrimary, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, federatedAuthenticators, provisioning);
+        return Objects.hash(name, description, image, templateId, isPrimary, isFederationHub, homeRealmIdentifier, certificate, alias, claims, roles, federatedAuthenticators, provisioning);
     }
 
     @Override
@@ -352,7 +332,6 @@ public class IdentityProviderPOSTRequest  {
         sb.append("    homeRealmIdentifier: ").append(toIndentedString(homeRealmIdentifier)).append("\n");
         sb.append("    certificate: ").append(toIndentedString(certificate)).append("\n");
         sb.append("    alias: ").append(toIndentedString(alias)).append("\n");
-        sb.append("    idpIssuerName: ").append(toIndentedString(idpIssuerName)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
         sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
         sb.append("    federatedAuthenticators: ").append(toIndentedString(federatedAuthenticators)).append("\n");
