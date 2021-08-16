@@ -109,8 +109,7 @@ public class ServerUserStoreService {
 
             List<ClaimAttributeMapping> claimAttributeMappingList = userStoreReq.getClaimAttributeMappings();
             if (claimAttributeMappingList != null) {
-                localClaimList =  createLocalClaimList(userstoreDomain,
-                        claimAttributeMappingList);
+                localClaimList =  createLocalClaimList(userstoreDomain, claimAttributeMappingList);
                 validateClaimMappings(tenantDomain, localClaimList);
             }
 
@@ -440,11 +439,11 @@ public class ServerUserStoreService {
     /**
      * To make a partial update single or multiple claim attribute mappings of a specific user store.
      *
-     * @param userstoreDomainId     user store domain id
-     * @param claimAttributeMapping list of claim attribute mappings in patch request
+     * @param userstoreDomainId     user store domain id.
+     * @param claimAttributeMapping list of claim attribute mappings in patch request.
      */
-    public void patchClaimAttributeMapping(String userstoreDomainId,
-                                           List<ClaimAttributeMapping> claimAttributeMapping) {
+    public void updateClaimAttributeMappings(String userstoreDomainId,
+                                             List<ClaimAttributeMapping> claimAttributeMapping) {
 
         if (claimAttributeMapping == null) {
             throw handleException(Response.Status.BAD_REQUEST,
@@ -1154,8 +1153,8 @@ public class ServerUserStoreService {
      * Handle ClaimManagementException, extract the error code and the error message from the corresponding
      * exception and set it to the API Error Response.
      *
-     * @param exception     Exception thrown
-     * @param errorEnum     Corresponding error enum
+     * @param exception     Exception thrown.
+     * @param errorEnum     Corresponding error enum.
      * @return API Error object.
      */
     private APIError handleClaimManagementException(ClaimMetadataException exception,
@@ -1177,9 +1176,9 @@ public class ServerUserStoreService {
      * Handle ClaimManagementException, extract the error code and the error message from the corresponding
      * exception and set it to the API Error Response.
      *
-     * @param exception     Exception thrown
-     * @param errorResponse Corresponding error response
-     * @param status        Corresponding status response
+     * @param exception     Exception thrown.
+     * @param errorResponse Corresponding error response.
+     * @param status        Corresponding status response.
      * @return API Error object.
      */
     private APIError handleClaimManagementClientException(ClaimMetadataException  exception,
@@ -1230,7 +1229,7 @@ public class ServerUserStoreService {
     /**
      * Validate userstore domain Id.
      *
-     * @param userstoreDomainId    Userstore domain ID
+     * @param userstoreDomainId    Userstore domain ID.
      * @throws IdentityUserStoreClientException If request is invalid.
      */
     private void validateUserstore(String userstoreDomainId) throws UserStoreException,

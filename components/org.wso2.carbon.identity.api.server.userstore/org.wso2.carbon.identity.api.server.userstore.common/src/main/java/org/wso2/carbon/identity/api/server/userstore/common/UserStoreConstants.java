@@ -107,12 +107,12 @@ public class UserStoreConstants {
                 "Userstore update request is either NULL or empty"),
         ERROR_CODE_USER_STORE_LIMIT_REACHED("60011", "Unable to create a user store.",
                 "Maximum number of allowed user stores have been reached."),
-        ERROR_CODE_ERROR_UPDATING_CLAIM_MAPPING("60012", "Unable to add local claims",
-                "Error occurred while adding local claims"),
-        ERROR_CODE_ERROR_RETRIEVING_CLAIM_MAPPING("60013", "Invalid attribute mapping.",
-                "Invalid userstore provided for attribute mapping"),
-        ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("60014", "Attribute mapping not specified",
-                "Attribute mapping cannot be empty");
+        ERROR_CODE_ERROR_UPDATING_CLAIM_MAPPING("60012", "Unable to update local claim mappings",
+                "Error occurred while updating local claim mappings."),
+        ERROR_CODE_ERROR_RETRIEVING_CLAIM_MAPPING("60013", "Unable to retrieve claim mappings.",
+                "Error occurred while retrieving claim attribute mappings."),
+        ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("60014", "Attribute mapping not specified.",
+                "Attribute mapping cannot be empty.");
 
         private final String code;
         private final String message;

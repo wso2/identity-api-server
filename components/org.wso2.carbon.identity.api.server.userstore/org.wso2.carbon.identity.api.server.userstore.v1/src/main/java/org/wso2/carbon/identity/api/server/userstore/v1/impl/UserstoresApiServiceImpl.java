@@ -89,10 +89,10 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     }
 
     @Override
-    public Response patchAttributeMappings(String userstoreDomainId,
-                                           List<ClaimAttributeMapping> claimAttributeMapping) {
-        serverUserStoreService.patchClaimAttributeMapping(userstoreDomainId,
-                claimAttributeMapping);
+    public Response updateAttributeMappings(String userstoreDomainId,
+                                           List<ClaimAttributeMapping> claimAttributeMappings) {
+        serverUserStoreService.updateClaimAttributeMappings(userstoreDomainId,
+                claimAttributeMappings);
         return Response.ok().build();
     }
 

@@ -53,7 +53,7 @@ public interface UserstoresApiService {
 
       public Response getUserStoreManagerProperties(String typeId);
 
-      public Response patchAttributeMappings(String userstoreDomainId, List<ClaimAttributeMapping> claimAttributeMapping);
+      public Response updateAttributeMappings(String userstoreDomainId, List<ClaimAttributeMapping> claimAttributeMapping);
 
       public Response patchUserStore(String userstoreDomainId, List<PatchDocument> patchDocument);
 

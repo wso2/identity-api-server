@@ -214,7 +214,7 @@ public class UserstoresApi  {
     @Path("/{userstore-domain-id}/attribute-mappings")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Patch the secondary user store attribute mappings by it's domain id.", notes = "This API provides the capability to update the secondary user store's attribute mappings using patch request by using its domain id.  <b>Permission required:</b>  *_/permission/admin ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update the secondary user store attribute mappings by it's domain id.", notes = "This API provides the capability to update the secondary user store's attribute mappings using patch request by using its domain id.  <b>Permission required:</b>  *_/permission/admin ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -230,7 +230,7 @@ public class UserstoresApi  {
     })
     public Response patchAttributeMappings(@ApiParam(value = "The unique name of the user store domain",required=true) @PathParam("userstore-domain-id") String userstoreDomainId, @ApiParam(value = "" ,required=true) @Valid List<ClaimAttributeMapping> claimAttributeMapping) {
 
-        return delegate.patchAttributeMappings(userstoreDomainId,  claimAttributeMapping );
+        return delegate.updateAttributeMappings(userstoreDomainId,  claimAttributeMapping );
     }
 
     @Valid
