@@ -469,7 +469,7 @@ public class ServerUserStoreService {
     /**
      * To check whether user store is exist.
      *
-     * @param userStoreDomain     user store domain name
+     * @param userStoreDomain     user store domain name.
      * @return boolean
      */
     private boolean isUserStoreExists(String userStoreDomain) throws UserStoreException {
@@ -622,9 +622,9 @@ public class ServerUserStoreService {
     /**
      * To update claim attribute mappings in bulk for specific user store.
      *
-     * @param userstoreDomain user store domain name
-     * @param tenantDomain tenant domain name
-     * @param localClaimList list of claim attribute mappings
+     * @param userstoreDomain user store domain name.
+     * @param tenantDomain tenant domain name.
+     * @param localClaimList list of claim attribute mappings.
      */
     private void updateClaimMappings(String userstoreDomain, String tenantDomain, List<LocalClaim> localClaimList) {
 
@@ -642,8 +642,8 @@ public class ServerUserStoreService {
     /**
      * To validate claim existence of claim attribute mappings.
      *
-     * @param tenantDomain tenant domain name
-     * @param localClaimList list of claim attribute mappings
+     * @param tenantDomain tenant domain name.
+     * @param localClaimList list of claim attribute mappings.
      */
     private void validateClaimMappings(String tenantDomain, List<LocalClaim> localClaimList) {
 

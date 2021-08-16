@@ -197,7 +197,7 @@ public class UserStoreConfigurationsRes  {
     }
 
     /**
-     * Requested configured user store claim attribute mappings
+     * Requested configured user store claim attribute mappings.
      **/
     public UserStoreConfigurationsRes claimAttributeMappings(List<ClaimAttributeMapping> claimAttributeMappings) {
 
