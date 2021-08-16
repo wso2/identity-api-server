@@ -29,6 +29,7 @@ public class UserStoreConstants {
     public static final String USER_STORE_DOMAIN_NAME = "/domainName";
     public static final String USER_STORE_PROPERTIES = "/properties/";
     public static final String USER_STORE_PROPERTY_MASK = "************";
+    public static final String CLAIM_MANAGEMENT_PREFIX = "CMT-";
 
     /**
      * Enum for user store related errors in the format of
@@ -109,7 +110,13 @@ public class UserStoreConstants {
         ERROR_CODE_REQUEST_BODY_NOT_FOUND("60010", "Invalid userstore update request",
                 "Userstore update request is either NULL or empty"),
         ERROR_CODE_USER_STORE_LIMIT_REACHED("60011", "Unable to create a user store.",
-                "Maximum number of allowed user stores have been reached.");
+                "Maximum number of allowed user stores have been reached."),
+        ERROR_CODE_ERROR_UPDATING_CLAIM_MAPPING("60012", "Unable to update local claim mappings",
+                "Error occurred while updating local claim mappings."),
+        ERROR_CODE_ERROR_RETRIEVING_CLAIM_MAPPING("60013", "Unable to retrieve claim mappings.",
+                "Error occurred while retrieving claim attribute mappings."),
+        ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("60014", "Attribute mapping not specified.",
+                "Attribute mapping cannot be empty.");
 
         private final String code;
         private final String message;

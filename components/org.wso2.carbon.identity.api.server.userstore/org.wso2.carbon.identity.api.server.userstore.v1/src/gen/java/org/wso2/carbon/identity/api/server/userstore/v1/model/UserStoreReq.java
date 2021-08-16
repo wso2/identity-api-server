@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.Property;
 import javax.validation.constraints.*;
 
@@ -40,7 +41,7 @@ public class UserStoreReq  {
     private String description;
     private String name;
     private List<Property> properties = new ArrayList<>();
-
+    private List<ClaimAttributeMapping> claimAttributeMappings = null;
 
     /**
     * The id of the user store manager class type.
@@ -131,7 +132,32 @@ public class UserStoreReq  {
         return this;
     }
 
+    /**
+    * Claim attribute mappings.
+    **/
+    public UserStoreReq claimAttributeMappings(List<ClaimAttributeMapping> claimAttributeMappings) {
+
+        this.claimAttributeMappings = claimAttributeMappings;
+        return this;
+    }
     
+    @ApiModelProperty(value = "Claim attribute mappings.")
+    @JsonProperty("claimAttributeMappings")
+    @Valid
+    public List<ClaimAttributeMapping> getClaimAttributeMappings() {
+        return claimAttributeMappings;
+    }
+    public void setClaimAttributeMappings(List<ClaimAttributeMapping> claimAttributeMappings) {
+        this.claimAttributeMappings = claimAttributeMappings;
+    }
+
+    public UserStoreReq addClaimAttributeMappingsItem(ClaimAttributeMapping claimAttributeMappingsItem) {
+        if (this.claimAttributeMappings == null) {
+            this.claimAttributeMappings = new ArrayList<>();
+        }
+        this.claimAttributeMappings.add(claimAttributeMappingsItem);
+        return this;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -146,12 +172,13 @@ public class UserStoreReq  {
         return Objects.equals(this.typeId, userStoreReq.typeId) &&
             Objects.equals(this.description, userStoreReq.description) &&
             Objects.equals(this.name, userStoreReq.name) &&
-            Objects.equals(this.properties, userStoreReq.properties);
+            Objects.equals(this.properties, userStoreReq.properties) &&
+            Objects.equals(this.claimAttributeMappings, userStoreReq.claimAttributeMappings);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(typeId, description, name, properties);
+        return Objects.hash(typeId, description, name, properties, claimAttributeMappings);
     }
 
     @Override
@@ -164,6 +191,7 @@ public class UserStoreReq  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+        sb.append("    claimAttributeMappings: ").append(toIndentedString(claimAttributeMappings)).append("\n");
         sb.append("}");
         return sb.toString();
     }

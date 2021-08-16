@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStoreClassesRes;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ConnectionEstablishedResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.Error;
 import java.util.List;
@@ -207,6 +208,30 @@ public class UserstoresApi  {
     public Response getUserStoreManagerProperties(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId) {
 
         return delegate.getUserStoreManagerProperties(typeId );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/{userstore-domain-id}/attribute-mappings")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update the secondary user store attribute mappings by it's domain id.", notes = "This API provides the capability to update the secondary user store's attribute mappings using patch request by using its domain id.  <b>Permission required:</b>  *_/permission/admin ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "User Store", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK.", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response updateAttributeMappings(@ApiParam(value = "The unique name of the user store domain",required=true) @PathParam("userstore-domain-id") String userstoreDomainId, @ApiParam(value = "" ,required=true) @Valid List<ClaimAttributeMapping> claimAttributeMapping) {
+
+        return delegate.updateAttributeMappings(userstoreDomainId,  claimAttributeMapping );
     }
 
     @Valid

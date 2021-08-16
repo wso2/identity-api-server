@@ -19,6 +19,7 @@ package org.wso2.carbon.identity.api.server.userstore.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.userstore.v1.UserstoresApiService;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
@@ -85,6 +86,14 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     public Response getUserStoreManagerProperties(String typeId) {
 
         return Response.ok().entity(serverUserStoreService.getUserStoreManagerProperties(typeId)).build();
+    }
+
+    @Override
+    public Response updateAttributeMappings(String userstoreDomainId,
+                                           List<ClaimAttributeMapping> claimAttributeMappings) {
+        serverUserStoreService.updateClaimAttributeMappings(userstoreDomainId,
+                claimAttributeMappings);
+        return Response.ok().build();
     }
 
     @Override
