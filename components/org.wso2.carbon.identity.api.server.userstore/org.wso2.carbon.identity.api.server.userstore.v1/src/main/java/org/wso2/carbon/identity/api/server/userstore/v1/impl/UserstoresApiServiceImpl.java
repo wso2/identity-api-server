@@ -105,6 +105,12 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
         return Response.ok().entity(serverUserStoreService.editUserStore(userstoreDomainId, userStoreReq)).build();
     }
 
+    @Override
+    public Response getUserStoreMappingAttributes(String typeId) {
+
+        return Response.ok().entity(serverUserStoreService.getUserStoreMappingAttributes(typeId)).build();
+    }
+
     private URI getResourceLocation(String id) {
 
         return buildURIForHeader(String.format(V1_API_PATH_COMPONENT + USER_STORE_PATH_COMPONENT + "/%s", id));

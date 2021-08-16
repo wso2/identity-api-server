@@ -29,6 +29,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConfigurationsRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
@@ -277,5 +278,28 @@ public class UserstoresApi  {
 
         return delegate.updateUserStore(userstoreDomainId,  userStoreReq );
     }
+
+    @Valid
+    @GET
+    @Path("/meta/types/{type-id}/attributes")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the meta attributes of a user store of a given user store type.", notes = "This API provides the capability to retrieve the attribute mappings of a given user store type.   <b>Permission required:</b>  *_/permission/admin ", response = UserStoreAttributeMapping.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Meta", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Response.", response = UserStoreAttributeMapping.class),
+            @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+            @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+            @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response getUserStoreMappingAttributes(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId) {
+
+        return delegate.getUserStoreMappingAttributes(typeId);
+    }
+
 
 }

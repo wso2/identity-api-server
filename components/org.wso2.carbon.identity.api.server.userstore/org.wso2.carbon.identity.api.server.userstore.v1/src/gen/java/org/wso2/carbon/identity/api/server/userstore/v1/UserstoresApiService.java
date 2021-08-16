@@ -57,4 +57,6 @@ public interface UserstoresApiService {
       public Response testRDBMSConnection(RDBMSConnectionReq rdBMSConnectionReq);
 
       public Response updateUserStore(String userstoreDomainId, UserStoreReq userStoreReq);
+
+      public Response getUserStoreMappingAttributes(String typeId);
 }
