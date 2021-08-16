@@ -257,7 +257,7 @@ paths:
       tags:
         - User Store
       summary: Update the secondary user store attribute mappings by it's domain id.
-      operationId: patchAttributeMappings
+      operationId: updateAttributeMappings
       description: >
         This API provides the capability to update the secondary user store's attribute mappings using patch request by using its domain id.
          <b>Permission required:</b>

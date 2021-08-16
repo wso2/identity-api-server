@@ -228,7 +228,7 @@ public class UserstoresApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response patchAttributeMappings(@ApiParam(value = "The unique name of the user store domain",required=true) @PathParam("userstore-domain-id") String userstoreDomainId, @ApiParam(value = "" ,required=true) @Valid List<ClaimAttributeMapping> claimAttributeMapping) {
+    public Response updateAttributeMappings(@ApiParam(value = "The unique name of the user store domain",required=true) @PathParam("userstore-domain-id") String userstoreDomainId, @ApiParam(value = "" ,required=true) @Valid List<ClaimAttributeMapping> claimAttributeMapping) {
 
         return delegate.updateAttributeMappings(userstoreDomainId,  claimAttributeMapping );
     }

@@ -49,8 +49,7 @@ public class ClaimMetadataManagementServiceFactory extends AbstractFactoryBean<C
         if (claimMetadataManagementService != null) {
             this.claimMetadataManagementService = claimMetadataManagementService;
             return this.claimMetadataManagementService;
-        } else {
-            throw new Exception("Unable to retrieve Claim Metadata Management Service.");
         }
+        throw new Exception("Unable to retrieve Claim Metadata Management Service.");
     }
 }
