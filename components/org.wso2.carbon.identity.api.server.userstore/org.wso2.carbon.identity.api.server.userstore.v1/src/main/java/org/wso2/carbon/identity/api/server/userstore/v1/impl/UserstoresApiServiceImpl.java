@@ -19,6 +19,7 @@ package org.wso2.carbon.identity.api.server.userstore.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.userstore.v1.UserstoresApiService;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStoreClassesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
@@ -41,9 +42,21 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     @Autowired
     private ServerUserStoreService serverUserStoreService;
 
+
+    private static boolean isAvailableUserStoreTypes(List<AvailableUserStoreClassesRes> userStoreList, String typeID) {
+        for (AvailableUserStoreClassesRes userStore : userStoreList) {
+            if (userStore.getTypeId().equals(typeID)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public Response addUserStore(UserStoreReq userStoreReq) {
-
+        if (isAvailableUserStoreTypes(serverUserStoreService.getAvailableUserStoreTypes(), userStoreReq.getTypeId())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         UserStoreResponse response = serverUserStoreService.addUserStore(userStoreReq);
         return Response.created(getResourceLocation(response.getId())).entity(response).build();
     }
