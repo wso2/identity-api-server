@@ -54,7 +54,7 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
 
     @Override
     public Response addUserStore(UserStoreReq userStoreReq) {
-        if (isAvailableUserStoreTypes(serverUserStoreService.getAvailableUserStoreTypes(), userStoreReq.getTypeId())) {
+        if (!isAvailableUserStoreTypes(serverUserStoreService.getAvailableUserStoreTypes(), userStoreReq.getTypeId())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         UserStoreResponse response = serverUserStoreService.addUserStore(userStoreReq);
