@@ -226,7 +226,6 @@ public class SecretManagementService {
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
-
             if (ERROR_CODE_CONFLICT_SECRET.getCode().equals(e.getErrorCode())) {
                 status = Response.Status.CONFLICT;
             } else if (ERROR_CODE_SECRET_NOT_FOUND.getCode().equals(e.getErrorCode())) {
@@ -234,6 +233,7 @@ public class SecretManagementService {
             } else {
                 status = Response.Status.BAD_REQUEST;
             }
+
         } else if (e instanceof SecretManagementServerException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
