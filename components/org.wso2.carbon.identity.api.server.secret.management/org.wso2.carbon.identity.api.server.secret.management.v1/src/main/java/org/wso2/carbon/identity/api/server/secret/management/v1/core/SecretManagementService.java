@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.CONFIG_MGT_ERROR_CODE_DELIMITER;
 import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_SECRET;
 import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.ErrorMessage.ERROR_CODE_SECRET_NOT_FOUND;
 
@@ -224,8 +223,6 @@ public class SecretManagementService {
         if (e instanceof SecretManagementClientException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
-                errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
-                        errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
@@ -240,8 +237,6 @@ public class SecretManagementService {
         } else if (e instanceof SecretManagementServerException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
-                errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
-                        errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());

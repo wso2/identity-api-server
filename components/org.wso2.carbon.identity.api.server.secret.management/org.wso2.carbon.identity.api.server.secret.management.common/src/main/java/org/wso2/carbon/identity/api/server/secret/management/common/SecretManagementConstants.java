@@ -24,7 +24,7 @@ package org.wso2.carbon.identity.api.server.secret.management.common;
 public class SecretManagementConstants {
 
     public static final String SECRET_CONTEXT_PATH = "/secrets";
-    public static final String CONFIG_MGT_ERROR_CODE_DELIMITER = "_";
+    public static final String SECRET_TYPE_CONTEXT_PATH = "/secret-type";
     public static final String CORRELATION_ID_MDC = "Correlation-ID";
     public static final String V1_API_PATH_COMPONENT = "/v1";
 
