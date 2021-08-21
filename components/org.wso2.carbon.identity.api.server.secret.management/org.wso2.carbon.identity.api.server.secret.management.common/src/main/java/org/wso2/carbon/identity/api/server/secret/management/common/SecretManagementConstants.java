@@ -23,8 +23,6 @@ package org.wso2.carbon.identity.api.server.secret.management.common;
  */
 public class SecretManagementConstants {
 
-    public static final String ERROR_PREFIX = "ECM-";
-
     public static final String SECRET_CONTEXT_PATH = "/secrets";
     public static final String CONFIG_MGT_ERROR_CODE_DELIMITER = "_";
     public static final String CORRELATION_ID_MDC = "Correlation-ID";
@@ -36,14 +34,21 @@ public class SecretManagementConstants {
     public enum ErrorMessage {
 
         // Client errors 600xx.
+        ERROR_CODE_CONFLICT_SECRET("SECRETM_00006", "Secret already exists.", "There exists a " +
+                "secret: %s in the tenant."),
+        ERROR_CODE_SECRET_NOT_FOUND("SECRETM_00009", "Secret not found.", "Secret with the " +
+                "name: %s does not exists."),
+        ERROR_CODE_CONFLICT_SECRET_TYPE("SECRETM_00019", "Secret type already exists.",
+                "Secret type with the name: %s already exists."),
+        ERROR_CODE_SECRET_TYPE_NOT_FOUND("SECRETM_00021", "Secret type not found.",
+                "Secret type with the name: %s does not exists."),
+
         ERROR_CODE_REFERENCE_NAME_NOT_SPECIFIED("60001", "Empty reference name",
                 "Secret reference name is not specified in the request"),
         ERROR_CODE_SECRET_KEY_NOT_SPECIFIED("60002", "Empty key",
                 "Secret key is not specified in the request"),
         ERROR_CODE_SECRET_VALUE_NOT_SPECIFIED("60003", "Empty value",
                 "Secret value is not specified in the request"),
-        ERROR_CODE_CONFLICT_SECRET("60004", "Secret already exists.",
-                "There exists a secret: %s in the tenant."),
 
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_SECRET("65003", "Error while getting secret.",
@@ -72,7 +77,7 @@ public class SecretManagementConstants {
 
         public String getCode() {
 
-            return ERROR_PREFIX + code;
+            return code;
         }
 
         public String getMessage() {

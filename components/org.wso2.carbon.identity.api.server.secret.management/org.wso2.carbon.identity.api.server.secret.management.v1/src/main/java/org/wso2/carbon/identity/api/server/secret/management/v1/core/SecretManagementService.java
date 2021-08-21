@@ -38,7 +38,8 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.CONFIG_MGT_ERROR_CODE_DELIMITER;
-import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.ERROR_PREFIX;
+import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_SECRET;
+import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.ErrorMessage.ERROR_CODE_SECRET_NOT_FOUND;
 
 /**
  * Invoke internal OSGi service to perform secret management operations.
@@ -162,7 +163,6 @@ public class SecretManagementService {
      *
      * @return secrets of the tenant.
      */
-
     public List<SecretResponse> getSecretsList(String secretType) {
 
         try {
@@ -225,16 +225,23 @@ public class SecretManagementService {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
-                        ERROR_PREFIX + errorCode;
+                        errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
-            status = Response.Status.BAD_REQUEST;
+
+            if (ERROR_CODE_CONFLICT_SECRET.getCode().equals(e.getErrorCode())) {
+                status = Response.Status.CONFLICT;
+            } else if (ERROR_CODE_SECRET_NOT_FOUND.getCode().equals(e.getErrorCode())) {
+                status = Response.Status.NOT_FOUND;
+            } else {
+                status = Response.Status.BAD_REQUEST;
+            }
         } else if (e instanceof SecretManagementServerException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
-                        ERROR_PREFIX + errorCode;
+                        errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
