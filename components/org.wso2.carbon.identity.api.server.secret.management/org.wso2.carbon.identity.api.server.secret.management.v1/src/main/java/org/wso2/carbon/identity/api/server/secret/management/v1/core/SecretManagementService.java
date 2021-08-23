@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_SECRET;
-import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.ErrorMessage.ERROR_CODE_SECRET_NOT_FOUND;
+import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_ALREADY_EXISTS;
+import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_DOES_NOT_EXISTS;
 
 /**
  * Invoke internal OSGi service to perform secret management operations.
@@ -226,9 +226,9 @@ public class SecretManagementService {
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
-            if (ERROR_CODE_CONFLICT_SECRET.getCode().equals(e.getErrorCode())) {
+            if (ERROR_CODE_SECRET_ALREADY_EXISTS.getCode().equals(e.getErrorCode())) {
                 status = Response.Status.CONFLICT;
-            } else if (ERROR_CODE_SECRET_NOT_FOUND.getCode().equals(e.getErrorCode())) {
+            } else if (ERROR_CODE_SECRET_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
                 status = Response.Status.NOT_FOUND;
             } else {
                 status = Response.Status.BAD_REQUEST;
