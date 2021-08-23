@@ -33,8 +33,8 @@ import org.wso2.carbon.identity.secret.mgt.core.model.SecretType;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.CONFIG_MGT_ERROR_CODE_DELIMITER;
-import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.ERROR_PREFIX;
+import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_TYPE_ALREADY_EXISTS;
+import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_TYPE_DOES_NOT_EXISTS;
 
 /**
  * Invoke internal OSGi service to perform secret type management operations.
@@ -189,17 +189,20 @@ public class SecretTypeManagementService {
         if (e instanceof SecretManagementClientException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
-                errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
-                        ERROR_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
-            status = Response.Status.BAD_REQUEST;
+            if (ERROR_CODE_SECRET_TYPE_ALREADY_EXISTS.getCode().equals(e.getErrorCode())) {
+                status = Response.Status.CONFLICT;
+            } else if (ERROR_CODE_SECRET_TYPE_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
+                status = Response.Status.NOT_FOUND;
+            } else {
+                status = Response.Status.BAD_REQUEST;
+            }
+
         } else if (e instanceof SecretManagementServerException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
-                errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
-                        ERROR_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());

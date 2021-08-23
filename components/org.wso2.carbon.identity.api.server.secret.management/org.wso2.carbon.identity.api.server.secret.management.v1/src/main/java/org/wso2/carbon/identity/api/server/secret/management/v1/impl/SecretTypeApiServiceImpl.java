@@ -27,7 +27,7 @@ import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretType
 import java.net.URI;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.SECRET_CONTEXT_PATH;
+import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.SECRET_TYPE_CONTEXT_PATH;
 import static org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants.V1_API_PATH_COMPONENT;
 
 /**
@@ -42,7 +42,7 @@ public class SecretTypeApiServiceImpl implements SecretTypeApiService {
     public Response createSecretType(SecretTypeAddRequest secretTypeAddRequest) {
 
         SecretTypeResponse secretType = secretTypeManagementService.addSecretType(secretTypeAddRequest);
-        URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + SECRET_CONTEXT_PATH + "/"
+        URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + SECRET_TYPE_CONTEXT_PATH + "/"
                 + secretType.getName());
         return Response.created(location).entity(secretType).build();
 

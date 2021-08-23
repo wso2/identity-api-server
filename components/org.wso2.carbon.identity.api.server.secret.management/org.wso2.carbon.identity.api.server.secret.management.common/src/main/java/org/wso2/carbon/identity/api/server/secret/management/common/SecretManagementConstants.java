@@ -23,10 +23,9 @@ package org.wso2.carbon.identity.api.server.secret.management.common;
  */
 public class SecretManagementConstants {
 
-    public static final String ERROR_PREFIX = "ECM-";
-
+    public static final String ERROR_PREFIX = "SECRETM_";
     public static final String SECRET_CONTEXT_PATH = "/secrets";
-    public static final String CONFIG_MGT_ERROR_CODE_DELIMITER = "_";
+    public static final String SECRET_TYPE_CONTEXT_PATH = "/secret-type";
     public static final String CORRELATION_ID_MDC = "Correlation-ID";
     public static final String V1_API_PATH_COMPONENT = "/v1";
 
@@ -38,12 +37,8 @@ public class SecretManagementConstants {
         // Client errors 600xx.
         ERROR_CODE_REFERENCE_NAME_NOT_SPECIFIED("60001", "Empty reference name",
                 "Secret reference name is not specified in the request"),
-        ERROR_CODE_SECRET_KEY_NOT_SPECIFIED("60002", "Empty key",
-                "Secret key is not specified in the request"),
         ERROR_CODE_SECRET_VALUE_NOT_SPECIFIED("60003", "Empty value",
                 "Secret value is not specified in the request"),
-        ERROR_CODE_CONFLICT_SECRET("60004", "Secret already exists.",
-                "There exists a secret: %s in the tenant."),
 
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_SECRET("65003", "Error while getting secret.",
