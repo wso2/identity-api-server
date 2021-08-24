@@ -128,6 +128,7 @@ import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.ErrorMessage.ERROR_CODE_IDP_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPLATE_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.JWKS_URI;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_CATEGORY;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_DISPLAY_ORDER;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_SERVICES;
@@ -1406,7 +1407,7 @@ public class ServerIdpManagementService {
                 ConnectedApp listItem = new ConnectedApp();
                 listItem.setAppId(app);
                 listItem.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
-                                "/applications/%s", app)).toString());
+                        "/applications/%s", app)).toString());
                 connectedAppList.add(listItem);
             }
             connectedAppsResponse.setConnectedApps(connectedAppList);
@@ -1801,7 +1802,7 @@ public class ServerIdpManagementService {
         List<IdentityProviderProperty> idpProperties = new ArrayList<>();
         if (StringUtils.isNotBlank(idpJWKSUri)) {
             IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
-            jwksProperty.setName(Constants.JWKS_URI);
+            jwksProperty.setName(JWKS_URI);
             jwksProperty.setValue(idpJWKSUri);
             idpProperties.add(jwksProperty);
         }
@@ -1835,7 +1836,7 @@ public class ServerIdpManagementService {
         listResponse.setTotalResults(idpSearchResult.getTotalIDPCount());
         listResponse.setStartIndex(idpSearchResult.getOffSet() + 1);
         listResponse.setLinks(createLinks(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT, idpSearchResult
-                        .getLimit(), idpSearchResult.getOffSet(), idpSearchResult.getTotalIDPCount(), idpSearchResult
+                .getLimit(), idpSearchResult.getOffSet(), idpSearchResult.getTotalIDPCount(), idpSearchResult
                 .getFilter()));
         return listResponse;
     }
@@ -1989,7 +1990,7 @@ public class ServerIdpManagementService {
         Certificate certificate = null;
         IdentityProviderProperty[] idpProperties = identityProvider.getIdpProperties();
         for (IdentityProviderProperty property : idpProperties) {
-            if (Constants.JWKS_URI.equals(property.getName())) {
+            if (JWKS_URI.equals(property.getName())) {
                 certificate = new Certificate().jwksUri(property.getValue());
                 break;
             }
@@ -2733,7 +2734,7 @@ public class ServerIdpManagementService {
                             patchIdpProperties(idpToUpdate, Constants.IDP_ISSUER_NAME, value);
                             break;
                         case Constants.CERTIFICATE_JWKSURI_PATH:
-                            patchIdpProperties(idpToUpdate, Constants.JWKS_URI, value);
+                            patchIdpProperties(idpToUpdate, JWKS_URI, value);
                             break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -2792,10 +2793,25 @@ public class ServerIdpManagementService {
 
     private void patchIdpProperties(IdentityProvider identityProvider, String propertyName, String propertyValue) {
 
+        Boolean hasExistingJWKSUri = false;
         IdentityProviderProperty[] propertyDTOS = identityProvider.getIdpProperties();
         for (IdentityProviderProperty propertyDTO : propertyDTOS) {
             if (propertyName.equals(propertyDTO.getName())) {
                 propertyDTO.setValue(propertyValue);
+                if (propertyName.equals(JWKS_URI)){
+                    hasExistingJWKSUri = true;
+                }
+            }
+        }
+        if (!hasExistingJWKSUri && propertyName.equals(JWKS_URI)) {
+            List<IdentityProviderProperty> idpProperties = new ArrayList<>(Arrays.asList(propertyDTOS));
+            IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
+            jwksProperty.setName(JWKS_URI);
+            jwksProperty.setValue(propertyValue);
+            idpProperties.add(jwksProperty);
+            identityProvider.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
+            if (ArrayUtils.isNotEmpty(identityProvider.getCertificateInfoArray())){
+                identityProvider.setCertificate(null);
             }
         }
     }
@@ -2980,7 +2996,7 @@ public class ServerIdpManagementService {
      *                                                   the claim mappings.
      */
     private void validateUserAndRoleClaims(String userClaimURI, String roleClaimURI,
-                               List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> claimMappings)
+                                           List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> claimMappings)
             throws IdentityProviderManagementClientException {
 
         boolean isUserClaimURISpecified = StringUtils.isNotBlank(userClaimURI);
