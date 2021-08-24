@@ -34,7 +34,7 @@ public class Certificate  {
     private String value;
 
     /**
-    * Certificate type.this should be either JWKS or PEM.
+    * Certificate type. This should be either JWKS or PEM.
     **/
     public Certificate type(String type) {
 
@@ -42,7 +42,7 @@ public class Certificate  {
         return this;
     }
     
-    @ApiModelProperty(value = "Certificate type.this should be either JWKS or PEM.")
+    @ApiModelProperty(value = "Certificate type. This should be either JWKS or PEM.")
     @JsonProperty("type")
     @Valid
     public String getType() {

@@ -2392,7 +2392,7 @@ components:
         type:
           type: string
           description: >-
-            Certificate type.this should be either JWKS or PEM.
+            Certificate type. This should be either JWKS or PEM.
         value:
           type: string
           description: >-
