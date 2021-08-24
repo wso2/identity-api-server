@@ -59,6 +59,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.arrayToStream;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_JWKS;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_PEM;
 
 /**
  * Converts the backend model ServiceProvider into the corresponding API model object.
@@ -353,9 +355,9 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private Certificate getCertificate(ServiceProvider serviceProvider) {
 
         if (StringUtils.isNotBlank(serviceProvider.getCertificateContent())) {
-            return new Certificate().type(Certificate.TypeEnum.PEM).value(serviceProvider.getCertificateContent());
+            return new Certificate().type(TYPE_JWKS).value(serviceProvider.getCertificateContent());
         } else if (StringUtils.isNotBlank(serviceProvider.getJwksUri())) {
-            return new Certificate().type(Certificate.TypeEnum.JWKS).value(serviceProvider.getJwksUri());
+            return new Certificate().type(TYPE_PEM).value(serviceProvider.getJwksUri());
         }
 
         return null;
