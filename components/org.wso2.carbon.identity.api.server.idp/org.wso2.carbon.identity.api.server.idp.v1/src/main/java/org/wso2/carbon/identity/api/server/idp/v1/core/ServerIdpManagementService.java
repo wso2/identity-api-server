@@ -1406,7 +1406,7 @@ public class ServerIdpManagementService {
                 ConnectedApp listItem = new ConnectedApp();
                 listItem.setAppId(app);
                 listItem.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
-                        "/applications/%s", app)).toString());
+                                "/applications/%s", app)).toString());
                 connectedAppList.add(listItem);
             }
             connectedAppsResponse.setConnectedApps(connectedAppList);
@@ -1835,7 +1835,7 @@ public class ServerIdpManagementService {
         listResponse.setTotalResults(idpSearchResult.getTotalIDPCount());
         listResponse.setStartIndex(idpSearchResult.getOffSet() + 1);
         listResponse.setLinks(createLinks(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT, idpSearchResult
-                .getLimit(), idpSearchResult.getOffSet(), idpSearchResult.getTotalIDPCount(), idpSearchResult
+                        .getLimit(), idpSearchResult.getOffSet(), idpSearchResult.getTotalIDPCount(), idpSearchResult
                 .getFilter()));
         return listResponse;
     }
@@ -2797,7 +2797,7 @@ public class ServerIdpManagementService {
         for (IdentityProviderProperty propertyDTO : propertyDTOS) {
             if (propertyName.equals(propertyDTO.getName())) {
                 propertyDTO.setValue(propertyValue);
-                if (propertyName.equals(Constants.JWKS_URI)){
+                if (propertyName.equals(Constants.JWKS_URI)) {
                     hasExistingJWKSUri = true;
                 }
             }
@@ -2809,7 +2809,7 @@ public class ServerIdpManagementService {
             jwksProperty.setValue(propertyValue);
             idpProperties.add(jwksProperty);
             identityProvider.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
-            if (ArrayUtils.isNotEmpty(identityProvider.getCertificateInfoArray())){
+            if (ArrayUtils.isNotEmpty(identityProvider.getCertificateInfoArray())) {
                 identityProvider.setCertificate(null);
             }
         }
@@ -2995,7 +2995,7 @@ public class ServerIdpManagementService {
      *                                                   the claim mappings.
      */
     private void validateUserAndRoleClaims(String userClaimURI, String roleClaimURI,
-                                           List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> claimMappings)
+                               List<org.wso2.carbon.identity.api.server.idp.v1.model.ClaimMapping> claimMappings)
             throws IdentityProviderManagementClientException {
 
         boolean isUserClaimURISpecified = StringUtils.isNotBlank(userClaimURI);
