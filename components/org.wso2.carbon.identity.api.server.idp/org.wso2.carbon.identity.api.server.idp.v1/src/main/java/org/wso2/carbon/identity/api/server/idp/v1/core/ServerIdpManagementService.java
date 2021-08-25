@@ -2809,8 +2809,8 @@ public class ServerIdpManagementService {
                 return;
             }
         }
-        // If identity provider does not have existing JWKS URI, have to create new IdentityProviderProperty and
-        // set the JWKS_URI
+        /*  If identity provider does not have existing JWKS URI, have to create new IdentityProviderProperty and
+        set the JWKS_URI */
         List<IdentityProviderProperty> idpProperties = new ArrayList<>(Arrays.asList(propertyDTOS));
         IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
         jwksProperty.setName(Constants.JWKS_URI);
