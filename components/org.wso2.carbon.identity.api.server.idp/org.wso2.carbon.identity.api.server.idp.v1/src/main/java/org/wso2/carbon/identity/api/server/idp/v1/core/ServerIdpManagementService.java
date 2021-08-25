@@ -2733,7 +2733,7 @@ public class ServerIdpManagementService {
                             patchIdpProperties(idpToUpdate, Constants.IDP_ISSUER_NAME, value);
                             break;
                         case Constants.CERTIFICATE_JWKSURI_PATH:
-                            patchIdpProperties(idpToUpdate, Constants.JWKS_URI, value);
+                            patchJWSURI(idpToUpdate, Constants.JWKS_URI, value);
                             break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -2792,26 +2792,33 @@ public class ServerIdpManagementService {
 
     private void patchIdpProperties(IdentityProvider identityProvider, String propertyName, String propertyValue) {
 
-        Boolean hasExistingJWKSUri = false;
         IdentityProviderProperty[] propertyDTOS = identityProvider.getIdpProperties();
         for (IdentityProviderProperty propertyDTO : propertyDTOS) {
             if (propertyName.equals(propertyDTO.getName())) {
                 propertyDTO.setValue(propertyValue);
-                if (propertyName.equals(Constants.JWKS_URI)) {
-                    hasExistingJWKSUri = true;
-                }
             }
         }
-        if (!hasExistingJWKSUri && propertyName.equals(Constants.JWKS_URI)) {
-            List<IdentityProviderProperty> idpProperties = new ArrayList<>(Arrays.asList(propertyDTOS));
-            IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
-            jwksProperty.setName(Constants.JWKS_URI);
-            jwksProperty.setValue(propertyValue);
-            idpProperties.add(jwksProperty);
-            identityProvider.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
-            if (ArrayUtils.isNotEmpty(identityProvider.getCertificateInfoArray())) {
-                identityProvider.setCertificate(null);
+    }
+
+    private void patchJWSURI(IdentityProvider identityProvider, String propertyName, String propertyValue) {
+
+        IdentityProviderProperty[] propertyDTOS = identityProvider.getIdpProperties();
+        for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+            if (propertyName.equals(propertyDTO.getName())) {
+                propertyDTO.setValue(propertyValue);
+                return;
             }
+        }
+        // If identity provider does not have existing JWSK URI, have to create new IdentityProviderProperty and
+        // set the URI
+        List<IdentityProviderProperty> idpProperties = new ArrayList<>(Arrays.asList(propertyDTOS));
+        IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
+        jwksProperty.setName(Constants.JWKS_URI);
+        jwksProperty.setValue(propertyValue);
+        idpProperties.add(jwksProperty);
+        identityProvider.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
+        if (ArrayUtils.isNotEmpty(identityProvider.getCertificateInfoArray())) {
+            identityProvider.setCertificate(null);
         }
     }
 
