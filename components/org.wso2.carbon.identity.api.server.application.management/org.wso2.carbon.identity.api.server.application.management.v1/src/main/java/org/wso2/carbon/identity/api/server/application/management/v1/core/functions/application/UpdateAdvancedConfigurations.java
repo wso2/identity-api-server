@@ -28,6 +28,9 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
  */
 public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvider, AdvancedApplicationConfiguration> {
 
+    public static final String TYPE_JWKS = "JWKS";
+    public static final String TYPE_PEM = "PEM";
+
     @Override
     public void apply(ServiceProvider serviceProvider,
                       AdvancedApplicationConfiguration advancedConfigurations) {
@@ -59,9 +62,9 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
     private void updateCertificate(Certificate certificate, ServiceProvider serviceProvider) {
 
         if (certificate != null) {
-            if (certificate.getType() == Certificate.TypeEnum.PEM) {
+            if (TYPE_PEM.equals(certificate.getType())) {
                 setIfNotNull(certificate.getValue(), serviceProvider::setCertificateContent);
-            } else if (certificate.getType() == Certificate.TypeEnum.JWKS) {
+            } else if (TYPE_JWKS.equals(certificate.getType())) {
                 setIfNotNull(certificate.getValue(), serviceProvider::setJwksUri);
             }
         }
