@@ -89,6 +89,11 @@ public class UserStoreConstants {
                 "Unable to retrieve user store attribute metadata",
                 "Server Encountered an error while retrieving user store attribute metadata",
                 Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_ERROR_CREATING_USERSTORE("65014",
+                "UserStore type is not allowed",
+                "Requested UserStore type is not allowed",
+                Response.Status.BAD_REQUEST
+        ),
 
         // Client Errors - 600xx
         ERROR_CODE_DOMAIN_ID_NOT_FOUND("60001",

@@ -43,22 +43,9 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     private ServerUserStoreService serverUserStoreService;
 
 
-    private static boolean isAvailableUserStoreTypes(List<AvailableUserStoreClassesRes> userStoreList, String typeID) {
-
-        for (AvailableUserStoreClassesRes userStore : userStoreList) {
-            if (userStore.getTypeId().equals(typeID)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public Response addUserStore(UserStoreReq userStoreReq) {
 
-        if (!isAvailableUserStoreTypes(serverUserStoreService.getAvailableUserStoreTypes(), userStoreReq.getTypeId())) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("UserStore type is not allowed").build();
-        }
         UserStoreResponse response = serverUserStoreService.addUserStore(userStoreReq);
         return Response.created(getResourceLocation(response.getId())).entity(response).build();
     }
