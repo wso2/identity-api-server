@@ -19,7 +19,6 @@ package org.wso2.carbon.identity.api.server.userstore.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.userstore.v1.UserstoresApiService;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStoreClassesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
@@ -41,7 +40,6 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
 
     @Autowired
     private ServerUserStoreService serverUserStoreService;
-
 
     @Override
     public Response addUserStore(UserStoreReq userStoreReq) {
