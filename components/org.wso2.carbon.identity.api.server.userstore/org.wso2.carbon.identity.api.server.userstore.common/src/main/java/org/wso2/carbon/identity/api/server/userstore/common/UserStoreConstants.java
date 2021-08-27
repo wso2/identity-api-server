@@ -118,7 +118,7 @@ public class UserStoreConstants {
                 "Error occurred while retrieving claim attribute mappings."),
         ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("60014", "Attribute mapping not specified.",
                 "Attribute mapping cannot be empty."),
-        ERROR_CODE_INVALID_USERSTORE_TYPE("65015","UserStore type is not allowed",
+        ERROR_CODE_INVALID_USERSTORE_TYPE("60015","UserStore type is not allowed",
                 "Requested UserStore type is not allowed", Response.Status.BAD_REQUEST);
 
         private final String code;
