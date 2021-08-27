@@ -94,6 +94,16 @@ public class ServerUserStoreService {
 
     private static final String DUMMY_MESSAGE_ID = "DUMMY-MESSAGE-ID";
 
+    private static boolean isAvailableUserStoreTypes(List<AvailableUserStoreClassesRes> userStoreList, String typeID) {
+
+        for (AvailableUserStoreClassesRes userStore : userStoreList) {
+            if (userStore.getTypeId().equals(typeID)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Add a userStore {@link UserStoreReq}.
      *
@@ -104,7 +114,10 @@ public class ServerUserStoreService {
 
         try {
             validateMandatoryProperties(userStoreReq);
-
+            if (!isAvailableUserStoreTypes(getAvailableUserStoreTypes(), userStoreReq.getTypeId())) {
+                throw handleException(Response.Status.BAD_REQUEST,
+                        UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_USERSTORE_TYPE);
+            }
             String userstoreDomain = userStoreReq.getName();
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             List<LocalClaim> localClaimList = new ArrayList<>();

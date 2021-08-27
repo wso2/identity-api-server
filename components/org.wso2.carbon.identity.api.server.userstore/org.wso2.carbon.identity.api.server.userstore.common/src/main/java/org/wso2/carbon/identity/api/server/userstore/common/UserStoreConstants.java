@@ -116,7 +116,9 @@ public class UserStoreConstants {
         ERROR_CODE_ERROR_RETRIEVING_CLAIM_MAPPING("60013", "Unable to retrieve claim mappings.",
                 "Error occurred while retrieving claim attribute mappings."),
         ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("60014", "Attribute mapping not specified.",
-                "Attribute mapping cannot be empty.");
+                "Attribute mapping cannot be empty."),
+        ERROR_CODE_INVALID_USERSTORE_TYPE("60015", "UserStore type is not allowed",
+                "Requested UserStore type is not allowed", Response.Status.BAD_REQUEST);
 
         private final String code;
         private final String message;
