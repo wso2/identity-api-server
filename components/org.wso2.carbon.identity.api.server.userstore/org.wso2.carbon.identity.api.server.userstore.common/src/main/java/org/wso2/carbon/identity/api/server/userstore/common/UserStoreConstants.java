@@ -90,7 +90,6 @@ public class UserStoreConstants {
                 "Server Encountered an error while retrieving user store attribute metadata",
                 Response.Status.INTERNAL_SERVER_ERROR),
 
-
         // Client Errors - 600xx
         ERROR_CODE_DOMAIN_ID_NOT_FOUND("60001",
                 "Resource not found.",
@@ -118,7 +117,7 @@ public class UserStoreConstants {
                 "Error occurred while retrieving claim attribute mappings."),
         ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("60014", "Attribute mapping not specified.",
                 "Attribute mapping cannot be empty."),
-        ERROR_CODE_INVALID_USERSTORE_TYPE("60015","UserStore type is not allowed",
+        ERROR_CODE_INVALID_USERSTORE_TYPE("60015", "UserStore type is not allowed",
                 "Requested UserStore type is not allowed", Response.Status.BAD_REQUEST);
 
         private final String code;
