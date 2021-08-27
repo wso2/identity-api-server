@@ -89,11 +89,7 @@ public class UserStoreConstants {
                 "Unable to retrieve user store attribute metadata",
                 "Server Encountered an error while retrieving user store attribute metadata",
                 Response.Status.INTERNAL_SERVER_ERROR),
-        ERROR_CODE_ERROR_CREATING_USERSTORE("65014",
-                "UserStore type is not allowed",
-                "Requested UserStore type is not allowed",
-                Response.Status.BAD_REQUEST
-        ),
+
 
         // Client Errors - 600xx
         ERROR_CODE_DOMAIN_ID_NOT_FOUND("60001",
@@ -121,7 +117,9 @@ public class UserStoreConstants {
         ERROR_CODE_ERROR_RETRIEVING_CLAIM_MAPPING("60013", "Unable to retrieve claim mappings.",
                 "Error occurred while retrieving claim attribute mappings."),
         ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("60014", "Attribute mapping not specified.",
-                "Attribute mapping cannot be empty.");
+                "Attribute mapping cannot be empty."),
+        ERROR_CODE_INVALID_USERSTORE_TYPE("65015","UserStore type is not allowed",
+                "Requested UserStore type is not allowed", Response.Status.BAD_REQUEST);
 
         private final String code;
         private final String message;

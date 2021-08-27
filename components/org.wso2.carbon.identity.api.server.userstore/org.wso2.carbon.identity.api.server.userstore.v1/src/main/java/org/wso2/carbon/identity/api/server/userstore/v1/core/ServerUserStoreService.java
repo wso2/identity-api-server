@@ -116,7 +116,7 @@ public class ServerUserStoreService {
             validateMandatoryProperties(userStoreReq);
             if (!isAvailableUserStoreTypes(getAvailableUserStoreTypes(), userStoreReq.getTypeId())) {
                 throw handleException(Response.Status.BAD_REQUEST,
-                        UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_CREATING_USERSTORE);
+                        UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_USERSTORE_TYPE);
             }
             String userstoreDomain = userStoreReq.getName();
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
