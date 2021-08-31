@@ -355,9 +355,9 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private Certificate getCertificate(ServiceProvider serviceProvider) {
 
         if (StringUtils.isNotBlank(serviceProvider.getCertificateContent())) {
-            return new Certificate().type(TYPE_JWKS).value(serviceProvider.getCertificateContent());
+            return new Certificate().type(TYPE_PEM).value(serviceProvider.getCertificateContent());
         } else if (StringUtils.isNotBlank(serviceProvider.getJwksUri())) {
-            return new Certificate().type(TYPE_PEM).value(serviceProvider.getJwksUri());
+            return new Certificate().type(TYPE_JWKS).value(serviceProvider.getJwksUri());
         }
 
         return null;

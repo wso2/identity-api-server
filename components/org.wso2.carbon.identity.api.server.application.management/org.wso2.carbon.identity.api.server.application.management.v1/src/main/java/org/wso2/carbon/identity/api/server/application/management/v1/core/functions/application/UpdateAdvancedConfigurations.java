@@ -64,8 +64,10 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
         if (certificate != null) {
             if (TYPE_PEM.equals(certificate.getType())) {
                 setIfNotNull(certificate.getValue(), serviceProvider::setCertificateContent);
+                serviceProvider.setJwksUri(null);
             } else if (TYPE_JWKS.equals(certificate.getType())) {
                 setIfNotNull(certificate.getValue(), serviceProvider::setJwksUri);
+                serviceProvider.setCertificateContent(null);
             }
         }
     }
