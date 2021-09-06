@@ -2391,9 +2391,8 @@ components:
       properties:
         type:
           type: string
-          enum:
-            - JWKS
-            - PEM
+          description: >-
+            Certificate type. This should be either JWKS or PEM.
         value:
           type: string
           description: >-
