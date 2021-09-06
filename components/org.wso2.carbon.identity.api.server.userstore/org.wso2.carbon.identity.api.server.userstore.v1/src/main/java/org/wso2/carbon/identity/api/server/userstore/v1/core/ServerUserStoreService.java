@@ -1288,8 +1288,7 @@ public class ServerUserStoreService {
             UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
                     .getUserStoreConfigService();
             classNames = userStoreConfigService.getAvailableUserStoreClasses();
-            if (CollectionUtils.isEmpty(classNames) ||
-                    !classNames.contains(userStoreName)) {
+            if (CollectionUtils.isEmpty(classNames) || !classNames.contains(userStoreName)) {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.
                         ERROR_CODE_NOT_FOUND);
             }
