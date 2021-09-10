@@ -2620,10 +2620,11 @@ public class ServerIdpManagementService {
             String path = patch.getPath();
             Patch.OperationEnum operation = patch.getOperation();
             String value = patch.getValue();
-            // We support only 'ADD', 'REPLACE' and 'REMOVE' patch operations.
+            boolean isCertificateUpdateRequest =
+                    path.matches(Constants.CERTIFICATE_PATH_REGEX) && path.split(Constants.PATH_SEPERATOR).length == 4;
+            // 'ADD', 'REPLACE' and 'REMOVE' patch operations supported.
             if (operation == Patch.OperationEnum.REPLACE) {
-                if (path.matches(Constants.CERTIFICATE_PATH_REGEX) && path.split(Constants.PATH_SEPERATOR).length ==
-                        4) {
+                if (isCertificateUpdateRequest) {
                     List<String> certificates = new ArrayList<>();
                     int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
                     if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index >= 0)
@@ -2682,40 +2683,113 @@ public class ServerIdpManagementService {
                                     .ERROR_CODE_INVALID_INPUT, null);
                     }
                 }
-            } else if (operation == Patch.OperationEnum.ADD && path.matches(Constants.CERTIFICATE_PATH_REGEX) && path
-                    .split(Constants.PATH_SEPERATOR).length == 4) {
-                List<String> certificates = new ArrayList<>();
-                int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
-                if (index < 0) {
-                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                            .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
-                }
-                if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
-                    if (index > idpToUpdate.getCertificateInfoArray().length) {
-                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                                .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+            } else if (operation == Patch.OperationEnum.ADD) {
+                if (isCertificateUpdateRequest) {
+
+                    List<String> certificates = new ArrayList<>();
+                    int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
+                    if (index < 0) {
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
                     }
-                    for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
-                        certificates.add(certInfo.getCertValue());
+                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
+                        if (index > idpToUpdate.getCertificateInfoArray().length) {
+                            throw handleException(Response.Status.BAD_REQUEST,
+                                    Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                                    "Invalid index in 'path' attribute");
+                        }
+                        for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
+                            certificates.add(base64Decode(certInfo.getCertValue()));
+                        }
                     }
-                }
-                certificates.add(index, value);
-                idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
-            } else if (operation == Patch.OperationEnum.REMOVE && path.matches(Constants.CERTIFICATE_PATH_REGEX) &&
-                    path.split(Constants.PATH_SEPERATOR).length == 4) {
-                List<String> certificates = new ArrayList<>();
-                int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
-                if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index >= 0) && index <
-                        idpToUpdate.getCertificateInfoArray().length) {
-                    for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
-                        certificates.add(certInfo.getCertValue());
+                    if (!value.startsWith(IdentityUtil.PEM_BEGIN_CERTFICATE)) {
+                        try {
+                            value = base64Decode(value);
+                        } catch (IllegalArgumentException e) {
+                            throw handleException(Response.Status.BAD_REQUEST,
+                                    Constants.ErrorMessage.ERROR_CODE_INVALID_CERTIFICATE_FORMAT, null);
+                        }
                     }
-                    certificates.remove(index);
+                    certificates.add(index, value);
+                    idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
+
+                    // Need to remove the JWKS URI property, if it exists, when adding certificates as they are
+                    // alternate options of the property Certificate Type.
+                    IdentityProviderProperty[] propertyDTOS = idpToUpdate.getIdpProperties();
+                    List<IdentityProviderProperty> idpNewProperties = new ArrayList<>();
+                    for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+                        // Add properties to new list omitting the JWKS URI property.
+                        if (!Constants.JWKS_URI.equals(propertyDTO.getName())) {
+                            idpNewProperties.add(propertyDTO);
+                        }
+                    }
+                    idpToUpdate.setIdpProperties(idpNewProperties.toArray(new IdentityProviderProperty[0]));
+                } else if (StringUtils.equalsIgnoreCase(Constants.CERTIFICATE_JWKSURI_PATH, path)) {
+
+                    IdentityProviderProperty[] propertyDTOS = idpToUpdate.getIdpProperties();
+                    for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+                        if (Constants.JWKS_URI.equals(propertyDTO.getName())) {
+                            throw handleException(Response.Status.BAD_REQUEST,
+                                    Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
+                                    "Cannot add JWKS URI as it already exists");
+                        }
+                    }
+
+                    List<IdentityProviderProperty> idpProperties = new ArrayList<>(Arrays.asList(propertyDTOS));
+                    IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
+                    jwksProperty.setName(Constants.JWKS_URI);
+                    jwksProperty.setValue(value);
+                    idpProperties.add(jwksProperty);
+                    idpToUpdate.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
+                    // Need to remove certificates, if any, when adding JWKS URI as they are alternate options of the
+                    // property Certificate Type.
+                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
+                        idpToUpdate.setCertificate(null);
+                    }
                 } else {
-                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                            .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+                    throw handleException(Response.Status.BAD_REQUEST,
+                            Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, null);
                 }
-                idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
+            } else if (operation == Patch.OperationEnum.REMOVE) {
+                if (isCertificateUpdateRequest) {
+
+                    List<String> certificates = new ArrayList<>();
+                    int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
+                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index >= 0) &&
+                            index < idpToUpdate.getCertificateInfoArray().length) {
+                        for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
+                            certificates.add(base64Decode(certInfo.getCertValue()));
+                        }
+                        certificates.remove(index);
+                    } else {
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+                    }
+                    idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
+                } else if (StringUtils.equalsIgnoreCase(Constants.CERTIFICATE_JWKSURI_PATH, path)) {
+
+                    IdentityProviderProperty[] propertyDTOS = idpToUpdate.getIdpProperties();
+                    List<IdentityProviderProperty> idpNewProperties = new ArrayList<>();
+                    for (IdentityProviderProperty propertyDTO: propertyDTOS) {
+                        // Add properties to new list omitting the JWKS URI property.
+                        if (!Constants.JWKS_URI.equals(propertyDTO.getName())) {
+                            idpNewProperties.add(propertyDTO);
+                        }
+                    }
+
+                    // If the sizes of original and new property lists are equal, then the JWKS URI property has not
+                    // been available.
+                    if (propertyDTOS.length == idpNewProperties.size()) {
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
+                                "Cannot remove JWKS URI as it does not exist");
+                    }
+
+                    idpToUpdate.setIdpProperties(idpNewProperties.toArray(new IdentityProviderProperty[0]));
+                } else {
+                    throw handleException(Response.Status.BAD_REQUEST,
+                            Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, null);
+                }
             } else {
                 // Throw an error if any other patch operations are sent in the request.
                 throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
