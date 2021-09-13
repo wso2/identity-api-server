@@ -29,6 +29,10 @@ public class SecretManagementConstants {
     public static final String CORRELATION_ID_MDC = "Correlation-ID";
     public static final String V1_API_PATH_COMPONENT = "/v1";
 
+    // Patch operation paths.
+    public static final String VALUE_PATH = "/value";
+    public static final String DESCRIPTION_PATH = "/description";
+
     /**
      * Enums for error messages.
      */
@@ -37,8 +41,12 @@ public class SecretManagementConstants {
         // Client errors 600xx.
         ERROR_CODE_REFERENCE_NAME_NOT_SPECIFIED("60001", "Empty reference name",
                 "Secret reference name is not specified in the request"),
-        ERROR_CODE_SECRET_VALUE_NOT_SPECIFIED("60003", "Empty value",
+        ERROR_CODE_SECRET_VALUE_NOT_SPECIFIED("60002", "Empty value",
                 "Secret value is not specified in the request"),
+        ERROR_CODE_SECRET_NOT_FOUND("60003", "Secret not found.", "Unable to find a secret matching the provided " +
+                "secret name %s."),
+        ERROR_CODE_INVALID_INPUT("60004", "Invalid input.", "One of the given inputs is invalid : %s."),
+
 
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_SECRET("65003", "Error while getting secret.",

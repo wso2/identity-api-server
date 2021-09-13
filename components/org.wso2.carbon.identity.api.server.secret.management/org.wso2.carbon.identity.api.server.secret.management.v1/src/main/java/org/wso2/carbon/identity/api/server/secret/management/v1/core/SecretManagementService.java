@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants;
 import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretAddRequest;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretPatchRequest;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretResponse;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretUpdateRequest;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementClientException;
@@ -173,6 +174,48 @@ public class SecretManagementService {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_GETTING_SECRET, null);
         }
+    }
+
+    /**
+     * To make a partial update or update the specific property of the secret.
+     *
+     * @param name               secret name.
+     * @param secretPatchRequest secret's patch details.
+     * @return Updated secret.
+     */
+    public SecretResponse patchSecret(String secretType, String name, SecretPatchRequest secretPatchRequest) {
+
+        Secret secret, responseDTO;
+        try {
+            secret = SecretManagementServiceHolder.getSecretConfigManager().getSecret(secretType, name);
+            if (secret == null) {
+                throw handleException(Response.Status.NOT_FOUND, SecretManagementConstants.ErrorMessage.ERROR_CODE_SECRET_NOT_FOUND,
+                        name);
+            }
+            String path = secretPatchRequest.getPath();
+            SecretPatchRequest.OperationEnum operation = secretPatchRequest.getOperation();
+            //Only the Replace operation supported with PATCH request
+            if (SecretPatchRequest.OperationEnum.REPLACE.equals(operation)) {
+                if (SecretManagementConstants.VALUE_PATH.equals(path)) {
+                    secret.setSecretValue(secretPatchRequest.getValue());
+                } else if (SecretManagementConstants.DESCRIPTION_PATH.equals(path)) {
+                    secret.setDescription(secretPatchRequest.getValue());
+                } else {
+                    throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage
+                            .ERROR_CODE_INVALID_INPUT, "Path");
+                }
+                responseDTO = SecretManagementServiceHolder.getSecretConfigManager().replaceSecret(secretType, secret);
+            } else {
+                // Throw an error if any other patch operations are sent in the request.
+                throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage
+                        .ERROR_CODE_INVALID_INPUT, "Operation");
+            }
+
+        } catch (SecretManagementException e) {
+            throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
+                    name);
+        }
+        return buildSecretResponseFromResponseDTO(responseDTO);
     }
 
     /**

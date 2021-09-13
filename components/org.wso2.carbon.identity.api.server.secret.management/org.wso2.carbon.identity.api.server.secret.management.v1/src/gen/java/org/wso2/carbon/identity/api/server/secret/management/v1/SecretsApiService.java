@@ -17,6 +17,7 @@
 package org.wso2.carbon.identity.api.server.secret.management.v1;
 
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretAddRequest;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretPatchRequest;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretUpdateRequest;
 import javax.ws.rs.core.Response;
 
@@ -30,6 +31,8 @@ public interface SecretsApiService {
       public Response getSecret(String secretType, String name);
 
       public Response getSecretsList(String secretType);
+
+      public Response patchSecret(String secretType, String name, SecretPatchRequest secretPatchRequest);
 
       public Response updateSecret(String secretType, String name, SecretUpdateRequest secretUpdateRequest);
 }
