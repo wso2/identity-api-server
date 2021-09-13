@@ -189,8 +189,8 @@ public class SecretManagementService {
         try {
             secret = SecretManagementServiceHolder.getSecretConfigManager().getSecret(secretType, name);
             if (secret == null) {
-                throw handleException(Response.Status.NOT_FOUND, SecretManagementConstants.ErrorMessage.ERROR_CODE_SECRET_NOT_FOUND,
-                        name);
+                throw handleException(Response.Status.NOT_FOUND, SecretManagementConstants.ErrorMessage.
+                                ERROR_CODE_SECRET_NOT_FOUND, name);
             }
             String path = secretPatchRequest.getPath();
             SecretPatchRequest.OperationEnum operation = secretPatchRequest.getOperation();
