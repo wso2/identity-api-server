@@ -40,6 +40,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
+import static org.wso2.carbon.identity.sso.saml.Error.URL_NOT_FOUND;
+
 /**
  * Helper functions for SAML inbound management.
  */
@@ -220,6 +222,9 @@ public class SAMLInboundFunctions {
 
         String msg = "Error while creating/updating SAML inbound of application.";
         if (e instanceof IdentitySAML2ClientException) {
+            if (URL_NOT_FOUND.getErrorCode().equals(e.getErrorCode())) {
+                return buildNotFoundError(msg, e);
+            }
             return buildBadRequestError(msg, e);
         } else {
             return buildServerError(msg, e);
@@ -232,6 +237,14 @@ public class SAMLInboundFunctions {
         String errorDescription = ex.getMessage();
 
         return Utils.buildClientError(errorCode, message, errorDescription);
+    }
+
+    private static APIError buildNotFoundError(String message, IdentityException ex) {
+
+        String errorCode = ex.getErrorCode();
+        String errorDescription = ex.getMessage();
+
+        return Utils.buildNotFoundError(errorCode, message, errorDescription);
     }
 
     private static APIError buildServerError(String message, IdentityException e) {
