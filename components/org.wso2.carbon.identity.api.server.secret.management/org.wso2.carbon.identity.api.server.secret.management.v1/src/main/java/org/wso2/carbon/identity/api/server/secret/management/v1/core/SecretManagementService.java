@@ -194,7 +194,7 @@ public class SecretManagementService {
             }
             String path = secretPatchRequest.getPath();
             SecretPatchRequest.OperationEnum operation = secretPatchRequest.getOperation();
-            //Only the Replace operation supported with PATCH request
+            // Only the Replace operation supported with PATCH request.
             if (SecretPatchRequest.OperationEnum.REPLACE.equals(operation)) {
                 if (SecretManagementConstants.VALUE_PATH.equals(path)) {
                     secret.setSecretValue(secretPatchRequest.getValue());
