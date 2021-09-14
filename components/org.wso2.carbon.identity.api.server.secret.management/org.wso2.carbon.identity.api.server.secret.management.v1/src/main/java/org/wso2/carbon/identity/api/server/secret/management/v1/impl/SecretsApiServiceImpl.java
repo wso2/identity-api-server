@@ -21,6 +21,7 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.secret.management.v1.SecretsApiService;
 import org.wso2.carbon.identity.api.server.secret.management.v1.core.SecretManagementService;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretAddRequest;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretPatchRequest;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretResponse;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretUpdateRequest;
 
@@ -65,6 +66,12 @@ public class SecretsApiServiceImpl implements SecretsApiService {
     public Response getSecretsList(String secretType) {
 
         return Response.ok().entity(secretManagementService.getSecretsList(secretType)).build();
+    }
+
+    @Override
+    public Response patchSecret(String secretType, String name, SecretPatchRequest secretPatchRequest) {
+
+        return Response.ok().entity(secretManagementService.patchSecret(secretType, name, secretPatchRequest)).build();
     }
 
     @Override

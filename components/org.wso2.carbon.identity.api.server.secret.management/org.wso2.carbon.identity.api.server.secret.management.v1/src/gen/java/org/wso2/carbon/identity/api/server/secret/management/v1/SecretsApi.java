@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretAddRequest;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretPatchRequest;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretResponse;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretUpdateRequest;
 
@@ -66,15 +67,15 @@ public class SecretsApi  {
     @Valid
     @DELETE
     @Path("/{secret-type}/{name}")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete an secret by name", notes = "This API provides the capability to delete a secret by name. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Secret", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 204, message = "No Content", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -136,6 +137,31 @@ public class SecretsApi  {
     public Response getSecretsList(@ApiParam(value = "name of the secret type",required=true) @PathParam("secret-type") String secretType) {
 
         return delegate.getSecretsList(secretType );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/{secret-type}/{name}")
+    @Consumes({"application/json"})
+    @Produces({"application/json"})
+    @ApiOperation(value = "Patch a secret by name.", notes = "This API provides the capability to update a secret using patch request by using its name. ", response = SecretResponse.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags = {"Secret",})
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Response", response = SecretResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 405, message = "Method Not Allowed.", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchSecret(@ApiParam(value = "name of the secret type", required = true) @PathParam("secret-type") String secretType, @ApiParam(value = "name of the secret", required = true) @PathParam("name") String name, @ApiParam(value = "", required = true) @Valid SecretPatchRequest secretPatchRequest) {
+
+        return delegate.patchSecret(secretType, name, secretPatchRequest);
     }
 
     @Valid
