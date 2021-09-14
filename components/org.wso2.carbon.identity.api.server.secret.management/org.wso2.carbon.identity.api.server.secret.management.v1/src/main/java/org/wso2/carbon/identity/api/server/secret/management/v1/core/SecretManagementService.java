@@ -190,21 +190,23 @@ public class SecretManagementService {
             secret = SecretManagementServiceHolder.getSecretConfigManager().getSecret(secretType, name);
             if (secret == null) {
                 throw handleException(Response.Status.NOT_FOUND, SecretManagementConstants.ErrorMessage.
-                                ERROR_CODE_SECRET_NOT_FOUND, name);
+                        ERROR_CODE_SECRET_NOT_FOUND, name);
             }
             String path = secretPatchRequest.getPath();
             SecretPatchRequest.OperationEnum operation = secretPatchRequest.getOperation();
             // Only the Replace operation supported with PATCH request.
             if (SecretPatchRequest.OperationEnum.REPLACE.equals(operation)) {
                 if (SecretManagementConstants.VALUE_PATH.equals(path)) {
-                    secret.setSecretValue(secretPatchRequest.getValue());
+                    responseDTO = SecretManagementServiceHolder.getSecretConfigManager().updateSecretValue(secretType,
+                            name, secretPatchRequest.getValue());
+
                 } else if (SecretManagementConstants.DESCRIPTION_PATH.equals(path)) {
-                    secret.setDescription(secretPatchRequest.getValue());
+                    responseDTO = SecretManagementServiceHolder.getSecretConfigManager().updateSecretDescription
+                            (secretType, name, secretPatchRequest.getValue());
                 } else {
                     throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage
                             .ERROR_CODE_INVALID_INPUT, "Path");
                 }
-                responseDTO = SecretManagementServiceHolder.getSecretConfigManager().replaceSecret(secretType, secret);
             } else {
                 // Throw an error if any other patch operations are sent in the request.
                 throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage
