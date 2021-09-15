@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.configs.v1.core;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -665,9 +667,10 @@ public class ServerConfigManagementService {
     private IdentityProvider createIdPClone(IdentityProvider idP) {
 
         try {
-            return (IdentityProvider) BeanUtils.cloneBean(idP);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException
-                e) {
+            Gson gson = new Gson();
+            IdentityProvider clonedIdentityProvider = gson.fromJson(gson.toJson(idP), IdentityProvider.class);
+            return clonedIdentityProvider;
+        } catch (JsonSyntaxException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
                     .ERROR_CODE_ERROR_UPDATING_CONFIGS, null);
         }
