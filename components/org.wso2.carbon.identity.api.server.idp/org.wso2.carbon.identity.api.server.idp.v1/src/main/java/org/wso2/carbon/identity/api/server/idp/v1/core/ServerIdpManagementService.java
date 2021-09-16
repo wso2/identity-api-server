@@ -2698,8 +2698,16 @@ public class ServerIdpManagementService {
                                         Constants.ErrorMessage.ERROR_CODE_INVALID_CERTIFICATE_FORMAT, null);
                             }
                         }
+                        if (certificates.contains(value)) {
+                            throw handleException(Response.Status.CONFLICT,
+                                    Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
+                                    "Cannot replace certificate as this certificate is already exists.");
+                        }
                         certificates.set(index, value);
                         idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
+                    } else if (ArrayUtils.isEmpty(idpToUpdate.getCertificateInfoArray()) || index >= idpToUpdate.getCertificateInfoArray().length) {
+                        throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage
+                                .ERROR_CODE_ERROR_UPDATING_IDP, "Cannot replace certificate as it does not exist");
                     } else {
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                 .ERROR_CODE_INVALID_INPUT, null);
@@ -2746,16 +2754,11 @@ public class ServerIdpManagementService {
 
                     List<String> certificates = new ArrayList<>();
                     int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
-                    if (index < 0) {
+                    if (index != idpToUpdate.getCertificateInfoArray().length) {
                         throw handleException(Response.Status.BAD_REQUEST,
                                 Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
                     }
                     if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
-                        if (index > idpToUpdate.getCertificateInfoArray().length) {
-                            throw handleException(Response.Status.BAD_REQUEST,
-                                    Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
-                                    "Invalid index in 'path' attribute");
-                        }
                         for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
                             certificates.add(base64Decode(certInfo.getCertValue()));
                         }
@@ -2767,6 +2770,11 @@ public class ServerIdpManagementService {
                             throw handleException(Response.Status.BAD_REQUEST,
                                     Constants.ErrorMessage.ERROR_CODE_INVALID_CERTIFICATE_FORMAT, null);
                         }
+                    }
+                    if (certificates.contains(value)) {
+                        throw handleException(Response.Status.CONFLICT,
+                                Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
+                                "Cannot add certificate as it already exists");
                     }
                     certificates.add(index, value);
                     idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
@@ -2819,6 +2827,10 @@ public class ServerIdpManagementService {
                             certificates.add(base64Decode(certInfo.getCertValue()));
                         }
                         certificates.remove(index);
+                    } else if (ArrayUtils.isEmpty(idpToUpdate.getCertificateInfoArray()) ||
+                            index >= idpToUpdate.getCertificateInfoArray().length) {
+                        throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage
+                                .ERROR_CODE_ERROR_UPDATING_IDP, "Cannot replace certificate as it does not exist");
                     } else {
                         throw handleException(Response.Status.BAD_REQUEST,
                                 Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
@@ -2838,7 +2850,7 @@ public class ServerIdpManagementService {
                     // If the sizes of original and new property lists are equal, then the JWKS URI property has not
                     // been available.
                     if (propertyDTOS.length == idpNewProperties.size()) {
-                        throw handleException(Response.Status.BAD_REQUEST,
+                        throw handleException(Response.Status.NOT_FOUND,
                                 Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
                                 "Cannot remove JWKS URI as it does not exist");
                     }
@@ -2862,7 +2874,13 @@ public class ServerIdpManagementService {
         for (IdentityProviderProperty propertyDTO : propertyDTOS) {
             if (propertyName.equals(propertyDTO.getName())) {
                 propertyDTO.setValue(propertyValue);
+                return;
             }
+        }
+
+        if (Constants.JWKS_URI.equals(propertyName)) {
+            throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
+                    "Cannot replace JWKS URI as it does not exist");
         }
     }
 
