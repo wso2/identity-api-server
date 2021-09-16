@@ -2705,7 +2705,8 @@ public class ServerIdpManagementService {
                         }
                         certificates.set(index, value);
                         idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
-                    } else if (ArrayUtils.isEmpty(idpToUpdate.getCertificateInfoArray()) || index >= idpToUpdate.getCertificateInfoArray().length) {
+                    } else if (ArrayUtils.isEmpty(idpToUpdate.getCertificateInfoArray()) ||
+                            index >= idpToUpdate.getCertificateInfoArray().length) {
                         throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage
                                 .ERROR_CODE_ERROR_UPDATING_IDP, "Cannot replace certificate as it does not exist");
                     } else {
