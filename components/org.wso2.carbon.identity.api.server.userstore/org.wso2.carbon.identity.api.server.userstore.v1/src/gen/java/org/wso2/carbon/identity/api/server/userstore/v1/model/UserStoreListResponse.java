@@ -38,6 +38,7 @@ public class UserStoreListResponse  {
     private Boolean enabled;
     private String description;
     private boolean isLocal;
+    private String typeName;
     private String self;
     private List<AddUserStorePropertiesRes> properties = null;
 
@@ -243,6 +244,24 @@ public class UserStoreListResponse  {
             return "null";
         }
         return o.toString().replace("\n", "\n");
+    }
+
+    @ApiModelProperty(example = "UniqueIDJDBCUserStoreManager", value = "User store type name")
+    @JsonProperty("typeName")
+    @Valid
+    public String getTypeName() {
+
+        return typeName;
+    }
+
+    /**
+     * Set the user store type name.
+     *
+     * @param typeName User store type.
+     */
+    public void setTypeName(String typeName) {
+
+        this.typeName = typeName;
     }
 }
 

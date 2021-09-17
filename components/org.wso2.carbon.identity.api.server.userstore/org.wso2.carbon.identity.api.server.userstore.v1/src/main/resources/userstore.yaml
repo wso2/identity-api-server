@@ -693,6 +693,10 @@ components:
           type: string
           example: /t/{tenant-domain}/api/server/v1/userstores/SkRCQy1TRUNPTkRBUlk
           description: Location of the created/updated resource.
+        typeName:
+          type: string
+          example: UniqueIDJDBCUserStoreManager
+          description: User store type name.
         properties:
           type: array
           description: Requested configured user store property for the set
