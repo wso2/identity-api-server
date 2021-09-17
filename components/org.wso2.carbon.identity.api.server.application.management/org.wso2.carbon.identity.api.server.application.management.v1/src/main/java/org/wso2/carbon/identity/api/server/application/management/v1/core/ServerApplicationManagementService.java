@@ -208,6 +208,12 @@ public class ServerApplicationManagementService {
         final int maximumItemPerPage = IdentityUtil.getMaximumItemPerPage();
         if (limit != null && limit > 0 && limit <= maximumItemPerPage) {
             return limit;
+        } else if (limit != null && limit > maximumItemPerPage) {
+            if (log.isDebugEnabled()) {
+                log.debug("Given limit exceeds the maximum limit. Therefore the configured default limit: "
+                        + maximumItemPerPage + " is set as the limit.");
+            }
+            return maximumItemPerPage;
         } else {
             return IdentityUtil.getDefaultItemsPerPage();
         }
