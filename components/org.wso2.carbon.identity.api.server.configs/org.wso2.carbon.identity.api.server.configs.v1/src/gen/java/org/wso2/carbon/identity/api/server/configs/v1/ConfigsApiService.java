@@ -29,6 +29,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
+import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
 import javax.ws.rs.core.Response;
@@ -45,6 +47,10 @@ public interface ConfigsApiService {
       public Response getHomeRealmIdentifiers();
 
       public Response getInboundScimConfigs();
+
+      public Response getSchema(String schemaId);
+
+      public Response getSchemas();
 
       public Response listAuthenticators(String type);
 

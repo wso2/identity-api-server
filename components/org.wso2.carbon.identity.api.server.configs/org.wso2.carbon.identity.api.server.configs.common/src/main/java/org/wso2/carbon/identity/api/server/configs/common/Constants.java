@@ -27,6 +27,7 @@ public class Constants {
 
     public static final String CONFIG_ERROR_PREFIX = "CNF-";
     public static final String CONFIGS_AUTHENTICATOR_PATH_COMPONENT = "/configs/authenticators";
+    public static final String CONFIGS_SCHEMAS_PATH_COMPONENT = "/configs/schemas";
     public static final String PATH_SEPERATOR = "/";
 
     // PATCH operation paths.
@@ -72,6 +73,9 @@ public class Constants {
                 "Unable to retrieve server configs.",
                 "Server encountered an " +
                 "error while retrieving the server configs."),
+        ERROR_CODE_SCHEMA_NOT_FOUND("60004",
+                "Resource not found.",
+                "Unable to find a resource matching the provided schema identifier %s."),
 
         /**
          * CORS errors.
