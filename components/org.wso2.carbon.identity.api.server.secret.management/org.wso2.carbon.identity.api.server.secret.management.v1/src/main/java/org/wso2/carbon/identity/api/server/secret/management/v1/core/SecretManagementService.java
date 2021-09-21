@@ -1,5 +1,4 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +50,8 @@ public class SecretManagementService {
     /**
      * Create a secret.
      *
-     * @param secretAddRequest secret post request.
+     * @param secretType Secret type name.
+     * @param secretAddRequest Secret post request.
      * @return secret.
      */
     public SecretResponse addSecret(String secretType, SecretAddRequest secretAddRequest) {
@@ -71,7 +71,7 @@ public class SecretManagementService {
     /**
      * To create Secret Response object for the post request
      *
-     * @param secretReq secret object.
+     * @param secretReq Secret object.
      * @return {@link SecretResponse} .
      */
     private SecretResponse buildSecretResponseFromResponseDTO(Secret secretReq) {
@@ -89,7 +89,7 @@ public class SecretManagementService {
     /**
      * Validate the secret post request.
      *
-     * @param secretAddRequest secret post request.
+     * @param secretAddRequest Secret post request.
      */
     private void validateSecretAddRequest(SecretAddRequest secretAddRequest) {
 
@@ -107,7 +107,7 @@ public class SecretManagementService {
     /**
      * Build secret requestDTO by secret body request.
      *
-     * @param secretAddRequest secret post body.
+     * @param secretAddRequest Secret post body.
      * @return Secret requestDTO object.
      */
     private Secret buildSecretRequestDTOFromSecretAddRequest(SecretAddRequest secretAddRequest) {
@@ -122,6 +122,7 @@ public class SecretManagementService {
     /**
      * Delete a secret sender by name.
      *
+     * @param secretType Secret type name.
      * @param name Name of the secret.
      */
     public void deleteSecret(String secretType, String name) {
@@ -137,7 +138,8 @@ public class SecretManagementService {
     /**
      * Retrieve the secret details by name.
      *
-     * @param name secret name.
+     * @param secretType Secret type name.
+     * @param name Secret name.
      * @return secret.
      */
     public SecretResponse getSecret(String secretType, String name) {
@@ -161,7 +163,8 @@ public class SecretManagementService {
     /**
      * Retrieve all the secrets of the tenant.
      *
-     * @return secrets of the tenant.
+     * @param secretType Secret type name.
+     * @return Secrets of the tenant.
      */
     public List<SecretResponse> getSecretsList(String secretType) {
 
@@ -179,8 +182,9 @@ public class SecretManagementService {
     /**
      * To make a partial update or update the specific property of the secret.
      *
-     * @param name               secret name.
-     * @param secretPatchRequest secret's patch details.
+     * @param secretType Secret type name.
+     * @param name               Secret name.
+     * @param secretPatchRequest Secret's patch details.
      * @return Updated secret.
      */
     public SecretResponse patchSecret(String secretType, String name, SecretPatchRequest secretPatchRequest) {
@@ -223,8 +227,9 @@ public class SecretManagementService {
     /**
      * Update secret details by name.
      *
-     * @param name                secret name.
-     * @param secretUpdateRequest secret's updated details.
+     * @param secretType Secret type name.
+     * @param name                Secret name.
+     * @param secretUpdateRequest Secret's updated details.
      * @return Updated secret.
      */
     public SecretResponse updateSecret(String secretType, String name, SecretUpdateRequest secretUpdateRequest) {
@@ -244,8 +249,8 @@ public class SecretManagementService {
     /**
      * Build secretAdd object from secret update request.
      *
-     * @param name                secret name.
-     * @param secretUpdateRequest secret's update request body.
+     * @param name                Secret name.
+     * @param secretUpdateRequest Secret's update request body.
      * @return secretAdd object
      */
     private SecretAddRequest buildSecretAddFromSecretUpdateRequest(String name,
@@ -327,12 +332,10 @@ public class SecretManagementService {
      */
     private static String includeData(SecretManagementConstants.ErrorMessage error, String data) {
 
-        String message;
         if (StringUtils.isNotBlank(data)) {
-            message = String.format(error.getDescription(), data);
+            return String.format(error.getDescription(), data);
         } else {
-            message = error.getDescription();
+            return error.getDescription();
         }
-        return message;
     }
 }
