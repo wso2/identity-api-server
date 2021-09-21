@@ -368,6 +368,7 @@ paths:
           description: Id of the user store type
           schema:
             type: string
+        - $ref: '#/components/parameters/excludeIdentityClaimsPathParam'
       responses:
         '200':
           description: Successful Response.
@@ -431,6 +432,14 @@ components:
       schema:
         type: string
         example: SkRCQy1TRUNPTkRBUlk
+    excludeIdentityClaimsPathParam:
+      in: query
+      name: excludeIdentityClaimMappings
+      required: false
+      description: Whether to exlcude the identity claim mappings from userstore attributes.
+      example: false
+      schema:
+        type: boolean
     limitQueryParam:
       in: query
       name: limit

@@ -715,6 +715,7 @@ public class ServerUserStoreService {
      */
     private List<LocalClaim> createLocalClaimList(String userStoreId,
                                                   List<ClaimAttributeMapping> claimAttributeMappingList) {
+
         List<LocalClaim> localClaimList = new ArrayList<>();
 
         for (ClaimAttributeMapping claimAttributeMapping : claimAttributeMappingList) {
@@ -1115,6 +1116,7 @@ public class ServerUserStoreService {
      */
     private APIError handleIdentityUserStoreMgtException(IdentityUserStoreMgtException exception,
                                                          UserStoreConstants.ErrorMessage errorEnum) {
+
         Response.Status status;
         ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
         if (exception instanceof IdentityUserStoreServerException) {
@@ -1275,8 +1277,24 @@ public class ServerUserStoreService {
      *
      * @param typeId String user store type id.
      * @return UserStoreAttributeMapping user store attribute mappings.
+     * @since 1.0.256
+     * @deprecated Method does not support excluding or including identity claim mapped attributes.
      */
+    @Deprecated
     public UserStoreAttributeMapping getUserStoreMappingAttributes(String typeId) {
+
+        return getUserStoreMappingAttributes(typeId, false);
+    }
+
+    /**
+     * Get user store attributes mappings for a given user store type id.
+     *
+     * @param typeId                       String user store type id.
+     * @param excludeIdentityClaimMappings Whether to exclude claim mapping for identity claims.
+     * @return UserStoreAttributeMapping user store attribute mappings.
+     */
+    public UserStoreAttributeMapping getUserStoreMappingAttributes(String typeId,
+                                                                   boolean excludeIdentityClaimMappings) {
 
         Set<String> classNames;
         String userStoreName = getUserStoreType(base64URLDecodeId(typeId));
@@ -1298,7 +1316,8 @@ public class ServerUserStoreService {
             throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
         UserStoreAttributeMapping userStoreAttributeMapping = new UserStoreAttributeMapping();
-        List<UserStoreAttributeDO> attributeMappings = getAttributeMappings(userStoreName);
+        List<UserStoreAttributeDO> attributeMappings = getAttributeMappings(userStoreName,
+                excludeIdentityClaimMappings);
         userStoreAttributeMapping = userStoreAttributeMapping
                 .attributeMapping(attributeMappings)
                 .typeId(typeId)
@@ -1315,10 +1334,12 @@ public class ServerUserStoreService {
     /**
      * Get user store attribute mappings for a given user store typeId.
      *
-     * @param userStoreName String user store name (base64 decoded user store id).
+     * @param userStoreName                String user store name (base64 decoded user store id).
+     * @param excludeIdentityClaimMappings Whether to exclude claim mapping for identity claims.
      * @return List of user store attribute mappings for the given typeId.
      */
-    private List<UserStoreAttributeDO> getAttributeMappings(String userStoreName) {
+    private List<UserStoreAttributeDO> getAttributeMappings(String userStoreName,
+                                                            boolean excludeIdentityClaimMappings) {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
                 getUserStoreConfigService();
@@ -1327,11 +1348,35 @@ public class ServerUserStoreService {
                     getUserStoreAttributeMappings();
             Map<String, UserStoreAttributeDO> mapping = userStoreAttributeMappings
                     .getUserStoreAttributeMappings(userStoreName);
+
+            // Remove identity claim mappings by iterating through all the claim mappings.
+            if (excludeIdentityClaimMappings) {
+                return excludeIdentityClaims(mapping);
+            }
             return new ArrayList<>(mapping.values());
         } catch (IdentityUserStoreMgtException e) {
             LOG.error("Error occurred while retrieving user store attribute metadata", e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
                     ERROR_CODE_ERROR_RETRIEVING_USER_STORE_ATTRIBUTE_METADATA);
         }
+    }
+
+    /**
+     * Exclude the userstore attributes with identity claims.
+     *
+     * @param userStoreAttributeDOMap Userstore attribute map.
+     * @return List of UserStoreAttributeDOs.
+     */
+    private List<UserStoreAttributeDO> excludeIdentityClaims(Map<String,
+            UserStoreAttributeDO> userStoreAttributeDOMap) {
+
+        List<UserStoreAttributeDO> userstoreMappings = new ArrayList<>();
+        for (String key : userStoreAttributeDOMap.keySet()) {
+            UserStoreAttributeDO userStoreAttributeDO = userStoreAttributeDOMap.get(key);
+            if (!userStoreAttributeDO.getClaimUri().startsWith(UserCoreConstants.ClaimTypeURIs.IDENTITY_CLAIM_URI)) {
+                userstoreMappings.add(userStoreAttributeDO);
+            }
+        }
+        return userstoreMappings;
     }
 }
