@@ -748,6 +748,7 @@ public class ServerUserStoreService {
                                 UserStoreConstants.USER_STORE_PATH_COMPONENT + "/%s",
                         base64URLEncodeId(jsonObject.getDomainId()))).toString());
                 userStoreList.setEnabled(jsonObject.getDisabled() != null && !jsonObject.getDisabled());
+                userStoreList.setTypeName(getUserStoreTypeName(jsonObject.getClassName()));
 
                 if (StringUtils.isNotBlank(requiredAttributes)) {
                     String[] requiredAttributesArray = requiredAttributes.split(REGEX_COMMA);
