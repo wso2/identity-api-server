@@ -1368,8 +1368,8 @@ public class ServerUserStoreService {
      * @param userStoreAttributeDOMap Userstore attribute map.
      * @return List of UserStoreAttributeDOs.
      */
-    private List<UserStoreAttributeDO> excludeIdentityClaims(Map<String,
-            UserStoreAttributeDO> userStoreAttributeDOMap) {
+    private List<UserStoreAttributeDO> excludeIdentityClaims(
+            Map<String, UserStoreAttributeDO> userStoreAttributeDOMap) {
 
         List<UserStoreAttributeDO> userstoreMappings = new ArrayList<>();
         for (Map.Entry<String, UserStoreAttributeDO> entry : userStoreAttributeDOMap.entrySet()) {
