@@ -37,9 +37,9 @@ public class UserStoreListResponse  {
     private String name;
     private Boolean enabled;
     private String description;
-    private boolean isLocal;
-    private String typeName;
+    private Boolean isLocal;
     private String self;
+    private String typeName;
     private List<AddUserStorePropertiesRes> properties = null;
 
 
@@ -119,6 +119,25 @@ public class UserStoreListResponse  {
     }
 
     /**
+    * Whether the userstore is local or not.
+    **/
+    public UserStoreListResponse isLocal(Boolean isLocal) {
+
+        this.isLocal = isLocal;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "Whether the userstore is local or not.")
+    @JsonProperty("isLocal")
+    @Valid
+    public Boolean getIsLocal() {
+        return isLocal;
+    }
+    public void setIsLocal(Boolean isLocal) {
+        this.isLocal = isLocal;
+    }
+
+    /**
     * Location of the created/updated resource.
     **/
     public UserStoreListResponse self(String self) {
@@ -135,6 +154,25 @@ public class UserStoreListResponse  {
     }
     public void setSelf(String self) {
         this.self = self;
+    }
+
+    /**
+    * User store type name.
+    **/
+    public UserStoreListResponse typeName(String typeName) {
+
+        this.typeName = typeName;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "UniqueIDJDBCUserStoreManager", value = "User store type name.")
+    @JsonProperty("typeName")
+    @Valid
+    public String getTypeName() {
+        return typeName;
+    }
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
 
     /**
@@ -157,7 +195,6 @@ public class UserStoreListResponse  {
     }
 
     public UserStoreListResponse addPropertiesItem(AddUserStorePropertiesRes propertiesItem) {
-
         if (this.properties == null) {
             this.properties = new ArrayList<>();
         }
@@ -165,35 +202,7 @@ public class UserStoreListResponse  {
         return this;
     }
 
-    @ApiModelProperty(example = "true", value = "")
-    @JsonProperty("isLocal")
-    @Valid
-    public boolean getIsLocal() {
-
-        return isLocal;
-    }
-
-    /**
-     * Set isLocalUserStore.
-     *
-     * @param isLocal Boolean is local user store or not.
-     */
-    public void setIsLocal(boolean isLocal) {
-
-        this.isLocal = isLocal;
-    }
-
-    /**
-     * Set is local user store or not and get the object.
-     *
-     * @param isLocal Boolean is local user store or not.
-     * @return This object.
-     */
-    public UserStoreListResponse isLocal(boolean isLocal) {
-
-        this.isLocal = isLocal;
-        return this;
-    }
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -209,13 +218,15 @@ public class UserStoreListResponse  {
             Objects.equals(this.name, userStoreListResponse.name) &&
             Objects.equals(this.enabled, userStoreListResponse.enabled) &&
             Objects.equals(this.description, userStoreListResponse.description) &&
+            Objects.equals(this.isLocal, userStoreListResponse.isLocal) &&
             Objects.equals(this.self, userStoreListResponse.self) &&
+            Objects.equals(this.typeName, userStoreListResponse.typeName) &&
             Objects.equals(this.properties, userStoreListResponse.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, enabled, description, self, properties);
+        return Objects.hash(id, name, enabled, description, isLocal, self, typeName, properties);
     }
 
     @Override
@@ -228,7 +239,9 @@ public class UserStoreListResponse  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    isLocal: ").append(toIndentedString(isLocal)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
+        sb.append("    typeName: ").append(toIndentedString(typeName)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
@@ -244,24 +257,6 @@ public class UserStoreListResponse  {
             return "null";
         }
         return o.toString().replace("\n", "\n");
-    }
-
-    @ApiModelProperty(example = "UniqueIDJDBCUserStoreManager", value = "User store type name")
-    @JsonProperty("typeName")
-    @Valid
-    public String getTypeName() {
-
-        return typeName;
-    }
-
-    /**
-     * Set the user store type name.
-     *
-     * @param typeName User store type.
-     */
-    public void setTypeName(String typeName) {
-
-        this.typeName = typeName;
     }
 }
 

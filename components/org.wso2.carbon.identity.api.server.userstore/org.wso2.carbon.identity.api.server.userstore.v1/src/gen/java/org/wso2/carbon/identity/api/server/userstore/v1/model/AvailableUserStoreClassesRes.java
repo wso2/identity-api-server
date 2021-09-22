@@ -30,14 +30,13 @@ import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
 @ApiModel(description = "Available User Store Classes Response.")
 public class AvailableUserStoreClassesRes  {
   
     private String typeId;
     private String typeName;
     private String className;
-    private boolean isLocal;
+    private Boolean isLocal;
     private String self;
 
     /**
@@ -95,56 +94,43 @@ public class AvailableUserStoreClassesRes  {
     }
 
     /**
+    * Whether the userstore is local or not.
+    **/
+    public AvailableUserStoreClassesRes isLocal(Boolean isLocal) {
+
+        this.isLocal = isLocal;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "Whether the userstore is local or not.")
+    @JsonProperty("isLocal")
+    @Valid
+    public Boolean getIsLocal() {
+        return isLocal;
+    }
+    public void setIsLocal(Boolean isLocal) {
+        this.isLocal = isLocal;
+    }
+
+    /**
     **/
     public AvailableUserStoreClassesRes self(String self) {
 
         this.self = self;
         return this;
     }
-
+    
     @ApiModelProperty(example = "/t/{tenant-domain}/api/server/v1/userstores/meta/types/VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg", value = "")
     @JsonProperty("self")
     @Valid
     public String getSelf() {
-
         return self;
     }
-
     public void setSelf(String self) {
-
         this.self = self;
     }
 
-    @ApiModelProperty(example = "true", value = "")
-    @JsonProperty("isLocal")
-    @Valid
-    public boolean getIsLocal() {
 
-        return isLocal;
-    }
-
-    /**
-     * Set isLocalUserStore.
-     *
-     * @param isLocal Boolean is local user store or not.
-     */
-    public void setIsLocal(boolean isLocal) {
-
-        this.isLocal = isLocal;
-    }
-
-
-    /**
-     * Set is local user store or not and get the object.
-     *
-     * @param isLocal Boolean is local user store or not.
-     * @return This object.
-     */
-    public AvailableUserStoreClassesRes isLocal(boolean isLocal) {
-
-        this.isLocal = isLocal;
-        return this;
-    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -159,12 +145,13 @@ public class AvailableUserStoreClassesRes  {
         return Objects.equals(this.typeId, availableUserStoreClassesRes.typeId) &&
             Objects.equals(this.typeName, availableUserStoreClassesRes.typeName) &&
             Objects.equals(this.className, availableUserStoreClassesRes.className) &&
+            Objects.equals(this.isLocal, availableUserStoreClassesRes.isLocal) &&
             Objects.equals(this.self, availableUserStoreClassesRes.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(typeId, typeName, className, self);
+        return Objects.hash(typeId, typeName, className, isLocal, self);
     }
 
     @Override
@@ -176,6 +163,7 @@ public class AvailableUserStoreClassesRes  {
         sb.append("    typeId: ").append(toIndentedString(typeId)).append("\n");
         sb.append("    typeName: ").append(toIndentedString(typeName)).append("\n");
         sb.append("    className: ").append(toIndentedString(className)).append("\n");
+        sb.append("    isLocal: ").append(toIndentedString(isLocal)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
