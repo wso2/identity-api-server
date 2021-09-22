@@ -77,6 +77,18 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     }
 
     @Override
+    public Response getUserStoreAttributeMappings(String typeId, Boolean excludeIdentityClaimMappings) {
+
+        boolean excludeIdentityClaims = false;
+        // This is added to provide backward compatibility.
+        if (excludeIdentityClaimMappings != null) {
+            excludeIdentityClaims = excludeIdentityClaimMappings;
+        }
+        return Response.ok().entity(serverUserStoreService.getUserStoreMappingAttributes(typeId,
+                excludeIdentityClaims)).build();
+    }
+
+    @Override
     public Response getUserStoreByDomainId(String userstoreDomainId) {
 
         return Response.ok().entity(serverUserStoreService.getUserStoreByDomainId(userstoreDomainId)).build();
@@ -90,7 +102,8 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
 
     @Override
     public Response updateAttributeMappings(String userstoreDomainId,
-                                           List<ClaimAttributeMapping> claimAttributeMappings) {
+                                            List<ClaimAttributeMapping> claimAttributeMappings) {
+
         serverUserStoreService.updateClaimAttributeMappings(userstoreDomainId,
                 claimAttributeMappings);
         return Response.ok().build();
@@ -112,12 +125,6 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     public Response updateUserStore(String userstoreDomainId, UserStoreReq userStoreReq) {
 
         return Response.ok().entity(serverUserStoreService.editUserStore(userstoreDomainId, userStoreReq)).build();
-    }
-
-    @Override
-    public Response getUserStoreMappingAttributes(String typeId) {
-
-        return Response.ok().entity(serverUserStoreService.getUserStoreMappingAttributes(typeId)).build();
     }
 
     private URI getResourceLocation(String id) {
