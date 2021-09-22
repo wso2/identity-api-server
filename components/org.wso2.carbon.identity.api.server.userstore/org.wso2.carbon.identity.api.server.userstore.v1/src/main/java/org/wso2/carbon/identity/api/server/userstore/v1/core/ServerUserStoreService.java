@@ -1371,8 +1371,8 @@ public class ServerUserStoreService {
             UserStoreAttributeDO> userStoreAttributeDOMap) {
 
         List<UserStoreAttributeDO> userstoreMappings = new ArrayList<>();
-        for (String key : userStoreAttributeDOMap.keySet()) {
-            UserStoreAttributeDO userStoreAttributeDO = userStoreAttributeDOMap.get(key);
+        for (Map.Entry<String, UserStoreAttributeDO> entry : userStoreAttributeDOMap.entrySet()) {
+            UserStoreAttributeDO userStoreAttributeDO = entry.getValue();
             if (!userStoreAttributeDO.getClaimUri().startsWith(UserCoreConstants.ClaimTypeURIs.IDENTITY_CLAIM_URI)) {
                 userstoreMappings.add(userStoreAttributeDO);
             }
