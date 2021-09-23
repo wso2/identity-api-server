@@ -1337,11 +1337,11 @@ public class ServerUserStoreService {
                     getUserStoreAttributeMappings();
             Map<String, UserStoreAttributeDO> mapping = userStoreAttributeMappings
                     .getUserStoreAttributeMappings(userStoreName);
-            if (includeIdentityClaimMappings) {
-                return new ArrayList<>(mapping.values());
+            if (!includeIdentityClaimMappings) {
+                // Remove identity claim mappings by iterating through all the claim mappings.
+                return excludeIdentityClaims(mapping);
             }
-            // Remove identity claim mappings by iterating through all the claim mappings.
-            return excludeIdentityClaims(mapping);
+            return new ArrayList<>(mapping.values());
         } catch (IdentityUserStoreMgtException e) {
             LOG.error("Error occurred while retrieving user store attribute metadata", e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
