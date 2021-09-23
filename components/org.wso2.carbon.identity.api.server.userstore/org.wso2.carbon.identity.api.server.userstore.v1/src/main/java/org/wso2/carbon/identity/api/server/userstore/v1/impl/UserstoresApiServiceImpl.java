@@ -77,15 +77,14 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     }
 
     @Override
-    public Response getUserStoreAttributeMappings(String typeId, Boolean excludeIdentityClaimMappings) {
+    public Response getUserStoreAttributeMappings(String typeId, Boolean includeIdentityClaimMappings) {
 
-        boolean excludeIdentityClaims = false;
-        // This is added to provide backward compatibility.
-        if (excludeIdentityClaimMappings != null) {
-            excludeIdentityClaims = excludeIdentityClaimMappings;
+        boolean includeIdentityClaims = false;
+        if (includeIdentityClaimMappings != null) {
+            includeIdentityClaims = includeIdentityClaimMappings;
         }
         return Response.ok().entity(serverUserStoreService.getUserStoreMappingAttributes(typeId,
-                excludeIdentityClaims)).build();
+                includeIdentityClaims)).build();
     }
 
     @Override
