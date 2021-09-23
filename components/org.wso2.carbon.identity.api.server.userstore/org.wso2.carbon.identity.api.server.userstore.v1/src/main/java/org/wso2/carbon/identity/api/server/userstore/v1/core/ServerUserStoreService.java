@@ -1276,20 +1276,6 @@ public class ServerUserStoreService {
     /**
      * Get user store attributes mappings for a given user store type id.
      *
-     * @param typeId String user store type id.
-     * @return UserStoreAttributeMapping user store attribute mappings.
-     * @since 1.0.256
-     * @deprecated Method does not support excluding or including identity claim mapped attributes.
-     */
-    @Deprecated
-    public UserStoreAttributeMapping getUserStoreMappingAttributes(String typeId) {
-
-        return getUserStoreMappingAttributes(typeId, true);
-    }
-
-    /**
-     * Get user store attributes mappings for a given user store type id.
-     *
      * @param typeId                       String user store type id.
      * @param includeIdentityClaimMappings Whether to include claim mapping for identity claims with other userstore
      *                                     attributes.
