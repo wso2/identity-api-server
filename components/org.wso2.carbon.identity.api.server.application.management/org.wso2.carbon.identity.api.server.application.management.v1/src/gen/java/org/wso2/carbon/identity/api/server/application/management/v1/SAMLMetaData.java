@@ -46,7 +46,7 @@ public class SAMLMetaData  {
         return this;
     }
     
-    @ApiModelProperty(example = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", value = "")
+    @ApiModelProperty(example = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", value = "")
     @JsonProperty("defaultNameIdFormat")
     @Valid
     public String getDefaultNameIdFormat() {
