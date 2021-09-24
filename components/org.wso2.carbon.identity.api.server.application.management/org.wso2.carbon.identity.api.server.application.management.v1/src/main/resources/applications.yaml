@@ -2625,7 +2625,7 @@ components:
       properties:
         nameIdFormat:
           type: string
-          default: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+          default: 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
           example: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
 
         audiences:

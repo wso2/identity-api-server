@@ -33,7 +33,7 @@ import javax.xml.bind.annotation.*;
 
 public class SAMLAssertionConfiguration  {
   
-    private String nameIdFormat = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
+    private String nameIdFormat = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
     private List<String> audiences = null;
 
     private List<String> recipients = null;
@@ -49,7 +49,7 @@ public class SAMLAssertionConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress", value = "")
+    @ApiModelProperty(example = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified", value = "")
     @JsonProperty("nameIdFormat")
     @Valid
     public String getNameIdFormat() {
