@@ -390,7 +390,7 @@ public class ServerApplicationManagementService {
                         "Error creating application. Found duplicate allowed origin entries.");
             }
             throw buildClientError(e, "Error creating application. Allow CORS origins update failed.");
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // TODO - Need to handle the application creation exceptions gracefully.
             if (log.isDebugEnabled()) {
                 log.debug("Server encountered unexpected error. Rolling back created application data.", e);
