@@ -368,6 +368,7 @@ paths:
           description: Id of the user store type
           schema:
             type: string
+        - $ref: '#/components/parameters/includeIdentityClaimsQueryParam'
       responses:
         '200':
           description: Successful Response.
@@ -431,6 +432,14 @@ components:
       schema:
         type: string
         example: SkRCQy1TRUNPTkRBUlk
+    includeIdentityClaimsQueryParam:
+      in: query
+      name: includeIdentityClaimMappings
+      required: false
+      description: Whether to include the identity claim mappings with userstore attributes.
+      example: true
+      schema:
+        type: boolean
     limitQueryParam:
       in: query
       name: limit

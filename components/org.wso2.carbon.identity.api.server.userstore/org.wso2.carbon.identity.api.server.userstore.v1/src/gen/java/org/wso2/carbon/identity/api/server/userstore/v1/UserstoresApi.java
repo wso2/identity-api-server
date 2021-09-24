@@ -166,6 +166,29 @@ public class UserstoresApi  {
 
     @Valid
     @GET
+    @Path("/meta/types/{type-id}/attributes")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the meta attributes of a user store of a given user store type.", notes = "This API provides the capability to retrieve the attribute mappings of a given user store type   <b>Permission required:</b>  *_/permission/admin ", response = UserStoreAttributeMapping.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Meta", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response.", response = UserStoreAttributeMapping.class),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response getUserStoreAttributeMappings(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId,     @Valid@ApiParam(value = "Whether to include the identity claim mappings with userstore attributes.")  @QueryParam("includeIdentityClaimMappings") Boolean includeIdentityClaimMappings) {
+
+        return delegate.getUserStoreAttributeMappings(typeId,  includeIdentityClaimMappings );
+    }
+
+    @Valid
+    @GET
     @Path("/{userstore-domain-id}")
     
     @Produces({ "application/json" })
@@ -208,30 +231,6 @@ public class UserstoresApi  {
     public Response getUserStoreManagerProperties(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId) {
 
         return delegate.getUserStoreManagerProperties(typeId );
-    }
-
-    @Valid
-    @PATCH
-    @Path("/{userstore-domain-id}/attribute-mappings")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update the secondary user store attribute mappings by it's domain id.", notes = "This API provides the capability to update the secondary user store's attribute mappings using patch request by using its domain id.  <b>Permission required:</b>  *_/permission/admin ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "User Store", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK.", response = Void.class),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response updateAttributeMappings(@ApiParam(value = "The unique name of the user store domain",required=true) @PathParam("userstore-domain-id") String userstoreDomainId, @ApiParam(value = "" ,required=true) @Valid List<ClaimAttributeMapping> claimAttributeMapping) {
-
-        return delegate.updateAttributeMappings(userstoreDomainId,  claimAttributeMapping );
     }
 
     @Valid
@@ -281,6 +280,30 @@ public class UserstoresApi  {
     }
 
     @Valid
+    @PATCH
+    @Path("/{userstore-domain-id}/attribute-mappings")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update the secondary user store attribute mappings by it's domain id.", notes = "This API provides the capability to update the secondary user store's attribute mappings using patch request by using its domain id.  <b>Permission required:</b>  *_/permission/admin ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "User Store", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK.", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response updateAttributeMappings(@ApiParam(value = "The unique name of the user store domain",required=true) @PathParam("userstore-domain-id") String userstoreDomainId, @ApiParam(value = "" ,required=true) @Valid List<ClaimAttributeMapping> claimAttributeMapping) {
+
+        return delegate.updateAttributeMappings(userstoreDomainId,  claimAttributeMapping );
+    }
+
+    @Valid
     @PUT
     @Path("/{userstore-domain-id}")
     @Consumes({ "application/json" })
@@ -303,29 +326,5 @@ public class UserstoresApi  {
 
         return delegate.updateUserStore(userstoreDomainId,  userStoreReq );
     }
-
-    @Valid
-    @GET
-    @Path("/meta/types/{type-id}/attributes")
-
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the meta attributes of a user store of a given user store type.", notes = "This API provides the capability to retrieve the attribute mappings of a given user store type.   <b>Permission required:</b>  *_/permission/admin ", response = UserStoreAttributeMapping.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags={ "Meta", })
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful Response.", response = UserStoreAttributeMapping.class),
-            @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-            @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-            @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response getUserStoreMappingAttributes(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId) {
-
-        return delegate.getUserStoreMappingAttributes(typeId);
-    }
-
 
 }

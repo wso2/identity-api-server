@@ -43,7 +43,7 @@ public class ApplicationManagementConstants {
     public static final String INBOUND_PROTOCOL_WS_TRUST_PATH_COMPONENT = "/ws-trust";
 
     private static final Map<String, String> OAUTH_GRANT_TYPE_NAMES = new LinkedHashMap<>();
-    public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress";
+    public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
     public static final String DEFAULT_CERTIFICATE_ALIAS = "wso2carbon";
 
     /**

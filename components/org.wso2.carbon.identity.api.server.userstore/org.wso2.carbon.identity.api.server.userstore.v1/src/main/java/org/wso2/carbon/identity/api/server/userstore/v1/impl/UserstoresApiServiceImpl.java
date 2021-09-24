@@ -77,6 +77,17 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     }
 
     @Override
+    public Response getUserStoreAttributeMappings(String typeId, Boolean includeIdentityClaimMappings) {
+
+        boolean includeIdentityClaims = false;
+        if (includeIdentityClaimMappings != null) {
+            includeIdentityClaims = includeIdentityClaimMappings;
+        }
+        return Response.ok().entity(serverUserStoreService.getUserStoreMappingAttributes(typeId,
+                includeIdentityClaims)).build();
+    }
+
+    @Override
     public Response getUserStoreByDomainId(String userstoreDomainId) {
 
         return Response.ok().entity(serverUserStoreService.getUserStoreByDomainId(userstoreDomainId)).build();
@@ -90,7 +101,8 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
 
     @Override
     public Response updateAttributeMappings(String userstoreDomainId,
-                                           List<ClaimAttributeMapping> claimAttributeMappings) {
+                                            List<ClaimAttributeMapping> claimAttributeMappings) {
+
         serverUserStoreService.updateClaimAttributeMappings(userstoreDomainId,
                 claimAttributeMappings);
         return Response.ok().build();
@@ -112,12 +124,6 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     public Response updateUserStore(String userstoreDomainId, UserStoreReq userStoreReq) {
 
         return Response.ok().entity(serverUserStoreService.editUserStore(userstoreDomainId, userStoreReq)).build();
-    }
-
-    @Override
-    public Response getUserStoreMappingAttributes(String typeId) {
-
-        return Response.ok().entity(serverUserStoreService.getUserStoreMappingAttributes(typeId)).build();
     }
 
     private URI getResourceLocation(String id) {
