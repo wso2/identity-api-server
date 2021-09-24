@@ -1276,26 +1276,13 @@ public class ServerUserStoreService {
     /**
      * Get user store attributes mappings for a given user store type id.
      *
-     * @param typeId String user store type id.
-     * @return UserStoreAttributeMapping user store attribute mappings.
-     * @since 1.0.256
-     * @deprecated Method does not support excluding or including identity claim mapped attributes.
-     */
-    @Deprecated
-    public UserStoreAttributeMapping getUserStoreMappingAttributes(String typeId) {
-
-        return getUserStoreMappingAttributes(typeId, false);
-    }
-
-    /**
-     * Get user store attributes mappings for a given user store type id.
-     *
      * @param typeId                       String user store type id.
-     * @param excludeIdentityClaimMappings Whether to exclude claim mapping for identity claims.
+     * @param includeIdentityClaimMappings Whether to include claim mapping for identity claims with other userstore
+     *                                     attributes.
      * @return UserStoreAttributeMapping user store attribute mappings.
      */
     public UserStoreAttributeMapping getUserStoreMappingAttributes(String typeId,
-                                                                   boolean excludeIdentityClaimMappings) {
+                                                                   boolean includeIdentityClaimMappings) {
 
         Set<String> classNames;
         String userStoreName = getUserStoreType(base64URLDecodeId(typeId));
@@ -1318,7 +1305,7 @@ public class ServerUserStoreService {
         }
         UserStoreAttributeMapping userStoreAttributeMapping = new UserStoreAttributeMapping();
         List<UserStoreAttributeDO> attributeMappings = getAttributeMappings(userStoreName,
-                excludeIdentityClaimMappings);
+                includeIdentityClaimMappings);
         userStoreAttributeMapping = userStoreAttributeMapping
                 .attributeMapping(attributeMappings)
                 .typeId(typeId)
@@ -1336,11 +1323,12 @@ public class ServerUserStoreService {
      * Get user store attribute mappings for a given user store typeId.
      *
      * @param userStoreName                String user store name (base64 decoded user store id).
-     * @param excludeIdentityClaimMappings Whether to exclude claim mapping for identity claims.
+     * @param includeIdentityClaimMappings Whether to include claim mapping for identity claims with other userstore
+     *                                     attributes.
      * @return List of user store attribute mappings for the given typeId.
      */
     private List<UserStoreAttributeDO> getAttributeMappings(String userStoreName,
-                                                            boolean excludeIdentityClaimMappings) {
+                                                            boolean includeIdentityClaimMappings) {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
                 getUserStoreConfigService();
@@ -1349,9 +1337,8 @@ public class ServerUserStoreService {
                     getUserStoreAttributeMappings();
             Map<String, UserStoreAttributeDO> mapping = userStoreAttributeMappings
                     .getUserStoreAttributeMappings(userStoreName);
-
-            // Remove identity claim mappings by iterating through all the claim mappings.
-            if (excludeIdentityClaimMappings) {
+            if (!includeIdentityClaimMappings) {
+                // Remove identity claim mappings by iterating through all the claim mappings.
                 return excludeIdentityClaims(mapping);
             }
             return new ArrayList<>(mapping.values());

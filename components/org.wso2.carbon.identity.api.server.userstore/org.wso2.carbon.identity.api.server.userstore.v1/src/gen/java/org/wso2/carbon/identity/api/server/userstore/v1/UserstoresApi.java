@@ -182,9 +182,9 @@ public class UserstoresApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response getUserStoreAttributeMappings(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId,     @Valid@ApiParam(value = "Whether to exlcude the identity claim mappings from userstore attributes.")  @QueryParam("excludeIdentityClaimMappings") Boolean excludeIdentityClaimMappings) {
+    public Response getUserStoreAttributeMappings(@ApiParam(value = "Id of the user store type",required=true) @PathParam("type-id") String typeId,     @Valid@ApiParam(value = "Whether to include the identity claim mappings with userstore attributes.")  @QueryParam("includeIdentityClaimMappings") Boolean includeIdentityClaimMappings) {
 
-        return delegate.getUserStoreAttributeMappings(typeId,  excludeIdentityClaimMappings );
+        return delegate.getUserStoreAttributeMappings(typeId,  includeIdentityClaimMappings );
     }
 
     @Valid
