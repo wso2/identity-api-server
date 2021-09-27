@@ -43,7 +43,7 @@ public class SecretsApi  {
     @Path("/{secret-type}")
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @ApiOperation(value = "Create a secret", notes = "This API provides the capability to create a secret ", response = SecretResponse.class, authorizations = {
+    @ApiOperation(value = "Create a secret", notes = "This API provides the capability to create a secret. ", response = SecretResponse.class, authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
 
@@ -94,7 +94,7 @@ public class SecretsApi  {
     @Path("/{secret-type}/{name}")
 
     @Produces({"application/json"})
-    @ApiOperation(value = "Retrieve secret by name", notes = "This API provides the capability to retrieve a secret ", response = SecretResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve secret by name", notes = "This API provides the capability to retrieve a secret.", response = SecretResponse.class, authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
 
@@ -119,7 +119,7 @@ public class SecretsApi  {
     @Path("/{secret-type}")
 
     @Produces({"application/json"})
-    @ApiOperation(value = "Get a list of configured secrets", notes = "This API provides the capability to retrieve the list of configured secrets. ", response = SecretResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Get a list of configured secrets", notes = "This API provides the capability to retrieve the list of configured secrets.", response = SecretResponse.class, responseContainer = "List", authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
 
@@ -144,7 +144,7 @@ public class SecretsApi  {
     @Path("/{secret-type}/{name}")
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @ApiOperation(value = "Patch a secret by name.", notes = "This API provides the capability to update a secret using patch request by using its name. ", response = SecretResponse.class, authorizations = {
+    @ApiOperation(value = "Patch a secret by name.", notes = "This API provides the capability to update a secret using patch request by using its name.", response = SecretResponse.class, authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
 
@@ -169,7 +169,7 @@ public class SecretsApi  {
     @Path("/{secret-type}/{name}")
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @ApiOperation(value = "Update a secret", notes = "This API provides the capability to update a secret name. ", response = SecretResponse.class, authorizations = {
+    @ApiOperation(value = "Update a secret", notes = "This API provides the capability to update a secret name.", response = SecretResponse.class, authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
 
@@ -188,5 +188,4 @@ public class SecretsApi  {
 
         return delegate.updateSecret(secretType,  name,  secretUpdateRequest );
     }
-
 }
