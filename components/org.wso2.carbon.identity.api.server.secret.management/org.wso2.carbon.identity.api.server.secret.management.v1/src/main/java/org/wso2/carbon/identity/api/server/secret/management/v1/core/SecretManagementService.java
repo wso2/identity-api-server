@@ -71,18 +71,18 @@ public class SecretManagementService {
     /**
      * To create Secret Response object for the post request
      *
-     * @param secretReq Secret object.
+     * @param responseDTO Secret object.
      * @return {@link SecretResponse} .
      */
-    private SecretResponse buildSecretResponseFromResponseDTO(Secret secretReq) {
+    private SecretResponse buildSecretResponseFromResponseDTO(Secret responseDTO) {
 
         SecretResponse secretResponse = new SecretResponse();
-        secretResponse.secretName(secretReq.getSecretName());
-        secretResponse.setCreated(secretReq.getCreatedTime());
-        secretResponse.setLastModified(secretReq.getLastModified());
-        secretResponse.setSecretId(secretReq.getSecretId());
-        secretResponse.setType(secretReq.getSecretType());
-        secretResponse.setDescription(secretReq.getDescription());
+        secretResponse.secretName(responseDTO.getSecretName());
+        secretResponse.setCreated(responseDTO.getCreatedTime());
+        secretResponse.setLastModified(responseDTO.getLastModified());
+        secretResponse.setSecretId(responseDTO.getSecretId());
+        secretResponse.setType(responseDTO.getSecretType());
+        secretResponse.setDescription(responseDTO.getDescription());
         return secretResponse;
     }
 
