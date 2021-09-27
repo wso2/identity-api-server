@@ -32,6 +32,7 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
+import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
@@ -42,6 +43,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.InboundConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ProvisioningConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RealmConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
+import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
@@ -74,6 +77,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -83,6 +87,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.CONFIGS_AUTHENTICATOR_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.configs.common.Constants.CONFIGS_SCHEMAS_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_SEPERATOR;
 
 /**
@@ -399,6 +404,45 @@ public class ServerConfigManagementService {
                     Arrays.stream(homeRealmIdStr.trim().split("\\s*,\\s*")).collect(Collectors.toList());
         }
         return homeRealmIdentifiers;
+    }
+
+    /**
+     * Get schemas supported by the server.
+     *
+     * @return  List of schema metadata.
+     */
+    public List<SchemaListItem> getSchemas() {
+
+        return SchemaConfigParser.getInstance().getSchemaMap().keySet().stream()
+                .map(key -> {
+                    final String schemaId = base64URLEncode(key);
+                    return new SchemaListItem().id(schemaId).name(key)
+                            .self(ContextLoader.buildURIForBody(V1_API_PATH_COMPONENT +
+                                    CONFIGS_SCHEMAS_PATH_COMPONENT + PATH_SEPERATOR + schemaId).toString());
+                }).collect(Collectors.toList());
+    }
+
+    /**
+     * Get attributes of a schema.
+     *
+     * @param schemaId  Schema ID.
+     * @return Schema attribute list.
+     */
+    public Schema getSchema(String schemaId) {
+
+        String schemaName = base64URLDecode(schemaId);
+        Map<String, List<String>> schemaMap = SchemaConfigParser.getInstance().getSchemaMap();
+
+        if (!schemaMap.containsKey(schemaName)) {
+            throw handleException(Response.Status.NOT_FOUND,
+                    Constants.ErrorMessage.ERROR_CODE_SCHEMA_NOT_FOUND, schemaId);
+        }
+
+        Schema schema = new Schema();
+        schema.setId(schemaId);
+        schema.setName(schemaName);
+        schema.setAttributes(schemaMap.get(schemaName));
+        return schema;
     }
 
     private List<AuthenticatorListItem> buildAuthenticatorListResponse(

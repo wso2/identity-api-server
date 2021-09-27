@@ -26,6 +26,11 @@
     <Match>
         <Bug pattern="JAXRS_ENDPOINT" />
     </Match>
+    <!-- Excluded since this bug is fixed in Java 8+ versions :
+    https://find-sec-bugs.github.io/bugs.htm#WEAK_FILENAMEUTILS -->
+    <Match>
+        <Bug pattern="WEAK_FILENAMEUTILS" />
+    </Match>
     <FindBugsFilter>
         <Match>
             <Class name="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants" />
@@ -35,6 +40,13 @@
     <FindBugsFilter>
         <Match>
             <Class name="org.wso2.carbon.identity.api.server.keystore.management.v1.core.KeyStoreService" />
+            <Bug pattern="PATH_TRAVERSAL_IN" />
+        </Match>
+    </FindBugsFilter>
+    <!-- Excluded since false positive. -->
+    <FindBugsFilter>
+        <Match>
+            <Class name="org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser" />
             <Bug pattern="PATH_TRAVERSAL_IN" />
         </Match>
     </FindBugsFilter>
