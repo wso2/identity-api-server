@@ -50,7 +50,7 @@ public class SecretManagementService {
     /**
      * Create a secret.
      *
-     * @param secretType Secret type name.
+     * @param secretType       Secret type name.
      * @param secretAddRequest Secret post request.
      * @return secret.
      */
@@ -123,7 +123,7 @@ public class SecretManagementService {
      * Delete a secret sender by name.
      *
      * @param secretType Secret type name.
-     * @param name Name of the secret.
+     * @param name       Name of the secret.
      */
     public void deleteSecret(String secretType, String name) {
 
@@ -139,7 +139,7 @@ public class SecretManagementService {
      * Retrieve the secret details by name.
      *
      * @param secretType Secret type name.
-     * @param name Secret name.
+     * @param name       Secret name.
      * @return secret.
      */
     public SecretResponse getSecret(String secretType, String name) {
@@ -182,7 +182,7 @@ public class SecretManagementService {
     /**
      * To make a partial update or update the specific property of the secret.
      *
-     * @param secretType Secret type name.
+     * @param secretType         Secret type name.
      * @param name               Secret name.
      * @param secretPatchRequest Secret's patch details.
      * @return Updated secret.
@@ -227,7 +227,7 @@ public class SecretManagementService {
     /**
      * Update secret details by name.
      *
-     * @param secretType Secret type name.
+     * @param secretType          Secret type name.
      * @param name                Secret name.
      * @param secretUpdateRequest Secret's updated details.
      * @return Updated secret.

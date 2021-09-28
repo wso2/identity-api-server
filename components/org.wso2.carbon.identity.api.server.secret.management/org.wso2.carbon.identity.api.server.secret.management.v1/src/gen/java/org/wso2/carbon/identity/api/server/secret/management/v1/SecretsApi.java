@@ -43,7 +43,7 @@ public class SecretsApi  {
     @Path("/{secret-type}")
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    @ApiOperation(value = "Create a secret", notes = "This API provides the capability to create a secret. ", response = SecretResponse.class, authorizations = {
+    @ApiOperation(value = "Create a secret", notes = "This API provides the capability to create a secret.", response = SecretResponse.class, authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
 
@@ -69,7 +69,7 @@ public class SecretsApi  {
     @Path("/{secret-type}/{name}")
 
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete an secret by name", notes = "This API provides the capability to delete a secret by name. ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete an secret by name", notes = "This API provides the capability to delete a secret by name.", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
 
