@@ -19,114 +19,159 @@
 package org.wso2.carbon.identity.api.server.userstore.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.user.store.configuration.model.UserStoreAttributeDO;
-
+import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttribute;
+import javax.validation.constraints.*;
+
+
+import io.swagger.annotations.*;
+import java.util.Objects;
 import javax.validation.Valid;
+import javax.xml.bind.annotation.*;
 
-public class UserStoreAttributeMapping {
-
-    private String typeId;
+public class UserStoreAttributeMapping  {
+  
     private String typeName;
-    private boolean isLocal;
-    private List<UserStoreAttributeDO> attributeMappings;
+    private String typeId;
+    private Boolean isLocal;
+    private List<UserStoreAttribute> attributeMappings = null;
+
 
     /**
-     * Set user store attribute type and get the object.
-     *
-     * @param typeId String user store type id.
-     * @return UserStoreAttributeMapping .
-     */
-    public UserStoreAttributeMapping typeId(String typeId) {
-
-        this.typeId = typeId;
-        return this;
-    }
-
-    @ApiModelProperty(example = "b3JnLndzbzIuY2FyYm9uLnVzZXIuY29yZS5qZGJjLkpEQkNVc2VyU3RvcmVNYW5hZ2Vy",
-            value = "User store type")
-    @JsonProperty("typeId")
-    @Valid
-    public String getTypeId() {
-
-        return typeId;
-    }
-
-    public void setTypeId(String typeId) {
-
-        this.typeId = typeId;
-    }
-
-    /**
-     * Set user store attribute type and get the object.
-     *
-     * @param typeName String user store type.
-     * @return UserStoreAttributeMapping .
-     */
+    * Type name of the userstore.
+    **/
     public UserStoreAttributeMapping typeName(String typeName) {
 
         this.typeName = typeName;
         return this;
     }
-
-    @ApiModelProperty(example = "org.wso2.carbon.user.core.ldap.UniqueIDActiveDirectoryUserStoreManager",
-            value = "User store type")
+    
+    @ApiModelProperty(example = "org.wso2.carbon.user.core.ldap.UniqueIDActiveDirectoryUserStoreManager", value = "Type name of the userstore.")
     @JsonProperty("typeName")
     @Valid
     public String getTypeName() {
-
         return typeName;
     }
-
     public void setTypeName(String typeName) {
-
         this.typeName = typeName;
     }
 
     /**
-     * Set local user store is local or not and get the object.
-     *
-     * @param isLocal Boolean local user store or not.
-     * @return UserStoreAttributeMapping .
-     */
-    public UserStoreAttributeMapping isLocal(boolean isLocal) {
+    * Type id of the userstore.
+    **/
+    public UserStoreAttributeMapping typeId(String typeId) {
+
+        this.typeId = typeId;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "b3JnLndzbzIuY2FyYm9uLnVzZXIuY29yZS5qZGJjLkpEQkNVc2VyU3RvcmVNYW5hZ2Vy", value = "Type id of the userstore.")
+    @JsonProperty("typeId")
+    @Valid
+    public String getTypeId() {
+        return typeId;
+    }
+    public void setTypeId(String typeId) {
+        this.typeId = typeId;
+    }
+
+    /**
+    * Whether the userstore is local or not.
+    **/
+    public UserStoreAttributeMapping isLocal(Boolean isLocal) {
 
         this.isLocal = isLocal;
         return this;
     }
-
-    @ApiModelProperty(example = "true",
-            value = "Is local user store or not")
+    
+    @ApiModelProperty(example = "true", value = "Whether the userstore is local or not.")
     @JsonProperty("isLocal")
     @Valid
-    public boolean getIsLocal() {
-
+    public Boolean getIsLocal() {
         return isLocal;
     }
-
-    public void setIsLocal(boolean isLocal) {
-
+    public void setIsLocal(Boolean isLocal) {
         this.isLocal = isLocal;
     }
 
     /**
-     * Set attribute mappings and get the object.
-     *
-     * @param attributeMappings List of attribute mappings.
-     * @return UserStoreAttributeMapping.
-     */
-    public UserStoreAttributeMapping attributeMapping(List<UserStoreAttributeDO> attributeMappings) {
+    * Userstore attribute mappings.
+    **/
+    public UserStoreAttributeMapping attributeMappings(List<UserStoreAttribute> attributeMappings) {
 
         this.attributeMappings = attributeMappings;
         return this;
     }
-
-    @ApiModelProperty(value = "Attribute mappings")
-    @JsonProperty("AttributeMapping")
+    
+    @ApiModelProperty(value = "Userstore attribute mappings.")
+    @JsonProperty("attributeMappings")
     @Valid
-    public List<UserStoreAttributeDO> getAttributeMappings() {
-
+    public List<UserStoreAttribute> getAttributeMappings() {
         return attributeMappings;
     }
+    public void setAttributeMappings(List<UserStoreAttribute> attributeMappings) {
+        this.attributeMappings = attributeMappings;
+    }
+
+    public UserStoreAttributeMapping addAttributeMappingsItem(UserStoreAttribute attributeMappingsItem) {
+        if (this.attributeMappings == null) {
+            this.attributeMappings = new ArrayList<>();
+        }
+        this.attributeMappings.add(attributeMappingsItem);
+        return this;
+    }
+
+    
+
+    @Override
+    public boolean equals(java.lang.Object o) {
+
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UserStoreAttributeMapping userStoreAttributeMapping = (UserStoreAttributeMapping) o;
+        return Objects.equals(this.typeName, userStoreAttributeMapping.typeName) &&
+            Objects.equals(this.typeId, userStoreAttributeMapping.typeId) &&
+            Objects.equals(this.isLocal, userStoreAttributeMapping.isLocal) &&
+            Objects.equals(this.attributeMappings, userStoreAttributeMapping.attributeMappings);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(typeName, typeId, isLocal, attributeMappings);
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("class UserStoreAttributeMapping {\n");
+        
+        sb.append("    typeName: ").append(toIndentedString(typeName)).append("\n");
+        sb.append("    typeId: ").append(toIndentedString(typeId)).append("\n");
+        sb.append("    isLocal: ").append(toIndentedString(isLocal)).append("\n");
+        sb.append("    attributeMappings: ").append(toIndentedString(attributeMappings)).append("\n");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    /**
+    * Convert the given object to string with each line indented by 4 spaces
+    * (except the first line).
+    */
+    private String toIndentedString(java.lang.Object o) {
+
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n");
+    }
 }
+
