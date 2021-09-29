@@ -90,7 +90,7 @@ public class SecretResponse {
         return this;
     }
 
-    @ApiModelProperty(example = "Mon, 12 Jul 2021 06:29:22 GMT", required = true, value = "")
+    @ApiModelProperty(example = "2021-09-29 10:36:24.976", required = true, value = "")
     @JsonProperty("created")
     @Valid
     @NotNull(message = "Property created cannot be null.")
@@ -114,7 +114,7 @@ public class SecretResponse {
         return this;
     }
 
-    @ApiModelProperty(example = "Mon, 12 Jul 2021 06:29:22 GMT", required = true, value = "")
+    @ApiModelProperty(example = "2021-09-29 10:36:24.976", required = true, value = "")
     @JsonProperty("lastModified")
     @Valid
     @NotNull(message = "Property lastModified cannot be null.")
