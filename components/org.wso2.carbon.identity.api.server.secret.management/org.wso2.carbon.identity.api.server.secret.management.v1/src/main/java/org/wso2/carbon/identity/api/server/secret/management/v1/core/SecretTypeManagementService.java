@@ -46,7 +46,7 @@ public class SecretTypeManagementService {
     /**
      * Create a secret Type.
      *
-     * @param secretTypeAddRequest secret post request.
+     * @param secretTypeAddRequest Secret post request.
      * @return secret.
      */
     public SecretTypeResponse addSecretType(SecretTypeAddRequest secretTypeAddRequest) {
@@ -66,7 +66,7 @@ public class SecretTypeManagementService {
     /**
      * To create Secret Response object for the post request
      *
-     * @param secretTypeReq secret object.
+     * @param secretTypeReq Secret object.
      * @return {@link SecretTypeResponse} .
      */
     private SecretTypeResponse buildSecretTypeResponseFromResponseDTO(SecretType secretTypeReq) {
@@ -81,7 +81,7 @@ public class SecretTypeManagementService {
     /**
      * Validate the secret post request.
      *
-     * @param secretTypeAddRequest secret post request.
+     * @param secretTypeAddRequest Secret post request.
      */
     private void validateSecretTypeAddRequest(SecretTypeAddRequest secretTypeAddRequest) {
 
@@ -95,7 +95,7 @@ public class SecretTypeManagementService {
     /**
      * Build secret requestDTO by secret body request.
      *
-     * @param secretTypeAddRequest secret type post body.
+     * @param secretTypeAddRequest Secret type post body.
      * @return Secret requestDTO object.
      */
     private SecretType buildSecretTypeRequestDTOFromSecretTypeAddRequest(SecretTypeAddRequest secretTypeAddRequest) {
@@ -124,13 +124,12 @@ public class SecretTypeManagementService {
     /**
      * Retrieve the secret details by name.
      *
-     * @param secretTypeName secret name.
+     * @param secretTypeName Secret name.
      * @return secret.
      */
     public SecretTypeResponse getSecretType(String secretTypeName) {
 
         try {
-
             SecretType responseDTO = SecretManagementServiceHolder.getSecretConfigManager().getSecretType
                     (secretTypeName);
             SecretTypeResponse secretTypeResponse = new SecretTypeResponse();
@@ -147,8 +146,8 @@ public class SecretTypeManagementService {
     /**
      * Update secret details by name.
      *
-     * @param name                secret name.
-     * @param secretUpdateRequest secret's updated details.
+     * @param name                Secret name.
+     * @param secretUpdateRequest Secret's updated details.
      * @return Updated secret.
      */
     public SecretTypeResponse updateTypeSecret(String name, SecretTypeUpdateRequest secretUpdateRequest) {
@@ -168,8 +167,8 @@ public class SecretTypeManagementService {
     /**
      * Build secretAdd object from secret type update request.
      *
-     * @param name                    secret type name.
-     * @param secretTypeUpdateRequest secret type's update request body.
+     * @param name                    Secret type name.
+     * @param secretTypeUpdateRequest Secret type's update request body.
      * @return secretTypeAdd object
      */
     private SecretTypeAddRequest buildSecretTypeAddFromSecretTypeUpdateRequest(String name, SecretTypeUpdateRequest
@@ -248,12 +247,10 @@ public class SecretTypeManagementService {
      */
     private static String includeData(SecretManagementConstants.ErrorMessage error, String data) {
 
-        String message;
         if (StringUtils.isNotBlank(data)) {
-            message = String.format(error.getDescription(), data);
+            return String.format(error.getDescription(), data);
         } else {
-            message = error.getDescription();
+            return error.getDescription();
         }
-        return message;
     }
 }

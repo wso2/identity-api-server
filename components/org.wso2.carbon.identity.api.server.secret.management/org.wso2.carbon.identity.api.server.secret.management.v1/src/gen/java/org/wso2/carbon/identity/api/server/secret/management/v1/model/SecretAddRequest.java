@@ -39,7 +39,7 @@ public class SecretAddRequest {
         return this;
     }
 
-    @ApiModelProperty(example = "choreo-riskScore", required = true, value = "")
+    @ApiModelProperty(example = "sample-secret", required = true, value = "")
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
@@ -63,7 +63,7 @@ public class SecretAddRequest {
         return this;
     }
 
-    @ApiModelProperty(example = "bgtehaldhjdevch", required = true, value = "")
+    @ApiModelProperty(example = "sample-value", required = true, value = "")
     @JsonProperty("value")
     @Valid
     @NotNull(message = "Property value cannot be null.")
