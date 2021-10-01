@@ -45,7 +45,6 @@ public class SecretTypeApiServiceImpl implements SecretTypeApiService {
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + SECRET_TYPE_CONTEXT_PATH + "/"
                 + secretType.getName());
         return Response.created(location).entity(secretType).build();
-
     }
 
     @Override

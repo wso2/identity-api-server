@@ -65,6 +65,18 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response getSchema(String schemaId) {
+
+        return Response.ok().entity(configManagementService.getSchema(schemaId)).build();
+    }
+
+    @Override
+    public Response getSchemas() {
+
+        return Response.ok().entity(configManagementService.getSchemas()).build();
+    }
+
+    @Override
     public Response listAuthenticators(String type) {
 
         return Response.ok().entity(configManagementService.getAuthenticators(type)).build();

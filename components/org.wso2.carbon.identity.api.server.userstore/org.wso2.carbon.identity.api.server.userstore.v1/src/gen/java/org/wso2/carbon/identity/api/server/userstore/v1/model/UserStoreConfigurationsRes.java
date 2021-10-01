@@ -34,17 +34,17 @@ import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
 @ApiModel(description = "Available User Store Configurations Response.")
 public class UserStoreConfigurationsRes  {
-
+  
     private String typeName;
     private String typeId;
     private String name;
     private String description;
     private String className;
-    private boolean isLocal;
+    private Boolean isLocal;
     private List<AddUserStorePropertiesRes> properties = null;
+
     private List<ClaimAttributeMapping> claimAttributeMappings = null;
 
 
@@ -55,7 +55,7 @@ public class UserStoreConfigurationsRes  {
         this.typeName = typeName;
         return this;
     }
-
+    
     @ApiModelProperty(example = "UniqueIDJDBCUserStoreManager", value = "")
     @JsonProperty("typeName")
     @Valid
@@ -73,7 +73,7 @@ public class UserStoreConfigurationsRes  {
         this.typeId = typeId;
         return this;
     }
-
+    
     @ApiModelProperty(example = "VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg", value = "")
     @JsonProperty("typeId")
     @Valid
@@ -91,7 +91,7 @@ public class UserStoreConfigurationsRes  {
         this.name = name;
         return this;
     }
-
+    
     @ApiModelProperty(example = "JDBC-SECONDARY", value = "")
     @JsonProperty("name")
     @Valid
@@ -109,7 +109,7 @@ public class UserStoreConfigurationsRes  {
         this.description = description;
         return this;
     }
-
+    
     @ApiModelProperty(example = "Some description of the user store", value = "")
     @JsonProperty("description")
     @Valid
@@ -127,7 +127,7 @@ public class UserStoreConfigurationsRes  {
         this.className = className;
         return this;
     }
-
+    
     @ApiModelProperty(example = "org.wso2.carbon.user.core.jdbc.UniqueIDJDBCUserStoreManager", value = "")
     @JsonProperty("className")
     @Valid
@@ -139,6 +139,25 @@ public class UserStoreConfigurationsRes  {
     }
 
     /**
+    * Whether the userstore is local or not.
+    **/
+    public UserStoreConfigurationsRes isLocal(Boolean isLocal) {
+
+        this.isLocal = isLocal;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "Whether the userstore is local or not.")
+    @JsonProperty("isLocal")
+    @Valid
+    public Boolean getIsLocal() {
+        return isLocal;
+    }
+    public void setIsLocal(Boolean isLocal) {
+        this.isLocal = isLocal;
+    }
+
+    /**
     * Configured user store property for the set
     **/
     public UserStoreConfigurationsRes properties(List<AddUserStorePropertiesRes> properties) {
@@ -146,7 +165,7 @@ public class UserStoreConfigurationsRes  {
         this.properties = properties;
         return this;
     }
-
+    
     @ApiModelProperty(value = "Configured user store property for the set")
     @JsonProperty("properties")
     @Valid
@@ -158,7 +177,6 @@ public class UserStoreConfigurationsRes  {
     }
 
     public UserStoreConfigurationsRes addPropertiesItem(AddUserStorePropertiesRes propertiesItem) {
-
         if (this.properties == null) {
             this.properties = new ArrayList<>();
         }
@@ -166,45 +184,15 @@ public class UserStoreConfigurationsRes  {
         return this;
     }
 
-    @ApiModelProperty(example = "true", value = "")
-    @JsonProperty("isLocal")
-    @Valid
-    public boolean getIsLocal() {
-
-        return isLocal;
-    }
-
-    /**
-     * Set isLocalUserStore.
-     *
-     * @param isLocal Boolean is local user store or not.
-     */
-    public void setIsLocal(boolean isLocal) {
-
-        this.isLocal = isLocal;
-    }
-
-    /**
-     * Set is local user store or not and get the object.
-     *
-     * @param isLocal Boolean is local user store or not.
-     * @return This object.
-     */
-    public UserStoreConfigurationsRes isLocal(boolean isLocal) {
-
-        this.isLocal = isLocal;
-        return this;
-    }
-
-    /**
-     * Requested configured user store claim attribute mappings.
-     **/
+        /**
+    * Requested configured user store claim attribute mappings
+    **/
     public UserStoreConfigurationsRes claimAttributeMappings(List<ClaimAttributeMapping> claimAttributeMappings) {
 
         this.claimAttributeMappings = claimAttributeMappings;
         return this;
     }
-
+    
     @ApiModelProperty(value = "Requested configured user store claim attribute mappings")
     @JsonProperty("claimAttributeMappings")
     @Valid
@@ -223,7 +211,7 @@ public class UserStoreConfigurationsRes  {
         return this;
     }
 
-
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -240,13 +228,14 @@ public class UserStoreConfigurationsRes  {
             Objects.equals(this.name, userStoreConfigurationsRes.name) &&
             Objects.equals(this.description, userStoreConfigurationsRes.description) &&
             Objects.equals(this.className, userStoreConfigurationsRes.className) &&
+            Objects.equals(this.isLocal, userStoreConfigurationsRes.isLocal) &&
             Objects.equals(this.properties, userStoreConfigurationsRes.properties) &&
             Objects.equals(this.claimAttributeMappings, userStoreConfigurationsRes.claimAttributeMappings);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(typeName, typeId, name, description, className, properties, claimAttributeMappings);
+        return Objects.hash(typeName, typeId, name, description, className, isLocal, properties, claimAttributeMappings);
     }
 
     @Override
@@ -254,12 +243,13 @@ public class UserStoreConfigurationsRes  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class UserStoreConfigurationsRes {\n");
-
+        
         sb.append("    typeName: ").append(toIndentedString(typeName)).append("\n");
         sb.append("    typeId: ").append(toIndentedString(typeId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    className: ").append(toIndentedString(className)).append("\n");
+        sb.append("    isLocal: ").append(toIndentedString(isLocal)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("    claimAttributeMappings: ").append(toIndentedString(claimAttributeMappings)).append("\n");
         sb.append("}");

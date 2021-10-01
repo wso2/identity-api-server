@@ -29,6 +29,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
+import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ServerConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
@@ -166,6 +168,54 @@ public class ConfigsApi  {
     public Response getInboundScimConfigs() {
 
         return delegate.getInboundScimConfigs();
+    }
+
+    @Valid
+    @GET
+    @Path("/schemas/{schema-id}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get Schema by ID", notes = "By passing in the appropriate schema ID, you can retrieve attributes of a schema supported by the Server. ", response = Schema.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Schemas", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = Schema.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getSchema(@ApiParam(value = "Schema ID",required=true) @PathParam("schema-id") String schemaId) {
+
+        return delegate.getSchema(schemaId );
+    }
+
+    @Valid
+    @GET
+    @Path("/schemas")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve Schemas supported By Server.", notes = "Retrieve Schemas supported by Server. ", response = SchemaListItem.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Schemas", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = SchemaListItem.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getSchemas() {
+
+        return delegate.getSchemas();
     }
 
     @Valid
