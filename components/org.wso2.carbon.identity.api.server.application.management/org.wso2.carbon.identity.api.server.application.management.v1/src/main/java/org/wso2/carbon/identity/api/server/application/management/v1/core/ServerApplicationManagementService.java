@@ -391,7 +391,10 @@ public class ServerApplicationManagementService {
             }
             throw buildClientError(e, "Error creating application. Allow CORS origins update failed.");
         } catch (Throwable e) {
-            // TODO - Need to handle the application creation exceptions gracefully.
+            /*
+             * For more information read https://github.com/wso2/product-is/issues/12579. This is to overcome the
+             * above issue.
+             */
             if (log.isDebugEnabled()) {
                 log.debug("Server encountered unexpected error. Rolling back created application data.", e);
             }
@@ -400,8 +403,7 @@ public class ServerApplicationManagementService {
             } else {
                 rollbackInbounds(getConfiguredInbounds(application));
             }
-            throw buildClientError(ErrorMessage.ERROR_PROCESSING_REQUEST,
-                    "Error creating application. Server encountered an error when handling the request.");
+            throw Utils.buildServerError("Error creating application. Server encountered an unexpected error.");
         }
     }
 
