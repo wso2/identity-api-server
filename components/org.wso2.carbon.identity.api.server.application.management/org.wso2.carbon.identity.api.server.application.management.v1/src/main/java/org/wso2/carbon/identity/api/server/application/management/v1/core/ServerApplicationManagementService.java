@@ -117,6 +117,7 @@ import java.util.stream.Collectors;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
@@ -403,7 +404,8 @@ public class ServerApplicationManagementService {
             } else {
                 rollbackInbounds(getConfiguredInbounds(application));
             }
-            throw Utils.buildServerError("Error creating application. Server encountered an unexpected error.");
+            throw Utils.buildServerError(ERROR_PROCESSING_REQUEST.getCode(), ERROR_PROCESSING_REQUEST.getMessage(),
+                    ERROR_PROCESSING_REQUEST.getDescription());
         }
     }
 
