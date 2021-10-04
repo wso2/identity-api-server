@@ -2701,14 +2701,14 @@ public class ServerIdpManagementService {
                         if (certificates.contains(value)) {
                             throw handleException(Response.Status.CONFLICT,
                                     Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
-                                    "Cannot replace certificate as this certificate is already exists.");
+                                    "Cannot replace certificate as this certificate already exists.");
                         }
                         certificates.set(index, value);
                         idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
                     } else if (ArrayUtils.isEmpty(idpToUpdate.getCertificateInfoArray()) ||
                             index >= idpToUpdate.getCertificateInfoArray().length) {
                         throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage
-                                .ERROR_CODE_ERROR_UPDATING_IDP, "Cannot replace certificate as it does not exist");
+                                .ERROR_CODE_ERROR_UPDATING_IDP, "Cannot replace certificate as it does not exist.");
                     } else {
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                 .ERROR_CODE_INVALID_INPUT, null);
@@ -2775,7 +2775,7 @@ public class ServerIdpManagementService {
                     if (certificates.contains(value)) {
                         throw handleException(Response.Status.CONFLICT,
                                 Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
-                                "Cannot add certificate as it already exists");
+                                "Cannot add certificate as it already exists.");
                     }
                     certificates.add(index, value);
                     idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
@@ -2831,7 +2831,7 @@ public class ServerIdpManagementService {
                     } else if (ArrayUtils.isEmpty(idpToUpdate.getCertificateInfoArray()) ||
                             index >= idpToUpdate.getCertificateInfoArray().length) {
                         throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage
-                                .ERROR_CODE_ERROR_UPDATING_IDP, "Cannot replace certificate as it does not exist");
+                                .ERROR_CODE_ERROR_UPDATING_IDP, "Cannot replace certificate as it does not exist.");
                     } else {
                         throw handleException(Response.Status.BAD_REQUEST,
                                 Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
@@ -2853,7 +2853,7 @@ public class ServerIdpManagementService {
                     if (propertyDTOS.length == idpNewProperties.size()) {
                         throw handleException(Response.Status.NOT_FOUND,
                                 Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
-                                "Cannot remove JWKS URI as it does not exist");
+                                "Cannot remove JWKS URI as it does not exist.");
                     }
 
                     idpToUpdate.setIdpProperties(idpNewProperties.toArray(new IdentityProviderProperty[0]));
@@ -2881,7 +2881,6 @@ public class ServerIdpManagementService {
 
         throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
                 String.format("Cannot replace  %s as it does not exist", propertyName));
-
     }
 
     /**
