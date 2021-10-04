@@ -2878,7 +2878,6 @@ public class ServerIdpManagementService {
                 return;
             }
         }
-
         throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
                 String.format("Cannot replace %s as it does not exist.", propertyName));
     }
