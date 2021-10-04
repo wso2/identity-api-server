@@ -83,7 +83,7 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
         if (includeIdentityClaimMappings != null) {
             includeIdentityClaims = includeIdentityClaimMappings;
         }
-        return Response.ok().entity(serverUserStoreService.getUserStoreMappingAttributes(typeId,
+        return Response.ok().entity(serverUserStoreService.getUserStoreAttributeMappings(typeId,
                 includeIdentityClaims)).build();
     }
 

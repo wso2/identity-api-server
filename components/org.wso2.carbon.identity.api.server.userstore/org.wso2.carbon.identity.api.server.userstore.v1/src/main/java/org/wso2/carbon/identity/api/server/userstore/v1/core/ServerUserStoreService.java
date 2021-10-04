@@ -39,7 +39,7 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PropertiesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeMapping;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeMappingResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConfigurationsRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStorePropertiesRes;
@@ -54,7 +54,7 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.user.store.configuration.UserStoreConfigService;
 import org.wso2.carbon.identity.user.store.configuration.dto.PropertyDTO;
 import org.wso2.carbon.identity.user.store.configuration.dto.UserStoreDTO;
-import org.wso2.carbon.identity.user.store.configuration.model.UserStoreAttributeDO;
+import org.wso2.carbon.identity.user.store.configuration.model.UserStoreAttribute;
 import org.wso2.carbon.identity.user.store.configuration.model.UserStoreAttributeMappings;
 import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreClientException;
 import org.wso2.carbon.identity.user.store.configuration.utils.IdentityUserStoreMgtException;
@@ -1278,12 +1278,12 @@ public class ServerUserStoreService {
      * Get user store attributes mappings for a given user store type id.
      *
      * @param typeId                       String user store type id.
-     * @param includeIdentityClaimMappings Whether to include claim mapping for identity claims with other userstore
+     * @param includeIdentityClaimMappings Whether to include claim mapping for identity claims with other userstore.
      *                                     attributes.
      * @return UserStoreAttributeMapping user store attribute mappings.
      */
-    public UserStoreAttributeMapping getUserStoreMappingAttributes(String typeId,
-                                                                   boolean includeIdentityClaimMappings) {
+    public UserStoreAttributeMappingResponse getUserStoreAttributeMappings(String typeId,
+                                                                           boolean includeIdentityClaimMappings) {
 
         Set<String> classNames;
         String userStoreName = getUserStoreType(base64URLDecodeId(typeId));
@@ -1304,20 +1304,18 @@ public class ServerUserStoreService {
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_USER_STORE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
-        UserStoreAttributeMapping userStoreAttributeMapping = new UserStoreAttributeMapping();
-        List<UserStoreAttributeDO> attributeMappings = getAttributeMappings(userStoreName,
+        UserStoreAttributeMappingResponse userStoreAttributeMappingResponse = new UserStoreAttributeMappingResponse();
+        List<UserStoreAttribute> attributeMappings = getAttributeMappings(userStoreName,
                 includeIdentityClaimMappings);
-        userStoreAttributeMapping = userStoreAttributeMapping
-                .attributeMappings(new AttributeMappingsToApiModel().apply(attributeMappings))
-                .typeId(typeId)
-                .typeName(userStoreName);
+        userStoreAttributeMappingResponse = userStoreAttributeMappingResponse.attributeMappings(
+                new AttributeMappingsToApiModel().apply(attributeMappings)).typeId(typeId).typeName(userStoreName);
         try {
             boolean isLocal = UserStoreManagerRegistry.isLocalUserStore(userStoreName);
-            userStoreAttributeMapping.setIsLocal(isLocal);
+            userStoreAttributeMappingResponse.setIsLocal(isLocal);
         } catch (UserStoreException e) {
             LOG.error(String.format("Userstore type is not found for %s", userStoreName), e);
         }
-        return userStoreAttributeMapping;
+        return userStoreAttributeMappingResponse;
     }
 
     /**
@@ -1328,21 +1326,26 @@ public class ServerUserStoreService {
      *                                     attributes.
      * @return List of user store attribute mappings for the given typeId.
      */
-    private List<UserStoreAttributeDO> getAttributeMappings(String userStoreName,
-                                                            boolean includeIdentityClaimMappings) {
+    private List<UserStoreAttribute> getAttributeMappings(String userStoreName,
+                                                          boolean includeIdentityClaimMappings) {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
                 getUserStoreConfigService();
         try {
             UserStoreAttributeMappings userStoreAttributeMappings = userStoreConfigService.
                     getUserStoreAttributeMappings();
-            Map<String, UserStoreAttributeDO> mapping = userStoreAttributeMappings
-                    .getUserStoreAttributeMappings(userStoreName);
+            Map<String, Map<String, UserStoreAttribute>> mapping = userStoreAttributeMappings
+                    .getUserStoreAttributeMappings();
+            Map<String, UserStoreAttribute> userStoreAttributeMap =
+                    userStoreAttributeMappings.getDefaultUserStoreAttributeMappings();
+            if (mapping.containsKey(userStoreName)) {
+                userStoreAttributeMap = mapping.get(userStoreName);
+            }
             if (!includeIdentityClaimMappings) {
                 // Remove identity claim mappings by iterating through all the claim mappings.
-                return excludeIdentityClaims(mapping);
+                return excludeIdentityClaims(userStoreAttributeMap);
             }
-            return new ArrayList<>(mapping.values());
+            return new ArrayList<>(userStoreAttributeMap.values());
         } catch (IdentityUserStoreMgtException e) {
             LOG.error("Error occurred while retrieving user store attribute metadata", e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
@@ -1353,17 +1356,17 @@ public class ServerUserStoreService {
     /**
      * Exclude the userstore attributes with identity claims.
      *
-     * @param userStoreAttributeDOMap Userstore attribute map.
+     * @param userStoreAttributeMap Userstore attribute map.
      * @return List of UserStoreAttributeDOs.
      */
-    private List<UserStoreAttributeDO> excludeIdentityClaims(
-            Map<String, UserStoreAttributeDO> userStoreAttributeDOMap) {
+    private List<UserStoreAttribute> excludeIdentityClaims(
+            Map<String, UserStoreAttribute> userStoreAttributeMap) {
 
-        List<UserStoreAttributeDO> userstoreMappings = new ArrayList<>();
-        for (Map.Entry<String, UserStoreAttributeDO> entry : userStoreAttributeDOMap.entrySet()) {
-            UserStoreAttributeDO userStoreAttributeDO = entry.getValue();
-            if (!userStoreAttributeDO.getClaimUri().startsWith(UserCoreConstants.ClaimTypeURIs.IDENTITY_CLAIM_URI)) {
-                userstoreMappings.add(userStoreAttributeDO);
+        List<UserStoreAttribute> userstoreMappings = new ArrayList<>();
+        for (Map.Entry<String, UserStoreAttribute> entry : userStoreAttributeMap.entrySet()) {
+            UserStoreAttribute userStoreAttribute = entry.getValue();
+            if (!userStoreAttribute.getClaimUri().startsWith(UserCoreConstants.ClaimTypeURIs.IDENTITY_CLAIM_URI)) {
+                userstoreMappings.add(userStoreAttribute);
             }
         }
         return userstoreMappings;

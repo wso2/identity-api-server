@@ -19,8 +19,8 @@
 package org.wso2.carbon.identity.api.server.userstore.v1.core.functions.userstore;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttribute;
-import org.wso2.carbon.identity.user.store.configuration.model.UserStoreAttributeDO;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeResponse;
+import org.wso2.carbon.identity.user.store.configuration.model.UserStoreAttribute;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,22 +30,23 @@ import java.util.function.Function;
 /**
  * Convert userstore attribute mappings to API model.
  */
-public class AttributeMappingsToApiModel implements Function<List<UserStoreAttributeDO>, List<UserStoreAttribute>> {
+public class AttributeMappingsToApiModel
+        implements Function<List<UserStoreAttribute>, List<UserStoreAttributeResponse>> {
 
     @Override
-    public List<UserStoreAttribute> apply(List<UserStoreAttributeDO> userStoreAttributeDOs) {
+    public List<UserStoreAttributeResponse> apply(List<UserStoreAttribute> userStoreAttributeDOs) {
 
         if (CollectionUtils.isNotEmpty(userStoreAttributeDOs)) {
 
-            List<UserStoreAttribute> userStoreAttributes = new ArrayList<>();
+            List<UserStoreAttributeResponse> userStoreAttributes = new ArrayList<>();
             userStoreAttributeDOs.stream().forEach(
-                    userStoreAttributeDO -> {
-                        UserStoreAttribute userStoreAttribute = new UserStoreAttribute();
-                        userStoreAttribute.mappedAttribute(userStoreAttributeDO.getMappedAttribute());
-                        userStoreAttribute.claimId(userStoreAttributeDO.getClaimId());
-                        userStoreAttribute.claimURI(userStoreAttributeDO.getClaimUri());
-                        userStoreAttribute.displayName(userStoreAttributeDO.getDisplayName());
-                        userStoreAttributes.add(userStoreAttribute);
+                    userStoreAttribute -> {
+                        UserStoreAttributeResponse userStoreAttributeResponse = new UserStoreAttributeResponse();
+                        userStoreAttributeResponse.mappedAttribute(userStoreAttribute.getMappedAttribute());
+                        userStoreAttributeResponse.claimId(userStoreAttribute.getClaimId());
+                        userStoreAttributeResponse.claimURI(userStoreAttribute.getClaimUri());
+                        userStoreAttributeResponse.displayName(userStoreAttribute.getDisplayName());
+                        userStoreAttributes.add(userStoreAttributeResponse);
                     });
             return userStoreAttributes;
         }

@@ -30,7 +30,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeMapping;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeMappingResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConfigurationsRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
@@ -169,14 +169,14 @@ public class UserstoresApi  {
     @Path("/meta/types/{type-id}/attributes")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the meta attributes of a user store of a given user store type.", notes = "This API provides the capability to retrieve the attribute mappings of a given user store type <b>Permission required:</b><br> *_/permission/admin/manage/identity/userstore/config/view <b>scope required:</b> * internal_userstore_view ", response = UserStoreAttributeMapping.class, authorizations = {
+    @ApiOperation(value = "Retrieve the meta attributes of a user store of a given user store type.", notes = "This API provides the capability to retrieve the attribute mappings of a given user store type <b>Permission required:</b><br> *_/permission/admin/manage/identity/userstore/config/view <b>scope required:</b> * internal_userstore_view ", response = UserStoreAttributeMappingResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Meta", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful Response.", response = UserStoreAttributeMapping.class),
+        @ApiResponse(code = 200, message = "Successful Response.", response = UserStoreAttributeMappingResponse.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),

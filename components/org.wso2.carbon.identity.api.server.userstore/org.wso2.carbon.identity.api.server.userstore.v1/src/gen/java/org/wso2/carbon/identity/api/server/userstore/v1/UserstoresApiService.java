@@ -30,7 +30,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeMapping;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeMappingResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConfigurationsRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
