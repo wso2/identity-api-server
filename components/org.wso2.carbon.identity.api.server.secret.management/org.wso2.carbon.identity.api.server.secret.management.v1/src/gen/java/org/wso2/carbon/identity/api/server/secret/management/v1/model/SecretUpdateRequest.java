@@ -37,7 +37,7 @@ public class SecretUpdateRequest {
         return this;
     }
 
-    @ApiModelProperty(example = "bgtehaldhjdevch", required = true, value = "")
+    @ApiModelProperty(example = "new-sample-value", required = true, value = "")
     @JsonProperty("value")
     @Valid
     @NotNull(message = "Property value cannot be null.")
