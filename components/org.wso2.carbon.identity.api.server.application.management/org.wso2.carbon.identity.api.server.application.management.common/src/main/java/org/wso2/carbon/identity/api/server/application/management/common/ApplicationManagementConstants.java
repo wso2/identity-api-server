@@ -103,6 +103,9 @@ public class ApplicationManagementConstants {
         ERROR_RESOLVING_APPLICATION_TEMPLATE("65005",
                 "Error occurred while retrieving application template.",
                 "Unexpected error occurred while retrieving application template."),
+        ERROR_PROCESSING_REQUEST("65006",
+                "Unexpected Processing Error.",
+                "Server encountered an unexpected error when creating the application."),
 
         // Server errors defined at REST API layer.
         APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED("65501",
