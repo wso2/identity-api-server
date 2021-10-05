@@ -51,8 +51,9 @@ public class SecretManagementService {
     /**
      * Create a secret.
      *
+     * @param secretType Type of the secret.
      * @param secretAddRequest secret post request.
-     * @return secret.
+     * @return {@link SecretResponse} .
      */
     public SecretResponse addSecret(String secretType, SecretAddRequest secretAddRequest) {
 
@@ -69,7 +70,7 @@ public class SecretManagementService {
     }
 
     /**
-     * To create Secret Response object for the post request
+     * To create Secret Response object for the post request.
      *
      * @param secretReq secret object.
      * @return {@link SecretResponse} .
@@ -81,7 +82,6 @@ public class SecretManagementService {
         secretResponse.setCreated(secretReq.getCreatedTime());
         secretResponse.setLastModified(secretReq.getLastModified());
         secretResponse.setSecretId(secretReq.getSecretId());
-        secretResponse.setType(secretReq.getSecretType());
         secretResponse.setDescription(secretReq.getDescription());
         return secretResponse;
     }
@@ -120,48 +120,48 @@ public class SecretManagementService {
     }
 
     /**
-     * Delete a secret sender by name.
+     * Delete a secret sender by secret id.
      *
-     * @param name Name of the secret.
+     * @param secretId Id of the secret.
      */
-    public void deleteSecret(String secretType, String name) {
+    public void deleteSecret(String secretId) {
 
         try {
-            SecretManagementServiceHolder.getSecretConfigManager().deleteSecret(secretType, name);
+            SecretManagementServiceHolder.getSecretConfigManager().deleteSecretById(secretId);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
-                    ERROR_CODE_ERROR_DELETING_SECRET, name);
+                    ERROR_CODE_ERROR_DELETING_SECRET, secretId);
         }
     }
 
     /**
-     * Retrieve the secret details by name.
+     * Retrieve the secret details by id.
      *
-     * @param name secret name.
-     * @return secret.
+     * @param secretId Id of the secret.
+     * @return {@link SecretResponse} .
      */
-    public SecretResponse getSecret(String secretType, String name) {
+    public SecretResponse getSecret(String secretId) {
 
         try {
-            Secret responseDTO = SecretManagementServiceHolder.getSecretConfigManager().getSecret(secretType, name);
+            Secret responseDTO = SecretManagementServiceHolder.getSecretConfigManager().getSecretById(secretId);
             SecretResponse secretResponse = new SecretResponse();
             secretResponse.secretName(responseDTO.getSecretName());
             secretResponse.setCreated(responseDTO.getCreatedTime());
             secretResponse.setLastModified(responseDTO.getLastModified());
             secretResponse.setSecretId(responseDTO.getSecretId());
-            secretResponse.setType(responseDTO.getSecretType());
             secretResponse.setDescription(responseDTO.getDescription());
             return secretResponse;
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
-                    ERROR_CODE_ERROR_GETTING_SECRET, name);
+                    ERROR_CODE_ERROR_GETTING_SECRET, secretId);
         }
     }
 
     /**
      * Retrieve all the secrets of the tenant.
      *
-     * @return secrets of the tenant.
+     * @param secretType Type of the secret.
+     * @return List<SecretResponse> secrets of the tenant.
      */
     public List<SecretResponse> getSecretsList(String secretType) {
 
@@ -179,30 +179,31 @@ public class SecretManagementService {
     /**
      * To make a partial update or update the specific property of the secret.
      *
-     * @param name               secret name.
+     * @param secretType Type of the secret.
+     * @param secretId Id of the secret.
      * @param secretPatchRequest secret's patch details.
      * @return Updated secret.
      */
-    public SecretResponse patchSecret(String secretType, String name, SecretPatchRequest secretPatchRequest) {
+    public SecretResponse patchSecret(String secretType, String secretId, SecretPatchRequest secretPatchRequest) {
 
         Secret secret, responseDTO;
         try {
-            secret = SecretManagementServiceHolder.getSecretConfigManager().getSecret(secretType, name);
+            secret = SecretManagementServiceHolder.getSecretConfigManager().getSecretById(secretId);
             if (secret == null) {
                 throw handleException(Response.Status.NOT_FOUND, SecretManagementConstants.ErrorMessage.
-                        ERROR_CODE_SECRET_NOT_FOUND, name);
+                        ERROR_CODE_SECRET_NOT_FOUND, secretId);
             }
             String path = secretPatchRequest.getPath();
             SecretPatchRequest.OperationEnum operation = secretPatchRequest.getOperation();
             // Only the Replace operation supported with PATCH request.
             if (SecretPatchRequest.OperationEnum.REPLACE.equals(operation)) {
                 if (SecretManagementConstants.VALUE_PATH.equals(path)) {
-                    responseDTO = SecretManagementServiceHolder.getSecretConfigManager().updateSecretValue(secretType,
-                            name, secretPatchRequest.getValue());
+                    responseDTO = SecretManagementServiceHolder.getSecretConfigManager()
+                            .updateSecretValueById(secretId, secretPatchRequest.getValue());
 
                 } else if (SecretManagementConstants.DESCRIPTION_PATH.equals(path)) {
-                    responseDTO = SecretManagementServiceHolder.getSecretConfigManager().updateSecretDescription
-                            (secretType, name, secretPatchRequest.getValue());
+                    responseDTO = SecretManagementServiceHolder.getSecretConfigManager()
+                            .updateSecretDescriptionById(secretId, secretPatchRequest.getValue());
                 } else {
                     throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage
                             .ERROR_CODE_INVALID_INPUT, "Path");
@@ -214,52 +215,49 @@ public class SecretManagementService {
             }
 
         } catch (SecretManagementException e) {
-            throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
-                    name);
+            throw handleSecretMgtException(
+                    e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET, secretId
+            );
         }
         return buildSecretResponseFromResponseDTO(responseDTO);
     }
 
     /**
-     * Update secret details by name.
+     * Update secret details by the secret id.
      *
-     * @param name                secret name.
+     * @param secretType Type of the secret.
+     * @param secretId Id of the secret.
      * @param secretUpdateRequest secret's updated details.
      * @return Updated secret.
      */
-    public SecretResponse updateSecret(String secretType, String name, SecretUpdateRequest secretUpdateRequest) {
+    public SecretResponse updateSecret(String secretType, String secretId, SecretUpdateRequest secretUpdateRequest) {
+        Secret requestDTO  = new Secret();
+        Secret responseDTO = new Secret();
 
-        Secret requestDTO, responseDTO;
-        SecretAddRequest secretAddRequest = buildSecretAddFromSecretUpdateRequest(name, secretUpdateRequest);
+        requestDTO.setSecretId(secretId);
+        requestDTO.setSecretValue(secretUpdateRequest.getValue());
+
+        if (!StringUtils.isEmpty(secretUpdateRequest.getDescription())) {
+            requestDTO.setDescription(secretUpdateRequest.getDescription());
+        }
+
         try {
-            requestDTO = buildSecretRequestDTOFromSecretAddRequest(secretAddRequest);
             responseDTO = SecretManagementServiceHolder.getSecretConfigManager().replaceSecret(secretType, requestDTO);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
-                    name);
+                    secretId);
         }
+
         return buildSecretResponseFromResponseDTO(responseDTO);
     }
 
     /**
-     * Build secretAdd object from secret update request.
-     *
-     * @param name                secret name.
-     * @param secretUpdateRequest secret's update request body.
-     * @return secretAdd object
+     * Handle secret management exceptions.
+     * @param e Secret management exception.
+     * @param errorEnum Error.
+     * @param data Context data.
+     * @return
      */
-    private SecretAddRequest buildSecretAddFromSecretUpdateRequest(String name,
-                                                                   SecretUpdateRequest secretUpdateRequest) {
-
-        SecretAddRequest secretAddRequest = new SecretAddRequest();
-        secretAddRequest.setName(name);
-        secretAddRequest.setValue(secretUpdateRequest.getValue());
-        if (!StringUtils.isEmpty(secretUpdateRequest.getDescription())) {
-            secretAddRequest.setDescription(secretUpdateRequest.getDescription());
-        }
-        return secretAddRequest;
-    }
-
     private APIError handleSecretMgtException(SecretManagementException e, SecretManagementConstants.ErrorMessage
             errorEnum, String data) {
 
@@ -297,6 +295,7 @@ public class SecretManagementService {
      *
      * @param status HTTP Status.
      * @param error  Error Message information.
+     * @param data Context data.
      * @return APIError.
      */
     private APIError handleException(Response.Status status, SecretManagementConstants.ErrorMessage error,
@@ -309,6 +308,7 @@ public class SecretManagementService {
      * Return error builder.
      *
      * @param errorMsg Error Message information.
+     * @param data Context data.
      * @return ErrorResponse.Builder.
      */
     private ErrorResponse.Builder getErrorBuilder(SecretManagementConstants.ErrorMessage errorMsg,

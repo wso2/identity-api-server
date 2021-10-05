@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretResponse;
 import javax.validation.constraints.*;
 
 
@@ -30,50 +33,38 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class SecretUpdateRequest  {
+public class SecretsList  {
   
-    private String value;
-    private String description;
+    private List<SecretResponse> secrets = null;
+
 
     /**
     **/
-    public SecretUpdateRequest value(String value) {
+    public SecretsList secrets(List<SecretResponse> secrets) {
 
-        this.value = value;
+        this.secrets = secrets;
         return this;
     }
     
-    @ApiModelProperty(example = "jrkahbE3C5m4gsjk", required = true, value = "")
-    @JsonProperty("value")
+    @ApiModelProperty(value = "")
+    @JsonProperty("secrets")
     @Valid
-    @NotNull(message = "Property value cannot be null.")
-
-    public String getValue() {
-        return value;
+    public List<SecretResponse> getSecrets() {
+        return secrets;
     }
-    public void setValue(String value) {
-        this.value = value;
+    public void setSecrets(List<SecretResponse> secrets) {
+        this.secrets = secrets;
     }
 
-    /**
-    **/
-    public SecretUpdateRequest description(String description) {
-
-        this.description = description;
+    public SecretsList addSecretsItem(SecretResponse secretsItem) {
+        if (this.secrets == null) {
+            this.secrets = new ArrayList<>();
+        }
+        this.secrets.add(secretsItem);
         return this;
     }
+
     
-    @ApiModelProperty(example = "Some sample description", value = "")
-    @JsonProperty("description")
-    @Valid
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -84,24 +75,22 @@ public class SecretUpdateRequest  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SecretUpdateRequest secretUpdateRequest = (SecretUpdateRequest) o;
-        return Objects.equals(this.value, secretUpdateRequest.value) &&
-            Objects.equals(this.description, secretUpdateRequest.description);
+        SecretsList secretsList = (SecretsList) o;
+        return Objects.equals(this.secrets, secretsList.secrets);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value, description);
+        return Objects.hash(secrets);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class SecretUpdateRequest {\n");
+        sb.append("class SecretsList {\n");
         
-        sb.append("    value: ").append(toIndentedString(value)).append("\n");
-        sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    secrets: ").append(toIndentedString(secrets)).append("\n");
         sb.append("}");
         return sb.toString();
     }
