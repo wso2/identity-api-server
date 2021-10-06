@@ -31,7 +31,7 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class SecretUpdateRequest  {
-
+  
     private String value;
     private String description;
 
@@ -42,7 +42,7 @@ public class SecretUpdateRequest  {
         this.value = value;
         return this;
     }
-
+    
     @ApiModelProperty(example = "new-sample-value", required = true, value = "")
     @JsonProperty("value")
     @Valid
@@ -62,7 +62,7 @@ public class SecretUpdateRequest  {
         this.description = description;
         return this;
     }
-
+    
     @ApiModelProperty(example = "Some sample description", value = "")
     @JsonProperty("description")
     @Valid
@@ -99,7 +99,7 @@ public class SecretUpdateRequest  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class SecretUpdateRequest {\n");
-
+        
         sb.append("    value: ").append(toIndentedString(value)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("}");
@@ -118,3 +118,4 @@ public class SecretUpdateRequest  {
         return o.toString().replace("\n", "\n");
     }
 }
+

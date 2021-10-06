@@ -37,7 +37,7 @@ public class SecretPatchRequest  {
 @XmlEnum(String.class)
 public enum OperationEnum {
 
-    @XmlEnumValue("ADD") ADD(String.valueOf("ADD")), @XmlEnumValue("REMOVE") REMOVE(String.valueOf("REMOVE")), @XmlEnumValue("REPLACE") REPLACE(String.valueOf("REPLACE"));
+    @XmlEnumValue("REPLACE") REPLACE(String.valueOf("REPLACE"));
 
 
     private String value;

@@ -31,7 +31,7 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class SecretResponse  {
-
+  
     private String secretId;
     private String secretName;
     private String created;
@@ -45,7 +45,7 @@ public class SecretResponse  {
         this.secretId = secretId;
         return this;
     }
-
+    
     @ApiModelProperty(example = "30103923-923c-485f-a8f9-606398", required = true, value = "")
     @JsonProperty("secretId")
     @Valid
@@ -65,8 +65,8 @@ public class SecretResponse  {
         this.secretName = secretName;
         return this;
     }
-
-    @ApiModelProperty(example = "ADAPTIVE_AUTH", required = true, value = "")
+    
+    @ApiModelProperty(example = "Secret1", required = true, value = "")
     @JsonProperty("secretName")
     @Valid
     @NotNull(message = "Property secretName cannot be null.")
@@ -85,7 +85,7 @@ public class SecretResponse  {
         this.created = created;
         return this;
     }
-
+    
     @ApiModelProperty(example = "2021-09-29 10:36:24.976", required = true, value = "")
     @JsonProperty("created")
     @Valid
@@ -105,8 +105,8 @@ public class SecretResponse  {
         this.lastModified = lastModified;
         return this;
     }
-
-    @ApiModelProperty(example = "2021-09-29 10:36:24.976", required = true, value = "")
+    
+    @ApiModelProperty(example = "2021-09-30 11:29:54.124", required = true, value = "")
     @JsonProperty("lastModified")
     @Valid
     @NotNull(message = "Property lastModified cannot be null.")
@@ -125,7 +125,7 @@ public class SecretResponse  {
         this.description = description;
         return this;
     }
-
+    
     @ApiModelProperty(example = "Some sample description", value = "")
     @JsonProperty("description")
     @Valid
@@ -165,7 +165,7 @@ public class SecretResponse  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class SecretResponse {\n");
-
+        
         sb.append("    secretId: ").append(toIndentedString(secretId)).append("\n");
         sb.append("    secretName: ").append(toIndentedString(secretName)).append("\n");
         sb.append("    created: ").append(toIndentedString(created)).append("\n");
@@ -187,3 +187,4 @@ public class SecretResponse  {
         return o.toString().replace("\n", "\n");
     }
 }
+

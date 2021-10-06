@@ -87,7 +87,7 @@ public class SecretMgtApi  {
         @ApiResponse(code = 204, message = "No Content", response = Void.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 404, message = "Secret Type Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response deleteSecret(@ApiParam(value = "Name of the secret type",required=true) @PathParam("secret-type") String secretType, @ApiParam(value = "Id of the secret",required=true) @PathParam("secret-id") String secretId) {

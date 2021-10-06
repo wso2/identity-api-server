@@ -45,7 +45,7 @@ public class Error  {
         return this;
     }
     
-    @ApiModelProperty(example = "NSM-00000", value = "")
+    @ApiModelProperty(example = "SECRETM-00000", value = "")
     @JsonProperty("code")
     @Valid
     public String getCode() {
