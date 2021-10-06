@@ -117,6 +117,7 @@ import java.util.stream.Collectors;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
@@ -390,6 +391,21 @@ public class ServerApplicationManagementService {
                         "Error creating application. Found duplicate allowed origin entries.");
             }
             throw buildClientError(e, "Error creating application. Allow CORS origins update failed.");
+        } catch (Throwable e) {
+            /*
+             * For more information read https://github.com/wso2/product-is/issues/12579. This is to overcome the
+             * above issue.
+             */
+            if (log.isDebugEnabled()) {
+                log.debug("Server encountered unexpected error. Rolling back created application data.", e);
+            }
+            if (applicationId != null) {
+                deleteApplication(applicationId);
+            } else {
+                rollbackInbounds(getConfiguredInbounds(application));
+            }
+            throw Utils.buildServerError(ERROR_PROCESSING_REQUEST.getCode(), ERROR_PROCESSING_REQUEST.getMessage(),
+                    ERROR_PROCESSING_REQUEST.getDescription());
         }
     }
 

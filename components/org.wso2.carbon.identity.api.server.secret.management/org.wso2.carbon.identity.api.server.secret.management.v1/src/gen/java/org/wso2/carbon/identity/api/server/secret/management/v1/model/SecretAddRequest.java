@@ -31,7 +31,7 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class SecretAddRequest  {
-  
+
     private String name;
     private String value;
     private String description;
@@ -43,7 +43,7 @@ public class SecretAddRequest  {
         this.name = name;
         return this;
     }
-    
+
     @ApiModelProperty(example = "ADAPTIVE_AUTH", required = true, value = "")
     @JsonProperty("name")
     @Valid
@@ -63,8 +63,8 @@ public class SecretAddRequest  {
         this.value = value;
         return this;
     }
-    
-    @ApiModelProperty(example = "jeascbE3C5msk7jk", required = true, value = "")
+
+    @ApiModelProperty(example = "sample-value", required = true, value = "")
     @JsonProperty("value")
     @Valid
     @NotNull(message = "Property value cannot be null.")
@@ -83,7 +83,7 @@ public class SecretAddRequest  {
         this.description = description;
         return this;
     }
-    
+
     @ApiModelProperty(example = "Some sample description", value = "")
     @JsonProperty("description")
     @Valid
@@ -121,7 +121,7 @@ public class SecretAddRequest  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class SecretAddRequest {\n");
-        
+
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    value: ").append(toIndentedString(value)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
@@ -141,4 +141,3 @@ public class SecretAddRequest  {
         return o.toString().replace("\n", "\n");
     }
 }
-

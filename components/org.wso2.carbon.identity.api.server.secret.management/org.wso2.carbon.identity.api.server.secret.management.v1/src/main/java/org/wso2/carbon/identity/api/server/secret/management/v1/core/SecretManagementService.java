@@ -1,5 +1,4 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,10 +71,10 @@ public class SecretManagementService {
     /**
      * To create Secret Response object for the post request.
      *
-     * @param secretReq secret object.
+     * @param responseDTO Secret object.
      * @return {@link SecretResponse} .
      */
-    private SecretResponse buildSecretResponseFromResponseDTO(Secret secretReq) {
+    private SecretResponse buildSecretResponseFromResponseDTO(Secret responseDTO) {
 
         SecretResponse secretResponse = new SecretResponse();
         secretResponse.secretName(secretReq.getSecretName());
@@ -89,7 +88,7 @@ public class SecretManagementService {
     /**
      * Validate the secret post request.
      *
-     * @param secretAddRequest secret post request.
+     * @param secretAddRequest Secret post request.
      */
     private void validateSecretAddRequest(SecretAddRequest secretAddRequest) {
 
@@ -107,7 +106,7 @@ public class SecretManagementService {
     /**
      * Build secret requestDTO by secret body request.
      *
-     * @param secretAddRequest secret post body.
+     * @param secretAddRequest Secret post body.
      * @return Secret requestDTO object.
      */
     private Secret buildSecretRequestDTOFromSecretAddRequest(SecretAddRequest secretAddRequest) {
@@ -327,12 +326,10 @@ public class SecretManagementService {
      */
     private static String includeData(SecretManagementConstants.ErrorMessage error, String data) {
 
-        String message;
         if (StringUtils.isNotBlank(data)) {
-            message = String.format(error.getDescription(), data);
+            return String.format(error.getDescription(), data);
         } else {
-            message = error.getDescription();
+            return error.getDescription();
         }
-        return message;
     }
 }
