@@ -17,70 +17,32 @@
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.*;
 
-
-import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
 
 public class Certificate  {
   
-
-@XmlType(name="TypeEnum")
-@XmlEnum(String.class)
-public enum TypeEnum {
-
-    @XmlEnumValue("JWKS") JWKS(String.valueOf("JWKS")), @XmlEnumValue("PEM") PEM(String.valueOf("PEM"));
-
-
-    private String value;
-
-    TypeEnum(String v) {
-        value = v;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static TypeEnum fromValue(String value) {
-        for (TypeEnum b : TypeEnum.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-}
-
-    private TypeEnum type;
+    private String type;
     private String value;
 
     /**
+    * Certificate type. This should be either JWKS or PEM.
     **/
-    public Certificate type(TypeEnum type) {
+    public Certificate type(String type) {
 
         this.type = type;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "Certificate type. This should be either JWKS or PEM.")
     @JsonProperty("type")
     @Valid
-    public TypeEnum getType() {
+    public String getType() {
         return type;
     }
-    public void setType(TypeEnum type) {
+    public void setType(String type) {
         this.type = type;
     }
 
