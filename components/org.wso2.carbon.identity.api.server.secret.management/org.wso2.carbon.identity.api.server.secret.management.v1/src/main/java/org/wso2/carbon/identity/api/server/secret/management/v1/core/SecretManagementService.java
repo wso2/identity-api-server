@@ -71,10 +71,10 @@ public class SecretManagementService {
     /**
      * To create Secret Response object for the post request.
      *
-     * @param responseDTO Secret object.
+     * @param secretReq secret object.
      * @return {@link SecretResponse} .
      */
-    private SecretResponse buildSecretResponseFromResponseDTO(Secret responseDTO) {
+    private SecretResponse buildSecretResponseFromResponseDTO(Secret secretReq) {
 
         SecretResponse secretResponse = new SecretResponse();
         secretResponse.secretName(secretReq.getSecretName());
@@ -88,7 +88,7 @@ public class SecretManagementService {
     /**
      * Validate the secret post request.
      *
-     * @param secretAddRequest Secret post request.
+     * @param secretAddRequest secret post request.
      */
     private void validateSecretAddRequest(SecretAddRequest secretAddRequest) {
 
@@ -106,7 +106,7 @@ public class SecretManagementService {
     /**
      * Build secret requestDTO by secret body request.
      *
-     * @param secretAddRequest Secret post body.
+     * @param secretAddRequest secret post body.
      * @return Secret requestDTO object.
      */
     private Secret buildSecretRequestDTOFromSecretAddRequest(SecretAddRequest secretAddRequest) {
