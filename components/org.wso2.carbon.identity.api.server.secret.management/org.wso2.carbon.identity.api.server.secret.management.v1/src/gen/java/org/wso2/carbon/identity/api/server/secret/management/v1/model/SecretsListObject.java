@@ -33,14 +33,14 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class SecretsList  {
+public class SecretsListObject  {
   
     private List<SecretResponse> secrets = null;
 
 
     /**
     **/
-    public SecretsList secrets(List<SecretResponse> secrets) {
+    public SecretsListObject secrets(List<SecretResponse> secrets) {
 
         this.secrets = secrets;
         return this;
@@ -56,7 +56,7 @@ public class SecretsList  {
         this.secrets = secrets;
     }
 
-    public SecretsList addSecretsItem(SecretResponse secretsItem) {
+    public SecretsListObject addSecretsItem(SecretResponse secretsItem) {
         if (this.secrets == null) {
             this.secrets = new ArrayList<>();
         }
@@ -75,8 +75,8 @@ public class SecretsList  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SecretsList secretsList = (SecretsList) o;
-        return Objects.equals(this.secrets, secretsList.secrets);
+        SecretsListObject secretsListObject = (SecretsListObject) o;
+        return Objects.equals(this.secrets, secretsListObject.secrets);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class SecretsList  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class SecretsList {\n");
+        sb.append("class SecretsListObject {\n");
         
         sb.append("    secrets: ").append(toIndentedString(secrets)).append("\n");
         sb.append("}");

@@ -48,7 +48,7 @@ public class SecretAddRequest  {
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
-    @Pattern(regexp="^[a-zA-Z][^\\s]{0,63}$")
+ @Pattern(regexp="^[a-zA-Z][^\\s]{0,63}$")
     public String getName() {
         return name;
     }
@@ -68,7 +68,7 @@ public class SecretAddRequest  {
     @JsonProperty("value")
     @Valid
     @NotNull(message = "Property value cannot be null.")
-
+ @Pattern(regexp="^.{1,2048}$")
     public String getValue() {
         return value;
     }
@@ -86,7 +86,7 @@ public class SecretAddRequest  {
     
     @ApiModelProperty(example = "Some sample description", value = "")
     @JsonProperty("description")
-    @Valid
+    @Valid @Pattern(regexp="^.{0,1023}$")
     public String getDescription() {
         return description;
     }

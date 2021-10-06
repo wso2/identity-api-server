@@ -29,7 +29,7 @@ import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretAddR
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretPatchRequest;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretResponse;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretUpdateRequest;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretsList;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretsListObject;
 import javax.ws.rs.core.Response;
 
 

@@ -29,7 +29,7 @@ import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretAddR
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretPatchRequest;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretResponse;
 import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretUpdateRequest;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretsList;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretsListObject;
 import org.wso2.carbon.identity.api.server.secret.management.v1.SecretMgtApiService;
 
 import javax.validation.Valid;
@@ -124,14 +124,14 @@ public class SecretMgtApi  {
     @Path("/types/{secret-type}/secrets")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get a list of configured secrets", notes = "This API provides the capability to retrieve the list of configured secrets. ", response = SecretsList.class, authorizations = {
+    @ApiOperation(value = "Get a list of configured secrets", notes = "This API provides the capability to retrieve the list of configured secrets. ", response = SecretsListObject.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful Response", response = SecretsList.class),
+        @ApiResponse(code = 200, message = "Successful Response", response = SecretsListObject.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
