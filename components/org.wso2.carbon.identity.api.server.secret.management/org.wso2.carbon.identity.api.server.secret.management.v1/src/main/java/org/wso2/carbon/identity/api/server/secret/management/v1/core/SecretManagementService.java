@@ -23,10 +23,7 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants;
 import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementServiceHolder;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretAddRequest;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretPatchRequest;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretResponse;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretUpdateRequest;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.*;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementClientException;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementException;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementServerException;
@@ -160,15 +157,17 @@ public class SecretManagementService {
      * Retrieve all the secrets of the tenant.
      *
      * @param secretType Type of the secret.
-     * @return List<SecretResponse> secrets of the tenant.
+     * @return {@link SecretsListObject} .
      */
-    public List<SecretResponse> getSecretsList(String secretType) {
+    public SecretsListObject getSecretsList(String secretType) {
 
         try {
             Secrets secrets = SecretManagementServiceHolder.getSecretConfigManager().getSecrets(secretType);
-            List<Secret> secretsList = secrets.getSecrets();
-            return secretsList.stream().map(secret ->
-                    buildSecretResponseFromResponseDTO(secret)).collect(Collectors.toList());
+            SecretsListObject secretsListObject = new SecretsListObject();
+            secretsListObject.setSecrets(secrets.getSecrets().stream().map(secret ->
+                    buildSecretResponseFromResponseDTO(secret)).collect(Collectors.toList())
+            );
+            return secretsListObject;
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_GETTING_SECRET, null);

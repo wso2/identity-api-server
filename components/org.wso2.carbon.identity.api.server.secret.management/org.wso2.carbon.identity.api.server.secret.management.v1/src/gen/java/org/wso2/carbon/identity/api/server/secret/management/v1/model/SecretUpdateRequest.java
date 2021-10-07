@@ -47,7 +47,8 @@ public class SecretUpdateRequest  {
     @JsonProperty("value")
     @Valid
     @NotNull(message = "Property value cannot be null.")
- @Pattern(regexp="^.{1,2048}$")
+    @Pattern(regexp="^.{1,2048}$",
+            message = "Secret value does not conform to the pattern: ^.{1,2048}$")
     public String getValue() {
         return value;
     }
@@ -65,7 +66,8 @@ public class SecretUpdateRequest  {
     
     @ApiModelProperty(example = "Some sample description", value = "")
     @JsonProperty("description")
-    @Valid @Pattern(regexp="^.{0,1023}$")
+    @Valid @Pattern(regexp="^.{0,1023}$",
+            message = "Secret description does not conform to the pattern: ^.{0,1023}$")
     public String getDescription() {
         return description;
     }
