@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org).
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -49,17 +49,17 @@ public class SecretManagementConstants {
 
 
         // Server errors 650xx.
-        ERROR_CODE_ERROR_GETTING_SECRET("65003", "Error while getting secret.",
+        ERROR_CODE_ERROR_GETTING_SECRET("65001", "Error while getting secret.",
                 "Error while retrieving secret for for the name: %s."),
-        ERROR_CODE_ERROR_ADDING_SECRET("65004", "Unable to add the secret.",
+        ERROR_CODE_ERROR_ADDING_SECRET("65002", "Unable to add the secret.",
                 "Server encountered an error while adding the secret: %s"),
-        ERROR_CODE_ERROR_DELETING_SECRET("65005", "Unable to delete the secret.",
+        ERROR_CODE_ERROR_DELETING_SECRET("65003", "Unable to delete the secret.",
                 "Server encountered an error while deleting the secret: %s"),
-        ERROR_CODE_ERROR_GETTING_SECRET_BY_NAME("65006", "Error while getting secret.",
+        ERROR_CODE_ERROR_GETTING_SECRET_BY_NAME("65004", "Error while getting secret.",
                 "Error while retrieving %s secret."),
-        ERROR_CODE_ERROR_GETTING_SECRETS("65007", "Error while getting secrets.",
+        ERROR_CODE_ERROR_GETTING_SECRETS("65005", "Error while getting secrets.",
                 "Error while retrieving secrets."),
-        ERROR_CODE_ERROR_UPDATING_SECRET("65008", "Unable to update the secret.",
+        ERROR_CODE_ERROR_UPDATING_SECRET("65006", "Unable to update the secret.",
                 "Error while updating secret: %s.");
 
         private final String code;
