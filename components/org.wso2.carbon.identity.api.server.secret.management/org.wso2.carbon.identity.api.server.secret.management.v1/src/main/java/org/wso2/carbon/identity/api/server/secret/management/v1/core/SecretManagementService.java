@@ -23,14 +23,17 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementConstants;
 import org.wso2.carbon.identity.api.server.secret.management.common.SecretManagementServiceHolder;
-import org.wso2.carbon.identity.api.server.secret.management.v1.model.*;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretAddRequest;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretPatchRequest;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretResponse;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretUpdateRequest;
+import org.wso2.carbon.identity.api.server.secret.management.v1.model.SecretsListObject;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementClientException;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementException;
 import org.wso2.carbon.identity.secret.mgt.core.exception.SecretManagementServerException;
 import org.wso2.carbon.identity.secret.mgt.core.model.Secret;
 import org.wso2.carbon.identity.secret.mgt.core.model.Secrets;
 
-import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
