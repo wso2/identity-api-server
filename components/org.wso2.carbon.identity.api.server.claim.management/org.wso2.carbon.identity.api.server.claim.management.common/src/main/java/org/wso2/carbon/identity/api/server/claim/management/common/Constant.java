@@ -154,6 +154,12 @@ public class Constant {
                 "External claim URI already exists. External claim URI must be unique."),
         ERROR_CODE_EXISTING_LOCAL_CLAIM_URI("50039", "Unable to add local claim.",
                 "Local claim URI already exists. Local claim URI must be unique."),
+        ERROR_CODE_LOCAL_CLAIM_REFERRED_BY_APPLICATION("50040",
+                "Unable to remove local claim.",
+                "Unable to delete claim as it is referred by an application"),
+        ERROR_CODE_LOCAL_CLAIM_REFERRED_BY_AN_IDP("50041",
+                "Unable to remove local claim.",
+                "Unable to delete claim as it is referred by an IDP."),
         ERROR_CODE_INVALID_IDENTIFIER("CMT-60001", "Invalid identifier",
                 "Invalid Identifier: %s"),
         ERROR_CODE_CLAIM_URI_NOT_SPECIFIED("CMT-60002", "Empty claim URI", "Claim URI is " +
