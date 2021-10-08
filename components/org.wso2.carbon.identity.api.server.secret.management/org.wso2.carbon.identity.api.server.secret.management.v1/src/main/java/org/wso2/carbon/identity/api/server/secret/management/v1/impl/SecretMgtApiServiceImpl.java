@@ -53,7 +53,7 @@ public class SecretMgtApiServiceImpl implements SecretMgtApiService {
 
         SecretResponse secretResponse = secretManagementService.addSecret(secretType, secretAddRequest);
         return Response.created(
-                getResourceLocation(secretResponse.getSecretName())
+                getResourceLocation(secretResponse.getSecretId())
         ).entity(secretResponse).build();
     }
 
