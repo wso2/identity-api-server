@@ -377,7 +377,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserStoreAttributeMapping'
+                $ref: '#/components/schemas/UserStoreAttributeMappingResponse'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -863,7 +863,7 @@ components:
         value:
           type: string
           example: basic
-    UserStoreAttributeMapping:
+    UserStoreAttributeMappingResponse:
       type: object
       properties:
         typeName:
@@ -882,8 +882,8 @@ components:
           type: array
           description: Userstore attribute mappings.
           items:
-            $ref: '#/components/schemas/UserStoreAttribute'
-    UserStoreAttribute:
+            $ref: '#/components/schemas/UserStoreAttributeResponse'
+    UserStoreAttributeResponse:
       type: object
       properties:
         claimId:

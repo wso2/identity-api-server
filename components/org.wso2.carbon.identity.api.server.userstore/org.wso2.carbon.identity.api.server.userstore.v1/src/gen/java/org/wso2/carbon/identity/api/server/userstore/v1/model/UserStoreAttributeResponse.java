@@ -30,7 +30,7 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class UserStoreAttribute  {
+public class UserStoreAttributeResponse  {
   
     private String claimId;
     private String claimURI;
@@ -40,7 +40,7 @@ public class UserStoreAttribute  {
     /**
     * Claim id of the attribute.
     **/
-    public UserStoreAttribute claimId(String claimId) {
+    public UserStoreAttributeResponse claimId(String claimId) {
 
         this.claimId = claimId;
         return this;
@@ -59,7 +59,7 @@ public class UserStoreAttribute  {
     /**
     * Claim URI of the attribute.
     **/
-    public UserStoreAttribute claimURI(String claimURI) {
+    public UserStoreAttributeResponse claimURI(String claimURI) {
 
         this.claimURI = claimURI;
         return this;
@@ -78,7 +78,7 @@ public class UserStoreAttribute  {
     /**
     * Mapped attribute name.
     **/
-    public UserStoreAttribute mappedAttribute(String mappedAttribute) {
+    public UserStoreAttributeResponse mappedAttribute(String mappedAttribute) {
 
         this.mappedAttribute = mappedAttribute;
         return this;
@@ -97,7 +97,7 @@ public class UserStoreAttribute  {
     /**
     * Display name of the attribute.
     **/
-    public UserStoreAttribute displayName(String displayName) {
+    public UserStoreAttributeResponse displayName(String displayName) {
 
         this.displayName = displayName;
         return this;
@@ -124,11 +124,11 @@ public class UserStoreAttribute  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        UserStoreAttribute userStoreAttribute = (UserStoreAttribute) o;
-        return Objects.equals(this.claimId, userStoreAttribute.claimId) &&
-            Objects.equals(this.claimURI, userStoreAttribute.claimURI) &&
-            Objects.equals(this.mappedAttribute, userStoreAttribute.mappedAttribute) &&
-            Objects.equals(this.displayName, userStoreAttribute.displayName);
+        UserStoreAttributeResponse userStoreAttributeResponse = (UserStoreAttributeResponse) o;
+        return Objects.equals(this.claimId, userStoreAttributeResponse.claimId) &&
+            Objects.equals(this.claimURI, userStoreAttributeResponse.claimURI) &&
+            Objects.equals(this.mappedAttribute, userStoreAttributeResponse.mappedAttribute) &&
+            Objects.equals(this.displayName, userStoreAttributeResponse.displayName);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class UserStoreAttribute  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class UserStoreAttribute {\n");
+        sb.append("class UserStoreAttributeResponse {\n");
         
         sb.append("    claimId: ").append(toIndentedString(claimId)).append("\n");
         sb.append("    claimURI: ").append(toIndentedString(claimURI)).append("\n");

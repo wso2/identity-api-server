@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttribute;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeResponse;
 import javax.validation.constraints.*;
 
 
@@ -33,18 +33,18 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class UserStoreAttributeMapping  {
+public class UserStoreAttributeMappingResponse  {
   
     private String typeName;
     private String typeId;
     private Boolean isLocal;
-    private List<UserStoreAttribute> attributeMappings = null;
+    private List<UserStoreAttributeResponse> attributeMappings = null;
 
 
     /**
     * Type name of the userstore.
     **/
-    public UserStoreAttributeMapping typeName(String typeName) {
+    public UserStoreAttributeMappingResponse typeName(String typeName) {
 
         this.typeName = typeName;
         return this;
@@ -63,7 +63,7 @@ public class UserStoreAttributeMapping  {
     /**
     * Type id of the userstore.
     **/
-    public UserStoreAttributeMapping typeId(String typeId) {
+    public UserStoreAttributeMappingResponse typeId(String typeId) {
 
         this.typeId = typeId;
         return this;
@@ -82,7 +82,7 @@ public class UserStoreAttributeMapping  {
     /**
     * Whether the userstore is local or not.
     **/
-    public UserStoreAttributeMapping isLocal(Boolean isLocal) {
+    public UserStoreAttributeMappingResponse isLocal(Boolean isLocal) {
 
         this.isLocal = isLocal;
         return this;
@@ -101,7 +101,7 @@ public class UserStoreAttributeMapping  {
     /**
     * Userstore attribute mappings.
     **/
-    public UserStoreAttributeMapping attributeMappings(List<UserStoreAttribute> attributeMappings) {
+    public UserStoreAttributeMappingResponse attributeMappings(List<UserStoreAttributeResponse> attributeMappings) {
 
         this.attributeMappings = attributeMappings;
         return this;
@@ -110,14 +110,14 @@ public class UserStoreAttributeMapping  {
     @ApiModelProperty(value = "Userstore attribute mappings.")
     @JsonProperty("attributeMappings")
     @Valid
-    public List<UserStoreAttribute> getAttributeMappings() {
+    public List<UserStoreAttributeResponse> getAttributeMappings() {
         return attributeMappings;
     }
-    public void setAttributeMappings(List<UserStoreAttribute> attributeMappings) {
+    public void setAttributeMappings(List<UserStoreAttributeResponse> attributeMappings) {
         this.attributeMappings = attributeMappings;
     }
 
-    public UserStoreAttributeMapping addAttributeMappingsItem(UserStoreAttribute attributeMappingsItem) {
+    public UserStoreAttributeMappingResponse addAttributeMappingsItem(UserStoreAttributeResponse attributeMappingsItem) {
         if (this.attributeMappings == null) {
             this.attributeMappings = new ArrayList<>();
         }
@@ -136,11 +136,11 @@ public class UserStoreAttributeMapping  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        UserStoreAttributeMapping userStoreAttributeMapping = (UserStoreAttributeMapping) o;
-        return Objects.equals(this.typeName, userStoreAttributeMapping.typeName) &&
-            Objects.equals(this.typeId, userStoreAttributeMapping.typeId) &&
-            Objects.equals(this.isLocal, userStoreAttributeMapping.isLocal) &&
-            Objects.equals(this.attributeMappings, userStoreAttributeMapping.attributeMappings);
+        UserStoreAttributeMappingResponse userStoreAttributeMappingResponse = (UserStoreAttributeMappingResponse) o;
+        return Objects.equals(this.typeName, userStoreAttributeMappingResponse.typeName) &&
+            Objects.equals(this.typeId, userStoreAttributeMappingResponse.typeId) &&
+            Objects.equals(this.isLocal, userStoreAttributeMappingResponse.isLocal) &&
+            Objects.equals(this.attributeMappings, userStoreAttributeMappingResponse.attributeMappings);
     }
 
     @Override
@@ -152,7 +152,7 @@ public class UserStoreAttributeMapping  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class UserStoreAttributeMapping {\n");
+        sb.append("class UserStoreAttributeMappingResponse {\n");
         
         sb.append("    typeName: ").append(toIndentedString(typeName)).append("\n");
         sb.append("    typeId: ").append(toIndentedString(typeId)).append("\n");
