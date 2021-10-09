@@ -67,7 +67,7 @@ public class SecretMgtApiServiceImpl implements SecretMgtApiService {
     @Override
     public Response deleteSecret(String secretType, String secretId) {
 
-        secretManagementService.deleteSecret(secretId);
+        secretManagementService.deleteSecret(secretType, secretId);
         return Response.noContent().build();
     }
 
@@ -81,7 +81,7 @@ public class SecretMgtApiServiceImpl implements SecretMgtApiService {
     @Override
     public Response getSecret(String secretType, String secretId) {
 
-        return Response.ok().entity(secretManagementService.getSecret(secretId)).build();
+        return Response.ok().entity(secretManagementService.getSecret(secretType, secretId)).build();
     }
 
     /**

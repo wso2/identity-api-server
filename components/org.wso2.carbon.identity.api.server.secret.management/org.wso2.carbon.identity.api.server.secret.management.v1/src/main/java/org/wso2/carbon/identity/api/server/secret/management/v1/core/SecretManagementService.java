@@ -37,8 +37,10 @@ import org.wso2.carbon.identity.secret.mgt.core.model.Secrets;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_DELETE_SECRET_DOES_NOT_EXISTS;
 import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_ALREADY_EXISTS;
 import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_DOES_NOT_EXISTS;
+import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_TYPE_DOES_NOT_EXISTS;
 
 /**
  * Invoke internal OSGi service to perform secret management operations.
@@ -121,12 +123,14 @@ public class SecretManagementService {
     /**
      * Delete a secret sender by secret id.
      *
+     * @param secretType Type of the secret.
      * @param secretId Id of the secret.
      */
-    public void deleteSecret(String secretId) {
+    public void deleteSecret(String secretType, String secretId) {
 
         try {
-            SecretManagementServiceHolder.getSecretConfigManager().deleteSecretById(secretId);
+            SecretManagementServiceHolder.getSecretConfigManager()
+                    .deleteSecretById(secretType, secretId);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_DELETING_SECRET, secretId);
@@ -136,13 +140,15 @@ public class SecretManagementService {
     /**
      * Retrieve the secret details by id.
      *
+     * @param secretType Type of the secret.
      * @param secretId Id of the secret.
      * @return {@link SecretResponse} .
      */
-    public SecretResponse getSecret(String secretId) {
+    public SecretResponse getSecret(String secretType, String secretId) {
 
         try {
-            Secret responseDTO = SecretManagementServiceHolder.getSecretConfigManager().getSecretById(secretId);
+            Secret responseDTO = SecretManagementServiceHolder
+                    .getSecretConfigManager().getSecretById(secretType, secretId);
             SecretResponse secretResponse = new SecretResponse();
             secretResponse.secretName(responseDTO.getSecretName());
             secretResponse.setCreated(responseDTO.getCreatedTime());
@@ -189,7 +195,7 @@ public class SecretManagementService {
 
         Secret secret, responseDTO;
         try {
-            secret = SecretManagementServiceHolder.getSecretConfigManager().getSecretById(secretId);
+            secret = SecretManagementServiceHolder.getSecretConfigManager().getSecretById(secretType, secretId);
             if (secret == null) {
                 throw handleException(Response.Status.NOT_FOUND, SecretManagementConstants.ErrorMessage.
                         ERROR_CODE_SECRET_NOT_FOUND, secretId);
@@ -200,11 +206,11 @@ public class SecretManagementService {
             if (SecretPatchRequest.OperationEnum.REPLACE.equals(operation)) {
                 if (SecretManagementConstants.VALUE_PATH.equals(path)) {
                     responseDTO = SecretManagementServiceHolder.getSecretConfigManager()
-                            .updateSecretValueById(secretId, secretPatchRequest.getValue());
+                            .updateSecretValueById(secretType, secretId, secretPatchRequest.getValue());
 
                 } else if (SecretManagementConstants.DESCRIPTION_PATH.equals(path)) {
                     responseDTO = SecretManagementServiceHolder.getSecretConfigManager()
-                            .updateSecretDescriptionById(secretId, secretPatchRequest.getValue());
+                            .updateSecretDescriptionById(secretType, secretId, secretPatchRequest.getValue());
                 } else {
                     throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage
                             .ERROR_CODE_INVALID_INPUT, "Path");
@@ -233,7 +239,7 @@ public class SecretManagementService {
      */
     public SecretResponse updateSecret(String secretType, String secretId, SecretUpdateRequest secretUpdateRequest) {
         Secret requestDTO  = new Secret();
-        Secret responseDTO = new Secret();
+        Secret responseDTO;
 
         requestDTO.setSecretId(secretId);
         requestDTO.setSecretValue(secretUpdateRequest.getValue());
@@ -257,7 +263,7 @@ public class SecretManagementService {
      * @param e Secret management exception.
      * @param errorEnum Error.
      * @param data Context data.
-     * @return
+     * @return APIError
      */
     private APIError handleSecretMgtException(SecretManagementException e, SecretManagementConstants.ErrorMessage
             errorEnum, String data) {
@@ -270,10 +276,14 @@ public class SecretManagementService {
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
-            if (ERROR_CODE_SECRET_ALREADY_EXISTS.getCode().equals(e.getErrorCode())) {
+            if (ERROR_CODE_SECRET_TYPE_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
+                status = Response.Status.NOT_FOUND;
+            } else if (ERROR_CODE_SECRET_ALREADY_EXISTS.getCode().equals(e.getErrorCode())) {
                 status = Response.Status.CONFLICT;
             } else if (ERROR_CODE_SECRET_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
                 status = Response.Status.NOT_FOUND;
+            } else if (ERROR_CODE_DELETE_SECRET_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
+                status = Response.Status.NO_CONTENT;
             } else {
                 status = Response.Status.BAD_REQUEST;
             }
