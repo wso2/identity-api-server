@@ -184,8 +184,8 @@ public class UserStoreConfigurationsRes  {
         return this;
     }
 
-        /**
-    * Requested configured user store claim attribute mappings
+    /**
+    * Requested configured user store claim attribute mappings.
     **/
     public UserStoreConfigurationsRes claimAttributeMappings(List<ClaimAttributeMapping> claimAttributeMappings) {
 
@@ -193,7 +193,7 @@ public class UserStoreConfigurationsRes  {
         return this;
     }
     
-    @ApiModelProperty(value = "Requested configured user store claim attribute mappings")
+    @ApiModelProperty(value = "Requested configured user store claim attribute mappings.")
     @JsonProperty("claimAttributeMappings")
     @Valid
     public List<ClaimAttributeMapping> getClaimAttributeMappings() {
