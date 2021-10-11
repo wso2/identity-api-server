@@ -808,7 +808,7 @@ components:
             $ref: '#/components/schemas/AddUserStorePropertiesRes'
         claimAttributeMappings:
           type: array
-          description: Requested configured user store claim attribute mappings
+          description: Requested configured user store claim attribute mappings.
           items:
             $ref: '#/components/schemas/ClaimAttributeMapping'
     AddUserStorePropertiesRes:
