@@ -16,6 +16,7 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AssertionEncryptionConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdpInitiatedSingleLogout;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
@@ -128,6 +129,9 @@ public class ApiModelToSAMLSSOServiceProvider implements Function<SAML2ServicePr
 
         if (ssoConfig != null) {
 
+            if (StringUtils.isNotBlank(ssoConfig.getAttributeConsumingServiceIndex())) {
+                dto.setAttributeConsumingServiceIndex(ssoConfig.getAttributeConsumingServiceIndex());
+            }
             List<SingleSignOnProfile.BindingsEnum> bindings = ssoConfig.getBindings();
             // HTTP_POST and HTTP_REDIRECT bindings are not considered at the backend. They are always available by
             // default, therefore we only need to process the artifact binding.

@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
@@ -28,8 +29,10 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
+import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.base.IdentityException;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
 import org.wso2.carbon.identity.sso.saml.exception.IdentitySAML2ClientException;
@@ -47,6 +50,7 @@ import static org.wso2.carbon.identity.sso.saml.Error.URL_NOT_FOUND;
  */
 public class SAMLInboundFunctions {
 
+    private static final String ATTRIBUTE_CONSUMING_SERVICE_INDEX = "attrConsumServiceIndex";
     private static final Log logger = LogFactory.getLog(SAMLInboundFunctions.class);
 
     private SAMLInboundFunctions() {
@@ -133,13 +137,13 @@ public class SAMLInboundFunctions {
 
         SAML2ServiceProvider samlManualConfiguration = saml2Configuration.getManualConfiguration();
 
-        String issuer;
+        SAMLSSOServiceProviderDTO samlssoServiceProviderDTO;
         if (saml2Configuration.getMetadataFile() != null) {
-            issuer = createSAMLSpWithMetadataFile(saml2Configuration.getMetadataFile());
+            samlssoServiceProviderDTO = createSAMLSpWithMetadataFile(saml2Configuration.getMetadataFile());
         } else if (saml2Configuration.getMetadataURL() != null) {
-            issuer = createSAMLSpWithMetadataUrl(saml2Configuration.getMetadataURL());
+            samlssoServiceProviderDTO = createSAMLSpWithMetadataUrl(saml2Configuration.getMetadataURL());
         } else if (samlManualConfiguration != null) {
-            issuer = createSAMLSpWithManualConfiguration(samlManualConfiguration);
+            samlssoServiceProviderDTO = createSAMLSpWithManualConfiguration(samlManualConfiguration);
         } else {
             throw Utils.buildBadRequestError("Invalid SAML2 Configuration. One of metadataFile, metaDataUrl or " +
                     "serviceProvider manual configuration needs to be present.");
@@ -147,7 +151,23 @@ public class SAMLInboundFunctions {
 
         InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
         samlInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.SAML2);
-        samlInbound.setInboundAuthKey(issuer);
+        samlInbound.setInboundAuthKey(samlssoServiceProviderDTO.getIssuer());
+        if (samlssoServiceProviderDTO.isEnableAttributeProfile()) {
+            Property[] properties = new Property[1];
+            Property property = new Property();
+            property.setName(ATTRIBUTE_CONSUMING_SERVICE_INDEX);
+            if (StringUtils.isNotBlank(samlssoServiceProviderDTO.getAttributeConsumingServiceIndex())) {
+                property.setValue(samlssoServiceProviderDTO.getAttributeConsumingServiceIndex());
+            } else {
+                try {
+                    property.setValue(Integer.toString(IdentityUtil.getRandomInteger()));
+                } catch (IdentityException e) {
+                    handleException(e);
+                }
+            }
+            properties[0] = property;
+            samlInbound.setProperties(properties);
+        }
         return samlInbound;
     }
 
@@ -177,18 +197,18 @@ public class SAMLInboundFunctions {
         }
     }
 
-    private static String createSAMLSpWithManualConfiguration(SAML2ServiceProvider saml2SpModel) {
+    private static SAMLSSOServiceProviderDTO createSAMLSpWithManualConfiguration(SAML2ServiceProvider saml2SpModel) {
 
         SAMLSSOServiceProviderDTO serviceProviderDTO = new ApiModelToSAMLSSOServiceProvider().apply(saml2SpModel);
         try {
             SAMLSSOServiceProviderDTO addedSAMLSp = getSamlSsoConfigService().createServiceProvider(serviceProviderDTO);
-            return addedSAMLSp.getIssuer();
+            return addedSAMLSp;
         } catch (IdentityException e) {
             throw handleException(e);
         }
     }
 
-    private static String createSAMLSpWithMetadataFile(String encodedMetaFileContent) {
+    private static SAMLSSOServiceProviderDTO createSAMLSpWithMetadataFile(String encodedMetaFileContent) {
 
         try {
             byte[] metaData = Base64.getDecoder().decode(encodedMetaFileContent.getBytes(StandardCharsets.UTF_8));
@@ -200,19 +220,20 @@ public class SAMLInboundFunctions {
         }
     }
 
-    private static String createSAMLSpWithMetadataContent(String metadataContent) throws IdentitySAML2SSOException {
+    private static SAMLSSOServiceProviderDTO createSAMLSpWithMetadataContent(String metadataContent)
+            throws IdentitySAML2SSOException {
 
         SAMLSSOServiceProviderDTO serviceProviderDTO =
                 getSamlSsoConfigService().uploadRPServiceProvider(metadataContent);
-        return serviceProviderDTO.getIssuer();
+        return serviceProviderDTO;
     }
 
-    private static String createSAMLSpWithMetadataUrl(String metadataUrl) {
+    private static SAMLSSOServiceProviderDTO createSAMLSpWithMetadataUrl(String metadataUrl) {
 
         try {
             SAMLSSOServiceProviderDTO serviceProviderDTO =
                     getSamlSsoConfigService().createServiceProviderWithMetadataURL(metadataUrl);
-            return serviceProviderDTO.getIssuer();
+            return serviceProviderDTO;
         } catch (IdentitySAML2SSOException e) {
             throw handleException(e);
         }
