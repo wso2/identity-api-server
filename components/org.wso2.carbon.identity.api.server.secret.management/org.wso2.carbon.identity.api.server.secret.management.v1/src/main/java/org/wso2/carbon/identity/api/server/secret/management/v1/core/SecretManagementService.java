@@ -239,7 +239,7 @@ public class SecretManagementService {
      * @return Updated secret.
      */
     public SecretResponse updateSecret(String secretType, String secretId, SecretUpdateRequest secretUpdateRequest) {
-        Secret requestDTO  = new Secret();
+        Secret requestDTO = new Secret();
         Secret responseDTO;
 
         requestDTO.setSecretId(secretId);
@@ -250,7 +250,8 @@ public class SecretManagementService {
         }
 
         try {
-            responseDTO = SecretManagementServiceHolder.getSecretConfigManager().replaceSecret(secretType, requestDTO);
+            responseDTO = SecretManagementServiceHolder.getSecretConfigManager()
+                    .replaceSecretById(secretType, requestDTO);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
                     secretId);
