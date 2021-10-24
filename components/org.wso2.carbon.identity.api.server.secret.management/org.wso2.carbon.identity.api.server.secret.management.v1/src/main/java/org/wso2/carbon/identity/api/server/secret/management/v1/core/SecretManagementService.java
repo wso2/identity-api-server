@@ -133,8 +133,22 @@ public class SecretManagementService {
             SecretManagementServiceHolder.getSecretConfigManager()
                     .deleteSecretById(secretType, secretId);
         } catch (SecretManagementException e) {
-            throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
-                    ERROR_CODE_ERROR_DELETING_SECRET, secretId);
+            if (e instanceof SecretManagementClientException &&
+                    e.getErrorCode() != null &&
+                    ERROR_CODE_DELETE_SECRET_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())
+            ) {
+                ErrorResponse errorResponse = getErrorBuilder(
+                        SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_SECRET,
+                        secretId
+                ).build(log, e, SecretManagementConstants.ErrorMessage.
+                        ERROR_CODE_ERROR_DELETING_SECRET.getDescription());
+                errorResponse.setCode(e.getErrorCode());
+                errorResponse.setDescription(e.getMessage());
+                throw new APIError(Response.Status.NO_CONTENT, errorResponse);
+            } else {
+                throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
+                        ERROR_CODE_ERROR_DELETING_SECRET, secretId);
+            }
         }
     }
 
@@ -167,9 +181,16 @@ public class SecretManagementService {
      * Retrieve all the secrets of the tenant.
      *
      * @param secretType Type of the secret.
+     * @param limit Maximum number of records to return.
+     * @param offset Number of records to skip for pagination.
      * @return {@link SecretsListObject} .
      */
-    public SecretsListObject getSecretsList(String secretType) {
+    public SecretsListObject getSecretsList(String secretType, Integer limit, Integer offset) {
+
+        if (limit != null || offset != null) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    SecretManagementConstants.ErrorMessage.UNSUPPORTED_QUERY_PARAMETERS, null);
+        }
 
         try {
             Secrets secrets = SecretManagementServiceHolder.getSecretConfigManager().getSecrets(secretType);
@@ -239,15 +260,13 @@ public class SecretManagementService {
      * @return Updated secret.
      */
     public SecretResponse updateSecret(String secretType, String secretId, SecretUpdateRequest secretUpdateRequest) {
+
         Secret requestDTO = new Secret();
         Secret responseDTO;
 
         requestDTO.setSecretId(secretId);
         requestDTO.setSecretValue(secretUpdateRequest.getValue());
-
-        if (!StringUtils.isEmpty(secretUpdateRequest.getDescription())) {
-            requestDTO.setDescription(secretUpdateRequest.getDescription());
-        }
+        requestDTO.setDescription(secretUpdateRequest.getDescription());
 
         try {
             responseDTO = SecretManagementServiceHolder.getSecretConfigManager()
@@ -278,20 +297,16 @@ public class SecretManagementService {
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
-            if (ERROR_CODE_SECRET_TYPE_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
-                status = Response.Status.NOT_FOUND;
-            } else if (ERROR_CODE_SECRET_ALREADY_EXISTS.getCode().equals(e.getErrorCode())) {
+
+            if (ERROR_CODE_SECRET_ALREADY_EXISTS.getCode().equals(e.getErrorCode())) {
                 status = Response.Status.CONFLICT;
-            } else if (ERROR_CODE_SECRET_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
+            } else if (ERROR_CODE_SECRET_TYPE_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode()) ||
+                    ERROR_CODE_SECRET_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode()) ||
+                    ERROR_CODE_SECRET_ID_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
                 status = Response.Status.NOT_FOUND;
-            } else if (ERROR_CODE_SECRET_ID_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
-                status = Response.Status.NOT_FOUND;
-            } else if (ERROR_CODE_DELETE_SECRET_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
-                status = Response.Status.NO_CONTENT;
             } else {
                 status = Response.Status.BAD_REQUEST;
             }
-
         } else if (e instanceof SecretManagementServerException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();

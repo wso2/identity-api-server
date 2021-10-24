@@ -66,7 +66,7 @@ public class SecretResponse  {
         return this;
     }
     
-    @ApiModelProperty(example = "Secret1", required = true, value = "")
+    @ApiModelProperty(example = "sample-secret", required = true, value = "")
     @JsonProperty("secretName")
     @Valid
     @NotNull(message = "Property secretName cannot be null.")

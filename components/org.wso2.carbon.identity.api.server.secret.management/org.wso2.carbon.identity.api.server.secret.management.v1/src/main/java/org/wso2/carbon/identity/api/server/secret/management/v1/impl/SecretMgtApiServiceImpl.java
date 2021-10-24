@@ -95,7 +95,7 @@ public class SecretMgtApiServiceImpl implements SecretMgtApiService {
     @Override
     public Response getSecretsList(String secretType, Integer limit, Integer offset) {
 
-        return Response.ok().entity(secretManagementService.getSecretsList(secretType)).build();
+        return Response.ok().entity(secretManagementService.getSecretsList(secretType, limit, offset)).build();
     }
 
     /**

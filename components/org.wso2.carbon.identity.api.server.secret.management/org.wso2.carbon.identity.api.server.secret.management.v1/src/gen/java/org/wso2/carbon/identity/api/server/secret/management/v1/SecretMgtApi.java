@@ -84,7 +84,7 @@ public class SecretMgtApi  {
         })
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "No Content", response = Void.class),
+        @ApiResponse(code = 204, message = "Successfully Deleted or Secret Doesn't Exist", response = Void.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Secret Type Not Found", response = Error.class),
@@ -132,6 +132,7 @@ public class SecretMgtApi  {
     }, tags={  })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = SecretsListObject.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),

@@ -43,10 +43,12 @@ public class SecretManagementConstants {
                 "Secret reference name is not specified in the request"),
         ERROR_CODE_SECRET_VALUE_NOT_SPECIFIED("60002", "Empty value",
                 "Secret value is not specified in the request"),
-        ERROR_CODE_SECRET_NOT_FOUND("60003", "Secret not found.", "Unable to find a secret matching the provided " +
-                "secret name %s."),
-        ERROR_CODE_INVALID_INPUT("60004", "Invalid input.", "One of the given inputs is invalid : %s."),
-
+        ERROR_CODE_SECRET_NOT_FOUND("60003", "Secret not found.",
+                "Unable to find a secret matching the provided secret name %s."),
+        ERROR_CODE_INVALID_INPUT("60004", "Invalid input.",
+                "One of the given inputs is invalid : %s."),
+        UNSUPPORTED_QUERY_PARAMETERS("60005", "Unsupported query parameters.",
+                "Unsupported query parameters. Pagination is not supported by this version of the API"),
 
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_SECRET("65001", "Error while getting secret.",
