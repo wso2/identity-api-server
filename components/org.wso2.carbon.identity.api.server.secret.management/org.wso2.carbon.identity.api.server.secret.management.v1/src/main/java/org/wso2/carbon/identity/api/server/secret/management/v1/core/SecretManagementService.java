@@ -131,7 +131,7 @@ public class SecretManagementService {
 
         try {
             SecretManagementServiceHolder.getSecretConfigManager()
-                    .deleteSecretById(secretType, secretId);
+                    .deleteSecret(secretType, secretId);
         } catch (SecretManagementException e) {
             if (e instanceof SecretManagementClientException &&
                     e.getErrorCode() != null &&
@@ -163,7 +163,7 @@ public class SecretManagementService {
 
         try {
             Secret responseDTO = SecretManagementServiceHolder
-                    .getSecretConfigManager().getSecretById(secretType, secretId);
+                    .getSecretConfigManager().getSecret(secretType, secretId);
             SecretResponse secretResponse = new SecretResponse();
             secretResponse.secretName(responseDTO.getSecretName());
             secretResponse.setCreated(responseDTO.getCreatedTime());
@@ -193,11 +193,11 @@ public class SecretManagementService {
         }
 
         try {
-            Secrets secrets = SecretManagementServiceHolder.getSecretConfigManager().getSecrets(secretType);
+            Secrets secrets = SecretManagementServiceHolder.getSecretConfigManager().listSecrets(secretType);
             SecretsListObject secretsListObject = new SecretsListObject();
-            secretsListObject.setSecrets(secrets.getSecrets().stream().map(secret ->
-                    buildSecretResponseFromResponseDTO(secret)).collect(Collectors.toList())
-            );
+            secretsListObject.setSecrets(secrets.getSecrets().stream().map(
+                    this::buildSecretResponseFromResponseDTO
+            ).collect(Collectors.toList()));
             return secretsListObject;
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
@@ -217,7 +217,7 @@ public class SecretManagementService {
 
         Secret secret, responseDTO;
         try {
-            secret = SecretManagementServiceHolder.getSecretConfigManager().getSecretById(secretType, secretId);
+            secret = SecretManagementServiceHolder.getSecretConfigManager().getSecret(secretType, secretId);
             if (secret == null) {
                 throw handleException(Response.Status.NOT_FOUND, SecretManagementConstants.ErrorMessage.
                         ERROR_CODE_SECRET_NOT_FOUND, secretId);
@@ -228,11 +228,11 @@ public class SecretManagementService {
             if (SecretPatchRequest.OperationEnum.REPLACE.equals(operation)) {
                 if (SecretManagementConstants.VALUE_PATH.equals(path)) {
                     responseDTO = SecretManagementServiceHolder.getSecretConfigManager()
-                            .updateSecretValueById(secretType, secretId, secretPatchRequest.getValue());
+                            .updateSecretValue(secretType, secretId, secretPatchRequest.getValue());
 
                 } else if (SecretManagementConstants.DESCRIPTION_PATH.equals(path)) {
                     responseDTO = SecretManagementServiceHolder.getSecretConfigManager()
-                            .updateSecretDescriptionById(secretType, secretId, secretPatchRequest.getValue());
+                            .updateSecretDescription(secretType, secretId, secretPatchRequest.getValue());
                 } else {
                     throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage
                             .ERROR_CODE_INVALID_INPUT, "Path");
@@ -270,7 +270,7 @@ public class SecretManagementService {
 
         try {
             responseDTO = SecretManagementServiceHolder.getSecretConfigManager()
-                    .replaceSecretById(secretType, requestDTO);
+                    .replaceSecret(secretType, requestDTO);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
                     secretId);

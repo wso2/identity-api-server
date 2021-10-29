@@ -138,7 +138,7 @@ public class SecretMgtApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getSecretsList(@ApiParam(value = "name of the secret type",required=true) @PathParam("secret-type") String secretType,     @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset) {
+    public Response getSecretsList(@ApiParam(value = "name of the secret type",required=true) @PathParam("secret-type") String secretType,     @Valid@ApiParam(value = "Maximum number of records to return (currently not supported). ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination (currently not supported). ")  @QueryParam("offset") Integer offset) {
 
         return delegate.getSecretsList(secretType,  limit,  offset );
     }
