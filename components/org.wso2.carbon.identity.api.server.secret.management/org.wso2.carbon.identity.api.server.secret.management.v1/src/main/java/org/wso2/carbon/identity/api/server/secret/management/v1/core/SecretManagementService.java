@@ -37,7 +37,6 @@ import org.wso2.carbon.identity.secret.mgt.core.model.Secrets;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_DELETE_SECRET_DOES_NOT_EXISTS;
 import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_ALREADY_EXISTS;
 import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_DOES_NOT_EXISTS;
 import static org.wso2.carbon.identity.secret.mgt.core.constant.SecretConstants.ErrorMessages.ERROR_CODE_SECRET_ID_DOES_NOT_EXISTS;
@@ -62,8 +61,13 @@ public class SecretManagementService {
         validateSecretAddRequest(secretAddRequest);
         Secret requestDTO, responseDTO;
         try {
-            requestDTO = buildSecretRequestDTOFromSecretAddRequest(secretAddRequest);
-            responseDTO = SecretManagementServiceHolder.getSecretConfigManager().addSecret(secretType, requestDTO);
+            if (getIfSecretExistByName(secretType, secretAddRequest.getName()) == null) {
+                requestDTO = buildSecretRequestDTOFromSecretAddRequest(secretAddRequest);
+                responseDTO = SecretManagementServiceHolder.getSecretConfigManager().addSecret(secretType, requestDTO);
+            } else {
+                throw handleException(Response.Status.CONFLICT,
+                        SecretManagementConstants.ErrorMessage.ERROR_CODE_SECRET_ALREADY_EXISTS, null);
+            }
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_SECRET,
                     secretAddRequest.getName());
@@ -130,25 +134,15 @@ public class SecretManagementService {
     public void deleteSecret(String secretType, String secretId) {
 
         try {
-            SecretManagementServiceHolder.getSecretConfigManager()
-                    .deleteSecret(secretType, secretId);
-        } catch (SecretManagementException e) {
-            if (e instanceof SecretManagementClientException &&
-                    e.getErrorCode() != null &&
-                    ERROR_CODE_DELETE_SECRET_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())
-            ) {
-                ErrorResponse errorResponse = getErrorBuilder(
-                        SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_SECRET,
-                        secretId
-                ).build(log, e, SecretManagementConstants.ErrorMessage.
-                        ERROR_CODE_ERROR_DELETING_SECRET.getDescription());
-                errorResponse.setCode(e.getErrorCode());
-                errorResponse.setDescription(e.getMessage());
-                throw new APIError(Response.Status.NO_CONTENT, errorResponse);
+            if (getIfSecretExistById(secretType, secretId) != null) {
+                SecretManagementServiceHolder.getSecretConfigManager().deleteSecret(secretType, secretId);
             } else {
-                throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
-                        ERROR_CODE_ERROR_DELETING_SECRET, secretId);
+                throw handleException(Response.Status.NO_CONTENT,
+                        SecretManagementConstants.ErrorMessage.ERROR_CODE_SECRET_NOT_FOUND, secretId);
             }
+        } catch (SecretManagementException e) {
+            throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_DELETING_SECRET, secretId);
         }
     }
 
@@ -217,7 +211,7 @@ public class SecretManagementService {
 
         Secret secret, responseDTO;
         try {
-            secret = SecretManagementServiceHolder.getSecretConfigManager().getSecret(secretType, secretId);
+            secret = getIfSecretExistById(secretType, secretId);
             if (secret == null) {
                 throw handleException(Response.Status.NOT_FOUND, SecretManagementConstants.ErrorMessage.
                         ERROR_CODE_SECRET_NOT_FOUND, secretId);
@@ -227,12 +221,13 @@ public class SecretManagementService {
             // Only the Replace operation supported with PATCH request.
             if (SecretPatchRequest.OperationEnum.REPLACE.equals(operation)) {
                 if (SecretManagementConstants.VALUE_PATH.equals(path)) {
+                    secret.setSecretValue(secretPatchRequest.getValue());
                     responseDTO = SecretManagementServiceHolder.getSecretConfigManager()
-                            .updateSecretValue(secretType, secretId, secretPatchRequest.getValue());
-
+                            .updateSecret(secretType, secret);
                 } else if (SecretManagementConstants.DESCRIPTION_PATH.equals(path)) {
+                    secret.setDescription(secretPatchRequest.getValue());
                     responseDTO = SecretManagementServiceHolder.getSecretConfigManager()
-                            .updateSecretDescription(secretType, secretId, secretPatchRequest.getValue());
+                            .updateSecret(secretType, secret);
                 } else {
                     throw handleException(Response.Status.BAD_REQUEST, SecretManagementConstants.ErrorMessage
                             .ERROR_CODE_INVALID_INPUT, "Path");
@@ -261,22 +256,58 @@ public class SecretManagementService {
      */
     public SecretResponse updateSecret(String secretType, String secretId, SecretUpdateRequest secretUpdateRequest) {
 
-        Secret requestDTO = new Secret();
-        Secret responseDTO;
-
-        requestDTO.setSecretId(secretId);
-        requestDTO.setSecretValue(secretUpdateRequest.getValue());
-        requestDTO.setDescription(secretUpdateRequest.getDescription());
+        Secret requestDTO, responseDTO;
 
         try {
-            responseDTO = SecretManagementServiceHolder.getSecretConfigManager()
-                    .replaceSecret(secretType, requestDTO);
+            requestDTO = getIfSecretExistById(secretType, secretId);
+            if (requestDTO == null) {
+                throw handleException(Response.Status.NOT_FOUND, SecretManagementConstants.ErrorMessage.
+                        ERROR_CODE_SECRET_NOT_FOUND, secretId);
+            }
+            requestDTO.setSecretValue(secretUpdateRequest.getValue());
+            requestDTO.setDescription(secretUpdateRequest.getDescription());
+
+            responseDTO = SecretManagementServiceHolder.getSecretConfigManager().updateSecret(secretType, requestDTO);
         } catch (SecretManagementException e) {
             throw handleSecretMgtException(e, SecretManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SECRET,
                     secretId);
         }
 
         return buildSecretResponseFromResponseDTO(responseDTO);
+    }
+
+    private Secret getIfSecretExistByName(String secretType, String secretName) throws SecretManagementException {
+        Secret secretResponse;
+        try {
+            secretResponse = SecretManagementServiceHolder.getSecretConfigManager()
+                    .getSecretByName(secretType, secretName);
+        } catch (SecretManagementException e) {
+            if (e instanceof SecretManagementClientException
+                    && e.getErrorCode() != null
+                    && ERROR_CODE_SECRET_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())
+            ) {
+                return null;
+            }
+            throw e;
+        }
+        return secretResponse;
+    }
+
+    private Secret getIfSecretExistById(String secretType, String secretId) throws SecretManagementException {
+        Secret secretResponse;
+        try {
+            secretResponse = SecretManagementServiceHolder.getSecretConfigManager()
+                    .getSecret(secretType, secretId);
+        } catch (SecretManagementException e) {
+            if (e instanceof SecretManagementClientException
+                    && e.getErrorCode() != null
+                    && ERROR_CODE_SECRET_ID_DOES_NOT_EXISTS.getCode().equals(e.getErrorCode())
+            ) {
+                return null;
+            }
+            throw e;
+        }
+        return secretResponse;
     }
 
     /**
