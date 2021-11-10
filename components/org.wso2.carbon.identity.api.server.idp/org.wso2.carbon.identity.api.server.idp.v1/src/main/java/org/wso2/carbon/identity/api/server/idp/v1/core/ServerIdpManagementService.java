@@ -101,6 +101,7 @@ import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
+import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 
@@ -907,6 +908,7 @@ public class ServerIdpManagementService {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
             }
+            validateJitProvisioningConfig(idP, justInTimeProvisioningConfig);
             updateJIT(idP, justInTimeProvisioningConfig);
 
             IdentityProvider updatedIdP =
@@ -996,6 +998,22 @@ public class ServerIdpManagementService {
             }
         }
         return null;
+    }
+
+    private void validateJitProvisioningConfig(IdentityProvider identityProvider,
+                                               JustInTimeProvisioning justInTimeProvisioningConfig)
+            throws IdentityProviderManagementException {
+
+        int configuredAppCount =
+                IdentityProviderManager.getInstance().getConnectedApplications(identityProvider.getResourceId(),
+                        null, 0, ContextLoader.getTenantDomainFromContext()).getTotalAppCount();
+        boolean currentProxyModeStatus = justInTimeProvisioningConfig.getIsEnabled();
+        boolean previousProxyModeStatus = identityProvider.getJustInTimeProvisioningConfig().isProvisioningEnabled();
+        if (configuredAppCount > 0 && currentProxyModeStatus != previousProxyModeStatus) {
+            String msg = "Enabling proxy mode is not allowed since an application has been already configured " +
+                    "with the identity provider: " + identityProvider.getIdentityProviderName();
+            throw new IdentityProviderManagementClientException(msg);
+        }
     }
 
     private Condition buildSearchCondition(SearchCondition searchCondition) {
