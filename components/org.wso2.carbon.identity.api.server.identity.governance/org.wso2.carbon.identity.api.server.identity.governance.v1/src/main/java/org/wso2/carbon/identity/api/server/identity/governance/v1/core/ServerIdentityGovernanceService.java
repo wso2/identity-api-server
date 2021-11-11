@@ -191,10 +191,8 @@ public class ServerIdentityGovernanceService {
                 ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(tenantDomain,
                         connectorName);
                 if (connectorConfig == null) {
-                    Response.Status status = Response.Status.BAD_REQUEST;
-                    throw handleException(new IdentityGovernanceException(GovernanceConstants.ErrorMessage
-                            .ERROR_CODE_INCORRECT_CONNECTOR_NAME.getMessage()), GovernanceConstants.
-                            ErrorMessage.ERROR_CODE_INCORRECT_CONNECTOR_NAME, status, connectorName);
+                    throw handleBadRequestError(GovernanceConstants.ErrorMessage.ERROR_CODE_INCORRECT_CONNECTOR_NAME,
+                            connectorName);
                 }
                 properties = connectorConfig.getProperties();
                 PreferenceResp preferenceResp =
@@ -309,6 +307,14 @@ public class ServerIdentityGovernanceService {
 
         ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(LOG, e, buildErrorDescription(errorEnum,
                 data));
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleBadRequestError(GovernanceConstants.ErrorMessage errorMessage, String... data) {
+
+        Response.Status status = Response.Status.BAD_REQUEST;
+        ErrorResponse errorResponse = getErrorBuilder(errorMessage, data).build(LOG,
+                buildErrorDescription(errorMessage, data));
         return new APIError(status, errorResponse);
     }
 
