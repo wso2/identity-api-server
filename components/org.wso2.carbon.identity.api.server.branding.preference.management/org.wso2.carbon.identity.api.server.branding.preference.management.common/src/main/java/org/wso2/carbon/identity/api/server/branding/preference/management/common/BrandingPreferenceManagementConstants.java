@@ -1,0 +1,104 @@
+/*
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.wso2.carbon.identity.api.server.branding.preference.management.common;
+
+/**
+ * Branding preference management related constant class.
+ */
+public class BrandingPreferenceManagementConstants {
+
+    public static final String BRANDING_PREFERENCE_ERROR_PREFIX = "BPM-";
+    public static final String BRANDING_PREFERENCE_CONTEXT_PATH = "/branding-preference";
+    public static final String BRANDING_RESOURCE_TYPE = "BRANDING_PREFERENCES";
+    public static final String GET_PREFERENCE_COMPONENT_WITH_QUERY_PARAM = "?type=%s&name=%s&locale=%s";
+    public static final String ORGANIZATION_TYPE = "ORG";
+    public static final String APPLICATION_TYPE = "APP";
+    public static final String CUSTOM_TYPE = "CUSTOM";
+    public static final String DEFAULT_LOCALE = "en-US";
+    public static final String CONFIG_MGT_ERROR_CODE_DELIMITER = "_";
+    public static final String RESOURCE_NAME_SEPARATOR = "_";
+
+    public static final String RESOURCE_NOT_EXISTS_ERROR_CODE = "CONFIGM_00017";
+    public static final String RESOURCE_ALREADY_EXISTS_ERROR_CODE = "CONFIGM_00013";
+
+    /**
+     * Enums for error messages.
+     */
+    public enum ErrorMessage {
+
+        // Client errors 600xx.
+        ERROR_CODE_INVALID_BRANDING_PREFERENCE("60001",
+                "Invalid Branding Preference resource in request.",
+                "Invalid Branding Preference resource in request"),
+        ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS("60002",
+                "No matching branding preference resource found.",
+                "Can not find a branding preference resource in tenant: %s."),
+        ERROR_CODE_CONFLICT_BRANDING_PREFERENCE("60003", "Branding preference already exists.",
+                "There exists a branding preference resource in the tenant: %s."),
+
+        // Server errors 650xx.
+        ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE("65001", "Error while getting branding preference.",
+                "Error while retrieving notification branding preference resource: %s."),
+        ERROR_CODE_ERROR_ADDING_BRANDING_PREFERENCE("65002", "Unable to add branding preference.",
+                "Server encountered an error while adding the branding preference resource for tenant: %s"),
+        ERROR_CODE_ERROR_DELETING_BRANDING_PREFERENCE("65003", "Unable to delete branding preference.",
+                "Server encountered an error while deleting the branding preference resource: %s"),
+        ERROR_CODE_ERROR_UPDATING_BRANDING_PREFERENCE("65004", "Unable to update branding preference.",
+                "Error while updating branding preference for tenant: %s."),
+        ERROR_CODE_JSON_PROCESSING_EXCEPTION("65005", "Json Processing Exception.",
+                "Json Processing Exception: %s."),
+        ERROR_CODE_UNSUPPORTED_ENCODING_EXCEPTION("65006", "Unsupported Encoding Exception.",
+                "Unsupported Encoding Exception: %s."),
+        ERROR_CODE_ERROR_BUILDING_RESPONSE_EXCEPTION("65007",
+                "Unable to build response from preference resources.",
+                "Error while building response from preference resources.");
+
+        private final String code;
+        private final String message;
+        private final String description;
+
+        ErrorMessage(String code, String message, String description) {
+
+            this.code = code;
+            this.message = message;
+            this.description = description;
+        }
+
+        public String getCode() {
+
+            return BRANDING_PREFERENCE_ERROR_PREFIX + code;
+        }
+
+        public String getMessage() {
+
+            return message;
+        }
+
+        public String getDescription() {
+
+            return description;
+        }
+
+        @Override
+        public String toString() {
+
+            return code + " | " + message;
+        }
+    }
+}

@@ -1,0 +1,278 @@
+openapi: 3.0.0
+info:
+  title: WSO2 Identity Server - Branding Preferences API Definition
+  description: >-
+    This document specifies a **RESTful API** for **Managing Branding Preferences of Organizations** in **WSO2 Identity Server**.
+  contact:
+    name: WSO2 Identity Server
+    url: 'https://wso2.com/identity-and-access-management/'
+    email: architecture@wso2.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: v1
+
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      server-url:
+        default: "localhost:9443"
+      tenant-domain:
+        default: "carbon.super"
+
+security:
+  - OAuth2: []
+  - BasicAuth: []
+
+paths:
+  '/branding-preference':
+    get:
+      tags:
+        - Branding Preference
+      operationId: getBrandingPreference
+      summary: Get branding preference of Tenant.
+      description: |
+        This API provides the capability to retrieve the branding preference of the tenant.
+      parameters:
+        - $ref: '#/components/parameters/typeQueryParam'
+        - $ref: '#/components/parameters/nameQueryParam'
+        - $ref: '#/components/parameters/localeQueryParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/BrandingPreferenceModel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    post:
+      tags:
+        - Branding Preference
+      operationId: addBrandingPreference
+      summary: Add branding preferences for Tenant.
+      description: |
+        This API provides the capability to Add a custom branding preference of the tenant.<br>
+          <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+            * internal_application_mgt_update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrandingPreferenceModel'
+        description: This represents the branding preferences to be added.
+        required: true
+      responses:
+        '201':
+          description: Successfully created.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        "409":
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+    put:
+      tags:
+        - Branding Preference
+      operationId: updateBrandingPreference
+      summary: Update branding preferences of Tenant.
+      description: |
+        This API provides the capability to update the branding preference of the tenant.<br>
+          <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+            * internal_application_mgt_update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrandingPreferenceModel'
+        description: This represents the branding preferences to be updated.
+        required: true
+      responses:
+        '200' :
+          description: Successfully updated
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags:
+        - Branding Preference
+      operationId: deleteBrandingPreference
+      summary: Deletes branding preferences of Tenant.
+      description: |
+        This API provides the capability to delete the branding preferences of the tenant.<br>
+          <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+            * internal_application_mgt_update
+      parameters:
+        - $ref: '#/components/parameters/typeQueryParam'
+        - $ref: '#/components/parameters/nameQueryParam'
+        - $ref: '#/components/parameters/localeQueryParam'
+      responses:
+        '204' :
+          description: Successfully deleted.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  parameters:
+    typeQueryParam:
+      in: query
+      name: type
+      required: false
+      description: Resource Type to filter the retrieval of themes.
+      schema:
+        type: string
+        enum:
+          - ORG
+          - APP
+          - CUSTOM
+      example: "ORG"
+    nameQueryParam:
+      in: query
+      name: name
+      required: false
+      description: Application name/ Tenant name to filter the retrieval of themes.
+      schema:
+        type: string
+      example: "NAME"
+    localeQueryParam:
+      in: query
+      name: locale
+      required: false
+      description: Resource Localye to filter the retrieval of themes.
+      schema:
+        type: string
+      example: "en-US"
+
+  schemas:
+    BrandingPreferenceModel:
+      required:
+        - type
+        - object
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - ORG
+            - APP
+            - CUSTOM
+          example: "ORG"
+        name:
+          type: string
+          example: "NAME"
+        locale:
+          type: string
+          example: "en-US"
+        preference:
+          type: object
+          description: "This is the JSON structured branding preference"
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: TBM-60001
+        message:
+          type: string
+          example: Some Error Message
+        description:
+          type: string
+          example: Some Error Description
+        traceId:
+          type: string
+          example: 3erfee-232-efewv-2321-43ferfe24r
+
+  #-----------------------------------------------------
+  # Descriptions of Branding Preference API responses.
+  #-----------------------------------------------------
+  responses:
+    BadRequest:
+      description: Invalid input in the request.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Authentication information is missing or invalid.
+    Forbidden:
+      description: Access forbidden.
+    NotFound:
+      description: Requested resource is not found.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflict.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServerError:
+      description: Internal server error.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotImplemented:
+      description: Not Implemented.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  #-----------------------------------------------------
+  # Applicable authentication mechanisms.
+  #-----------------------------------------------------
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
+          scopes: {}
