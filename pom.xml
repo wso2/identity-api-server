@@ -401,6 +401,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.branding.preference.management.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.secret.mgt.core</artifactId>
                 <version>${carbon.identity.framework.version}</version>
@@ -530,6 +536,7 @@
         <module>components/org.wso2.carbon.identity.api.server.notification.sender</module>
         <module>components/org.wso2.carbon.identity.api.server.authenticators</module>
         <module>components/org.wso2.carbon.identity.api.server.secret.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.branding.preference.management</module>
     </modules>
 
 </project>
