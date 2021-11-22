@@ -91,13 +91,13 @@ public class BrandingPreferenceManagementService {
         if (isResourceExists(BRANDING_RESOURCE_TYPE, resourceName)) {
             throw handleException(Response.Status.CONFLICT, ERROR_CODE_CONFLICT_BRANDING_PREFERENCE, tenantDomain);
         }
-        String preferencesJson = generatePreferencesJsonFromRequest(brandingPreferenceModel.getPreference());
-        if (!BrandingPreferenceUtils.isValidJsonString(preferencesJson)) {
+        String preferencesJSON = generatePreferencesJSONFromRequest(brandingPreferenceModel.getPreference());
+        if (!BrandingPreferenceUtils.isValidJSONString(preferencesJSON)) {
             throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_BRANDING_PREFERENCE, null);
         }
 
         try {
-            InputStream inputStream = BrandingPreferenceUtils.generatePreferenceInputStream(preferencesJson);
+            InputStream inputStream = BrandingPreferenceUtils.generatePreferenceInputStream(preferencesJSON);
             Resource brandingPreferenceResource =
                     buildResourceFromBrandingPreference(brandingPreferenceModel, inputStream);
             BrandingPreferenceServiceHolder.getBrandingPreferenceConfigManager()
@@ -203,13 +203,13 @@ public class BrandingPreferenceManagementService {
             throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS, tenantDomain);
         }
 
-        String preferencesJson = generatePreferencesJsonFromRequest(brandingPreferenceModel.getPreference());
-        if (!BrandingPreferenceUtils.isValidJsonString(preferencesJson)) {
+        String preferencesJSON = generatePreferencesJSONFromRequest(brandingPreferenceModel.getPreference());
+        if (!BrandingPreferenceUtils.isValidJSONString(preferencesJSON)) {
             throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_BRANDING_PREFERENCE, null);
         }
 
         try {
-            InputStream inputStream = BrandingPreferenceUtils.generatePreferenceInputStream(preferencesJson);
+            InputStream inputStream = BrandingPreferenceUtils.generatePreferenceInputStream(preferencesJSON);
             Resource brandingPreferenceResource =
                     buildResourceFromBrandingPreference(brandingPreferenceModel, inputStream);
             BrandingPreferenceServiceHolder.getBrandingPreferenceConfigManager()
@@ -298,14 +298,14 @@ public class BrandingPreferenceManagementService {
     private BrandingPreferenceModel buildBrandingPreferenceFromResource(InputStream inputStream)
             throws IOException {
 
-        String preferencesJson = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
-        if (!BrandingPreferenceUtils.isValidJsonString(preferencesJson)) {
+        String preferencesJSON = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
+        if (!BrandingPreferenceUtils.isValidJSONString(preferencesJSON)) {
             throw handleException
                     (Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_ERROR_BUILDING_RESPONSE_EXCEPTION, null);
         }
 
         ObjectMapper mapper = new ObjectMapper();
-        Object preference = mapper.readValue(preferencesJson, Object.class);
+        Object preference = mapper.readValue(preferencesJSON, Object.class);
         BrandingPreferenceModel brandingPreferenceModel = new BrandingPreferenceModel();
         brandingPreferenceModel.setPreference(preference);
         brandingPreferenceModel.setType(BrandingPreferenceModel.TypeEnum.valueOf(ORGANIZATION_TYPE));
@@ -315,23 +315,23 @@ public class BrandingPreferenceManagementService {
     }
 
     /**
-     * Build a Json string which contains preferences from a preference object.
+     * Build a JSON string which contains preferences from a preference object.
      *
      * @param object Preference object of Branding Preference Model.
-     * @return Json string which contains preferences.
+     * @return JSON string which contains preferences.
      */
-    private String generatePreferencesJsonFromRequest(Object object) {
+    private String generatePreferencesJSONFromRequest(Object object) {
 
         ObjectMapper mapper = new ObjectMapper();
-        String json = null;
+        String preferencesJSON = null;
         try {
-            json = mapper.writeValueAsString(object);
+            preferencesJSON = mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             if (log.isDebugEnabled()) {
-                log.debug("Error while generating json string from the branding preference request.", e);
+                log.debug("Error while generating JSON string from the branding preference request.", e);
             }
         }
-        return json;
+        return preferencesJSON;
     }
 
     /**

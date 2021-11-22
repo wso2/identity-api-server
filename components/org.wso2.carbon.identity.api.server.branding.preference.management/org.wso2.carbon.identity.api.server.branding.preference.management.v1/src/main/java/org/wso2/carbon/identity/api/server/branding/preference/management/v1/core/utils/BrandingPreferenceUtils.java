@@ -36,34 +36,34 @@ public class BrandingPreferenceUtils {
     /**
      * Generate Branding Preference input stream.
      *
-     * @param jsonString Json string of preferences.
-     * @return Input stream of the preferences json string.
-     * @throws JsonProcessingException      Json Processing Exception.
+     * @param preferencesJSON JSON string of preferences.
+     * @return Input stream of the preferences JSON string.
+     * @throws JsonProcessingException      JSON Processing Exception.
      * @throws UnsupportedEncodingException Unsupported Encoding Exception.
      */
-    public static InputStream generatePreferenceInputStream(String jsonString)
+    public static InputStream generatePreferenceInputStream(String preferencesJSON)
             throws JsonProcessingException, UnsupportedEncodingException {
 
-        return new ByteArrayInputStream(jsonString.getBytes(StandardCharsets.UTF_8.name()));
+        return new ByteArrayInputStream(preferencesJSON.getBytes(StandardCharsets.UTF_8.name()));
     }
 
     /**
-     * Check whether the given string is a valid Json or not.
+     * Check whether the given string is a valid JSON or not.
      *
-     * @param jsonString Input String.
-     * @return True if the input string is a valid Json.
+     * @param stringJSON Input String.
+     * @return True if the input string is a valid JSON.
      */
-    public static boolean isValidJsonString(String jsonString) {
+    public static boolean isValidJSONString(String stringJSON) {
 
-        if (StringUtils.isBlank(jsonString)) {
+        if (StringUtils.isBlank(stringJSON)) {
             return false;
         }
         try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            if (jsonObject.length() == 0) {
+            JSONObject objectJSON = new JSONObject(stringJSON);
+            if (objectJSON.length() == 0) {
                 return false;
             }
-        } catch (JSONException exception1) {
+        } catch (JSONException exception) {
             return false;
         }
         return true;
