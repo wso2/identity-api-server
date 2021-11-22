@@ -176,7 +176,7 @@ public class BrandingPreferenceManagementService {
                 throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS,
                         tenantDomain);
             }
-            return buildBrandingPreferenceFromResource(inputStream);
+            return buildBrandingPreferenceFromResource(inputStream, type, name, locale);
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE, tenantDomain);
         } catch (IOException e) {
@@ -293,10 +293,13 @@ public class BrandingPreferenceManagementService {
      * Build a Branding Preference Model from branding preference file stream.
      *
      * @param inputStream Branding Preference file stream.
+     * @param type        Resource Type.
+     * @param name        Tenant/Application name.
+     * @param locale      Language preference
      * @return Branding Preference Model.
      */
-    private BrandingPreferenceModel buildBrandingPreferenceFromResource(InputStream inputStream)
-            throws IOException {
+    private BrandingPreferenceModel buildBrandingPreferenceFromResource(InputStream inputStream, String type,
+                                                                        String name, String locale) throws IOException {
 
         String preferencesJSON = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
         if (!BrandingPreferenceUtils.isValidJSONString(preferencesJSON)) {
@@ -308,6 +311,10 @@ public class BrandingPreferenceManagementService {
         Object preference = mapper.readValue(preferencesJSON, Object.class);
         BrandingPreferenceModel brandingPreferenceModel = new BrandingPreferenceModel();
         brandingPreferenceModel.setPreference(preference);
+        /**
+         * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
+         * So ATM always use default type(ORG), default name(tenantDomain) and default locale("en-US").
+         */
         brandingPreferenceModel.setType(BrandingPreferenceModel.TypeEnum.valueOf(ORGANIZATION_TYPE));
         brandingPreferenceModel.setName(getTenantDomainFromContext());
         brandingPreferenceModel.setLocale(DEFAULT_LOCALE);
