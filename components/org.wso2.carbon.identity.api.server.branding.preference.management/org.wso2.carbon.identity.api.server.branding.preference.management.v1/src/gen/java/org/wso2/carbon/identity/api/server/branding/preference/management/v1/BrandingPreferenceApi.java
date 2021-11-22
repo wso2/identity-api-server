@@ -48,7 +48,7 @@ public class BrandingPreferenceApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add branding preferences for Tenant.", notes = "This API provides the capability to Add a custom branding preference of the tenant.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/add <br>   <b>Scope required:</b> <br>     * internal_config_mgt_add ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Add branding preferences for a tenant.", notes = "This API provides the capability to add a custom branding preference for a tenant/application.<br> Currently this API provides the capability to only configure tenant wise branding preference for 'en-US' locale.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -73,7 +73,7 @@ public class BrandingPreferenceApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Deletes branding preferences of Tenant.", notes = "This API provides the capability to delete the branding preferences of the tenant.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/delete <br>   <b>Scope required:</b> <br>     * internal_config_mgt_delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Deletes branding preferences of a tenant.", notes = "This API provides the capability to delete the branding preferences of a tenant/application.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -87,7 +87,7 @@ public class BrandingPreferenceApi  {
         @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
-    public Response deleteBrandingPreference(    @Valid@ApiParam(value = "Resource Type to filter the retrieval of themes.", allowableValues="ORG, APP, CUSTOM")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Application name/ Tenant name to filter the retrieval of themes.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Resource Localye to filter the retrieval of themes.")  @QueryParam("locale") String locale) {
+    public Response deleteBrandingPreference(    @Valid@ApiParam(value = "Type to filter the retrieval of themes.", allowableValues="ORG, APP, CUSTOM", defaultValue="ORG") @DefaultValue("ORG")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of themes.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of themes.", defaultValue="en-US") @DefaultValue("en-US")  @QueryParam("locale") String locale) {
 
         return delegate.deleteBrandingPreference(type,  name,  locale );
     }
@@ -97,7 +97,7 @@ public class BrandingPreferenceApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get branding preference of Tenant.", notes = "This API provides the capability to retrieve the branding preference of the tenant. ", response = BrandingPreferenceModel.class, authorizations = {
+    @ApiOperation(value = "Get branding preference of a tenant.", notes = "This API provides the capability to retrieve the branding preference of a tenant/specific application.<br> If there is no branding preference available for the requested locale, API will check for the default locale('en-US') and return it.<br> If there is no branding preference available for the requested application, API will check for the tenant's branding preferences and return it.<br>   <b>Permission required:</b> <br>     * None <br>   <b>Scope required:</b> <br>     * None ", response = BrandingPreferenceModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -111,7 +111,7 @@ public class BrandingPreferenceApi  {
         @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
-    public Response getBrandingPreference(    @Valid@ApiParam(value = "Resource Type to filter the retrieval of themes.", allowableValues="ORG, APP, CUSTOM")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Application name/ Tenant name to filter the retrieval of themes.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Resource Localye to filter the retrieval of themes.")  @QueryParam("locale") String locale) {
+    public Response getBrandingPreference(    @Valid@ApiParam(value = "Type to filter the retrieval of themes.", allowableValues="ORG, APP, CUSTOM", defaultValue="ORG") @DefaultValue("ORG")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of themes.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of themes.", defaultValue="en-US") @DefaultValue("en-US")  @QueryParam("locale") String locale) {
 
         return delegate.getBrandingPreference(type,  name,  locale );
     }
@@ -121,7 +121,7 @@ public class BrandingPreferenceApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update branding preferences of Tenant.", notes = "This API provides the capability to update the branding preference of the tenant.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/update <br>   <b>Scope required:</b> <br>     * internal_config_mgt_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update branding preferences of a tenant.", notes = "This API provides the capability to update the branding preference of a tenant/application.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

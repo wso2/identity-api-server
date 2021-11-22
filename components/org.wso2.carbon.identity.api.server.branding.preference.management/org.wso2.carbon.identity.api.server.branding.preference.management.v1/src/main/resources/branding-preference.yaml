@@ -30,9 +30,15 @@ paths:
       tags:
         - Branding Preference
       operationId: getBrandingPreference
-      summary: Get branding preference of Tenant.
+      summary: Get branding preference of a tenant.
       description: |
-        This API provides the capability to retrieve the branding preference of the tenant.
+        This API provides the capability to retrieve the branding preference of a tenant/specific application.<br>
+        If there is no branding preference available for the requested locale, API will check for the default locale('en-US') and return it.<br>
+        If there is no branding preference available for the requested application, API will check for the tenant's branding preference and return it.<br>
+          <b>Permission required:</b> <br>
+            * None <br>
+          <b>Scope required:</b> <br>
+            * None
       parameters:
         - $ref: '#/components/parameters/typeQueryParam'
         - $ref: '#/components/parameters/nameQueryParam'
@@ -59,9 +65,10 @@ paths:
       tags:
         - Branding Preference
       operationId: addBrandingPreference
-      summary: Add branding preferences for Tenant.
+      summary: Add branding preferences for a tenant.
       description: |
-        This API provides the capability to Add a custom branding preference of the tenant.<br>
+        This API provides the capability to add a custom branding preference for a tenant/application.<br>
+        Currently this API provides the capability to only configure tenant wise branding preference for 'en-US' locale.<br>
           <b>Permission required:</b> <br>
             * /permission/admin/manage/identity/applicationmgt/update <br>
           <b>Scope required:</b> <br>
@@ -92,9 +99,9 @@ paths:
       tags:
         - Branding Preference
       operationId: updateBrandingPreference
-      summary: Update branding preferences of Tenant.
+      summary: Update branding preferences of a tenant.
       description: |
-        This API provides the capability to update the branding preference of the tenant.<br>
+        This API provides the capability to update the branding preference of a tenant/application.<br>
           <b>Permission required:</b> <br>
             * /permission/admin/manage/identity/applicationmgt/update <br>
           <b>Scope required:</b> <br>
@@ -124,9 +131,9 @@ paths:
       tags:
         - Branding Preference
       operationId: deleteBrandingPreference
-      summary: Deletes branding preferences of Tenant.
+      summary: Deletes branding preferences of a tenant.
       description: |
-        This API provides the capability to delete the branding preferences of the tenant.<br>
+        This API provides the capability to delete the branding preferences of a tenant/application.<br>
           <b>Permission required:</b> <br>
             * /permission/admin/manage/identity/applicationmgt/update <br>
           <b>Scope required:</b> <br>
@@ -155,19 +162,20 @@ components:
       in: query
       name: type
       required: false
-      description: Resource Type to filter the retrieval of themes.
+      description: Type to filter the retrieval of themes.
       schema:
         type: string
         enum:
           - ORG
           - APP
           - CUSTOM
+        default: "ORG"
       example: "ORG"
     nameQueryParam:
       in: query
       name: name
       required: false
-      description: Application name/ Tenant name to filter the retrieval of themes.
+      description: Tenant/Application name to filter the retrieval of themes.
       schema:
         type: string
       example: "NAME"
@@ -175,16 +183,17 @@ components:
       in: query
       name: locale
       required: false
-      description: Resource Localye to filter the retrieval of themes.
+      description: Locale to filter the retrieval of themes.
       schema:
         type: string
+        default: "en-US"
       example: "en-US"
 
   schemas:
     BrandingPreferenceModel:
       required:
         - type
-        - object
+        - preference
       type: object
       properties:
         type:
@@ -196,13 +205,45 @@ components:
           example: "ORG"
         name:
           type: string
-          example: "NAME"
+          example: "WSO2"
         locale:
           type: string
           example: "en-US"
+          default: "en-US"
         preference:
           type: object
           description: "This is the JSON structured branding preference"
+          example: {
+            "organizationDetails": {
+              "displayName": "Ballerina.io",
+              "siteTitle": "Login - Ballerina",
+              "copyrightText": "© 2021 WSO2",
+              "supportEmail": "support@ballerina.io"
+            },
+            "images": {
+              "logo": {
+                "imgURL": "https://ballerina.io/img/ballerina-logo.svg",
+                "altText": "Ballerina.io Logo"
+              },
+              "favicon": {
+                "imgURL": "https://central.ballerina.io/favicon.ico"
+              }
+            },
+            "urls": {
+              "privacyPolicyURL": "https://ballerina.io/privacy-policy",
+              "termsOfUseURL": "https://ballerina.io/terms-of-service/",
+              "cookiePolicyURL": "https://ballerina.io/privacy-policy/#cookie-policy"
+            },
+            "stylesheets": {
+              "accountApp": "https://firebasestorage.googleapis.com/v0/b/asgardeo-branding.appspot.com/o/ballerina%2Flogin-portal.overrides.css?alt=media&token=0315462e-534e-4f33-83f9-e4c092d0273d",
+              "myAccountApp": "https://asgardeo-branding/user-portal.css"
+            },
+            "configs": {
+              "isBrandingEnabled": true,
+              "removeDefaultBranding": false,
+              "selfSignUpEnabled": true
+            }
+          }
 
     Error:
       type: object
@@ -212,7 +253,7 @@ components:
       properties:
         code:
           type: string
-          example: TBM-60001
+          example: BPM-60001
         message:
           type: string
           example: Some Error Message

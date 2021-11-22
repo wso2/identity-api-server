@@ -67,7 +67,7 @@ public enum TypeEnum {
 
     private TypeEnum type;
     private String name;
-    private String locale;
+    private String locale = "en-US";
     private Object preference;
 
     /**
@@ -98,7 +98,7 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "NAME", value = "")
+    @ApiModelProperty(example = "WSO2", value = "")
     @JsonProperty("name")
     @Valid
     public String getName() {
@@ -135,9 +135,11 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "This is the JSON structured branding preference")
+    @ApiModelProperty(example = "{\"organizationDetails\":{\"displayName\":\"Ballerina.io\",\"siteTitle\":\"Login - Ballerina\",\"copyrightText\":\"© 2021 WSO2\",\"supportEmail\":\"support@ballerina.io\"},\"images\":{\"logo\":{\"imgURL\":\"https://ballerina.io/img/ballerina-logo.svg\",\"altText\":\"Ballerina.io Logo\"},\"favicon\":{\"imgURL\":\"https://central.ballerina.io/favicon.ico\"}},\"urls\":{\"privacyPolicyURL\":\"https://ballerina.io/privacy-policy\",\"termsOfUseURL\":\"https://ballerina.io/terms-of-service/\",\"cookiePolicyURL\":\"https://ballerina.io/privacy-policy/#cookie-policy\"},\"stylesheets\":{\"accountApp\":\"https://firebasestorage.googleapis.com/v0/b/asgardeo-branding.appspot.com/o/ballerina%2Flogin-portal.overrides.css?alt=media&token=0315462e-534e-4f33-83f9-e4c092d0273d\",\"myAccountApp\":\"https://asgardeo-branding/user-portal.css\"},\"configs\":{\"isBrandingEnabled\":true,\"removeDefaultBranding\":false,\"selfSignUpEnabled\":true}}", required = true, value = "This is the JSON structured branding preference")
     @JsonProperty("preference")
     @Valid
+    @NotNull(message = "Property preference cannot be null.")
+
     public Object getPreference() {
         return preference;
     }
