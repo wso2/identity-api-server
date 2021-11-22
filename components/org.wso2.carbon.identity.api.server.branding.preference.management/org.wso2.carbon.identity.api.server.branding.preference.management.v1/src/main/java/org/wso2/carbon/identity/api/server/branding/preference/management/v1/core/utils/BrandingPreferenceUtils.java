@@ -58,7 +58,6 @@ public class BrandingPreferenceUtils {
         if (StringUtils.isBlank(jsonString)) {
             return false;
         }
-
         try {
             JSONObject jsonObject = new JSONObject(jsonString);
             if (jsonObject.length() == 0) {

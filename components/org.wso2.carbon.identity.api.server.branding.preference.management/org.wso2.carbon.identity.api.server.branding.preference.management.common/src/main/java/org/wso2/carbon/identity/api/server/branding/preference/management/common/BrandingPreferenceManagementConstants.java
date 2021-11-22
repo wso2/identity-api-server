@@ -26,7 +26,8 @@ public class BrandingPreferenceManagementConstants {
     public static final String BRANDING_PREFERENCE_ERROR_PREFIX = "BPM-";
     public static final String BRANDING_PREFERENCE_CONTEXT_PATH = "/branding-preference";
     public static final String BRANDING_RESOURCE_TYPE = "BRANDING_PREFERENCES";
-    public static final String GET_PREFERENCE_COMPONENT_WITH_QUERY_PARAM = "?type=%s&name=%s&locale=%s";
+    public static final String QUERY_PARAM_INDICATOR = "?";
+    public static final String GET_PREFERENCE_COMPONENT_WITH_QUERY_PARAM = "type=%s&name=%s&locale=%s";
     public static final String ORGANIZATION_TYPE = "ORG";
     public static final String APPLICATION_TYPE = "APP";
     public static final String CUSTOM_TYPE = "CUSTOM";
@@ -54,11 +55,11 @@ public class BrandingPreferenceManagementConstants {
 
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE("65001", "Error while getting branding preference.",
-                "Error while retrieving notification branding preference resource: %s."),
+                "Error while retrieving branding preference resource for tenant: %s."),
         ERROR_CODE_ERROR_ADDING_BRANDING_PREFERENCE("65002", "Unable to add branding preference.",
                 "Server encountered an error while adding the branding preference resource for tenant: %s"),
         ERROR_CODE_ERROR_DELETING_BRANDING_PREFERENCE("65003", "Unable to delete branding preference.",
-                "Server encountered an error while deleting the branding preference resource: %s"),
+                "Server encountered an error while deleting the branding preference resource for tenant: %s"),
         ERROR_CODE_ERROR_UPDATING_BRANDING_PREFERENCE("65004", "Unable to update branding preference.",
                 "Error while updating branding preference for tenant: %s."),
         ERROR_CODE_JSON_PROCESSING_EXCEPTION("65005", "Json Processing Exception.",
@@ -67,7 +68,10 @@ public class BrandingPreferenceManagementConstants {
                 "Unsupported Encoding Exception: %s."),
         ERROR_CODE_ERROR_BUILDING_RESPONSE_EXCEPTION("65007",
                 "Unable to build response from preference resources.",
-                "Error while building response from preference resources.");
+                "Error while building response from preference resources."),
+        ERROR_CODE_ERROR_CHECKING_BRANDING_PREFERENCE_EXISTS("65008",
+                "Error while checking branding preference exists.",
+                "Error while checking the existence of branding preference resource for tenant: %s.");
 
         private final String code;
         private final String message;

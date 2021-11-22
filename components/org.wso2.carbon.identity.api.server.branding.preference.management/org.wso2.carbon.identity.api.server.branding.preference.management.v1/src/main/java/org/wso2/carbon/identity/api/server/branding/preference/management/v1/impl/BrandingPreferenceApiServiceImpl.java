@@ -24,8 +24,13 @@ import org.wso2.carbon.identity.api.server.branding.preference.management.v1.Bra
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingPreferenceManagementService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.APPLICATION_TYPE;
@@ -34,6 +39,7 @@ import static org.wso2.carbon.identity.api.server.branding.preference.management
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.DEFAULT_LOCALE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.GET_PREFERENCE_COMPONENT_WITH_QUERY_PARAM;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ORGANIZATION_TYPE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.QUERY_PARAM_INDICATOR;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 
@@ -53,18 +59,25 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         if (StringUtils.isBlank(brandingPreferenceModel.getType().toString())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (!StringUtils.equals(brandingPreferenceModel.getType().toString(), ORGANIZATION_TYPE)) {
+        if (!ORGANIZATION_TYPE.equals(brandingPreferenceModel.getType().toString())) {
             return Response.status(Response.Status.NOT_IMPLEMENTED).build();
         }
-        if ((!StringUtils.equals(brandingPreferenceModel.getLocale(), DEFAULT_LOCALE)) &&
+        if ((!DEFAULT_LOCALE.equals(brandingPreferenceModel.getLocale())) &&
                 StringUtils.isNotBlank(brandingPreferenceModel.getLocale())) {
             return Response.status(Response.Status.NOT_IMPLEMENTED).build();
         }
 
         brandingPreferenceManagementService.addBrandingPreference(brandingPreferenceModel);
-        URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + BRANDING_PREFERENCE_CONTEXT_PATH
-                + String.format(GET_PREFERENCE_COMPONENT_WITH_QUERY_PARAM, ORGANIZATION_TYPE,
-                getTenantDomainFromContext(), DEFAULT_LOCALE));
+        URI location = null;
+        try {
+            location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + BRANDING_PREFERENCE_CONTEXT_PATH
+                    + QUERY_PARAM_INDICATOR + URLEncoder.encode(String.format(GET_PREFERENCE_COMPONENT_WITH_QUERY_PARAM,
+                    ORGANIZATION_TYPE, getTenantDomainFromContext(), DEFAULT_LOCALE), StandardCharsets.UTF_8.name()));
+        } catch (UnsupportedEncodingException e) {
+            ErrorResponse errorResponse =
+                    new ErrorResponse.Builder().withMessage("Error due to unsupported encoding.").build();
+            throw new APIError(Response.Status.METHOD_NOT_ALLOWED, errorResponse);
+        }
         return Response.created(location).build();
     }
 
@@ -72,15 +85,15 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     public Response deleteBrandingPreference(String type, String name, String locale) {
 
         if (type != null) {
-            if (!(type.equals(ORGANIZATION_TYPE) || type.equals(APPLICATION_TYPE) || type.equals(CUSTOM_TYPE))) {
+            if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
-            if (!StringUtils.equals(type, ORGANIZATION_TYPE)) {
+            if (!ORGANIZATION_TYPE.equals(type)) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
         }
         if (locale != null) {
-            if (!StringUtils.equals(locale, DEFAULT_LOCALE)) {
+            if (!DEFAULT_LOCALE.equals(locale)) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
         }
@@ -93,7 +106,7 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     public Response getBrandingPreference(String type, String name, String locale) {
 
         if (type != null) {
-            if (!(type.equals(ORGANIZATION_TYPE) || type.equals(APPLICATION_TYPE) || type.equals(CUSTOM_TYPE))) {
+            if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         }
@@ -107,10 +120,10 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         if (StringUtils.isBlank(brandingPreferenceModel.getType().toString())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (!StringUtils.equals(brandingPreferenceModel.getType().toString(), ORGANIZATION_TYPE)) {
+        if (!ORGANIZATION_TYPE.equals(brandingPreferenceModel.getType().toString())) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        if ((!StringUtils.equals(brandingPreferenceModel.getLocale(), DEFAULT_LOCALE)) &&
+        if ((!DEFAULT_LOCALE.equals(brandingPreferenceModel.getLocale())) &&
                 StringUtils.isNotBlank(brandingPreferenceModel.getLocale())) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }

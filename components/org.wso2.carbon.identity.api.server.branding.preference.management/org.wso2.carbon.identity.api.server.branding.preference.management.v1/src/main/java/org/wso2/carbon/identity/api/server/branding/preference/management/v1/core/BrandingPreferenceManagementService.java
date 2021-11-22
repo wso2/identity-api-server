@@ -53,6 +53,7 @@ import static org.wso2.carbon.identity.api.server.branding.preference.management
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_BRANDING_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_BRANDING_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_BUILDING_RESPONSE_EXCEPTION;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_CHECKING_BRANDING_PREFERENCE_EXISTS;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_BRANDING_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_BRANDING_PREFERENCE;
@@ -81,8 +82,13 @@ public class BrandingPreferenceManagementService {
     public void addBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
         String tenantDomain = getTenantDomainFromContext();
+        /**
+         * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
+         * So always use resource name as default resource name.
+         */
+        String resourceName = getDefaultResourceName();
         // Check whether a branding resource already exists with the same name in the particular tenant to be added.
-        if (isResourceExists(BRANDING_RESOURCE_TYPE, getDefaultResourceName())) {
+        if (isResourceExists(BRANDING_RESOURCE_TYPE, resourceName)) {
             throw handleException(Response.Status.CONFLICT, ERROR_CODE_CONFLICT_BRANDING_PREFERENCE, tenantDomain);
         }
         String preferencesJson = generatePreferencesJsonFromRequest(brandingPreferenceModel.getPreference());
@@ -117,9 +123,13 @@ public class BrandingPreferenceManagementService {
     public void deleteBrandingPreference(String type, String name, String locale) {
 
         String tenantDomain = getTenantDomainFromContext();
+        /**
+         * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
+         * So always use resource name as default resource name.
+         */
         String resourceName = getDefaultResourceName();
         // Check whether the branding resource exists in the particular tenant.
-        if (!isResourceExists(BRANDING_RESOURCE_TYPE, getDefaultResourceName())) {
+        if (!isResourceExists(BRANDING_RESOURCE_TYPE, resourceName)) {
             throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS, tenantDomain);
         }
 
@@ -127,7 +137,7 @@ public class BrandingPreferenceManagementService {
             BrandingPreferenceServiceHolder.getBrandingPreferenceConfigManager()
                     .deleteResource(BRANDING_RESOURCE_TYPE, resourceName);
         } catch (ConfigurationManagementException e) {
-            throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_DELETING_BRANDING_PREFERENCE, resourceName);
+            throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_DELETING_BRANDING_PREFERENCE, tenantDomain);
         }
     }
 
@@ -142,6 +152,10 @@ public class BrandingPreferenceManagementService {
     public BrandingPreferenceModel getBrandingPreference(String type, String name, String locale) {
 
         String tenantDomain = getTenantDomainFromContext();
+        /**
+         * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
+         * So always use resource name as default resource name.
+         */
         String resourceName = getDefaultResourceName();
         try {
             // Return default branding preference.
@@ -164,7 +178,7 @@ public class BrandingPreferenceManagementService {
             }
             return buildBrandingPreferenceFromResource(inputStream);
         } catch (ConfigurationManagementException e) {
-            throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE, resourceName);
+            throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE, tenantDomain);
         } catch (IOException e) {
             throw handleException
                     (Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_ERROR_BUILDING_RESPONSE_EXCEPTION, null);
@@ -179,8 +193,13 @@ public class BrandingPreferenceManagementService {
     public void updateBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
         String tenantDomain = getTenantDomainFromContext();
+        /**
+         * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
+         * So always use resource name as default resource name.
+         */
+        String resourceName = getDefaultResourceName();
         // Check whether the branding resource exists in the particular tenant.
-        if (!isResourceExists(BRANDING_RESOURCE_TYPE, getDefaultResourceName())) {
+        if (!isResourceExists(BRANDING_RESOURCE_TYPE, resourceName)) {
             throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS, tenantDomain);
         }
 
@@ -220,7 +239,11 @@ public class BrandingPreferenceManagementService {
             resource = BrandingPreferenceServiceHolder.getBrandingPreferenceConfigManager()
                     .getResource(resourceType, resourceName);
         } catch (ConfigurationManagementException e) {
-            return false;
+            if (RESOURCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                return false;
+            }
+            throw handleConfigurationMgtException
+                    (e, ERROR_CODE_ERROR_CHECKING_BRANDING_PREFERENCE_EXISTS, getTenantDomainFromContext());
         }
         if (resource == null) {
             return false;
@@ -249,6 +272,10 @@ public class BrandingPreferenceManagementService {
      */
     private Resource buildResourceFromBrandingPreference(BrandingPreferenceModel model, InputStream inputStream) {
 
+        /**
+         * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
+         * So always use resource name as default resource name.
+         */
         String resourceName = getDefaultResourceName();
         Resource resource = new Resource();
         resource.setResourceName(resourceName);
