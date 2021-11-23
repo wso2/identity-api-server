@@ -178,6 +178,13 @@ public class BrandingPreferenceManagementService {
             }
             return buildBrandingPreferenceFromResource(inputStream, type, name, locale);
         } catch (ConfigurationManagementException e) {
+            if (RESOURCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find a branding preference configurations for tenant: " + tenantDomain, e);
+                }
+                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS,
+                        tenantDomain);
+            }
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE, tenantDomain);
         } catch (IOException e) {
             throw handleException
