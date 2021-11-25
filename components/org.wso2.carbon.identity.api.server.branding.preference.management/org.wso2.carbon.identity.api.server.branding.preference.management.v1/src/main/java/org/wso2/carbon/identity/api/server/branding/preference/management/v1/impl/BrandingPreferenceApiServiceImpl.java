@@ -60,14 +60,15 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         if (!ORGANIZATION_TYPE.equals(brandingPreferenceModel.getType().toString())) {
-            return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+            return Response.status(Response.Status.NOT_IMPLEMENTED).entity("Not Implemented.").build();
         }
         if ((!DEFAULT_LOCALE.equals(brandingPreferenceModel.getLocale())) &&
                 StringUtils.isNotBlank(brandingPreferenceModel.getLocale())) {
-            return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+            return Response.status(Response.Status.NOT_IMPLEMENTED).entity("Not Implemented.").build();
         }
 
-        brandingPreferenceManagementService.addBrandingPreference(brandingPreferenceModel);
+        BrandingPreferenceModel createdBrandingPreferenceModel =
+                brandingPreferenceManagementService.addBrandingPreference(brandingPreferenceModel);
         URI location = null;
         try {
             location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + BRANDING_PREFERENCE_CONTEXT_PATH
@@ -78,7 +79,7 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
                     new ErrorResponse.Builder().withMessage("Error due to unsupported encoding.").build();
             throw new APIError(Response.Status.METHOD_NOT_ALLOWED, errorResponse);
         }
-        return Response.created(location).build();
+        return Response.created(location).entity(createdBrandingPreferenceModel).build();
     }
 
     @Override
@@ -128,7 +129,8 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        brandingPreferenceManagementService.updateBrandingPreference(brandingPreferenceModel);
-        return Response.ok().build();
+        BrandingPreferenceModel updatedBrandingPreferenceModel =
+                brandingPreferenceManagementService.updateBrandingPreference(brandingPreferenceModel);
+        return Response.ok().entity(updatedBrandingPreferenceModel).build();
     }
 }

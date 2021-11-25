@@ -83,6 +83,10 @@ paths:
       responses:
         '201':
           description: Successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandingPreferenceModel'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -116,6 +120,10 @@ paths:
       responses:
         '200' :
           description: Successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandingPreferenceModel'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
