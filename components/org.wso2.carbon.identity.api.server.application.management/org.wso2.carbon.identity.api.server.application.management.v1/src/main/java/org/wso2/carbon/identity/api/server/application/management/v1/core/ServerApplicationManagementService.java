@@ -454,7 +454,9 @@ public class ServerApplicationManagementService {
              we need to return 204.
              */
             if (ERROR_CODE_INVALID_APP_ID.getCode().equals(e.getErrorCode())) {
-                log.error("Invalid application id: " + applicationId, e);
+                if (log.isDebugEnabled()) {
+                    log.debug("Invalid application id: " + applicationId, e);
+                }
                 return;
             }
             String msg = "Error while trying to remove CORS origins associated with the application: " + applicationId;
