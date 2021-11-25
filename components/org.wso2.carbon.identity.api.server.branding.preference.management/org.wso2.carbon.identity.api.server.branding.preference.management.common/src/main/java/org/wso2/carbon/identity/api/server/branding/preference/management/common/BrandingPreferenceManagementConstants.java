@@ -48,34 +48,34 @@ public class BrandingPreferenceManagementConstants {
                 "Invalid Branding Preference configurations.",
                 "Invalid Branding Preference configurations in request"),
         ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS("60002",
-                "Branding preference configurations are not found.",
-                "Can not find a branding preference configurations for tenant: %s."),
+                "Branding preferences are not configured.",
+                "Branding preferences are not configured for organization: %s."),
         ERROR_CODE_CONFLICT_BRANDING_PREFERENCE("60003", "Branding preference already exists.",
-                "There exists a branding preference configurations in the tenant: %s."),
+                "There exists a branding preference configurations in the organization: %s."),
 
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE("65001",
                 "Error while getting branding preference configurations.",
-                "Error while retrieving branding preference configurations for tenant: %s."),
+                "Error while retrieving branding preference configurations for organization: %s."),
         ERROR_CODE_ERROR_ADDING_BRANDING_PREFERENCE("65002",
                 "Unable to add branding preference configurations.",
-                "Server encountered an error while adding the branding preference configurations for tenant: %s"),
+                "Server encountered an error while adding the branding preference configurations for organization: %s"),
         ERROR_CODE_ERROR_DELETING_BRANDING_PREFERENCE("65003",
                 "Unable to delete branding preference configurations.",
-                "Server encountered an error while deleting the branding preference configurations for tenant: %s"),
+                "Server encountered an error while deleting branding preference configurations for organization: %s"),
         ERROR_CODE_ERROR_UPDATING_BRANDING_PREFERENCE("65004",
                 "Unable to update branding preference configurations.",
-                "Error while updating branding preference configurations for tenant: %s."),
+                "Error while updating branding preference configurations for organization: %s."),
         ERROR_CODE_JSON_PROCESSING_EXCEPTION("65005", "Json Processing Exception.",
                 "Json Processing Exception: %s."),
         ERROR_CODE_UNSUPPORTED_ENCODING_EXCEPTION("65006", "Unsupported Encoding Exception.",
                 "Unsupported Encoding Exception: %s."),
         ERROR_CODE_ERROR_BUILDING_RESPONSE_EXCEPTION("65007",
                 "Unable to build response from branding preference configurations.",
-                "Error while building response from branding preference configurations.."),
+                "Error while building response from branding preference configurations."),
         ERROR_CODE_ERROR_CHECKING_BRANDING_PREFERENCE_EXISTS("65008",
                 "Error while checking branding preference configurations existence.",
-                "Error while checking the existence of branding preference configurations for tenant: %s.");
+                "Error while checking the existence of branding preference configurations for organization: %s.");
 
         private final String code;
         private final String message;

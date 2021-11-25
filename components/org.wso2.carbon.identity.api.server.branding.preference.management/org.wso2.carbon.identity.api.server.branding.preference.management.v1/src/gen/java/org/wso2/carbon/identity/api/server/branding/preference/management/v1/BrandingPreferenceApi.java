@@ -48,14 +48,14 @@ public class BrandingPreferenceApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add branding preferences for a tenant.", notes = "This API provides the capability to add a custom branding preference for a tenant/application.<br> Currently this API provides the capability to only configure tenant wise branding preference for 'en-US' locale.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Add branding preferences for a tenant.", notes = "This API provides the capability to add a custom branding preference for a tenant/application.<br> Currently this API provides the capability to only configure tenant wise branding preference for 'en-US' locale.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = BrandingPreferenceModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Branding Preference", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "Successfully created.", response = Void.class),
+        @ApiResponse(code = 201, message = "Successfully created.", response = BrandingPreferenceModel.class),
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
         @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
         @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
@@ -97,7 +97,7 @@ public class BrandingPreferenceApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get branding preference of a tenant.", notes = "This API provides the capability to retrieve the branding preference of a tenant/specific application.<br> If there is no branding preference available for the requested locale, API will check for the default locale('en-US') and return it.<br> If there is no branding preference available for the requested application, API will check for the tenant's branding preferences and return it.<br>   <b>Permission required:</b> <br>     * None <br>   <b>Scope required:</b> <br>     * None ", response = BrandingPreferenceModel.class, authorizations = {
+    @ApiOperation(value = "Get branding preference of a tenant.", notes = "This API provides the capability to retrieve the branding preference of a tenant/specific application.<br> If there is no branding preference available for the requested locale, API will check for the default locale('en-US') and return it.<br> If there is no branding preference available for the requested application, API will check for the tenant's branding preference and return it.<br>   <b>Permission required:</b> <br>     * None <br>   <b>Scope required:</b> <br>     * None ", response = BrandingPreferenceModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -121,14 +121,14 @@ public class BrandingPreferenceApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update branding preferences of a tenant.", notes = "This API provides the capability to update the branding preference of a tenant/application.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update branding preferences of a tenant.", notes = "This API provides the capability to update the branding preference of a tenant/application.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = BrandingPreferenceModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Branding Preference" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successfully updated", response = Void.class),
+        @ApiResponse(code = 200, message = "Successfully updated", response = BrandingPreferenceModel.class),
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
         @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
         @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),

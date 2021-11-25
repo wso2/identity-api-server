@@ -78,8 +78,9 @@ public class BrandingPreferenceManagementService {
      * Create a branding preference resource with a resource file.
      *
      * @param brandingPreferenceModel Branding preference post request.
+     * @return created branding preference model.
      */
-    public void addBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
+    public BrandingPreferenceModel addBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
         String tenantDomain = getTenantDomainFromContext();
         /**
@@ -111,6 +112,8 @@ public class BrandingPreferenceManagementService {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_UNSUPPORTED_ENCODING_EXCEPTION,
                     e.getMessage());
         }
+        return buildBrandingPreferenceModel
+                (brandingPreferenceModel.getPreference(), ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
     }
 
     /**
@@ -196,8 +199,9 @@ public class BrandingPreferenceManagementService {
      * Update branding preferences.
      *
      * @param brandingPreferenceModel Branding Preference Model with new preferences.
+     * @return Updated branding preference model.
      */
-    public void updateBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
+    public BrandingPreferenceModel updateBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
         String tenantDomain = getTenantDomainFromContext();
         /**
@@ -230,6 +234,8 @@ public class BrandingPreferenceManagementService {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_UNSUPPORTED_ENCODING_EXCEPTION,
                     e.getMessage());
         }
+        return buildBrandingPreferenceModel
+                (brandingPreferenceModel.getPreference(), ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
     }
 
     /**
@@ -325,6 +331,26 @@ public class BrandingPreferenceManagementService {
         brandingPreferenceModel.setType(BrandingPreferenceModel.TypeEnum.valueOf(ORGANIZATION_TYPE));
         brandingPreferenceModel.setName(getTenantDomainFromContext());
         brandingPreferenceModel.setLocale(DEFAULT_LOCALE);
+        return brandingPreferenceModel;
+    }
+
+    /**
+     * Build a Branding Preference Model.
+     *
+     * @param preference Preference object.
+     * @param type       Resource Type.
+     * @param name       Tenant/Application name.
+     * @param locale     Language preference
+     * @return Branding Preference Model.
+     */
+    private BrandingPreferenceModel buildBrandingPreferenceModel(Object preference, String type, String name,
+                                                                 String locale) {
+
+        BrandingPreferenceModel brandingPreferenceModel = new BrandingPreferenceModel();
+        brandingPreferenceModel.setType(BrandingPreferenceModel.TypeEnum.valueOf(type));
+        brandingPreferenceModel.setName(name);
+        brandingPreferenceModel.setLocale(locale);
+        brandingPreferenceModel.setPreference(preference);
         return brandingPreferenceModel;
     }
 
