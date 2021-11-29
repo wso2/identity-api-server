@@ -41,6 +41,7 @@ public class ApplicationModel  {
     private String imageUrl;
     private String accessUrl;
     private String templateId;
+    private Boolean isManagementApp;
     private ClaimConfiguration claimConfiguration;
     private InboundProtocols inboundProtocolConfiguration;
     private AuthenticationSequence authenticationSequence;
@@ -157,6 +158,22 @@ public class ApplicationModel  {
         this.templateId = templateId;
     }
 
+    public ApplicationModel isManagementApp(Boolean isManagementApp) {
+
+        this.isManagementApp = isManagementApp;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "Decides whether the application used to access System APIs")
+    @JsonProperty("isManagementApp")
+    @Valid
+    public Boolean isManagementApp() {
+        return isManagementApp;
+    }
+    public void setIsManagementApp(Boolean isManagementApp) {
+        this.isManagementApp = isManagementApp;
+    }
+
     /**
     **/
     public ApplicationModel claimConfiguration(ClaimConfiguration claimConfiguration) {
@@ -265,6 +282,7 @@ public class ApplicationModel  {
             Objects.equals(this.imageUrl, applicationModel.imageUrl) &&
             Objects.equals(this.accessUrl, applicationModel.accessUrl) &&
             Objects.equals(this.templateId, applicationModel.templateId) &&
+            Objects.equals(this.isManagementApp, applicationModel.isManagementApp) &&
             Objects.equals(this.claimConfiguration, applicationModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocolConfiguration, applicationModel.inboundProtocolConfiguration) &&
             Objects.equals(this.authenticationSequence, applicationModel.authenticationSequence) &&
@@ -274,7 +292,7 @@ public class ApplicationModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, isManagementApp, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -289,6 +307,7 @@ public class ApplicationModel  {
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
+        sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocolConfiguration: ").append(toIndentedString(inboundProtocolConfiguration)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");

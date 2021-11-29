@@ -2232,6 +2232,11 @@ components:
         templateId:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
+        isManagementApp:
+          default: false
+          type: boolean
+          example: false
+          description: Decides whether the application used to access System APIs
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocolConfiguration:
@@ -2267,6 +2272,10 @@ components:
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
+        isManagementApp:
+          type: boolean
+          example: false
+          description: Decides whether the application used to access System APIs
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocols:
