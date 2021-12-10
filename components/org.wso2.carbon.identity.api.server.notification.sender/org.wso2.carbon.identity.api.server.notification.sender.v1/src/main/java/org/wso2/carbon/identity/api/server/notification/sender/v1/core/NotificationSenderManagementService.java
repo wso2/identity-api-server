@@ -665,8 +665,12 @@ public class NotificationSenderManagementService {
         resource.setResourceName(emailSenderAdd.getName());
         Map<String, String> emailSenderAttributes = new HashMap<>();
         emailSenderAttributes.put(FROM_ADDRESS, emailSenderAdd.getFromAddress());
-        emailSenderAttributes.put(USERNAME, emailSenderAdd.getUserName());
-        emailSenderAttributes.put(PASSWORD, emailSenderAdd.getPassword());
+        if (StringUtils.isNotEmpty(emailSenderAdd.getUserName())) {
+            emailSenderAttributes.put(USERNAME, emailSenderAdd.getUserName());
+        }
+        if (StringUtils.isNotEmpty(emailSenderAdd.getPassword())) {
+            emailSenderAttributes.put(PASSWORD, emailSenderAdd.getPassword());
+        }
         emailSenderAttributes.put(SMTP_SERVER_HOST, emailSenderAdd.getSmtpServerHost());
         emailSenderAttributes.put(SMTP_PORT, String.valueOf(emailSenderAdd.getSmtpPort()));
         emailSenderAdd.getProperties().stream()
