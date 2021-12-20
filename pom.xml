@@ -424,6 +424,11 @@
                 <version>${org.wso2.carbon.event.publisher.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.governance</groupId>
+                <artifactId>org.wso2.carbon.identity.tenant.resource.manager</artifactId>
+                <version>${tenant.resource.manager.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -513,6 +518,8 @@
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
         <org.wso2.carbon.event.publisher.version>5.2.15</org.wso2.carbon.event.publisher.version>
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
+
+        <tenant.resource.manager.version>1.5.49</tenant.resource.manager.version>
     </properties>
 
     <modules>

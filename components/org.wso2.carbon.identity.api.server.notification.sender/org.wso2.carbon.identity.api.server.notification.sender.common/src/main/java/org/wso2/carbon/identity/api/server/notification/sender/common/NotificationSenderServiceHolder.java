@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.notification.sender.common;
 import org.wso2.carbon.email.mgt.SMSProviderPayloadTemplateManager;
 import org.wso2.carbon.event.publisher.core.EventPublisherService;
 import org.wso2.carbon.identity.configuration.mgt.core.ConfigurationManager;
+import org.wso2.carbon.identity.tenant.resource.manager.core.ResourceManager;
 
 /**
  * Service holder class for notification senders configurations.
@@ -30,6 +31,7 @@ public class NotificationSenderServiceHolder {
     private static ConfigurationManager notificationSenderConfigManager;
     private static EventPublisherService eventPublisherService;
     private static SMSProviderPayloadTemplateManager smsProviderPayloadTemplateManager;
+    private static ResourceManager resourceManager;
 
     /**
      * Get ConfigurationManager OSGi service.
@@ -90,5 +92,25 @@ public class NotificationSenderServiceHolder {
             SMSProviderPayloadTemplateManager smsProviderPayloadTemplateManager) {
 
         NotificationSenderServiceHolder.smsProviderPayloadTemplateManager = smsProviderPayloadTemplateManager;
+    }
+
+    /**
+     * Get ResourceManager OSGi service.
+     *
+     * @return NotificationSenderConfig Manager.
+     */
+    public static ResourceManager getResourceManager() {
+
+        return resourceManager;
+    }
+
+    /**
+     * Set ResourceManager OSGi service.
+     *
+     * @param resourceManager Resource Manager.
+     */
+    public static void setResourceManager(ResourceManager resourceManager) {
+
+        NotificationSenderServiceHolder.resourceManager = resourceManager;
     }
 }

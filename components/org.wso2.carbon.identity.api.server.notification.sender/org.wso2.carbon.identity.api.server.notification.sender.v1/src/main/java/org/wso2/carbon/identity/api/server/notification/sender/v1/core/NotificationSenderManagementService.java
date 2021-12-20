@@ -47,6 +47,7 @@ import org.wso2.carbon.identity.configuration.mgt.core.model.Resource;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceFile;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Resources;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+import org.wso2.carbon.identity.tenant.resource.manager.exception.TenantResourceManagementException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.InputStream;
@@ -74,6 +75,7 @@ import static org.wso2.carbon.identity.api.server.notification.sender.common.Not
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_NO_RESOURCE_EXISTS;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_PARSER_CONFIG_EXCEPTION;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_PUBLISHER_NOT_EXISTS_IN_SUPER_TENANT;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_RESOURCE_RE_DEPLOY_ERROR;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_SERVER_ERRORS_GETTING_EVENT_PUBLISHER;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_SMS_PAYLOAD_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_SMS_PROVIDER_REQUIRED;
@@ -132,6 +134,9 @@ public class NotificationSenderManagementService {
              */
             NotificationSenderServiceHolder.getNotificationSenderConfigManager()
                     .addResource(PUBLISHER_RESOURCE_TYPE, emailSenderResource);
+
+            reDeployEmailSenderResource(emailSenderResource.getFiles().get(0));
+
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_ADDING_NOTIFICATION_SENDER,
                     emailSenderAdd.getName());
@@ -297,6 +302,9 @@ public class NotificationSenderManagementService {
             emailSenderResource = buildResourceFromEmailSenderAdd(emailSenderAdd, inputStream);
             NotificationSenderServiceHolder.getNotificationSenderConfigManager()
                     .replaceResource(PUBLISHER_RESOURCE_TYPE, emailSenderResource);
+
+            reDeployEmailSenderResource(emailSenderResource.getFiles().get(0));
+
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_UPDATING_NOTIFICATION_SENDER, senderName);
         } catch (ParserConfigurationException e) {
@@ -307,6 +315,15 @@ public class NotificationSenderManagementService {
                     e.getMessage());
         }
         return buildEmailSenderFromResource(emailSenderResource);
+    }
+
+    private void reDeployEmailSenderResource(ResourceFile resourceFile) {
+
+        try {
+            NotificationSenderServiceHolder.getResourceManager().addEventPublisherConfiguration(resourceFile);
+        } catch (TenantResourceManagementException e) {
+            log.warn(ERROR_CODE_RESOURCE_RE_DEPLOY_ERROR.getMessage() + e.getMessage());
+        }
     }
 
     /**
