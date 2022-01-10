@@ -47,7 +47,9 @@ import org.wso2.carbon.identity.configuration.mgt.core.model.Resource;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceFile;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Resources;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+import org.wso2.carbon.identity.tenant.resource.manager.exception.TenantResourceManagementClientException;
 import org.wso2.carbon.identity.tenant.resource.manager.exception.TenantResourceManagementException;
+import org.wso2.carbon.identity.tenant.resource.manager.exception.TenantResourceManagementServerException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.InputStream;
@@ -195,10 +197,17 @@ public class NotificationSenderManagementService {
     public void deleteNotificationSender(String notificationSenderName) {
 
         try {
+            NotificationSenderServiceHolder.getResourceManager()
+                    .removeEventPublisherConfiguration(PUBLISHER_RESOURCE_TYPE, notificationSenderName);
+
             NotificationSenderServiceHolder.getNotificationSenderConfigManager()
                     .deleteResource(PUBLISHER_RESOURCE_TYPE, notificationSenderName);
+
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_DELETING_NOTIFICATION_SENDER,
+                    notificationSenderName);
+        } catch (TenantResourceManagementException e) {
+            throw handleTenantResourceManagementException(e, ERROR_CODE_ERROR_DELETING_NOTIFICATION_SENDER,
                     notificationSenderName);
         }
     }
@@ -910,6 +919,36 @@ public class NotificationSenderManagementService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof ConfigurationManagementServerException) {
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
+                        NOTIFICATION_SENDER_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        } else {
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleTenantResourceManagementException(TenantResourceManagementException e,
+                                                     NotificationSenderManagementConstants.ErrorMessage errorEnum,
+                                                     String data) {
+
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
+        Response.Status status;
+        if (e instanceof TenantResourceManagementClientException) {
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
+                        NOTIFICATION_SENDER_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.BAD_REQUEST;
+        } else if (e instanceof TenantResourceManagementServerException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :

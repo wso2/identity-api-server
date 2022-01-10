@@ -144,7 +144,9 @@ public class NotificationSenderManagementConstants {
         ERROR_CODE_NO_RESOURCE_EXISTS("65010", "No notification sender found.",
                 "No notification sender found with name: %s."),
         ERROR_CODE_RESOURCE_RE_DEPLOY_ERROR("65011", "Error while re-deploying resource.",
-                                              "Error while re-deploying resource with name: %s.");
+                                              "Error while re-deploying resource with name: %s."),
+        ERROR_CODE_RESOURCE_DELETE_ERROR("65011", "Error while deleting resource.",
+                "Error while deleting resource with name: %s.");
 
         private final String code;
         private final String message;
