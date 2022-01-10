@@ -21,11 +21,13 @@
     <bean class="org.wso2.carbon.identity.api.server.notification.sender.v1.core.NotificationSenderManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.notification.sender.v1.impl.NotificationSendersApiServiceImpl"/>
     <bean id="configurationManagerFactoryBean" class="org.wso2.carbon.identity.api.server.notification.sender.common.factory.ConfigurationMgtOSGiServiceFactory"/>
+    <bean id="resourceManagerFactoryBean" class="org.wso2.carbon.identity.api.server.notification.sender.common.factory.ResourceMgtOSGiServiceFactory"/>
     <bean id="eventPublisherServiceFactoryBean" class="org.wso2.carbon.identity.api.server.notification.sender.common.factory.EventPublisherOSGiServiceFactory"/>
     <bean id="smsProviderPayloadTemplateManagerFactoryBean" class="org.wso2.carbon.identity.api.server.notification.sender.common.factory.SMSProviderPayloadTemplateMgtOSSGiServiceFactory"/>
     <bean id="notificationSenderServiceImplDataHolderBean" class="org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderServiceHolder">
         <property name="notificationSenderConfigManager" ref="configurationManagerFactoryBean"/>
         <property name="eventPublisherService" ref="eventPublisherServiceFactoryBean"/>
         <property name="smsProviderPayloadTemplateManager" ref="smsProviderPayloadTemplateManagerFactoryBean"/>
+        <property name="resourceManager" ref="resourceManagerFactoryBean"/>
     </bean>
 </beans>
