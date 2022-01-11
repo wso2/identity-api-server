@@ -430,7 +430,7 @@ public class ServerTenantManagementService {
             if (ERROR_CODE_RESOURCE_LIMIT_REACHED.equals(e.getErrorCode())) {
                 return handleResourceLimitReached();
             }
-            errorResponse = getErrorBuilder(errorEnum, data).build(log, errorEnum.getDescription());
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorResponse.setCode(errorCode);

@@ -386,10 +386,10 @@ public class BrandingPreferenceManagementService {
                                                      BrandingPreferenceManagementConstants.ErrorMessage errorEnum,
                                                      String data) {
 
-        ErrorResponse errorResponse =
-                getErrorBuilder(errorEnum, data).build(log, exception, errorEnum.getDescription());
+        ErrorResponse errorResponse;
         Response.Status status;
         if (exception instanceof ConfigurationManagementClientException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, exception.getMessage());
             if (exception.getErrorCode() != null) {
                 String errorCode = exception.getErrorCode();
                 errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
@@ -405,6 +405,7 @@ public class BrandingPreferenceManagementService {
                 status = Response.Status.BAD_REQUEST;
             }
         } else if (exception instanceof ConfigurationManagementServerException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, exception, errorEnum.getDescription());
             if (exception.getErrorCode() != null) {
                 String errorCode = exception.getErrorCode();
                 errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
@@ -414,6 +415,7 @@ public class BrandingPreferenceManagementService {
             errorResponse.setDescription(exception.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, exception, errorEnum.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);
