@@ -167,7 +167,7 @@ public class ServerIdpManagementService {
                             sortBy, sortOrder, ContextLoader.getTenantDomainFromContext(), requestedAttributeList),
                     requestedAttributeList);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, null);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
         }
     }
 
@@ -184,7 +184,7 @@ public class ServerIdpManagementService {
             identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().addIdPWithResourceId(
                     createIDP(identityProviderPOSTRequest), ContextLoader.getTenantDomainFromContext());
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, null);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP, null);
         }
         return createIDPResponse(identityProvider);
     }
@@ -207,7 +207,7 @@ public class ServerIdpManagementService {
             }
             return createIDPResponse(identityProvider);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, idpId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP, idpId);
         }
     }
 
@@ -239,7 +239,7 @@ public class ServerIdpManagementService {
             return createIDPResponse(updatedIdP);
 
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, identityProviderId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP, identityProviderId);
         }
     }
 
@@ -254,7 +254,7 @@ public class ServerIdpManagementService {
             IdentityProviderServiceHolder.getIdentityProviderManager().deleteIdPByResourceId(identityProviderId,
                     ContextLoader.getTenantDomainFromContext());
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, identityProviderId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP, identityProviderId);
         }
     }
 
@@ -270,7 +270,7 @@ public class ServerIdpManagementService {
             IdentityProviderServiceHolder.getIdentityProviderManager().forceDeleteIdpByResourceId(identityProviderId,
                     ContextLoader.getTenantDomainFromContext());
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, identityProviderId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP, identityProviderId);
         }
     }
 
@@ -295,7 +295,7 @@ public class ServerIdpManagementService {
             }
             return metaAuthenticators;
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, null);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_META_AUTHENTICATORS, null);
         }
     }
 
@@ -323,7 +323,7 @@ public class ServerIdpManagementService {
             }
             return authenticator;
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, id);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_META_AUTHENTICATOR, id);
         }
     }
 
@@ -367,7 +367,7 @@ public class ServerIdpManagementService {
             }
             return metaOutboundConnectors;
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, null);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_META_CONNECTORS,  null);
         }
     }
 
@@ -394,7 +394,7 @@ public class ServerIdpManagementService {
             }
             return connector;
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, id);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_META_AUTHENTICATOR, id);
         }
     }
 
@@ -449,7 +449,7 @@ public class ServerIdpManagementService {
                 listResponse.setAuthenticators(fedAuthList);
             }
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, idpId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_AUTHENTICATORS, idpId);
         }
         return listResponse;
     }
@@ -482,7 +482,8 @@ public class ServerIdpManagementService {
             throw handleException(Response.Status.NOT_FOUND,
                     Constants.ErrorMessage.ERROR_CODE_AUTHENTICATOR_NOT_FOUND_FOR_IDP, authenticatorId);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, authenticatorId);
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_AUTHENTICATOR, authenticatorId);
         }
     }
 
@@ -514,7 +515,7 @@ public class ServerIdpManagementService {
                             idpId, idpToUpdate, ContextLoader.getTenantDomainFromContext());
             return createFederatedAuthenticatorResponse(updatedIdp);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, null);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
         }
     }
 
@@ -575,7 +576,8 @@ public class ServerIdpManagementService {
                             .getTenantDomainFromContext());
             return createFederatedAuthenticator(federatedAuthenticatorId, updatedIdP);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, federatedAuthenticatorId);
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_AUTHENTICATOR, federatedAuthenticatorId);
         }
     }
 
@@ -615,7 +617,7 @@ public class ServerIdpManagementService {
             return listResponse;
 
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, idpId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTORS, idpId);
         }
     }
 
@@ -647,7 +649,7 @@ public class ServerIdpManagementService {
             throw handleException(Response.Status.NOT_FOUND,
                     Constants.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND_FOR_IDP, connectorId);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, connectorId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTOR, connectorId);
         }
     }
 
@@ -679,7 +681,7 @@ public class ServerIdpManagementService {
                             idpId, idpToUpdate, ContextLoader.getTenantDomainFromContext());
             return createOutboundProvisioningResponse(updatedIdp);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, null);
+            throw handleIdPException(e,  Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
         }
     }
 
@@ -738,7 +740,7 @@ public class ServerIdpManagementService {
                             .getTenantDomainFromContext());
             return createOutboundConnector(connectorId, updatedIdP);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, connectorId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_CONNECTOR, connectorId);
         }
     }
 
@@ -761,7 +763,7 @@ public class ServerIdpManagementService {
             return createClaimResponse(identityProvider.getClaimConfig());
 
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, idpId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CLAIMS, idpId);
         }
     }
 
@@ -790,7 +792,7 @@ public class ServerIdpManagementService {
                             idP, tenantDomain);
             return createClaimResponse(updatedIdP.getClaimConfig());
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, idpId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_CLAIMS, idpId);
         }
     }
 
@@ -812,7 +814,7 @@ public class ServerIdpManagementService {
             }
             return createRoleResponse(identityProvider);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, idpId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_ROLES, idpId);
         }
     }
 
@@ -840,7 +842,7 @@ public class ServerIdpManagementService {
                             idP, ContextLoader.getTenantDomainFromContext());
             return createRoleResponse(updatedIdP);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, idpId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_ROLES, idpId);
         }
     }
 
@@ -862,7 +864,7 @@ public class ServerIdpManagementService {
             }
             return createProvisioningResponse(identityProvider);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, idpId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_PROVISIONING, idpId);
         }
     }
 
@@ -884,7 +886,7 @@ public class ServerIdpManagementService {
             }
             return createJITResponse(identityProvider);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, idpId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_JIT, idpId);
         }
     }
 
@@ -912,7 +914,7 @@ public class ServerIdpManagementService {
                             idP, ContextLoader.getTenantDomainFromContext());
             return createJITResponse(updatedIdP);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, idpId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_JIT, idpId);
         }
     }
 
@@ -932,7 +934,8 @@ public class ServerIdpManagementService {
                             limit, offset, ContextLoader.getTenantDomainFromContext());
             return createConnectedAppsResponse(resourceId, connectedAppsResult);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, resourceId);
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS, resourceId);
         }
     }
 
@@ -1350,33 +1353,40 @@ public class ServerIdpManagementService {
                                                 String data) {
 
         ErrorResponse errorResponse;
-
         Response.Status status;
 
         if (e instanceof TemplateManagementClientException) {
-            errorResponse = getErrorBuilder(e.getErrorCode(), e.getMessage(), data).build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
+                errorResponse = getErrorBuilder(errorCode, e.getMessage(), data).build(log, e.getMessage());
                 errorCode = errorCode.contains(TEMPLATE_MGT_ERROR_CODE_DELIMITER) ?
                         errorCode : Constants.IDP_MANAGEMENT_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
+            } else {
+                errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             }
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof TemplateManagementServerException) {
-            errorResponse = getErrorBuilder(e.getErrorCode(), e.getMessage(), data).build(log, e,
-                    includeData(e.getMessage(), data));
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
+                errorResponse = getErrorBuilder(errorCode, e.getMessage(), data).build(log, e,
+                        includeData(e.getMessage(), data));
                 errorCode = errorCode.contains(TEMPLATE_MGT_ERROR_CODE_DELIMITER) ?
                         errorCode : Constants.IDP_MANAGEMENT_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
+            } else {
+                errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(e.getMessage(), data));
             }
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
-            errorResponse = getErrorBuilder(e.getErrorCode(), e.getMessage(), data).build(log, e,
-                    includeData(e.getMessage(), data));
+            if (e.getErrorCode() != null) {
+                errorResponse = getErrorBuilder(e.getErrorCode(), e.getMessage(), data).build(log, e,
+                        includeData(e.getMessage(), data));
+            } else {
+                errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(e.getMessage(), data));
+            }
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
 
@@ -1558,7 +1568,7 @@ public class ServerIdpManagementService {
                 }
             }
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, null);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP, null);
         }
         return null;
     }
@@ -2912,42 +2922,52 @@ public class ServerIdpManagementService {
      * in the response.
      *
      * @param e         IdentityProviderManagementException
+     * @param errorEnum Error message Information
      * @return APIError.
      */
-    private APIError handleIdPException(IdentityProviderManagementException e, String data) {
+    private APIError handleIdPException(IdentityProviderManagementException e,
+                                        Constants.ErrorMessage errorEnum, String data) {
 
         ErrorResponse errorResponse;
         Response.Status status;
 
         if (e instanceof IdentityProviderManagementClientException) {
-            errorResponse = getErrorBuilder(e.getErrorCode(), e.getMessage(), data).build(log, e.getMessage());
             if (ERROR_CODE_RESOURCE_LIMIT_REACHED.equals(e.getErrorCode())) {
                 return handleResourceLimitReached();
             }
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
+                errorResponse = getErrorBuilder(errorCode, e.getMessage(), data).build(log, e.getMessage());
                 errorCode =
                         errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
                                 errorCode : Constants.IDP_MANAGEMENT_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
+            } else {
+                errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             }
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof IdentityProviderManagementServerException) {
-            errorResponse = getErrorBuilder(e.getErrorCode(), e.getMessage(), data).build(log, e,
-                    includeData(e.getMessage(), data));
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
+                errorResponse = getErrorBuilder(errorCode, e.getMessage(), data).build(log, e,
+                        includeData(e.getMessage(), data));
                 errorCode =
                         errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
                                 errorCode : Constants.IDP_MANAGEMENT_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
+             } else {
+                errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(e.getMessage(), data));
             }
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
-            errorResponse = getErrorBuilder(e.getErrorCode(), e.getMessage(), data).build(log, e,
-                    includeData(e.getMessage(), data));
+            if (e.getErrorCode() != null) {
+                errorResponse = getErrorBuilder(e.getErrorCode(), e.getMessage(), data).build(log,
+                        e, includeData(e.getMessage(), data));
+            } else {
+                errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(e.getMessage(), data));
+            }
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);
