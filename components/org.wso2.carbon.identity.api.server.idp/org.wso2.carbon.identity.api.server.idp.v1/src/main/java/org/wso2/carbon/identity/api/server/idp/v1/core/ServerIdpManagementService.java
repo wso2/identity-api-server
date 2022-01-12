@@ -394,7 +394,7 @@ public class ServerIdpManagementService {
             }
             return connector;
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_META_AUTHENTICATOR, id);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_META_CONNECTOR, id);
         }
     }
 
@@ -577,7 +577,7 @@ public class ServerIdpManagementService {
             return createFederatedAuthenticator(federatedAuthenticatorId, updatedIdP);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e,
-                    Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_AUTHENTICATOR, federatedAuthenticatorId);
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_AUTHENTICATOR, federatedAuthenticatorId);
         }
     }
 
