@@ -24,6 +24,8 @@ import javax.validation.constraints.*;
 
 
 import io.swagger.annotations.*;
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
@@ -64,8 +66,8 @@ public enum SchemeEnum {
     }
 }
 
-    private SchemeEnum scheme = SchemeEnum.PROVISION_SILENTLY;
-    private String userstore = "PRIMARY";
+    private SchemeEnum scheme;
+    private String userstore;
 
     /**
     **/
@@ -99,6 +101,9 @@ public enum SchemeEnum {
     @JsonProperty("scheme")
     @Valid
     public SchemeEnum getScheme() {
+        if (scheme == null) {
+            return SchemeEnum.PROVISION_SILENTLY;
+        }
         return scheme;
     }
     public void setScheme(SchemeEnum scheme) {
@@ -117,6 +122,9 @@ public enum SchemeEnum {
     @JsonProperty("userstore")
     @Valid
     public String getUserstore() {
+        if (StringUtils.isBlank(userstore)) {
+            return "PRIMARY"; // Fallback to PRIMARY userstore
+        }
         return userstore;
     }
     public void setUserstore(String userstore) {
@@ -136,8 +144,8 @@ public enum SchemeEnum {
         }
         JustInTimeProvisioning justInTimeProvisioning = (JustInTimeProvisioning) o;
         return Objects.equals(this.isEnabled, justInTimeProvisioning.isEnabled) &&
-            Objects.equals(this.scheme, justInTimeProvisioning.scheme) &&
-            Objects.equals(this.userstore, justInTimeProvisioning.userstore);
+            Objects.equals(getScheme(), justInTimeProvisioning.scheme) &&
+            Objects.equals(getUserstore(), justInTimeProvisioning.userstore);
     }
 
     @Override
