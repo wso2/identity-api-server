@@ -367,7 +367,7 @@ public class ServerIdpManagementService {
             }
             return metaOutboundConnectors;
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_META_CONNECTORS,  null);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_META_CONNECTORS, null);
         }
     }
 
@@ -482,8 +482,8 @@ public class ServerIdpManagementService {
             throw handleException(Response.Status.NOT_FOUND,
                     Constants.ErrorMessage.ERROR_CODE_AUTHENTICATOR_NOT_FOUND_FOR_IDP, authenticatorId);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e,
-                    Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_AUTHENTICATOR, authenticatorId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_AUTHENTICATOR,
+                    authenticatorId);
         }
     }
 
@@ -576,8 +576,8 @@ public class ServerIdpManagementService {
                             .getTenantDomainFromContext());
             return createFederatedAuthenticator(federatedAuthenticatorId, updatedIdP);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e,
-                    Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_AUTHENTICATOR, federatedAuthenticatorId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_AUTHENTICATOR,
+                    federatedAuthenticatorId);
         }
     }
 
@@ -681,7 +681,7 @@ public class ServerIdpManagementService {
                             idpId, idpToUpdate, ContextLoader.getTenantDomainFromContext());
             return createOutboundProvisioningResponse(updatedIdp);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e,  Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
         }
     }
 
@@ -934,8 +934,8 @@ public class ServerIdpManagementService {
                             limit, offset, ContextLoader.getTenantDomainFromContext());
             return createConnectedAppsResponse(resourceId, connectedAppsResult);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e,
-                    Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS, resourceId);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS,
+                    resourceId);
         }
     }
 
@@ -2922,7 +2922,7 @@ public class ServerIdpManagementService {
      * in the response.
      *
      * @param e         IdentityProviderManagementException
-     * @param errorEnum Error message Information
+     * @param errorEnum Error message Information.
      * @return APIError.
      */
     private APIError handleIdPException(IdentityProviderManagementException e,
