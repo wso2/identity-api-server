@@ -97,11 +97,12 @@ public class CORSService {
     private APIError handleCORSException(CORSManagementServiceException e,
                                          Constants.ErrorMessage errorEnum, String data) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+        ErrorResponse errorResponse;
 
         Response.Status status;
 
         if (e instanceof CORSManagementServiceClientException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -112,6 +113,7 @@ public class CORSService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof CORSManagementServiceServerException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -122,6 +124,7 @@ public class CORSService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);

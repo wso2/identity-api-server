@@ -1352,29 +1352,41 @@ public class ServerIdpManagementService {
     private APIError handleTemplateMgtException(TemplateManagementException e, Constants.ErrorMessage errorEnum,
                                                 String data) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(errorEnum, data));
-
+        ErrorResponse errorResponse;
         Response.Status status;
 
         if (e instanceof TemplateManagementClientException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
+                errorResponse = getErrorBuilder(errorCode, e.getMessage(), data).build(log, e.getMessage());
                 errorCode = errorCode.contains(TEMPLATE_MGT_ERROR_CODE_DELIMITER) ?
                         errorCode : Constants.IDP_MANAGEMENT_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
+            } else {
+                errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             }
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof TemplateManagementServerException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
+                errorResponse = getErrorBuilder(errorCode, e.getMessage(), data).build(log, e,
+                        includeData(e.getMessage(), data));
                 errorCode = errorCode.contains(TEMPLATE_MGT_ERROR_CODE_DELIMITER) ?
                         errorCode : Constants.IDP_MANAGEMENT_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
+            } else {
+                errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(e.getMessage(), data));
             }
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
+            if (e.getErrorCode() != null) {
+                errorResponse = getErrorBuilder(e.getErrorCode(), e.getMessage(), data).build(log, e,
+                        includeData(e.getMessage(), data));
+            } else {
+                errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(e.getMessage(), data));
+            }
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
 
@@ -2910,14 +2922,13 @@ public class ServerIdpManagementService {
      * in the response.
      *
      * @param e         IdentityProviderManagementException
-     * @param errorEnum Error Message information.
+     * @param errorEnum Error message Information.
      * @return APIError.
      */
     private APIError handleIdPException(IdentityProviderManagementException e,
                                         Constants.ErrorMessage errorEnum, String data) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(errorEnum, data));
-
+        ErrorResponse errorResponse;
         Response.Status status;
 
         if (e instanceof IdentityProviderManagementClientException) {
@@ -2926,24 +2937,37 @@ public class ServerIdpManagementService {
             }
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
+                errorResponse = getErrorBuilder(errorCode, e.getMessage(), data).build(log, e.getMessage());
                 errorCode =
                         errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
                                 errorCode : Constants.IDP_MANAGEMENT_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
+            } else {
+                errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             }
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof IdentityProviderManagementServerException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
+                errorResponse = getErrorBuilder(errorCode, e.getMessage(), data).build(log, e,
+                        includeData(e.getMessage(), data));
                 errorCode =
                         errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
                                 errorCode : Constants.IDP_MANAGEMENT_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
+             } else {
+                errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(e.getMessage(), data));
             }
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
+            if (e.getErrorCode() != null) {
+                errorResponse = getErrorBuilder(e.getErrorCode(), e.getMessage(), data).build(log,
+                        e, includeData(e.getMessage(), data));
+            } else {
+                errorResponse = getErrorBuilder(errorEnum, data).build(log, e, includeData(e.getMessage(), data));
+            }
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);
@@ -2953,7 +2977,6 @@ public class ServerIdpManagementService {
 
         ErrorResponse errorResponse = getErrorBuilder(ERROR_CODE_IDP_LIMIT_REACHED, null)
                 .build(log, ERROR_CODE_IDP_LIMIT_REACHED.getDescription());
-
         Response.Status status = Response.Status.FORBIDDEN;
         return new APIError(status, errorResponse);
     }
@@ -2982,6 +3005,12 @@ public class ServerIdpManagementService {
                 .withDescription(includeData(errorMsg, data));
     }
 
+    private ErrorResponse.Builder getErrorBuilder(String errorCode, String errorMsg, String data) {
+
+        return new ErrorResponse.Builder().withCode(errorCode).withMessage(errorMsg)
+                .withDescription(includeData(errorMsg, data));
+    }
+
     /**
      * Include context data to error message.
      *
@@ -2996,6 +3025,17 @@ public class ServerIdpManagementService {
             message = String.format(error.getDescription(), data);
         } else {
             message = String.format(error.getDescription(), "");
+        }
+        return message;
+    }
+
+    private static String includeData(String errorMsg, String data) {
+
+        String message;
+        if (StringUtils.isNotBlank(data)) {
+            message = String.format(errorMsg, data);
+        } else {
+            message = String.format(errorMsg, "");
         }
         return message;
     }
