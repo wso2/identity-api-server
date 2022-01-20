@@ -2191,6 +2191,10 @@ public class ServerIdpManagementService {
                 } else {
                     jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROVISION_SILENTLY);
                 }
+            }
+            if (idp.getJustInTimeProvisioningConfig().getProvisioningUserStore() == null) {
+                jitConfig.setUserstore("PRIMARY");
+            } else {
                 jitConfig.setUserstore(idp.getJustInTimeProvisioningConfig().getProvisioningUserStore());
             }
         }
