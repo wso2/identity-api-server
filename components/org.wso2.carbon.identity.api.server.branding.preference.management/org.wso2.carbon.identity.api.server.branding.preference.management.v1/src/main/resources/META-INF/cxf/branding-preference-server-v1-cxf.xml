@@ -20,8 +20,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
     <bean class="org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingPreferenceManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.branding.preference.management.v1.impl.BrandingPreferenceApiServiceImpl"/>
-    <bean id="configurationManagerFactoryBean" class="org.wso2.carbon.identity.api.server.branding.preference.management.common.factory.ConfigurationMgtOSGiServiceFactory"/>
+    <bean id="brandingPreferenceManagerFactoryBean" class="org.wso2.carbon.identity.api.server.branding.preference.management.common.factory.BrandingPreferenceMgtOSGiServiceFactory"/>
     <bean id="brandingPreferenceServiceImplDataHolderBean" class="org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceServiceHolder">
-        <property name="brandingPreferenceConfigManager" ref="configurationManagerFactoryBean"/>
+        <property name="brandingPreferenceManager" ref="brandingPreferenceManagerFactoryBean"/>
     </bean>
 </beans>

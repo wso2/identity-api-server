@@ -92,11 +92,15 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
             if (!ORGANIZATION_TYPE.equals(type)) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
+        } else {
+            type = ORGANIZATION_TYPE;
         }
         if (locale != null) {
             if (!DEFAULT_LOCALE.equals(locale)) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
+        } else {
+            locale = DEFAULT_LOCALE;
         }
 
         brandingPreferenceManagementService.deleteBrandingPreference(type, name, locale);

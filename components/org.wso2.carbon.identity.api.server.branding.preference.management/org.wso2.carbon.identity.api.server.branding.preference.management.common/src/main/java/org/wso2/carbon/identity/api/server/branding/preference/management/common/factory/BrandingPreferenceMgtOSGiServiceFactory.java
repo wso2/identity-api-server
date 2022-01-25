@@ -20,15 +20,15 @@ package org.wso2.carbon.identity.api.server.branding.preference.management.commo
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.configuration.mgt.core.ConfigurationManager;
+import org.wso2.carbon.identity.branding.preference.management.core.BrandingPreferenceManager;
 
 /**
  * Factory Beans serve as a factory for creating other beans within the IOC container. This factory bean is used to
- * instantiate the ConfigurationManager type of object inside the container.
+ * instantiate the BrandingPreferenceManager type of object inside the container.
  */
-public class ConfigurationMgtOSGiServiceFactory extends AbstractFactoryBean<ConfigurationManager> {
+public class BrandingPreferenceMgtOSGiServiceFactory extends AbstractFactoryBean<BrandingPreferenceManager> {
 
-    private ConfigurationManager configurationManager;
+    private BrandingPreferenceManager brandingPreferenceManager;
 
     @Override
     public Class<?> getObjectType() {
@@ -37,18 +37,18 @@ public class ConfigurationMgtOSGiServiceFactory extends AbstractFactoryBean<Conf
     }
 
     @Override
-    protected ConfigurationManager createInstance() throws Exception {
+    protected BrandingPreferenceManager createInstance() throws Exception {
 
-        if (this.configurationManager == null) {
-            ConfigurationManager taskOperationService = (ConfigurationManager) PrivilegedCarbonContext.
-                    getThreadLocalCarbonContext().getOSGiService(ConfigurationManager.class, null);
+        if (this.brandingPreferenceManager == null) {
+            BrandingPreferenceManager taskOperationService = (BrandingPreferenceManager) PrivilegedCarbonContext.
+                    getThreadLocalCarbonContext().getOSGiService(BrandingPreferenceManager.class, null);
 
             if (taskOperationService != null) {
-                this.configurationManager = taskOperationService;
+                this.brandingPreferenceManager = taskOperationService;
             } else {
                 throw new Exception("Unable to retrieve ConfigurationManager service.");
             }
         }
-        return this.configurationManager;
+        return this.brandingPreferenceManager;
     }
 }

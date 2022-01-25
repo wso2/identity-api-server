@@ -20,50 +20,35 @@ package org.wso2.carbon.identity.api.server.branding.preference.management.v1.co
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants;
 import org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceServiceHolder;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.utils.BrandingPreferenceUtils;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationManagementClientException;
-import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationManagementException;
-import org.wso2.carbon.identity.configuration.mgt.core.exception.ConfigurationManagementServerException;
-import org.wso2.carbon.identity.configuration.mgt.core.model.Resource;
-import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceFile;
+import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtClientException;
+import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtException;
+import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtServerException;
+import org.wso2.carbon.identity.branding.preference.management.core.model.BrandingPreference;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_ERROR_PREFIX;
-import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_RESOURCE_TYPE;
-import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.CONFIG_MGT_ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_MGT_ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.DEFAULT_LOCALE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_BRANDING_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_BRANDING_PREFERENCE;
-import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_BUILDING_RESPONSE_EXCEPTION;
-import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_CHECKING_BRANDING_PREFERENCE_EXISTS;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_BRANDING_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_BRANDING_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_INVALID_BRANDING_PREFERENCE;
-import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_JSON_PROCESSING_EXCEPTION;
-import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_ENCODING_EXCEPTION;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ORGANIZATION_TYPE;
-import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.RESOURCE_ALREADY_EXISTS_ERROR_CODE;
-import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.RESOURCE_NAME_SEPARATOR;
-import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.RESOURCE_NOT_EXISTS_ERROR_CODE;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 
 /**
@@ -83,37 +68,27 @@ public class BrandingPreferenceManagementService {
     public BrandingPreferenceModel addBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
         String tenantDomain = getTenantDomainFromContext();
-        /**
-         * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
-         * So always use resource name as default resource name.
-         */
-        String resourceName = getDefaultResourceName();
-        // Check whether a branding resource already exists with the same name in the particular tenant to be added.
-        if (isResourceExists(BRANDING_RESOURCE_TYPE, resourceName)) {
-            throw handleException(Response.Status.CONFLICT, ERROR_CODE_CONFLICT_BRANDING_PREFERENCE, tenantDomain);
-        }
         String preferencesJSON = generatePreferencesJSONFromRequest(brandingPreferenceModel.getPreference());
         if (!BrandingPreferenceUtils.isValidJSONString(preferencesJSON)) {
             throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_BRANDING_PREFERENCE, null);
         }
 
+        BrandingPreference requestDTO, responseDTO;
         try {
-            InputStream inputStream = BrandingPreferenceUtils.generatePreferenceInputStream(preferencesJSON);
-            Resource brandingPreferenceResource =
-                    buildResourceFromBrandingPreference(brandingPreferenceModel, inputStream);
-            BrandingPreferenceServiceHolder.getBrandingPreferenceConfigManager()
-                    .addResource(BRANDING_RESOURCE_TYPE, brandingPreferenceResource);
-        } catch (ConfigurationManagementException e) {
-            throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_ADDING_BRANDING_PREFERENCE, tenantDomain);
-        } catch (JsonProcessingException e) {
-            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_JSON_PROCESSING_EXCEPTION,
-                    e.getMessage());
-        } catch (UnsupportedEncodingException e) {
-            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_UNSUPPORTED_ENCODING_EXCEPTION,
-                    e.getMessage());
+            requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
+            responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
+                    addBrandingPreference(requestDTO);
+        } catch (BrandingPreferenceMgtException e) {
+            if (BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Branding preferences are already exists for tenant: " + tenantDomain, e);
+                }
+                throw handleException(Response.Status.CONFLICT, ERROR_CODE_CONFLICT_BRANDING_PREFERENCE,
+                        tenantDomain);
+            }
+            throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_ADDING_BRANDING_PREFERENCE, tenantDomain);
         }
-        return buildBrandingPreferenceModel
-                (brandingPreferenceModel.getPreference(), ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
+        return buildBrandingResponseFromResponseDTO(responseDTO);
     }
 
     /**
@@ -126,21 +101,21 @@ public class BrandingPreferenceManagementService {
     public void deleteBrandingPreference(String type, String name, String locale) {
 
         String tenantDomain = getTenantDomainFromContext();
-        /**
-         * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
-         * So always use resource name as default resource name.
-         */
-        String resourceName = getDefaultResourceName();
-        // Check whether the branding resource exists in the particular tenant.
-        if (!isResourceExists(BRANDING_RESOURCE_TYPE, resourceName)) {
-            throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS, tenantDomain);
+        if (ORGANIZATION_TYPE.equals(type)) {
+            name = tenantDomain;
         }
 
         try {
-            BrandingPreferenceServiceHolder.getBrandingPreferenceConfigManager()
-                    .deleteResource(BRANDING_RESOURCE_TYPE, resourceName);
-        } catch (ConfigurationManagementException e) {
-            throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_DELETING_BRANDING_PREFERENCE, tenantDomain);
+            BrandingPreferenceServiceHolder.getBrandingPreferenceManager().deleteBrandingPreference(type, name, locale);
+        } catch (BrandingPreferenceMgtException e) {
+            if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find a branding preferences to delete for tenant: " + tenantDomain, e);
+                }
+                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS,
+                        tenantDomain);
+            }
+            throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_DELETING_BRANDING_PREFERENCE, tenantDomain);
         }
     }
 
@@ -154,44 +129,26 @@ public class BrandingPreferenceManagementService {
      */
     public BrandingPreferenceModel getBrandingPreference(String type, String name, String locale) {
 
-        String tenantDomain = getTenantDomainFromContext();
         /**
          * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
-         * So always use resource name as default resource name.
+         * So always retrieve customized default branding preference.
          */
-        String resourceName = getDefaultResourceName();
+        String tenantDomain = getTenantDomainFromContext();
         try {
-            // Return default branding preference.
-            List<ResourceFile> resourceFiles = BrandingPreferenceServiceHolder.getBrandingPreferenceConfigManager()
-                    .getFiles(BRANDING_RESOURCE_TYPE, resourceName);
-            if (resourceFiles.isEmpty()) {
-                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS,
-                        tenantDomain);
-            }
-            if (StringUtils.isBlank(resourceFiles.get(0).getId())) {
-                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS,
-                        tenantDomain);
-            }
+            // Get default branding preference.
+            BrandingPreference responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
+                    getBrandingPreference(ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
 
-            InputStream inputStream = BrandingPreferenceServiceHolder.getBrandingPreferenceConfigManager()
-                    .getFileById(BRANDING_RESOURCE_TYPE, resourceName, resourceFiles.get(0).getId());
-            if (inputStream == null) {
-                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS,
-                        tenantDomain);
-            }
-            return buildBrandingPreferenceFromResource(inputStream, type, name, locale);
-        } catch (ConfigurationManagementException e) {
-            if (RESOURCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+            return buildBrandingResponseFromResponseDTO(responseDTO);
+        } catch (BrandingPreferenceMgtException e) {
+            if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
                 if (log.isDebugEnabled()) {
                     log.debug("Can not find a branding preference configurations for tenant: " + tenantDomain, e);
                 }
                 throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS,
                         tenantDomain);
             }
-            throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE, tenantDomain);
-        } catch (IOException e) {
-            throw handleException
-                    (Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_ERROR_BUILDING_RESPONSE_EXCEPTION, null);
+            throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE, tenantDomain);
         }
     }
 
@@ -204,154 +161,68 @@ public class BrandingPreferenceManagementService {
     public BrandingPreferenceModel updateBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
         String tenantDomain = getTenantDomainFromContext();
-        /**
-         * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
-         * So always use resource name as default resource name.
-         */
-        String resourceName = getDefaultResourceName();
-        // Check whether the branding resource exists in the particular tenant.
-        if (!isResourceExists(BRANDING_RESOURCE_TYPE, resourceName)) {
-            throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS, tenantDomain);
-        }
 
         String preferencesJSON = generatePreferencesJSONFromRequest(brandingPreferenceModel.getPreference());
         if (!BrandingPreferenceUtils.isValidJSONString(preferencesJSON)) {
             throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_BRANDING_PREFERENCE, null);
         }
 
+        BrandingPreference requestDTO, responseDTO;
         try {
-            InputStream inputStream = BrandingPreferenceUtils.generatePreferenceInputStream(preferencesJSON);
-            Resource brandingPreferenceResource =
-                    buildResourceFromBrandingPreference(brandingPreferenceModel, inputStream);
-            BrandingPreferenceServiceHolder.getBrandingPreferenceConfigManager()
-                    .replaceResource(BRANDING_RESOURCE_TYPE, brandingPreferenceResource);
-        } catch (ConfigurationManagementException e) {
-            throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_UPDATING_BRANDING_PREFERENCE, tenantDomain);
-        } catch (JsonProcessingException e) {
-            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_JSON_PROCESSING_EXCEPTION,
-                    e.getMessage());
-        } catch (UnsupportedEncodingException e) {
-            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_UNSUPPORTED_ENCODING_EXCEPTION,
-                    e.getMessage());
-        }
-        return buildBrandingPreferenceModel
-                (brandingPreferenceModel.getPreference(), ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
-    }
-
-    /**
-     * Check whether a branding preference resource already exists with the same name in the particular tenant.
-     *
-     * @param resourceType Resource type.
-     * @param resourceName Resource name.
-     * @return Return true if the resource already exists. If not return false.
-     */
-    private boolean isResourceExists(String resourceType, String resourceName) {
-
-        Resource resource;
-        try {
-            resource = BrandingPreferenceServiceHolder.getBrandingPreferenceConfigManager()
-                    .getResource(resourceType, resourceName);
-        } catch (ConfigurationManagementException e) {
-            if (RESOURCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
-                return false;
+            requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
+            responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
+                    replaceBrandingPreference(requestDTO);
+        } catch (BrandingPreferenceMgtException e) {
+            if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find a branding preferences to update for tenant: " + tenantDomain, e);
+                }
+                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS,
+                        tenantDomain);
             }
-            throw handleConfigurationMgtException
-                    (e, ERROR_CODE_ERROR_CHECKING_BRANDING_PREFERENCE_EXISTS, getTenantDomainFromContext());
+            throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_UPDATING_BRANDING_PREFERENCE, tenantDomain);
         }
-        if (resource == null) {
-            return false;
+        return buildBrandingResponseFromResponseDTO(responseDTO);
+    }
+
+    /**
+     * Build branding preference requestDTO from request body.
+     *
+     * @param brandingModel Branding preference request body.
+     * @return Branding preference requestDTO object.
+     */
+    private BrandingPreference buildRequestDTOFromBrandingRequest(BrandingPreferenceModel brandingModel) {
+
+        BrandingPreference brandingRequestDTO = new BrandingPreference();
+        brandingRequestDTO.setType(brandingModel.getType().toString());
+        if (ORGANIZATION_TYPE.equals(brandingModel.getType().toString())) {
+            brandingRequestDTO.setName(getTenantDomainFromContext());
+        } else {
+            brandingRequestDTO.setName(brandingModel.getName());
         }
-        return true;
-    }
-
-    /**
-     * Generate and return resource name of the default branding of the particular tenant.
-     *
-     * @return resource name of the default branding resource.
-     */
-    private String getDefaultResourceName() {
-
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        String resourceName = tenantId + RESOURCE_NAME_SEPARATOR + DEFAULT_LOCALE;
-        return resourceName;
-    }
-
-    /**
-     * Build a resource object from Branding Preference Model.
-     *
-     * @param model       Branding Preference Model.
-     * @param inputStream Branding Preference file stream.
-     * @return Resource object.
-     */
-    private Resource buildResourceFromBrandingPreference(BrandingPreferenceModel model, InputStream inputStream) {
-
-        /**
-         * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
-         * So always use resource name as default resource name.
-         */
-        String resourceName = getDefaultResourceName();
-        Resource resource = new Resource();
-        resource.setResourceName(resourceName);
-        // Set file.
-        ResourceFile file = new ResourceFile();
-        file.setName(resourceName);
-        file.setInputStream(inputStream);
-        List<ResourceFile> resourceFiles = new ArrayList<>();
-        resourceFiles.add(file);
-        resource.setFiles(resourceFiles);
-        return resource;
-    }
-
-    /**
-     * Build a Branding Preference Model from branding preference file stream.
-     *
-     * @param inputStream Branding Preference file stream.
-     * @param type        Resource Type.
-     * @param name        Tenant/Application name.
-     * @param locale      Language preference
-     * @return Branding Preference Model.
-     */
-    private BrandingPreferenceModel buildBrandingPreferenceFromResource(InputStream inputStream, String type,
-                                                                        String name, String locale) throws IOException {
-
-        String preferencesJSON = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
-        if (!BrandingPreferenceUtils.isValidJSONString(preferencesJSON)) {
-            throw handleException
-                    (Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_ERROR_BUILDING_RESPONSE_EXCEPTION, null);
+        if (StringUtils.isBlank(brandingModel.getLocale())) {
+            brandingRequestDTO.setLocale(DEFAULT_LOCALE);
+        } else {
+            brandingRequestDTO.setLocale(brandingModel.getLocale());
         }
-
-        ObjectMapper mapper = new ObjectMapper();
-        Object preference = mapper.readValue(preferencesJSON, Object.class);
-        BrandingPreferenceModel brandingPreferenceModel = new BrandingPreferenceModel();
-        brandingPreferenceModel.setPreference(preference);
-        /**
-         * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
-         * So ATM always use default type(ORG), default name(tenantDomain) and default locale("en-US").
-         */
-        brandingPreferenceModel.setType(BrandingPreferenceModel.TypeEnum.valueOf(ORGANIZATION_TYPE));
-        brandingPreferenceModel.setName(getTenantDomainFromContext());
-        brandingPreferenceModel.setLocale(DEFAULT_LOCALE);
-        return brandingPreferenceModel;
+        brandingRequestDTO.setPreference(brandingModel.getPreference());
+        return brandingRequestDTO;
     }
 
     /**
-     * Build a Branding Preference Model.
+     * Build branding preference response object from the responseDTO.
      *
-     * @param preference Preference object.
-     * @param type       Resource Type.
-     * @param name       Tenant/Application name.
-     * @param locale     Language preference
-     * @return Branding Preference Model.
+     * @param responseDTO Branding preference responseDTO object.
+     * @return Branding preference response object{@link BrandingPreferenceModel}.
      */
-    private BrandingPreferenceModel buildBrandingPreferenceModel(Object preference, String type, String name,
-                                                                 String locale) {
+    private BrandingPreferenceModel buildBrandingResponseFromResponseDTO(BrandingPreference responseDTO) {
 
-        BrandingPreferenceModel brandingPreferenceModel = new BrandingPreferenceModel();
-        brandingPreferenceModel.setType(BrandingPreferenceModel.TypeEnum.valueOf(type));
-        brandingPreferenceModel.setName(name);
-        brandingPreferenceModel.setLocale(locale);
-        brandingPreferenceModel.setPreference(preference);
-        return brandingPreferenceModel;
+        BrandingPreferenceModel brandingPreferenceResponse = new BrandingPreferenceModel();
+        brandingPreferenceResponse.setType(BrandingPreferenceModel.TypeEnum.valueOf(responseDTO.getType()));
+        brandingPreferenceResponse.setName(responseDTO.getName());
+        brandingPreferenceResponse.setLocale(responseDTO.getLocale());
+        brandingPreferenceResponse.setPreference(responseDTO.getPreference());
+        return brandingPreferenceResponse;
     }
 
     /**
@@ -375,40 +246,40 @@ public class BrandingPreferenceManagementService {
     }
 
     /**
-     * Handle configuration management exceptions and return an API error.
+     * Handle branding preference management exceptions and return an API error.
      *
-     * @param exception Configuration management exception
+     * @param exception Branding preference management exception
      * @param errorEnum Branding preference management error enum.
      * @param data      Relevant data.
      * @return Processed API Error.
      */
-    private APIError handleConfigurationMgtException(ConfigurationManagementException exception,
-                                                     BrandingPreferenceManagementConstants.ErrorMessage errorEnum,
-                                                     String data) {
+    private APIError handleBrandingPreferenceMgtException(BrandingPreferenceMgtException exception,
+                                                          BrandingPreferenceManagementConstants.ErrorMessage errorEnum,
+                                                          String data) {
 
         ErrorResponse errorResponse;
         Response.Status status;
-        if (exception instanceof ConfigurationManagementClientException) {
+        if (exception instanceof BrandingPreferenceMgtClientException) {
             errorResponse = getErrorBuilder(errorEnum, data).build(log, exception.getMessage());
             if (exception.getErrorCode() != null) {
                 String errorCode = exception.getErrorCode();
-                errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
+                errorCode = errorCode.contains(BRANDING_PREFERENCE_MGT_ERROR_CODE_DELIMITER) ? errorCode :
                         BRANDING_PREFERENCE_ERROR_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(exception.getMessage());
-            if (RESOURCE_ALREADY_EXISTS_ERROR_CODE.equals(exception.getErrorCode())) {
+            if (BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE.equals(exception.getErrorCode())) {
                 status = Response.Status.CONFLICT;
-            } else if (RESOURCE_NOT_EXISTS_ERROR_CODE.equals(exception.getErrorCode())) {
+            } else if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(exception.getErrorCode())) {
                 status = Response.Status.NOT_FOUND;
             } else {
                 status = Response.Status.BAD_REQUEST;
             }
-        } else if (exception instanceof ConfigurationManagementServerException) {
+        } else if (exception instanceof BrandingPreferenceMgtServerException) {
             errorResponse = getErrorBuilder(errorEnum, data).build(log, exception, errorEnum.getDescription());
             if (exception.getErrorCode() != null) {
                 String errorCode = exception.getErrorCode();
-                errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
+                errorCode = errorCode.contains(BRANDING_PREFERENCE_MGT_ERROR_CODE_DELIMITER) ? errorCode :
                         BRANDING_PREFERENCE_ERROR_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
             }
