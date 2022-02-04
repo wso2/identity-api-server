@@ -20,6 +20,8 @@ package org.wso2.carbon.identity.api.server.idp.v1.core;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -1726,7 +1728,24 @@ public class ServerIdpManagementService {
             idpJWKSUri = identityProviderPOSTRequest.getCertificate().getJwksUri();
         } else if (identityProviderPOSTRequest.getCertificate() != null && identityProviderPOSTRequest.getCertificate()
                 .getCertificates() != null) {
-            idp.setCertificate(StringUtils.join(identityProviderPOSTRequest.getCertificate().getCertificates(), ""));
+            List<String> certificates = new ArrayList<>();
+            for (int certificateNo = 0; certificateNo < identityProviderPOSTRequest.getCertificate()
+                    .getCertificates().size(); certificateNo++) {
+                if (identityProviderPOSTRequest.getCertificate()
+                        .getCertificates().get(certificateNo).startsWith(IdentityUtil.PEM_BEGIN_CERTFICATE)) {
+                    certificates.add(identityProviderPOSTRequest.getCertificate()
+                            .getCertificates().get(certificateNo));
+                } else {
+                    try {
+                        certificates.add(base64Decode(identityProviderPOSTRequest.getCertificate()
+                                .getCertificates().get(certificateNo)));
+                    } catch (IllegalArgumentException e) {
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_INVALID_CERTIFICATE_FORMAT, null);
+                    }
+                }
+            }
+            idp.setCertificate(base64Encode(StringUtils.join(certificates, "")));
         }
         idp.setFederationHub(identityProviderPOSTRequest.getIsFederationHub());
 
@@ -1744,6 +1763,12 @@ public class ServerIdpManagementService {
             jwksProperty.setName(Constants.JWKS_URI);
             jwksProperty.setValue(idpJWKSUri);
             idpProperties.add(jwksProperty);
+        }
+        if (StringUtils.isNotEmpty(identityProviderPOSTRequest.getIdpIssuerName())) {
+            IdentityProviderProperty idpIssuerProperty = new IdentityProviderProperty();
+            idpIssuerProperty.setName(Constants.IDP_ISSUER_NAME);
+            idpIssuerProperty.setValue(identityProviderPOSTRequest.getIdpIssuerName());
+            idpProperties.add(idpIssuerProperty);
         }
         idp.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
         return idp;
@@ -1900,9 +1925,21 @@ public class ServerIdpManagementService {
         idpResponse.setName(identityProvider.getIdentityProviderName());
         idpResponse.setDescription(identityProvider.getIdentityProviderDescription());
         idpResponse.setAlias(identityProvider.getAlias());
+        idpResponse.setIdpIssuerName(getIDPIssuerName(identityProvider));
         idpResponse.setImage(identityProvider.getImageUrl());
         idpResponse.setIsFederationHub(identityProvider.isFederationHub());
         idpResponse.setHomeRealmIdentifier(identityProvider.getHomeRealmId());
+    }
+
+    private String getIDPIssuerName(IdentityProvider identityProvider) {
+
+        IdentityProviderProperty[] idpProperties = identityProvider.getIdpProperties();
+        for (IdentityProviderProperty property : idpProperties) {
+            if (Constants.IDP_ISSUER_NAME.equals(property.getName())) {
+                return property.getValue();
+            }
+        }
+        return null;
     }
 
     private Certificate createIDPCertificate(IdentityProvider identityProvider) {
@@ -2226,9 +2263,10 @@ public class ServerIdpManagementService {
     private IdentityProvider createIdPClone(IdentityProvider idP) {
 
         try {
-            return (IdentityProvider) BeanUtils.cloneBean(idP);
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException
-                e) {
+            Gson gson = new Gson();
+            IdentityProvider clonedIdentityProvider = gson.fromJson(gson.toJson(idP), IdentityProvider.class);
+            return clonedIdentityProvider;
+        } catch (JsonSyntaxException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
                     .ERROR_CODE_ERROR_UPDATING_IDP, idP.getResourceId());
         }
@@ -2585,19 +2623,28 @@ public class ServerIdpManagementService {
             String path = patch.getPath();
             Patch.OperationEnum operation = patch.getOperation();
             String value = patch.getValue();
-            // We support only 'ADD', 'REPLACE' and 'REMOVE' patch operations.
+            boolean isCertificateUpdateRequest =
+                    path.matches(Constants.CERTIFICATE_PATH_REGEX) && path.split(Constants.PATH_SEPERATOR).length == 4;
+            // 'ADD', 'REPLACE' and 'REMOVE' patch operations supported.
             if (operation == Patch.OperationEnum.REPLACE) {
-                if (path.matches(Constants.CERTIFICATE_PATH_REGEX) && path.split(Constants.PATH_SEPERATOR).length ==
-                        4) {
+                if (isCertificateUpdateRequest) {
                     List<String> certificates = new ArrayList<>();
                     int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
                     if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index >= 0)
                             && (index < idpToUpdate.getCertificateInfoArray().length)) {
                         for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
-                            certificates.add(certInfo.getCertValue());
+                            certificates.add(base64Decode(certInfo.getCertValue()));
+                        }
+                        if (!value.startsWith(IdentityUtil.PEM_BEGIN_CERTFICATE)) {
+                            try {
+                                value = base64Decode(value);
+                            } catch (IllegalArgumentException e) {
+                                throw handleException(Response.Status.BAD_REQUEST,
+                                        Constants.ErrorMessage.ERROR_CODE_INVALID_CERTIFICATE_FORMAT, null);
+                            }
                         }
                         certificates.set(index, value);
-                        idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
+                        idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
                     } else {
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                 .ERROR_CODE_INVALID_INPUT, null);
@@ -2628,53 +2675,124 @@ public class ServerIdpManagementService {
                         case Constants.ALIAS_PATH:
                             idpToUpdate.setAlias(value);
                             break;
+                        case Constants.IDP_ISSUER_NAME_PATH:
+                            patchIdpProperties(idpToUpdate, Constants.IDP_ISSUER_NAME, value);
+                            break;
                         case Constants.CERTIFICATE_JWKSURI_PATH:
-                            List<IdentityProviderProperty> idpProperties = new ArrayList<>();
-                            IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
-                            jwksProperty.setName(Constants.JWKS_URI);
-                            jwksProperty.setValue(value);
-                            idpProperties.add(jwksProperty);
-                            idpToUpdate.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
+                            patchIdpProperties(idpToUpdate, Constants.JWKS_URI, value);
                             break;
                         default:
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                     .ERROR_CODE_INVALID_INPUT, null);
                     }
                 }
-            } else if (operation == Patch.OperationEnum.ADD && path.matches(Constants.CERTIFICATE_PATH_REGEX) && path
-                    .split(Constants.PATH_SEPERATOR).length == 4) {
-                List<String> certificates = new ArrayList<>();
-                int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
-                if (index < 0) {
-                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                            .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
-                }
-                if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
-                    if (index > idpToUpdate.getCertificateInfoArray().length) {
-                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                                .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+            } else if (operation == Patch.OperationEnum.ADD) {
+                if (isCertificateUpdateRequest) {
+
+                    List<String> certificates = new ArrayList<>();
+                    int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
+                    if (index < 0) {
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
                     }
-                    for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
-                        certificates.add(certInfo.getCertValue());
+                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
+                        if (index > idpToUpdate.getCertificateInfoArray().length) {
+                            throw handleException(Response.Status.BAD_REQUEST,
+                                    Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                                    "Invalid index in 'path' attribute");
+                        }
+                        for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
+                            certificates.add(base64Decode(certInfo.getCertValue()));
+                        }
                     }
-                }
-                certificates.add(index, value);
-                idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
-            } else if (operation == Patch.OperationEnum.REMOVE && path.matches(Constants.CERTIFICATE_PATH_REGEX) &&
-                    path.split(Constants.PATH_SEPERATOR).length == 4) {
-                List<String> certificates = new ArrayList<>();
-                int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
-                if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index >= 0) && index <
-                        idpToUpdate.getCertificateInfoArray().length) {
-                    for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
-                        certificates.add(certInfo.getCertValue());
+                    if (!value.startsWith(IdentityUtil.PEM_BEGIN_CERTFICATE)) {
+                        try {
+                            value = base64Decode(value);
+                        } catch (IllegalArgumentException e) {
+                            throw handleException(Response.Status.BAD_REQUEST,
+                                    Constants.ErrorMessage.ERROR_CODE_INVALID_CERTIFICATE_FORMAT, null);
+                        }
                     }
-                    certificates.remove(index);
+                    certificates.add(index, value);
+                    idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
+
+                    // Need to remove the JWKS URI property, if it exists, when adding certificates as they are
+                    // alternate options of the property Certificate Type.
+                    IdentityProviderProperty[] propertyDTOS = idpToUpdate.getIdpProperties();
+                    List<IdentityProviderProperty> idpNewProperties = new ArrayList<>();
+                    for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+                        // Add properties to new list omitting the JWKS URI property.
+                        if (!Constants.JWKS_URI.equals(propertyDTO.getName())) {
+                            idpNewProperties.add(propertyDTO);
+                        }
+                    }
+                    idpToUpdate.setIdpProperties(idpNewProperties.toArray(new IdentityProviderProperty[0]));
+                } else if (StringUtils.equalsIgnoreCase(Constants.CERTIFICATE_JWKSURI_PATH, path)) {
+
+                    IdentityProviderProperty[] propertyDTOS = idpToUpdate.getIdpProperties();
+                    for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+                        if (Constants.JWKS_URI.equals(propertyDTO.getName())) {
+                            throw handleException(Response.Status.BAD_REQUEST,
+                                    Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
+                                    "Cannot add JWKS URI as it already exists");
+                        }
+                    }
+
+                    List<IdentityProviderProperty> idpProperties = new ArrayList<>(Arrays.asList(propertyDTOS));
+                    IdentityProviderProperty jwksProperty = new IdentityProviderProperty();
+                    jwksProperty.setName(Constants.JWKS_URI);
+                    jwksProperty.setValue(value);
+                    idpProperties.add(jwksProperty);
+                    idpToUpdate.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
+                    // Need to remove certificates, if any, when adding JWKS URI as they are alternate options of the
+                    // property Certificate Type.
+                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
+                        idpToUpdate.setCertificate(null);
+                    }
                 } else {
-                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                            .ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+                    throw handleException(Response.Status.BAD_REQUEST,
+                            Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, null);
                 }
-                idpToUpdate.setCertificate(StringUtils.join(certificates, ""));
+            } else if (operation == Patch.OperationEnum.REMOVE) {
+                if (isCertificateUpdateRequest) {
+
+                    List<String> certificates = new ArrayList<>();
+                    int index = Integer.parseInt(path.split(Constants.PATH_SEPERATOR)[3]);
+                    if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray()) && (index >= 0) &&
+                            index < idpToUpdate.getCertificateInfoArray().length) {
+                        for (CertificateInfo certInfo : idpToUpdate.getCertificateInfoArray()) {
+                            certificates.add(base64Decode(certInfo.getCertValue()));
+                        }
+                        certificates.remove(index);
+                    } else {
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, "Invalid index in 'path' attribute");
+                    }
+                    idpToUpdate.setCertificate(base64Encode(StringUtils.join(certificates, "")));
+                } else if (StringUtils.equalsIgnoreCase(Constants.CERTIFICATE_JWKSURI_PATH, path)) {
+
+                    IdentityProviderProperty[] propertyDTOS = idpToUpdate.getIdpProperties();
+                    List<IdentityProviderProperty> idpNewProperties = new ArrayList<>();
+                    for (IdentityProviderProperty propertyDTO: propertyDTOS) {
+                        // Add properties to new list omitting the JWKS URI property.
+                        if (!Constants.JWKS_URI.equals(propertyDTO.getName())) {
+                            idpNewProperties.add(propertyDTO);
+                        }
+                    }
+
+                    // If the sizes of original and new property lists are equal, then the JWKS URI property has not
+                    // been available.
+                    if (propertyDTOS.length == idpNewProperties.size()) {
+                        throw handleException(Response.Status.BAD_REQUEST,
+                                Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
+                                "Cannot remove JWKS URI as it does not exist");
+                    }
+
+                    idpToUpdate.setIdpProperties(idpNewProperties.toArray(new IdentityProviderProperty[0]));
+                } else {
+                    throw handleException(Response.Status.BAD_REQUEST,
+                            Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, null);
+                }
             } else {
                 // Throw an error if any other patch operations are sent in the request.
                 throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -2694,6 +2812,30 @@ public class ServerIdpManagementService {
         return new String(Base64.getDecoder().decode(encodedContent), (StandardCharsets.UTF_8));
     }
 
+    /**
+     * Base64-encode content.
+     *
+     * @param content Message content to be encoded.
+     * @return Encoded value.
+     */
+    private String base64Encode(String content) {
+
+        return new String(Base64.getEncoder().encode(content.getBytes(StandardCharsets.UTF_8)),
+                (StandardCharsets.UTF_8));
+    }
+
+
+    private void patchIdpProperties(IdentityProvider identityProvider, String propertyName, String propertyValue) {
+
+        IdentityProviderProperty[] propertyDTOS = identityProvider.getIdpProperties();
+        if (ArrayUtils.isNotEmpty(propertyDTOS)) {
+            for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+                if (propertyName.equals(propertyDTO.getName())) {
+                    propertyDTO.setValue(propertyValue);
+                }
+            }
+        }
+    }
     /**
      * Handle IdentityProviderManagementException, extract error code, error description and status code to be sent
      * in the response.
