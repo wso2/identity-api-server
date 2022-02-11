@@ -39,7 +39,7 @@ public class UserStoreResponse  {
     private String typeId;
     private String description;
     private List<AddUserStorePropertiesRes> properties = null;
-
+    private List<ClaimAttributeMapping> claimAttributeMappings = null;
 
     /**
     * base64 url encoded value of domain name
@@ -160,7 +160,15 @@ public class UserStoreResponse  {
         return this;
     }
 
-    
+    @ApiModelProperty(value = "Claim attribute mappings.")
+    @JsonProperty("claimAttributeMappings")
+    @Valid
+    public List<ClaimAttributeMapping> getClaimAttributeMappings() {
+        return claimAttributeMappings;
+    }
+    public void setClaimAttributeMappings(List<ClaimAttributeMapping> claimAttributeMappings) {
+        this.claimAttributeMappings = claimAttributeMappings;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -197,6 +205,7 @@ public class UserStoreResponse  {
         sb.append("    typeId: ").append(toIndentedString(typeId)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+        sb.append("    claimAttributeMappings: ").append(toIndentedString(claimAttributeMappings)).append("\n");
         sb.append("}");
         return sb.toString();
     }
