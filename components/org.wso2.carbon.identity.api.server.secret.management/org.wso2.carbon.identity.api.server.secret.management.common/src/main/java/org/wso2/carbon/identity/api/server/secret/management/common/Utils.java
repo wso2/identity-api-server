@@ -38,7 +38,7 @@ public class Utils {
 
         if (isCorrelationIDPresent()) {
 
-            return ThreadContext.get(CORRELATION_ID_MDC).toString();
+            return ThreadContext.get(CORRELATION_ID_MDC);
         }
         return UUID.randomUUID().toString();
     }
