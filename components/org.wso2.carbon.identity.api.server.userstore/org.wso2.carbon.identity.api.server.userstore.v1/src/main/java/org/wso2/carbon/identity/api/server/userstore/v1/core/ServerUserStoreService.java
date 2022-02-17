@@ -154,7 +154,6 @@ public class ServerUserStoreService {
     public void deleteUserStore(String userstoreDomainId) {
 
         try {
-            validateUserstore(userstoreDomainId);
             UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
                     getUserStoreConfigService();
             userStoreConfigService.deleteUserStore(base64URLDecodeId(userstoreDomainId));
@@ -166,9 +165,6 @@ public class ServerUserStoreService {
             UserStoreConstants.ErrorMessage errorEnum =
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_USER_STORE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
-        } catch (UserStoreException e) {
-            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, UserStoreConstants.ErrorMessage.
-                    ERROR_CODE_ERROR_DELETING_USER_STORE);
         }
     }
 
