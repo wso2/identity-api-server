@@ -35,6 +35,7 @@ public class BrandingPreferenceManagementConstants {
 
     public static final String BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE = "BRANDINGM_00002";
     public static final String BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE = "BRANDINGM_00003";
+    public static final String BRANDING_PREFERENCE_NOT_ALLOWED_ERROR_CODE = "BRANDINGM_00011";
 
     /**
      * Enums for error messages.
@@ -50,6 +51,9 @@ public class BrandingPreferenceManagementConstants {
                 "Branding preferences are not configured for organization: %s."),
         ERROR_CODE_CONFLICT_BRANDING_PREFERENCE("60003", "Branding preference already exists.",
                 "There exists a branding preference configurations in the organization: %s."),
+        ERROR_CODE_NOT_ALLOWED_BRANDING_PREFERENCE_CONFIGURATIONS("60004",
+                "Not allowed branding preference configurations.",
+                "Requested branding preference configuration: %s is not allowed for the organization."),
 
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE("65001",

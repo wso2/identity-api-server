@@ -39,6 +39,7 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_ERROR_PREFIX;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_MGT_ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_NOT_ALLOWED_ERROR_CODE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.DEFAULT_LOCALE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS;
@@ -48,6 +49,7 @@ import static org.wso2.carbon.identity.api.server.branding.preference.management
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_BRANDING_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_INVALID_BRANDING_PREFERENCE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_NOT_ALLOWED_BRANDING_PREFERENCE_CONFIGURATIONS;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ORGANIZATION_TYPE;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 
@@ -85,6 +87,14 @@ public class BrandingPreferenceManagementService {
                 }
                 throw handleException(Response.Status.CONFLICT, ERROR_CODE_CONFLICT_BRANDING_PREFERENCE,
                         tenantDomain);
+            }
+            if (BRANDING_PREFERENCE_NOT_ALLOWED_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Requested branding preference customizations are not allowed to add for tenant: "
+                            + tenantDomain, e);
+                }
+                throw handleExceptionWithMessage(Response.Status.FORBIDDEN,
+                        ERROR_CODE_NOT_ALLOWED_BRANDING_PREFERENCE_CONFIGURATIONS, e.getMessage());
             }
             throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_ADDING_BRANDING_PREFERENCE, tenantDomain);
         }
@@ -179,6 +189,14 @@ public class BrandingPreferenceManagementService {
                 }
                 throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS,
                         tenantDomain);
+            }
+            if (BRANDING_PREFERENCE_NOT_ALLOWED_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Requested branding preference customizations are not allowed to update for tenant: "
+                            + tenantDomain, e);
+                }
+                throw handleExceptionWithMessage(Response.Status.FORBIDDEN,
+                        ERROR_CODE_NOT_ALLOWED_BRANDING_PREFERENCE_CONFIGURATIONS, e.getMessage());
             }
             throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_UPDATING_BRANDING_PREFERENCE, tenantDomain);
         }
@@ -332,5 +350,22 @@ public class BrandingPreferenceManagementService {
         } else {
             return error.getDescription();
         }
+    }
+
+    /**
+     * Handle exceptions generated in API with a custom description.
+     *
+     * @param status      HTTP Status.
+     * @param error       Error Message information.
+     * @param description Error Message description.
+     * @return APIError.
+     */
+    private APIError handleExceptionWithMessage(Response.Status status,
+                                                BrandingPreferenceManagementConstants.ErrorMessage error,
+                                                String description) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder().withCode(error.getCode())
+                .withMessage(error.getMessage()).withDescription(description).build();
+        return new APIError(status, errorResponse);
     }
 }
