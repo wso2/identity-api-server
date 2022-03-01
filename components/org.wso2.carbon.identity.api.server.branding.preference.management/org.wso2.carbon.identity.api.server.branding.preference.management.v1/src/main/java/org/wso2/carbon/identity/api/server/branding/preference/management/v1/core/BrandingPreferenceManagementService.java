@@ -75,9 +75,9 @@ public class BrandingPreferenceManagementService {
             throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_BRANDING_PREFERENCE, null);
         }
 
-        BrandingPreference requestDTO, responseDTO;
+        BrandingPreference responseDTO;
         try {
-            requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
+            BrandingPreference requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
             responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
                     addBrandingPreference(requestDTO);
         } catch (BrandingPreferenceMgtException e) {
@@ -177,9 +177,9 @@ public class BrandingPreferenceManagementService {
             throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_BRANDING_PREFERENCE, null);
         }
 
-        BrandingPreference requestDTO, responseDTO;
+        BrandingPreference responseDTO;
         try {
-            requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
+            BrandingPreference requestDTO = buildRequestDTOFromBrandingRequest(brandingPreferenceModel);
             responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
                     replaceBrandingPreference(requestDTO);
         } catch (BrandingPreferenceMgtException e) {
