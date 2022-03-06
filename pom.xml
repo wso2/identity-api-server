@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.4-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -499,9 +499,9 @@
         <!--Maven Plugin Version-->
         <maven.compiler.plugin.version>2.3.1</maven.compiler.plugin.version>
         <maven.bundle.plugin.version>2.4.0</maven.bundle.plugin.version>
-        <jackson-jaxrs-json-provider.version>2.10.5</jackson-jaxrs-json-provider.version>
-        <jackson-databind.version>2.10.5</jackson-databind.version>
-        <cxf-bundle.version>3.3.7</cxf-bundle.version>
+        <jackson-jaxrs-json-provider.version>2.13.0</jackson-jaxrs-json-provider.version>
+        <jackson-databind.version>2.13.0</jackson-databind.version>
+        <cxf-bundle.version>3.4.5</cxf-bundle.version>
         <cxf.extensions.search.version>3.3.1</cxf.extensions.search.version>
         <jackson.version>1.9.13</jackson.version>
         <spring-web.version>5.1.1.RELEASE</spring-web.version>
