@@ -162,8 +162,8 @@
             <artifactId>org.wso2.carbon.identity.api.server.branding.preference.management.common</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity.framework</groupId>
-            <artifactId>org.wso2.carbon.identity.configuration.mgt.core</artifactId>
+            <groupId>org.wso2.carbon.identity.branding.preference.management</groupId>
+            <artifactId>org.wso2.carbon.identity.branding.preference.management.core</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>
