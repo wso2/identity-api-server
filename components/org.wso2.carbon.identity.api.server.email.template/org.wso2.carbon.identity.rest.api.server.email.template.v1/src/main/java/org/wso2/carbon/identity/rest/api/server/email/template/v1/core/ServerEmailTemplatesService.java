@@ -583,7 +583,7 @@ public class ServerEmailTemplatesService {
      */
     private APIError handleI18nEmailMgtException(I18nEmailMgtException exception, Constants.ErrorMessage errorEnum) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(log, exception, errorEnum.getDescription());
+        ErrorResponse errorResponse;
         Response.Status status;
 
         if (exception instanceof I18nEmailMgtInternalException &&
@@ -595,11 +595,13 @@ public class ServerEmailTemplatesService {
 
         } else if (exception instanceof I18nEmailMgtClientException) {
             // Send client error with original exception message.
+            errorResponse = getErrorBuilder(errorEnum).build(log, exception.getMessage());
             errorResponse.setDescription(exception.getMessage());
             status = Response.Status.BAD_REQUEST;
 
         } else {
             // Server error
+            errorResponse = getErrorBuilder(errorEnum).build(log, exception, errorEnum.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);

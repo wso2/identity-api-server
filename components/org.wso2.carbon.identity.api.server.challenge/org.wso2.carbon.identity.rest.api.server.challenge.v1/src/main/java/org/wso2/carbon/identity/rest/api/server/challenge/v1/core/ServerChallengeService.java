@@ -331,11 +331,12 @@ public class ServerChallengeService {
     private APIError handleIdentityRecoveryException(IdentityRecoveryException e,
                                                      ChallengeConstant.ErrorMessage errorEnum) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(log, e, errorEnum.getDescription());
+        ErrorResponse errorResponse;
 
         Response.Status status;
 
         if (e instanceof IdentityRecoveryClientException) {
+            errorResponse = getErrorBuilder(errorEnum).build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode = errorCode.contains(Constants.ERROR_CODE_DELIMITER) ? errorCode :
@@ -345,6 +346,7 @@ public class ServerChallengeService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
         } else {
+            errorResponse = getErrorBuilder(errorEnum).build(log, e, errorEnum.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);

@@ -18,34 +18,14 @@
 
 package org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Util class for branding preference management.
  */
 public class BrandingPreferenceUtils {
-
-    /**
-     * Generate Branding Preference input stream.
-     *
-     * @param preferencesJSON JSON string of preferences.
-     * @return Input stream of the preferences JSON string.
-     * @throws JsonProcessingException      JSON Processing Exception.
-     * @throws UnsupportedEncodingException Unsupported Encoding Exception.
-     */
-    public static InputStream generatePreferenceInputStream(String preferencesJSON)
-            throws JsonProcessingException, UnsupportedEncodingException {
-
-        return new ByteArrayInputStream(preferencesJSON.getBytes(StandardCharsets.UTF_8.name()));
-    }
 
     /**
      * Check whether the given string is a valid JSON or not.

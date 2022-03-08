@@ -268,9 +268,10 @@ public class SecretManagementService {
     private APIError handleSecretMgtException(SecretManagementException e, SecretManagementConstants.ErrorMessage
             errorEnum, String data) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
+        ErrorResponse errorResponse;
         Response.Status status;
         if (e instanceof SecretManagementClientException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorResponse.setCode(errorCode);
@@ -285,6 +286,7 @@ public class SecretManagementService {
             }
 
         } else if (e instanceof SecretManagementServerException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorResponse.setCode(errorCode);
@@ -292,6 +294,7 @@ public class SecretManagementService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);

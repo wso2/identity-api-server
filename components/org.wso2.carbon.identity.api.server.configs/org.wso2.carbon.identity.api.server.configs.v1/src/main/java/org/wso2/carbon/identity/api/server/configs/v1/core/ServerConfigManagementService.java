@@ -748,11 +748,12 @@ public class ServerConfigManagementService {
     private APIError handleApplicationMgtException(IdentityApplicationManagementException e,
                                                    Constants.ErrorMessage errorEnum, String data) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+        ErrorResponse errorResponse;
 
         Response.Status status;
 
         if (e instanceof IdentityApplicationManagementClientException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -763,6 +764,7 @@ public class ServerConfigManagementService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof IdentityApplicationManagementServerException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -773,6 +775,7 @@ public class ServerConfigManagementService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);
@@ -789,11 +792,12 @@ public class ServerConfigManagementService {
     private APIError handleIdPException(IdentityProviderManagementException e,
                                         Constants.ErrorMessage errorEnum, String data) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+        ErrorResponse errorResponse;
 
         Response.Status status;
 
         if (e instanceof IdentityProviderManagementClientException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -804,6 +808,7 @@ public class ServerConfigManagementService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof IdentityProviderManagementServerException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -814,6 +819,7 @@ public class ServerConfigManagementService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);
@@ -822,11 +828,12 @@ public class ServerConfigManagementService {
     private APIError handleCORSException(CORSManagementServiceException e,
                                          Constants.ErrorMessage errorEnum, String data) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+        ErrorResponse errorResponse;
 
         Response.Status status;
 
         if (e instanceof CORSManagementServiceClientException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -837,6 +844,7 @@ public class ServerConfigManagementService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof CORSManagementServiceServerException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -847,6 +855,7 @@ public class ServerConfigManagementService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);

@@ -626,8 +626,6 @@ components:
     EmailSenderAdd:
       required:
         - fromAddress
-        - password
-        - userName
       type: object
       properties:
         name:
@@ -689,8 +687,6 @@ components:
       required:
         - fromAddress
         - name
-        - password
-        - userName
       type: object
       properties:
         name:
@@ -755,8 +751,6 @@ components:
     EmailSenderUpdateRequest:
       required:
         - fromAddress
-        - password
-        - userName
       type: object
       properties:
         smtpServerHost:
