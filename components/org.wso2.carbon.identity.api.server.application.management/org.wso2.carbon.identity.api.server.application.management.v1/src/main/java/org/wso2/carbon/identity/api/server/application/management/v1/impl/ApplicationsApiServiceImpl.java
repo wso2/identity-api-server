@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationOwner;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
@@ -74,6 +75,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response getApplicationTemplate(String templateId) {
 
         return Response.ok().entity(applicationManagementService.getApplicationTemplateById(templateId)).build();
+    }
+
+    @Override
+    public Response changeApplicationOwner(String applicationId, ApplicationOwner applicationOwner) {
+
+        applicationManagementService.changeApplicationOwner(applicationId, applicationOwner);
+        return Response.ok().build();
     }
 
     @Override

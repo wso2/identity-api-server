@@ -50,6 +50,8 @@ import javax.ws.rs.core.Response;
 
 public interface ApplicationsApiService {
 
+      public Response changeApplicationOwner(String applicationId, ApplicationOwner applicationOwner);
+
       public Response createApplication(ApplicationModel applicationModel, String template);
 
       public Response createApplicationTemplate(ApplicationTemplateModel applicationTemplateModel);

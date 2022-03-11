@@ -34,6 +34,7 @@ import org.wso2.carbon.identity.api.server.application.management.common.Applica
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationOwner;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
@@ -78,6 +79,7 @@ import org.wso2.carbon.identity.application.common.model.InboundAuthenticationCo
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
+import org.wso2.carbon.identity.application.common.model.User;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.base.IdentityException;
@@ -99,6 +101,8 @@ import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
 import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementClientException;
 import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementException;
 import org.wso2.carbon.identity.template.mgt.model.Template;
+import org.wso2.carbon.user.core.UniqueIDUserStoreManager;
+import org.wso2.carbon.user.core.service.RealmService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -856,6 +860,29 @@ public class ServerApplicationManagementService {
         }
     }
 
+    /**
+     * Update the application owner.
+     *
+     * @param applicationId Application ID.
+     * @param applicationOwner UUID of the new application owner.
+     */
+    public void changeApplicationOwner(String applicationId, ApplicationOwner applicationOwner) {
+
+        ServiceProvider appToUpdate = cloneApplication(applicationId);
+        org.wso2.carbon.user.core.common.User user = getUserFromUserID(applicationOwner.getId());
+        if (user == null) {
+            throw buildClientError(ErrorMessage.NON_EXISTING_USER_ID, applicationOwner.getId());
+        }
+        // Build application owner.
+        User appOwner = new User();
+        appOwner.setUserName(user.getUsername());
+        appOwner.setUserStoreDomain(user.getUserStoreDomain());
+        appOwner.setTenantDomain(user.getTenantDomain());
+        // Update the app owner of service provider.
+        appToUpdate.setOwner(appOwner);
+        updateServiceProvider(applicationId, appToUpdate);
+    }
+
     private <T> T getInbound(String applicationId,
                              String inboundType,
                              Function<InboundAuthenticationRequestConfig, T> getInboundApiModelFunction) {
@@ -1248,5 +1275,39 @@ public class ServerApplicationManagementService {
                 }
             }
         }
+    }
+
+    /**
+     * Resolve user from user id.
+     *
+     * @param userId UUID of a user.
+     * @return User object.
+     */
+    private org.wso2.carbon.user.core.common.User getUserFromUserID(String userId) {
+
+        RealmService realmService = ApplicationManagementServiceHolder.getRealmService();
+        if (realmService == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("RealmService is not set properly.");
+            }
+            throw Utils.buildServerError(ErrorMessage.ERROR_RETRIEVING_USER_NAME_BY_ID.getCode(),
+                    ErrorMessage.ERROR_RETRIEVING_USER_NAME_BY_ID.getMessage(),
+                    buildFormattedDescription(ErrorMessage.ERROR_RETRIEVING_USER_NAME_BY_ID.getDescription(),
+                            userId));
+        }
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        try {
+            UniqueIDUserStoreManager userStoreManager =
+                    (UniqueIDUserStoreManager) realmService.getTenantUserRealm(tenantId).getUserStoreManager();
+            return userStoreManager.getUserWithID(userId, null, null);
+        } catch (org.wso2.carbon.user.api.UserStoreException e) {
+            if (e.getMessage().startsWith(ApplicationManagementConstants.NON_EXISTING_USER_CODE)) {
+                throw buildClientError(ErrorMessage.NON_EXISTING_USER_ID, userId);
+            }
+            Utils.buildServerError(ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getCode(),
+                    ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getMessage(),
+                    ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getDescription());
+        }
+        return null;
     }
 }
