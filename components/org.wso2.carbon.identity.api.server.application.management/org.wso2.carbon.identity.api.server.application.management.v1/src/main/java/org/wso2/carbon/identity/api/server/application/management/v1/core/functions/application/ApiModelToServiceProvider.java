@@ -27,6 +27,8 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
 import java.util.function.Function;
 
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
+
 /**
  * Converts the API model object into a ServiceProvider object.
  */
@@ -42,6 +44,8 @@ public class ApiModelToServiceProvider implements Function<ApplicationModel, Ser
         application.setImageUrl(applicationModel.getImageUrl());
         application.setAccessUrl(applicationModel.getAccessUrl());
         application.setTemplateId(applicationModel.getTemplateId());
+        setIfNotNull(applicationModel.isManagementApp(), application::setManagementApp);
+
 
         addAdvancedConfigurationToApplication(application, applicationModel.getAdvancedConfigurations());
         addClaimConfigurationToApplication(application, applicationModel.getClaimConfiguration());

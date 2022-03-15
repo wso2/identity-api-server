@@ -43,6 +43,7 @@ public class ApplicationResponseModel  {
     private String imageUrl;
     private String accessUrl;
     private String templateId;
+    private Boolean isManagementApp;
     private ClaimConfiguration claimConfiguration;
     private List<InboundProtocolListItem> inboundProtocols = null;
 
@@ -194,6 +195,22 @@ public enum AccessEnum {
         this.templateId = templateId;
     }
 
+    public ApplicationResponseModel isManagementApp(Boolean isManagementApp) {
+
+        this.isManagementApp = isManagementApp;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "Decides whether the application used to access System APIs")
+    @JsonProperty("isManagementApp")
+    @Valid
+    public Boolean isManagementApp() {
+        return this.isManagementApp;
+    }
+    public void setIsManagementApp(Boolean isManagementApp) {
+        this.isManagementApp = isManagementApp;
+    }
+
     /**
     **/
     public ApplicationResponseModel claimConfiguration(ClaimConfiguration claimConfiguration) {
@@ -328,6 +345,7 @@ public enum AccessEnum {
             Objects.equals(this.imageUrl, applicationResponseModel.imageUrl) &&
             Objects.equals(this.accessUrl, applicationResponseModel.accessUrl) &&
             Objects.equals(this.templateId, applicationResponseModel.templateId) &&
+            Objects.equals(this.isManagementApp, applicationResponseModel.isManagementApp) &&
             Objects.equals(this.claimConfiguration, applicationResponseModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocols, applicationResponseModel.inboundProtocols) &&
             Objects.equals(this.authenticationSequence, applicationResponseModel.authenticationSequence) &&
@@ -338,7 +356,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, isManagementApp, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
     }
 
     @Override
@@ -353,6 +371,7 @@ public enum AccessEnum {
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
+        sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocols: ").append(toIndentedString(inboundProtocols)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
