@@ -47,6 +47,9 @@ import org.wso2.carbon.identity.configuration.mgt.core.model.Resource;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceFile;
 import org.wso2.carbon.identity.configuration.mgt.core.model.Resources;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+import org.wso2.carbon.identity.tenant.resource.manager.exception.TenantResourceManagementClientException;
+import org.wso2.carbon.identity.tenant.resource.manager.exception.TenantResourceManagementException;
+import org.wso2.carbon.identity.tenant.resource.manager.exception.TenantResourceManagementServerException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.InputStream;
@@ -74,6 +77,7 @@ import static org.wso2.carbon.identity.api.server.notification.sender.common.Not
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_NO_RESOURCE_EXISTS;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_PARSER_CONFIG_EXCEPTION;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_PUBLISHER_NOT_EXISTS_IN_SUPER_TENANT;
+import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_RESOURCE_RE_DEPLOY_ERROR;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_SERVER_ERRORS_GETTING_EVENT_PUBLISHER;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_SMS_PAYLOAD_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_SMS_PROVIDER_REQUIRED;
@@ -132,6 +136,9 @@ public class NotificationSenderManagementService {
              */
             NotificationSenderServiceHolder.getNotificationSenderConfigManager()
                     .addResource(PUBLISHER_RESOURCE_TYPE, emailSenderResource);
+
+            reDeployEmailSenderResource(emailSenderResource.getFiles().get(0));
+
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_ADDING_NOTIFICATION_SENDER,
                     emailSenderAdd.getName());
@@ -190,10 +197,17 @@ public class NotificationSenderManagementService {
     public void deleteNotificationSender(String notificationSenderName) {
 
         try {
+            NotificationSenderServiceHolder.getResourceManager()
+                    .removeEventPublisherConfiguration(PUBLISHER_RESOURCE_TYPE, notificationSenderName);
+
             NotificationSenderServiceHolder.getNotificationSenderConfigManager()
                     .deleteResource(PUBLISHER_RESOURCE_TYPE, notificationSenderName);
+
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_DELETING_NOTIFICATION_SENDER,
+                    notificationSenderName);
+        } catch (TenantResourceManagementException e) {
+            throw handleTenantResourceManagementException(e, ERROR_CODE_ERROR_DELETING_NOTIFICATION_SENDER,
                     notificationSenderName);
         }
     }
@@ -297,6 +311,9 @@ public class NotificationSenderManagementService {
             emailSenderResource = buildResourceFromEmailSenderAdd(emailSenderAdd, inputStream);
             NotificationSenderServiceHolder.getNotificationSenderConfigManager()
                     .replaceResource(PUBLISHER_RESOURCE_TYPE, emailSenderResource);
+
+            reDeployEmailSenderResource(emailSenderResource.getFiles().get(0));
+
         } catch (ConfigurationManagementException e) {
             throw handleConfigurationMgtException(e, ERROR_CODE_ERROR_UPDATING_NOTIFICATION_SENDER, senderName);
         } catch (ParserConfigurationException e) {
@@ -307,6 +324,15 @@ public class NotificationSenderManagementService {
                     e.getMessage());
         }
         return buildEmailSenderFromResource(emailSenderResource);
+    }
+
+    private void reDeployEmailSenderResource(ResourceFile resourceFile) {
+
+        try {
+            NotificationSenderServiceHolder.getResourceManager().addEventPublisherConfiguration(resourceFile);
+        } catch (TenantResourceManagementException e) {
+            log.warn(ERROR_CODE_RESOURCE_RE_DEPLOY_ERROR.getMessage() + e.getMessage());
+        }
     }
 
     /**
@@ -665,8 +691,12 @@ public class NotificationSenderManagementService {
         resource.setResourceName(emailSenderAdd.getName());
         Map<String, String> emailSenderAttributes = new HashMap<>();
         emailSenderAttributes.put(FROM_ADDRESS, emailSenderAdd.getFromAddress());
-        emailSenderAttributes.put(USERNAME, emailSenderAdd.getUserName());
-        emailSenderAttributes.put(PASSWORD, emailSenderAdd.getPassword());
+        if (StringUtils.isNotEmpty(emailSenderAdd.getUserName())) {
+            emailSenderAttributes.put(USERNAME, emailSenderAdd.getUserName());
+        }
+        if (StringUtils.isNotEmpty(emailSenderAdd.getPassword())) {
+            emailSenderAttributes.put(PASSWORD, emailSenderAdd.getPassword());
+        }
         emailSenderAttributes.put(SMTP_SERVER_HOST, emailSenderAdd.getSmtpServerHost());
         emailSenderAttributes.put(SMTP_PORT, String.valueOf(emailSenderAdd.getSmtpPort()));
         emailSenderAdd.getProperties().stream()
@@ -877,9 +907,10 @@ public class NotificationSenderManagementService {
                                                      NotificationSenderManagementConstants.ErrorMessage errorEnum,
                                                      String data) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
+        ErrorResponse errorResponse;
         Response.Status status;
         if (e instanceof ConfigurationManagementClientException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
@@ -889,6 +920,38 @@ public class NotificationSenderManagementService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof ConfigurationManagementServerException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
+                        NOTIFICATION_SENDER_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        } else {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleTenantResourceManagementException(TenantResourceManagementException e,
+                                                     NotificationSenderManagementConstants.ErrorMessage errorEnum,
+                                                     String data) {
+
+        ErrorResponse errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
+        Response.Status status;
+        if (e instanceof TenantResourceManagementClientException) {
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :
+                        NOTIFICATION_SENDER_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.BAD_REQUEST;
+        } else if (e instanceof TenantResourceManagementServerException) {
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode = errorCode.contains(CONFIG_MGT_ERROR_CODE_DELIMITER) ? errorCode :

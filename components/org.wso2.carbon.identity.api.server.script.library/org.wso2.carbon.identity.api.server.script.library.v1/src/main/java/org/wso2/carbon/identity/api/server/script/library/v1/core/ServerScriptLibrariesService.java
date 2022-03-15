@@ -395,15 +395,18 @@ public class ServerScriptLibrariesService {
      */
     private APIError handleScriptLibraryError(FunctionLibraryManagementException e, Constants.ErrorMessage errorEnum) {
 
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(log, e, errorEnum.getDescription());
+        ErrorResponse errorResponse;
         Response.Status status;
         if (e instanceof FunctionLibraryManagementClientException) {
+            errorResponse = getErrorBuilder(errorEnum).build(log, e.getMessage());
             createErrorResponse(e, errorResponse);
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof FunctionLibraryManagementServerException) {
+            errorResponse = getErrorBuilder(errorEnum).build(log, e, errorEnum.getDescription());
             createErrorResponse(e, errorResponse);
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
+            errorResponse = getErrorBuilder(errorEnum).build(log, e, errorEnum.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
 

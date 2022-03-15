@@ -105,11 +105,9 @@ public class EmailSenderUpdateRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "iam", required = true, value = "")
+    @ApiModelProperty(example = "iam", value = "")
     @JsonProperty("userName")
     @Valid
-    @NotNull(message = "Property userName cannot be null.")
-
     public String getUserName() {
         return userName;
     }
@@ -125,11 +123,9 @@ public class EmailSenderUpdateRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "iam123", required = true, value = "")
+    @ApiModelProperty(example = "iam123", value = "")
     @JsonProperty("password")
     @Valid
-    @NotNull(message = "Property password cannot be null.")
-
     public String getPassword() {
         return password;
     }

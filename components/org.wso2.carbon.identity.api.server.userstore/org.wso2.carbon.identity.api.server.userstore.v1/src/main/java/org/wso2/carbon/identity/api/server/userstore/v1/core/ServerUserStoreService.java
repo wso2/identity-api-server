@@ -186,7 +186,18 @@ public class ServerUserStoreService {
          */
         try {
             validateUserstoreUpdateRequest(domainId, userStoreReq);
+            String userstoreDomain = userStoreReq.getName();
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            List<LocalClaim> localClaimList = new ArrayList<>();
+            List<ClaimAttributeMapping> claimAttributeMappingList = userStoreReq.getClaimAttributeMappings();
+            if (claimAttributeMappingList != null) {
+                localClaimList =  createLocalClaimList(userstoreDomain, claimAttributeMappingList);
+                validateClaimMappings(tenantDomain, localClaimList);
+            }
             userStoreConfigService.updateUserStore(createUserStoreDTO(userStoreReq), false);
+            if (claimAttributeMappingList != null) {
+                updateClaimMappings(userstoreDomain, tenantDomain, localClaimList);
+            }
             return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
@@ -986,6 +997,7 @@ public class ServerUserStoreService {
         userStoreResponseDTO.setTypeName(base64URLDecodeId(userStoreReq.getTypeId()));
         userStoreResponseDTO.setDescription(userStoreReq.getDescription());
         userStoreResponseDTO.setProperties(buildUserStorePropertiesRes(userStoreReq));
+        userStoreResponseDTO.setClaimAttributeMappings(userStoreReq.getClaimAttributeMappings());
         return userStoreResponseDTO;
     }
 
@@ -1120,11 +1132,13 @@ public class ServerUserStoreService {
                                                          UserStoreConstants.ErrorMessage errorEnum) {
 
         Response.Status status;
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
+        ErrorResponse errorResponse;
         if (exception instanceof IdentityUserStoreServerException) {
+            errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
             return handleIdentityUserStoreException(exception, errorResponse, status);
         } else if (exception instanceof IdentityUserStoreClientException) {
+            errorResponse = getErrorBuilder(errorEnum).build(LOG, exception.getMessage());
             if (ERROR_CODE_RESOURCE_LIMIT_REACHED.equals(exception.getErrorCode())) {
                 return handleResourceLimitReached();
             }
@@ -1133,6 +1147,7 @@ public class ServerUserStoreService {
             return handleIdentityUserStoreException(exception, errorResponse, status);
         } else {
             // Internal Server error
+            errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
             return new APIError(status, errorResponse);
         }
@@ -1180,12 +1195,14 @@ public class ServerUserStoreService {
                                                     UserStoreConstants.ErrorMessage errorEnum) {
 
         Response.Status status;
-        ErrorResponse errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
+        ErrorResponse errorResponse;
         if (exception instanceof ClaimMetadataClientException) {
+            errorResponse = getErrorBuilder(errorEnum).build(LOG, exception.getMessage());
             status = Response.Status.BAD_REQUEST;
             return handleClaimManagementClientException(exception, errorResponse, status);
         } else {
             // Internal Server error
+            errorResponse = getErrorBuilder(errorEnum).build(LOG, exception, errorEnum.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
             return new APIError(status, errorResponse);
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
+ * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,19 +16,19 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.branding.preference.management.common.factory;
+package org.wso2.carbon.identity.api.server.notification.sender.common.factory;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.configuration.mgt.core.ConfigurationManager;
+import org.wso2.carbon.identity.tenant.resource.manager.core.ResourceManager;
 
 /**
  * Factory Beans serve as a factory for creating other beans within the IOC container. This factory bean is used to
  * instantiate the ConfigurationManager type of object inside the container.
  */
-public class ConfigurationMgtOSGiServiceFactory extends AbstractFactoryBean<ConfigurationManager> {
+public class ResourceMgtOSGiServiceFactory extends AbstractFactoryBean<ResourceManager> {
 
-    private ConfigurationManager configurationManager;
+    private ResourceManager resourceManager;
 
     @Override
     public Class<?> getObjectType() {
@@ -37,18 +37,18 @@ public class ConfigurationMgtOSGiServiceFactory extends AbstractFactoryBean<Conf
     }
 
     @Override
-    protected ConfigurationManager createInstance() throws Exception {
+    protected ResourceManager createInstance() throws Exception {
 
-        if (this.configurationManager == null) {
-            ConfigurationManager taskOperationService = (ConfigurationManager) PrivilegedCarbonContext.
-                    getThreadLocalCarbonContext().getOSGiService(ConfigurationManager.class, null);
+        if (this.resourceManager == null) {
+            ResourceManager taskOperationService = (ResourceManager) PrivilegedCarbonContext.
+                    getThreadLocalCarbonContext().getOSGiService(ResourceManager.class, null);
 
             if (taskOperationService != null) {
-                this.configurationManager = taskOperationService;
+                this.resourceManager = taskOperationService;
             } else {
-                throw new Exception("Unable to retrieve ConfigurationManager service.");
+                throw new Exception("Unable to retrieve ResourceManager service.");
             }
         }
-        return this.configurationManager;
+        return this.resourceManager;
     }
 }
