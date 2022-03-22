@@ -101,7 +101,7 @@ import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
 import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementClientException;
 import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementException;
 import org.wso2.carbon.identity.template.mgt.model.Template;
-import org.wso2.carbon.user.core.UniqueIDUserStoreManager;
+import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 
 import java.io.IOException;
@@ -870,9 +870,6 @@ public class ServerApplicationManagementService {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
         org.wso2.carbon.user.core.common.User user = getUserFromUserID(applicationOwner.getId());
-        if (user == null) {
-            throw buildClientError(ErrorMessage.NON_EXISTING_USER_ID, applicationOwner.getId());
-        }
         // Build application owner.
         User appOwner = new User();
         appOwner.setUserName(user.getUsername());
@@ -1290,24 +1287,23 @@ public class ServerApplicationManagementService {
             if (log.isDebugEnabled()) {
                 log.debug("RealmService is not set properly.");
             }
-            throw Utils.buildServerError(ErrorMessage.ERROR_RETRIEVING_USER_NAME_BY_ID.getCode(),
-                    ErrorMessage.ERROR_RETRIEVING_USER_NAME_BY_ID.getMessage(),
-                    buildFormattedDescription(ErrorMessage.ERROR_RETRIEVING_USER_NAME_BY_ID.getDescription(),
+            throw Utils.buildServerError(ErrorMessage.ERROR_RETRIEVING_USER_BY_ID.getCode(),
+                    ErrorMessage.ERROR_RETRIEVING_USER_BY_ID.getMessage(),
+                    buildFormattedDescription(ErrorMessage.ERROR_RETRIEVING_USER_BY_ID.getDescription(),
                             userId));
         }
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         try {
-            UniqueIDUserStoreManager userStoreManager =
-                    (UniqueIDUserStoreManager) realmService.getTenantUserRealm(tenantId).getUserStoreManager();
+            AbstractUserStoreManager userStoreManager =
+                    (AbstractUserStoreManager) realmService.getTenantUserRealm(tenantId).getUserStoreManager();
             return userStoreManager.getUserWithID(userId, null, null);
         } catch (org.wso2.carbon.user.api.UserStoreException e) {
             if (e.getMessage().startsWith(ApplicationManagementConstants.NON_EXISTING_USER_CODE)) {
                 throw buildClientError(ErrorMessage.NON_EXISTING_USER_ID, userId);
             }
-            Utils.buildServerError(ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getCode(),
+            throw Utils.buildServerError(ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getCode(),
                     ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getMessage(),
                     ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getDescription());
         }
-        return null;
     }
 }

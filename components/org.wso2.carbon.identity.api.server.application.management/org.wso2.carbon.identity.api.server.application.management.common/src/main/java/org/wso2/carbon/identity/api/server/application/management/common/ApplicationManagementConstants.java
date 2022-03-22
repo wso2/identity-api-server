@@ -116,8 +116,8 @@ public class ApplicationManagementConstants {
                 "Unsupported Operation.",
                 "Application creation with templates is not supported in this version of the API."),
         ERROR_CODE_ERROR_INVALID_SEARCH_FILTER("65502", "Search request validation failed.", "Invalid search filter."),
-        ERROR_RETRIEVING_USER_NAME_BY_ID("65503", "Error occurred while retrieving username",
-                "Error occurred while retrieving username by userid: %s."),
+        ERROR_RETRIEVING_USER_BY_ID("65503", "Error occurred while retrieving user",
+                "Error occurred while retrieving user by userid: %s."),
         ERROR_RETRIEVING_USERSTORE_MANAGER("65504", "Error retrieving userstore manager.",
                 "Error occurred while retrieving userstore manager.");
 
