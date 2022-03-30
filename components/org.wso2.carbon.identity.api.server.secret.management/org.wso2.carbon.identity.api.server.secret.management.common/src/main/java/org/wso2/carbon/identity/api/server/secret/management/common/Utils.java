@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.secret.management.common;
 
-import org.apache.logging.log4j.ThreadContext;
+import org.slf4j.MDC;
 
 import java.util.UUID;
 
@@ -38,7 +38,7 @@ public class Utils {
 
         if (isCorrelationIDPresent()) {
 
-            return ThreadContext.get(CORRELATION_ID_MDC);
+            return MDC.get(CORRELATION_ID_MDC);
         }
         return UUID.randomUUID().toString();
     }
@@ -50,6 +50,6 @@ public class Utils {
      */
     public static boolean isCorrelationIDPresent() {
 
-        return ThreadContext.get(CORRELATION_ID_MDC) != null;
+        return MDC.get(CORRELATION_ID_MDC) != null;
     }
 }
