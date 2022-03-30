@@ -16,7 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.common;
 
-import org.apache.logging.log4j.ThreadContext;
+import org.slf4j.MDC;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.recovery.ChallengeQuestionManager;
 
@@ -55,7 +55,7 @@ public class Util {
     public static String getCorrelation() {
         String ref;
         if (isCorrelationIDPresent()) {
-            ref = ThreadContext.get(Constants.CORRELATION_ID_MDC);
+            ref = MDC.get(Constants.CORRELATION_ID_MDC);
         } else {
             ref = UUID.randomUUID().toString();
 
@@ -69,7 +69,7 @@ public class Util {
      * @return whether the correlation id is present
      */
     public static boolean isCorrelationIDPresent() {
-        return ThreadContext.get(Constants.CORRELATION_ID_MDC) != null;
+        return MDC.get(Constants.CORRELATION_ID_MDC) != null;
     }
 
     /**
