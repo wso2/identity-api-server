@@ -64,6 +64,30 @@ public class ApplicationsApi  {
     private ApplicationsApiService delegate;
 
     @Valid
+    @PUT
+    @Path("/{applicationId}/owner")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Change application owner ", notes = "This API provides the capability to change the application owner.<br>   <b>Permission required:</b> <br>       * /permission/admin <br>   <b>Scope required:</b> <br>       * SYSTEM ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Applications", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully Updated", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response changeApplicationOwner(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "" ) @Valid ApplicationOwner applicationOwner) {
+
+        return delegate.changeApplicationOwner(applicationId,  applicationOwner );
+    }
+
+    @Valid
     @POST
     
     @Consumes({ "application/json" })
