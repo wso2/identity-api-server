@@ -133,6 +133,8 @@ public class SAMLInboundFunctions {
         }
     }
 
+    @Deprecated
+    /** @Deprecated. Please use {@link #createSAMLInbound(ServiceProvider, SAML2Configuration)} instead. */
     public static InboundAuthenticationRequestConfig createSAMLInbound(SAML2Configuration saml2Configuration) {
 
         SAML2ServiceProvider samlManualConfiguration = saml2Configuration.getManualConfiguration();
@@ -147,6 +149,50 @@ public class SAMLInboundFunctions {
         } else {
             throw Utils.buildBadRequestError("Invalid SAML2 Configuration. One of metadataFile, metaDataUrl or " +
                     "serviceProvider manual configuration needs to be present.");
+        }
+
+        InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
+        samlInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.SAML2);
+        samlInbound.setInboundAuthKey(samlssoServiceProviderDTO.getIssuer());
+        if (samlssoServiceProviderDTO.isEnableAttributeProfile()) {
+            Property[] properties = new Property[1];
+            Property property = new Property();
+            property.setName(ATTRIBUTE_CONSUMING_SERVICE_INDEX);
+            if (StringUtils.isNotBlank(samlssoServiceProviderDTO.getAttributeConsumingServiceIndex())) {
+                property.setValue(samlssoServiceProviderDTO.getAttributeConsumingServiceIndex());
+            } else {
+                try {
+                    property.setValue(Integer.toString(IdentityUtil.getRandomInteger()));
+                } catch (IdentityException e) {
+                    handleException(e);
+                }
+            }
+            properties[0] = property;
+            samlInbound.setProperties(properties);
+        }
+        return samlInbound;
+    }
+
+    public static InboundAuthenticationRequestConfig createSAMLInbound(
+            ServiceProvider serviceProvider, SAML2Configuration saml2Configuration) {
+
+        SAML2ServiceProvider samlManualConfiguration = saml2Configuration.getManualConfiguration();
+
+        SAMLSSOServiceProviderDTO samlssoServiceProviderDTO;
+        if (saml2Configuration.getMetadataFile() != null) {
+            samlssoServiceProviderDTO = createSAMLSpWithMetadataFile(saml2Configuration.getMetadataFile());
+        } else if (saml2Configuration.getMetadataURL() != null) {
+            samlssoServiceProviderDTO = createSAMLSpWithMetadataUrl(saml2Configuration.getMetadataURL());
+        } else if (samlManualConfiguration != null) {
+            samlssoServiceProviderDTO = createSAMLSpWithManualConfiguration(samlManualConfiguration);
+        } else {
+            throw Utils.buildBadRequestError("Invalid SAML2 Configuration. One of metadataFile, metaDataUrl or " +
+                    "serviceProvider manual configuration needs to be present.");
+        }
+
+        // Set certificate if available.
+        if (samlssoServiceProviderDTO.getCertificateContent() != null) {
+            serviceProvider.setCertificateContent(base64Encode(samlssoServiceProviderDTO.getCertificateContent()));
         }
 
         InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
@@ -279,6 +325,12 @@ public class SAMLInboundFunctions {
     private static SAMLSSOConfigServiceImpl getSamlSsoConfigService() {
 
         return ApplicationManagementServiceHolder.getSamlssoConfigService();
+    }
+
+    private static String base64Encode(String content) {
+
+        return new String(Base64.getEncoder().encode(content.getBytes(StandardCharsets.UTF_8)),
+                (StandardCharsets.UTF_8));
     }
 
 }
