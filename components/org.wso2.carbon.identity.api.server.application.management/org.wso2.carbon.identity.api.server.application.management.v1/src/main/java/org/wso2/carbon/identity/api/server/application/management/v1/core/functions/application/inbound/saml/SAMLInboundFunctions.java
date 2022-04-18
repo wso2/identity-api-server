@@ -134,22 +134,10 @@ public class SAMLInboundFunctions {
     }
 
     @Deprecated
-    /** @Deprecated. Please use {@link #createSAMLInbound(ServiceProvider, SAML2Configuration)} instead. */
+    /* @Deprecated. Please use {@link #createSAMLInbound(ServiceProvider, SAML2Configuration)} instead. */
     public static InboundAuthenticationRequestConfig createSAMLInbound(SAML2Configuration saml2Configuration) {
 
-        SAML2ServiceProvider samlManualConfiguration = saml2Configuration.getManualConfiguration();
-
-        SAMLSSOServiceProviderDTO samlssoServiceProviderDTO;
-        if (saml2Configuration.getMetadataFile() != null) {
-            samlssoServiceProviderDTO = createSAMLSpWithMetadataFile(saml2Configuration.getMetadataFile());
-        } else if (saml2Configuration.getMetadataURL() != null) {
-            samlssoServiceProviderDTO = createSAMLSpWithMetadataUrl(saml2Configuration.getMetadataURL());
-        } else if (samlManualConfiguration != null) {
-            samlssoServiceProviderDTO = createSAMLSpWithManualConfiguration(samlManualConfiguration);
-        } else {
-            throw Utils.buildBadRequestError("Invalid SAML2 Configuration. One of metadataFile, metaDataUrl or " +
-                    "serviceProvider manual configuration needs to be present.");
-        }
+        SAMLSSOServiceProviderDTO samlssoServiceProviderDTO = getSamlSsoServiceProviderDTO(saml2Configuration);
 
         InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
         samlInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.SAML2);
@@ -176,19 +164,7 @@ public class SAMLInboundFunctions {
     public static InboundAuthenticationRequestConfig createSAMLInbound(
             ServiceProvider serviceProvider, SAML2Configuration saml2Configuration) {
 
-        SAML2ServiceProvider samlManualConfiguration = saml2Configuration.getManualConfiguration();
-
-        SAMLSSOServiceProviderDTO samlssoServiceProviderDTO;
-        if (saml2Configuration.getMetadataFile() != null) {
-            samlssoServiceProviderDTO = createSAMLSpWithMetadataFile(saml2Configuration.getMetadataFile());
-        } else if (saml2Configuration.getMetadataURL() != null) {
-            samlssoServiceProviderDTO = createSAMLSpWithMetadataUrl(saml2Configuration.getMetadataURL());
-        } else if (samlManualConfiguration != null) {
-            samlssoServiceProviderDTO = createSAMLSpWithManualConfiguration(samlManualConfiguration);
-        } else {
-            throw Utils.buildBadRequestError("Invalid SAML2 Configuration. One of metadataFile, metaDataUrl or " +
-                    "serviceProvider manual configuration needs to be present.");
-        }
+        SAMLSSOServiceProviderDTO samlssoServiceProviderDTO = getSamlSsoServiceProviderDTO(saml2Configuration);
 
         // Set certificate if available.
         if (samlssoServiceProviderDTO.getCertificateContent() != null) {
@@ -331,6 +307,23 @@ public class SAMLInboundFunctions {
 
         return new String(Base64.getEncoder().encode(content.getBytes(StandardCharsets.UTF_8)),
                 (StandardCharsets.UTF_8));
+    }
+
+    private static SAMLSSOServiceProviderDTO getSamlSsoServiceProviderDTO(SAML2Configuration saml2Configuration)
+            throws APIError {
+
+        SAML2ServiceProvider samlManualConfiguration = saml2Configuration.getManualConfiguration();
+
+        if (saml2Configuration.getMetadataFile() != null) {
+            return createSAMLSpWithMetadataFile(saml2Configuration.getMetadataFile());
+        } else if (saml2Configuration.getMetadataURL() != null) {
+            return createSAMLSpWithMetadataUrl(saml2Configuration.getMetadataURL());
+        } else if (samlManualConfiguration != null) {
+            return createSAMLSpWithManualConfiguration(samlManualConfiguration);
+        } else {
+            throw Utils.buildBadRequestError("Invalid SAML2 Configuration. One of metadataFile, metaDataUrl or " +
+                    "serviceProvider manual configuration needs to be present.");
+        }
     }
 
 }
