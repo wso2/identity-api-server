@@ -62,7 +62,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 
 import static org.wso2.carbon.identity.sso.saml.Error.INVALID_REQUEST;
 import static org.wso2.carbon.identity.sso.saml.Error.URL_NOT_FOUND;
@@ -75,40 +78,41 @@ public class SAMLInboundFunctions {
     private static final String ATTRIBUTE_CONSUMING_SERVICE_INDEX = "attrConsumServiceIndex";
     private static final Log logger = LogFactory.getLog(SAMLInboundFunctions.class);
 
-    public static final String ISSUER = "issuer";
-    public static final String ISSUER_QUALIFIER = "issuerQualifier";
-    public static final String ASSERTION_CONSUMER_URLS = "assertionConsumerUrls";
-    public static final String DEFAULT_ASSERTION_CONSUMER_URL = "defaultAssertionConsumerUrl";
-    public static final String SIGNING_ALGORITHM_URI = "signingAlgorithmURI";
-    public static final String DIGEST_ALGORITHM_URI = "digestAlgorithmURI";
-    public static final String ASSERTION_ENCRYPTION_ALGORITHM_URI = "assertionEncryptionAlgorithmURI";
-    public static final String KEY_ENCRYPTION_ALGORITHM_URI = "keyEncryptionAlgorithmURI";
-    public static final String CERT_ALIAS = "certAlias";
-//    TODO: check "attrConsumServiceIndex" (Line 77)
+    private static final String ISSUER = "issuer";
+    private static final String ISSUER_QUALIFIER = "issuerQualifier";
+    private static final String ASSERTION_CONSUMER_URLS = "assertionConsumerUrls";
+    private static final String DEFAULT_ASSERTION_CONSUMER_URL = "defaultAssertionConsumerUrl";
+    private static final String SIGNING_ALGORITHM_URI = "signingAlgorithmURI";
+    private static final String DIGEST_ALGORITHM_URI = "digestAlgorithmURI";
+    private static final String ASSERTION_ENCRYPTION_ALGORITHM_URI = "assertionEncryptionAlgorithmURI";
+    private static final String KEY_ENCRYPTION_ALGORITHM_URI = "keyEncryptionAlgorithmURI";
+    private static final String CERT_ALIAS = "certAlias";
+    //    TODO: check "attrConsumServiceIndex" (Line 77)
 //    public static final String ATTRIBUTE_CONSUMING_SERVICE_INDEX = "attributeConsumingServiceIndex";
-    public static final String DO_SIGN_RESPONSE = "doSignResponse";
-    public static final String DO_SINGLE_LOGOUT = "doSingleLogout";
-    public static final String DO_FRONT_CHANNEL_LOGOUT = "doFrontChannelLogout";
-    public static final String FRONT_CHANNEL_LOGOUT_BINDING = "frontChannelLogoutBinding";
-    public static final String IS_ASSERTION_QUERY_REQUEST_PROFILE_ENABLED = "isAssertionQueryRequestProfileEnabled";
-    public static final String SUPPORTED_ASSERTION_QUERY_REQUEST_TYPES = "supportedAssertionQueryRequestTypes";
-    public static final String ENABLE_SAML2_ARTIFACT_BINDING = "enableSAML2ArtifactBinding";
-    public static final String DO_VALIDATE_SIGNATURE_IN_ARTIFACT_RESOLVE = "doValidateSignatureInArtifactResolve";
-    public static final String LOGIN_PAGE_URL = "loginPageURL";
-    public static final String SLO_RESPONSE_URL = "sloResponseURL";
-    public static final String SLO_REQUEST_URL = "sloRequestURL";
-    public static final String REQUESTED_CLAIMS = "requestedClaims";
-    public static final String REQUESTED_AUDIENCES = "requestedAudiences";
-    public static final String REQUESTED_RECIPIENTS = "requestedRecipients";
-    public static final String ENABLE_ATTRIBUTES_BY_DEFAULT = "enableAttributesByDefault";
-    public static final String NAME_ID_CLAIM_URI = "nameIdClaimUri";
-    public static final String NAME_ID_FORMAT = "nameIDFormat";
-    public static final String IDP_INIT_SSO_ENABLED = "idPInitSSOEnabled";
-    public static final String IDP_INIT_SLO_ENABLED = "idPInitSLOEnabled";
-    public static final String IDP_INIT_SLO_RETURN_TO_URLS = "idpInitSLOReturnToURLs";
-    public static final String DO_ENABLE_ENCRYPTED_ASSERTION = "doEnableEncryptedAssertion";
-    public static final String DO_VALIDATE_SIGNATURE_IN_REQUESTS = "doValidateSignatureInRequests";
-    public static final String IDP_ENTITY_ID_ALIAS = "idpEntityIDAlias";
+    private static final String DO_SIGN_RESPONSE = "doSignResponse";
+    private static final String DO_SINGLE_LOGOUT = "doSingleLogout";
+    private static final String DO_FRONT_CHANNEL_LOGOUT = "doFrontChannelLogout";
+    private static final String FRONT_CHANNEL_LOGOUT_BINDING = "frontChannelLogoutBinding";
+    private static final String IS_ASSERTION_QUERY_REQUEST_PROFILE_ENABLED = "isAssertionQueryRequestProfileEnabled";
+    private static final String SUPPORTED_ASSERTION_QUERY_REQUEST_TYPES = "supportedAssertionQueryRequestTypes";
+    private static final String ENABLE_SAML2_ARTIFACT_BINDING = "enableSAML2ArtifactBinding";
+    private static final String DO_VALIDATE_SIGNATURE_IN_ARTIFACT_RESOLVE = "doValidateSignatureInArtifactResolve";
+    private static final String LOGIN_PAGE_URL = "loginPageURL";
+    private static final String SLO_RESPONSE_URL = "sloResponseURL";
+    private static final String SLO_REQUEST_URL = "sloRequestURL";
+    private static final String REQUESTED_CLAIMS = "requestedClaims";
+    private static final String REQUESTED_AUDIENCES = "requestedAudiences";
+    private static final String REQUESTED_RECIPIENTS = "requestedRecipients";
+    private static final String ENABLE_ATTRIBUTES_BY_DEFAULT = "enableAttributesByDefault";
+    private static final String NAME_ID_CLAIM_URI = "nameIdClaimUri";
+    private static final String NAME_ID_FORMAT = "nameIDFormat";
+    private static final String IDP_INIT_SSO_ENABLED = "idPInitSSOEnabled";
+    private static final String IDP_INIT_SLO_ENABLED = "idPInitSLOEnabled";
+    private static final String IDP_INIT_SLO_RETURN_TO_URLS = "idpInitSLOReturnToURLs";
+    private static final String DO_ENABLE_ENCRYPTED_ASSERTION = "doEnableEncryptedAssertion";
+    private static final String DO_VALIDATE_SIGNATURE_IN_REQUESTS = "doValidateSignatureInRequests";
+    private static final String IDP_ENTITY_ID_ALIAS = "idpEntityIDAlias";
+
 
     private SAMLInboundFunctions() {
 
@@ -190,7 +194,7 @@ public class SAMLInboundFunctions {
         }
     }
 
-    public static InboundAuthenticationRequestConfig createSAMLInbound(SAML2Configuration saml2Configuration) {
+    public static InboundAuthenticationRequestConfig createSAMLInbound_old(SAML2Configuration saml2Configuration) {
 
         SAML2ServiceProvider samlManualConfiguration = saml2Configuration.getManualConfiguration();
 
@@ -228,7 +232,7 @@ public class SAMLInboundFunctions {
         return samlInbound;
     }
 
-    public static InboundAuthenticationRequestConfig createSAMLInbound_new(SAML2Configuration saml2Configuration) {
+    public static InboundAuthenticationRequestConfig createSAMLInbound(SAML2Configuration saml2Configuration) {
 
         SAML2ServiceProvider samlManualConfiguration = saml2Configuration.getManualConfiguration();
 
@@ -263,7 +267,7 @@ public class SAMLInboundFunctions {
             propertyList.add(property);
         }
 
-        addSAMLInboundProperties(propertyList,samlssoServiceProviderDO);
+        addSAMLInboundProperties(propertyList, samlssoServiceProviderDO);
 
         Property[] properties = propertyList.toArray(new Property[0]);
         samlInbound.setProperties(properties);
@@ -397,7 +401,8 @@ public class SAMLInboundFunctions {
         }
     }
 
-    private static SAMLSSOServiceProviderDO createSAMLSpWithMetadataUrl_new_new(String metadataUrl) throws IdentitySAML2SSOException {
+    private static SAMLSSOServiceProviderDO createSAMLSpWithMetadataUrl_new_new(String metadataUrl)
+            throws IdentitySAML2SSOException {
         InputStream in = null;
         try {
             URL url = new URL(metadataUrl);
@@ -410,8 +415,8 @@ public class SAMLInboundFunctions {
             return getServiceProviderDOFromMetadata(metadata);
         } catch (IOException e) {
             String tenantDomain = getTenantDomain();
-            throw handleIOException(URL_NOT_FOUND, "Non-existing metadata URL for SAML service provider creation in tenantDomain: "
-                    + tenantDomain, e);
+            throw handleIOException(URL_NOT_FOUND, "Non-existing metadata URL for SAML service provider creation in " +
+                    "tenantDomain: " + tenantDomain, e);
         } catch (IdentityException e) {
             throw handleException(e);
         } finally {
@@ -482,7 +487,8 @@ public class SAMLInboundFunctions {
             try {
                 configValue = Integer.parseInt(config);
             } catch (NumberFormatException var6) {
-                logger.error("Provided HTTP connection config value in " + xPath + " should be an integer type. Value : " + config);
+                logger.error("Provided HTTP connection config value in " + xPath + " should be an integer type. " +
+                        "Value : " + config);
             }
         }
 
@@ -514,13 +520,14 @@ public class SAMLInboundFunctions {
                 .getRegistry(RegistryType.SYSTEM_CONFIGURATION);
     }
 
-    /**
+    /*
      * Save Certificate To Key Store
      *
      * @param serviceProviderDO Service provider data object
      * @throws Exception exception
      */
-    private static void saveCertificateToKeyStore(SAMLSSOServiceProviderDO serviceProviderDO, UserRegistry registry) throws Exception {
+    private static void saveCertificateToKeyStore(SAMLSSOServiceProviderDO serviceProviderDO, UserRegistry registry)
+            throws Exception {
 
         KeyStoreManager manager = KeyStoreManager.getInstance(registry.getTenantId(), IdentitySAMLSSOServiceComponent
                 .getServerConfigurationService(), IdentityTenantUtil.getRegistryService());
@@ -547,7 +554,7 @@ public class SAMLInboundFunctions {
             manager.updateKeyStore(keyStoreName, keyStore);
         }
     }
-    /**
+    /*
      * This method returns the key store file name from the domain Name
      *
      * @return key store name
@@ -563,7 +570,8 @@ public class SAMLInboundFunctions {
         return new IdentitySAML2ClientException(error.getErrorCode(), message, e);
     }
 
-    private static SAMLSSOServiceProviderDO createSAMLSSOServiceProviderDO(SAMLSSOServiceProviderDTO serviceProviderDTO) throws IdentityException {
+    private static SAMLSSOServiceProviderDO createSAMLSSOServiceProviderDO(SAMLSSOServiceProviderDTO serviceProviderDTO)
+            throws IdentityException {
         SAMLSSOServiceProviderDO serviceProviderDO = new SAMLSSOServiceProviderDO();
 
         //TODO: validate in SAML validator
@@ -596,14 +604,16 @@ public class SAMLInboundFunctions {
         serviceProviderDO.setKeyEncryptionAlgorithmUri(serviceProviderDTO.getKeyEncryptionAlgorithmURI());
         serviceProviderDO.setAssertionQueryRequestProfileEnabled(serviceProviderDTO
                 .isAssertionQueryRequestProfileEnabled());
-        serviceProviderDO.setSupportedAssertionQueryRequestTypes(serviceProviderDTO.getSupportedAssertionQueryRequestTypes());
+        serviceProviderDO.setSupportedAssertionQueryRequestTypes(
+                serviceProviderDTO.getSupportedAssertionQueryRequestTypes());
         serviceProviderDO.setEnableSAML2ArtifactBinding(serviceProviderDTO.isEnableSAML2ArtifactBinding());
         serviceProviderDO.setDoValidateSignatureInArtifactResolve(serviceProviderDTO
                 .isDoValidateSignatureInArtifactResolve());
         if (serviceProviderDTO.getNameIDFormat() == null) {
             serviceProviderDTO.setNameIDFormat(NameIdentifier.UNSPECIFIED);
         } else {
-            serviceProviderDTO.setNameIDFormat(serviceProviderDTO.getNameIDFormat().replace("/", ":"));
+            serviceProviderDTO.setNameIDFormat(serviceProviderDTO.getNameIDFormat().replace("/",
+                    ":"));
         }
 
         serviceProviderDO.setNameIDFormat(serviceProviderDTO.getNameIDFormat());
@@ -625,10 +635,12 @@ public class SAMLInboundFunctions {
             serviceProviderDO.setEnableAttributesByDefault(false);
         }
 
-        if (serviceProviderDTO.getRequestedAudiences() != null && serviceProviderDTO.getRequestedAudiences().length != 0) {
+        if (serviceProviderDTO.getRequestedAudiences() != null &&
+                serviceProviderDTO.getRequestedAudiences().length != 0) {
             serviceProviderDO.setRequestedAudiences(serviceProviderDTO.getRequestedAudiences());
         }
-        if (serviceProviderDTO.getRequestedRecipients() != null && serviceProviderDTO.getRequestedRecipients().length != 0) {
+        if (serviceProviderDTO.getRequestedRecipients() != null &&
+                serviceProviderDTO.getRequestedRecipients().length != 0) {
             serviceProviderDO.setRequestedRecipients(serviceProviderDTO.getRequestedRecipients());
         }
         serviceProviderDO.setIdPInitSSOEnabled(serviceProviderDTO.isIdPInitSSOEnabled());
@@ -640,18 +652,21 @@ public class SAMLInboundFunctions {
         return serviceProviderDO;
     }
 
-    private static void addSAMLInboundProperties(List<Property> propertyList, SAMLSSOServiceProviderDO serviceProviderDO) {
+    private static void addSAMLInboundProperties(List<Property> propertyList,
+                                                 SAMLSSOServiceProviderDO serviceProviderDO) {
         propertyList.add(addKeyValuePair(ISSUER, serviceProviderDO.getIssuer()));
         propertyList.add(addKeyValuePair(ISSUER_QUALIFIER, serviceProviderDO.getIssuerQualifier()));
         for (String url : serviceProviderDO.getAssertionConsumerUrls()) {
             propertyList.add(addKeyValuePair(ASSERTION_CONSUMER_URLS, url));
         }
-        propertyList.add(addKeyValuePair(DEFAULT_ASSERTION_CONSUMER_URL, serviceProviderDO.getDefaultAssertionConsumerUrl()));
+        propertyList.add(addKeyValuePair(DEFAULT_ASSERTION_CONSUMER_URL,
+                serviceProviderDO.getDefaultAssertionConsumerUrl()));
         propertyList.add(addKeyValuePair(SIGNING_ALGORITHM_URI, serviceProviderDO.getSigningAlgorithmUri()));
         propertyList.add(addKeyValuePair(DIGEST_ALGORITHM_URI, serviceProviderDO.getDigestAlgorithmUri()));
         propertyList.add(addKeyValuePair(ASSERTION_ENCRYPTION_ALGORITHM_URI,
                 serviceProviderDO.getAssertionEncryptionAlgorithmUri()));
-        propertyList.add(addKeyValuePair(KEY_ENCRYPTION_ALGORITHM_URI, serviceProviderDO.getKeyEncryptionAlgorithmUri()));
+        propertyList.add(addKeyValuePair(KEY_ENCRYPTION_ALGORITHM_URI,
+                serviceProviderDO.getKeyEncryptionAlgorithmUri()));
         propertyList.add(addKeyValuePair(CERT_ALIAS, serviceProviderDO.getCertAlias()));
         //TODO: check ATTRIBUTE_CONSUMING_SERVICE_INDEX
 
@@ -661,7 +676,8 @@ public class SAMLInboundFunctions {
         propertyList.add(addKeyValuePair(DO_SINGLE_LOGOUT, serviceProviderDO.isDoSingleLogout() ? "true" : "false"));
         propertyList.add(addKeyValuePair(DO_FRONT_CHANNEL_LOGOUT,
                 serviceProviderDO.isDoFrontChannelLogout() ? "true" : "false"));
-        propertyList.add(addKeyValuePair(FRONT_CHANNEL_LOGOUT_BINDING, serviceProviderDO.getFrontChannelLogoutBinding()));
+        propertyList.add(addKeyValuePair(FRONT_CHANNEL_LOGOUT_BINDING,
+                serviceProviderDO.getFrontChannelLogoutBinding()));
         propertyList.add(addKeyValuePair(IS_ASSERTION_QUERY_REQUEST_PROFILE_ENABLED,
                 serviceProviderDO.isAssertionQueryRequestProfileEnabled() ? "true" : "false"));
         propertyList.add(addKeyValuePair(SUPPORTED_ASSERTION_QUERY_REQUEST_TYPES,
@@ -682,12 +698,14 @@ public class SAMLInboundFunctions {
         for (String recipient : serviceProviderDO.getRequestedRecipients()) {
             propertyList.add(addKeyValuePair(REQUESTED_RECIPIENTS, recipient));
         }
-        propertyList.add(addKeyValuePair( ENABLE_ATTRIBUTES_BY_DEFAULT,
+        propertyList.add(addKeyValuePair(ENABLE_ATTRIBUTES_BY_DEFAULT,
                 serviceProviderDO.isEnableAttributesByDefault() ? "true" : "false"));
         propertyList.add(addKeyValuePair(NAME_ID_CLAIM_URI, serviceProviderDO.getNameIdClaimUri()));
         propertyList.add(addKeyValuePair(NAME_ID_FORMAT, serviceProviderDO.getNameIDFormat()));
-        propertyList.add(addKeyValuePair(IDP_INIT_SSO_ENABLED, serviceProviderDO.isIdPInitSSOEnabled() ? "true" : "false"));
-        propertyList.add(addKeyValuePair(IDP_INIT_SLO_ENABLED, serviceProviderDO.isIdPInitSLOEnabled() ? "true" : "false"));
+        propertyList.add(addKeyValuePair(IDP_INIT_SSO_ENABLED,
+                serviceProviderDO.isIdPInitSSOEnabled() ? "true" : "false"));
+        propertyList.add(addKeyValuePair(IDP_INIT_SLO_ENABLED,
+                serviceProviderDO.isIdPInitSLOEnabled() ? "true" : "false"));
         for (String url : serviceProviderDO.getIdpInitSLOReturnToURLs()) {
             propertyList.add(addKeyValuePair(IDP_INIT_SLO_RETURN_TO_URLS, url));
         }
@@ -702,7 +720,7 @@ public class SAMLInboundFunctions {
         Property property = new Property();
         property.setName(key);
         property.setValue(value);
-        return null;
+        return property;
     }
 
 }
