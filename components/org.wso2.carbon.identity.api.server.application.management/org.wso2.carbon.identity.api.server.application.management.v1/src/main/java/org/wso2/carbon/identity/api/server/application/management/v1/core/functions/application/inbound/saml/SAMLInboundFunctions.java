@@ -75,7 +75,7 @@ public class SAMLInboundFunctions {
         }
 
         try {
-            return createSAMLInbound(saml2Configuration);
+            return createSAMLInbound(application, saml2Configuration);
         } catch (APIError error) {
             // Try to rollback by recreating the previous SAML SP.
             rollbackSAMLSpRemoval(oldSAMLSp);
