@@ -240,22 +240,6 @@ public class SAMLInboundFunctions {
         return samlInbound;
     }
 
-    public static SAML2ServiceProvider getSAML2ServiceProvider_old(InboundAuthenticationRequestConfig inboundAuth) {
-
-        String issuer = inboundAuth.getInboundAuthKey();
-        try {
-            SAMLSSOServiceProviderDTO serviceProvider = getSamlSsoConfigService().getServiceProvider(issuer);
-
-            if (serviceProvider != null) {
-                return new SAMLSSOServiceProviderToAPIModel().apply(serviceProvider);
-            } else {
-                return null;
-            }
-        } catch (IdentityException e) {
-            throw buildServerError("Error while retrieving service provider data for issuer: " + issuer, e);
-        }
-    }
-
     public static SAML2ServiceProvider getSAML2ServiceProvider(InboundAuthenticationRequestConfig inboundAuth) {
 
         if (inboundAuth.getProperties() == null) {
@@ -270,70 +254,93 @@ public class SAMLInboundFunctions {
                 Property::getName, Collectors.mapping(Property::getValue, Collectors.toList()))));
 
         SAMLSSOServiceProviderDTO serviceProviderDTO = new SAMLSSOServiceProviderDTO();
+        if (map.containsKey(ISSUER)) {
+            serviceProviderDTO.setIssuer(map.get(ISSUER).get(0));
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("SAML SP not found for issuer: " + ISSUER + " in tenantDomain: " + getTenantDomain());
+            }
+            return null;
+        }
+        serviceProviderDTO.setIssuerQualifier(getSingleValue(map, ISSUER_QUALIFIER));
+        serviceProviderDTO.setAssertionConsumerUrls(getMultiValues(map, ASSERTION_CONSUMER_URLS));
 
-        serviceProviderDTO.setIssuer(map.get(ISSUER).get(0));
-        serviceProviderDTO.setIssuerQualifier(map.get(ISSUER_QUALIFIER).get(0));
-        serviceProviderDTO.setAssertionConsumerUrls(map.get(ASSERTION_CONSUMER_URLS).toArray(new String[0]));
-        serviceProviderDTO.setDefaultAssertionConsumerUrl(map.get(DEFAULT_ASSERTION_CONSUMER_URL).get(0));
-        serviceProviderDTO.setSigningAlgorithmURI(map.get(SIGNING_ALGORITHM_URI).get(0));
-        serviceProviderDTO.setDigestAlgorithmURI(map.get(DIGEST_ALGORITHM_URI).get(0));
-        serviceProviderDTO.setAssertionEncryptionAlgorithmURI(map.get(ASSERTION_ENCRYPTION_ALGORITHM_URI).get(0));
-        serviceProviderDTO.setKeyEncryptionAlgorithmURI(map.get(KEY_ENCRYPTION_ALGORITHM_URI).get(0));
-        serviceProviderDTO.setCertAlias(map.get(CERT_ALIAS).get(0));
-        serviceProviderDTO.setAttributeConsumingServiceIndex(map.get(ATTRIBUTE_CONSUMING_SERVICE_INDEX).get(0));
+        serviceProviderDTO.setDefaultAssertionConsumerUrl(getSingleValue(map, DEFAULT_ASSERTION_CONSUMER_URL));
+        serviceProviderDTO.setSigningAlgorithmURI(getSingleValue(map, SIGNING_ALGORITHM_URI));
+        serviceProviderDTO.setDigestAlgorithmURI(getSingleValue(map, DIGEST_ALGORITHM_URI));
+        serviceProviderDTO.setAssertionEncryptionAlgorithmURI(getSingleValue(map, ASSERTION_ENCRYPTION_ALGORITHM_URI));
+        serviceProviderDTO.setKeyEncryptionAlgorithmURI(getSingleValue(map, KEY_ENCRYPTION_ALGORITHM_URI));
+        serviceProviderDTO.setCertAlias(getSingleValue(map, CERT_ALIAS));
+        serviceProviderDTO.setAttributeConsumingServiceIndex(getSingleValue(map, ATTRIBUTE_CONSUMING_SERVICE_INDEX));
 
-        if (StringUtils.isNotBlank(map.get(ATTRIBUTE_CONSUMING_SERVICE_INDEX).get(0))) {
+        if (map.containsKey(ATTRIBUTE_CONSUMING_SERVICE_INDEX)
+                && StringUtils.isNotBlank(map.get(ATTRIBUTE_CONSUMING_SERVICE_INDEX).get(0))) {
             serviceProviderDTO.setEnableAttributeProfile(true);
         }
 
-        serviceProviderDTO.setDoSignResponse(Boolean.parseBoolean(map.get(DO_SIGN_RESPONSE).get(0)));
+        serviceProviderDTO.setDoSignResponse(Boolean.parseBoolean(getSingleValue(map, DO_SIGN_RESPONSE)));
                 /*
                 According to the spec, "The <Assertion> element(s) in the <Response> MUST be signed". Therefore we
                 should not reply on any property to decide this behaviour. Hence the property is set to sign by default.
                 */
         serviceProviderDTO.setDoSignAssertions(true);
-        serviceProviderDTO.setDoSingleLogout(Boolean.parseBoolean(map.get(DO_SINGLE_LOGOUT).get(0)));
-        serviceProviderDTO.setDoFrontChannelLogout(Boolean.parseBoolean(map.get(DO_FRONT_CHANNEL_LOGOUT).get(0)));
-        serviceProviderDTO.setFrontChannelLogoutBinding(map.get(FRONT_CHANNEL_LOGOUT_BINDING).get(0));
+        serviceProviderDTO.setDoSingleLogout(Boolean.parseBoolean(getSingleValue(map, DO_SINGLE_LOGOUT)));
+        serviceProviderDTO.setDoFrontChannelLogout(Boolean.parseBoolean(getSingleValue(map, DO_FRONT_CHANNEL_LOGOUT)));
+        serviceProviderDTO.setFrontChannelLogoutBinding(getSingleValue(map, FRONT_CHANNEL_LOGOUT_BINDING));
         serviceProviderDTO.setAssertionQueryRequestProfileEnabled(Boolean.parseBoolean(
-                map.get(IS_ASSERTION_QUERY_REQUEST_PROFILE_ENABLED).get(0)));
+                getSingleValue(map, IS_ASSERTION_QUERY_REQUEST_PROFILE_ENABLED)));
         serviceProviderDTO.setSupportedAssertionQueryRequestTypes(
-                map.get(SUPPORTED_ASSERTION_QUERY_REQUEST_TYPES).get(0));
+                getSingleValue(map, SUPPORTED_ASSERTION_QUERY_REQUEST_TYPES));
         serviceProviderDTO.setEnableSAML2ArtifactBinding(Boolean.parseBoolean(
-                map.get(ENABLE_SAML2_ARTIFACT_BINDING).get(0)));
+                getSingleValue(map, ENABLE_SAML2_ARTIFACT_BINDING)));
         serviceProviderDTO.setDoValidateSignatureInArtifactResolve(
-                Boolean.parseBoolean(map.get(DO_VALIDATE_SIGNATURE_IN_ARTIFACT_RESOLVE).get(0)));
+                Boolean.parseBoolean(getSingleValue(map, DO_VALIDATE_SIGNATURE_IN_ARTIFACT_RESOLVE)));
 
-        if (map.get(LOGIN_PAGE_URL).get(0) == null || "null".equals(map.get(LOGIN_PAGE_URL).get(0))) {
+        if (!map.containsKey(LOGIN_PAGE_URL) || map.get(LOGIN_PAGE_URL).get(0) == null
+                || "null".equals(map.get(LOGIN_PAGE_URL).get(0))) {
             serviceProviderDTO.setLoginPageURL("");
         } else {
-            serviceProviderDTO.setLoginPageURL(map.get(LOGIN_PAGE_URL).get(0));
+            serviceProviderDTO.setLoginPageURL(getSingleValue(map, LOGIN_PAGE_URL));
         }
 
-        serviceProviderDTO.setSloResponseURL(map.get(SLO_RESPONSE_URL).get(0));
-        serviceProviderDTO.setSloRequestURL(map.get(SLO_REQUEST_URL).get(0));
-        serviceProviderDTO.setRequestedClaims(map.get(REQUESTED_CLAIMS).toArray(new String[0]));
-        serviceProviderDTO.setRequestedAudiences(map.get(REQUESTED_AUDIENCES).toArray(new String[0]));
-        serviceProviderDTO.setRequestedRecipients(map.get(REQUESTED_RECIPIENTS).toArray(new String[0]));
+        serviceProviderDTO.setSloResponseURL(getSingleValue(map, SLO_RESPONSE_URL));
+        serviceProviderDTO.setSloRequestURL(getSingleValue(map, SLO_REQUEST_URL));
+        serviceProviderDTO.setRequestedClaims(getMultiValues(map, REQUESTED_CLAIMS));
+        serviceProviderDTO.setRequestedAudiences(getMultiValues(map, REQUESTED_AUDIENCES));
+        serviceProviderDTO.setRequestedRecipients(getMultiValues(map, REQUESTED_RECIPIENTS));
         serviceProviderDTO.setEnableAttributesByDefault(Boolean.parseBoolean(
-                map.get(ENABLE_ATTRIBUTES_BY_DEFAULT).get(0)));
-        serviceProviderDTO.setNameIdClaimUri(map.get(NAME_ID_CLAIM_URI).get(0));
-        serviceProviderDTO.setNameIDFormat(map.get(NAME_ID_FORMAT).get(0));
+                getSingleValue(map, ENABLE_ATTRIBUTES_BY_DEFAULT)));
+        serviceProviderDTO.setNameIdClaimUri(getSingleValue(map, NAME_ID_CLAIM_URI));
+        serviceProviderDTO.setNameIDFormat(getSingleValue(map, NAME_ID_FORMAT));
 
         if (serviceProviderDTO.getNameIDFormat() == null) {
             serviceProviderDTO.setNameIDFormat(NameIdentifier.UNSPECIFIED);
         }
         serviceProviderDTO.setNameIDFormat(serviceProviderDTO.getNameIDFormat().replace(":", "/"));
 
-        serviceProviderDTO.setIdPInitSSOEnabled(Boolean.parseBoolean(map.get(IDP_INIT_SSO_ENABLED).get(0)));
-        serviceProviderDTO.setIdPInitSLOEnabled(Boolean.parseBoolean(map.get(IDP_INIT_SLO_ENABLED).get(0)));
-        serviceProviderDTO.setIdpInitSLOReturnToURLs(map.get(IDP_INIT_SLO_RETURN_TO_URLS).toArray(new String[0]));
+        serviceProviderDTO.setIdPInitSSOEnabled(Boolean.parseBoolean(getSingleValue(map, IDP_INIT_SSO_ENABLED)));
+        serviceProviderDTO.setIdPInitSLOEnabled(Boolean.parseBoolean(getSingleValue(map, IDP_INIT_SLO_ENABLED)));
+        serviceProviderDTO.setIdpInitSLOReturnToURLs(getMultiValues(map, IDP_INIT_SLO_RETURN_TO_URLS));
         serviceProviderDTO.setDoEnableEncryptedAssertion(Boolean.parseBoolean(
-                map.get(DO_ENABLE_ENCRYPTED_ASSERTION).get(0)));
+                getSingleValue(map, DO_ENABLE_ENCRYPTED_ASSERTION)));
         serviceProviderDTO.setDoValidateSignatureInRequests(Boolean.parseBoolean(
-                map.get(DO_VALIDATE_SIGNATURE_IN_REQUESTS).get(0)));
-        serviceProviderDTO.setIdpEntityIDAlias(map.get(IDP_ENTITY_ID_ALIAS).get(0));
+                getSingleValue(map, DO_VALIDATE_SIGNATURE_IN_REQUESTS)));
+        serviceProviderDTO.setIdpEntityIDAlias(getSingleValue(map, IDP_ENTITY_ID_ALIAS));
         return serviceProviderDTO;
+    }
+
+    private static String[] getMultiValues(HashMap<String, List<String>> map, String key) {
+        if (key != null && map.containsKey(key)) {
+            return map.get(key).toArray(new String[0]);
+        }
+        return new String[0];
+    }
+
+    private static String getSingleValue(HashMap<String, List<String>> map, String key) {
+        if (key != null && map.containsKey(key)) {
+            return map.get(key).get(0);
+        }
+        return null;
     }
 
     public static void deleteSAMLServiceProvider(InboundAuthenticationRequestConfig inbound) {
@@ -389,14 +396,6 @@ public class SAMLInboundFunctions {
             }
         }
         return samlssoServiceProviderDO;
-    }
-
-    private static SAMLSSOServiceProviderDTO createSAMLSpWithMetadataContent(String metadataContent)
-            throws IdentitySAML2SSOException {
-
-        SAMLSSOServiceProviderDTO serviceProviderDTO =
-                getSamlSsoConfigService().uploadRPServiceProvider(metadataContent);
-        return serviceProviderDTO;
     }
 
     private static SAMLSSOServiceProviderDO createSAMLSpWithMetadataUrl(String metadataUrl) {
