@@ -91,8 +91,6 @@ public class SAMLInboundFunctions {
     private static final String ASSERTION_ENCRYPTION_ALGORITHM_URI = "assertionEncryptionAlgorithmURI";
     private static final String KEY_ENCRYPTION_ALGORITHM_URI = "keyEncryptionAlgorithmURI";
     private static final String CERT_ALIAS = "certAlias";
-    //    TODO: check "attrConsumServiceIndex" (Line 77)
-//    public static final String ATTRIBUTE_CONSUMING_SERVICE_INDEX = "attributeConsumingServiceIndex";
     private static final String DO_SIGN_RESPONSE = "doSignResponse";
     private static final String DO_SINGLE_LOGOUT = "doSingleLogout";
     private static final String DO_FRONT_CHANNEL_LOGOUT = "doFrontChannelLogout";
@@ -656,73 +654,72 @@ public class SAMLInboundFunctions {
 
     private static void addSAMLInboundProperties(List<Property> propertyList,
                                                  SAMLSSOServiceProviderDO serviceProviderDO) {
-        propertyList.add(addKeyValuePair(ISSUER, serviceProviderDO.getIssuer()));
-        propertyList.add(addKeyValuePair(ISSUER_QUALIFIER, serviceProviderDO.getIssuerQualifier()));
+        addKeyValuePair(ISSUER, serviceProviderDO.getIssuer(), propertyList);
+        addKeyValuePair(ISSUER_QUALIFIER, serviceProviderDO.getIssuerQualifier(), propertyList);
         for (String url : serviceProviderDO.getAssertionConsumerUrls()) {
-            propertyList.add(addKeyValuePair(ASSERTION_CONSUMER_URLS, url));
+            addKeyValuePair(ASSERTION_CONSUMER_URLS, url, propertyList);
         }
-        propertyList.add(addKeyValuePair(DEFAULT_ASSERTION_CONSUMER_URL,
-                serviceProviderDO.getDefaultAssertionConsumerUrl()));
-        propertyList.add(addKeyValuePair(SIGNING_ALGORITHM_URI, serviceProviderDO.getSigningAlgorithmUri()));
-        propertyList.add(addKeyValuePair(DIGEST_ALGORITHM_URI, serviceProviderDO.getDigestAlgorithmUri()));
-        propertyList.add(addKeyValuePair(ASSERTION_ENCRYPTION_ALGORITHM_URI,
-                serviceProviderDO.getAssertionEncryptionAlgorithmUri()));
-        propertyList.add(addKeyValuePair(KEY_ENCRYPTION_ALGORITHM_URI,
-                serviceProviderDO.getKeyEncryptionAlgorithmUri()));
-        propertyList.add(addKeyValuePair(CERT_ALIAS, serviceProviderDO.getCertAlias()));
-        //TODO: check ATTRIBUTE_CONSUMING_SERVICE_INDEX
-
-        //        propertyList.add(addKeyValuePair(ATTRIBUTE_CONSUMING_SERVICE_INDEX,
-        //        serviceProviderDO.getAttributeConsumingServiceIndex()));
-        propertyList.add(addKeyValuePair(DO_SIGN_RESPONSE, serviceProviderDO.isDoSignResponse() ? "true" : "false"));
-        propertyList.add(addKeyValuePair(DO_SINGLE_LOGOUT, serviceProviderDO.isDoSingleLogout() ? "true" : "false"));
-        propertyList.add(addKeyValuePair(DO_FRONT_CHANNEL_LOGOUT,
-                serviceProviderDO.isDoFrontChannelLogout() ? "true" : "false"));
-        propertyList.add(addKeyValuePair(FRONT_CHANNEL_LOGOUT_BINDING,
-                serviceProviderDO.getFrontChannelLogoutBinding()));
-        propertyList.add(addKeyValuePair(IS_ASSERTION_QUERY_REQUEST_PROFILE_ENABLED,
-                serviceProviderDO.isAssertionQueryRequestProfileEnabled() ? "true" : "false"));
-        propertyList.add(addKeyValuePair(SUPPORTED_ASSERTION_QUERY_REQUEST_TYPES,
-                serviceProviderDO.getSupportedAssertionQueryRequestTypes()));
-        propertyList.add(addKeyValuePair(ENABLE_SAML2_ARTIFACT_BINDING,
-                serviceProviderDO.isEnableSAML2ArtifactBinding() ? "true" : "false"));
-        propertyList.add(addKeyValuePair(DO_VALIDATE_SIGNATURE_IN_ARTIFACT_RESOLVE,
-                serviceProviderDO.isDoValidateSignatureInArtifactResolve() ? "true" : "false"));
-        propertyList.add(addKeyValuePair(LOGIN_PAGE_URL, serviceProviderDO.getLoginPageURL()));
-        propertyList.add(addKeyValuePair(SLO_RESPONSE_URL, serviceProviderDO.getSloResponseURL()));
-        propertyList.add(addKeyValuePair(SLO_REQUEST_URL, serviceProviderDO.getSloRequestURL()));
+        addKeyValuePair(DEFAULT_ASSERTION_CONSUMER_URL,
+                serviceProviderDO.getDefaultAssertionConsumerUrl(), propertyList);
+        addKeyValuePair(SIGNING_ALGORITHM_URI, serviceProviderDO.getSigningAlgorithmUri(), propertyList);
+        addKeyValuePair(DIGEST_ALGORITHM_URI, serviceProviderDO.getDigestAlgorithmUri(), propertyList);
+        addKeyValuePair(ASSERTION_ENCRYPTION_ALGORITHM_URI,
+                serviceProviderDO.getAssertionEncryptionAlgorithmUri(), propertyList);
+        addKeyValuePair(KEY_ENCRYPTION_ALGORITHM_URI,
+                serviceProviderDO.getKeyEncryptionAlgorithmUri(), propertyList);
+        addKeyValuePair(CERT_ALIAS, serviceProviderDO.getCertAlias(), propertyList);
+        addKeyValuePair(DO_SIGN_RESPONSE, serviceProviderDO.isDoSignResponse() ? "true" : "false", propertyList);
+        addKeyValuePair(DO_SINGLE_LOGOUT, serviceProviderDO.isDoSingleLogout() ? "true" : "false", propertyList);
+        addKeyValuePair(DO_FRONT_CHANNEL_LOGOUT,
+                serviceProviderDO.isDoFrontChannelLogout() ? "true" : "false", propertyList);
+        addKeyValuePair(FRONT_CHANNEL_LOGOUT_BINDING,
+                serviceProviderDO.getFrontChannelLogoutBinding(), propertyList);
+        addKeyValuePair(IS_ASSERTION_QUERY_REQUEST_PROFILE_ENABLED,
+                serviceProviderDO.isAssertionQueryRequestProfileEnabled() ? "true" : "false", propertyList);
+        addKeyValuePair(SUPPORTED_ASSERTION_QUERY_REQUEST_TYPES,
+                serviceProviderDO.getSupportedAssertionQueryRequestTypes(), propertyList);
+        addKeyValuePair(ENABLE_SAML2_ARTIFACT_BINDING,
+                serviceProviderDO.isEnableSAML2ArtifactBinding() ? "true" : "false", propertyList);
+        addKeyValuePair(DO_VALIDATE_SIGNATURE_IN_ARTIFACT_RESOLVE,
+                serviceProviderDO.isDoValidateSignatureInArtifactResolve() ? "true" : "false", propertyList);
+        addKeyValuePair(LOGIN_PAGE_URL, serviceProviderDO.getLoginPageURL(), propertyList);
+        addKeyValuePair(SLO_RESPONSE_URL, serviceProviderDO.getSloResponseURL(), propertyList);
+        addKeyValuePair(SLO_REQUEST_URL, serviceProviderDO.getSloRequestURL(), propertyList);
         for (String claim : serviceProviderDO.getRequestedClaims()) {
-            propertyList.add(addKeyValuePair(REQUESTED_CLAIMS, claim));
+            addKeyValuePair(REQUESTED_CLAIMS, claim, propertyList);
         }
         for (String audience : serviceProviderDO.getRequestedAudiences()) {
-            propertyList.add(addKeyValuePair(REQUESTED_AUDIENCES, audience));
+            addKeyValuePair(REQUESTED_AUDIENCES, audience, propertyList);
         }
         for (String recipient : serviceProviderDO.getRequestedRecipients()) {
-            propertyList.add(addKeyValuePair(REQUESTED_RECIPIENTS, recipient));
+            addKeyValuePair(REQUESTED_RECIPIENTS, recipient, propertyList);
         }
-        propertyList.add(addKeyValuePair(ENABLE_ATTRIBUTES_BY_DEFAULT,
-                serviceProviderDO.isEnableAttributesByDefault() ? "true" : "false"));
-        propertyList.add(addKeyValuePair(NAME_ID_CLAIM_URI, serviceProviderDO.getNameIdClaimUri()));
-        propertyList.add(addKeyValuePair(NAME_ID_FORMAT, serviceProviderDO.getNameIDFormat()));
-        propertyList.add(addKeyValuePair(IDP_INIT_SSO_ENABLED,
-                serviceProviderDO.isIdPInitSSOEnabled() ? "true" : "false"));
-        propertyList.add(addKeyValuePair(IDP_INIT_SLO_ENABLED,
-                serviceProviderDO.isIdPInitSLOEnabled() ? "true" : "false"));
+        addKeyValuePair(ENABLE_ATTRIBUTES_BY_DEFAULT,
+                serviceProviderDO.isEnableAttributesByDefault() ? "true" : "false", propertyList);
+        addKeyValuePair(NAME_ID_CLAIM_URI, serviceProviderDO.getNameIdClaimUri(), propertyList);
+        addKeyValuePair(NAME_ID_FORMAT, serviceProviderDO.getNameIDFormat(), propertyList);
+        addKeyValuePair(IDP_INIT_SSO_ENABLED,
+                serviceProviderDO.isIdPInitSSOEnabled() ? "true" : "false", propertyList);
+        addKeyValuePair(IDP_INIT_SLO_ENABLED,
+                serviceProviderDO.isIdPInitSLOEnabled() ? "true" : "false", propertyList);
         for (String url : serviceProviderDO.getIdpInitSLOReturnToURLs()) {
-            propertyList.add(addKeyValuePair(IDP_INIT_SLO_RETURN_TO_URLS, url));
+            addKeyValuePair(IDP_INIT_SLO_RETURN_TO_URLS, url, propertyList);
         }
-        propertyList.add(addKeyValuePair(DO_ENABLE_ENCRYPTED_ASSERTION,
-                serviceProviderDO.isDoEnableEncryptedAssertion() ? "true" : "false"));
-        propertyList.add(addKeyValuePair(DO_VALIDATE_SIGNATURE_IN_REQUESTS,
-                serviceProviderDO.isDoValidateSignatureInRequests() ? "true" : "false"));
-        propertyList.add(addKeyValuePair(IDP_ENTITY_ID_ALIAS, serviceProviderDO.getIdpEntityIDAlias()));
+        addKeyValuePair(DO_ENABLE_ENCRYPTED_ASSERTION,
+                serviceProviderDO.isDoEnableEncryptedAssertion() ? "true" : "false", propertyList);
+        addKeyValuePair(DO_VALIDATE_SIGNATURE_IN_REQUESTS,
+                serviceProviderDO.isDoValidateSignatureInRequests() ? "true" : "false", propertyList);
+        addKeyValuePair(IDP_ENTITY_ID_ALIAS, serviceProviderDO.getIdpEntityIDAlias(), propertyList);
     }
 
-    private static Property addKeyValuePair(String key, String value) {
+    private static void addKeyValuePair(String key, String value, List<Property> propertyList) {
+        if (value == null) {
+            return;
+        }
         Property property = new Property();
         property.setName(key);
         property.setValue(value);
-        return property;
+        propertyList.add(property);
     }
 
 }
