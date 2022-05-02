@@ -328,14 +328,14 @@ public class SAMLInboundFunctions {
     }
 
     private static String[] getMultiValues(HashMap<String, List<String>> map, String key) {
-        if (key != null && map.containsKey(key)) {
+        if (key != null && map.containsKey(key) && map.get(key) != null) {
             return map.get(key).toArray(new String[0]);
         }
         return new String[0];
     }
 
     private static String getSingleValue(HashMap<String, List<String>> map, String key) {
-        if (key != null && map.containsKey(key)) {
+        if (key != null && map.containsKey(key) && map.get(key) != null) {
             return map.get(key).get(0);
         }
         return null;
