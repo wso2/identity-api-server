@@ -114,7 +114,7 @@ public class SAMLInboundFunctions {
     private static final String DO_ENABLE_ENCRYPTED_ASSERTION = "doEnableEncryptedAssertion";
     private static final String DO_VALIDATE_SIGNATURE_IN_REQUESTS = "doValidateSignatureInRequests";
     private static final String IDP_ENTITY_ID_ALIAS = "idpEntityIDAlias";
-
+    private static final String IS_UPDATE = "isUpdate";
 
     private SAMLInboundFunctions() {
 
@@ -710,6 +710,7 @@ public class SAMLInboundFunctions {
         addKeyValuePair(DO_VALIDATE_SIGNATURE_IN_REQUESTS,
                 serviceProviderDO.isDoValidateSignatureInRequests() ? "true" : "false", propertyList);
         addKeyValuePair(IDP_ENTITY_ID_ALIAS, serviceProviderDO.getIdpEntityIDAlias(), propertyList);
+        addKeyValuePair(IS_UPDATE, "false", propertyList);
     }
 
     private static void addKeyValuePair(String key, String value, List<Property> propertyList) {
