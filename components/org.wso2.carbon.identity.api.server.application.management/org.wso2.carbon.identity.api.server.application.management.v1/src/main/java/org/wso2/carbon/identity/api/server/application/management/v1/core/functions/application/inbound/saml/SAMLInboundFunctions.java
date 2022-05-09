@@ -32,10 +32,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Config
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SingleSignOnProfile;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
-import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
@@ -123,25 +121,21 @@ public class SAMLInboundFunctions {
     public static InboundAuthenticationRequestConfig putSAMLInbound(ServiceProvider application,
                                                                     SAML2Configuration saml2Configuration) {
 
-        // First we identify whether this is a insert or update.
-        String currentIssuer = InboundFunctions.getInboundAuthKey(application, StandardInboundProtocols.SAML2);
-        SAMLSSOServiceProviderDTO oldSAMLSp = null;
         try {
             validateSingleSignOnProfileBindings(saml2Configuration);
-            if (currentIssuer != null) {
-                // Delete the current app.
-                oldSAMLSp = getSamlSsoConfigService().getServiceProvider(currentIssuer);
-                getSamlSsoConfigService().removeServiceProvider(currentIssuer);
-            }
         } catch (IdentityException e) {
             throw handleException(e);
         }
 
         try {
-            return createSAMLInbound(saml2Configuration);
+            InboundAuthenticationRequestConfig inboundConfig =  createSAMLInbound(saml2Configuration);
+            Property[] properties = Arrays.stream(inboundConfig.getProperties()).filter(property ->
+                    (!property.getName().equals(IS_UPDATE))).toArray(Property[]::new);
+            List<Property> propertyList = new ArrayList<>(Arrays.asList(properties));
+            addKeyValuePair(IS_UPDATE, "true", propertyList);
+            inboundConfig.setProperties(propertyList.toArray(new Property[0]));
+            return inboundConfig;
         } catch (APIError error) {
-            // Try to rollback by recreating the previous SAML SP.
-            rollbackSAMLSpRemoval(oldSAMLSp);
             throw error;
         }
     }
