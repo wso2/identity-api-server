@@ -255,6 +255,9 @@ public class SAMLInboundFunctions {
             return null;
         }
         serviceProviderDTO.setIssuerQualifier(getSingleValue(map, ISSUER_QUALIFIER));
+        if (StringUtils.isNotBlank(serviceProviderDTO.getIssuerQualifier())) {
+            serviceProviderDTO.setIssuer(SAMLSSOUtil.getIssuerWithoutQualifier(serviceProviderDTO.getIssuer()));
+        }
         serviceProviderDTO.setAssertionConsumerUrls(getMultiValues(map, ASSERTION_CONSUMER_URLS));
 
         serviceProviderDTO.setDefaultAssertionConsumerUrl(getSingleValue(map, DEFAULT_ASSERTION_CONSUMER_URL));
@@ -648,6 +651,10 @@ public class SAMLInboundFunctions {
 
     private static void addSAMLInboundProperties(List<Property> propertyList,
                                                  SAMLSSOServiceProviderDO serviceProviderDO) {
+        if (StringUtils.isNotBlank(serviceProviderDO.getIssuerQualifier())) {
+            serviceProviderDO.setIssuer(SAMLSSOUtil.getIssuerWithQualifier(serviceProviderDO.getIssuer(),
+                    serviceProviderDO.getIssuerQualifier()));
+        }
         addKeyValuePair(ISSUER, serviceProviderDO.getIssuer(), propertyList);
         addKeyValuePair(ISSUER_QUALIFIER, serviceProviderDO.getIssuerQualifier(), propertyList);
         for (String url : serviceProviderDO.getAssertionConsumerUrls()) {
