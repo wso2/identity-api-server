@@ -113,6 +113,7 @@ public class SAMLInboundFunctions {
     private static final String DO_VALIDATE_SIGNATURE_IN_REQUESTS = "doValidateSignatureInRequests";
     private static final String IDP_ENTITY_ID_ALIAS = "idpEntityIDAlias";
     private static final String IS_UPDATE = "isUpdate";
+    private static final String METADATA = "metadata";
 
     private SAMLInboundFunctions() {
 
@@ -193,12 +194,13 @@ public class SAMLInboundFunctions {
     public static InboundAuthenticationRequestConfig createSAMLInbound(SAML2Configuration saml2Configuration) {
 
         SAML2ServiceProvider samlManualConfiguration = saml2Configuration.getManualConfiguration();
+        List<Property> propertyList = new ArrayList<>();
 
         SAMLSSOServiceProviderDO samlssoServiceProviderDO;
         if (saml2Configuration.getMetadataFile() != null) {
-            samlssoServiceProviderDO = createSAMLSpWithMetadataFile(saml2Configuration.getMetadataFile());
+            samlssoServiceProviderDO = createSAMLSpWithMetadataFile(saml2Configuration.getMetadataFile(), propertyList);
         } else if (saml2Configuration.getMetadataURL() != null) {
-            samlssoServiceProviderDO = createSAMLSpWithMetadataUrl(saml2Configuration.getMetadataURL());
+            samlssoServiceProviderDO = createSAMLSpWithMetadataUrl(saml2Configuration.getMetadataURL(), propertyList);
         } else if (samlManualConfiguration != null) {
             samlssoServiceProviderDO = createSAMLSpWithManualConfiguration(samlManualConfiguration);
         } else {
@@ -209,21 +211,6 @@ public class SAMLInboundFunctions {
         InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
         samlInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.SAML2);
         samlInbound.setInboundAuthKey(samlssoServiceProviderDO.getIssuer());
-        List<Property> propertyList = new ArrayList<>();
-        if (StringUtils.isNotBlank(samlssoServiceProviderDO.getAttributeConsumingServiceIndex())) {
-            Property property = new Property();
-            property.setName(ATTRIBUTE_CONSUMING_SERVICE_INDEX);
-            if (StringUtils.isNotBlank(samlssoServiceProviderDO.getAttributeConsumingServiceIndex())) {
-                property.setValue(samlssoServiceProviderDO.getAttributeConsumingServiceIndex());
-            } else {
-                try {
-                    property.setValue(Integer.toString(IdentityUtil.getRandomInteger()));
-                } catch (IdentityException e) {
-                    handleException(e);
-                }
-            }
-            propertyList.add(property);
-        }
 
         addSAMLInboundProperties(propertyList, samlssoServiceProviderDO);
 
@@ -355,7 +342,8 @@ public class SAMLInboundFunctions {
         }
     }
 
-    private static SAMLSSOServiceProviderDO createSAMLSpWithMetadataFile(String encodedMetaFileContent) {
+    private static SAMLSSOServiceProviderDO createSAMLSpWithMetadataFile(String encodedMetaFileContent,
+                                                                         List<Property> propertyList) {
         try {
             byte[] metaData = Base64.getDecoder().decode(encodedMetaFileContent.getBytes(StandardCharsets.UTF_8));
             String base64DecodedMetadata = new String(metaData, StandardCharsets.UTF_8);
@@ -363,13 +351,15 @@ public class SAMLInboundFunctions {
             if (logger.isDebugEnabled()) {
                 logger.debug("Creating SAML Service Provider with metadata: " + base64DecodedMetadata);
             }
-            return getServiceProviderDOFromMetadata(base64DecodedMetadata);
+            return getServiceProviderDOFromMetadata(base64DecodedMetadata, propertyList);
         } catch (IdentityException e) {
             throw handleException(e);
         }
     }
 
-    private static SAMLSSOServiceProviderDO getServiceProviderDOFromMetadata(String metadata) throws IdentityException {
+    private static SAMLSSOServiceProviderDO getServiceProviderDOFromMetadata(String metadata,
+                                                                             List<Property> propertyList)
+            throws IdentityException {
         SAMLSSOServiceProviderDO samlssoServiceProviderDO = new SAMLSSOServiceProviderDO();
         Registry registry = getConfigSystemRegistry();
         try {
@@ -380,29 +370,27 @@ public class SAMLInboundFunctions {
             throw buildClientException(INVALID_REQUEST, "Error parsing SAML SP metadata.", e);
         }
         if (samlssoServiceProviderDO.getX509Certificate() != null) {
-            try {
-                //save certificate
-                saveCertificateToKeyStore(samlssoServiceProviderDO, (UserRegistry) registry);
-            } catch (Exception e) {
-                throw new IdentityException("Error occurred while setting certificate and alias", e);
-            }
+            addKeyValuePair(METADATA, metadata, propertyList);
         }
         return samlssoServiceProviderDO;
     }
 
-    private static SAMLSSOServiceProviderDO createSAMLSpWithMetadataUrl(String metadataUrl) {
+    private static SAMLSSOServiceProviderDO createSAMLSpWithMetadataUrl(String metadataUrl,
+                                                                        List<Property> propertyList) {
 
         try {
             SAMLSSOServiceProviderDO serviceProviderDO =
-                    createSAMLServiceProviderDOWithMetadataUrl(metadataUrl);
+                    createSAMLServiceProviderDOWithMetadataUrl(metadataUrl, propertyList);
             return serviceProviderDO;
         } catch (IdentitySAML2SSOException e) {
             throw handleException(e);
         }
     }
 
-    private static SAMLSSOServiceProviderDO createSAMLServiceProviderDOWithMetadataUrl(String metadataUrl)
+    private static SAMLSSOServiceProviderDO createSAMLServiceProviderDOWithMetadataUrl(String metadataUrl,
+                                                                                       List<Property> propertyList)
             throws IdentitySAML2SSOException {
+
         InputStream in = null;
         try {
             URL url = new URL(metadataUrl);
@@ -412,7 +400,7 @@ public class SAMLInboundFunctions {
             in = new BoundedInputStream(con.getInputStream(), getMaxSizeInBytes());
 
             String metadata = IOUtils.toString(in);
-            return getServiceProviderDOFromMetadata(metadata);
+            return getServiceProviderDOFromMetadata(metadata, propertyList);
         } catch (IOException e) {
             String tenantDomain = getTenantDomain();
             throw handleIOException(URL_NOT_FOUND, "Non-existing metadata URL for SAML service provider creation in " +
@@ -516,51 +504,6 @@ public class SAMLInboundFunctions {
 
         return (Registry) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                 .getRegistry(RegistryType.SYSTEM_CONFIGURATION);
-    }
-
-    /*
-     * Save Certificate To Key Store
-     *
-     * @param serviceProviderDO Service provider data object
-     * @throws Exception exception
-     */
-    private static void saveCertificateToKeyStore(SAMLSSOServiceProviderDO serviceProviderDO, UserRegistry registry)
-            throws Exception {
-
-        KeyStoreManager manager = KeyStoreManager.getInstance(registry.getTenantId(), IdentitySAMLSSOServiceComponent
-                .getServerConfigurationService(), IdentityTenantUtil.getRegistryService());
-
-        if (MultitenantConstants.SUPER_TENANT_ID == registry.getTenantId()) {
-
-            KeyStore keyStore = manager.getPrimaryKeyStore();
-
-            // Admin should manually add the service provider signing certificate to the keystore file.
-            // If the certificate is available we will set the alias of that certificate.
-            String alias = keyStore.getCertificateAlias(serviceProviderDO.getX509Certificate());
-            if (!StringUtils.isBlank(alias)) {
-                serviceProviderDO.setCertAlias(alias);
-            } else {
-                serviceProviderDO.setCertAlias(null);
-            }
-        } else {
-
-            String keyStoreName = getKeyStoreName(registry.getTenantId());
-            KeyStore keyStore = manager.getKeyStore(keyStoreName);
-
-            // Add new certificate
-            keyStore.setCertificateEntry(serviceProviderDO.getIssuer(), serviceProviderDO.getX509Certificate());
-            manager.updateKeyStore(keyStoreName, keyStore);
-        }
-    }
-    /*
-     * This method returns the key store file name from the domain Name
-     *
-     * @return key store name
-     */
-    private static String getKeyStoreName(int tenantId) {
-
-        String ksName = IdentityTenantUtil.getTenantDomain(tenantId).replace(".", "-");
-        return (ksName + ".jks");
     }
 
     private static IdentitySAML2ClientException buildClientException(Error error, String message, Exception e) {
@@ -683,6 +626,8 @@ public class SAMLInboundFunctions {
         addKeyValuePair(LOGIN_PAGE_URL, serviceProviderDO.getLoginPageURL(), propertyList);
         addKeyValuePair(SLO_RESPONSE_URL, serviceProviderDO.getSloResponseURL(), propertyList);
         addKeyValuePair(SLO_REQUEST_URL, serviceProviderDO.getSloRequestURL(), propertyList);
+        addKeyValuePair(ATTRIBUTE_CONSUMING_SERVICE_INDEX, serviceProviderDO.getAttributeConsumingServiceIndex(),
+                propertyList);
         for (String claim : serviceProviderDO.getRequestedClaims()) {
             addKeyValuePair(REQUESTED_CLAIMS, claim, propertyList);
         }
