@@ -103,6 +103,7 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
+import org.wso2.carbon.user.core.UserCoreConstants;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -2193,7 +2194,7 @@ public class ServerIdpManagementService {
                 }
             }
             if (idp.getJustInTimeProvisioningConfig().getProvisioningUserStore() == null) {
-                jitConfig.setUserstore("PRIMARY");
+                jitConfig.setUserstore(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME);
             } else {
                 jitConfig.setUserstore(idp.getJustInTimeProvisioningConfig().getProvisioningUserStore());
             }
