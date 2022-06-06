@@ -758,6 +758,11 @@ components:
           description: Configured user store proper for the set.
           items:
             $ref: '#/components/schemas/AddUserStorePropertiesRes'
+        claimAttributeMappings:
+          type: array
+          description: Configured user store claim attribute mappings
+          items:
+            $ref: '#/components/schemas/ClaimAttributeMapping'
     AvailableUserStoreClassesRes:
       type: object
       description: Available User Store Classes Response.

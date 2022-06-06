@@ -22,6 +22,7 @@ import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
+import org.wso2.carbon.user.core.service.RealmService;
 
 /**
  * ApplicationManagementService OSGi service holder.
@@ -35,6 +36,7 @@ public class ApplicationManagementServiceHolder {
     private static OAuthServerConfiguration oAuthServerConfiguration;
     private static TemplateManager templateManager;
     private static CORSManagementService corsManagementService;
+    private static RealmService realmService;
 
     public static ApplicationManagementService getApplicationManagementService() {
 
@@ -104,5 +106,25 @@ public class ApplicationManagementServiceHolder {
     public static void setCorsManagementService(CORSManagementService corsManagementService) {
 
         ApplicationManagementServiceHolder.corsManagementService = corsManagementService;
+    }
+
+    /**
+     * Get RealmService.
+     *
+     * @return RealmService.
+     */
+    public static RealmService getRealmService() {
+
+        return realmService;
+    }
+
+    /**
+     * Set RealmService.
+     *
+     * @param realmService RealmService.
+     */
+    public static void setRealmService(RealmService realmService) {
+
+        ApplicationManagementServiceHolder.realmService = realmService;
     }
 }

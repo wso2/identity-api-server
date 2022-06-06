@@ -18,32 +18,32 @@
 
 package org.wso2.carbon.identity.api.server.branding.preference.management.common;
 
-import org.wso2.carbon.identity.configuration.mgt.core.ConfigurationManager;
+import org.wso2.carbon.identity.branding.preference.management.core.BrandingPreferenceManager;
 
 /**
  * Service holder class for branding preference management.
  */
 public class BrandingPreferenceServiceHolder {
 
-    private static ConfigurationManager brandingPreferenceConfigManager;
+    private static BrandingPreferenceManager brandingPreferenceManager;
 
     /**
-     * Get ConfigurationManager OSGi service.
+     * Get BrandingPreferenceManager OSGi service.
      *
-     * @return BrandingPreferenceConfig Manager.
+     * @return BrandingPreference Manager.
      */
-    public static ConfigurationManager getBrandingPreferenceConfigManager() {
+    public static BrandingPreferenceManager getBrandingPreferenceManager() {
 
-        return brandingPreferenceConfigManager;
+        return brandingPreferenceManager;
     }
 
     /**
-     * Set ConfigurationManager OSGi service.
+     * Set BrandingPreferenceManager OSGi service.
      *
-     * @param configManager Configuration Manager.
+     * @param brandingPreferenceManager Branding Preference Manager.
      */
-    public static void setBrandingPreferenceConfigManager(ConfigurationManager configManager) {
+    public static void setBrandingPreferenceManager(BrandingPreferenceManager brandingPreferenceManager) {
 
-        BrandingPreferenceServiceHolder.brandingPreferenceConfigManager = configManager;
+        BrandingPreferenceServiceHolder.brandingPreferenceManager = brandingPreferenceManager;
     }
 }
