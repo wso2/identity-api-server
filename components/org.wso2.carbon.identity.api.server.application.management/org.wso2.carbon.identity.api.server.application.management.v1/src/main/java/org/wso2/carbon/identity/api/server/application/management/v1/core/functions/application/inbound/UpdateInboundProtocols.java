@@ -52,7 +52,7 @@ public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, I
             }
 
             if (inboundProtocols.getSaml() != null) {
-                inbounds.add(createSAMLInbound(inboundProtocols.getSaml()));
+                inbounds.add(createSAMLInbound(application, inboundProtocols.getSaml()));
             }
 
             if (inboundProtocols.getWsTrust() != null) {

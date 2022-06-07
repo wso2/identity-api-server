@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.5-SNAPSHOT</version>
+    <version>1.1.15-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -499,18 +499,18 @@
         <!--Maven Plugin Version-->
         <maven.compiler.plugin.version>2.3.1</maven.compiler.plugin.version>
         <maven.bundle.plugin.version>2.4.0</maven.bundle.plugin.version>
-        <jackson-jaxrs-json-provider.version>2.13.0</jackson-jaxrs-json-provider.version>
-        <jackson-databind.version>2.13.0</jackson-databind.version>
-        <cxf-bundle.version>3.4.5</cxf-bundle.version>
+        <jackson-jaxrs-json-provider.version>2.13.2</jackson-jaxrs-json-provider.version>
+        <jackson-databind.version>2.13.2.2</jackson-databind.version>
+        <cxf-bundle.version>3.5.0</cxf-bundle.version>
         <cxf.extensions.search.version>3.3.1</cxf.extensions.search.version>
         <jackson.version>1.9.13</jackson.version>
-        <spring-web.version>5.1.1.RELEASE</spring-web.version>
+        <spring-web.version>5.3.19</spring-web.version>
         <swagger-jaxrs.version>1.6.2</swagger-jaxrs.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.5.25</identity.governance.version>
-        <carbon.identity.framework.version>5.20.222</carbon.identity.framework.version>
+        <carbon.identity.framework.version>5.20.337</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
