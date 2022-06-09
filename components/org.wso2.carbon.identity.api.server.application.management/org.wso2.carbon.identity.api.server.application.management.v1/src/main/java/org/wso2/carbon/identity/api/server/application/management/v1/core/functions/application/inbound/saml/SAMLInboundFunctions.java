@@ -324,7 +324,7 @@ public class SAMLInboundFunctions {
     }
 
     public static void deleteSAMLServiceProvider(InboundAuthenticationRequestConfig inbound) {
-        //no need for remove SAML SP inbound configuration separately from the application.Because now SAML metadata
+        // No need for remove SAML SP inbound configuration separately from the application.Because now SAML metadata
         // will get stored only with the application
     }
 
