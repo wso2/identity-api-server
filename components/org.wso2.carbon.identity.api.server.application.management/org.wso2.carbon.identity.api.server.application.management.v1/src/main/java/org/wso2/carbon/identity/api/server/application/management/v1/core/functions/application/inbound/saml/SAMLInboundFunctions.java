@@ -324,8 +324,8 @@ public class SAMLInboundFunctions {
     }
 
     public static void deleteSAMLServiceProvider(InboundAuthenticationRequestConfig inbound) {
-        // No need for remove SAML SP inbound configuration separately from the application.Because now SAML metadata
-        // will get stored only with the application
+        // No need for remove SAML SP inbound configuration separately from the application. Because now SAML metadata
+        // will get stored only with the application.
     }
 
     private static SAMLSSOServiceProviderDTO createSAMLSpWithManualConfiguration(SAML2ServiceProvider saml2SpModel) {
