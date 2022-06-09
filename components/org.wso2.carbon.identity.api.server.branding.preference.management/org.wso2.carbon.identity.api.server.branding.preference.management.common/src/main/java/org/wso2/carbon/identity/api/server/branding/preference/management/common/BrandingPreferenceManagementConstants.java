@@ -25,18 +25,17 @@ public class BrandingPreferenceManagementConstants {
 
     public static final String BRANDING_PREFERENCE_ERROR_PREFIX = "BPM-";
     public static final String BRANDING_PREFERENCE_CONTEXT_PATH = "/branding-preference";
-    public static final String BRANDING_RESOURCE_TYPE = "BRANDING_PREFERENCES";
     public static final String QUERY_PARAM_INDICATOR = "?";
     public static final String GET_PREFERENCE_COMPONENT_WITH_QUERY_PARAM = "type=%s&name=%s&locale=%s";
     public static final String ORGANIZATION_TYPE = "ORG";
     public static final String APPLICATION_TYPE = "APP";
     public static final String CUSTOM_TYPE = "CUSTOM";
     public static final String DEFAULT_LOCALE = "en-US";
-    public static final String CONFIG_MGT_ERROR_CODE_DELIMITER = "_";
-    public static final String RESOURCE_NAME_SEPARATOR = "_";
+    public static final String BRANDING_PREFERENCE_MGT_ERROR_CODE_DELIMITER = "_";
 
-    public static final String RESOURCE_NOT_EXISTS_ERROR_CODE = "CONFIGM_00017";
-    public static final String RESOURCE_ALREADY_EXISTS_ERROR_CODE = "CONFIGM_00013";
+    public static final String BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE = "BRANDINGM_00002";
+    public static final String BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE = "BRANDINGM_00003";
+    public static final String BRANDING_PREFERENCE_NOT_ALLOWED_ERROR_CODE = "BRANDINGM_00011";
 
     /**
      * Enums for error messages.
@@ -52,6 +51,9 @@ public class BrandingPreferenceManagementConstants {
                 "Branding preferences are not configured for organization: %s."),
         ERROR_CODE_CONFLICT_BRANDING_PREFERENCE("60003", "Branding preference already exists.",
                 "There exists a branding preference configurations in the organization: %s."),
+        ERROR_CODE_NOT_ALLOWED_BRANDING_PREFERENCE_CONFIGURATIONS("60004",
+                "Not allowed branding preference configurations.",
+                "Requested branding preference configuration: %s is not allowed for the organization."),
 
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE("65001",
@@ -65,17 +67,7 @@ public class BrandingPreferenceManagementConstants {
                 "Server encountered an error while deleting branding preference configurations for organization: %s"),
         ERROR_CODE_ERROR_UPDATING_BRANDING_PREFERENCE("65004",
                 "Unable to update branding preference configurations.",
-                "Error while updating branding preference configurations for organization: %s."),
-        ERROR_CODE_JSON_PROCESSING_EXCEPTION("65005", "Json Processing Exception.",
-                "Json Processing Exception: %s."),
-        ERROR_CODE_UNSUPPORTED_ENCODING_EXCEPTION("65006", "Unsupported Encoding Exception.",
-                "Unsupported Encoding Exception: %s."),
-        ERROR_CODE_ERROR_BUILDING_RESPONSE_EXCEPTION("65007",
-                "Unable to build response from branding preference configurations.",
-                "Error while building response from branding preference configurations."),
-        ERROR_CODE_ERROR_CHECKING_BRANDING_PREFERENCE_EXISTS("65008",
-                "Error while checking branding preference configurations existence.",
-                "Error while checking the existence of branding preference configurations for organization: %s.");
+                "Error while updating branding preference configurations for organization: %s.");
 
         private final String code;
         private final String message;

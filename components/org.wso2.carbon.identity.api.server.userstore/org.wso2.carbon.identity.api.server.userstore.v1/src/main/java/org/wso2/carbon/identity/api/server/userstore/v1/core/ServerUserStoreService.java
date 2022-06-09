@@ -186,7 +186,18 @@ public class ServerUserStoreService {
          */
         try {
             validateUserstoreUpdateRequest(domainId, userStoreReq);
+            String userstoreDomain = userStoreReq.getName();
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            List<LocalClaim> localClaimList = new ArrayList<>();
+            List<ClaimAttributeMapping> claimAttributeMappingList = userStoreReq.getClaimAttributeMappings();
+            if (claimAttributeMappingList != null) {
+                localClaimList =  createLocalClaimList(userstoreDomain, claimAttributeMappingList);
+                validateClaimMappings(tenantDomain, localClaimList);
+            }
             userStoreConfigService.updateUserStore(createUserStoreDTO(userStoreReq), false);
+            if (claimAttributeMappingList != null) {
+                updateClaimMappings(userstoreDomain, tenantDomain, localClaimList);
+            }
             return buildUserStoreResponseDTO(userStoreReq);
         } catch (IdentityUserStoreMgtException e) {
             UserStoreConstants.ErrorMessage errorEnum =
@@ -986,6 +997,7 @@ public class ServerUserStoreService {
         userStoreResponseDTO.setTypeName(base64URLDecodeId(userStoreReq.getTypeId()));
         userStoreResponseDTO.setDescription(userStoreReq.getDescription());
         userStoreResponseDTO.setProperties(buildUserStorePropertiesRes(userStoreReq));
+        userStoreResponseDTO.setClaimAttributeMappings(userStoreReq.getClaimAttributeMappings());
         return userStoreResponseDTO;
     }
 

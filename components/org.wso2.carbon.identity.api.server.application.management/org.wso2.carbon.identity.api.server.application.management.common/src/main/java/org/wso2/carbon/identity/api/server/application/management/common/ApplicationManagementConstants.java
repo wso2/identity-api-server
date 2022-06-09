@@ -46,6 +46,8 @@ public class ApplicationManagementConstants {
     public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
     public static final String DEFAULT_CERTIFICATE_ALIAS = "wso2carbon";
 
+    public static final String NON_EXISTING_USER_CODE = "30007 - ";
+
     /**
      * Enums for error messages.
      */
@@ -83,6 +85,8 @@ public class ApplicationManagementConstants {
         ERROR_APPLICATION_LIMIT_REACHED("60503",
                 "Unable to create an application.",
                 "Maximum number of allowed applications have been reached."),
+        NON_EXISTING_USER_ID("60504", "User not found",
+                "Non exiting user for the given userid: %s."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
@@ -111,7 +115,11 @@ public class ApplicationManagementConstants {
         APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED("65501",
                 "Unsupported Operation.",
                 "Application creation with templates is not supported in this version of the API."),
-        ERROR_CODE_ERROR_INVALID_SEARCH_FILTER("65502", "Search request validation failed.", "Invalid search filter.");
+        ERROR_CODE_ERROR_INVALID_SEARCH_FILTER("65502", "Search request validation failed.", "Invalid search filter."),
+        ERROR_RETRIEVING_USER_BY_ID("65503", "Error occurred while retrieving user",
+                "Error occurred while retrieving user by userid: %s."),
+        ERROR_RETRIEVING_USERSTORE_MANAGER("65504", "Error retrieving userstore manager.",
+                "Error occurred while retrieving userstore manager.");
 
 
         private final String code;

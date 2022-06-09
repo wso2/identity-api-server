@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.1</version>
+    <version>1.1.15-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -40,7 +40,7 @@
         <developerConnection>scm:git:https://github.com/wso2/identity-api-server.git
         </developerConnection>
         <connection>scm:git:https://github.com/wso2/identity-api-server.git</connection>
-        <tag>v1.1.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
 
@@ -429,6 +429,12 @@
                 <artifactId>org.wso2.carbon.identity.tenant.resource.manager</artifactId>
                 <version>${tenant.resource.manager.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.branding.preference.management</groupId>
+                <artifactId>org.wso2.carbon.identity.branding.preference.management.core</artifactId>
+                <version>${identity.branding.preference.management.version}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -493,12 +499,12 @@
         <!--Maven Plugin Version-->
         <maven.compiler.plugin.version>2.3.1</maven.compiler.plugin.version>
         <maven.bundle.plugin.version>2.4.0</maven.bundle.plugin.version>
-        <jackson-jaxrs-json-provider.version>2.13.0</jackson-jaxrs-json-provider.version>
-        <jackson-databind.version>2.13.0</jackson-databind.version>
-        <cxf-bundle.version>3.4.5</cxf-bundle.version>
+        <jackson-jaxrs-json-provider.version>2.13.2</jackson-jaxrs-json-provider.version>
+        <jackson-databind.version>2.13.2.2</jackson-databind.version>
+        <cxf-bundle.version>3.5.0</cxf-bundle.version>
         <cxf.extensions.search.version>3.3.1</cxf.extensions.search.version>
         <jackson.version>1.9.13</jackson.version>
-        <spring-web.version>5.1.1.RELEASE</spring-web.version>
+        <spring-web.version>5.3.19</spring-web.version>
         <swagger-jaxrs.version>1.6.2</swagger-jaxrs.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
@@ -517,6 +523,7 @@
         <carbon.multitenancy.version>4.9.10</carbon.multitenancy.version>
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
         <org.wso2.carbon.event.publisher.version>5.2.15</org.wso2.carbon.event.publisher.version>
+        <identity.branding.preference.management.version>1.0.1</identity.branding.preference.management.version>
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
