@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
@@ -46,11 +47,13 @@ import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfi
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -350,7 +353,28 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
                 .skipLoginConsent(authConfig.isSkipConsent())
                 .skipLogoutConsent(authConfig.isSkipLogoutConsent())
+                .additionalSpProperties(getSpProperties(serviceProvider))
                 .certificate(getCertificate(serviceProvider));
+    }
+
+    private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {
+
+        ServiceProviderProperty[] serviceProviderProperties = serviceProvider.getSpProperties();
+        List<AdditionalSpProperty> additionalSpProperties = new ArrayList<>();
+        if(serviceProviderProperties != null) {
+            for (ServiceProviderProperty serviceProviderProperty: serviceProviderProperties) {
+                AdditionalSpProperty spProperties = new AdditionalSpProperty();
+                if(StringUtils.isNotBlank(serviceProviderProperty.getName())) {
+                    spProperties.setName(serviceProviderProperty.getName());
+                    spProperties.setValue(serviceProviderProperty.getValue());
+                }
+                if(StringUtils.isNotBlank(serviceProviderProperty.getDisplayName())) {
+                    spProperties.setDisplayName(serviceProviderProperty.getDisplayName());
+                }
+                additionalSpProperties.add(spProperties);
+            }
+        }
+        return additionalSpProperties;
     }
 
     private Certificate getCertificate(ServiceProvider serviceProvider) {
