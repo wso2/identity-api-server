@@ -361,14 +361,14 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         ServiceProviderProperty[] serviceProviderProperties = serviceProvider.getSpProperties();
         List<AdditionalSpProperty> additionalSpProperties = new ArrayList<>();
-        if(serviceProviderProperties != null) {
+        if (serviceProviderProperties != null) {
             for (ServiceProviderProperty serviceProviderProperty: serviceProviderProperties) {
                 AdditionalSpProperty spProperties = new AdditionalSpProperty();
-                if(StringUtils.isNotBlank(serviceProviderProperty.getName())) {
+                if (StringUtils.isNotBlank(serviceProviderProperty.getName())) {
                     spProperties.setName(serviceProviderProperty.getName());
                     spProperties.setValue(serviceProviderProperty.getValue());
                 }
-                if(StringUtils.isNotBlank(serviceProviderProperty.getDisplayName())) {
+                if (StringUtils.isNotBlank(serviceProviderProperty.getDisplayName())) {
                     spProperties.setDisplayName(serviceProviderProperty.getDisplayName());
                 }
                 additionalSpProperties.add(spProperties);

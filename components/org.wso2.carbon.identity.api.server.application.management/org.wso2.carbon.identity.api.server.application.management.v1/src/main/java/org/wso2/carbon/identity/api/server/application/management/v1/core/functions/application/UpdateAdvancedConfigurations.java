@@ -80,7 +80,8 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
     }
 
 
-    private void addAdditionalSpProperties(List<AdditionalSpProperty> spAdditionalProperties, ServiceProvider serviceProvider) {
+    private void addAdditionalSpProperties(List<AdditionalSpProperty> spAdditionalProperties,
+                                           ServiceProvider serviceProvider) {
 
         List<ServiceProviderProperty> serviceProviderProperties = new ArrayList<>();
         if (!CollectionUtils.isEmpty(spAdditionalProperties)) {
