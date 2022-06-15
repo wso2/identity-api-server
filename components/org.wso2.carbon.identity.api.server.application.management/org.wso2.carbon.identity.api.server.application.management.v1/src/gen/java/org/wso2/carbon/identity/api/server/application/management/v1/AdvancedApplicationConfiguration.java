@@ -38,6 +38,7 @@ public class AdvancedApplicationConfiguration  {
     private Boolean skipLogoutConsent;
     private Boolean returnAuthenticatedIdpList;
     private Boolean enableAuthorization;
+    private Boolean sharedApp;
 
     /**
     * Decides whether the application is accessible across tenants.
@@ -171,7 +172,24 @@ public class AdvancedApplicationConfiguration  {
         this.enableAuthorization = enableAuthorization;
     }
 
+    /**
+     * Decides whether application is a shared application.
+     */
+    public AdvancedApplicationConfiguration sharedApp(Boolean sharedApp) {
 
+        this.sharedApp = sharedApp;
+        return this;
+    }
+
+    @ApiModelProperty(example = "true", value = "Decides whether the application is shared application.")
+    @JsonProperty("sharedApp")
+    @Valid
+    public Boolean getSharedApp() {
+        return sharedApp;
+    }
+    public void setSharedApp(Boolean sharedApp) {
+        this.sharedApp = sharedApp;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {
