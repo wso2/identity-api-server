@@ -2445,13 +2445,13 @@ components:
           type: boolean
           description: Decides whether authorization policies needs to be engaged during authentication flows.
           example: true
-        spAdditionalProperties:
+        additionalSpProperties:
           $ref: '#/components/schemas/AdditionalProperties'
     AdditionalProperties:
       type: array
       items:
-        $ref: "#/components/schemas/SpProperties"
-    SpProperties:
+        $ref: "#/components/schemas/AdditionalSpProperty"
+    AdditionalSpProperty:
         type: object
         required:
           - name

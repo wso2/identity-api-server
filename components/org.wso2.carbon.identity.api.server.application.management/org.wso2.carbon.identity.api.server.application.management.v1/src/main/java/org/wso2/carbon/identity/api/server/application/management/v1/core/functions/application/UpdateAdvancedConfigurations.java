@@ -16,9 +16,9 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
-import org.wso2.carbon.identity.api.server.application.management.v1.SpProperties;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
@@ -54,7 +54,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
 
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
-            addAdditionalSpProperties(advancedConfigurations.getSpAdditionalProperties(), serviceProvider);
+            addAdditionalSpProperties(advancedConfigurations.getAdditionalSpProperties(), serviceProvider);
         }
     }
 
@@ -81,11 +81,11 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
     }
 
 
-    private void addAdditionalSpProperties(List<SpProperties> spAdditionalProperties, ServiceProvider serviceProvider) {
+    private void addAdditionalSpProperties(List<AdditionalSpProperty> spAdditionalProperties, ServiceProvider serviceProvider) {
 
         List<ServiceProviderProperty> serviceProviderProperties = new ArrayList<>();
         if (!CollectionUtils.isEmpty(spAdditionalProperties)) {
-            for (SpProperties spProp: spAdditionalProperties) {
+            for (AdditionalSpProperty spProp: spAdditionalProperties) {
                 ServiceProviderProperty serviceProviderProperty = new ServiceProviderProperty();
                 serviceProviderProperty.setName(spProp.getName());
                 serviceProviderProperty.setValue(spProp.getValue());

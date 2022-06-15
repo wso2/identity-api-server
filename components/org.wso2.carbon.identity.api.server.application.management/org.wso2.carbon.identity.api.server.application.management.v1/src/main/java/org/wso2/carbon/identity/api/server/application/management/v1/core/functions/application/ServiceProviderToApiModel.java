@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
@@ -32,7 +33,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.InboundProt
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
-import org.wso2.carbon.identity.api.server.application.management.v1.SpProperties;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
@@ -353,17 +353,17 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
                 .skipLoginConsent(authConfig.isSkipConsent())
                 .skipLogoutConsent(authConfig.isSkipLogoutConsent())
-                .spAdditionalProperties(getSpProperties(serviceProvider))
+                .additionalSpProperties(getSpProperties(serviceProvider))
                 .certificate(getCertificate(serviceProvider));
     }
 
-    private List<SpProperties> getSpProperties(ServiceProvider serviceProvider) {
+    private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {
 
         ServiceProviderProperty[] serviceProviderProperties = serviceProvider.getSpProperties();
-        List<SpProperties> additionalSpProperties = new ArrayList<>();
+        List<AdditionalSpProperty> additionalSpProperties = new ArrayList<>();
         if(serviceProviderProperties != null) {
             for (ServiceProviderProperty serviceProviderProperty: serviceProviderProperties) {
-                SpProperties spProperties = new SpProperties();
+                AdditionalSpProperty spProperties = new AdditionalSpProperty();
                 if(StringUtils.isNotBlank(serviceProviderProperty.getName())) {
                     spProperties.setName(serviceProviderProperty.getName());
                     spProperties.setValue(serviceProviderProperty.getValue());

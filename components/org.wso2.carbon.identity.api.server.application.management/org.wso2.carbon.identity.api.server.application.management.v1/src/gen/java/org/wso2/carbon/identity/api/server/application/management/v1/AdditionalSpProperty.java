@@ -30,7 +30,7 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class SpProperties  {
+public class AdditionalSpProperty  {
   
     private String name;
     private String value;
@@ -38,7 +38,7 @@ public class SpProperties  {
 
     /**
     **/
-    public SpProperties name(String name) {
+    public AdditionalSpProperty name(String name) {
 
         this.name = name;
         return this;
@@ -58,7 +58,7 @@ public class SpProperties  {
 
     /**
     **/
-    public SpProperties value(String value) {
+    public AdditionalSpProperty value(String value) {
 
         this.value = value;
         return this;
@@ -78,7 +78,7 @@ public class SpProperties  {
 
     /**
     **/
-    public SpProperties displayName(String displayName) {
+    public AdditionalSpProperty displayName(String displayName) {
 
         this.displayName = displayName;
         return this;
@@ -105,10 +105,10 @@ public class SpProperties  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SpProperties spProperties = (SpProperties) o;
-        return Objects.equals(this.name, spProperties.name) &&
-            Objects.equals(this.value, spProperties.value) &&
-            Objects.equals(this.displayName, spProperties.displayName);
+        AdditionalSpProperty additionalSpProperty = (AdditionalSpProperty) o;
+        return Objects.equals(this.name, additionalSpProperty.name) &&
+            Objects.equals(this.value, additionalSpProperty.value) &&
+            Objects.equals(this.displayName, additionalSpProperty.displayName);
     }
 
     @Override
@@ -120,7 +120,7 @@ public class SpProperties  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class SpProperties {\n");
+        sb.append("class AdditionalSpProperty {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    value: ").append(toIndentedString(value)).append("\n");
