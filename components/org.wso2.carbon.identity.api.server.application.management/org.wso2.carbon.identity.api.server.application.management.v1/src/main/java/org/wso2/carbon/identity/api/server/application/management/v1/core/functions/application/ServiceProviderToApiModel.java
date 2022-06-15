@@ -32,6 +32,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.InboundProt
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
+import org.wso2.carbon.identity.api.server.application.management.v1.SpProperties;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
@@ -46,11 +47,13 @@ import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfi
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -350,7 +353,28 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
                 .skipLoginConsent(authConfig.isSkipConsent())
                 .skipLogoutConsent(authConfig.isSkipLogoutConsent())
+                .spAdditionalProperties(getSpProperties(serviceProvider))
                 .certificate(getCertificate(serviceProvider));
+    }
+
+    private List<SpProperties> getSpProperties(ServiceProvider serviceProvider) {
+
+        ServiceProviderProperty[] serviceProviderProperties = serviceProvider.getSpProperties();
+        List<SpProperties> additionalSpProperties = new ArrayList<>();
+        if(serviceProviderProperties != null) {
+            for (ServiceProviderProperty serviceProviderProperty: serviceProviderProperties) {
+                SpProperties spProperties = new SpProperties();
+                if(StringUtils.isNotBlank(serviceProviderProperty.getName())) {
+                    spProperties.setName(serviceProviderProperty.getName());
+                    spProperties.setValue(serviceProviderProperty.getValue());
+                }
+                if(StringUtils.isNotBlank(serviceProviderProperty.getDisplayName())) {
+                    spProperties.setDisplayName(serviceProviderProperty.getDisplayName());
+                }
+                additionalSpProperties.add(spProperties);
+            }
+        }
+        return additionalSpProperties;
     }
 
     private Certificate getCertificate(ServiceProvider serviceProvider) {

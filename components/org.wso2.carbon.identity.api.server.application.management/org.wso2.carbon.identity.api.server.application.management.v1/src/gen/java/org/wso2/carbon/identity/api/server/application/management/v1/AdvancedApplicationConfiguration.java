@@ -20,7 +20,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
+import org.wso2.carbon.identity.api.server.application.management.v1.SpProperties;
 import javax.validation.constraints.*;
 
 
@@ -38,6 +41,8 @@ public class AdvancedApplicationConfiguration  {
     private Boolean skipLogoutConsent;
     private Boolean returnAuthenticatedIdpList;
     private Boolean enableAuthorization;
+    private List<SpProperties> spAdditionalProperties = null;
+
 
     /**
     * Decides whether the application is accessible across tenants.
@@ -171,7 +176,31 @@ public class AdvancedApplicationConfiguration  {
         this.enableAuthorization = enableAuthorization;
     }
 
+    /**
+    **/
+    public AdvancedApplicationConfiguration spAdditionalProperties(List<SpProperties> spAdditionalProperties) {
 
+        this.spAdditionalProperties = spAdditionalProperties;
+        return this;
+    }
+    @ApiModelProperty(value = "")
+    @JsonProperty("spAdditionalProperties")
+    @Valid
+    public List<SpProperties> getSpAdditionalProperties() {
+        return spAdditionalProperties;
+    }
+    public void setSpAdditionalProperties(List<SpProperties> spAdditionalProperties) {
+        this.spAdditionalProperties = spAdditionalProperties;
+    }
+
+    public AdvancedApplicationConfiguration addSpAdditionalPropertiesItem(SpProperties spAdditionalPropertiesItem) {
+
+        if (this.spAdditionalProperties == null) {
+            this.spAdditionalProperties = new ArrayList<>();
+        }
+        this.spAdditionalProperties.add(spAdditionalPropertiesItem);
+        return this;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -189,12 +218,13 @@ public class AdvancedApplicationConfiguration  {
             Objects.equals(this.skipLoginConsent, advancedApplicationConfiguration.skipLoginConsent) &&
             Objects.equals(this.skipLogoutConsent, advancedApplicationConfiguration.skipLogoutConsent) &&
             Objects.equals(this.returnAuthenticatedIdpList, advancedApplicationConfiguration.returnAuthenticatedIdpList) &&
-            Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization);
+            Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization) &&
+            Objects.equals(this.spAdditionalProperties, advancedApplicationConfiguration.spAdditionalProperties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, returnAuthenticatedIdpList, enableAuthorization);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, returnAuthenticatedIdpList, enableAuthorization, spAdditionalProperties);
     }
 
     @Override
@@ -210,6 +240,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");
         sb.append("    enableAuthorization: ").append(toIndentedString(enableAuthorization)).append("\n");
+        sb.append("    spAdditionalProperties: ").append(toIndentedString(spAdditionalProperties)).append("\n");
         sb.append("}");
         return sb.toString();
     }
