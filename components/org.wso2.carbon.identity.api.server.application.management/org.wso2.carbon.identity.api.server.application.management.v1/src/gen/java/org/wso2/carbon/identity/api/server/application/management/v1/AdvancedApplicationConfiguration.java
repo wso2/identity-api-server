@@ -22,8 +22,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
-import org.wso2.carbon.identity.api.server.application.management.v1.SpProperties;
 import javax.validation.constraints.*;
 
 
@@ -33,7 +33,7 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class AdvancedApplicationConfiguration  {
-  
+
     private Boolean saas;
     private Boolean discoverableByEndUsers;
     private Certificate certificate;
@@ -41,7 +41,7 @@ public class AdvancedApplicationConfiguration  {
     private Boolean skipLogoutConsent;
     private Boolean returnAuthenticatedIdpList;
     private Boolean enableAuthorization;
-    private List<SpProperties> spAdditionalProperties = null;
+    private List<AdditionalSpProperty> additionalSpProperties = null;
 
 
     /**
@@ -52,7 +52,7 @@ public class AdvancedApplicationConfiguration  {
         this.saas = saas;
         return this;
     }
-    
+
     @ApiModelProperty(example = "false", value = "Decides whether the application is accessible across tenants.")
     @JsonProperty("saas")
     @Valid
@@ -71,7 +71,7 @@ public class AdvancedApplicationConfiguration  {
         this.discoverableByEndUsers = discoverableByEndUsers;
         return this;
     }
-    
+
     @ApiModelProperty(example = "false", value = "Decides whether the application is visible for end users.")
     @JsonProperty("discoverableByEndUsers")
     @Valid
@@ -89,7 +89,7 @@ public class AdvancedApplicationConfiguration  {
         this.certificate = certificate;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("certificate")
     @Valid
@@ -108,7 +108,7 @@ public class AdvancedApplicationConfiguration  {
         this.skipLoginConsent = skipLoginConsent;
         return this;
     }
-    
+
     @ApiModelProperty(example = "false", value = "Decides whether user consent needs to be skipped during login flows.")
     @JsonProperty("skipLoginConsent")
     @Valid
@@ -127,7 +127,7 @@ public class AdvancedApplicationConfiguration  {
         this.skipLogoutConsent = skipLogoutConsent;
         return this;
     }
-    
+
     @ApiModelProperty(example = "false", value = "Decides whether user consent needs to be skipped during logout flows.")
     @JsonProperty("skipLogoutConsent")
     @Valid
@@ -146,7 +146,7 @@ public class AdvancedApplicationConfiguration  {
         this.returnAuthenticatedIdpList = returnAuthenticatedIdpList;
         return this;
     }
-    
+
     @ApiModelProperty(example = "false", value = "Decides whether the list of authenticated identity providers need to be returned in the authentication response.")
     @JsonProperty("returnAuthenticatedIdpList")
     @Valid
@@ -165,7 +165,7 @@ public class AdvancedApplicationConfiguration  {
         this.enableAuthorization = enableAuthorization;
         return this;
     }
-    
+
     @ApiModelProperty(example = "true", value = "Decides whether authorization policies needs to be engaged during authentication flows.")
     @JsonProperty("enableAuthorization")
     @Valid
@@ -178,27 +178,27 @@ public class AdvancedApplicationConfiguration  {
 
     /**
     **/
-    public AdvancedApplicationConfiguration spAdditionalProperties(List<SpProperties> spAdditionalProperties) {
+    public AdvancedApplicationConfiguration additionalSpProperties(List<AdditionalSpProperty> additionalSpProperties) {
 
-        this.spAdditionalProperties = spAdditionalProperties;
+        this.additionalSpProperties = additionalSpProperties;
         return this;
     }
     @ApiModelProperty(value = "")
-    @JsonProperty("spAdditionalProperties")
+    @JsonProperty("additionalSpProperties")
     @Valid
-    public List<SpProperties> getSpAdditionalProperties() {
-        return spAdditionalProperties;
+    public List<AdditionalSpProperty> getAdditionalSpProperties() {
+        return additionalSpProperties;
     }
-    public void setSpAdditionalProperties(List<SpProperties> spAdditionalProperties) {
-        this.spAdditionalProperties = spAdditionalProperties;
+    public void setAdditionalSpProperties(List<AdditionalSpProperty> additionalSpProperties) {
+        this.additionalSpProperties = additionalSpProperties;
     }
 
-    public AdvancedApplicationConfiguration addSpAdditionalPropertiesItem(SpProperties spAdditionalPropertiesItem) {
-
-        if (this.spAdditionalProperties == null) {
-            this.spAdditionalProperties = new ArrayList<>();
+    public AdvancedApplicationConfiguration addAdditionalSpPropertiesItem(AdditionalSpProperty
+                                                                                  additionalSpPropertiesItem) {
+        if (this.additionalSpProperties == null) {
+            this.additionalSpProperties = new ArrayList<>();
         }
-        this.spAdditionalProperties.add(spAdditionalPropertiesItem);
+        this.additionalSpProperties.add(additionalSpPropertiesItem);
         return this;
     }
 
@@ -219,12 +219,12 @@ public class AdvancedApplicationConfiguration  {
             Objects.equals(this.skipLogoutConsent, advancedApplicationConfiguration.skipLogoutConsent) &&
             Objects.equals(this.returnAuthenticatedIdpList, advancedApplicationConfiguration.returnAuthenticatedIdpList) &&
             Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization) &&
-            Objects.equals(this.spAdditionalProperties, advancedApplicationConfiguration.spAdditionalProperties);
+            Objects.equals(this.additionalSpProperties, advancedApplicationConfiguration.additionalSpProperties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, returnAuthenticatedIdpList, enableAuthorization, spAdditionalProperties);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, returnAuthenticatedIdpList, enableAuthorization, additionalSpProperties);
     }
 
     @Override
@@ -232,7 +232,7 @@ public class AdvancedApplicationConfiguration  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class AdvancedApplicationConfiguration {\n");
-        
+
         sb.append("    saas: ").append(toIndentedString(saas)).append("\n");
         sb.append("    discoverableByEndUsers: ").append(toIndentedString(discoverableByEndUsers)).append("\n");
         sb.append("    certificate: ").append(toIndentedString(certificate)).append("\n");
@@ -240,7 +240,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");
         sb.append("    enableAuthorization: ").append(toIndentedString(enableAuthorization)).append("\n");
-        sb.append("    spAdditionalProperties: ").append(toIndentedString(spAdditionalProperties)).append("\n");
+        sb.append("    additionalSpProperties: ").append(toIndentedString(additionalSpProperties)).append("\n");
         sb.append("}");
         return sb.toString();
     }
