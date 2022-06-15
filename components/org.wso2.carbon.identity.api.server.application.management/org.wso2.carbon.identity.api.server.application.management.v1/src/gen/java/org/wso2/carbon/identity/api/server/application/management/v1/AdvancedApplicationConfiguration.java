@@ -173,15 +173,15 @@ public class AdvancedApplicationConfiguration  {
     }
 
     /**
-     * Decides whether application is a shared application.
-     */
+    * Decides whether application is a shared application.
+    **/
     public AdvancedApplicationConfiguration sharedApp(Boolean sharedApp) {
 
         this.sharedApp = sharedApp;
         return this;
     }
-
-    @ApiModelProperty(example = "true", value = "Decides whether the application is shared application.")
+    
+    @ApiModelProperty(example = "false", value = "Decides whether application is a shared application.")
     @JsonProperty("sharedApp")
     @Valid
     public Boolean getSharedApp() {
@@ -190,6 +190,8 @@ public class AdvancedApplicationConfiguration  {
     public void setSharedApp(Boolean sharedApp) {
         this.sharedApp = sharedApp;
     }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -207,12 +209,13 @@ public class AdvancedApplicationConfiguration  {
             Objects.equals(this.skipLoginConsent, advancedApplicationConfiguration.skipLoginConsent) &&
             Objects.equals(this.skipLogoutConsent, advancedApplicationConfiguration.skipLogoutConsent) &&
             Objects.equals(this.returnAuthenticatedIdpList, advancedApplicationConfiguration.returnAuthenticatedIdpList) &&
-            Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization);
+            Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization) &&
+            Objects.equals(this.sharedApp, advancedApplicationConfiguration.sharedApp);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, returnAuthenticatedIdpList, enableAuthorization);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, returnAuthenticatedIdpList, enableAuthorization, sharedApp);
     }
 
     @Override
@@ -228,6 +231,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");
         sb.append("    enableAuthorization: ").append(toIndentedString(enableAuthorization)).append("\n");
+        sb.append("    sharedApp: ").append(toIndentedString(sharedApp)).append("\n");
         sb.append("}");
         return sb.toString();
     }
