@@ -15,11 +15,17 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
@@ -47,6 +53,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
 
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
+            addAdditionalSpProperties(advancedConfigurations.getAdditionalSpProperties(), serviceProvider);
         }
     }
 
@@ -69,6 +76,25 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                 setIfNotNull(certificate.getValue(), serviceProvider::setJwksUri);
                 serviceProvider.setCertificateContent(null);
             }
+        }
+    }
+
+
+    private void addAdditionalSpProperties(List<AdditionalSpProperty> spAdditionalProperties, ServiceProvider serviceProvider) {
+
+        List<ServiceProviderProperty> serviceProviderProperties = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(spAdditionalProperties)) {
+            for (AdditionalSpProperty spProp: spAdditionalProperties) {
+                ServiceProviderProperty serviceProviderProperty = new ServiceProviderProperty();
+                serviceProviderProperty.setName(spProp.getName());
+                serviceProviderProperty.setValue(spProp.getValue());
+                serviceProviderProperty.setDisplayName(spProp.getDisplayName());
+                serviceProviderProperties.add(serviceProviderProperty);
+            }
+            ServiceProviderProperty[] updatedAdditionalProps =
+                    new ServiceProviderProperty[serviceProviderProperties.size()];
+            updatedAdditionalProps = serviceProviderProperties.toArray(updatedAdditionalProps);
+            serviceProvider.setSpProperties(serviceProviderProperties.toArray(updatedAdditionalProps));
         }
     }
 }
