@@ -367,7 +367,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         return serviceProvider != null && serviceProvider.getSpProperties() != null &&
                 Arrays.stream(serviceProvider.getSpProperties())
-                        .filter(p -> IS_SHARED_APP.equalsIgnoreCase(p.getName())).findFirst().map(
+                        .filter(p -> IS_SHARED_APP.equals(p.getName())).findFirst().map(
                                 p -> Boolean.valueOf(p.getValue())).orElse(Boolean.FALSE);
     }
 
