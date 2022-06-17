@@ -516,7 +516,7 @@ public class ServerIdpManagementService {
                             idpId, idpToUpdate, ContextLoader.getTenantDomainFromContext());
             return createFederatedAuthenticatorResponse(updatedIdp);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, StringUtils.EMPTY);
         }
     }
 
@@ -682,7 +682,7 @@ public class ServerIdpManagementService {
                             idpId, idpToUpdate, ContextLoader.getTenantDomainFromContext());
             return createOutboundProvisioningResponse(updatedIdp);
         } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, StringUtils.EMPTY);
         }
     }
 
@@ -3036,11 +3036,9 @@ public class ServerIdpManagementService {
 
     private static String includeData(String errorMsg, String data) {
 
-        String message;
-        if (StringUtils.isNotBlank(data)) {
+        String message = errorMsg;
+        if (data != null) {
             message = String.format(errorMsg, data);
-        } else {
-            message = String.format(errorMsg, "");
         }
         return message;
     }
