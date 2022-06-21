@@ -71,7 +71,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
     private static final Set<String> systemApplications = ApplicationManagementServiceHolder
             .getApplicationManagementService().getSystemApplications();
-    private static final String IS_SHARED_APP = "isSharedApp";
+    private static final String IS_FRAGMENT_APP = "isFragmentApp";
 
     @Override
     public ApplicationResponseModel apply(ServiceProvider application) {
@@ -349,7 +349,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .skipLoginConsent(authConfig.isSkipConsent())
                 .skipLogoutConsent(authConfig.isSkipLogoutConsent())
                 .certificate(getCertificate(serviceProvider))
-                .sharedApp(isSharedApp(serviceProvider));
+                .fragment(isFragmentApp(serviceProvider));
     }
 
     private Certificate getCertificate(ServiceProvider serviceProvider) {
@@ -363,11 +363,11 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return null;
     }
 
-    private boolean isSharedApp(ServiceProvider serviceProvider) {
+    private boolean isFragmentApp(ServiceProvider serviceProvider) {
 
         return serviceProvider != null && serviceProvider.getSpProperties() != null &&
                 Arrays.stream(serviceProvider.getSpProperties())
-                        .filter(p -> IS_SHARED_APP.equals(p.getName())).findFirst().map(
+                        .filter(p -> IS_FRAGMENT_APP.equals(p.getName())).findFirst().map(
                                 p -> Boolean.valueOf(p.getValue())).orElse(Boolean.FALSE);
     }
 

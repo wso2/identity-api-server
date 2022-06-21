@@ -2445,9 +2445,9 @@ components:
           type: boolean
           description: Decides whether authorization policies needs to be engaged during authentication flows.
           example: true
-        sharedApp:
+        fragment:
           type: boolean
-          description: Decides whether application is a shared application.
+          description: Decides whether application is a fragment application.
           example: false
     Certificate:
       type: object

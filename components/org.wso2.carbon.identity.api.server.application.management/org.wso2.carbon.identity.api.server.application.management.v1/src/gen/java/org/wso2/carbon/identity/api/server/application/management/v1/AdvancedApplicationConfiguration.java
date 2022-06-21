@@ -38,7 +38,7 @@ public class AdvancedApplicationConfiguration  {
     private Boolean skipLogoutConsent;
     private Boolean returnAuthenticatedIdpList;
     private Boolean enableAuthorization;
-    private Boolean sharedApp;
+    private Boolean fragment;
 
     /**
     * Decides whether the application is accessible across tenants.
@@ -173,22 +173,22 @@ public class AdvancedApplicationConfiguration  {
     }
 
     /**
-    * Decides whether application is a shared application.
+    * Decides whether application is a fragment application.
     **/
-    public AdvancedApplicationConfiguration sharedApp(Boolean sharedApp) {
+    public AdvancedApplicationConfiguration fragment(Boolean fragment) {
 
-        this.sharedApp = sharedApp;
+        this.fragment = fragment;
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Decides whether application is a shared application.")
-    @JsonProperty("sharedApp")
+    @ApiModelProperty(example = "false", value = "Decides whether application is a fragment application.")
+    @JsonProperty("fragment")
     @Valid
-    public Boolean getSharedApp() {
-        return sharedApp;
+    public Boolean getFragment() {
+        return fragment;
     }
-    public void setSharedApp(Boolean sharedApp) {
-        this.sharedApp = sharedApp;
+    public void setFragment(Boolean fragment) {
+        this.fragment = fragment;
     }
 
 
@@ -210,12 +210,12 @@ public class AdvancedApplicationConfiguration  {
             Objects.equals(this.skipLogoutConsent, advancedApplicationConfiguration.skipLogoutConsent) &&
             Objects.equals(this.returnAuthenticatedIdpList, advancedApplicationConfiguration.returnAuthenticatedIdpList) &&
             Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization) &&
-            Objects.equals(this.sharedApp, advancedApplicationConfiguration.sharedApp);
+            Objects.equals(this.fragment, advancedApplicationConfiguration.fragment);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, returnAuthenticatedIdpList, enableAuthorization, sharedApp);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, returnAuthenticatedIdpList, enableAuthorization, fragment);
     }
 
     @Override
@@ -231,7 +231,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");
         sb.append("    enableAuthorization: ").append(toIndentedString(enableAuthorization)).append("\n");
-        sb.append("    sharedApp: ").append(toIndentedString(sharedApp)).append("\n");
+        sb.append("    fragment: ").append(toIndentedString(fragment)).append("\n");
         sb.append("}");
         return sb.toString();
     }
