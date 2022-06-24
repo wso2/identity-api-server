@@ -2830,6 +2830,21 @@ public class ServerIdpManagementService {
                     if (ArrayUtils.isNotEmpty(idpToUpdate.getCertificateInfoArray())) {
                         idpToUpdate.setCertificate(null);
                     }
+                } else if (Constants.IDP_ISSUER_NAME_PATH.equals(path)) {
+                    IdentityProviderProperty[] propertyDTOS = idpToUpdate.getIdpProperties();
+                    for (IdentityProviderProperty propertyDTO : propertyDTOS) {
+                        if (Constants.IDP_ISSUER_NAME.equals(propertyDTO.getName())) {
+                            throw handleException(Response.Status.BAD_REQUEST,
+                                    Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP,
+                                    "Cannot add Issuer Name as it already exists");
+                        }
+                    }
+                    List<IdentityProviderProperty> idpProperties = new ArrayList<>(Arrays.asList(propertyDTOS));
+                    IdentityProviderProperty issuerNameProperty = new IdentityProviderProperty();
+                    issuerNameProperty.setName(Constants.IDP_ISSUER_NAME);
+                    issuerNameProperty.setValue(value);
+                    idpProperties.add(issuerNameProperty);
+                    idpToUpdate.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
                 } else {
                     throw handleException(Response.Status.BAD_REQUEST,
                             Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT, null);
