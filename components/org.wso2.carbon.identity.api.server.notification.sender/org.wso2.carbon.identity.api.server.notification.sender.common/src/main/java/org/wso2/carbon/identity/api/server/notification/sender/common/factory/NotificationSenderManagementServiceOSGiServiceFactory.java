@@ -20,15 +20,16 @@ package org.wso2.carbon.identity.api.server.notification.sender.common.factory;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.event.publisher.core.EventPublisherService;
+import org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementService;
 
 /**
  * Factory Beans serve as a factory for creating other beans within the IOC container. This factory bean is used to
- * instantiate the EventPublisherService type of object inside the container.
+ * instantiate the ConfigurationManager type of object inside the container.
  */
-public class EventPublisherOSGiServiceFactory  extends AbstractFactoryBean<EventPublisherService> {
+public class NotificationSenderManagementServiceOSGiServiceFactory extends
+        AbstractFactoryBean<NotificationSenderManagementService> {
 
-    private EventPublisherService eventPublisherService;
+    private NotificationSenderManagementService notificationSenderManagementService;
 
     @Override
     public Class<?> getObjectType() {
@@ -37,18 +38,20 @@ public class EventPublisherOSGiServiceFactory  extends AbstractFactoryBean<Event
     }
 
     @Override
-    protected EventPublisherService createInstance() throws Exception {
+    protected NotificationSenderManagementService createInstance() throws Exception {
 
-        if (this.eventPublisherService == null) {
-            EventPublisherService taskOperationService = (EventPublisherService) PrivilegedCarbonContext.
-                    getThreadLocalCarbonContext().getOSGiService(EventPublisherService.class, null);
+        if (this.notificationSenderManagementService == null) {
+            NotificationSenderManagementService taskOperationService =
+                    (NotificationSenderManagementService) PrivilegedCarbonContext
+                            .getThreadLocalCarbonContext()
+                            .getOSGiService(NotificationSenderManagementService.class, null);
 
             if (taskOperationService != null) {
-                this.eventPublisherService = taskOperationService;
+                this.notificationSenderManagementService = taskOperationService;
             } else {
-                throw new Exception("Unable to retrieve Event Publisher service.");
+                throw new Exception("Unable to retrieve ConfigurationManager service.");
             }
         }
-        return this.eventPublisherService;
+        return this.notificationSenderManagementService;
     }
 }
