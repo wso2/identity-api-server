@@ -2257,6 +2257,11 @@ components:
         self:
           type: string
           example: "/t/wso2.com/api/server/v1/applications/85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
+        advancedConfigurations:
+            $ref: '#/components/schemas/AdvancedApplicationConfiguration'
+        templateId:
+          type: string
+          example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
 
     ApplicationModel:
       type: object
