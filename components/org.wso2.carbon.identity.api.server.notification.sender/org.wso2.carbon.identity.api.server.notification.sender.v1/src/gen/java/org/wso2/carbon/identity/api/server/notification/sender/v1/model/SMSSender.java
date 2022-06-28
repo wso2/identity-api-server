@@ -39,6 +39,40 @@ public class SMSSender  {
     private String key;
     private String secret;
     private String sender;
+
+    @XmlType(name="ContentTypeEnum")
+    @XmlEnum(String.class)
+    public enum ContentTypeEnum {
+
+        @XmlEnumValue("JSON") JSON(String.valueOf("JSON")), @XmlEnumValue("FORM") FORM(String.valueOf("FORM"));
+
+
+        private String value;
+
+        ContentTypeEnum(String v) {
+            value = v;
+        }
+
+        public String value() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(value);
+        }
+
+        public static ContentTypeEnum fromValue(String value) {
+            for (ContentTypeEnum b : ContentTypeEnum.values()) {
+                if (b.value.equals(value)) {
+                    return b;
+                }
+            }
+            throw new IllegalArgumentException("Unexpected value '" + value + "'");
+        }
+    }
+
+    private ContentTypeEnum contentType;
     private List<Properties> properties = null;
 
 
@@ -158,6 +192,26 @@ public class SMSSender  {
 
     /**
     **/
+    public SMSSender contentType(ContentTypeEnum contentType) {
+
+        this.contentType = contentType;
+        return this;
+    }
+
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("contentType")
+    @Valid
+    @NotNull(message = "Property contentType cannot be null.")
+
+    public ContentTypeEnum getContentType() {
+        return contentType;
+    }
+    public void setContentType(ContentTypeEnum contentType) {
+        this.contentType = contentType;
+    }
+
+    /**
+    **/
     public SMSSender properties(List<Properties> properties) {
 
         this.properties = properties;
@@ -200,12 +254,13 @@ public class SMSSender  {
             Objects.equals(this.key, smSSender.key) &&
             Objects.equals(this.secret, smSSender.secret) &&
             Objects.equals(this.sender, smSSender.sender) &&
+            Objects.equals(this.contentType, smSSender.contentType) &&
             Objects.equals(this.properties, smSSender.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, provider, providerURL, key, secret, sender, properties);
+        return Objects.hash(name, provider, providerURL, key, secret, sender, contentType, properties);
     }
 
     @Override
@@ -220,6 +275,7 @@ public class SMSSender  {
         sb.append("    key: ").append(toIndentedString(key)).append("\n");
         sb.append("    secret: ").append(toIndentedString(secret)).append("\n");
         sb.append("    sender: ").append(toIndentedString(sender)).append("\n");
+        sb.append("    contentType: ").append(toIndentedString(contentType)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
