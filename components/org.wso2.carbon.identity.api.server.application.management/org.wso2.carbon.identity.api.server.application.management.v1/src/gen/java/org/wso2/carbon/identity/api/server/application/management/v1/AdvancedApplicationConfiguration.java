@@ -42,7 +42,7 @@ public class AdvancedApplicationConfiguration  {
     private Boolean returnAuthenticatedIdpList;
     private Boolean enableAuthorization;
     private List<AdditionalSpProperty> additionalSpProperties = null;
-
+    private Boolean fragment;
 
     /**
     * Decides whether the application is accessible across tenants.
@@ -177,6 +177,25 @@ public class AdvancedApplicationConfiguration  {
     }
 
     /**
+    * Decides whether application is a fragment application.
+    **/
+    public AdvancedApplicationConfiguration fragment(Boolean fragment) {
+
+        this.fragment = fragment;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "Decides whether application is a fragment application.")
+    @JsonProperty("fragment")
+    @Valid
+    public Boolean getFragment() {
+        return fragment;
+    }
+    public void setFragment(Boolean fragment) {
+        this.fragment = fragment;
+    }
+
+    /**
     **/
     public AdvancedApplicationConfiguration additionalSpProperties(List<AdditionalSpProperty> additionalSpProperties) {
 
@@ -219,12 +238,14 @@ public class AdvancedApplicationConfiguration  {
             Objects.equals(this.skipLogoutConsent, advancedApplicationConfiguration.skipLogoutConsent) &&
             Objects.equals(this.returnAuthenticatedIdpList, advancedApplicationConfiguration.returnAuthenticatedIdpList) &&
             Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization) &&
+            Objects.equals(this.fragment, advancedApplicationConfiguration.fragment) &&
             Objects.equals(this.additionalSpProperties, advancedApplicationConfiguration.additionalSpProperties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, returnAuthenticatedIdpList, enableAuthorization, additionalSpProperties);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent,
+                returnAuthenticatedIdpList, enableAuthorization, fragment, additionalSpProperties);
     }
 
     @Override
@@ -240,6 +261,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");
         sb.append("    enableAuthorization: ").append(toIndentedString(enableAuthorization)).append("\n");
+        sb.append("    fragment: ").append(toIndentedString(fragment)).append("\n");
         sb.append("    additionalSpProperties: ").append(toIndentedString(additionalSpProperties)).append("\n");
         sb.append("}");
         return sb.toString();

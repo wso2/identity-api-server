@@ -22,7 +22,7 @@
         <artifactId>org.wso2.carbon.identity.api.server.notification.sender</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.1.15-SNAPSHOT</version>
+        <version>1.1.19-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -63,8 +63,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity.governance</groupId>
-            <artifactId>org.wso2.carbon.identity.tenant.resource.manager</artifactId>
+                <groupId>org.wso2.carbon.identity.event.handler.notification</groupId>
+                <artifactId>org.wso2.carbon.identity.notification.sender.tenant.config</artifactId>
         </dependency>
     </dependencies>
 </project>

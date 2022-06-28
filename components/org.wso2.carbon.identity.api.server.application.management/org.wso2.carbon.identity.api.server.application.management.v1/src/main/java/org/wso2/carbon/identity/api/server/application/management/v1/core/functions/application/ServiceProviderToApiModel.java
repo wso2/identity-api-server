@@ -74,6 +74,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
     private static final Set<String> systemApplications = ApplicationManagementServiceHolder
             .getApplicationManagementService().getSystemApplications();
+    private static final String IS_FRAGMENT_APP = "isFragmentApp";
 
     @Override
     public ApplicationResponseModel apply(ServiceProvider application) {
@@ -212,12 +213,10 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         arrayToStream(authenticationStep.getFederatedIdentityProviders()).forEach(y -> authStep.addOptionsItem(
                 new Authenticator().idp(y.getIdentityProviderName())
-                        .authenticator(y.getDefaultAuthenticatorConfig().getName()))
-        );
+                        .authenticator(y.getDefaultAuthenticatorConfig().getName())));
 
         arrayToStream(authenticationStep.getLocalAuthenticatorConfigs()).forEach(y -> authStep.addOptionsItem(
-                new Authenticator().idp(FrameworkConstants.LOCAL_IDP_NAME).authenticator(y.getName()))
-        );
+                new Authenticator().idp(FrameworkConstants.LOCAL_IDP_NAME).authenticator(y.getName())));
 
         return authStep;
     }
@@ -326,8 +325,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .forEach(roleMapping -> roleConfig.addMappingsItem(
                             new org.wso2.carbon.identity.api.server.application.management.v1.RoleMapping()
                                     .applicationRole(roleMapping.getRemoteRole())
-                                    .localRole(roleMapping.getLocalRole().getLocalRoleName())
-                    ));
+                                    .localRole(roleMapping.getLocalRole().getLocalRoleName())));
 
         }
 
@@ -353,6 +351,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
                 .skipLoginConsent(authConfig.isSkipConsent())
                 .skipLogoutConsent(authConfig.isSkipLogoutConsent())
+                .fragment(isFragmentApp(serviceProvider))
                 .additionalSpProperties(getSpProperties(serviceProvider))
                 .certificate(getCertificate(serviceProvider));
     }
@@ -386,6 +385,14 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         }
 
         return null;
+    }
+
+    private boolean isFragmentApp(ServiceProvider serviceProvider) {
+
+        return serviceProvider != null && serviceProvider.getSpProperties() != null &&
+                Arrays.stream(serviceProvider.getSpProperties())
+                        .filter(p -> IS_FRAGMENT_APP.equals(p.getName())).findFirst().map(
+                                p -> Boolean.valueOf(p.getValue())).orElse(Boolean.FALSE);
     }
 
     private Claim buildClaimModel(String claimUri) {
