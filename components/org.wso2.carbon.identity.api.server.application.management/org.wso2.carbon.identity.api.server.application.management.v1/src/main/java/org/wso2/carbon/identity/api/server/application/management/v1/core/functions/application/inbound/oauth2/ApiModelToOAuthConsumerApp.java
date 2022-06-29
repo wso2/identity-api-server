@@ -47,7 +47,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         consumerAppDTO.setOauthConsumerKey(oidcModel.getClientId());
         consumerAppDTO.setOauthConsumerSecret(oidcModel.getClientSecret());
 
-        consumerAppDTO.setCallbackUrl(getCallbackUrl(oidcModel.getCallbackURLs()));
+        consumerAppDTO.setCallBackUrls(getCallbackUrl(oidcModel.getCallbackURLs()));
 
         consumerAppDTO.setOAuthVersion(OAuthConstants.OAuthVersions.VERSION_2);
 
@@ -162,15 +162,17 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
                 .orElse(new String[0]);
     }
 
-    private String getCallbackUrl(List<String> callbackURLs) {
+    private List<String> getCallbackUrl(List<String> callbackURLs) {
 
         if (CollectionUtils.isNotEmpty(callbackURLs)) {
             // We can't support multiple callback URLs at the moment. So we need to send a server error.
             if (callbackURLs.size() > 1) {
-                throw Utils.buildNotImplementedError("Multiple callbacks for OAuth2 are not supported yet. " +
-                        "Please use regex to define multiple callbacks.");
+                return callbackURLs;
+//                throw Utils.buildNotImplementedError("Multiple callbacks for OAuth2 are not supported yet. " +
+//                        "Please use regex to define multiple callbacks.");
             } else if (callbackURLs.size() == 1) {
-                return callbackURLs.get(0);
+//                return callbackURLs.get(0);
+                return callbackURLs;
             } else {
                 return null;
             }
