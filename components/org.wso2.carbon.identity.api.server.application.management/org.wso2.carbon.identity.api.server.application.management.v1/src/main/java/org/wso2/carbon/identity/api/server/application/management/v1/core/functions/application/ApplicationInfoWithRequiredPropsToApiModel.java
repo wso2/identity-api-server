@@ -36,7 +36,8 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 /**
  * Converts the backend model ApplicationBasicInfo into the corresponding API model object.
  */
-public class ApplicationInfoWithRequiredPropsToApiModel implements Function<ApplicationResponseModel, ApplicationListItem> {
+public class ApplicationInfoWithRequiredPropsToApiModel implements Function<ApplicationResponseModel,
+        ApplicationListItem> {
 
     private static final Log log = LogFactory.getLog(ServerApplicationManagementService.class);
 

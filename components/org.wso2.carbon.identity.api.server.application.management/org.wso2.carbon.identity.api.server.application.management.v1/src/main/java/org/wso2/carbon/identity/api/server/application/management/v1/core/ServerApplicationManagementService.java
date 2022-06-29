@@ -119,11 +119,13 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.*;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthKey;
@@ -1048,7 +1050,7 @@ public class ServerApplicationManagementService {
     private List<ApplicationListItem> getApplicationListItems(List<ServiceProvider> serviceProviderList,
                                                               List<String> requiredAttributes) {
 
-        List <ApplicationListItem> applicationListItems = new ArrayList<>();
+        List<ApplicationListItem> applicationListItems = new ArrayList<>();
         for (ServiceProvider serviceProvider : serviceProviderList) {
             ApplicationResponseModel  applicationResponseModel =
                     new ServiceProviderToApiModel().apply(serviceProvider);
