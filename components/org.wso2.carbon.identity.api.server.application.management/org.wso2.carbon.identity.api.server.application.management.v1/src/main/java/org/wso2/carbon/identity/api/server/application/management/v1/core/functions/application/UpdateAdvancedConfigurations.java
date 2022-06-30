@@ -25,9 +25,10 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
 /**
@@ -54,7 +55,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
 
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
-            addAdditionalSpProperties(advancedConfigurations.getAdditionalSpProperties(), serviceProvider);
+            handleAdditionalSpProperties(advancedConfigurations.getAdditionalSpProperties());
         }
     }
 
@@ -81,21 +82,12 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
     }
 
 
-    private void addAdditionalSpProperties(List<AdditionalSpProperty> spAdditionalProperties, ServiceProvider serviceProvider) {
+    private void handleAdditionalSpProperties(List<AdditionalSpProperty> spAdditionalProperties) {
 
-        List<ServiceProviderProperty> serviceProviderProperties = new ArrayList<>();
+        // Support is not there only for POST or PATCH yet, Only for GET
         if (!CollectionUtils.isEmpty(spAdditionalProperties)) {
-            for (AdditionalSpProperty spProp: spAdditionalProperties) {
-                ServiceProviderProperty serviceProviderProperty = new ServiceProviderProperty();
-                serviceProviderProperty.setName(spProp.getName());
-                serviceProviderProperty.setValue(spProp.getValue());
-                serviceProviderProperty.setDisplayName(spProp.getDisplayName());
-                serviceProviderProperties.add(serviceProviderProperty);
-            }
-            ServiceProviderProperty[] updatedAdditionalProps =
-                    new ServiceProviderProperty[serviceProviderProperties.size()];
-            updatedAdditionalProps = serviceProviderProperties.toArray(updatedAdditionalProps);
-            serviceProvider.setSpProperties(serviceProviderProperties.toArray(updatedAdditionalProps));
+            throw buildNotImplementedError(ADDITIONAL_SP_PROP_NOT_IMPLEMENTED.getCode(),
+                    ADDITIONAL_SP_PROP_NOT_IMPLEMENTED.getDescription());
         }
     }
 }

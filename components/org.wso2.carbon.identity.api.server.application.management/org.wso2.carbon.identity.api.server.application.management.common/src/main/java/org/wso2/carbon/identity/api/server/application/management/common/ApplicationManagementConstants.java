@@ -123,7 +123,13 @@ public class ApplicationManagementConstants {
         ERROR_RETRIEVING_USER_BY_ID("65503", "Error occurred while retrieving user",
                 "Error occurred while retrieving user by userid: %s."),
         ERROR_RETRIEVING_USERSTORE_MANAGER("65504", "Error retrieving userstore manager.",
-                "Error occurred while retrieving userstore manager.");
+                "Error occurred while retrieving userstore manager."),
+
+        ADDITIONAL_SP_PROP_NOT_IMPLEMENTED("65505",
+                "Unsupported application property.",
+                "'additionalSpProperties' is not yet supported in this version of the API."),
+
+        ;
 
 
         private final String code;
