@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
@@ -141,7 +142,9 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
     private List<String> getCallbackUrls(OAuthConsumerAppDTO oauthApp) {
 
         List<String> callbackUris = new ArrayList<>();
-        if (StringUtils.isNotBlank(oauthApp.getCallbackUrl())) {
+        if (CollectionUtils.isNotEmpty(oauthApp.getCallBackUrls())) {
+            callbackUris = oauthApp.getCallBackUrls();
+        } else if (StringUtils.isNotBlank(oauthApp.getCallbackUrl())) {
             callbackUris.add(oauthApp.getCallbackUrl());
         }
         return callbackUris;
