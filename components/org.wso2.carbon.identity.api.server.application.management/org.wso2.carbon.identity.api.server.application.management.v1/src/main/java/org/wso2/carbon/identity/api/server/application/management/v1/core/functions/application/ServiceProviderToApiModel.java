@@ -357,8 +357,9 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
                 .skipLoginConsent(authConfig.isSkipConsent())
                 .skipLogoutConsent(authConfig.isSkipLogoutConsent())
-                .additionalSpProperties(getSpProperties(serviceProvider))
-                .certificate(getCertificate(serviceProvider));
+                .certificate(getCertificate(serviceProvider))
+                .fragment(isFragmentApp(serviceProvider))
+                .additionalSpProperties(getSpProperties(serviceProvider));
     }
 
     private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {
