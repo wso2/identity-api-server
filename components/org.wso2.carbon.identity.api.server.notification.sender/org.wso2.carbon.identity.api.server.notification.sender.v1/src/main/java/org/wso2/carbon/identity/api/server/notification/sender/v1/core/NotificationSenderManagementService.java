@@ -264,6 +264,7 @@ public class NotificationSenderManagementService {
         dto.setKey(smsSenderAdd.getKey());
         dto.setSecret(smsSenderAdd.getSecret());
         dto.setSender(smsSenderAdd.getSender());
+        dto.setContentType(smsSenderAdd.getContentType().toString());
         List<Properties> properties = smsSenderAdd.getProperties();
         properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
         return dto;
@@ -279,6 +280,7 @@ public class NotificationSenderManagementService {
         dto.setKey(smsSenderUpdateRequest.getKey());
         dto.setSecret(smsSenderUpdateRequest.getSecret());
         dto.setSender(smsSenderUpdateRequest.getSender());
+        dto.setContentType(smsSenderUpdateRequest.getContentType().toString());
         List<Properties> properties = smsSenderUpdateRequest.getProperties();
         properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
         return dto;
@@ -301,6 +303,7 @@ public class NotificationSenderManagementService {
         smsSender.setKey(dto.getKey());
         smsSender.setSecret(dto.getSecret());
         smsSender.setSender(dto.getSender());
+        smsSender.setContentType(SMSSender.ContentTypeEnum.valueOf(dto.getContentType()));
         List<Properties> properties = new ArrayList<>();
         dto.getProperties().forEach((key, value) -> {
             Properties prop = new Properties();
