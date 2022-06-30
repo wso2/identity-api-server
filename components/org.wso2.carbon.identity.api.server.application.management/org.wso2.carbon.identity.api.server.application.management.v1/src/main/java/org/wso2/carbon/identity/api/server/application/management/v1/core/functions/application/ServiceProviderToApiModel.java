@@ -405,6 +405,13 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         return null;
     }
+    private boolean isFragmentApp(ServiceProvider serviceProvider) {
+
+        return serviceProvider != null && serviceProvider.getSpProperties() != null &&
+                Arrays.stream(serviceProvider.getSpProperties())
+                        .filter(p -> IS_FRAGMENT_APP.equals(p.getName())).findFirst().map(
+                                p -> Boolean.valueOf(p.getValue())).orElse(Boolean.FALSE);
+    }
 
     private Claim buildClaimModel(String claimUri) {
 
