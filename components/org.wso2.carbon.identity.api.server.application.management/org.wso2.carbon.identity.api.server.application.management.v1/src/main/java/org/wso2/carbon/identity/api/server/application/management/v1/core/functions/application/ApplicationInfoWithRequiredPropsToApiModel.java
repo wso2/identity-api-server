@@ -18,6 +18,8 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
@@ -28,10 +30,17 @@ import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_MANAGEMENT_APP_SP_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.TEMPLATE_ID_SP_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.USE_USER_ID_FOR_DEFAULT_SUBJECT;
+import static org.wso2.carbon.identity.application.mgt.dao.impl.ApplicationDAOImpl.USE_DOMAIN_IN_ROLES;
+import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_CONSENT;
+import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_LOGOUT_CONSENT;
 
 /**
  * Converts the backend model ApplicationBasicInfo into the corresponding API model object.
@@ -54,10 +63,41 @@ public class ApplicationInfoWithRequiredPropsToApiModel implements Function<Appl
                 .image(applicationResponseModel.getImageUrl())
                 .accessUrl(applicationResponseModel.getAccessUrl())
                 .access(getAccess(applicationResponseModel.getName()))
-                .advancedConfigurations(applicationResponseModel.getAdvancedConfigurations())
+                .advancedConfigurations(getAdvancedConfigurations(applicationResponseModel))
                 .templateId(applicationResponseModel.getTemplateId())
                 .self(getApplicationLocation(applicationResponseModel.getId()));
     }
+
+    private AdvancedApplicationConfiguration getAdvancedConfigurations(ApplicationResponseModel applicationResponseModel) {
+
+        AdvancedApplicationConfiguration advancedApplicationConfiguration =
+                applicationResponseModel.getAdvancedConfigurations();
+
+        if (advancedApplicationConfiguration != null) {
+            List<AdditionalSpProperty> additionalSpPropertiesList =
+                    advancedApplicationConfiguration.getAdditionalSpProperties();
+        /* These properties are part of advanced configurations and hence removing
+        them as they can't be packed as a part of additional sp properties again. */
+            advancedApplicationConfiguration.
+                    setAdditionalSpProperties(removeAndSetSpProperties(additionalSpPropertiesList));
+        }
+        return advancedApplicationConfiguration;
+    }
+
+    private List<AdditionalSpProperty> removeAndSetSpProperties(List<AdditionalSpProperty> propertyList) {
+
+        /* These properties are either first class or part of advanced configurations and hence removing
+        them as they can't be packed as a part of additional sp properties again.*/
+        propertyList.removeIf(property -> SKIP_CONSENT.equals(property.getName()));
+        propertyList.removeIf(property -> SKIP_LOGOUT_CONSENT.equals(property.getName()));
+        propertyList.removeIf(property -> USE_DOMAIN_IN_ROLES.equals(property.getName()));
+        propertyList.removeIf(property -> USE_USER_ID_FOR_DEFAULT_SUBJECT.equals(property.getName()));
+        propertyList.removeIf(property -> TEMPLATE_ID_SP_PROPERTY_NAME.equals(property.getName()));
+        propertyList.removeIf(property -> IS_MANAGEMENT_APP_SP_PROPERTY_NAME.equals(property.getName()));
+        return propertyList;
+    }
+
+
 
     private String getApplicationLocation(String resourceId) {
 
