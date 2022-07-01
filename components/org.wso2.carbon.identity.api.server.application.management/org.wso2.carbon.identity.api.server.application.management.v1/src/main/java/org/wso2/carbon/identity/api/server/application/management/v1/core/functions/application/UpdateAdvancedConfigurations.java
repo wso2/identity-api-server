@@ -22,9 +22,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Certificate
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
-import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_IMPLEMENTED;
@@ -44,6 +42,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                       AdvancedApplicationConfiguration advancedConfigurations) {
 
         if (advancedConfigurations != null) {
+            handleAdditionalSpProperties(advancedConfigurations.getAdditionalSpProperties());
             setIfNotNull(advancedConfigurations.getSaas(), serviceProvider::setSaasApp);
             setIfNotNull(advancedConfigurations.getDiscoverableByEndUsers(), serviceProvider::setDiscoverable);
 
@@ -55,7 +54,6 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
 
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
-            handleAdditionalSpProperties(advancedConfigurations.getAdditionalSpProperties());
         }
     }
 
