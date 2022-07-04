@@ -25,8 +25,8 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
 import java.util.List;
 
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_IMPLEMENTED;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_SUPPORTED;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
 /**
@@ -82,10 +82,10 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
 
     private void handleAdditionalSpProperties(List<AdditionalSpProperty> spAdditionalProperties) {
 
-        // Support is not there only for POST or PATCH yet, Only for GET
+        // `additionalSpProperties` not yet supported.
         if (!CollectionUtils.isEmpty(spAdditionalProperties)) {
-            throw buildNotImplementedError(ADDITIONAL_SP_PROP_NOT_IMPLEMENTED.getCode(),
-                    ADDITIONAL_SP_PROP_NOT_IMPLEMENTED.getDescription());
+            throw buildBadRequestError(ADDITIONAL_SP_PROP_NOT_SUPPORTED.getCode(),
+                    ADDITIONAL_SP_PROP_NOT_SUPPORTED.getDescription());
         }
     }
 }
