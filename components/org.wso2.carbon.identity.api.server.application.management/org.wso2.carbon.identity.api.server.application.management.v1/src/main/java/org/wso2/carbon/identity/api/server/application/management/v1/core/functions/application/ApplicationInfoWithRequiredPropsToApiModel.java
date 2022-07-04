@@ -15,23 +15,14 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
-import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
-import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
-import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
