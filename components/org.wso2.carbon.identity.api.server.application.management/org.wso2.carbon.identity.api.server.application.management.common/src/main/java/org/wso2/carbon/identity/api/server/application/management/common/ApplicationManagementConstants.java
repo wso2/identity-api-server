@@ -92,6 +92,10 @@ public class ApplicationManagementConstants {
         NON_EXISTING_REQ_ATTRIBUTES("60505", "Invalid attribute name.",
                 "Invalid attribute name provided as required attribute."),
 
+        ADDITIONAL_SP_PROP_NOT_SUPPORTED("60506",
+                "Unsupported application property.",
+                "'additionalSpProperties' is not yet supported in this version of the API."),
+
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
                 "Error occurred while retrieving SAML Metadata.",
@@ -123,14 +127,7 @@ public class ApplicationManagementConstants {
         ERROR_RETRIEVING_USER_BY_ID("65503", "Error occurred while retrieving user",
                 "Error occurred while retrieving user by userid: %s."),
         ERROR_RETRIEVING_USERSTORE_MANAGER("65504", "Error retrieving userstore manager.",
-                "Error occurred while retrieving userstore manager."),
-
-        ADDITIONAL_SP_PROP_NOT_IMPLEMENTED("65505",
-                "Unsupported application property.",
-                "'additionalSpProperties' is not yet supported in this version of the API."),
-
-        ;
-
+                "Error occurred while retrieving userstore manager.");
 
         private final String code;
         private final String message;

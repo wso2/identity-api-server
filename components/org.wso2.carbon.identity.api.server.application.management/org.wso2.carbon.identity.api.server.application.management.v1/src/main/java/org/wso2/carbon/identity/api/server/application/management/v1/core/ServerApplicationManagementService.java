@@ -216,7 +216,7 @@ public class ServerApplicationManagementService {
 
             List<String> requestedAttributeList = null;
             if (StringUtils.isNotEmpty(requiredAttributes)) {
-                requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
+                requestedAttributeList = Arrays.asList(requiredAttributes.split(","));
                 validateRequiredAttributes(requestedAttributeList);
             }
             if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
@@ -257,6 +257,9 @@ public class ServerApplicationManagementService {
     private void validateRequiredAttributes(List<String> requestedAttributeList) {
 
         for (String attribute: requestedAttributeList) {
+            /* 'attributes' requested in get application list only supports advancedConfigurations and templateId.
+            * The advancedConfigurations is supported as metadata of the application is essential in certain cases and
+            * templateId is supported to add filtering on listing page. */
             if (!(attribute.equals(ADVANCED_CONFIGURATIONS) || attribute.equals(TEMPLATE_ID))) {
                 ErrorMessage errorEnum = ErrorMessage.NON_EXISTING_REQ_ATTRIBUTES;
                 throw Utils.buildBadRequestError(errorEnum.getCode(), errorEnum.getDescription());
@@ -1050,7 +1053,6 @@ public class ServerApplicationManagementService {
                                                               List<String> requiredAttributes) {
 
         List<ApplicationListItem> applicationListItems = new ArrayList<>();
-        System.out.println("============hello.com");
         for (ServiceProvider serviceProvider : serviceProviderList) {
             ApplicationResponseModel  applicationResponseModel =
                     new ServiceProviderToApiModel().apply(serviceProvider);
