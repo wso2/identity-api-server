@@ -266,7 +266,9 @@ public class NotificationSenderManagementService {
         dto.setSender(smsSenderAdd.getSender());
         dto.setContentType(smsSenderAdd.getContentType().toString());
         List<Properties> properties = smsSenderAdd.getProperties();
-        properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
+        if (properties != null) {
+            properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
+        }
         return dto;
     }
 
@@ -282,7 +284,9 @@ public class NotificationSenderManagementService {
         dto.setSender(smsSenderUpdateRequest.getSender());
         dto.setContentType(smsSenderUpdateRequest.getContentType().toString());
         List<Properties> properties = smsSenderUpdateRequest.getProperties();
-        properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
+        if (properties != null) {
+            properties.forEach((prop) -> dto.getProperties().put(prop.getKey(), prop.getValue()));
+        }
         return dto;
     }
 
