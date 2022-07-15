@@ -15,12 +15,18 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
+import java.util.List;
+
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_SUPPORTED;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
 /**
@@ -36,6 +42,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                       AdvancedApplicationConfiguration advancedConfigurations) {
 
         if (advancedConfigurations != null) {
+            handleAdditionalSpProperties(advancedConfigurations.getAdditionalSpProperties());
             setIfNotNull(advancedConfigurations.getSaas(), serviceProvider::setSaasApp);
             setIfNotNull(advancedConfigurations.getDiscoverableByEndUsers(), serviceProvider::setDiscoverable);
 
@@ -69,6 +76,16 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                 setIfNotNull(certificate.getValue(), serviceProvider::setJwksUri);
                 serviceProvider.setCertificateContent(null);
             }
+        }
+    }
+
+
+    private void handleAdditionalSpProperties(List<AdditionalSpProperty> spAdditionalProperties) {
+
+        // `additionalSpProperties` not yet supported.
+        if (!CollectionUtils.isEmpty(spAdditionalProperties)) {
+            throw buildBadRequestError(ADDITIONAL_SP_PROP_NOT_SUPPORTED.getCode(),
+                    ADDITIONAL_SP_PROP_NOT_SUPPORTED.getDescription());
         }
     }
 }
