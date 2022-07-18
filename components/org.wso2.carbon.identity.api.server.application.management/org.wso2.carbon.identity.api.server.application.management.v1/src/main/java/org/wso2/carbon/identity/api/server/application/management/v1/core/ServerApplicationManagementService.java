@@ -151,7 +151,7 @@ public class ServerApplicationManagementService {
 
     private static final Log log = LogFactory.getLog(ServerApplicationManagementService.class);
 
-    // Allowed filter attributes mapped to real field names
+    // Allowed filter attributes mapped to real field names.
     private static final Map<String, String> SEARCH_SUPPORTED_FIELD_MAP = new HashMap<>();
 
     // Filter related constants.
@@ -201,12 +201,15 @@ public class ServerApplicationManagementService {
                                 expressionNode.getOperation(), expressionNode.getValue());
 
                 } else if (rootNode instanceof OperationNode) {
-                    // Currently, support only filters with one operation.
+                    // Currently, supports only filters with one AND/OR operation.
                     // Have to recursively traverse the filter tree to support more than one operation.
                     OperationNode operationNode = (OperationNode) rootNode;
                     Node leftNode = rootNode.getLeftNode();
                     Node rightNode = rootNode.getRightNode();
 
+                    if (operationNode.getOperation().equalsIgnoreCase("not")) {
+                        throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
+                    }
                     if (leftNode instanceof ExpressionNode && rightNode instanceof ExpressionNode) {
                         ExpressionNode expressionLeftNode = (ExpressionNode) leftNode;
                         ExpressionNode expressionRightNode = (ExpressionNode) rightNode;
