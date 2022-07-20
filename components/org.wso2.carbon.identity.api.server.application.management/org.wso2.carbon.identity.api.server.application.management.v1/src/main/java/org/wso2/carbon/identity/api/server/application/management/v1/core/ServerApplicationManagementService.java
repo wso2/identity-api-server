@@ -90,6 +90,7 @@ import org.wso2.carbon.identity.configuration.mgt.core.search.PrimitiveCondition
 import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
 import org.wso2.carbon.identity.core.model.Node;
+import org.wso2.carbon.identity.core.model.OperationNode;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages;
@@ -113,7 +114,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -147,8 +151,8 @@ public class ServerApplicationManagementService {
 
     private static final Log log = LogFactory.getLog(ServerApplicationManagementService.class);
 
-    private static final List<String> SEARCH_SUPPORTED_FIELDS = new ArrayList<>();
-    private static final String APP_NAME = "name";
+    // Allowed filter attributes mapped to real field names.
+    private static final Map<String, String> SEARCH_SUPPORTED_FIELD_MAP = new HashMap<>();
 
     // Filter related constants.
     private static final String FILTER_STARTS_WITH = "sw";
@@ -163,8 +167,11 @@ public class ServerApplicationManagementService {
             "not be found since the WS-Trust connector has not been configured.";
 
     static {
-        SEARCH_SUPPORTED_FIELDS.add(APP_NAME);
+        SEARCH_SUPPORTED_FIELD_MAP.put("name", "SP_APP.APP_NAME");
+        SEARCH_SUPPORTED_FIELD_MAP.put("clientID", "SP_INBOUND_AUTH.INBOUND_AUTH_KEY");
     }
+
+    private static final Set<String> SEARCH_SUPPORTED_ATTRIBUTES = SEARCH_SUPPORTED_FIELD_MAP.keySet();
 
     @Autowired
     private ServerApplicationMetadataService applicationMetadataService;
@@ -174,21 +181,66 @@ public class ServerApplicationManagementService {
 
         handleNotImplementedCapabilities(sortOrder, sortBy, requiredAttributes);
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        boolean isEqualFilterUsed = false;
 
         limit = validateAndGetLimit(limit);
         offset = validateAndGetOffset(offset);
 
-        // Format the filter to a value that can be interpreted by the backend.
-        ExpressionNode expressionNode = buildFilterNode(filter);
+        // Get the filter tree and convert it to a string that can be interpreted by the backend.
         String formattedFilter = null;
-        if (expressionNode != null) {
-            // Handle eq operation as special case, there will be only one application with a given name in tenant.
-            if (isEqualOperation(expressionNode)) {
-                isEqualFilterUsed = true;
+        if (StringUtils.isNotBlank(filter)) {
+            try {
+                FilterTreeBuilder filterTreeBuilder = new FilterTreeBuilder(filter);
+                Node rootNode = filterTreeBuilder.buildTree();
+                if (rootNode instanceof ExpressionNode) {
+                    ExpressionNode expressionNode = (ExpressionNode) rootNode;
+                    if (!SEARCH_SUPPORTED_ATTRIBUTES.contains(expressionNode.getAttributeValue())) {
+                        throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, expressionNode
+                                .getAttributeValue());
+                    }
+                    formattedFilter = generateFilterStringForBackend(expressionNode.getAttributeValue(),
+                            expressionNode.getOperation(), expressionNode.getValue());
+
+                } else if (rootNode instanceof OperationNode) {
+                    // Currently, supports only filters with one AND/OR operation.
+                    // Have to recursively traverse the filter tree to support more than one operation.
+                    OperationNode operationNode = (OperationNode) rootNode;
+                    Node leftNode = rootNode.getLeftNode();
+                    Node rightNode = rootNode.getRightNode();
+
+                    if (operationNode.getOperation().equals("not")) {
+                        throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
+                    }
+                    if (leftNode instanceof ExpressionNode && rightNode instanceof ExpressionNode) {
+                        ExpressionNode expressionLeftNode = (ExpressionNode) leftNode;
+                        ExpressionNode expressionRightNode = (ExpressionNode) rightNode;
+                        if (!SEARCH_SUPPORTED_ATTRIBUTES.contains(expressionLeftNode.getAttributeValue())) {
+                            throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, expressionLeftNode
+                                    .getAttributeValue());
+                        }
+                        if (!SEARCH_SUPPORTED_ATTRIBUTES.contains(expressionRightNode.getAttributeValue())) {
+                            throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, expressionRightNode
+                                    .getAttributeValue());
+                        }
+
+                        String formattedLeftNode = generateFilterStringForBackend(
+                                expressionLeftNode.getAttributeValue(),
+                                expressionLeftNode.getOperation(),
+                                expressionLeftNode.getValue());
+                        String formattedRightNode = generateFilterStringForBackend(
+                                expressionRightNode.getAttributeValue(),
+                                expressionRightNode.getOperation(),
+                                expressionRightNode.getValue());
+                        formattedFilter = formattedLeftNode + " " +
+                                operationNode.getOperation() + " " + formattedRightNode;
+                    } else {
+                        throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
+                    }
+                } else {
+                    throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
+                }
+            } catch (IOException | IdentityException e) {
+                throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
             }
-            formattedFilter = generateFilterStringForBackend(expressionNode.getAttributeValue(), expressionNode
-                    .getOperation(), expressionNode.getValue());
         }
 
         String username = ContextLoader.getUsernameFromContext();
@@ -196,19 +248,8 @@ public class ServerApplicationManagementService {
             int totalResults = getApplicationManagementService()
                     .getCountOfApplications(tenantDomain, username, formattedFilter);
 
-            ApplicationBasicInfo[] filteredAppList;
-            if (isEqualFilterUsed) {
-                ApplicationBasicInfo applicationBasicInfo = getApplicationManagementService()
-                        .getApplicationBasicInfoByName(expressionNode.getValue(), tenantDomain);
-                if (applicationBasicInfo == null) {
-                    filteredAppList = new ApplicationBasicInfo[0];
-                } else {
-                    filteredAppList = new ApplicationBasicInfo[]{applicationBasicInfo};
-                }
-            } else {
-                filteredAppList = getApplicationManagementService()
-                        .getApplicationBasicInfo(tenantDomain, username, formattedFilter, offset, limit);
-            }
+            ApplicationBasicInfo[] filteredAppList = getApplicationManagementService()
+                    .getApplicationBasicInfo(tenantDomain, username, formattedFilter, offset, limit);
             int resultsInCurrentPage = filteredAppList.length;
 
             return new ApplicationListResponse()
@@ -996,63 +1037,29 @@ public class ServerApplicationManagementService {
                 .collect(Collectors.toList());
     }
 
-    private ExpressionNode buildFilterNode(String filter) {
-
-        if (StringUtils.isNotBlank(filter)) {
-            try {
-                FilterTreeBuilder filterTreeBuilder = new FilterTreeBuilder(filter);
-                Node rootNode = filterTreeBuilder.buildTree();
-                if (rootNode instanceof ExpressionNode) {
-                    ExpressionNode expressionNode = (ExpressionNode) rootNode;
-                    if (SEARCH_SUPPORTED_FIELDS.contains(expressionNode.getAttributeValue())) {
-                        return expressionNode;
-                    } else {
-                        throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, expressionNode
-                                .getAttributeValue());
-                    }
-
-                } else {
-                    throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
-                }
-            } catch (IOException | IdentityException e) {
-                throw buildClientError(ApplicationManagementConstants.ErrorMessage.INVALID_FILTER_FORMAT, null);
-            }
-        } else {
-            return null;
-        }
-    }
-
     private String generateFilterStringForBackend(String searchField, String searchOperation, String searchValue) {
 
-        // We do not have support for searching any fields other than the name. Therefore we simply format the search
-        // value based on the search operation.
+        // Format the filter attribute, condition, and value to fit in a SQL where clause.
         String formattedFilter;
+        String realSearchField = SEARCH_SUPPORTED_FIELD_MAP.get(searchField);
         switch (searchOperation) {
             case FILTER_STARTS_WITH:
-                formattedFilter = searchValue + "*";
+                formattedFilter = realSearchField + " LIKE '" + searchValue + "*'";
                 break;
             case FILTER_ENDS_WITH:
-                formattedFilter = "*" + searchValue;
+                formattedFilter = realSearchField + " LIKE " + "'*" + searchValue + "'";
                 break;
             case FILTER_EQUALS:
-                formattedFilter = searchValue;
+                formattedFilter = realSearchField + " = '" + searchValue + "'";
                 break;
             case FILTER_CONTAINS:
-                formattedFilter = "*" + searchValue + "*";
+                formattedFilter = realSearchField + " LIKE " + "'*" + searchValue + "*'";
                 break;
             default:
                 throw buildClientError(ErrorMessage.INVALID_FILTER_OPERATION, searchOperation);
         }
 
         return formattedFilter;
-    }
-
-    private boolean isEqualOperation(ExpressionNode expressionNode) {
-
-        if (FILTER_EQUALS.equals(expressionNode.getOperation())) {
-            return true;
-        }
-        return false;
     }
 
     /**

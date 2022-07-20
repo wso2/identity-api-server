@@ -56,7 +56,7 @@ public class ApplicationManagementConstants {
         // Client errors with codes defined at Application Management Layer.
         UNSUPPORTED_FILTER_ATTRIBUTE("60004", "Filtering using the attempted attribute is not supported.",
                 "Filtering cannot be done with the '%s' attribute. " +
-                        "Filtering is only supported with the 'name' attribute."),
+                        "Filtering is only supported with the 'name', and the 'clientID' attributes."),
         INVALID_FILTER_FORMAT("60004",
                 "Invalid format user for filtering.",
                 "Filter needs to be in the format <attribute>+<operation>+<value>. Eg: name+eq+john"),
