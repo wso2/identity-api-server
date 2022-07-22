@@ -185,8 +185,7 @@ public class ServerApplicationManagementService {
         limit = validateAndGetLimit(limit);
         offset = validateAndGetOffset(offset);
 
-        // Get the filter tree and convert it to a string that can be interpreted by the backend.
-        String formattedFilter = null;
+        // Get the filter tree and validate it before sending the filter to the backend.
         if (StringUtils.isNotBlank(filter)) {
             try {
                 FilterTreeBuilder filterTreeBuilder = new FilterTreeBuilder(filter);
@@ -197,9 +196,6 @@ public class ServerApplicationManagementService {
                         throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, expressionNode
                                 .getAttributeValue());
                     }
-                    formattedFilter = generateFilterStringForBackend(expressionNode.getAttributeValue(),
-                            expressionNode.getOperation(), expressionNode.getValue());
-
                 } else if (rootNode instanceof OperationNode) {
                     // Currently, supports only filters with one AND/OR operation.
                     // Have to recursively traverse the filter tree to support more than one operation.
@@ -221,17 +217,6 @@ public class ServerApplicationManagementService {
                             throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, expressionRightNode
                                     .getAttributeValue());
                         }
-
-                        String formattedLeftNode = generateFilterStringForBackend(
-                                expressionLeftNode.getAttributeValue(),
-                                expressionLeftNode.getOperation(),
-                                expressionLeftNode.getValue());
-                        String formattedRightNode = generateFilterStringForBackend(
-                                expressionRightNode.getAttributeValue(),
-                                expressionRightNode.getOperation(),
-                                expressionRightNode.getValue());
-                        formattedFilter = formattedLeftNode + " " +
-                                operationNode.getOperation() + " " + formattedRightNode;
                     } else {
                         throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
                     }
@@ -246,10 +231,10 @@ public class ServerApplicationManagementService {
         String username = ContextLoader.getUsernameFromContext();
         try {
             int totalResults = getApplicationManagementService()
-                    .getCountOfApplications(tenantDomain, username, formattedFilter);
+                    .getCountOfApplications(tenantDomain, username, filter);
 
             ApplicationBasicInfo[] filteredAppList = getApplicationManagementService()
-                    .getApplicationBasicInfo(tenantDomain, username, formattedFilter, offset, limit);
+                    .getApplicationBasicInfo(tenantDomain, username, filter, offset, limit);
             int resultsInCurrentPage = filteredAppList.length;
 
             return new ApplicationListResponse()
@@ -1035,31 +1020,6 @@ public class ServerApplicationManagementService {
         return Arrays.stream(allApplicationBasicInfo)
                 .map(new ApplicationBasicInfoToApiModel())
                 .collect(Collectors.toList());
-    }
-
-    private String generateFilterStringForBackend(String searchField, String searchOperation, String searchValue) {
-
-        // Format the filter attribute, condition, and value to fit in a SQL where clause.
-        String formattedFilter;
-        String realSearchField = SEARCH_SUPPORTED_FIELD_MAP.get(searchField);
-        switch (searchOperation) {
-            case FILTER_STARTS_WITH:
-                formattedFilter = realSearchField + " LIKE '" + searchValue + "*'";
-                break;
-            case FILTER_ENDS_WITH:
-                formattedFilter = realSearchField + " LIKE " + "'*" + searchValue + "'";
-                break;
-            case FILTER_EQUALS:
-                formattedFilter = realSearchField + " = '" + searchValue + "'";
-                break;
-            case FILTER_CONTAINS:
-                formattedFilter = realSearchField + " LIKE " + "'*" + searchValue + "*'";
-                break;
-            default:
-                throw buildClientError(ErrorMessage.INVALID_FILTER_OPERATION, searchOperation);
-        }
-
-        return formattedFilter;
     }
 
     /**
