@@ -35,6 +35,7 @@ public class ApplicationListItem  {
     private String description;
     private String image;
     private String accessUrl;
+    private String inboundKey;
 
 @XmlType(name="AccessEnum")
 @XmlEnum(String.class)
@@ -161,6 +162,22 @@ public enum AccessEnum {
         this.accessUrl = accessUrl;
     }
 
+    public ApplicationListItem inboundKey(String inboundKey) {
+
+        this.inboundKey = inboundKey;
+        return this;
+    }
+
+    @ApiModelProperty(example = "sampleRandomString", value = "")
+    @JsonProperty("inboundKey")
+    @Valid
+    public String getInboundKey() {
+        return inboundKey;
+    }
+    public void setInboundKey(String inboundKey) {
+        this.inboundKey = inboundKey;
+    }
+
     /**
     **/
     public ApplicationListItem access(AccessEnum access) {
@@ -214,13 +231,14 @@ public enum AccessEnum {
             Objects.equals(this.description, applicationListItem.description) &&
             Objects.equals(this.image, applicationListItem.image) &&
             Objects.equals(this.accessUrl, applicationListItem.accessUrl) &&
+            Objects.equals(this.inboundKey, applicationListItem.inboundKey) &&
             Objects.equals(this.access, applicationListItem.access) &&
             Objects.equals(this.self, applicationListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, accessUrl, access, self);
+        return Objects.hash(id, name, description, image, accessUrl, inboundKey, access, self);
     }
 
     @Override
@@ -234,6 +252,7 @@ public enum AccessEnum {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
+        sb.append("    inboundKey: ").append(toIndentedString(inboundKey)).append("\n");
         sb.append("    access: ").append(toIndentedString(access)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
