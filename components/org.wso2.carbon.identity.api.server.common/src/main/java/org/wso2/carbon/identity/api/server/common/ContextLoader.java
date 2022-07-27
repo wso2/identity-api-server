@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.common;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
@@ -31,6 +32,7 @@ import java.net.URI;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.common.Constants.ORGANIZATION_CONTEXT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.SERVER_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_CONTEXT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_NAME_FROM_CONTEXT;
@@ -68,8 +70,18 @@ public class ContextLoader {
     }
 
     /**
-     * Build URI prepending the user API context with the proxy context path to the endpoint.
-     * Ex: /t/<tenant-domain>/api/users/<endpoint>
+     * Retrieves organization id from carbon context.
+     *
+     * @return the organization id.
+     */
+    public static String getOrganizationIdFromContext() {
+
+        return PrivilegedCarbonContext.getThreadLocalCarbonContext().getOrganizationId();
+    }
+
+    /**
+     * Build URI prepending the server API context with the proxy context path to the endpoint.
+     * Ex: /t/<tenant-domain>/api/server/<endpoint> or /o/<organization-id>/api/server/<endpoint>
      *
      * @param endpoint relative endpoint path.
      * @return Relative URI.
@@ -89,8 +101,9 @@ public class ContextLoader {
     }
 
     /**
-     * Build the complete URI prepending the user API context without the proxy context path, to the endpoint.
-     * Ex: https://localhost:9443/t/<tenant-domain>/api/users/<endpoint>
+     * Build the complete URI prepending the server API context without the proxy context path, to the endpoint.
+     * Ex: https://localhost:9443/t/<tenant-domain>/api/server/<endpoint> or
+     *     https://localhost:9443/o/<organization-id>/api/server/<endpoint>
      *
      * @param endpoint relative endpoint path.
      * @return Fully qualified and complete URI.
@@ -111,9 +124,11 @@ public class ContextLoader {
     }
 
     /**
-     * Builds the API context on whether the tenant qualified url is enabled or not. In tenant qualified mode the
-     * ServiceURLBuilder appends the tenant domain to the URI as a path param automatically. But
-     * in non tenant qualified mode we need to append the tenant domain to the path manually.
+     * Builds the API context based on whether it is an organization specific or tenant specific path.
+     *
+     * For a tenant specific path, builds the API context on whether the tenant qualified url is enabled or not.
+     * In tenant qualified mode the ServiceURLBuilder appends the tenant domain to the URI as a path param
+     * automatically. But in non tenant qualified mode, we need to append the tenant domain to the path manually.
      *
      * @param endpoint Relative endpoint path.
      * @return Context of the API.
@@ -121,11 +136,17 @@ public class ContextLoader {
     private static String getContext(String endpoint) {
 
         String context;
-        if (IdentityTenantUtil.isTenantQualifiedUrlsEnabled()) {
-            context = SERVER_API_PATH_COMPONENT + endpoint;
-        } else {
-            context = String.format(TENANT_CONTEXT_PATH_COMPONENT, getTenantDomainFromContext()) +
+        String organizationId = getOrganizationIdFromContext();
+        if (StringUtils.isNotBlank(organizationId)) {
+            context = String.format(ORGANIZATION_CONTEXT_PATH_COMPONENT, organizationId) +
                     SERVER_API_PATH_COMPONENT + endpoint;
+        } else {
+            if (IdentityTenantUtil.isTenantQualifiedUrlsEnabled()) {
+                context = SERVER_API_PATH_COMPONENT + endpoint;
+            } else {
+                context = String.format(TENANT_CONTEXT_PATH_COMPONENT, getTenantDomainFromContext()) +
+                        SERVER_API_PATH_COMPONENT + endpoint;
+            }
         }
         return context;
     }

@@ -54,6 +54,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConf
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationBasicInfoToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationInfoWithRequiredPropsToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
@@ -122,11 +123,13 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthKey;
@@ -179,14 +182,13 @@ public class ServerApplicationManagementService {
     public ApplicationListResponse getAllApplications(Integer limit, Integer offset, String filter, String sortOrder,
                                                       String sortBy, String requiredAttributes) {
 
-        handleNotImplementedCapabilities(sortOrder, sortBy, requiredAttributes);
+        handleNotImplementedCapabilities(sortOrder, sortBy);
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         limit = validateAndGetLimit(limit);
         offset = validateAndGetOffset(offset);
 
-        // Get the filter tree and convert it to a string that can be interpreted by the backend.
-        String formattedFilter = null;
+        // Get the filter tree and validate it before sending the filter to the backend.
         if (StringUtils.isNotBlank(filter)) {
             try {
                 FilterTreeBuilder filterTreeBuilder = new FilterTreeBuilder(filter);
@@ -197,9 +199,6 @@ public class ServerApplicationManagementService {
                         throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, expressionNode
                                 .getAttributeValue());
                     }
-                    formattedFilter = generateFilterStringForBackend(expressionNode.getAttributeValue(),
-                                expressionNode.getOperation(), expressionNode.getValue());
-
                 } else if (rootNode instanceof OperationNode) {
                     // Currently, supports only filters with one AND/OR operation.
                     // Have to recursively traverse the filter tree to support more than one operation.
@@ -207,7 +206,7 @@ public class ServerApplicationManagementService {
                     Node leftNode = rootNode.getLeftNode();
                     Node rightNode = rootNode.getRightNode();
 
-                    if (operationNode.getOperation().equalsIgnoreCase("not")) {
+                    if (operationNode.getOperation().equals("not")) {
                         throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
                     }
                     if (leftNode instanceof ExpressionNode && rightNode instanceof ExpressionNode) {
@@ -221,17 +220,6 @@ public class ServerApplicationManagementService {
                             throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, expressionRightNode
                                     .getAttributeValue());
                         }
-
-                        String formattedLeftNode = generateFilterStringForBackend(
-                                expressionLeftNode.getAttributeValue(),
-                                expressionLeftNode.getOperation(),
-                                expressionLeftNode.getValue());
-                        String formattedRightNode = generateFilterStringForBackend(
-                                expressionRightNode.getAttributeValue(),
-                                expressionRightNode.getOperation(),
-                                expressionRightNode.getValue());
-                        formattedFilter = formattedLeftNode + " " +
-                                operationNode.getOperation() + " " + formattedRightNode;
                     } else {
                         throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
                     }
@@ -246,28 +234,79 @@ public class ServerApplicationManagementService {
         String username = ContextLoader.getUsernameFromContext();
         try {
             int totalResults = getApplicationManagementService()
-                    .getCountOfApplications(tenantDomain, username, formattedFilter);
+                    .getCountOfApplications(tenantDomain, username, filter);
 
             ApplicationBasicInfo[] filteredAppList = getApplicationManagementService()
-                        .getApplicationBasicInfo(tenantDomain, username, formattedFilter, offset, limit);
+                    .getApplicationBasicInfo(tenantDomain, username, filter, offset, limit);
             int resultsInCurrentPage = filteredAppList.length;
 
-            return new ApplicationListResponse()
-                    .totalResults(totalResults)
-                    .startIndex(offset + 1)
-                    .count(resultsInCurrentPage)
-                    .applications(getApplicationListItems(filteredAppList))
-                    .links(Util.buildPaginationLinks(limit, offset, totalResults, APPLICATION_MANAGEMENT_PATH_COMPONENT)
-                            .entrySet()
-                            .stream()
-                            .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
-                            .collect(Collectors.toList()));
+            List<String> requestedAttributeList = null;
+            if (StringUtils.isNotEmpty(requiredAttributes)) {
+                requestedAttributeList = Arrays.asList(requiredAttributes.split(","));
+                validateRequiredAttributes(requestedAttributeList);
+            }
+            if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
+                 List<ServiceProvider> serviceProviderList = getSpWithRequiredAttributes(filteredAppList,
+                        requestedAttributeList);
+
+                return new ApplicationListResponse()
+                        .totalResults(totalResults)
+                        .startIndex(offset + 1)
+                        .count(resultsInCurrentPage)
+                        .applications(getApplicationListItems(serviceProviderList, requestedAttributeList))
+                        .links(Util.buildPaginationLinks(limit, offset, totalResults,
+                                        APPLICATION_MANAGEMENT_PATH_COMPONENT)
+                                .entrySet()
+                                .stream()
+                                .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
+                                .collect(Collectors.toList()));
+            } else {
+                return new ApplicationListResponse()
+                        .totalResults(totalResults)
+                        .startIndex(offset + 1)
+                        .count(resultsInCurrentPage)
+                        .applications(getApplicationListItems(filteredAppList))
+                        .links(Util.buildPaginationLinks(limit, offset, totalResults,
+                                        APPLICATION_MANAGEMENT_PATH_COMPONENT)
+                                .entrySet()
+                                .stream()
+                                .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
+                                .collect(Collectors.toList()));
+            }
 
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error listing applications of tenantDomain: " + tenantDomain;
             throw handleIdentityApplicationManagementException(e, msg);
         }
     }
+
+    private void validateRequiredAttributes(List<String> requestedAttributeList) {
+
+        for (String attribute: requestedAttributeList) {
+            /* 'attributes' requested in get application list only supports advancedConfigurations and templateId.
+            * The advancedConfigurations is supported as metadata of the application is essential in certain cases and
+            * templateId is supported to add filtering on listing page. */
+            if (!(attribute.equals(ADVANCED_CONFIGURATIONS) || attribute.equals(TEMPLATE_ID))) {
+                ErrorMessage errorEnum = ErrorMessage.NON_EXISTING_REQ_ATTRIBUTES;
+                throw Utils.buildBadRequestError(errorEnum.getCode(), errorEnum.getDescription());
+            }
+        }
+    }
+
+    private List<ServiceProvider> getSpWithRequiredAttributes(ApplicationBasicInfo[] filteredAppList,
+                                                                  List<String> requestedAttributeList)
+            throws IdentityApplicationManagementException {
+
+        List<ServiceProvider> serviceProviderList = new ArrayList<>();
+        for (ApplicationBasicInfo applicationBasicInfo : filteredAppList) {
+            ServiceProvider serviceProvider = getApplicationManagementService().
+                    getApplicationWithRequiredAttributes(applicationBasicInfo.getApplicationId(),
+                            requestedAttributeList);
+            serviceProviderList.add(serviceProvider);
+        }
+        return serviceProviderList;
+    }
+
 
     private int validateAndGetOffset(Integer offset) {
 
@@ -1037,29 +1076,22 @@ public class ServerApplicationManagementService {
                 .collect(Collectors.toList());
     }
 
-    private String generateFilterStringForBackend(String searchField, String searchOperation, String searchValue) {
+    private List<ApplicationListItem> getApplicationListItems(List<ServiceProvider> serviceProviderList,
+                                                              List<String> requiredAttributes) {
 
-        // Format the filter attribute, condition, and value to fit in a SQL where clause
-        String formattedFilter;
-        String realSearchField = SEARCH_SUPPORTED_FIELD_MAP.get(searchField);
-        switch (searchOperation) {
-            case FILTER_STARTS_WITH:
-                formattedFilter = realSearchField + " LIKE '" + searchValue + "*'";
-                break;
-            case FILTER_ENDS_WITH:
-                formattedFilter = realSearchField + " LIKE " + "'*" + searchValue + "'";
-                break;
-            case FILTER_EQUALS:
-                formattedFilter = realSearchField + " = '" + searchValue + "'";
-                break;
-            case FILTER_CONTAINS:
-                formattedFilter = realSearchField + " LIKE " + "'*" + searchValue + "*'";
-                break;
-            default:
-                throw buildClientError(ErrorMessage.INVALID_FILTER_OPERATION, searchOperation);
+        List<ApplicationListItem> applicationListItems = new ArrayList<>();
+        for (ServiceProvider serviceProvider : serviceProviderList) {
+            ApplicationResponseModel  applicationResponseModel =
+                    new ServiceProviderToApiModel().apply(serviceProvider);
+            if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(TEMPLATE_ID))) {
+                applicationResponseModel.templateId(null);
+            }
+            if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(ADVANCED_CONFIGURATIONS))) {
+                applicationResponseModel.advancedConfigurations(null);
+            }
+            applicationListItems.add(new ApplicationInfoWithRequiredPropsToApiModel().apply(applicationResponseModel));
         }
-
-        return formattedFilter;
+        return applicationListItems;
     }
 
     /**
@@ -1127,15 +1159,12 @@ public class ServerApplicationManagementService {
         }
     }
 
-    private void handleNotImplementedCapabilities(String sortOrder, String sortBy, String requiredAttributes) {
+    private void handleNotImplementedCapabilities(String sortOrder, String sortBy) {
 
         ErrorMessage errorEnum = null;
         if (sortBy != null || sortOrder != null) {
             errorEnum = ErrorMessage.SORTING_NOT_IMPLEMENTED;
-        } else if (requiredAttributes != null) {
-            errorEnum = ErrorMessage.ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
         }
-
         if (errorEnum != null) {
             throw Utils.buildServerError(errorEnum.getCode(), errorEnum.getMessage(), errorEnum.getDescription());
         }

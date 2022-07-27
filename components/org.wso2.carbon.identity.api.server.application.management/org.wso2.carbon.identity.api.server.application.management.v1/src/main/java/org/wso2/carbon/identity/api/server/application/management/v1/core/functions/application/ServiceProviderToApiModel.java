@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
@@ -46,11 +47,13 @@ import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfi
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -61,6 +64,12 @@ import java.util.stream.Collectors;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.arrayToStream;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_JWKS;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_PEM;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_MANAGEMENT_APP_SP_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.TEMPLATE_ID_SP_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.USE_USER_ID_FOR_DEFAULT_SUBJECT;
+import static org.wso2.carbon.identity.application.mgt.dao.impl.ApplicationDAOImpl.USE_DOMAIN_IN_ROLES;
+import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_CONSENT;
+import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_LOGOUT_CONSENT;
 
 /**
  * Converts the backend model ServiceProvider into the corresponding API model object.
@@ -349,7 +358,42 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .skipLoginConsent(authConfig.isSkipConsent())
                 .skipLogoutConsent(authConfig.isSkipLogoutConsent())
                 .certificate(getCertificate(serviceProvider))
-                .fragment(isFragmentApp(serviceProvider));
+                .fragment(isFragmentApp(serviceProvider))
+                .additionalSpProperties(getSpProperties(serviceProvider));
+    }
+
+    private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {
+
+        ServiceProviderProperty[] serviceProviderProperties = serviceProvider.getSpProperties();
+        ServiceProviderProperty[] updatedSpProperties = removeAndSetSpProperties(serviceProviderProperties);
+        List<AdditionalSpProperty> additionalSpProperties = new ArrayList<>();
+        for (ServiceProviderProperty serviceProviderProperty : updatedSpProperties) {
+            AdditionalSpProperty spProperties = new AdditionalSpProperty();
+            if (StringUtils.isNotBlank(serviceProviderProperty.getName())) {
+                spProperties.setName(serviceProviderProperty.getName());
+                spProperties.setValue(serviceProviderProperty.getValue());
+            }
+            if (StringUtils.isNotBlank(serviceProviderProperty.getDisplayName())) {
+                spProperties.setDisplayName(serviceProviderProperty.getDisplayName());
+            }
+            additionalSpProperties.add(spProperties);
+        }
+        return additionalSpProperties;
+    }
+
+    private ServiceProviderProperty[] removeAndSetSpProperties(ServiceProviderProperty[] propertyList) {
+
+        /* These properties are part of advanced configurations and hence removing
+        them as they can't be packed as a part of additional sp properties again.*/
+            List<ServiceProviderProperty> spPropertyList =
+                    Arrays.stream(propertyList).collect(Collectors.toList());
+            spPropertyList.removeIf(property -> SKIP_CONSENT.equals(property.getName()));
+            spPropertyList.removeIf(property -> SKIP_LOGOUT_CONSENT.equals(property.getName()));
+            spPropertyList.removeIf(property -> USE_DOMAIN_IN_ROLES.equals(property.getName()));
+            spPropertyList.removeIf(property -> USE_USER_ID_FOR_DEFAULT_SUBJECT.equals(property.getName()));
+            spPropertyList.removeIf(property -> TEMPLATE_ID_SP_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property -> IS_MANAGEMENT_APP_SP_PROPERTY_NAME.equals(property.getName()));
+            return spPropertyList.toArray(new ServiceProviderProperty[0]);
     }
 
     private Certificate getCertificate(ServiceProvider serviceProvider) {
@@ -362,7 +406,6 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         return null;
     }
-
     private boolean isFragmentApp(ServiceProvider serviceProvider) {
 
         return serviceProvider != null && serviceProvider.getSpProperties() != null &&
