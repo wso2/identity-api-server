@@ -2260,6 +2260,11 @@ components:
         self:
           type: string
           example: "/t/wso2.com/api/server/v1/applications/85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
+        advancedConfigurations:
+            $ref: '#/components/schemas/AdvancedApplicationConfiguration'
+        templateId:
+          type: string
+          example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
 
     ApplicationModel:
       type: object
@@ -2448,6 +2453,31 @@ components:
           type: boolean
           description: Decides whether authorization policies needs to be engaged during authentication flows.
           example: true
+        fragment:
+          type: boolean
+          description: Decides whether application is a fragment application.
+          example: false
+        additionalSpProperties:
+          $ref: '#/components/schemas/AdditionalProperties'
+    AdditionalProperties:
+      type: array
+      items:
+        $ref: "#/components/schemas/AdditionalSpProperty"
+    AdditionalSpProperty:
+        type: object
+        required:
+          - name
+          - value
+        properties:
+          name:
+            type: string
+            example: "isInternalApp"
+          value:
+              type: string
+              example: "true"
+          displayName:
+              type: string
+              example: "Internal Application"
     Certificate:
       type: object
       properties:

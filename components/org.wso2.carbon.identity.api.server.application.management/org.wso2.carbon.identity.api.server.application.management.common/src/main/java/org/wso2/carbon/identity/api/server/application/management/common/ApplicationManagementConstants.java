@@ -45,6 +45,8 @@ public class ApplicationManagementConstants {
     private static final Map<String, String> OAUTH_GRANT_TYPE_NAMES = new LinkedHashMap<>();
     public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
     public static final String DEFAULT_CERTIFICATE_ALIAS = "wso2carbon";
+    public static final String ADVANCED_CONFIGURATIONS = "advancedConfigurations";
+    public static final String TEMPLATE_ID = "templateId";
 
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 
@@ -87,6 +89,12 @@ public class ApplicationManagementConstants {
                 "Maximum number of allowed applications have been reached."),
         NON_EXISTING_USER_ID("60504", "User not found",
                 "Non exiting user for the given userid: %s."),
+        NON_EXISTING_REQ_ATTRIBUTES("60505", "Invalid attribute name.",
+                "Invalid attribute name provided as required attribute."),
+
+        ADDITIONAL_SP_PROP_NOT_SUPPORTED("60506",
+                "Unsupported application property.",
+                "'additionalSpProperties' is not yet supported in this version of the API."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
@@ -120,7 +128,6 @@ public class ApplicationManagementConstants {
                 "Error occurred while retrieving user by userid: %s."),
         ERROR_RETRIEVING_USERSTORE_MANAGER("65504", "Error retrieving userstore manager.",
                 "Error occurred while retrieving userstore manager.");
-
 
         private final String code;
         private final String message;

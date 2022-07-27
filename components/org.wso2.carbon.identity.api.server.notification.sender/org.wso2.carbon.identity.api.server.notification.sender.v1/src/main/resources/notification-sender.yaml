@@ -378,6 +378,7 @@ paths:
               key: 123**45
               secret: 5tg**ssd
               sender: +94 775563324
+              type : json
               properties:
                 - key: body.scope
                   value: "internal"
@@ -513,6 +514,7 @@ paths:
               key: 123**45
               secret: 5tg**ssd
               sender: +94 775563324
+              type : json
               properties:
                 - key: body.scope
                   value: "internal"
@@ -656,6 +658,7 @@ components:
       required:
         - providerURL
         - provider
+        - contentType
       type: object
       properties:
         name:
@@ -676,6 +679,11 @@ components:
         sender:
           type: string
           example: +94 775563324
+        contentType:
+          type: string
+          enum:
+            - JSON
+            - FORM
         properties:
           type: array
           example:
@@ -719,6 +727,7 @@ components:
         - providerURL
         - name
         - provider
+        - contentType
       type: object
       properties:
         name:
@@ -739,6 +748,11 @@ components:
         sender:
           type: string
           example: +94 775563324
+        contentType:
+          type: string
+          enum:
+            - JSON
+            - FORM
         properties:
           type: array
           example:
@@ -781,6 +795,7 @@ components:
       required:
         - providerURL
         - provider
+        - contentType
       type: object
       properties:
         provider:
@@ -798,6 +813,11 @@ components:
         sender:
           type: string
           example: +94 775563324
+        contentType:
+          type: string
+          enum:
+            - JSON
+            - FORM
         properties:
           type: array
           example:

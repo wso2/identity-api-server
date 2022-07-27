@@ -54,6 +54,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConf
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationBasicInfoToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationInfoWithRequiredPropsToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
@@ -122,11 +123,13 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthKey;
@@ -179,7 +182,7 @@ public class ServerApplicationManagementService {
     public ApplicationListResponse getAllApplications(Integer limit, Integer offset, String filter, String sortOrder,
                                                       String sortBy, String requiredAttributes) {
 
-        handleNotImplementedCapabilities(sortOrder, sortBy, requiredAttributes);
+        handleNotImplementedCapabilities(sortOrder, sortBy);
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         limit = validateAndGetLimit(limit);
@@ -237,22 +240,74 @@ public class ServerApplicationManagementService {
                     .getApplicationBasicInfo(tenantDomain, username, filter, offset, limit);
             int resultsInCurrentPage = filteredAppList.length;
 
-            return new ApplicationListResponse()
-                    .totalResults(totalResults)
-                    .startIndex(offset + 1)
-                    .count(resultsInCurrentPage)
-                    .applications(getApplicationListItems(filteredAppList))
-                    .links(Util.buildPaginationLinks(limit, offset, totalResults, APPLICATION_MANAGEMENT_PATH_COMPONENT)
-                            .entrySet()
-                            .stream()
-                            .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
-                            .collect(Collectors.toList()));
+            List<String> requestedAttributeList = null;
+            if (StringUtils.isNotEmpty(requiredAttributes)) {
+                requestedAttributeList = Arrays.asList(requiredAttributes.split(","));
+                validateRequiredAttributes(requestedAttributeList);
+            }
+            if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
+                 List<ServiceProvider> serviceProviderList = getSpWithRequiredAttributes(filteredAppList,
+                        requestedAttributeList);
+
+                return new ApplicationListResponse()
+                        .totalResults(totalResults)
+                        .startIndex(offset + 1)
+                        .count(resultsInCurrentPage)
+                        .applications(
+                        (serviceProviderList, requestedAttributeList))
+                        .links(Util.buildPaginationLinks(limit, offset, totalResults,
+                                        APPLICATION_MANAGEMENT_PATH_COMPONENT)
+                                .entrySet()
+                                .stream()
+                                .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
+                                .collect(Collectors.toList()));
+            } else {
+                return new ApplicationListResponse()
+                        .totalResults(totalResults)
+                        .startIndex(offset + 1)
+                        .count(resultsInCurrentPage)
+                        .applications(getApplicationListItems(filteredAppList))
+                        .links(Util.buildPaginationLinks(limit, offset, totalResults,
+                                        APPLICATION_MANAGEMENT_PATH_COMPONENT)
+                                .entrySet()
+                                .stream()
+                                .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
+                                .collect(Collectors.toList()));
+            }
 
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error listing applications of tenantDomain: " + tenantDomain;
             throw handleIdentityApplicationManagementException(e, msg);
         }
     }
+
+    private void validateRequiredAttributes(List<String> requestedAttributeList) {
+
+        for (String attribute: requestedAttributeList) {
+            /* 'attributes' requested in get application list only supports advancedConfigurations and templateId.
+            * The advancedConfigurations is supported as metadata of the application is essential in certain cases and
+            * templateId is supported to add filtering on listing page. */
+            if (!(attribute.equals(ADVANCED_CONFIGURATIONS) || attribute.equals(TEMPLATE_ID))) {
+                ErrorMessage errorEnum = ErrorMessage.NON_EXISTING_REQ_ATTRIBUTES;
+                throw Utils.buildBadRequestError(errorEnum.getCode(), errorEnum.getDescription());
+            }
+        }
+    }
+
+    private List<ServiceProvider> getSpWithRequiredAttributes(ApplicationBasicInfo[] filteredAppList,
+                                                                  List<String> requestedAttributeList)
+            throws IdentityApplicationManagementException {
+
+        List<ServiceProvider> serviceProviderList = new ArrayList<>();
+        for (ApplicationBasicInfo applicationBasicInfo : filteredAppList) {
+            ServiceProvider serviceProvider = getApplicationManagementService().
+                    getApplicationWithRequiredAttributes(applicationBasicInfo.getApplicationId(),
+                            requestedAttributeList);
+            serviceProviderList.add(serviceProvider);
+        }
+        return serviceProviderList;
+    }
+
 
     private int validateAndGetOffset(Integer offset) {
 
@@ -1022,6 +1077,24 @@ public class ServerApplicationManagementService {
                 .collect(Collectors.toList());
     }
 
+    private List<ApplicationListItem> getApplicationListItems(List<ServiceProvider> serviceProviderList,
+                                                              List<String> requiredAttributes) {
+
+        List<ApplicationListItem> applicationListItems = new ArrayList<>();
+        for (ServiceProvider serviceProvider : serviceProviderList) {
+            ApplicationResponseModel  applicationResponseModel =
+                    new ServiceProviderToApiModel().apply(serviceProvider);
+            if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(TEMPLATE_ID))) {
+                applicationResponseModel.templateId(null);
+            }
+            if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(ADVANCED_CONFIGURATIONS))) {
+                applicationResponseModel.advancedConfigurations(null);
+            }
+            applicationListItems.add(new ApplicationInfoWithRequiredPropsToApiModel().apply(applicationResponseModel));
+        }
+        return applicationListItems;
+    }
+
     /**
      * Create or replace the provided inbound configuration.
      *
@@ -1087,15 +1160,12 @@ public class ServerApplicationManagementService {
         }
     }
 
-    private void handleNotImplementedCapabilities(String sortOrder, String sortBy, String requiredAttributes) {
+    private void handleNotImplementedCapabilities(String sortOrder, String sortBy) {
 
         ErrorMessage errorEnum = null;
         if (sortBy != null || sortOrder != null) {
             errorEnum = ErrorMessage.SORTING_NOT_IMPLEMENTED;
-        } else if (requiredAttributes != null) {
-            errorEnum = ErrorMessage.ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
         }
-
         if (errorEnum != null) {
             throw Utils.buildServerError(errorEnum.getCode(), errorEnum.getMessage(), errorEnum.getDescription());
         }

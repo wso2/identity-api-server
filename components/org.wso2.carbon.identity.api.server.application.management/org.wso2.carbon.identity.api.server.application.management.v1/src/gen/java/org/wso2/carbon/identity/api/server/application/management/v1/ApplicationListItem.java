@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import javax.validation.constraints.*;
 
 
@@ -71,6 +72,8 @@ public enum AccessEnum {
 
     private AccessEnum access = AccessEnum.READ;
     private String self;
+    private AdvancedApplicationConfiguration advancedConfigurations;
+    private String templateId;
 
     /**
     **/
@@ -214,6 +217,42 @@ public enum AccessEnum {
         this.self = self;
     }
 
+    /**
+    **/
+    public ApplicationListItem advancedConfigurations(AdvancedApplicationConfiguration advancedConfigurations) {
+
+        this.advancedConfigurations = advancedConfigurations;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("advancedConfigurations")
+    @Valid
+    public AdvancedApplicationConfiguration getAdvancedConfigurations() {
+        return advancedConfigurations;
+    }
+    public void setAdvancedConfigurations(AdvancedApplicationConfiguration advancedConfigurations) {
+        this.advancedConfigurations = advancedConfigurations;
+    }
+
+    /**
+    **/
+    public ApplicationListItem templateId(String templateId) {
+
+        this.templateId = templateId;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "980b8tester24c64a8a09a0d80abf8c337bd2555", value = "")
+    @JsonProperty("templateId")
+    @Valid
+    public String getTemplateId() {
+        return templateId;
+    }
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
+    }
+
 
 
     @Override
@@ -233,12 +272,14 @@ public enum AccessEnum {
             Objects.equals(this.accessUrl, applicationListItem.accessUrl) &&
             Objects.equals(this.inboundKey, applicationListItem.inboundKey) &&
             Objects.equals(this.access, applicationListItem.access) &&
-            Objects.equals(this.self, applicationListItem.self);
+            Objects.equals(this.self, applicationListItem.self) &&
+            Objects.equals(this.advancedConfigurations, applicationListItem.advancedConfigurations) &&
+            Objects.equals(this.templateId, applicationListItem.templateId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, accessUrl, inboundKey, access, self);
+        return Objects.hash(id, name, description, image, accessUrl, inboundKey, access, self, advancedConfigurations, templateId);
     }
 
     @Override
@@ -255,6 +296,8 @@ public enum AccessEnum {
         sb.append("    inboundKey: ").append(toIndentedString(inboundKey)).append("\n");
         sb.append("    access: ").append(toIndentedString(access)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
+        sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
+        sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -18,99 +18,33 @@
 
 package org.wso2.carbon.identity.api.server.notification.sender.common;
 
-import org.wso2.carbon.email.mgt.SMSProviderPayloadTemplateManager;
-import org.wso2.carbon.event.publisher.core.EventPublisherService;
-import org.wso2.carbon.identity.configuration.mgt.core.ConfigurationManager;
-import org.wso2.carbon.identity.tenant.resource.manager.core.ResourceManager;
+import org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementService;
 
 /**
  * Service holder class for notification senders configurations.
  */
 public class NotificationSenderServiceHolder {
 
-    private static ConfigurationManager notificationSenderConfigManager;
-    private static EventPublisherService eventPublisherService;
-    private static SMSProviderPayloadTemplateManager smsProviderPayloadTemplateManager;
-    private static ResourceManager resourceManager;
+    private static NotificationSenderManagementService notificationSenderManagementService;
 
     /**
-     * Get ConfigurationManager OSGi service.
+     * Get Notification Sender Manager OSGi service.
      *
      * @return NotificationSenderConfig Manager.
      */
-    public static ConfigurationManager getNotificationSenderConfigManager() {
+    public static NotificationSenderManagementService getNotificationSenderManagementService() {
 
-        return notificationSenderConfigManager;
+        return notificationSenderManagementService;
     }
 
     /**
-     * Set ConfigurationManager OSGi service.
+     * Set Notification Sender Manager OSGi service.
      *
      * @param notificationSenderConfigManager Configuration Manager.
      */
-    public static void setNotificationSenderConfigManager(ConfigurationManager notificationSenderConfigManager) {
+    public static void setNotificationSenderManagementService(NotificationSenderManagementService
+                                                                      notificationSenderConfigManager) {
 
-        NotificationSenderServiceHolder.notificationSenderConfigManager = notificationSenderConfigManager;
-    }
-
-    /**
-     * Get event publisher OSGi service.
-     *
-     * @return EventPublisher Service.
-     */
-    public static EventPublisherService getEventPublisherService() {
-
-        return eventPublisherService;
-    }
-
-    /**
-     * Set an event publisher OSGi service.
-     *
-     * @param eventPublisherService EventPublisher Service.
-     */
-    public static void setEventPublisherService(EventPublisherService eventPublisherService) {
-
-        NotificationSenderServiceHolder.eventPublisherService = eventPublisherService;
-    }
-
-    /**
-     * Get SMS providers' payload template manager OSGi service.
-     *
-     * @returns SMSProviderPayloadTemplateManager service.
-     */
-    public static SMSProviderPayloadTemplateManager getSmsProviderPayloadTemplateManager() {
-
-        return smsProviderPayloadTemplateManager;
-    }
-
-    /**
-     * Set SMS providers' payload template manager OSGi service.
-     *
-     * @param smsProviderPayloadTemplateManager SMSProviderPayloadTemplateManager service.
-     */
-    public static void setSmsProviderPayloadTemplateManager(
-            SMSProviderPayloadTemplateManager smsProviderPayloadTemplateManager) {
-
-        NotificationSenderServiceHolder.smsProviderPayloadTemplateManager = smsProviderPayloadTemplateManager;
-    }
-
-    /**
-     * Get ResourceManager OSGi service.
-     *
-     * @return NotificationSenderConfig Manager.
-     */
-    public static ResourceManager getResourceManager() {
-
-        return resourceManager;
-    }
-
-    /**
-     * Set ResourceManager OSGi service.
-     *
-     * @param resourceManager Resource Manager.
-     */
-    public static void setResourceManager(ResourceManager resourceManager) {
-
-        NotificationSenderServiceHolder.resourceManager = resourceManager;
+        NotificationSenderServiceHolder.notificationSenderManagementService = notificationSenderConfigManager;
     }
 }
