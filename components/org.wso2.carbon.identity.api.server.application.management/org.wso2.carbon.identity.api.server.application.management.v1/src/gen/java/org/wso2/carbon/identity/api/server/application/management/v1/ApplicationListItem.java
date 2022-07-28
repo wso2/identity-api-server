@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2020, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -177,6 +177,7 @@ public enum AccessEnum {
     public String getInboundKey() {
         return inboundKey;
     }
+
     public void setInboundKey(String inboundKey) {
         this.inboundKey = inboundKey;
     }
@@ -279,6 +280,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
+
         return Objects.hash(id, name, description, image, accessUrl, inboundKey, access, self,
                 advancedConfigurations, templateId);
     }

@@ -2250,7 +2250,7 @@ components:
           example: 'https://example.com/app/login'
         inboundKey:
           type: string
-          example: 'sampleRandomString_123'
+          example: 'SmrrDNXRYf1lMmDlnleeHTuXx_Ea'
         access:
           type: string
           enum:
