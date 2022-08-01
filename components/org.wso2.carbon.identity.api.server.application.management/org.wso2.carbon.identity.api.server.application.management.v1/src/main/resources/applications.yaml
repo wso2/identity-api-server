@@ -2248,6 +2248,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/app/login'
+        inboundKey:
+          type: string
+          example: 'SmrrDNXRYf1lMmDlnleeHTuXx_Ea'
         access:
           type: string
           enum:

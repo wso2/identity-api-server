@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,9 +56,10 @@ public class ApplicationManagementConstants {
     public enum ErrorMessage {
 
         // Client errors with codes defined at Application Management Layer.
-        UNSUPPORTED_FILTER_ATTRIBUTE("60004", "Filtering using the attempted attribute is not supported.",
+        UNSUPPORTED_FILTER_ATTRIBUTE("60004",
+                "Filtering using the attempted attribute is not supported.",
                 "Filtering cannot be done with the '%s' attribute. " +
-                        "Filtering is only supported with the 'name' attribute."),
+                        "Filtering is only supported with the 'name', and the 'clientID' attributes."),
         INVALID_FILTER_FORMAT("60004",
                 "Invalid format user for filtering.",
                 "Filter needs to be in the format <attribute>+<operation>+<value>. Eg: name+eq+john"),
