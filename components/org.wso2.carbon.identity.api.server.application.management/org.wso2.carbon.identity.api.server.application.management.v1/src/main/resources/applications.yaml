@@ -2154,7 +2154,7 @@ components:
       required: false
       description: |
         Specifies the required parameters in the response
-        _This parameter is not supported yet_
+        _This parameter only supports 'advancedConfigurations' & 'templateId' with this version of API_
       schema:
         type: string
     exportSecretsQueryParam:
