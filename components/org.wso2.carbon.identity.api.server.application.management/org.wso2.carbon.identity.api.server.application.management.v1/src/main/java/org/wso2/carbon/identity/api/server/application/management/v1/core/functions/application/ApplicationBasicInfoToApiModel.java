@@ -52,7 +52,8 @@ public class ApplicationBasicInfoToApiModel implements Function<ApplicationBasic
                 .description(applicationBasicInfo.getDescription())
                 .image(applicationBasicInfo.getImageUrl())
                 .accessUrl(applicationBasicInfo.getAccessUrl())
-                .inboundKey(applicationBasicInfo.getInboundKey())
+                .clientId(applicationBasicInfo.getClientId())
+                .issuer(applicationBasicInfo.getIssuer())
                 .access(getAccess(applicationBasicInfo.getApplicationName()))
                 .self(getApplicationLocation(applicationBasicInfo.getApplicationResourceId()));
     }
