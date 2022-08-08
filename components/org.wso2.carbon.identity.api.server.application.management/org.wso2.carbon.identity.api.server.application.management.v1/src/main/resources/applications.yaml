@@ -2248,9 +2248,12 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/app/login'
-        inboundKey:
+        clientId:
           type: string
           example: 'SmrrDNXRYf1lMmDlnleeHTuXx_Ea'
+        issuer:
+          type: string
+          example: 'http://idp.example.com/metadata.php'
         access:
           type: string
           enum:
