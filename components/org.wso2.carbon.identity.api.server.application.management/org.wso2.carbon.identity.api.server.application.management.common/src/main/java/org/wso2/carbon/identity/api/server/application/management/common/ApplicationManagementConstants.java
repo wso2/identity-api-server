@@ -175,6 +175,7 @@ public class ApplicationManagementConstants {
         OAUTH_GRANT_TYPE_NAMES.put("urn:ietf:params:oauth:grant-type:saml1-bearer", "SAML1");
         OAUTH_GRANT_TYPE_NAMES.put(GrantType.SAML20_BEARER.toString(), "SAML2");
         OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.IWA_NTLM, "IWA-NTLM");
+        OAUTH_GRANT_TYPE_NAMES.put("organization_switch", "Organization Switch");
     }
 
     public static Map<String, String> getOAuthGrantTypeNames() {
