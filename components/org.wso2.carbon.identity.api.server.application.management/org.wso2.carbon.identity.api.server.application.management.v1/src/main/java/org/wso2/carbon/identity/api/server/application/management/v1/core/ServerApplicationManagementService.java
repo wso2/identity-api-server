@@ -171,7 +171,7 @@ public class ServerApplicationManagementService {
 
     static {
         SEARCH_SUPPORTED_FIELD_MAP.put("name", "SP_APP.APP_NAME");
-        SEARCH_SUPPORTED_FIELD_MAP.put("clientID", "SP_INBOUND_AUTH.INBOUND_AUTH_KEY");
+        SEARCH_SUPPORTED_FIELD_MAP.put("clientId", "SP_INBOUND_AUTH.INBOUND_AUTH_KEY");
     }
 
     private static final Set<String> SEARCH_SUPPORTED_ATTRIBUTES = SEARCH_SUPPORTED_FIELD_MAP.keySet();
