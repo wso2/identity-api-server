@@ -125,10 +125,12 @@ import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.CLIENT_ID;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
@@ -156,6 +158,7 @@ public class ServerApplicationManagementService {
 
     // Allowed filter attributes mapped to real field names.
     private static final Map<String, String> SEARCH_SUPPORTED_FIELD_MAP = new HashMap<>();
+    private static final List<String> SUPPORTED_REQUIRED_ATTRIBUTES = new ArrayList<>();
 
     // Filter related constants.
     private static final String FILTER_STARTS_WITH = "sw";
@@ -172,6 +175,11 @@ public class ServerApplicationManagementService {
     static {
         SEARCH_SUPPORTED_FIELD_MAP.put("name", "SP_APP.APP_NAME");
         SEARCH_SUPPORTED_FIELD_MAP.put("clientId", "SP_INBOUND_AUTH.INBOUND_AUTH_KEY");
+
+        SUPPORTED_REQUIRED_ATTRIBUTES.add(ADVANCED_CONFIGURATIONS);
+        SUPPORTED_REQUIRED_ATTRIBUTES.add(CLIENT_ID);
+        SUPPORTED_REQUIRED_ATTRIBUTES.add(ISSUER);
+        SUPPORTED_REQUIRED_ATTRIBUTES.add(TEMPLATE_ID);
     }
 
     private static final Set<String> SEARCH_SUPPORTED_ATTRIBUTES = SEARCH_SUPPORTED_FIELD_MAP.keySet();
@@ -233,6 +241,24 @@ public class ServerApplicationManagementService {
 
         String username = ContextLoader.getUsernameFromContext();
         try {
+            List<String> requestedAttributeList = new ArrayList<>();
+            if (StringUtils.isNotEmpty(requiredAttributes)) {
+                requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
+                validateRequiredAttributes(requestedAttributeList);
+            }
+
+            // Handling clientId and issuer in required attributes param
+            if (StringUtils.isBlank(filter) || filter.equals("*")) {
+                if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
+                    if (requestedAttributeList.contains(CLIENT_ID) || requestedAttributeList.contains(ISSUER)) {
+                        filter = "name co *";
+                    }
+                }
+            } else {
+                requestedAttributeList.add(CLIENT_ID);
+                requestedAttributeList.add(ISSUER);
+            }
+
             int totalResults = getApplicationManagementService()
                     .getCountOfApplications(tenantDomain, username, filter);
 
@@ -240,13 +266,8 @@ public class ServerApplicationManagementService {
                     .getApplicationBasicInfo(tenantDomain, username, filter, offset, limit);
             int resultsInCurrentPage = filteredAppList.length;
 
-            List<String> requestedAttributeList = null;
-            if (StringUtils.isNotEmpty(requiredAttributes)) {
-                requestedAttributeList = Arrays.asList(requiredAttributes.split(","));
-                validateRequiredAttributes(requestedAttributeList);
-            }
             if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
-                 List<ServiceProvider> serviceProviderList = getSpWithRequiredAttributes(filteredAppList,
+                List<ServiceProvider> serviceProviderList = getSpWithRequiredAttributes(filteredAppList,
                         requestedAttributeList);
 
                 return new ApplicationListResponse()
@@ -283,10 +304,11 @@ public class ServerApplicationManagementService {
     private void validateRequiredAttributes(List<String> requestedAttributeList) {
 
         for (String attribute: requestedAttributeList) {
-            /* 'attributes' requested in get application list only supports advancedConfigurations and templateId.
+            /* 'attributes' requested in get application list only supports advancedConfigurations, templateId,
+            * clientId, and issuer.
             * The advancedConfigurations is supported as metadata of the application is essential in certain cases and
-            * templateId is supported to add filtering on listing page. */
-            if (!(attribute.equals(ADVANCED_CONFIGURATIONS) || attribute.equals(TEMPLATE_ID))) {
+            * templateId, clientId, and issuer attributes are supported to add filtering on listing page. */
+            if (!(SUPPORTED_REQUIRED_ATTRIBUTES.contains(attribute))) {
                 ErrorMessage errorEnum = ErrorMessage.NON_EXISTING_REQ_ATTRIBUTES;
                 throw Utils.buildBadRequestError(errorEnum.getCode(), errorEnum.getDescription());
             }
@@ -297,6 +319,7 @@ public class ServerApplicationManagementService {
                                                                   List<String> requestedAttributeList)
             throws IdentityApplicationManagementException {
 
+        /* clientId and issuer attributes are handled in getAllApplications() function. */
         List<ServiceProvider> serviceProviderList = new ArrayList<>();
         for (ApplicationBasicInfo applicationBasicInfo : filteredAppList) {
             ServiceProvider serviceProvider = getApplicationManagementService().
@@ -1088,6 +1111,12 @@ public class ServerApplicationManagementService {
             }
             if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(ADVANCED_CONFIGURATIONS))) {
                 applicationResponseModel.advancedConfigurations(null);
+            }
+            if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(CLIENT_ID))) {
+                applicationResponseModel.clientId(null);
+            }
+            if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(ISSUER))) {
+                applicationResponseModel.issuer(null);
             }
             applicationListItems.add(new ApplicationInfoWithRequiredPropsToApiModel().apply(applicationResponseModel));
         }

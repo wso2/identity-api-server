@@ -36,8 +36,6 @@ public class ApplicationListItem  {
     private String description;
     private String image;
     private String accessUrl;
-    private String clientId;
-    private String issuer;
 
 @XmlType(name="AccessEnum")
 @XmlEnum(String.class)
@@ -74,6 +72,8 @@ public enum AccessEnum {
     private AccessEnum access = AccessEnum.READ;
     private String self;
     private AdvancedApplicationConfiguration advancedConfigurations;
+    private String clientId;
+    private String issuer;
     private String templateId;
 
     /**
@@ -167,44 +167,6 @@ public enum AccessEnum {
     }
 
     /**
-     **/
-    public ApplicationListItem clientId(String clientId) {
-
-        this.clientId = clientId;
-        return this;
-    }
-
-    @ApiModelProperty(example = "sampleRandomString", value = "")
-    @JsonProperty("clientId")
-    @Valid
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    /**
-     **/
-    public ApplicationListItem issuer(String issuer) {
-
-        this.issuer = issuer;
-        return this;
-    }
-
-    @ApiModelProperty(example = "sampleRandomString", value = "")
-    @JsonProperty("issuer")
-    @Valid
-    public String getIssuer() {
-        return issuer;
-    }
-
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
-    }
-
-    /**
     **/
     public ApplicationListItem access(AccessEnum access) {
 
@@ -256,6 +218,44 @@ public enum AccessEnum {
     }
     public void setAdvancedConfigurations(AdvancedApplicationConfiguration advancedConfigurations) {
         this.advancedConfigurations = advancedConfigurations;
+    }
+
+    /**
+     **/
+    public ApplicationListItem clientId(String clientId) {
+
+        this.clientId = clientId;
+        return this;
+    }
+
+    @ApiModelProperty(example = "sampleRandomString", value = "")
+    @JsonProperty("clientId")
+    @Valid
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    /**
+     **/
+    public ApplicationListItem issuer(String issuer) {
+
+        this.issuer = issuer;
+        return this;
+    }
+
+    @ApiModelProperty(example = "sampleRandomString", value = "")
+    @JsonProperty("issuer")
+    @Valid
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 
     /**
