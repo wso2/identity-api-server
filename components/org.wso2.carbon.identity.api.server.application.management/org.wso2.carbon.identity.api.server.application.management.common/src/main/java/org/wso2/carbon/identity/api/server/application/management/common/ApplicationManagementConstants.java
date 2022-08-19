@@ -17,6 +17,7 @@ package org.wso2.carbon.identity.api.server.application.management.common;
 
 import org.wso2.carbon.identity.oauth.common.GrantType;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
+import org.wso2.carbon.identity.oauth2.device.constants.Constants;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -177,6 +178,8 @@ public class ApplicationManagementConstants {
         OAUTH_GRANT_TYPE_NAMES.put("urn:ietf:params:oauth:grant-type:saml1-bearer", "SAML1");
         OAUTH_GRANT_TYPE_NAMES.put(GrantType.SAML20_BEARER.toString(), "SAML2");
         OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.IWA_NTLM, "IWA-NTLM");
+        OAUTH_GRANT_TYPE_NAMES.put("organization_switch", "Organization Switch");
+        OAUTH_GRANT_TYPE_NAMES.put(Constants.DEVICE_FLOW_GRANT_TYPE, "Device Code");
     }
 
     public static Map<String, String> getOAuthGrantTypeNames() {
