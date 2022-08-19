@@ -130,7 +130,6 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
@@ -178,7 +177,6 @@ public class ServerApplicationManagementService {
 
         SUPPORTED_REQUIRED_ATTRIBUTES.add(ADVANCED_CONFIGURATIONS);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(CLIENT_ID);
-        SUPPORTED_REQUIRED_ATTRIBUTES.add(ISSUER);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(TEMPLATE_ID);
     }
 
@@ -247,16 +245,9 @@ public class ServerApplicationManagementService {
                 validateRequiredAttributes(requestedAttributeList);
             }
 
-            // Handling clientId and issuer in required attributes param
-            if (StringUtils.isBlank(filter) || filter.equals("*")) {
-                if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
-                    if (requestedAttributeList.contains(CLIENT_ID) || requestedAttributeList.contains(ISSUER)) {
-                        filter = "name co *";
-                    }
-                }
-            } else {
+            // Add clientId as required attribute when there's a filter param
+            if (!(StringUtils.isBlank(filter) || filter.equals("*"))) {
                 requestedAttributeList.add(CLIENT_ID);
-                requestedAttributeList.add(ISSUER);
             }
 
             int totalResults = getApplicationManagementService()
@@ -304,10 +295,9 @@ public class ServerApplicationManagementService {
     private void validateRequiredAttributes(List<String> requestedAttributeList) {
 
         for (String attribute: requestedAttributeList) {
-            /* 'attributes' requested in get application list only supports advancedConfigurations, templateId,
-            * clientId, and issuer.
+            /* 'attributes' requested in get applications only supports advancedConfigurations, templateId, clientId.
             * The advancedConfigurations is supported as metadata of the application is essential in certain cases and
-            * templateId, clientId, and issuer attributes are supported to add filtering on listing page. */
+            * templateId, and clientId attributes are supported to add filtering on listing page. */
             if (!(SUPPORTED_REQUIRED_ATTRIBUTES.contains(attribute))) {
                 ErrorMessage errorEnum = ErrorMessage.NON_EXISTING_REQ_ATTRIBUTES;
                 throw Utils.buildBadRequestError(errorEnum.getCode(), errorEnum.getDescription());
@@ -319,7 +309,6 @@ public class ServerApplicationManagementService {
                                                                   List<String> requestedAttributeList)
             throws IdentityApplicationManagementException {
 
-        /* clientId and issuer attributes are handled in getAllApplications() function. */
         List<ServiceProvider> serviceProviderList = new ArrayList<>();
         for (ApplicationBasicInfo applicationBasicInfo : filteredAppList) {
             ServiceProvider serviceProvider = getApplicationManagementService().
@@ -1114,9 +1103,6 @@ public class ServerApplicationManagementService {
             }
             if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(CLIENT_ID))) {
                 applicationResponseModel.clientId(null);
-            }
-            if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(ISSUER))) {
-                applicationResponseModel.issuer(null);
             }
             applicationListItems.add(new ApplicationInfoWithRequiredPropsToApiModel().apply(applicationResponseModel));
         }

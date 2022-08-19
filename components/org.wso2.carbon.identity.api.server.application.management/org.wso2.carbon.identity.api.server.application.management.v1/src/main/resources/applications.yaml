@@ -2251,9 +2251,6 @@ components:
         clientId:
           type: string
           example: 'SmrrDNXRYf1lMmDlnleeHTuXx_Ea'
-        issuer:
-          type: string
-          example: 'http://idp.example.com/metadata.php'
         access:
           type: string
           enum:
