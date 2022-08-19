@@ -245,7 +245,7 @@ public class ServerApplicationManagementService {
                 validateRequiredAttributes(requestedAttributeList);
             }
 
-            // Add clientId as required attribute when there's a filter param
+            // Add clientId as required attribute when there's a filter param.
             if (!(StringUtils.isBlank(filter) || filter.equals("*"))) {
                 requestedAttributeList.add(CLIENT_ID);
             }
