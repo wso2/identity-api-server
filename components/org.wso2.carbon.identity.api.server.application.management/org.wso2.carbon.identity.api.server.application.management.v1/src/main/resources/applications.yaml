@@ -2121,10 +2121,11 @@ components:
       name: filter
       required: false
       description: |
-        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently supports only filtering based on the 'name' attribute.
+        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations.
+        Currently supports only filtering based on the 'name' and the 'clientId' attribute.
 
         /applications?filter=name+eq+user_portal
-        /applications?filter=name+co+prod
+        /applications?filter=name+co+prod+or+clientId+co+123
       schema:
         type: string
     sortOrderQueryParam:
@@ -2153,8 +2154,10 @@ components:
       name: attributes
       required: false
       description: |
-        Specifies the required parameters in the response
-        _This parameter only supports 'advancedConfigurations' & 'templateId' with this version of API_
+        Specifies the required parameters in the response.
+        Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', and 'issuer' attributes.
+        
+        /applications?attributes=advancedConfigurations,templateId,clientId
       schema:
         type: string
     exportSecretsQueryParam:
@@ -2251,6 +2254,9 @@ components:
         clientId:
           type: string
           example: 'SmrrDNXRYf1lMmDlnleeHTuXx_Ea'
+        issuer:
+          type: string
+          example: 'http://idp.example.com/metadata.php'
         access:
           type: string
           enum:
@@ -2327,6 +2333,12 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        clientId:
+          type: string
+          example: 'SmrrDNXRYf1lMmDlnleeHTuXx_Ea'
+        issuer:
+          type: string
+          example: 'http://idp.example.com/metadata.php'
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
