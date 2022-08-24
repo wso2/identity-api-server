@@ -43,6 +43,7 @@ public class ApplicationResponseModel  {
     private String imageUrl;
     private String accessUrl;
     private String clientId;
+    private String issuer;
     private String templateId;
     private Boolean isManagementApp;
     private ClaimConfiguration claimConfiguration;
@@ -194,6 +195,24 @@ public enum AccessEnum {
     }
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    /**
+     **/
+    public ApplicationResponseModel issuer(String issuer) {
+
+        this.issuer = issuer;
+        return this;
+    }
+
+    @ApiModelProperty(example = "http://idp.example.com/metadata.php", value = "")
+    @JsonProperty("issuer")
+    @Valid
+    public String getIssuer() {
+        return issuer;
+    }
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 
     /**
@@ -364,6 +383,7 @@ public enum AccessEnum {
             Objects.equals(this.imageUrl, applicationResponseModel.imageUrl) &&
             Objects.equals(this.accessUrl, applicationResponseModel.accessUrl) &&
             Objects.equals(this.clientId, applicationResponseModel.clientId) &&
+            Objects.equals(this.issuer, applicationResponseModel.issuer) &&
             Objects.equals(this.templateId, applicationResponseModel.templateId) &&
             Objects.equals(this.isManagementApp, applicationResponseModel.isManagementApp) &&
             Objects.equals(this.claimConfiguration, applicationResponseModel.claimConfiguration) &&
@@ -376,7 +396,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, templateId, isManagementApp, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
     }
 
     @Override
@@ -391,6 +411,7 @@ public enum AccessEnum {
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
+        sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");

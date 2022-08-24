@@ -73,6 +73,7 @@ public enum AccessEnum {
     private String self;
     private AdvancedApplicationConfiguration advancedConfigurations;
     private String clientId;
+    private String issuer;
     private String templateId;
 
     /**
@@ -227,7 +228,7 @@ public enum AccessEnum {
         return this;
     }
 
-    @ApiModelProperty(example = "sampleRandomString", value = "")
+    @ApiModelProperty(example = "SmrrDNXRYf1lMmDlnleeHTuXx_Ea", value = "")
     @JsonProperty("clientId")
     @Valid
     public String getClientId() {
@@ -236,6 +237,25 @@ public enum AccessEnum {
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    /**
+     **/
+    public ApplicationListItem issuer(String issuer) {
+
+        this.issuer = issuer;
+        return this;
+    }
+
+    @ApiModelProperty(example = "http://idp.example.com/metadata.php", value = "")
+    @JsonProperty("issuer")
+    @Valid
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 
     /**
@@ -274,6 +294,7 @@ public enum AccessEnum {
             Objects.equals(this.image, applicationListItem.image) &&
             Objects.equals(this.accessUrl, applicationListItem.accessUrl) &&
             Objects.equals(this.clientId, applicationListItem.clientId) &&
+            Objects.equals(this.issuer, applicationListItem.issuer) &&
             Objects.equals(this.access, applicationListItem.access) &&
             Objects.equals(this.self, applicationListItem.self) &&
             Objects.equals(this.advancedConfigurations, applicationListItem.advancedConfigurations) &&
@@ -283,7 +304,7 @@ public enum AccessEnum {
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, name, description, image, accessUrl, clientId, access, self,
+        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, access, self,
                 advancedConfigurations, templateId);
     }
 
@@ -299,6 +320,7 @@ public enum AccessEnum {
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
+        sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
         sb.append("    access: ").append(toIndentedString(access)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
