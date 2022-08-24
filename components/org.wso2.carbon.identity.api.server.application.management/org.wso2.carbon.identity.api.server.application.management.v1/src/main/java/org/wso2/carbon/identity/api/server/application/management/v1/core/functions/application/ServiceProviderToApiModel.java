@@ -456,7 +456,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             }
         }
 
-        return null;
+        return StringUtils.EMPTY;
     }
 
     private String getIssuer(ServiceProvider application) {
@@ -472,6 +472,6 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             }
         }
 
-        return null;
+        return StringUtils.EMPTY;
     }
 }
