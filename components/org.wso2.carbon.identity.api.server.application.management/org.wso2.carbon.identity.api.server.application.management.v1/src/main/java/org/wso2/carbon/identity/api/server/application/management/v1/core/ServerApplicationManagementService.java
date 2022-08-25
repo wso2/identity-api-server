@@ -125,10 +125,12 @@ import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.CLIENT_ID;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
@@ -156,13 +158,14 @@ public class ServerApplicationManagementService {
 
     // Allowed filter attributes mapped to real field names.
     private static final Map<String, String> SEARCH_SUPPORTED_FIELD_MAP = new HashMap<>();
+    private static final List<String> SUPPORTED_REQUIRED_ATTRIBUTES = new ArrayList<>();
+    private static final int DEFAULT_OFFSET = 0;
 
     // Filter related constants.
     private static final String FILTER_STARTS_WITH = "sw";
     private static final String FILTER_ENDS_WITH = "ew";
     private static final String FILTER_EQUALS = "eq";
     private static final String FILTER_CONTAINS = "co";
-    private static final int DEFAULT_OFFSET = 0;
 
     // WS-Trust related constants.
     private static final String WS_TRUST_TEMPLATE_ID = "061a3de4-8c08-4878-84a6-24245f11bf0e";
@@ -172,6 +175,11 @@ public class ServerApplicationManagementService {
     static {
         SEARCH_SUPPORTED_FIELD_MAP.put("name", "SP_APP.APP_NAME");
         SEARCH_SUPPORTED_FIELD_MAP.put("clientId", "SP_INBOUND_AUTH.INBOUND_AUTH_KEY");
+
+        SUPPORTED_REQUIRED_ATTRIBUTES.add(ADVANCED_CONFIGURATIONS);
+        SUPPORTED_REQUIRED_ATTRIBUTES.add(CLIENT_ID);
+        SUPPORTED_REQUIRED_ATTRIBUTES.add(TEMPLATE_ID);
+        SUPPORTED_REQUIRED_ATTRIBUTES.add(ISSUER);
     }
 
     private static final Set<String> SEARCH_SUPPORTED_ATTRIBUTES = SEARCH_SUPPORTED_FIELD_MAP.keySet();
@@ -188,6 +196,8 @@ public class ServerApplicationManagementService {
         limit = validateAndGetLimit(limit);
         offset = validateAndGetOffset(offset);
 
+        boolean isFilterContainsClientIdAttribute = false;
+
         // Get the filter tree and validate it before sending the filter to the backend.
         if (StringUtils.isNotBlank(filter)) {
             try {
@@ -199,6 +209,10 @@ public class ServerApplicationManagementService {
                         throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, expressionNode
                                 .getAttributeValue());
                     }
+
+                    if (expressionNode.getAttributeValue().equals(CLIENT_ID)) {
+                        isFilterContainsClientIdAttribute = true;
+                    }
                 } else if (rootNode instanceof OperationNode) {
                     // Currently, supports only filters with one AND/OR operation.
                     // Have to recursively traverse the filter tree to support more than one operation.
@@ -209,6 +223,7 @@ public class ServerApplicationManagementService {
                     if (operationNode.getOperation().equals("not")) {
                         throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
                     }
+
                     if (leftNode instanceof ExpressionNode && rightNode instanceof ExpressionNode) {
                         ExpressionNode expressionLeftNode = (ExpressionNode) leftNode;
                         ExpressionNode expressionRightNode = (ExpressionNode) rightNode;
@@ -219,6 +234,11 @@ public class ServerApplicationManagementService {
                         if (!SEARCH_SUPPORTED_ATTRIBUTES.contains(expressionRightNode.getAttributeValue())) {
                             throw buildClientError(ErrorMessage.UNSUPPORTED_FILTER_ATTRIBUTE, expressionRightNode
                                     .getAttributeValue());
+                        }
+
+                        if (expressionLeftNode.getAttributeValue().equals(CLIENT_ID) ||
+                                expressionRightNode.getAttributeValue().equals(CLIENT_ID)) {
+                            isFilterContainsClientIdAttribute = true;
                         }
                     } else {
                         throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
@@ -240,13 +260,20 @@ public class ServerApplicationManagementService {
                     .getApplicationBasicInfo(tenantDomain, username, filter, offset, limit);
             int resultsInCurrentPage = filteredAppList.length;
 
-            List<String> requestedAttributeList = null;
+            List<String> requestedAttributeList = new ArrayList<>();
             if (StringUtils.isNotEmpty(requiredAttributes)) {
-                requestedAttributeList = Arrays.asList(requiredAttributes.split(","));
+                requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
                 validateRequiredAttributes(requestedAttributeList);
             }
+
+            // Add clientId as a required attribute when there's clientId as a filter param.
+            if (!requestedAttributeList.contains(CLIENT_ID) && !StringUtils.isBlank(filter) &&
+                    !filter.equals("*") && isFilterContainsClientIdAttribute) {
+                requestedAttributeList.add(CLIENT_ID);
+            }
+
             if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
-                 List<ServiceProvider> serviceProviderList = getSpWithRequiredAttributes(filteredAppList,
+                List<ServiceProvider> serviceProviderList = getSpWithRequiredAttributes(filteredAppList,
                         requestedAttributeList);
 
                 return new ApplicationListResponse()
@@ -283,10 +310,7 @@ public class ServerApplicationManagementService {
     private void validateRequiredAttributes(List<String> requestedAttributeList) {
 
         for (String attribute: requestedAttributeList) {
-            /* 'attributes' requested in get application list only supports advancedConfigurations and templateId.
-            * The advancedConfigurations is supported as metadata of the application is essential in certain cases and
-            * templateId is supported to add filtering on listing page. */
-            if (!(attribute.equals(ADVANCED_CONFIGURATIONS) || attribute.equals(TEMPLATE_ID))) {
+            if (!(SUPPORTED_REQUIRED_ATTRIBUTES.contains(attribute))) {
                 ErrorMessage errorEnum = ErrorMessage.NON_EXISTING_REQ_ATTRIBUTES;
                 throw Utils.buildBadRequestError(errorEnum.getCode(), errorEnum.getDescription());
             }
@@ -1088,6 +1112,12 @@ public class ServerApplicationManagementService {
             }
             if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(ADVANCED_CONFIGURATIONS))) {
                 applicationResponseModel.advancedConfigurations(null);
+            }
+            if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(CLIENT_ID))) {
+                applicationResponseModel.clientId(null);
+            }
+            if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(ISSUER))) {
+                applicationResponseModel.issuer(null);
             }
             applicationListItems.add(new ApplicationInfoWithRequiredPropsToApiModel().apply(applicationResponseModel));
         }

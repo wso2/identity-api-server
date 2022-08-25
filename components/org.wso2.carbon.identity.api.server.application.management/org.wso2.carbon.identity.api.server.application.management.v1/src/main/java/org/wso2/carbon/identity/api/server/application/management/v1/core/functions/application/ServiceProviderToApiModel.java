@@ -42,6 +42,7 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
+import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
@@ -99,6 +100,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .description(application.getDescription())
                     .imageUrl(application.getImageUrl())
                     .accessUrl(application.getAccessUrl())
+                    .clientId(getClientId(application))
+                    .issuer(getIssuer(application))
                     .templateId(application.getTemplateId())
                     .isManagementApp(application.isManagementApp())
                     .claimConfiguration(buildClaimConfiguration(application))
@@ -438,5 +441,37 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         }
 
         return ApplicationResponseModel.AccessEnum.WRITE;
+    }
+
+    private String getClientId(ServiceProvider application) {
+
+        if (application.getInboundAuthenticationConfig() != null) {
+            InboundAuthenticationRequestConfig[] authRequestConfigs = application.getInboundAuthenticationConfig()
+                    .getInboundAuthenticationRequestConfigs();
+
+            if (authRequestConfigs != null && authRequestConfigs.length > 0) {
+                if (authRequestConfigs[0].getInboundAuthType().equals("oauth2")) {
+                    return authRequestConfigs[0].getInboundAuthKey();
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    private String getIssuer(ServiceProvider application) {
+
+        if (application.getInboundAuthenticationConfig() != null) {
+            InboundAuthenticationRequestConfig[] authRequestConfigs = application.getInboundAuthenticationConfig()
+                    .getInboundAuthenticationRequestConfigs();
+
+            if (authRequestConfigs != null && authRequestConfigs.length > 0) {
+                if (authRequestConfigs[0].getInboundAuthType().equals("samlsso")) {
+                    return authRequestConfigs[0].getInboundAuthKey();
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
     }
 }

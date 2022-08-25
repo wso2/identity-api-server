@@ -48,6 +48,8 @@ public class ApplicationManagementConstants {
     public static final String DEFAULT_CERTIFICATE_ALIAS = "wso2carbon";
     public static final String ADVANCED_CONFIGURATIONS = "advancedConfigurations";
     public static final String TEMPLATE_ID = "templateId";
+    public static final String CLIENT_ID = "clientId";
+    public static final String ISSUER = "issuer";
 
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 
