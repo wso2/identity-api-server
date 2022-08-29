@@ -62,15 +62,14 @@ public class ApplicationManagementConstants {
         UNSUPPORTED_FILTER_ATTRIBUTE("60004",
                 "Filtering using the attempted attribute is not supported.",
                 "Filtering cannot be done with the '%s' attribute. " +
-                        "Filtering is only supported with the 'name', and the 'clientId' attributes."),
+                        "Filtering is only supported with 'name', 'clientId', and 'issuer' attributes."),
         INVALID_FILTER_FORMAT("60004",
-                "Invalid format user for filtering.",
+                "Invalid filter query format.",
                 "Filter needs to be in the format <attribute>+<operation>+<value>. Eg: name+eq+john"),
         INVALID_FILTER_OPERATION("60004",
                 "Attempted filtering operation is invalid.",
-                "Attempted filtering operation '%s' is invalid. " +
-                        "Please use one of the supported filtering operations such as 'eq', 'co', 'sw', 'ew', 'and' " +
-                        "or 'or'."),
+                "Attempted filtering operation '%s' is invalid. Please use one of the supported " +
+                        "filtering operations such as 'eq', 'co', 'sw', 'ew', 'and', 'or'."),
         APPLICATION_NOT_FOUND("60006",
                 "Application not found.",
                 "Application cannot be found for the provided id: %s in the tenantDomain: %s."),
