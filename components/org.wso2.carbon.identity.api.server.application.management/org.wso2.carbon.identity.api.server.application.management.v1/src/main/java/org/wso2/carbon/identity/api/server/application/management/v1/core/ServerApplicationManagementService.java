@@ -132,6 +132,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
@@ -168,7 +169,7 @@ public class ServerApplicationManagementService {
             "not be found since the WS-Trust connector has not been configured.";
 
     static {
-        SUPPORTED_FILTER_ATTRIBUTES.add("name");
+        SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
         SUPPORTED_FILTER_ATTRIBUTES.add(CLIENT_ID);
         SUPPORTED_FILTER_ATTRIBUTES.add(ISSUER);
 
