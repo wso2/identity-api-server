@@ -289,9 +289,7 @@ public class ServerApplicationManagementService {
             return Stream.of(validateFilterTree(leftNode), validateFilterTree(rightNode))
                     .flatMap(Collection::stream)
                     .collect(Collectors.toList());
-        } else {
-            throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
-        }
+        throw buildClientError(ErrorMessage.INVALID_FILTER_FORMAT);
     }
 
     private void validateRequiredAttributes(List<String> requestedAttributeList) {
