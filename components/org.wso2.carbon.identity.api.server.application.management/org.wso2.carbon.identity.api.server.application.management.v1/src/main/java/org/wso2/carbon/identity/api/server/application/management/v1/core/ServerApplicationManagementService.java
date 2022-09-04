@@ -41,6 +41,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorStepModal;
+import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.Link;
@@ -75,9 +77,14 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
+import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
+import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
+import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.ImportResponse;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
+import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
+import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.common.model.User;
@@ -337,6 +344,38 @@ public class ServerApplicationManagementService {
 
         ServiceProvider application = getServiceProvider(applicationId);
         return new ServiceProviderToApiModel().apply(application);
+    }
+
+    public ConfiguredAuthenticatorsModal getConfiguredAuthenticators(String applicationId) {
+        ServiceProvider application = getServiceProvider(applicationId);
+        return getConfiguredAuthenticators(application);
+    }
+
+
+    private ConfiguredAuthenticatorsModal getConfiguredAuthenticators(ServiceProvider application) {
+
+        ArrayList<String> localAuthenticators = new ArrayList<>();
+        ArrayList<String> federatedAuthenticators = new ArrayList<>();
+        ArrayList<ConfiguredAuthenticatorStepModal> configuredAuthenticatorStepModals = new ArrayList<>();
+        ConfiguredAuthenticatorsModal response = new ConfiguredAuthenticatorsModal();
+        LocalAndOutboundAuthenticationConfig localAndOutBoundAuthenticationConfig =
+                application.getLocalAndOutBoundAuthenticationConfig();
+        AuthenticationStep[] authenticationSteps = localAndOutBoundAuthenticationConfig.getAuthenticationSteps();
+        for (AuthenticationStep authenticationStep: authenticationSteps) {
+            ConfiguredAuthenticatorStepModal configuredAuthenticatorStepModal = new ConfiguredAuthenticatorStepModal();
+            configuredAuthenticatorStepModal.setStepId(authenticationStep.getStepOrder());
+            for (LocalAuthenticatorConfig localAuthenticatorConfig: authenticationStep.getLocalAuthenticatorConfigs()) {
+                localAuthenticators.add(localAuthenticatorConfig.getName());
+            }
+            for (IdentityProvider identityProvider: authenticationStep.getFederatedIdentityProviders()) {
+                federatedAuthenticators.add(identityProvider.getIdentityProviderName());
+            }
+            configuredAuthenticatorStepModal.setFederatedAuthenticators(localAuthenticators);
+            configuredAuthenticatorStepModal.setFederatedAuthenticators(federatedAuthenticators);
+            configuredAuthenticatorStepModals.add(configuredAuthenticatorStepModal);
+        }
+        response.setSteps(configuredAuthenticatorStepModals);
+        return response;
     }
 
     /**
