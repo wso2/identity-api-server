@@ -2480,7 +2480,7 @@ components:
       type: object
       properties:
         stepId:
-          type: int
+          type: integer
           example: 0
         localAuthenticators:
           type: array
