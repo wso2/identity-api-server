@@ -369,7 +369,7 @@ public class ServerApplicationManagementService {
             for (IdentityProvider identityProvider: authenticationStep.getFederatedIdentityProviders()) {
                 federatedAuthenticators.add(identityProvider.getIdentityProviderName());
             }
-            configuredAuthenticatorStepModal.setFederatedAuthenticators(localAuthenticators);
+            configuredAuthenticatorStepModal.setLocalAuthenticators(localAuthenticators);
             configuredAuthenticatorStepModal.setFederatedAuthenticators(federatedAuthenticators);
             configuredAuthenticatorStepModals.add(configuredAuthenticatorStepModal);
         }
