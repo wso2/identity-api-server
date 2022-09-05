@@ -345,7 +345,14 @@ public class ServerApplicationManagementService {
         return new ServiceProviderToApiModel().apply(application);
     }
 
+    /**
+     * Get the authenticators configured for an application.
+     *
+     * @param applicationId ID of the application to be exported.
+     * @return  configured authenticators.
+     */
     public ConfiguredAuthenticatorsModal getConfiguredAuthenticators(String applicationId) {
+
         ServiceProvider application = getServiceProvider(applicationId);
         return getConfiguredAuthenticators(application);
     }
