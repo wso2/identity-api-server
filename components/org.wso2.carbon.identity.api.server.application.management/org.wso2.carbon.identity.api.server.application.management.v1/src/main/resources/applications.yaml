@@ -496,7 +496,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /applications/{applicationId}/authenticators:
+  /applications/{applicationId}/authenticators/{tenantDomain}:
     get:
       tags:
         - Authenticators
@@ -512,13 +512,21 @@ paths:
           required: true
           schema:
             type: string
+        - name: tenantDomain
+          in: path
+          description: Name of the tenant.
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConfiguredAuthenticatorsModal'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConfiguredAuthenticatorsModal'
         '400':
           description: Bad Request
           content:
@@ -2472,30 +2480,26 @@ components:
     ConfiguredAuthenticatorsModal:
       type: object
       properties:
-        steps:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConfiguredAuthenticatorStepModal'
-    ConfiguredAuthenticatorStepModal:
-      type: object
-      properties:
         stepId:
           type: integer
-          example: 0
+          example: 1
         localAuthenticators:
           type: array
           items:
-            type: array
-            items:
-              type: string
-              example: BasicAuthenticator
+            $ref: '#/components/schemas/ConfiguredAuthenticator'
         federatedAuthenticators:
           type: array
           items:
-            type: array
-            items:
-              type: string
-              example: GoogleAuthenticator
+            $ref: '#/components/schemas/ConfiguredAuthenticator'
+    ConfiguredAuthenticator:
+      type: object
+      properties:
+        name:
+          type: string
+          example: googleIdP
+        type:
+          type: string
+          example: GoogleAuthenticator
     AdvancedApplicationConfiguration:
       type: object
       properties:

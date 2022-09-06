@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
  *
- * WSO2 LLC. licenses this file to you under the Apache License,
+ * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorStepModal;
+import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticator;
 import javax.validation.constraints.*;
 
 
@@ -35,32 +35,79 @@ import javax.xml.bind.annotation.*;
 
 public class ConfiguredAuthenticatorsModal  {
 
-    private List<ConfiguredAuthenticatorStepModal> steps = null;
+    private Integer stepId;
+    private List<ConfiguredAuthenticator> localAuthenticators = null;
+
+    private List<ConfiguredAuthenticator> federatedAuthenticators = null;
 
 
     /**
      **/
-    public ConfiguredAuthenticatorsModal steps(List<ConfiguredAuthenticatorStepModal> steps) {
+    public ConfiguredAuthenticatorsModal stepId(Integer stepId) {
 
-        this.steps = steps;
+        this.stepId = stepId;
+        return this;
+    }
+
+    @ApiModelProperty(example = "1", value = "")
+    @JsonProperty("stepId")
+    @Valid
+    public Integer getStepId() {
+        return stepId;
+    }
+    public void setStepId(Integer stepId) {
+        this.stepId = stepId;
+    }
+
+    /**
+     **/
+    public ConfiguredAuthenticatorsModal localAuthenticators(List<ConfiguredAuthenticator> localAuthenticators) {
+
+        this.localAuthenticators = localAuthenticators;
         return this;
     }
 
     @ApiModelProperty(value = "")
-    @JsonProperty("steps")
+    @JsonProperty("localAuthenticators")
     @Valid
-    public List<ConfiguredAuthenticatorStepModal> getSteps() {
-        return steps;
+    public List<ConfiguredAuthenticator> getLocalAuthenticators() {
+        return localAuthenticators;
     }
-    public void setSteps(List<ConfiguredAuthenticatorStepModal> steps) {
-        this.steps = steps;
+    public void setLocalAuthenticators(List<ConfiguredAuthenticator> localAuthenticators) {
+        this.localAuthenticators = localAuthenticators;
     }
 
-    public ConfiguredAuthenticatorsModal addStepsItem(ConfiguredAuthenticatorStepModal stepsItem) {
-        if (this.steps == null) {
-            this.steps = new ArrayList<>();
+    public ConfiguredAuthenticatorsModal addLocalAuthenticatorsItem(ConfiguredAuthenticator localAuthenticatorsItem) {
+        if (this.localAuthenticators == null) {
+            this.localAuthenticators = new ArrayList<>();
         }
-        this.steps.add(stepsItem);
+        this.localAuthenticators.add(localAuthenticatorsItem);
+        return this;
+    }
+
+    /**
+     **/
+    public ConfiguredAuthenticatorsModal federatedAuthenticators(List<ConfiguredAuthenticator> federatedAuthenticators) {
+
+        this.federatedAuthenticators = federatedAuthenticators;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("federatedAuthenticators")
+    @Valid
+    public List<ConfiguredAuthenticator> getFederatedAuthenticators() {
+        return federatedAuthenticators;
+    }
+    public void setFederatedAuthenticators(List<ConfiguredAuthenticator> federatedAuthenticators) {
+        this.federatedAuthenticators = federatedAuthenticators;
+    }
+
+    public ConfiguredAuthenticatorsModal addFederatedAuthenticatorsItem(ConfiguredAuthenticator federatedAuthenticatorsItem) {
+        if (this.federatedAuthenticators == null) {
+            this.federatedAuthenticators = new ArrayList<>();
+        }
+        this.federatedAuthenticators.add(federatedAuthenticatorsItem);
         return this;
     }
 
@@ -76,12 +123,14 @@ public class ConfiguredAuthenticatorsModal  {
             return false;
         }
         ConfiguredAuthenticatorsModal configuredAuthenticatorsModal = (ConfiguredAuthenticatorsModal) o;
-        return Objects.equals(this.steps, configuredAuthenticatorsModal.steps);
+        return Objects.equals(this.stepId, configuredAuthenticatorsModal.stepId) &&
+                Objects.equals(this.localAuthenticators, configuredAuthenticatorsModal.localAuthenticators) &&
+                Objects.equals(this.federatedAuthenticators, configuredAuthenticatorsModal.federatedAuthenticators);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(steps);
+        return Objects.hash(stepId, localAuthenticators, federatedAuthenticators);
     }
 
     @Override
@@ -90,7 +139,9 @@ public class ConfiguredAuthenticatorsModal  {
         StringBuilder sb = new StringBuilder();
         sb.append("class ConfiguredAuthenticatorsModal {\n");
 
-        sb.append("    steps: ").append(toIndentedString(steps)).append("\n");
+        sb.append("    stepId: ").append(toIndentedString(stepId)).append("\n");
+        sb.append("    localAuthenticators: ").append(toIndentedString(localAuthenticators)).append("\n");
+        sb.append("    federatedAuthenticators: ").append(toIndentedString(federatedAuthenticators)).append("\n");
         sb.append("}");
         return sb.toString();
     }

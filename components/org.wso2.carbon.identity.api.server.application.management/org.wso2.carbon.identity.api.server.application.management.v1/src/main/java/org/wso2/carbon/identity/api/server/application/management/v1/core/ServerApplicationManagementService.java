@@ -41,7 +41,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
-import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorStepModal;
+import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticator;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
@@ -78,6 +78,7 @@ import org.wso2.carbon.identity.application.common.IdentityApplicationManagement
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
+import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.ImportResponse;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
@@ -351,37 +352,48 @@ public class ServerApplicationManagementService {
      * @param applicationId ID of the application to be exported.
      * @return  configured authenticators.
      */
-    public ConfiguredAuthenticatorsModal getConfiguredAuthenticators(String applicationId) {
+    public ArrayList<ConfiguredAuthenticatorsModal> getConfiguredAuthenticators(String applicationId, String tenantDomain) {
 
-        ServiceProvider application = getServiceProvider(applicationId);
-        return getConfiguredAuthenticators(application);
-    }
+        ArrayList<ConfiguredAuthenticatorsModal> response = new ArrayList<>();
+        try {
+            AuthenticationStep[] authenticationSteps = getApplicationManagementService()
+                    .getConfiguredAuthenticators(applicationId, tenantDomain);
 
-
-    private ConfiguredAuthenticatorsModal getConfiguredAuthenticators(ServiceProvider application) {
-
-        ArrayList<String> localAuthenticators = new ArrayList<>();
-        ArrayList<String> federatedAuthenticators = new ArrayList<>();
-        ArrayList<ConfiguredAuthenticatorStepModal> configuredAuthenticatorStepModals = new ArrayList<>();
-        ConfiguredAuthenticatorsModal response = new ConfiguredAuthenticatorsModal();
-        LocalAndOutboundAuthenticationConfig localAndOutBoundAuthenticationConfig =
-                application.getLocalAndOutBoundAuthenticationConfig();
-        AuthenticationStep[] authenticationSteps = localAndOutBoundAuthenticationConfig.getAuthenticationSteps();
-        for (AuthenticationStep authenticationStep: authenticationSteps) {
-            ConfiguredAuthenticatorStepModal configuredAuthenticatorStepModal = new ConfiguredAuthenticatorStepModal();
-            configuredAuthenticatorStepModal.setStepId(authenticationStep.getStepOrder());
-            for (LocalAuthenticatorConfig localAuthenticatorConfig: authenticationStep.getLocalAuthenticatorConfigs()) {
-                localAuthenticators.add(localAuthenticatorConfig.getName());
+            if (authenticationSteps == null) {
+                throw buildClientError(ErrorMessage.APPLICATION_NOT_FOUND, applicationId, tenantDomain);
             }
-            for (IdentityProvider identityProvider: authenticationStep.getFederatedIdentityProviders()) {
-                federatedAuthenticators.add(identityProvider.getIdentityProviderName());
+
+            for (AuthenticationStep step: authenticationSteps) {
+                ArrayList<ConfiguredAuthenticator> localAuthenticators = new ArrayList<>();
+                ArrayList<ConfiguredAuthenticator> federatedAuthenticators = new ArrayList<>();
+                ConfiguredAuthenticatorsModal configuredAuthenticatorsModal = new ConfiguredAuthenticatorsModal();
+                configuredAuthenticatorsModal.stepId(step.getStepOrder());
+
+                for (LocalAuthenticatorConfig localAuthenticatorConfig: step.getLocalAuthenticatorConfigs()) {
+                    ConfiguredAuthenticator authenticator = new ConfiguredAuthenticator();
+                    authenticator.setName(localAuthenticatorConfig.getDisplayName());
+                    authenticator.setType(localAuthenticatorConfig.getName());
+                    localAuthenticators.add(authenticator);
+                }
+
+                for (IdentityProvider federatedAuthenticator: step.getFederatedIdentityProviders()) {
+                    for (FederatedAuthenticatorConfig federatedAuthenticatorConfig: federatedAuthenticator
+                            .getFederatedAuthenticatorConfigs()) {
+                        ConfiguredAuthenticator authenticator = new ConfiguredAuthenticator();
+                        authenticator.setName(federatedAuthenticatorConfig.getDisplayName());
+                        authenticator.setType(federatedAuthenticatorConfig.getName());
+                        federatedAuthenticators.add(authenticator);
+                    }
+                }
+                configuredAuthenticatorsModal.setLocalAuthenticators(localAuthenticators);
+                configuredAuthenticatorsModal.setFederatedAuthenticators(federatedAuthenticators);
+                response.add(configuredAuthenticatorsModal);
             }
-            configuredAuthenticatorStepModal.setLocalAuthenticators(localAuthenticators);
-            configuredAuthenticatorStepModal.setFederatedAuthenticators(federatedAuthenticators);
-            configuredAuthenticatorStepModals.add(configuredAuthenticatorStepModal);
+            return response;
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error retrieving application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
         }
-        response.setSteps(configuredAuthenticatorStepModals);
-        return response;
     }
 
     /**
