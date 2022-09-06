@@ -505,6 +505,10 @@ paths:
       operationId: getConfiguredAuthenticators
       description: |
         This API provides the capability to retrieve the configured authenticators.
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/applicationmgt/view <br>
+        <b>Scope required:</b> <br>
+            * internal_application_mgt_view
       parameters:
         - name: applicationId
           in: path

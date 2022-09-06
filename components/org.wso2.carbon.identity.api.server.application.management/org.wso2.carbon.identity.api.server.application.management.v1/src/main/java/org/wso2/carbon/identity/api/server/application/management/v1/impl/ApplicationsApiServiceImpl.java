@@ -73,6 +73,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Override
     public Response getConfiguredAuthenticators(String applicationId, String tenantDomain) {
+
         return Response.ok().entity(applicationManagementService
                 .getConfiguredAuthenticators(applicationId, tenantDomain)).build();
     }

@@ -17,9 +17,34 @@
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
+import org.wso2.carbon.identity.api.server.application.management.v1.*;
+import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
+import org.wso2.carbon.identity.api.server.application.management.v1.Error;
+import java.io.File;
+import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
+import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
+import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
+import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import javax.ws.rs.core.Response;
 
 
