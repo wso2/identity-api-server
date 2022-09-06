@@ -539,8 +539,6 @@ paths:
                 $ref: '#/components/schemas/Error'
         '401':
           description: Unauthorized
-        '403':
-          description: Forbidden
         '404':
           description: Not Found
           content:
