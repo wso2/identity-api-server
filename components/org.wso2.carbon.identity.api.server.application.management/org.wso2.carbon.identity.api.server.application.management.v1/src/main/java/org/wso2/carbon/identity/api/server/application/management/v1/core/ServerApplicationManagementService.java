@@ -83,7 +83,6 @@ import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.ImportResponse;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
-import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
@@ -352,7 +351,8 @@ public class ServerApplicationManagementService {
      * @param applicationId ID of the application to be exported.
      * @return  configured authenticators.
      */
-    public ArrayList<ConfiguredAuthenticatorsModal> getConfiguredAuthenticators(String applicationId, String tenantDomain) {
+    public ArrayList<ConfiguredAuthenticatorsModal> getConfiguredAuthenticators(String applicationId,
+                                                                                String tenantDomain) {
 
         ArrayList<ConfiguredAuthenticatorsModal> response = new ArrayList<>();
         try {
