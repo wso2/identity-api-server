@@ -431,7 +431,7 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/{applicationId}/authenticators/{tenantDomain}")
+    @Path("/{applicationId}/authenticators")
 
     @Produces({ "application/json" })
     @ApiOperation(value = "Get configured authenticators ", notes = "This API provides the capability to retrieve the configured authenticators. ", response = ConfiguredAuthenticatorsModal.class, responseContainer = "List", authorizations = {
@@ -448,9 +448,9 @@ public class ApplicationsApi  {
             @ApiResponse(code = 404, message = "Not Found", response = Error.class),
             @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getConfiguredAuthenticators(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Name of the tenant.",required=true) @PathParam("tenantDomain") String tenantDomain) {
+    public Response getConfiguredAuthenticators(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
-        return delegate.getConfiguredAuthenticators(applicationId,  tenantDomain );
+        return delegate.getConfiguredAuthenticators(applicationId );
     }
 
     @Valid

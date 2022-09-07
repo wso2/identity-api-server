@@ -496,7 +496,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /applications/{applicationId}/authenticators/{tenantDomain}:
+  /applications/{applicationId}/authenticators:
     get:
       tags:
         - Authenticators
@@ -513,12 +513,6 @@ paths:
         - name: applicationId
           in: path
           description: ID of the application.
-          required: true
-          schema:
-            type: string
-        - name: tenantDomain
-          in: path
-          description: Name of the tenant.
           required: true
           schema:
             type: string

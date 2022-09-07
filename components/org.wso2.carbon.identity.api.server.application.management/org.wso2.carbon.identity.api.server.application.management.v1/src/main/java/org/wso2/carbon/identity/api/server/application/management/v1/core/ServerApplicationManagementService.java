@@ -351,16 +351,15 @@ public class ServerApplicationManagementService {
      * @param applicationId ID of the application to be exported.
      * @return  configured authenticators.
      */
-    public ArrayList<ConfiguredAuthenticatorsModal> getConfiguredAuthenticators(String applicationId,
-                                                                                String tenantDomain) {
+    public ArrayList<ConfiguredAuthenticatorsModal> getConfiguredAuthenticators(String applicationId) {
 
         ArrayList<ConfiguredAuthenticatorsModal> response = new ArrayList<>();
         try {
             AuthenticationStep[] authenticationSteps = getApplicationManagementService()
-                    .getConfiguredAuthenticators(applicationId, tenantDomain);
+                    .getConfiguredAuthenticators(applicationId);
 
             if (authenticationSteps == null) {
-                throw buildClientError(ErrorMessage.APPLICATION_NOT_FOUND, applicationId, tenantDomain);
+                throw buildClientError(ErrorMessage.APPLICATION_NOT_FOUND, applicationId);
             }
 
             for (AuthenticationStep step: authenticationSteps) {
