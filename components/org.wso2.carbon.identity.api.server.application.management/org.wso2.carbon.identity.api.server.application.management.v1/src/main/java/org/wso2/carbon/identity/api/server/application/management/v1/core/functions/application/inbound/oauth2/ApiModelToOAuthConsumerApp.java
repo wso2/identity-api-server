@@ -88,7 +88,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
 
         if (idToken != null) {
             setIfNotNull(idToken.getExpiryInSeconds(), consumerAppDTO::setIdTokenExpiryTime);
-            consumerAppDTO.setAudiences(Optional.ofNullable(idToken.getAudience())
+            consumerAppDTO.setIdTokenAudiences(Optional.ofNullable(idToken.getAudience())
                     .map(audiences -> audiences.toArray(new String[0]))
                     .orElse(new String[0])
             );
@@ -131,6 +131,10 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         if (accessToken != null) {
             consumerAppDTO.setTokenType(accessToken.getType());
             consumerAppDTO.setUserAccessTokenExpiryTime(accessToken.getUserAccessTokenExpiryInSeconds());
+            consumerAppDTO.setAccessTokenAudiences(Optional.ofNullable(accessToken.getAudience())
+                    .map(audiences -> audiences.toArray(new String[0]))
+                    .orElse(new String[0])
+            );
             consumerAppDTO.setApplicationAccessTokenExpiryTime(accessToken.getApplicationAccessTokenExpiryInSeconds());
             consumerAppDTO.setTokenBindingType(accessToken.getBindingType());
             if (accessToken.getRevokeTokensWhenIDPSessionTerminated() != null) {

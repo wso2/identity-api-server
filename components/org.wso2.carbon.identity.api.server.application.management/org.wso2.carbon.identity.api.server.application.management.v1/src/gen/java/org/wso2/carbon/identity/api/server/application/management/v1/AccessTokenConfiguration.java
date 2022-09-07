@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
@@ -20,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 
 
@@ -31,6 +35,8 @@ import javax.xml.bind.annotation.*;
 public class AccessTokenConfiguration  {
   
     private String type;
+    private List<String> audience = null;
+
     private Long userAccessTokenExpiryInSeconds;
     private Long applicationAccessTokenExpiryInSeconds;
     private String bindingType = "None";
@@ -56,6 +62,32 @@ public class AccessTokenConfiguration  {
     }
 
     /**
+    **/
+    public AccessTokenConfiguration audience(List<String> audience) {
+
+        this.audience = audience;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"http://idp.xyz.com\",\"http://idp.abc.com\"]", value = "")
+    @JsonProperty("audience")
+    @Valid
+    public List<String> getAudience() {
+        return audience;
+    }
+    public void setAudience(List<String> audience) {
+        this.audience = audience;
+    }
+
+    public AccessTokenConfiguration addAudienceItem(String audienceItem) {
+        if (this.audience == null) {
+            this.audience = new ArrayList<>();
+        }
+        this.audience.add(audienceItem);
+        return this;
+    }
+
+        /**
     **/
     public AccessTokenConfiguration userAccessTokenExpiryInSeconds(Long userAccessTokenExpiryInSeconds) {
 
@@ -100,7 +132,7 @@ public class AccessTokenConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"sso-session\",\"cookie\"]", value = "OAuth2 access token and refresh token can be bound to an external attribute during the token generation so that it can be optionally validated during the API invocation.")
+    @ApiModelProperty(example = "cookie", value = "OAuth2 access token and refresh token can be bound to an external attribute during the token generation so that it can be optionally validated during the API invocation.")
     @JsonProperty("bindingType")
     @Valid
     public String getBindingType() {
@@ -161,6 +193,7 @@ public class AccessTokenConfiguration  {
         }
         AccessTokenConfiguration accessTokenConfiguration = (AccessTokenConfiguration) o;
         return Objects.equals(this.type, accessTokenConfiguration.type) &&
+            Objects.equals(this.audience, accessTokenConfiguration.audience) &&
             Objects.equals(this.userAccessTokenExpiryInSeconds, accessTokenConfiguration.userAccessTokenExpiryInSeconds) &&
             Objects.equals(this.applicationAccessTokenExpiryInSeconds, accessTokenConfiguration.applicationAccessTokenExpiryInSeconds) &&
             Objects.equals(this.bindingType, accessTokenConfiguration.bindingType) &&
@@ -170,7 +203,7 @@ public class AccessTokenConfiguration  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding);
+        return Objects.hash(type, audience, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding);
     }
 
     @Override
@@ -180,6 +213,7 @@ public class AccessTokenConfiguration  {
         sb.append("class AccessTokenConfiguration {\n");
         
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    audience: ").append(toIndentedString(audience)).append("\n");
         sb.append("    userAccessTokenExpiryInSeconds: ").append(toIndentedString(userAccessTokenExpiryInSeconds)).append("\n");
         sb.append("    applicationAccessTokenExpiryInSeconds: ").append(toIndentedString(applicationAccessTokenExpiryInSeconds)).append("\n");
         sb.append("    bindingType: ").append(toIndentedString(bindingType)).append("\n");

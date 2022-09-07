@@ -85,7 +85,8 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .bindingType(oAuthConsumerAppDTO.getTokenBindingType())
                 .revokeTokensWhenIDPSessionTerminated(oAuthConsumerAppDTO
                         .isTokenRevocationWithIDPSessionTerminationEnabled())
-                .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled());
+                .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled())
+                .audience(getAccessTokenAudiences(oAuthConsumerAppDTO));
     }
 
     private RefreshTokenConfiguration buildRefreshTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
@@ -99,10 +100,14 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
 
         return new IdTokenConfiguration()
                 .expiryInSeconds(oAuthConsumerAppDTO.getIdTokenExpiryTime())
-                .audience(getAudiences(oAuthConsumerAppDTO))
+                .audience(getIdTokenAudiences(oAuthConsumerAppDTO))
                 .encryption(buildIdTokenEncryptionConfiguration(oAuthConsumerAppDTO));
     }
 
+    /**
+     * @deprecated use {@link #getIdTokenAudiences()} instead.
+     */
+    @Deprecated
     private List<String> getAudiences(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
 
         if (oAuthConsumerAppDTO.getAudiences() == null) {
@@ -112,6 +117,23 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         }
     }
 
+    private List<String> getIdTokenAudiences(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+
+        if (oAuthConsumerAppDTO.getIdTokenAudiences() == null) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.asList(oAuthConsumerAppDTO.getIdTokenAudiences());
+        }
+    }
+
+    private List<String> getAccessTokenAudiences(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+
+        if (oAuthConsumerAppDTO.getAccessTokenAudiences() == null) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.asList(oAuthConsumerAppDTO.getAccessTokenAudiences());
+        }
+    }
     private IdTokenEncryptionConfiguration buildIdTokenEncryptionConfiguration(OAuthConsumerAppDTO appDTO) {
 
         return new IdTokenEncryptionConfiguration()
