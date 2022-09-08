@@ -1,19 +1,17 @@
 /*
- * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * WSO2 LLC. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2;
@@ -89,7 +87,7 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .revokeTokensWhenIDPSessionTerminated(oAuthConsumerAppDTO
                         .isTokenRevocationWithIDPSessionTerminationEnabled())
                 .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled())
-                .audience(getAccessTokenAudiences(oAuthConsumerAppDTO));
+                .audience(getAccessTokenAudiences(oAuthConsumerAppDTO.getAccessTokenAudiences()));
     }
 
     private RefreshTokenConfiguration buildRefreshTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
@@ -103,39 +101,18 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
 
         return new IdTokenConfiguration()
                 .expiryInSeconds(oAuthConsumerAppDTO.getIdTokenExpiryTime())
-                .audience(getIdTokenAudiences(oAuthConsumerAppDTO))
+                .audience(getIdTokenAudiences(oAuthConsumerAppDTO.getIdTokenAudiences()))
                 .encryption(buildIdTokenEncryptionConfiguration(oAuthConsumerAppDTO));
     }
 
-    /**
-     * @deprecated use {@link #getIdTokenAudiences()} instead.
-     */
-    @Deprecated
-    private List<String> getAudiences(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+    private List<String> getIdTokenAudiences(String[] audiences) {
 
-        if (oAuthConsumerAppDTO.getAudiences() == null) {
-            return Collections.emptyList();
-        } else {
-            return Arrays.asList(oAuthConsumerAppDTO.getAudiences());
-        }
+        return (audiences == null) ? Collections.emptyList() : Arrays.asList(audiences);
     }
 
-    private List<String> getIdTokenAudiences(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+    private List<String> getAccessTokenAudiences(String[] audiences) {
 
-        if (oAuthConsumerAppDTO.getIdTokenAudiences() == null) {
-            return Collections.emptyList();
-        } else {
-            return Arrays.asList(oAuthConsumerAppDTO.getIdTokenAudiences());
-        }
-    }
-
-    private List<String> getAccessTokenAudiences(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
-
-        if (oAuthConsumerAppDTO.getAccessTokenAudiences() == null) {
-            return Collections.emptyList();
-        } else {
-            return Arrays.asList(oAuthConsumerAppDTO.getAccessTokenAudiences());
-        }
+        return (audiences == null) ? Collections.emptyList() : Arrays.asList(audiences);
     }
     private IdTokenEncryptionConfiguration buildIdTokenEncryptionConfiguration(OAuthConsumerAppDTO appDTO) {
 
