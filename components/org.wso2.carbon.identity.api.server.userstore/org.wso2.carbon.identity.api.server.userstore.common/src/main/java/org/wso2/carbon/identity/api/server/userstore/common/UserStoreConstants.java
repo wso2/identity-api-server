@@ -30,6 +30,15 @@ public class UserStoreConstants {
     public static final String USER_STORE_PROPERTIES = "/properties/";
     public static final String USER_STORE_PROPERTY_MASK = "************";
     public static final String CLAIM_MANAGEMENT_PREFIX = "CMT-";
+    public static final String URL = "url";
+    public static final String DRIVER_NAME = "driverName";
+    public static final String USER_NAME = "userName";
+    public static final String PASSWORD = "password";
+    public static final String JDBC_USER_STORE_TYPE_ID = "SkRCQ1VzZXJTdG9yZU1hbmFnZXI=";
+    public static final String CONNECTION_URL = "ConnectionURL";
+    public static final String CONNECTION_NAME = "ConnectionName";
+    public static final String CONNECTION_PASSWORD = "ConnectionPassword";
+
 
     /**
      * Enum for user store related errors in the format of
@@ -118,8 +127,10 @@ public class UserStoreConstants {
         ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("60014", "Attribute mapping not specified.",
                 "Attribute mapping cannot be empty."),
         ERROR_CODE_INVALID_USERSTORE_TYPE("60015", "UserStore type is not allowed",
-                "Requested UserStore type is not allowed", Response.Status.BAD_REQUEST);
-
+                "Requested UserStore type is not allowed", Response.Status.BAD_REQUEST),
+        ERROR_CODE_INVALID_USER_STORE_TYPE("60016", "Invalid user store type",
+                "Incorrect user store type.",
+                Response.Status.BAD_REQUEST);
         private final String code;
         private final String message;
         private final String description;
