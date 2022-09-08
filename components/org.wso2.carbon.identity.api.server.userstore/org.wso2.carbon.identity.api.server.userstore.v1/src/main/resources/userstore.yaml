@@ -383,7 +383,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
-            $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -392,11 +392,11 @@ paths:
     post:
       tags:
         - User Store
-      summary: Test the connection to the datasource used by a JDBC user store manager.
-      operationId: testRDBMSConnection
+      summary: Test the connection to the datasource used by a user store manager.
+      operationId: testUserStoreConnection
       description: >
         This API provides the capability to test the connection to the
-        datasource used by a JDBC user store manager.
+        datasource used by a user store manager.
 
           <b>Permission required:</b>
           */permission/admin
@@ -417,7 +417,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RDBMSConnectionReq'
+              $ref: '#/components/schemas/UserStoreConnectionReq'
         description: >-
           RDBMS connection properties used to connect to the datasource used by a
           JDBC user store manager.
@@ -634,6 +634,38 @@ components:
           type: string
           description: The password.
           example: root
+    UserStoreConnectionReq:
+      description: User Store Connection Request.
+      properties:
+        typeId:
+          type: string
+          description: The id of the user store manager class type.
+          example: VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg
+        domain:
+          type: string
+          description: User store domain name.
+          example: PRIMARY
+        driverName:
+          type: string
+          description: Driver Name.
+          example: com.mysql.jdbc.Driver
+        connectionURL:
+          type: string
+          description: The Connection URL.
+          example: 'jdbc:mysql://192.168.48.154:3306/test'
+        username:
+          type: string
+          description: The username.
+          example: root
+        connectionPassword:
+          type: string
+          description: The password.
+          example: root
+        properties:
+          type: array
+          description: Properties related to the user store.
+          items:
+            $ref: '#/components/schemas/Property'
     ClaimAttributeMapping:
       type: object
       required:

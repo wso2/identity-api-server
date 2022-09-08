@@ -29,9 +29,9 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.Error;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeMappingResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConfigurationsRes;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConnectionReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
@@ -263,7 +263,7 @@ public class UserstoresApi  {
     @Path("/test-connection")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Test the connection to the datasource used by a JDBC user store manager.", notes = "This API provides the capability to test the connection to the datasource used by a JDBC user store manager.    <b>Permission required:</b>   *_/permission/admin ", response = ConnectionEstablishedResponse.class, authorizations = {
+    @ApiOperation(value = "Test the connection to the datasource used by a user store manager.", notes = "This API provides the capability to test the connection to the datasource used by a user store manager.    <b>Permission required:</b>   *_/permission/admin ", response = ConnectionEstablishedResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -275,9 +275,9 @@ public class UserstoresApi  {
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response testRDBMSConnection(@ApiParam(value = "RDBMS connection properties used to connect to the datasource used by a JDBC user store manager." ) @Valid RDBMSConnectionReq rdBMSConnectionReq) {
+    public Response testUserStoreConnection(@ApiParam(value = "RDBMS connection properties used to connect to the datasource used by a JDBC user store manager." ) @Valid UserStoreConnectionReq userStoreConnectionReq) {
 
-        return delegate.testRDBMSConnection(rdBMSConnectionReq );
+        return delegate.testUserStoreConnection(userStoreConnectionReq );
     }
 
     @Valid

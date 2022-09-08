@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.PropertiesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeMappingResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConfigurationsRes;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConnectionReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStorePropertiesRes;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
@@ -66,6 +67,8 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.UserStoreConfigConstants;
 import org.wso2.carbon.user.core.UserStoreManager;
+import org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager;
+import org.wso2.carbon.user.core.ldap.ReadOnlyLDAPUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
 
@@ -84,7 +87,15 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.common.Constants.REGEX_COMMA;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.CONNECTION_NAME;
+import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.CONNECTION_PASSWORD;
+import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.CONNECTION_URL;
+import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.DRIVER_NAME;
 import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.ErrorMessage.ERROR_CODE_USER_STORE_LIMIT_REACHED;
+import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.JDBC_USER_STORE_TYPE_ID;
+import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.PASSWORD;
+import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.URL;
+import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.USER_NAME;
 
 /**
  * Call internal osgi services to perform user store related operations.
@@ -413,11 +424,36 @@ public class ServerUserStoreService {
     }
 
     /**
+     * Test user store connectivity.
+     * @param connectionReq {@link UserStoreConnectionReq}
+     * @return ConnectionEstablishedResponse
+     */
+    public ConnectionEstablishedResponse testUserStoreConnection(UserStoreConnectionReq connectionReq) {
+        ConnectionEstablishedResponse connectionEstablishedResponse = new ConnectionEstablishedResponse();
+        connectionEstablishedResponse.setConnection(false);
+
+        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
+                .getUserStoreConfigService();
+        connectionEstablishedResponse.setConnection(false);
+
+        UserStoreDTO userStoreDTO = buildUserStoreDTO(connectionReq);
+
+        try {
+            connectionEstablishedResponse.setConnection(userStoreConfigService.testUserStoreConnection(userStoreDTO));
+        } catch (IdentityUserStoreMgtException e) {
+            connectionEstablishedResponse.setConnection(false);
+        }
+
+        return connectionEstablishedResponse;
+    }
+
+    /**
      * Check the connection heath for JDBC userstores.
      *
      * @param rdBMSConnectionReq {@link RDBMSConnectionReq}.
      * @return ConnectionEstablishedResponse.
      */
+    @Deprecated
     public ConnectionEstablishedResponse testRDBMSConnection(RDBMSConnectionReq rdBMSConnectionReq) {
 
         UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
@@ -714,7 +750,7 @@ public class ServerUserStoreService {
         userStoreDTO.setDomainId(userStoreReq.getName());
         userStoreDTO.setClassName(getUserStoreType(base64URLDecodeId(userStoreReq.getTypeId())));
         userStoreDTO.setDescription(userStoreReq.getDescription());
-        userStoreDTO.setProperties(createPropertyListDTO(userStoreReq));
+        userStoreDTO.setProperties(createPropertyListDTO(userStoreReq.getProperties()));
         return userStoreDTO;
     }
 
@@ -949,15 +985,15 @@ public class ServerUserStoreService {
     /**
      * Construct PropertyDTO array for POST request.
      *
-     * @param userStoreReq {@link UserStoreReq}.
+     * @param properties User store properties.
      * @return PropertyDTO[].
      */
-    private PropertyDTO[] createPropertyListDTO(UserStoreReq userStoreReq) {
+    private PropertyDTO[] createPropertyListDTO(
+            List<org.wso2.carbon.identity.api.server.userstore.v1.model.Property> properties) {
 
-        List<org.wso2.carbon.identity.api.server.userstore.v1.model.Property> values = userStoreReq.getProperties();
         ArrayList<PropertyDTO> propertiesToAdd = new ArrayList<>();
 
-        for (org.wso2.carbon.identity.api.server.userstore.v1.model.Property value : values) {
+        for (org.wso2.carbon.identity.api.server.userstore.v1.model.Property value : properties) {
             PropertyDTO propertyDTO = new PropertyDTO();
             propertyDTO.setName(value.getName());
             propertyDTO.setValue(value.getValue());
@@ -1388,4 +1424,94 @@ public class ServerUserStoreService {
         }
         return userstoreMappings;
     }
+
+    /**
+     * Build user store DTO to test user store connectivity.
+     * @param connectionReq connection request.
+     * @return user store DTO.
+     */
+    private UserStoreDTO buildUserStoreDTO(UserStoreConnectionReq connectionReq) {
+        String userStoreClassType = connectionReq.getTypeId();
+
+        if (userStoreClassType == null || userStoreClassType.isEmpty()) {
+            userStoreClassType = JDBC_USER_STORE_TYPE_ID;
+        }
+
+        UserStoreDTO userStoreDTO = new UserStoreDTO();
+        userStoreDTO.setClassName(getUserStoreType(base64URLDecodeId(userStoreClassType)));
+        userStoreDTO.setDomainId(connectionReq.getDomain());
+
+        PropertyDTO[] properties;
+
+        if (connectionReq.getProperties() != null) {
+            properties = createPropertyListDTO(connectionReq.getProperties());
+        } else {
+            ArrayList<PropertyDTO> propertiesList = new ArrayList<>();
+            propertiesList.add(new PropertyDTO(URL, connectionReq.getConnectionURL()));
+            propertiesList.add(new PropertyDTO(DRIVER_NAME, connectionReq.getDriverName()));
+            propertiesList.add(new PropertyDTO(USER_NAME, connectionReq.getUsername()));
+            propertiesList.add(new PropertyDTO(PASSWORD, connectionReq.getConnectionPassword()));
+            properties = generatePropertiesWithUniqueIDProperty(propertiesList);
+        }
+
+        validateMandatoryPropertiesForTestConnection(userStoreClassType, properties);
+
+        userStoreDTO.setProperties(properties);
+
+        return userStoreDTO;
+    }
+
+    /**
+     * Validate mandatory properties to test the user store connectivity.
+     * @param userStoreTypeID Type of the user store.
+     * @param properties User store properties.
+     */
+    private void validateMandatoryPropertiesForTestConnection(String userStoreTypeID, PropertyDTO[] properties) {
+
+        String userStoreClassName = getUserStoreType(base64URLDecodeId(userStoreTypeID));
+        if (StringUtils.isBlank(userStoreClassName)) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_INPUT);
+        }
+
+        Class<?> userStoreClass;
+
+        try {
+            userStoreClass = Class.forName(userStoreClassName);
+        } catch (ClassNotFoundException e) {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_USER_STORE_TYPE);
+        }
+
+        HashMap<String, String> hashMap = new HashMap<String, String>();
+
+        ArrayList<String> mandatoryPropertiesList = new ArrayList<>();
+
+        if (JDBCUserStoreManager.class.isAssignableFrom(userStoreClass)) {
+            mandatoryPropertiesList.add(URL);
+            mandatoryPropertiesList.add(DRIVER_NAME);
+            mandatoryPropertiesList.add(USER_NAME);
+            mandatoryPropertiesList.add(PASSWORD);
+        } else if (ReadOnlyLDAPUserStoreManager.class.isAssignableFrom(userStoreClass)) {
+            mandatoryPropertiesList.add(CONNECTION_URL);
+            mandatoryPropertiesList.add(CONNECTION_NAME);
+            mandatoryPropertiesList.add(CONNECTION_PASSWORD);
+        } else {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_INVALID_USER_STORE_TYPE);
+        }
+
+        for (PropertyDTO property : properties) {
+            hashMap.put(property.getName(), property.getValue());
+        }
+        for (String property : mandatoryPropertiesList) {
+            if (!hashMap.containsKey(property) || (StringUtils.isEmpty(hashMap.get(property)))) {
+                UserStoreConstants.ErrorMessage errorEnum =
+                        UserStoreConstants.ErrorMessage.ERROR_CODE_MANDATORY_PROPERTIES_NOT_FOUND;
+                Response.Status status = Response.Status.NOT_FOUND;
+                throw handleException(status, errorEnum);
+            }
+        }
+    }
+
 }

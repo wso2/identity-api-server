@@ -29,9 +29,9 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.Error;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeMappingResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConfigurationsRes;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConnectionReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
@@ -58,7 +58,7 @@ public interface UserstoresApiService {
 
       public Response patchUserStore(String userstoreDomainId, List<PatchDocument> patchDocument);
 
-      public Response testRDBMSConnection(RDBMSConnectionReq rdBMSConnectionReq);
+      public Response testUserStoreConnection(UserStoreConnectionReq userStoreConnectionReq);
 
       public Response updateAttributeMappings(String userstoreDomainId, List<ClaimAttributeMapping> claimAttributeMapping);
 
