@@ -41,6 +41,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticator;
+import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.Link;
@@ -75,9 +77,13 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
+import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
+import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
+import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.ImportResponse;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
+import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.common.model.User;
@@ -347,6 +353,56 @@ public class ServerApplicationManagementService {
 
         ServiceProvider application = getServiceProvider(applicationId);
         return new ServiceProviderToApiModel().apply(application);
+    }
+
+    /**
+     * Get the authenticators configured for an application.
+     *
+     * @param applicationId ID of the application to be exported.
+     * @return  configured authenticators.
+     */
+    public ArrayList<ConfiguredAuthenticatorsModal> getConfiguredAuthenticators(String applicationId) {
+
+        ArrayList<ConfiguredAuthenticatorsModal> response = new ArrayList<>();
+        try {
+            AuthenticationStep[] authenticationSteps = getApplicationManagementService()
+                    .getConfiguredAuthenticators(applicationId);
+
+            if (authenticationSteps == null) {
+                throw buildClientError(ErrorMessage.APPLICATION_NOT_FOUND, applicationId);
+            }
+
+            for (AuthenticationStep step: authenticationSteps) {
+                ArrayList<ConfiguredAuthenticator> localAuthenticators = new ArrayList<>();
+                ArrayList<ConfiguredAuthenticator> federatedAuthenticators = new ArrayList<>();
+                ConfiguredAuthenticatorsModal configuredAuthenticatorsModal = new ConfiguredAuthenticatorsModal();
+                configuredAuthenticatorsModal.stepId(step.getStepOrder());
+
+                for (LocalAuthenticatorConfig localAuthenticatorConfig: step.getLocalAuthenticatorConfigs()) {
+                    ConfiguredAuthenticator authenticator = new ConfiguredAuthenticator();
+                    authenticator.setName(localAuthenticatorConfig.getDisplayName());
+                    authenticator.setType(localAuthenticatorConfig.getName());
+                    localAuthenticators.add(authenticator);
+                }
+
+                for (IdentityProvider federatedAuthenticator: step.getFederatedIdentityProviders()) {
+                    for (FederatedAuthenticatorConfig federatedAuthenticatorConfig: federatedAuthenticator
+                            .getFederatedAuthenticatorConfigs()) {
+                        ConfiguredAuthenticator authenticator = new ConfiguredAuthenticator();
+                        authenticator.setName(federatedAuthenticatorConfig.getDisplayName());
+                        authenticator.setType(federatedAuthenticatorConfig.getName());
+                        federatedAuthenticators.add(authenticator);
+                    }
+                }
+                configuredAuthenticatorsModal.setLocalAuthenticators(localAuthenticators);
+                configuredAuthenticatorsModal.setFederatedAuthenticators(federatedAuthenticators);
+                response.add(configuredAuthenticatorsModal);
+            }
+            return response;
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error retrieving application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
+        }
     }
 
     /**
