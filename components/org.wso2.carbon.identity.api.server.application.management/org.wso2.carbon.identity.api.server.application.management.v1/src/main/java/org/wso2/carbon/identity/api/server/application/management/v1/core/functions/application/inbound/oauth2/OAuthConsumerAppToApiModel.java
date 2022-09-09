@@ -108,11 +108,13 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
     private List<String> getIdTokenAudiences(String[] audiences) {
 
         return (audiences == null) ? Collections.emptyList() : Arrays.asList(audiences);
+
     }
 
     private List<String> getAccessTokenAudiences(String[] audiences) {
 
         return (audiences == null) ? Collections.emptyList() : Arrays.asList(audiences);
+
     }
     private IdTokenEncryptionConfiguration buildIdTokenEncryptionConfiguration(OAuthConsumerAppDTO appDTO) {
 
