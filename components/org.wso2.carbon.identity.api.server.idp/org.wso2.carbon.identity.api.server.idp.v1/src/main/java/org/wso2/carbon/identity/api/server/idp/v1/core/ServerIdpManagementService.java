@@ -2488,9 +2488,40 @@ public class ServerIdpManagementService {
         if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authenticatorName)) {
             validateSamlMetadata(authProperties);
         }
+        if ("OpenIDConnectAuthenticator".equals(authenticatorName)) {
+            validateOpenIDConnectScopes(authProperties);
+        }
         List<Property> properties = authProperties.stream().map(propertyToInternal).collect(Collectors.toList());
         authConfig.setProperties(properties.toArray(new Property[0]));
         return authConfig;
+    }
+
+    /**
+     * Verify if scopes have not been set in both Scopes field and Additional Query Parameters field
+     *
+     * @param oidcAuthenticatorProperties Authenticator properties of OIDC authenticator.
+     */
+    private void validateOpenIDConnectScopes(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
+                                                     oidcAuthenticatorProperties) {
+
+        if (oidcAuthenticatorProperties != null) {
+            boolean scopesFieldFilled = false;
+            boolean queryParamsScopesFilled = false;
+            for (int i = 0; i < oidcAuthenticatorProperties.size(); i++) {
+                if (Constants.SCOPES_OIDC.equals(oidcAuthenticatorProperties.get(i).getKey()) &&
+                        StringUtils.isNotBlank(oidcAuthenticatorProperties.get(i).getValue())) {
+                    scopesFieldFilled = true;
+                }
+                if (Constants.QUERY_PARAMS.equals(oidcAuthenticatorProperties.get(i).getKey()) &&
+                        oidcAuthenticatorProperties.get(i).getValue().contains("scope=")) {
+                    queryParamsScopesFilled = true;
+                }
+            }
+            if (scopesFieldFilled && queryParamsScopesFilled) {
+                throw handleException(Response.Status.CONFLICT, Constants.ErrorMessage
+                        .ERROR_CODE_INVALID_OIDC_SCOPES, null);
+            }
+        }
     }
 
     /**

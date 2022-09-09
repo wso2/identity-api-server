@@ -36,6 +36,8 @@ public class Constants {
     public static final String SELECT_MODE = "SelectMode";
     public static final String SELECT_MODE_METADATA = "Metadata File Configuration";
     public static final String TEMPLATE_MGT_ERROR_CODE_DELIMITER = "_";
+    public static final String SCOPES_OIDC = "Scopes";
+    public static final Stirng QUERY_PARAMS = "commonAuthQueryParams";
 
     // IdP property keys.
     public static final String PROP_DISPLAY_NAME = "DisplayName";
@@ -134,6 +136,8 @@ public class Constants {
                 "Maximum number of allowed identity providers have been reached."),
         ERROR_CODE_INVALID_CERTIFICATE_FORMAT("60036", "Invalid IDP certificate format.",
                 "One or more IDP certificate formats are invalid"),
+        ERROR_CODE_INVALID_OIDC_SCOPES("60037", "Duplicate OIDC Scopes.",
+                "Cannot set scopes in both Scopes and Additional Query Parameters."),
 
         // Server Error starting from 650xx.
         ERROR_CODE_ERROR_ADDING_IDP("65002",
