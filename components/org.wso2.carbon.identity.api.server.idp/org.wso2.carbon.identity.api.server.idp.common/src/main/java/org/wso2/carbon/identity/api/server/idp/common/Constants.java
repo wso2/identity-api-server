@@ -37,7 +37,7 @@ public class Constants {
     public static final String SELECT_MODE_METADATA = "Metadata File Configuration";
     public static final String TEMPLATE_MGT_ERROR_CODE_DELIMITER = "_";
     public static final String SCOPES_OIDC = "Scopes";
-    public static final Stirng QUERY_PARAMS = "commonAuthQueryParams";
+    public static final String QUERY_PARAMS = "commonAuthQueryParams";
 
     // IdP property keys.
     public static final String PROP_DISPLAY_NAME = "DisplayName";
