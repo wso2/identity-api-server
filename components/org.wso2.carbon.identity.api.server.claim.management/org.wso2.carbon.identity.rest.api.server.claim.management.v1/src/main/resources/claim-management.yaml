@@ -72,6 +72,13 @@ paths:
               * internal_claim_meta_view
       produces:
       - application/json
+      parameters:
+      - $ref : '#/parameters/attributesQueryParam'
+      - $ref : '#/parameters/limitQueryParam'
+      - $ref : '#/parameters/offsetQueryParam'
+      - $ref : '#/parameters/filterQueryParam'
+      - $ref : '#/parameters/sortQueryParam'
+      - $ref : '#/parameters/excludeIdentityClaimsQueryParam'
       x-wso2-curl: |
       responses:
         200:
@@ -191,6 +198,12 @@ paths:
               * internal_claim_meta_create
       consumes:
       - application/json
+      parameters:
+      - in: body
+        name: claimDialect
+        description: claim dialect to add.
+        schema:
+          $ref: '#/definitions/ClaimDialectReq'
       x-wso2-curl: |
       responses:
         201:
@@ -342,6 +355,11 @@ paths:
       - application/json
       parameters:
       - $ref : '#/parameters/dialectIdPathParam'
+      - in: body
+        name: externalClaim
+        description: External claim to add.
+        schema:
+          $ref: '#/definitions/ExternalClaimReq'
       x-wso2-curl: |
       responses:
         201:
