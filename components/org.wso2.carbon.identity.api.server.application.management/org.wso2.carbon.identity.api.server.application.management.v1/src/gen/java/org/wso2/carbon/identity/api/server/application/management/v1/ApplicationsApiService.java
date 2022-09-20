@@ -80,6 +80,8 @@ public interface ApplicationsApiService {
 
       public Response getApplication(String applicationId);
 
+      public Response getConfiguredAuthenticators(String applicationId);
+
       public Response getApplicationTemplate(String templateId);
 
       public Response getCustomInboundConfiguration(String applicationId, String inboundProtocolId);
