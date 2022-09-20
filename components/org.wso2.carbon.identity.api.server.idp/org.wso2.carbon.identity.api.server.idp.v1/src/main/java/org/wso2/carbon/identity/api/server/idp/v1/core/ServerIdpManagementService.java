@@ -2518,7 +2518,7 @@ public class ServerIdpManagementService {
                 }
             }
             if (scopesFieldFilled && queryParamsScopesFilled) {
-                throw handleException(Response.Status.CONFLICT, Constants.ErrorMessage
+                throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                         .ERROR_CODE_INVALID_OIDC_SCOPES, null);
             }
         }
