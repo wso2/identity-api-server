@@ -389,7 +389,7 @@ public class ServerApplicationManagementService {
                     for (FederatedAuthenticatorConfig federatedAuthenticatorConfig: federatedAuthenticator
                             .getFederatedAuthenticatorConfigs()) {
                         ConfiguredAuthenticator authenticator = new ConfiguredAuthenticator();
-                        authenticator.setName(federatedAuthenticatorConfig.getDisplayName());
+                        authenticator.setName(federatedAuthenticator.getIdentityProviderName());
                         authenticator.setType(federatedAuthenticatorConfig.getName());
                         federatedAuthenticators.add(authenticator);
                     }
