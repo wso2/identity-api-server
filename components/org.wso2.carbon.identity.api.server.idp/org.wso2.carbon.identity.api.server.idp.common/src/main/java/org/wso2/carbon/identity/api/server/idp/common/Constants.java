@@ -136,7 +136,7 @@ public class Constants {
                 "Maximum number of allowed identity providers have been reached."),
         ERROR_CODE_INVALID_CERTIFICATE_FORMAT("60036", "Invalid IDP certificate format.",
                 "One or more IDP certificate formats are invalid"),
-        ERROR_CODE_INVALID_OIDC_SCOPES("60037", "Duplicate OIDC Scopes.",
+        ERROR_CODE_DUPLICATE_OIDC_SCOPES("60037", "Duplicate OIDC Scopes.",
                 "Cannot set scopes in both Scopes and Additional Query Parameters." +
                         " Please use Scopes field to set scopes."),
 

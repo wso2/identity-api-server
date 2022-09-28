@@ -2519,7 +2519,7 @@ public class ServerIdpManagementService {
             }
             if (scopesFieldFilled && queryParamsScopesFilled) {
                 throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                        .ERROR_CODE_INVALID_OIDC_SCOPES, null);
+                        .ERROR_CODE_DUPLICATE_OIDC_SCOPES, null);
             }
         }
     }
