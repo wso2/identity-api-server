@@ -2514,7 +2514,7 @@ public class ServerIdpManagementService {
                         StringUtils.isNotBlank(oidcAuthenticatorProperty.getValue())) {
                     scopesFieldFilled = true;
                 }
-                if (IdentityApplicationConstants.Authenticator.QUERY_PARAMS.equals(oidcAuthenticatorProperty.getKey())
+                if (IdentityApplicationConstants.Authenticator.OIDC.QUERY_PARAMS.equals(oidcAuthenticatorProperty.getKey())
                         && oidcAuthenticatorProperty.getValue().contains("scope=")) {
                     queryParamsScopesFilled = true;
                 }
