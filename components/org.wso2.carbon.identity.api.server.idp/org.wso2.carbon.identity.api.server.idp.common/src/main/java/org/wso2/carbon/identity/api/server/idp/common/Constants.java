@@ -138,7 +138,7 @@ public class Constants {
                 "One or more IDP certificate formats are invalid"),
         ERROR_CODE_DUPLICATE_OIDC_SCOPES("60037", "Duplicate OIDC Scopes.",
                 "Cannot set scopes in both Scopes and Additional Query Parameters." +
-                        " Please use Scopes field to set scopes."),
+                        " Recommend to use Scopes field."),
         ERROR_CODE_INVALID_OIDC_SCOPES("60038", "Invalid OIDC Scopes.",
                 "Scopes must contain 'openid'."),
 
