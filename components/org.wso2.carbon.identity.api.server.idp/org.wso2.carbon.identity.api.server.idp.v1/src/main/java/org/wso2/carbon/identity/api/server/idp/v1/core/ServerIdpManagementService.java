@@ -2488,7 +2488,7 @@ public class ServerIdpManagementService {
         if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authenticatorName)) {
             validateSamlMetadata(authProperties);
         }
-        if ("OpenIDConnectAuthenticator".equals(authenticatorName)) {
+        if (IdentityApplicationConstants.Authenticator.OIDC.FED_AUTH_NAME.equals(authenticatorName)) {
             validateDuplicateOpenIDConnectScopes(authProperties);
             validateDefaultOpenIDConnectScopes(authProperties);
         }
@@ -2510,12 +2510,12 @@ public class ServerIdpManagementService {
             boolean queryParamsScopesFilled = false;
             for (org.wso2.carbon.identity.api.server.idp.v1
                     .model.Property oidcAuthenticatorProperty : oidcAuthenticatorProperties) {
-                if (Constants.SCOPES_OIDC.equals(oidcAuthenticatorProperty.getKey()) &&
+                if (IdentityApplicationConstants.Authenticator.OIDC.SCOPES.equals(oidcAuthenticatorProperty.getKey()) &&
                         StringUtils.isNotBlank(oidcAuthenticatorProperty.getValue())) {
                     scopesFieldFilled = true;
                 }
-                if (Constants.QUERY_PARAMS.equals(oidcAuthenticatorProperty.getKey()) &&
-                        oidcAuthenticatorProperty.getValue().contains("scope=")) {
+                if (IdentityApplicationConstants.Authenticator.QUERY_PARAMS.equals(oidcAuthenticatorProperty.getKey())
+                        && oidcAuthenticatorProperty.getValue().contains("scope=")) {
                     queryParamsScopesFilled = true;
                 }
             }
@@ -2537,7 +2537,7 @@ public class ServerIdpManagementService {
         if (oidcAuthenticatorProperties != null) {
             for (org.wso2.carbon.identity.api.server.idp.v1
                     .model.Property oidcAuthenticatorProperty : oidcAuthenticatorProperties) {
-                if (Constants.SCOPES_OIDC.equals(oidcAuthenticatorProperty.getKey())) {
+                if (IdentityApplicationConstants.Authenticator.OIDC.SCOPES.equals(oidcAuthenticatorProperty.getKey())) {
                     String scopes = oidcAuthenticatorProperty.getValue();
                     if (StringUtils.isNotBlank(scopes) && !scopes.contains("openid")) {
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
