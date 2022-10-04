@@ -1,7 +1,7 @@
 # This workflow will build the project on pull requests with tests
 # Uses:
 #   OS: ubuntu-latest
-#   JDK: Adopt JDK 11 and Adopt JDK 17
+#   JDK: Adopt JDK 8, Adopt JDK 11 and Adopt JDK 17
 
 name: PR Builder
 
