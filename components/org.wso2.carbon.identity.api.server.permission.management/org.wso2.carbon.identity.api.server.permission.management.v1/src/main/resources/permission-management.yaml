@@ -471,16 +471,6 @@ components:
           resourcePath: "/permission/admin/manage/identity/challenge/update"
         - displayName: View
           resourcePath: "/permission/admin/manage/identity/challenge/view"
-        - displayName: STS Management
-          resourcePath: "/permission/admin/manage/identity/stsmgt"
-        - displayName: Create
-          resourcePath: "/permission/admin/manage/identity/stsmgt/create"
-        - displayName: Delete
-          resourcePath: "/permission/admin/manage/identity/stsmgt/delete"
-        - displayName: View
-          resourcePath: "/permission/admin/manage/identity/stsmgt/view"
-        - displayName: Update
-          resourcePath: "/permission/admin/manage/identity/stsmgt/update"
         - displayName: Template
           resourcePath: "/permission/admin/manage/identity/template"
         - displayName: Template Management
