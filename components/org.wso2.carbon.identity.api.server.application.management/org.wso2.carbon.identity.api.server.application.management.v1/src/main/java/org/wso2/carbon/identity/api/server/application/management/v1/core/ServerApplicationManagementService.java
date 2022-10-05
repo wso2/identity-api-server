@@ -47,12 +47,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.Link;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationBasicInfoToApiModel;
@@ -60,8 +58,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundFunctions;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundFunctions;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundFunctions;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundFunctions;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundFunctions;
@@ -149,9 +145,7 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.updateOrInsertInbound;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.OAUTH2;
-import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.PASSIVE_STS;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.SAML2;
-import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.WS_TRUST;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.INVALID_REQUEST;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
 import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
@@ -168,11 +162,6 @@ public class ServerApplicationManagementService {
     private static final Set<String> SUPPORTED_FILTER_ATTRIBUTES = new HashSet<>();
     private static final List<String> SUPPORTED_REQUIRED_ATTRIBUTES = new ArrayList<>();
     private static final int DEFAULT_OFFSET = 0;
-
-    // WS-Trust related constants.
-    private static final String WS_TRUST_TEMPLATE_ID = "061a3de4-8c08-4878-84a6-24245f11bf0e";
-    private static final String STS_TEMPLATE_NOT_FOUND_MESSAGE = "Request template with id: %s could " +
-            "not be found since the WS-Trust connector has not been configured.";
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -677,16 +666,6 @@ public class ServerApplicationManagementService {
         deleteInbound(applicationId, StandardInboundProtocols.SAML2);
     }
 
-    public void deletePassiveStsInbound(String applicationId) {
-
-        deleteInbound(applicationId, StandardInboundProtocols.PASSIVE_STS);
-    }
-
-    public void deleteWSTrustInbound(String applicationId) {
-
-        deleteInbound(applicationId, StandardInboundProtocols.WS_TRUST);
-    }
-
     public void deleteCustomInbound(String applicationId, String customInboundType) {
 
         deleteInbound(applicationId, customInboundType);
@@ -700,16 +679,6 @@ public class ServerApplicationManagementService {
     public SAML2ServiceProvider getInboundSAMLConfiguration(String applicationId) {
 
         return getInbound(applicationId, SAML2, SAMLInboundFunctions::getSAML2ServiceProvider);
-    }
-
-    public PassiveStsConfiguration getPassiveStsConfiguration(String applicationId) {
-
-        return getInbound(applicationId, PASSIVE_STS, PassiveSTSInboundFunctions::getPassiveSTSConfiguration);
-    }
-
-    public WSTrustConfiguration getWSTrustConfiguration(String applicationId) {
-
-        return getInbound(applicationId, WS_TRUST, WSTrustInboundFunctions::getWSTrustConfiguration);
     }
 
     public CustomInboundProtocolConfiguration getCustomInboundConfiguration(String applicationId, String inboundType) {
@@ -747,17 +716,6 @@ public class ServerApplicationManagementService {
     public void putInboundSAMLConfiguration(String applicationId, SAML2Configuration saml2Configuration) {
 
         putInbound(applicationId, saml2Configuration, SAMLInboundFunctions::putSAMLInbound);
-    }
-
-    public void putInboundPassiveSTSConfiguration(String applicationId,
-                                                  PassiveStsConfiguration passiveStsConfiguration) {
-
-        putInbound(applicationId, passiveStsConfiguration, PassiveSTSInboundFunctions::putPassiveSTSInbound);
-    }
-
-    public void putInboundWSTrustConfiguration(String applicationId, WSTrustConfiguration wsTrustConfiguration) {
-
-        putInbound(applicationId, wsTrustConfiguration, WSTrustInboundFunctions::putWSTrustConfiguration);
     }
 
     public void updateCustomInbound(String applicationId, String inboundType,

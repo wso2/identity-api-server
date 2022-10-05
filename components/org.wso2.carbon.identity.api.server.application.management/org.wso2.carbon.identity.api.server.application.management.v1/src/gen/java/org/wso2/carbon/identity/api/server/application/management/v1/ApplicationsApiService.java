@@ -37,14 +37,11 @@ import java.io.File;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import javax.ws.rs.core.Response;
 
 
@@ -65,10 +62,6 @@ public interface ApplicationsApiService {
       public Response deleteInboundOAuthConfiguration(String applicationId);
 
       public Response deleteInboundSAMLConfiguration(String applicationId);
-
-      public Response deletePassiveStsConfiguration(String applicationId);
-
-      public Response deleteWSTrustConfiguration(String applicationId);
 
       public Response exportApplication(String applicationId, Boolean exportSecrets);
 
@@ -98,15 +91,9 @@ public interface ApplicationsApiService {
 
       public Response getOIDCMetadata();
 
-      public Response getPassiveStsConfiguration(String applicationId);
-
       public Response getResidentApplication();
 
       public Response getSAMLMetadata();
-
-      public Response getWSTrustConfiguration(String applicationId);
-
-      public Response getWSTrustMetadata();
 
       public Response importApplication(InputStream fileInputStream, Attachment fileDetail);
 
@@ -126,9 +113,5 @@ public interface ApplicationsApiService {
 
       public Response updateInboundSAMLConfiguration(String applicationId, SAML2Configuration saML2Configuration);
 
-      public Response updatePassiveStsConfiguration(String applicationId, PassiveStsConfiguration passiveStsConfiguration);
-
       public Response updateResidentApplication(ProvisioningConfiguration provisioningConfiguration);
-
-      public Response updateWSTrustConfiguration(String applicationId, WSTrustConfiguration wsTrustConfiguration);
 }

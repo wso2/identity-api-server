@@ -32,7 +32,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.GrantTypeMe
 import org.wso2.carbon.identity.api.server.application.management.v1.MetadataProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.common.model.Property;
@@ -42,7 +41,6 @@ import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
 import org.wso2.carbon.identity.oauth.dto.TokenBindingMetaDataDTO;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
-import org.wso2.carbon.security.SecurityConfigException;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -55,7 +53,6 @@ import java.util.Map;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_CERTIFICATE_ALIAS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_NAME_ID_FORMAT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_RETRIEVING_SAML_METADATA;
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.getOAuthGrantTypeNames;
 
 /**
@@ -95,8 +92,6 @@ public class ServerApplicationMetadataService {
                     .displayName("SAML2 Web SSO Configuration"));
             authProtocolMetadataList.add(new AuthProtocolMetadata().name("oidc")
                     .displayName("OAuth/OpenID Connect Configuration"));
-            authProtocolMetadataList.add(new AuthProtocolMetadata().name("ws-trust")
-                    .displayName("WS-Trust Security Token Service Configuration"));
         }
 
         return authProtocolMetadataList;
@@ -212,35 +207,6 @@ public class ServerApplicationMetadataService {
     }
 
     /**
-     * Pull WS Trust metadata from STSAdminServiceInterface and return.
-     *
-     * @return Populated WSTrustMetadata object.
-     */
-    public WSTrustMetaData getWSTrustMetadata() {
-
-        WSTrustMetaData wsTrustMetaData = new WSTrustMetaData();
-        try {
-            // Check if WS-Trust is deployed.
-            if (ApplicationManagementServiceHolder.getStsAdminService() != null) {
-                wsTrustMetaData.setCertificateAlias(new MetadataProperty()
-                        .defaultValue(null)
-                        .options(Arrays.asList(ApplicationManagementServiceHolder.getStsAdminService()
-                                .getCertAliasOfPrimaryKeyStore())));
-            } else {
-                throw new SecurityConfigException(ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND.getDescription());
-            }
-        } catch (SecurityConfigException e) {
-            if (e.getMessage().equals(ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND.getDescription())) {
-                // Throw 404 error since the WS-Trust connector is not available.
-                throw handleNotFoundError(e);
-            } else {
-                throw handleException(e);
-            }
-        }
-        return wsTrustMetaData;
-    }
-
-    /**
      * Pull property metadata of the custom inbound protocol that matches to the protocol name.
      *
      * @param inboundProtocolName URL encoded protocol name.
@@ -333,22 +299,6 @@ public class ServerApplicationMetadataService {
         }
 
         return Utils.buildServerError(errorEnum.getCode(), errorEnum.getMessage(), description, e);
-    }
-
-    /**
-     * Extract the required arguments and build a not found error.
-     *
-     * @param e Exception caught.
-     * @return APIError with exception code, message and description.
-     */
-    private APIError handleNotFoundError(Exception e) {
-
-        ErrorMessage errorEnum = ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND;
-        String errorCode = errorEnum.getCode();
-        String errorMessage = errorEnum.getMessage();
-        String errorDescription = e.getMessage();
-
-        return Utils.buildNotFoundError(errorCode, errorMessage, errorDescription);
     }
 
     private APIError handleInvalidInboundProtocol(String inboundName) {

@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import javax.validation.constraints.*;
 
 
@@ -39,8 +37,6 @@ public class InboundProtocols  {
   
     private SAML2Configuration saml;
     private OpenIDConnectConfiguration oidc;
-    private PassiveStsConfiguration passiveSts;
-    private WSTrustConfiguration wsTrust;
     private List<CustomInboundProtocolConfiguration> custom = null;
 
 
@@ -78,42 +74,6 @@ public class InboundProtocols  {
     }
     public void setOidc(OpenIDConnectConfiguration oidc) {
         this.oidc = oidc;
-    }
-
-    /**
-    **/
-    public InboundProtocols passiveSts(PassiveStsConfiguration passiveSts) {
-
-        this.passiveSts = passiveSts;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("passiveSts")
-    @Valid
-    public PassiveStsConfiguration getPassiveSts() {
-        return passiveSts;
-    }
-    public void setPassiveSts(PassiveStsConfiguration passiveSts) {
-        this.passiveSts = passiveSts;
-    }
-
-    /**
-    **/
-    public InboundProtocols wsTrust(WSTrustConfiguration wsTrust) {
-
-        this.wsTrust = wsTrust;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("wsTrust")
-    @Valid
-    public WSTrustConfiguration getWsTrust() {
-        return wsTrust;
-    }
-    public void setWsTrust(WSTrustConfiguration wsTrust) {
-        this.wsTrust = wsTrust;
     }
 
     /**
@@ -156,14 +116,12 @@ public class InboundProtocols  {
         InboundProtocols inboundProtocols = (InboundProtocols) o;
         return Objects.equals(this.saml, inboundProtocols.saml) &&
             Objects.equals(this.oidc, inboundProtocols.oidc) &&
-            Objects.equals(this.passiveSts, inboundProtocols.passiveSts) &&
-            Objects.equals(this.wsTrust, inboundProtocols.wsTrust) &&
             Objects.equals(this.custom, inboundProtocols.custom);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(saml, oidc, passiveSts, wsTrust, custom);
+        return Objects.hash(saml, oidc, custom);
     }
 
     @Override
@@ -174,8 +132,6 @@ public class InboundProtocols  {
         
         sb.append("    saml: ").append(toIndentedString(saml)).append("\n");
         sb.append("    oidc: ").append(toIndentedString(oidc)).append("\n");
-        sb.append("    passiveSts: ").append(toIndentedString(passiveSts)).append("\n");
-        sb.append("    wsTrust: ").append(toIndentedString(wsTrust)).append("\n");
         sb.append("    custom: ").append(toIndentedString(custom)).append("\n");
         sb.append("}");
         return sb.toString();
