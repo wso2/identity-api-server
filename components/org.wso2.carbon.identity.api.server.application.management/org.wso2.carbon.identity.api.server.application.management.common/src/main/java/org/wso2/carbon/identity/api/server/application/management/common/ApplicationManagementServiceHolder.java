@@ -21,7 +21,6 @@ import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
-import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
 import org.wso2.carbon.user.core.service.RealmService;
 
 /**
@@ -31,7 +30,6 @@ public class ApplicationManagementServiceHolder {
 
     private static ApplicationManagementService applicationManagementService;
     private static OAuthAdminServiceImpl oauthAdminService;
-    private static STSAdminServiceInterface stsAdminService;
     private static SAMLSSOConfigServiceImpl samlssoConfigService;
     private static OAuthServerConfiguration oAuthServerConfiguration;
     private static TemplateManager templateManager;
@@ -56,16 +54,6 @@ public class ApplicationManagementServiceHolder {
     public static void setOauthAdminService(OAuthAdminServiceImpl oauthAdminService) {
 
         ApplicationManagementServiceHolder.oauthAdminService = oauthAdminService;
-    }
-
-    public static STSAdminServiceInterface getStsAdminService() {
-
-        return stsAdminService;
-    }
-
-    public static void setStsAdminService(STSAdminServiceInterface stsAdminService) {
-
-        ApplicationManagementServiceHolder.stsAdminService = stsAdminService;
     }
 
     public static SAMLSSOConfigServiceImpl getSamlssoConfigService() {

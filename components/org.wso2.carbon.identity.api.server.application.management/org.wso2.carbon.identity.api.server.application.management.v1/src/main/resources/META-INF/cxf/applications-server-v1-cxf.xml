@@ -30,10 +30,6 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
         <property name="oauthAdminService" ref="oauthAdminServiceFactoryBean"/>
     </bean>
-    <bean id="stsAdminServiceHolderBean"
-          class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
-        <property name="stsAdminService" ref="stsAdminServiceFactoryBean"/>
-    </bean>
     <bean id="samlSsoConfigServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
         <property name="samlssoConfigService" ref="samlSsoConfigServiceFactoryBean"/>
@@ -55,8 +51,6 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.ApplicationManagementOSGiServiceFactory"/>
     <bean id="oauthAdminServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.OAuthAdminOSGiServiceFactory"/>
-    <bean id="stsAdminServiceFactoryBean"
-          class="org.wso2.carbon.identity.api.server.application.management.common.factory.STSAdminOSGiServiceFactory"/>
     <bean id="samlSsoConfigServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.SAMLSSOConfigOSGiServiceFactory"/>
     <bean id="templateManagerServiceFactoryBean"

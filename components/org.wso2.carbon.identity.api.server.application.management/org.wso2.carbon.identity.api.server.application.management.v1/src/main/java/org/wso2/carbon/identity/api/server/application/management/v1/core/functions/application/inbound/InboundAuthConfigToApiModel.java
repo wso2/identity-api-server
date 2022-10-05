@@ -83,12 +83,6 @@ public class InboundAuthConfigToApiModel implements Function<ServiceProvider, Li
             case (FrameworkConstants.StandardInboundProtocols.OAUTH2):
                 inboundPathComponent = ApplicationManagementConstants.INBOUND_PROTOCOL_OAUTH2_PATH_COMPONENT;
                 break;
-            case (FrameworkConstants.StandardInboundProtocols.PASSIVE_STS):
-                inboundPathComponent = ApplicationManagementConstants.INBOUND_PROTOCOL_PASSIVE_STS_PATH_COMPONENT;
-                break;
-            case (FrameworkConstants.StandardInboundProtocols.WS_TRUST):
-                inboundPathComponent = ApplicationManagementConstants.INBOUND_PROTOCOL_WS_TRUST_PATH_COMPONENT;
-                break;
             default:
                 try {
                     inboundPathComponent = "/" + URLEncoder.encode(inboundAuthType, StandardCharsets.UTF_8.name());

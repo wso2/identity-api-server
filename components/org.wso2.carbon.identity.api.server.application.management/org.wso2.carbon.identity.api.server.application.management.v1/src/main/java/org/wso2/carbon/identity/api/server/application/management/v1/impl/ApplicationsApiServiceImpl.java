@@ -29,12 +29,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
 import org.wso2.carbon.identity.api.server.common.Constants;
@@ -134,20 +132,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response getPassiveStsConfiguration(String applicationId) {
-
-        PassiveStsConfiguration passiveStsApp = applicationManagementService.getPassiveStsConfiguration(applicationId);
-        return Response.ok(passiveStsApp).build();
-    }
-
-    @Override
-    public Response getWSTrustConfiguration(String applicationId) {
-
-        WSTrustConfiguration wsTrustConfiguration = applicationManagementService.getWSTrustConfiguration(applicationId);
-        return Response.ok(wsTrustConfiguration).build();
-    }
-
-    @Override
     public Response getCustomInboundConfiguration(String applicationId, String inboundProtocolId) {
 
         CustomInboundProtocolConfiguration customInbound =
@@ -166,20 +150,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response deleteInboundSAMLConfiguration(String applicationId) {
 
         applicationManagementService.deleteSAMLInbound(applicationId);
-        return Response.status(Response.Status.NO_CONTENT).build();
-    }
-
-    @Override
-    public Response deletePassiveStsConfiguration(String applicationId) {
-
-        applicationManagementService.deletePassiveStsInbound(applicationId);
-        return Response.status(Response.Status.NO_CONTENT).build();
-    }
-
-    @Override
-    public Response deleteWSTrustConfiguration(String applicationId) {
-
-        applicationManagementService.deleteWSTrustInbound(applicationId);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
@@ -280,21 +250,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response updatePassiveStsConfiguration(String applicationId,
-                                                  PassiveStsConfiguration passiveStsConfiguration) {
-
-        applicationManagementService.putInboundPassiveSTSConfiguration(applicationId, passiveStsConfiguration);
-        return Response.ok().build();
-    }
-
-    @Override
-    public Response updateWSTrustConfiguration(String applicationId, WSTrustConfiguration wsTrustConfiguration) {
-
-        applicationManagementService.putInboundWSTrustConfiguration(applicationId, wsTrustConfiguration);
-        return Response.ok().build();
-    }
-
-    @Override
     public Response getInboundProtocols(Boolean customOnly) {
 
         return Response.ok().entity(applicationMetadataService.getInboundProtocols(customOnly)).build();
@@ -316,12 +271,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response getSAMLMetadata() {
 
         return Response.ok().entity(applicationMetadataService.getSAMLMetadata()).build();
-    }
-
-    @Override
-    public Response getWSTrustMetadata() {
-
-        return Response.ok().entity(applicationMetadataService.getWSTrustMetadata()).build();
     }
 
     @Override

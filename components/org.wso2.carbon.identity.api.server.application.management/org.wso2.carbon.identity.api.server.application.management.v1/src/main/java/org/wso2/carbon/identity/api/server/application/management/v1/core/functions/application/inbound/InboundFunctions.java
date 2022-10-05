@@ -95,9 +95,6 @@ public class InboundFunctions {
             case FrameworkConstants.StandardInboundProtocols.OAUTH2:
                 OAuthInboundFunctions.deleteOAuthInbound(inbound);
                 break;
-            case FrameworkConstants.StandardInboundProtocols.WS_TRUST:
-                WSTrustInboundFunctions.deleteWSTrustConfiguration(inbound);
-                break;
             default:
                 // No rollbacks required for other inbounds.
                 break;
