@@ -134,6 +134,11 @@ public class Constants {
                 "Maximum number of allowed identity providers have been reached."),
         ERROR_CODE_INVALID_CERTIFICATE_FORMAT("60036", "Invalid IDP certificate format.",
                 "One or more IDP certificate formats are invalid"),
+        ERROR_CODE_DUPLICATE_OIDC_SCOPES("60037", "Duplicate OIDC Scopes.",
+                "Cannot set scopes in both Scopes and Additional Query Parameters." +
+                        " Recommend to use Scopes field."),
+        ERROR_CODE_INVALID_OIDC_SCOPES("60038", "Invalid OIDC Scopes.",
+                "Scopes must contain 'openid'."),
 
         // Server Error starting from 650xx.
         ERROR_CODE_ERROR_ADDING_IDP("65002",

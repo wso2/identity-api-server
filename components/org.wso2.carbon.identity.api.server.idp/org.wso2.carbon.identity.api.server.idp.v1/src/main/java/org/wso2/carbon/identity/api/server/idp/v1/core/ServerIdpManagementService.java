@@ -2488,9 +2488,65 @@ public class ServerIdpManagementService {
         if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authenticatorName)) {
             validateSamlMetadata(authProperties);
         }
+        if (IdentityApplicationConstants.Authenticator.OIDC.FED_AUTH_NAME.equals(authenticatorName)) {
+            validateDuplicateOpenIDConnectScopes(authProperties);
+            validateDefaultOpenIDConnectScopes(authProperties);
+        }
         List<Property> properties = authProperties.stream().map(propertyToInternal).collect(Collectors.toList());
         authConfig.setProperties(properties.toArray(new Property[0]));
         return authConfig;
+    }
+
+    /**
+     * Verify if scopes have not been set in both Scopes field and Additional Query Parameters field
+     *
+     * @param oidcAuthenticatorProperties Authenticator properties of OIDC authenticator.
+     */
+    private void validateDuplicateOpenIDConnectScopes(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
+                                                     oidcAuthenticatorProperties) {
+
+        if (oidcAuthenticatorProperties != null) {
+            boolean scopesFieldFilled = false;
+            boolean queryParamsScopesFilled = false;
+            for (org.wso2.carbon.identity.api.server.idp.v1
+                    .model.Property oidcAuthenticatorProperty : oidcAuthenticatorProperties) {
+                if (IdentityApplicationConstants.Authenticator.OIDC.SCOPES.equals(oidcAuthenticatorProperty.getKey()) &&
+                        StringUtils.isNotBlank(oidcAuthenticatorProperty.getValue())) {
+                    scopesFieldFilled = true;
+                }
+                if (IdentityApplicationConstants.Authenticator.OIDC.QUERY_PARAMS.equals
+                        (oidcAuthenticatorProperty.getKey())
+                        && oidcAuthenticatorProperty.getValue().contains("scope=")) {
+                    queryParamsScopesFilled = true;
+                }
+            }
+            if (scopesFieldFilled && queryParamsScopesFilled) {
+                throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                        .ERROR_CODE_DUPLICATE_OIDC_SCOPES, null);
+            }
+        }
+    }
+
+    /**
+     * Verify if scopes contain `openid`
+     *
+     * @param oidcAuthenticatorProperties Authenticator properties of OIDC authenticator.
+     */
+    private void validateDefaultOpenIDConnectScopes(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
+                                                     oidcAuthenticatorProperties) {
+
+        if (oidcAuthenticatorProperties != null) {
+            for (org.wso2.carbon.identity.api.server.idp.v1
+                    .model.Property oidcAuthenticatorProperty : oidcAuthenticatorProperties) {
+                if (IdentityApplicationConstants.Authenticator.OIDC.SCOPES.equals(oidcAuthenticatorProperty.getKey())) {
+                    String scopes = oidcAuthenticatorProperty.getValue();
+                    if (StringUtils.isNotBlank(scopes) && !scopes.contains("openid")) {
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_OIDC_SCOPES, null);
+                    }
+                }
+            }
+        }
     }
 
     /**
