@@ -1300,8 +1300,8 @@ paths:
         This API provides the capability to update the just-in-time provisioning
         config of an identity provider by specifying the identity provider's ID. This
         includes the ability to enable/disable JIT provisioning, change
-        provisioning userstore and enable/disable user prompts for username,
-        password and consent. <br>
+        provisioning userstore, enable/disable associate existing local users and 
+        enable/disable user prompts for username, password and consent. <br>
         The schemes supported for JIT provisioning are, <br>
             <ol>
               <li><code>PROVISION_SILENTLY</code> : Provision without any prompts</li>
@@ -2418,6 +2418,10 @@ components:
           type: string
           default: PRIMARY
           example: PRIMARY
+        associateLocalUser:
+          type: boolean
+          default: false
+          example: true
     ConnectedApps:
       type: object
       properties:
