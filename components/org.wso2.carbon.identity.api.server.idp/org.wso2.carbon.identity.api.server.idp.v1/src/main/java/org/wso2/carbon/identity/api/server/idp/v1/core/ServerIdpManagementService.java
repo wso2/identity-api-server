@@ -1647,6 +1647,7 @@ public class ServerIdpManagementService {
                     jitConfig.setPromptConsent(false);
                     break;
             }
+            jitConfig.setAssociateLocalUserEnabled(jit.getAssociateLocalUser());
             identityProvider.setJustInTimeProvisioningConfig(jitConfig);
         }
     }
@@ -2198,6 +2199,7 @@ public class ServerIdpManagementService {
             } else {
                 jitConfig.setUserstore(idp.getJustInTimeProvisioningConfig().getProvisioningUserStore());
             }
+            jitConfig.setAssociateLocalUser(idp.getJustInTimeProvisioningConfig().isAssociateLocalUserEnabled());
         }
         return jitConfig;
     }
