@@ -255,6 +255,44 @@ public class ApplicationsApi  {
     }
 
     @Valid
+    @DELETE
+    @Path("/{applicationId}/inbound-protocols/passive-sts")
+    
+    
+    @ApiOperation(value = "Removed from API ", notes = "Delete Passive STS authentication protocol parameters of application (Removed from API) ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Protocols - Passive STS", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+    })
+    public Response deletePassiveStsConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.deletePassiveStsConfiguration(applicationId );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/{applicationId}/inbound-protocols/ws-trust")
+    
+    
+    @ApiOperation(value = "Removed from API ", notes = "Delete WS Trust authentication protocol parameters of application (Removed from API) ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Protocols - WS Trust", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+    })
+    public Response deleteWSTrustConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.deleteWSTrustConfiguration(applicationId );
+    }
+
+    @Valid
     @GET
     @Path("/{applicationId}/export")
     
@@ -569,6 +607,25 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/{applicationId}/inbound-protocols/passive-sts")
+    
+    
+    @ApiOperation(value = "Removed from API ", notes = "Retrieve Passive STS authentication protocol parameters of application  (Removed from API) ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Protocols - Passive STS", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+    })
+    public Response getPassiveStsConfiguration(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.getPassiveStsConfiguration(applicationId );
+    }
+
+    @Valid
+    @GET
     @Path("/resident")
     
     @Produces({ "application/json" })
@@ -612,6 +669,44 @@ public class ApplicationsApi  {
     public Response getSAMLMetadata() {
 
         return delegate.getSAMLMetadata();
+    }
+
+    @Valid
+    @GET
+    @Path("/{applicationId}/inbound-protocols/ws-trust")
+    
+    
+    @ApiOperation(value = "Removed from API ", notes = "Retrieve WS Trust authentication protocol parameters of application (Removed from API) ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Protocols - WS Trust", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+    })
+    public Response getWSTrustConfiguration(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.getWSTrustConfiguration(applicationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/meta/inbound-protocols/ws-trust")
+    
+    
+    @ApiOperation(value = "Removed from API ", notes = "Retrieve all the metadata related to the auth protocol WS Trust (Removed from API) ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+    })
+    public Response getWSTrustMetadata() {
+
+        return delegate.getWSTrustMetadata();
     }
 
     @Valid
@@ -840,6 +935,25 @@ public class ApplicationsApi  {
 
     @Valid
     @PUT
+    @Path("/{applicationId}/inbound-protocols/passive-sts")
+    
+    
+    @ApiOperation(value = "Update Passive STS authentication protocol parameters of application ", notes = "Update Passive STS authentication protocol parameters of application (Removed from API) ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Protocols - Passive STS", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+    })
+    public Response updatePassiveStsConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.updatePassiveStsConfiguration(applicationId );
+    }
+
+    @Valid
+    @PUT
     @Path("/resident")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
@@ -862,6 +976,25 @@ public class ApplicationsApi  {
     public Response updateResidentApplication(@ApiParam(value = "This represents the provisioning configuration of the resident application." ,required=true) @Valid ProvisioningConfiguration provisioningConfiguration) {
 
         return delegate.updateResidentApplication(provisioningConfiguration );
+    }
+
+    @Valid
+    @PUT
+    @Path("/{applicationId}/inbound-protocols/ws-trust")
+    
+    
+    @ApiOperation(value = "Removed from API ", notes = "Update WS Trust authentication protocol parameters of application (Removed from API) ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Protocols - WS Trust" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+    })
+    public Response updateWSTrustConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.updateWSTrustConfiguration(applicationId );
     }
 
 }

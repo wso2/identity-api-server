@@ -1078,6 +1078,128 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  '/applications/{applicationId}/inbound-protocols/passive-sts':
+    get:
+      tags:
+        - Inbound Protocols - Passive STS
+      summary: >
+        Removed from API
+      description: >
+        Retrieve Passive STS authentication protocol parameters of application 
+        (Removed from API)
+      operationId: getPassiveStsConfiguration
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application
+          required: true
+          schema:
+            type: string
+      responses:
+        '410':
+          description: Endpoint is removed from the API
+
+    put:
+      tags:
+        - Inbound Protocols - Passive STS
+      summary: |
+        Removed from API
+      description: >
+        Update Passive STS authentication protocol parameters of application
+        (Removed from API)
+      operationId: updatePassiveStsConfiguration
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+      responses:
+        '410':
+          description: Endpoint is removed from the API
+
+    delete:
+      tags:
+        - Inbound Protocols - Passive STS
+      summary: |
+        Removed from API
+      description: >
+        Delete Passive STS authentication protocol parameters of application
+        (Removed from API)
+      operationId: deletePassiveStsConfiguration
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+      responses:
+        '410':
+          description: Endpoint is removed from the API
+
+  '/applications/{applicationId}/inbound-protocols/ws-trust':
+    get:
+      tags:
+        - Inbound Protocols - WS Trust
+      summary: |
+        Removed from API
+      description: >
+        Retrieve WS Trust authentication protocol parameters of application
+        (Removed from API)
+      operationId: getWSTrustConfiguration
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application
+          required: true
+          schema:
+            type: string
+      responses:
+        '410':
+          description: Endpoint is removed from the API
+
+    put:
+      tags:
+        - Inbound Protocols - WS Trust
+      summary: |
+        Removed from API
+      description: >
+        Update WS Trust authentication protocol parameters of application
+        (Removed from API)
+      operationId: updateWSTrustConfiguration
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+      responses:
+        '410':
+          description: Endpoint is removed from the API
+
+    delete:
+      tags:
+        - Inbound Protocols - WS Trust
+      summary: |
+        Removed from API
+      description: >
+        Delete WS Trust authentication protocol parameters of application
+        (Removed from API)
+      operationId: deleteWSTrustConfiguration
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+      responses:
+        '410':
+          description: Endpoint is removed from the API
+
   '/applications/{applicationId}/inbound-protocols/{inboundProtocolId}':
     get:
       tags:
@@ -1387,6 +1509,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  '/applications/meta/inbound-protocols/ws-trust':
+    get:
+      tags:
+        - Application Metadata
+      summary: |
+        Removed from API
+      description: >
+        Retrieve all the metadata related to the auth protocol WS Trust
+        (Removed from API)
+      operationId: getWSTrustMetadata
+      responses:
+        '410':
+          description: Endpoint is removed from the API
 
   '/applications/meta/inbound-protocols/{inboundProtocolId}':
     get:

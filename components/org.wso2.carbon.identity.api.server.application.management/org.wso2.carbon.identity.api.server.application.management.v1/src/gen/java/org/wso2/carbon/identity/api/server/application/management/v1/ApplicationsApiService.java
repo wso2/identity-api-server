@@ -63,6 +63,10 @@ public interface ApplicationsApiService {
 
       public Response deleteInboundSAMLConfiguration(String applicationId);
 
+      public Response deletePassiveStsConfiguration(String applicationId);
+
+      public Response deleteWSTrustConfiguration(String applicationId);
+
       public Response exportApplication(String applicationId, Boolean exportSecrets);
 
       public Response getAdaptiveAuthTemplates();
@@ -89,9 +93,15 @@ public interface ApplicationsApiService {
 
       public Response getOIDCMetadata();
 
+      public Response getPassiveStsConfiguration(String applicationId);
+
       public Response getResidentApplication();
 
       public Response getSAMLMetadata();
+
+      public Response getWSTrustConfiguration(String applicationId);
+
+      public Response getWSTrustMetadata();
 
       public Response importApplication(InputStream fileInputStream, Attachment fileDetail);
 
@@ -111,5 +121,9 @@ public interface ApplicationsApiService {
 
       public Response updateInboundSAMLConfiguration(String applicationId, SAML2Configuration saML2Configuration);
 
+      public Response updatePassiveStsConfiguration(String applicationId);
+
       public Response updateResidentApplication(ProvisioningConfiguration provisioningConfiguration);
+
+      public Response updateWSTrustConfiguration(String applicationId);
 }
