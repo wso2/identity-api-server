@@ -138,6 +138,24 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         return Response.ok(samlSp).build();
     }
 
+    /**
+     * Removed from the API.
+     */
+    @Override
+    public Response getPassiveStsConfiguration(String applicationId) {
+
+        return Response.status(Response.Status.GONE).build();
+    }
+
+    /**
+     * Removed from the API.
+     */
+    @Override
+    public Response getWSTrustConfiguration(String applicationId) {
+
+        return Response.status(Response.Status.GONE).build();
+    }
+
     @Override
     public Response getCustomInboundConfiguration(String applicationId, String inboundProtocolId) {
 
@@ -158,6 +176,24 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
         applicationManagementService.deleteSAMLInbound(applicationId);
         return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    /**
+     * Removed from the API.
+     */
+    @Override
+    public Response deletePassiveStsConfiguration(String applicationId) {
+
+        return Response.status(Response.Status.GONE).build();
+    }
+
+    /**
+     * Removed from the API.
+     */
+    @Override
+    public Response deleteWSTrustConfiguration(String applicationId) {
+
+        return Response.status(Response.Status.GONE).build();
     }
 
     @Override
@@ -256,6 +292,24 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         return Response.ok().build();
     }
 
+    /**
+     * Removed from the API.
+     */
+    @Override
+    public Response updatePassiveStsConfiguration(String applicationId) {
+
+        return Response.status(Response.Status.GONE).build();
+    }
+
+    /**
+     * Removed from the API.
+     */
+    @Override
+    public Response updateWSTrustConfiguration(String applicationId) {
+
+        return Response.status(Response.Status.GONE).build();
+    }
+
     @Override
     public Response getInboundProtocols(Boolean customOnly) {
 
@@ -278,6 +332,15 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response getSAMLMetadata() {
 
         return Response.ok().entity(applicationMetadataService.getSAMLMetadata()).build();
+    }
+
+    /**
+     * Removed from the API.
+     */
+    @Override
+    public Response getWSTrustMetadata() {
+
+        return Response.status(Response.Status.GONE).build();
     }
 
     @Override
