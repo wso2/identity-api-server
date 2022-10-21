@@ -266,7 +266,7 @@ public class ApplicationsApi  {
         })
     }, tags={ "Inbound Protocols - Passive STS", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
     public Response deletePassiveStsConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
@@ -285,7 +285,7 @@ public class ApplicationsApi  {
         })
     }, tags={ "Inbound Protocols - WS Trust", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
     public Response deleteWSTrustConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
@@ -641,7 +641,7 @@ public class ApplicationsApi  {
         })
     }, tags={ "Inbound Protocols - Passive STS", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
     public Response getPassiveStsConfiguration(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
 
@@ -707,7 +707,7 @@ public class ApplicationsApi  {
         })
     }, tags={ "Inbound Protocols - WS Trust", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
     public Response getWSTrustConfiguration(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
 
@@ -726,7 +726,7 @@ public class ApplicationsApi  {
         })
     }, tags={ "Application Metadata", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
     public Response getWSTrustMetadata() {
 
@@ -969,7 +969,7 @@ public class ApplicationsApi  {
         })
     }, tags={ "Inbound Protocols - Passive STS", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
     public Response updatePassiveStsConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
@@ -1014,7 +1014,7 @@ public class ApplicationsApi  {
         })
     }, tags={ "Inbound Protocols - WS Trust" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 410, message = "Endpoint is removed from the API", response = Void.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
     public Response updateWSTrustConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 

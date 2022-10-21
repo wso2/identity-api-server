@@ -1148,7 +1148,7 @@ paths:
             type: string
       responses:
         '410':
-          description: Endpoint is removed from the API
+          description: Gone
 
     put:
       tags:
@@ -1168,7 +1168,7 @@ paths:
             type: string
       responses:
         '410':
-          description: Endpoint is removed from the API
+          description: Gone
 
     delete:
       tags:
@@ -1188,7 +1188,7 @@ paths:
             type: string
       responses:
         '410':
-          description: Endpoint is removed from the API
+          description: Gone
 
   '/applications/{applicationId}/inbound-protocols/ws-trust':
     get:
@@ -1209,7 +1209,7 @@ paths:
             type: string
       responses:
         '410':
-          description: Endpoint is removed from the API
+          description: Gone
 
     put:
       tags:
@@ -1229,7 +1229,7 @@ paths:
             type: string
       responses:
         '410':
-          description: Endpoint is removed from the API
+          description: Gone
 
     delete:
       tags:
@@ -1249,7 +1249,7 @@ paths:
             type: string
       responses:
         '410':
-          description: Endpoint is removed from the API
+          description: Gone
 
   '/applications/{applicationId}/inbound-protocols/{inboundProtocolId}':
     get:
@@ -1573,7 +1573,7 @@ paths:
       operationId: getWSTrustMetadata
       responses:
         '410':
-          description: Endpoint is removed from the API
+          description: Gone
 
   '/applications/meta/inbound-protocols/{inboundProtocolId}':
     get:
