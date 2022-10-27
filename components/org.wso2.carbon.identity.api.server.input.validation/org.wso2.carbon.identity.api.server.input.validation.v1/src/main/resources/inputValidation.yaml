@@ -1,0 +1,296 @@
+openapi: 3.0.0
+info:
+  description: >
+    This document specifies an **Input Validation RESTful API** for **WSO2
+    Identity Server**.
+  version: "v1"
+  title: WSO2 Identity Server - Input Validation Rest API
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+servers:
+  - url: 'https://{host-name}/api/server/v1'
+    variables:
+      server-url:
+        default: "localhost:9443"
+security:
+  - bearerAuth: []
+paths:
+  /validation-rules:
+    get:
+      tags:
+        - Input Validations Rules
+      operationId: getValidationConfiguration
+      summary: |
+        Get input validation Rules
+      description: |
+        Get input validation configurations.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationConfigModal'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Input Validations Rules
+      summary: |
+        Update Input Validation Rules
+      operationId: updateInputValidationConfiguration
+      description: >
+        This API provides the capability to update the input validation rules.<br>
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationConfigModal'
+        description: This represents the input validation rules.
+        required: true
+      responses:
+        '201':
+          description: Successful response.
+          headers:
+            Location:
+              description: This denotes the location of the newly-added rules.
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /validation-rules/validate:
+    get:
+      tags:
+        - Validate input value
+      operationId: validateValues
+      summary: |
+        Validate user input values
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateRequest'
+        description: This represents the input validation rules.
+        required: true
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'http://localhost:9763/oauth2/token'
+          scopes: {}
+  schemas:
+    ValidationConfigModal:
+      type: object
+      properties:
+        password:
+          $ref: '#/components/schemas/PasswordValidationModal'
+    PasswordValidationModal:
+      type: object
+      properties:
+        rules:
+          $ref: '#/components/schemas/ValidationRulesModal'
+        regEx:
+          $ref: '#/components/schemas/ValidationRegExModal'
+    ValidationRegExModal:
+      type: object
+      properties:
+        jsRegExValidator:
+          type: string
+          example: /^[a-zA-Z0-9!@#$%^&*]{6,16}$/
+        javaRegExValidator:
+          type: string
+          example: ^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{6, 16}$
+    ValidationRulesModal:
+      type: object
+      properties:
+        lengthValidator:
+          $ref: '#/components/schemas/BasicValidatorModal'
+        specialCharactersValidator:
+          $ref: '#/components/schemas/BasicValidatorModal'
+        numeralsValidator:
+          $ref: '#/components/schemas/BasicValidatorModal'
+        upperCaseValidator:
+          $ref: '#/components/schemas/BasicValidatorModal'
+        lowercaseValidator:
+          $ref: '#Error/components/schemas/BasicValidatorModal'
+        repeatedCharactersValidator:
+          $ref: '#/components/schemas/RepeatedCharactersValidatorModal'
+        uniqueCharactersValidator:
+          $ref: '#/components/schemas/UniqueCharactersValidatorModal'
+    BasicValidatorModal:
+      type: object
+      properties:
+        min:
+          type: integer
+          example: 1
+        max:
+          type: integer
+          example: 5
+    RepeatedCharactersValidatorModal:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          example: true
+        case-sensitive:
+          type: boolean
+          example: true
+        max-consecutive-length:
+          type: integer
+          example: 1
+    UniqueCharactersValidatorModal:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          example: true
+        case-sensitive:
+          type: boolean
+          example: true
+        min-unique-characters:
+          type: integer
+          example: 5
+    ValidateRequest:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: VR-60001
+        message:
+          type: string
+          example: Some Error Message
+        description:
+          type: string
+          example: Some Error Description
+  responses:
+    Unauthorized:
+      description: Unauthorized
+    Forbidden:
+      description: Resource Forbidden
+    ServerError:
+      description: Internal Server Error
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid Input Request
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    Success:
+      description: Configurations successfully updated.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/ValidationConfigModal'
