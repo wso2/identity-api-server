@@ -66,6 +66,7 @@ public enum SchemeEnum {
 
     private SchemeEnum scheme = SchemeEnum.PROVISION_SILENTLY;
     private String userstore = "PRIMARY";
+    private Boolean associateLocalUser = false;
 
     /**
     **/
@@ -123,6 +124,24 @@ public enum SchemeEnum {
         this.userstore = userstore;
     }
 
+    /**
+    **/
+    public JustInTimeProvisioning associateLocalUser(Boolean associateLocalUser) {
+
+        this.associateLocalUser = associateLocalUser;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "")
+    @JsonProperty("associateLocalUser")
+    @Valid
+    public Boolean getAssociateLocalUser() {
+        return associateLocalUser;
+    }
+    public void setAssociateLocalUser(Boolean associateLocalUser) {
+        this.associateLocalUser = associateLocalUser;
+    }
+
 
 
     @Override
@@ -137,12 +156,13 @@ public enum SchemeEnum {
         JustInTimeProvisioning justInTimeProvisioning = (JustInTimeProvisioning) o;
         return Objects.equals(this.isEnabled, justInTimeProvisioning.isEnabled) &&
             Objects.equals(this.scheme, justInTimeProvisioning.scheme) &&
-            Objects.equals(this.userstore, justInTimeProvisioning.userstore);
+            Objects.equals(this.userstore, justInTimeProvisioning.userstore) &&
+            Objects.equals(this.associateLocalUser, justInTimeProvisioning.associateLocalUser);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isEnabled, scheme, userstore);
+        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser);
     }
 
     @Override
@@ -154,6 +174,7 @@ public enum SchemeEnum {
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    scheme: ").append(toIndentedString(scheme)).append("\n");
         sb.append("    userstore: ").append(toIndentedString(userstore)).append("\n");
+        sb.append("    associateLocalUser: ").append(toIndentedString(associateLocalUser)).append("\n");
         sb.append("}");
         return sb.toString();
     }
