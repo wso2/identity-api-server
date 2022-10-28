@@ -40,8 +40,6 @@ public class ApplicationManagementConstants {
     public static final String INBOUND_PROTOCOLS_PATH_COMPONENT = "/inbound-protocols";
     public static final String INBOUND_PROTOCOL_OAUTH2_PATH_COMPONENT = "/oidc";
     public static final String INBOUND_PROTOCOL_SAML_PATH_COMPONENT = "/saml";
-    public static final String INBOUND_PROTOCOL_PASSIVE_STS_PATH_COMPONENT = "/passive-sts";
-    public static final String INBOUND_PROTOCOL_WS_TRUST_PATH_COMPONENT = "/ws-trust";
 
     private static final Map<String, String> OAUTH_GRANT_TYPE_NAMES = new LinkedHashMap<>();
     public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
@@ -83,9 +81,6 @@ public class ApplicationManagementConstants {
         INBOUND_NOT_CONFIGURED("60502",
                 "Inbound protocol not configured.",
                 "Inbound protocol: %s not configured for application id: %s."),
-        ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND("60504",
-                "WS-Trust protocol is not supported.",
-                "STS admin service is unavailable at the moment."),
         ERROR_APPLICATION_LIMIT_REACHED("60503",
                 "Unable to create an application.",
                 "Maximum number of allowed applications have been reached."),

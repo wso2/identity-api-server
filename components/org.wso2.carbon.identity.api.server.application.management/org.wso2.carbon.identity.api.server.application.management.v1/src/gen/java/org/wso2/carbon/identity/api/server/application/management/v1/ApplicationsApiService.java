@@ -37,14 +37,11 @@ import java.io.File;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import javax.ws.rs.core.Response;
 
 
@@ -124,9 +121,9 @@ public interface ApplicationsApiService {
 
       public Response updateInboundSAMLConfiguration(String applicationId, SAML2Configuration saML2Configuration);
 
-      public Response updatePassiveStsConfiguration(String applicationId, PassiveStsConfiguration passiveStsConfiguration);
+      public Response updatePassiveStsConfiguration(String applicationId);
 
       public Response updateResidentApplication(ProvisioningConfiguration provisioningConfiguration);
 
-      public Response updateWSTrustConfiguration(String applicationId, WSTrustConfiguration wsTrustConfiguration);
+      public Response updateWSTrustConfiguration(String applicationId);
 }

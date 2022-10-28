@@ -37,14 +37,11 @@ import java.io.File;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
 
 import javax.validation.Valid;
@@ -261,20 +258,15 @@ public class ApplicationsApi  {
     @DELETE
     @Path("/{applicationId}/inbound-protocols/passive-sts")
     
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Delete Passive STS authentication protocol parameters of application ", notes = "This API provides the capability to delete Passive STS authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/delete <br>   <b>Scope required:</b> <br>       * internal_application_mgt_delete ", response = Void.class, authorizations = {
+    
+    @ApiOperation(value = "Removed from API ", notes = "Delete Passive STS authentication protocol parameters of application (Removed from API) ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Inbound Protocols - Passive STS", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Delete Success", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
     public Response deletePassiveStsConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
@@ -285,20 +277,15 @@ public class ApplicationsApi  {
     @DELETE
     @Path("/{applicationId}/inbound-protocols/ws-trust")
     
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Delete WS Trust authentication protocol parameters of application ", notes = "This API provides the capability to delete WS Trust authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/delete <br>   <b>Scope required:</b> <br>       * internal_application_mgt_delete ", response = Void.class, authorizations = {
+    
+    @ApiOperation(value = "Removed from API ", notes = "Delete WS Trust authentication protocol parameters of application (Removed from API) ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Inbound Protocols - WS Trust", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Delete Success", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
     public Response deleteWSTrustConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
@@ -622,20 +609,15 @@ public class ApplicationsApi  {
     @GET
     @Path("/{applicationId}/inbound-protocols/passive-sts")
     
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve Passive STS authentication protocol parameters of application ", notes = "This API provides the capability to retrieve Passive STS authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = PassiveStsConfiguration.class, authorizations = {
+    
+    @ApiOperation(value = "Removed from API ", notes = "Retrieve Passive STS authentication protocol parameters of application  (Removed from API) ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Inbound Protocols - Passive STS", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = PassiveStsConfiguration.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
     public Response getPassiveStsConfiguration(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
 
@@ -693,20 +675,15 @@ public class ApplicationsApi  {
     @GET
     @Path("/{applicationId}/inbound-protocols/ws-trust")
     
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve WS Trust authentication protocol parameters of application ", notes = "This API provides the capability to retrieve Passive STS authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = WSTrustConfiguration.class, authorizations = {
+    
+    @ApiOperation(value = "Removed from API ", notes = "Retrieve WS Trust authentication protocol parameters of application (Removed from API) ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Inbound Protocols - WS Trust", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = WSTrustConfiguration.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
     public Response getWSTrustConfiguration(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
 
@@ -717,19 +694,15 @@ public class ApplicationsApi  {
     @GET
     @Path("/meta/inbound-protocols/ws-trust")
     
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve all the metadata related to the auth protocol WS Trust ", notes = "This API provides the capability to retrieve all the metadata related to the auth protocol WS_Trust. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = WSTrustMetaData.class, authorizations = {
+    
+    @ApiOperation(value = "Removed from API ", notes = "Retrieve all the metadata related to the auth protocol WS Trust (Removed from API) ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Application Metadata", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = WSTrustMetaData.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
     public Response getWSTrustMetadata() {
 
@@ -963,27 +936,20 @@ public class ApplicationsApi  {
     @Valid
     @PUT
     @Path("/{applicationId}/inbound-protocols/passive-sts")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update Passive STS authentication protocol parameters of application ", notes = "This API provides the capability to store passive STS authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>       * internal_application_mgt_update ", response = Void.class, authorizations = {
+    
+    
+    @ApiOperation(value = "Update Passive STS authentication protocol parameters of application ", notes = "Update Passive STS authentication protocol parameters of application (Removed from API) ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Inbound Protocols - Passive STS", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful", response = Void.class),
-        @ApiResponse(code = 201, message = "Successful response.", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
-    public Response updatePassiveStsConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the Passive STS authentication protocol parameters of an application." ,required=true) @Valid PassiveStsConfiguration passiveStsConfiguration) {
+    public Response updatePassiveStsConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
-        return delegate.updatePassiveStsConfiguration(applicationId,  passiveStsConfiguration );
+        return delegate.updatePassiveStsConfiguration(applicationId );
     }
 
     @Valid
@@ -1015,27 +981,20 @@ public class ApplicationsApi  {
     @Valid
     @PUT
     @Path("/{applicationId}/inbound-protocols/ws-trust")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update WS Trust authentication protocol parameters of application ", notes = "This API provides the capability to store WS Trust authentication protocol parameters of an application. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>       * internal_application_mgt_update ", response = Void.class, authorizations = {
+    
+    
+    @ApiOperation(value = "Removed from API ", notes = "Update WS Trust authentication protocol parameters of application (Removed from API) ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Inbound Protocols - WS Trust" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful", response = Void.class),
-        @ApiResponse(code = 201, message = "Successful response.", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
     })
-    public Response updateWSTrustConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the Passive STS authentication protocol parameters of an application." ,required=true) @Valid WSTrustConfiguration wsTrustConfiguration) {
+    public Response updateWSTrustConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
-        return delegate.updateWSTrustConfiguration(applicationId,  wsTrustConfiguration );
+        return delegate.updateWSTrustConfiguration(applicationId );
     }
 
 }

@@ -29,12 +29,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
 import org.wso2.carbon.identity.api.server.common.Constants;
@@ -133,18 +131,22 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         return Response.ok(samlSp).build();
     }
 
+    /**
+     * Removed from the API.
+     */
     @Override
     public Response getPassiveStsConfiguration(String applicationId) {
 
-        PassiveStsConfiguration passiveStsApp = applicationManagementService.getPassiveStsConfiguration(applicationId);
-        return Response.ok(passiveStsApp).build();
+        return Response.status(Response.Status.GONE).build();
     }
 
+    /**
+     * Removed from the API.
+     */
     @Override
     public Response getWSTrustConfiguration(String applicationId) {
 
-        WSTrustConfiguration wsTrustConfiguration = applicationManagementService.getWSTrustConfiguration(applicationId);
-        return Response.ok(wsTrustConfiguration).build();
+        return Response.status(Response.Status.GONE).build();
     }
 
     @Override
@@ -169,18 +171,22 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
+    /**
+     * Removed from the API.
+     */
     @Override
     public Response deletePassiveStsConfiguration(String applicationId) {
 
-        applicationManagementService.deletePassiveStsInbound(applicationId);
-        return Response.status(Response.Status.NO_CONTENT).build();
+        return Response.status(Response.Status.GONE).build();
     }
 
+    /**
+     * Removed from the API.
+     */
     @Override
     public Response deleteWSTrustConfiguration(String applicationId) {
 
-        applicationManagementService.deleteWSTrustInbound(applicationId);
-        return Response.status(Response.Status.NO_CONTENT).build();
+        return Response.status(Response.Status.GONE).build();
     }
 
     @Override
@@ -279,19 +285,22 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         return Response.ok().build();
     }
 
+    /**
+     * Removed from the API.
+     */
     @Override
-    public Response updatePassiveStsConfiguration(String applicationId,
-                                                  PassiveStsConfiguration passiveStsConfiguration) {
+    public Response updatePassiveStsConfiguration(String applicationId) {
 
-        applicationManagementService.putInboundPassiveSTSConfiguration(applicationId, passiveStsConfiguration);
-        return Response.ok().build();
+        return Response.status(Response.Status.GONE).build();
     }
 
+    /**
+     * Removed from the API.
+     */
     @Override
-    public Response updateWSTrustConfiguration(String applicationId, WSTrustConfiguration wsTrustConfiguration) {
+    public Response updateWSTrustConfiguration(String applicationId) {
 
-        applicationManagementService.putInboundWSTrustConfiguration(applicationId, wsTrustConfiguration);
-        return Response.ok().build();
+        return Response.status(Response.Status.GONE).build();
     }
 
     @Override
@@ -318,10 +327,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         return Response.ok().entity(applicationMetadataService.getSAMLMetadata()).build();
     }
 
+    /**
+     * Removed from the API.
+     */
     @Override
     public Response getWSTrustMetadata() {
 
-        return Response.ok().entity(applicationMetadataService.getWSTrustMetadata()).build();
+        return Response.status(Response.Status.GONE).build();
     }
 
     @Override

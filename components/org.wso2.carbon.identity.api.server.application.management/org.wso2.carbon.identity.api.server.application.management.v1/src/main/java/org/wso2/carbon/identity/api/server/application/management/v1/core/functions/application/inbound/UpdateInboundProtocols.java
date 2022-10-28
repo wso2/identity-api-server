@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.rollbackInbounds;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundFunctions.createPassiveSTSInboundConfig;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundFunctions.createWsTrustInbound;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundFunctions.createCustomInbound;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundFunctions.createOAuthInbound;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundFunctions.createSAMLInbound;
@@ -55,9 +53,6 @@ public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, I
                 inbounds.add(createSAMLInbound(application, inboundProtocols.getSaml()));
             }
 
-            if (inboundProtocols.getWsTrust() != null) {
-                inbounds.add(createWsTrustInbound(inboundProtocols.getWsTrust()));
-            }
         } catch (APIError error) {
             if (log.isDebugEnabled()) {
                 log.debug("Error while adding inbound protocols for application id: "
@@ -66,10 +61,6 @@ public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, I
             }
             rollbackInbounds(inbounds);
             throw error;
-        }
-
-        if (inboundProtocols.getPassiveSts() != null) {
-            inbounds.add(createPassiveSTSInboundConfig(inboundProtocols.getPassiveSts()));
         }
 
         if (inboundProtocols.getCustom() != null) {
