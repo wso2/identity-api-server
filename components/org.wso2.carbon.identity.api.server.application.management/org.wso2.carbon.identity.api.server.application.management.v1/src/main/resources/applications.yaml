@@ -496,6 +496,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /applications/{applicationId}/authenticators:
+    get:
+      tags:
+        - Authenticators
+      summary: |
+        Get configured authenticators
+      operationId: getConfiguredAuthenticators
+      description: |
+        This API provides the capability to retrieve the configured authenticators.
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/applicationmgt/view <br>
+        <b>Scope required:</b> <br>
+            * internal_application_mgt_view
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConfiguredAuthenticatorsModal'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /applications/resident:
     get:
       tags:
@@ -2121,10 +2172,14 @@ components:
       name: filter
       required: false
       description: |
-        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations.
-        Currently supports only filtering based on the 'name' and the 'clientId' attribute.
+        Condition to filter the retrieval of records.
+        Supports 'sw', 'co', 'ew', and 'eq' operations with 'and', 'or' logical operators.
+        Please note that 'and' and 'or' operators in filters follow the general precedence of logical operators
+        ex: A and B or C and D = (A and B) or (C and D)).
+        Currently supports only filtering based on the 'name', the 'clientId', and the 'issuer' attributes.
 
         /applications?filter=name+eq+user_portal
+        <br>
         /applications?filter=name+co+prod+or+clientId+co+123
       schema:
         type: string
@@ -2436,6 +2491,29 @@ components:
         jit:
           type: boolean
           example: false
+    ConfiguredAuthenticatorsModal:
+      type: object
+      properties:
+        stepId:
+          type: integer
+          example: 1
+        localAuthenticators:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConfiguredAuthenticator'
+        federatedAuthenticators:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConfiguredAuthenticator'
+    ConfiguredAuthenticator:
+      type: object
+      properties:
+        name:
+          type: string
+          example: googleIdP
+        type:
+          type: string
+          example: GoogleAuthenticator
     AdvancedApplicationConfiguration:
       type: object
       properties:
