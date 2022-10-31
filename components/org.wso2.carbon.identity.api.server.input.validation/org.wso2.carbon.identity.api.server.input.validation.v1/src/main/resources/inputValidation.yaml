@@ -208,7 +208,7 @@ components:
         upperCaseValidator:
           $ref: '#/components/schemas/BasicValidatorModal'
         lowercaseValidator:
-          $ref: '#Error/components/schemas/BasicValidatorModal'
+          $ref: '#/components/schemas/BasicValidatorModal'
         repeatedCharactersValidator:
           $ref: '#/components/schemas/RepeatedCharactersValidatorModal'
         uniqueCharactersValidator:

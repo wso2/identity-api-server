@@ -45,8 +45,8 @@ public class ValidationManagementConstants {
                 "Unable to update input validation configurations.",
                 "Error while updating input validation configurations for organization: %s."),
         ERROR_CODE_ERROR_VALIDATING_PARAM("65003",
-                "Unable to update input validation configurations.",
-                "Error while updating input validation configurations for organization: %s.");
+                "Unable to validate against validation configurations.",
+                "Error while validating input against validation configurations for organization: %s.");
         private final String code;
         private final String message;
         private final String description;
