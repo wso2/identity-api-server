@@ -85,7 +85,7 @@ public class ValidationRulesApi  {
     }
 
     @Valid
-    @GET
+    @POST
     @Path("/validate")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })

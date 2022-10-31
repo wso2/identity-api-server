@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationM
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtException;
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtServerException;
 import org.wso2.carbon.identity.input.validation.mgt.model.*;
+import org.wso2.carbon.identity.input.validation.mgt.model.AdvancedConfiguration;
 
 import javax.ws.rs.core.Response;
 
@@ -70,6 +71,7 @@ public class ValidationRulesManagementApiService {
      */
     public ValidationConfigModal updateInputValidationConfiguration(ValidationConfigModal configuration,
                                                                     String tenantDomain) {
+
         InputValidationConfiguration validationDTO = buildRequestDTOFromValidationRequest(configuration);
         try {
             validationDTO = InputValidationServiceHolder.getInputValidationManager()
@@ -145,12 +147,19 @@ public class ValidationRulesManagementApiService {
         if(passwordRulesReq.getSpecialCharactersValidator() != null) {
             passwordRulesValidatorDTO.setSpecialCharacterValidator(buildLengthValidatorDTO(passwordRulesReq.getSpecialCharactersValidator()));
         }
-        if (passwordRulesReq.getRepeatedCharactersValidator() != null &&
-                passwordRulesReq.getRepeatedCharactersValidator().getEnabled() != null &&
-                passwordRulesReq.getRepeatedCharactersValidator().getEnabled() &&
-                passwordRulesReq.getRepeatedCharactersValidator().getMaxConsecutiveLength() != null) {
+        if (passwordRulesReq.getAdvancedConfiguration() == null) {
+            return passwordRulesValidatorDTO;
+        }
+        // Create advance configDTO
+        AdvancedConfigurationModal advancedConfigModal = passwordRulesReq.getAdvancedConfiguration();
+        AdvancedConfiguration advancedConfigDTO = new AdvancedConfiguration();
 
-            RepeatedCharactersValidatorModal repeatedChrValidator = passwordRulesReq.getRepeatedCharactersValidator();
+        if (advancedConfigModal.getRepeatedCharactersValidator() != null &&
+                advancedConfigModal.getRepeatedCharactersValidator().getEnabled() != null &&
+                advancedConfigModal.getRepeatedCharactersValidator().getEnabled() &&
+                advancedConfigModal.getRepeatedCharactersValidator().getMaxConsecutiveLength() != null) {
+
+            RepeatedCharactersValidatorModal repeatedChrValidator = advancedConfigModal.getRepeatedCharactersValidator();
             RepeatedCharacterValidator repeatedCharacterValidatorDTO = new RepeatedCharacterValidator();
             repeatedCharacterValidatorDTO.setEnable(true);
             repeatedCharacterValidatorDTO.setMaxConsecutiveLength(repeatedChrValidator.getMaxConsecutiveLength());
@@ -159,15 +168,16 @@ public class ValidationRulesManagementApiService {
                 caseSensitive = repeatedChrValidator.getCaseSensitive();
             }
             repeatedCharacterValidatorDTO.setCaseSensitive(caseSensitive);
-            passwordRulesValidatorDTO.setRepeatedCharacterValidator(repeatedCharacterValidatorDTO);
+            advancedConfigDTO.setRepeatedCharacterValidator(repeatedCharacterValidatorDTO);
+            passwordRulesValidatorDTO.setAdvancedConfiguration(advancedConfigDTO);
         }
 
-        if (passwordRulesReq.getUniqueCharactersValidator() != null &&
-                passwordRulesReq.getUniqueCharactersValidator().getEnabled() != null &&
-                passwordRulesReq.getUniqueCharactersValidator().getEnabled() &&
-                passwordRulesReq.getUniqueCharactersValidator().getMinUniqueCharacters()!= null) {
+        if (advancedConfigModal.getUniqueCharactersValidator() != null &&
+                advancedConfigModal.getUniqueCharactersValidator().getEnabled() != null &&
+                advancedConfigModal.getUniqueCharactersValidator().getEnabled() &&
+                advancedConfigModal.getUniqueCharactersValidator().getMinUniqueCharacters()!= null) {
 
-            UniqueCharactersValidatorModal uniqueChrValidatorReq = passwordRulesReq.getUniqueCharactersValidator();
+            UniqueCharactersValidatorModal uniqueChrValidatorReq = advancedConfigModal.getUniqueCharactersValidator();
             UniqueCharacterValidator uniqueChrValidatorDTO = new UniqueCharacterValidator();
             uniqueChrValidatorDTO.setEnable(true);
             uniqueChrValidatorDTO.setMinUniqueCharacter(uniqueChrValidatorReq.getMinUniqueCharacters());
@@ -176,7 +186,8 @@ public class ValidationRulesManagementApiService {
                 caseSensitive = uniqueChrValidatorReq.getCaseSensitive();
             }
             uniqueChrValidatorDTO.setCaseSensitive(caseSensitive);
-            passwordRulesValidatorDTO.setUniqueCharacterValidator(uniqueChrValidatorDTO);
+            advancedConfigDTO.setUniqueCharacterValidator(uniqueChrValidatorDTO);
+            passwordRulesValidatorDTO.setAdvancedConfiguration(advancedConfigDTO);
         }
 
         return passwordRulesValidatorDTO;
@@ -282,28 +293,38 @@ public class ValidationRulesManagementApiService {
             validationRulesModal.setSpecialCharactersValidator(buildBasicValidatorResponse(rulesValidator
                     .getSpecialCharacterValidator()));
         }
+        if (rulesValidator.getAdvancedConfiguration() == null) {
+            return validationRulesModal;
+        }
+
+        // Set advanced configurations.
+        AdvancedConfiguration advancedConfig = rulesValidator.getAdvancedConfiguration();
+        AdvancedConfigurationModal advancedConfigModal = new AdvancedConfigurationModal();
+
         // Set unique character validator.
-        if (rulesValidator.getUniqueCharacterValidator() != null) {
-            CharacterSequenceValidator uniqueChrValidator = rulesValidator.getUniqueCharacterValidator();
+        if (advancedConfig.getUniqueCharacterValidator() != null) {
+            CharacterSequenceValidator uniqueChrValidator = advancedConfig.getUniqueCharacterValidator();
             if (uniqueChrValidator.isEnable()) {
                 UniqueCharactersValidatorModal uniqueChrValidatorModal = new UniqueCharactersValidatorModal();
                 uniqueChrValidatorModal.setEnabled(true);
                 uniqueChrValidatorModal.setCaseSensitive(uniqueChrValidator.isCaseSensitive());
                 uniqueChrValidatorModal.setMinUniqueCharacters(
                         ((UniqueCharacterValidator)uniqueChrValidator).getMinUniqueCharacter());
-                validationRulesModal.setUniqueCharactersValidator(uniqueChrValidatorModal);
+                advancedConfigModal.setUniqueCharactersValidator(uniqueChrValidatorModal);
+                validationRulesModal.setAdvancedConfiguration(advancedConfigModal);
             }
         }
         // Set repeated character validator.
-        if (rulesValidator.getRepeatedCharacterValidator() != null) {
-            CharacterSequenceValidator repeatedChrValidator = rulesValidator.getRepeatedCharacterValidator();
+        if (advancedConfig.getRepeatedCharacterValidator() != null) {
+            CharacterSequenceValidator repeatedChrValidator = advancedConfig.getRepeatedCharacterValidator();
             if (repeatedChrValidator.isEnable()) {
                 RepeatedCharactersValidatorModal repeatedChrValidatorModal = new RepeatedCharactersValidatorModal();
                 repeatedChrValidatorModal.setEnabled(true);
                 repeatedChrValidatorModal.setCaseSensitive(repeatedChrValidator.isCaseSensitive());
                 repeatedChrValidatorModal.setMaxConsecutiveLength(
                         ((RepeatedCharacterValidator)repeatedChrValidator).getMaxConsecutiveLength());
-                validationRulesModal.setRepeatedCharactersValidator(repeatedChrValidatorModal);
+                advancedConfigModal.setRepeatedCharactersValidator(repeatedChrValidatorModal);
+                validationRulesModal.setAdvancedConfiguration(advancedConfigModal);
             }
         }
         return validationRulesModal;

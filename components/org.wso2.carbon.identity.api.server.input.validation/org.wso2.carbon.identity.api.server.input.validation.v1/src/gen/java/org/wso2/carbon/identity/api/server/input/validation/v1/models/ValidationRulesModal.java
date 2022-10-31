@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.AdvancedConfigurationModal;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.BasicValidatorModal;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.RepeatedCharactersValidatorModal;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.UniqueCharactersValidatorModal;
@@ -40,8 +41,7 @@ public class ValidationRulesModal  {
     private BasicValidatorModal numeralsValidator;
     private BasicValidatorModal upperCaseValidator;
     private BasicValidatorModal lowercaseValidator;
-    private RepeatedCharactersValidatorModal repeatedCharactersValidator;
-    private UniqueCharactersValidatorModal uniqueCharactersValidator;
+    private AdvancedConfigurationModal advancedConfiguration;
 
     /**
     **/
@@ -135,44 +135,26 @@ public class ValidationRulesModal  {
 
     /**
     **/
-    public ValidationRulesModal repeatedCharactersValidator(RepeatedCharactersValidatorModal repeatedCharactersValidator) {
+    public ValidationRulesModal advancedConfiguration(AdvancedConfigurationModal advancedConfiguration) {
 
-        this.repeatedCharactersValidator = repeatedCharactersValidator;
+        this.advancedConfiguration = advancedConfiguration;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("repeatedCharactersValidator")
+    @JsonProperty("advancedConfiguration")
     @Valid
-    public RepeatedCharactersValidatorModal getRepeatedCharactersValidator() {
-        return repeatedCharactersValidator;
+    public AdvancedConfigurationModal getAdvancedConfiguration() {
+        return advancedConfiguration;
     }
-    public void setRepeatedCharactersValidator(RepeatedCharactersValidatorModal repeatedCharactersValidator) {
-        this.repeatedCharactersValidator = repeatedCharactersValidator;
-    }
-
-    /**
-    **/
-    public ValidationRulesModal uniqueCharactersValidator(UniqueCharactersValidatorModal uniqueCharactersValidator) {
-
-        this.uniqueCharactersValidator = uniqueCharactersValidator;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("uniqueCharactersValidator")
-    @Valid
-    public UniqueCharactersValidatorModal getUniqueCharactersValidator() {
-        return uniqueCharactersValidator;
-    }
-    public void setUniqueCharactersValidator(UniqueCharactersValidatorModal uniqueCharactersValidator) {
-        this.uniqueCharactersValidator = uniqueCharactersValidator;
+    public void setAdvancedConfiguration(AdvancedConfigurationModal advancedConfiguration) {
+        this.advancedConfiguration = advancedConfiguration;
     }
 
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(java.lang.Object o) {
 
         if (this == o) {
             return true;
@@ -186,13 +168,12 @@ public class ValidationRulesModal  {
             Objects.equals(this.numeralsValidator, validationRulesModal.numeralsValidator) &&
             Objects.equals(this.upperCaseValidator, validationRulesModal.upperCaseValidator) &&
             Objects.equals(this.lowercaseValidator, validationRulesModal.lowercaseValidator) &&
-            Objects.equals(this.repeatedCharactersValidator, validationRulesModal.repeatedCharactersValidator) &&
-            Objects.equals(this.uniqueCharactersValidator, validationRulesModal.uniqueCharactersValidator);
+            Objects.equals(this.advancedConfiguration, validationRulesModal.advancedConfiguration);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(lengthValidator, specialCharactersValidator, numeralsValidator, upperCaseValidator, lowercaseValidator, repeatedCharactersValidator, uniqueCharactersValidator);
+        return Objects.hash(lengthValidator, specialCharactersValidator, numeralsValidator, upperCaseValidator, lowercaseValidator, advancedConfiguration);
     }
 
     @Override
@@ -206,8 +187,7 @@ public class ValidationRulesModal  {
         sb.append("    numeralsValidator: ").append(toIndentedString(numeralsValidator)).append("\n");
         sb.append("    upperCaseValidator: ").append(toIndentedString(upperCaseValidator)).append("\n");
         sb.append("    lowercaseValidator: ").append(toIndentedString(lowercaseValidator)).append("\n");
-        sb.append("    repeatedCharactersValidator: ").append(toIndentedString(repeatedCharactersValidator)).append("\n");
-        sb.append("    uniqueCharactersValidator: ").append(toIndentedString(uniqueCharactersValidator)).append("\n");
+        sb.append("    advancedConfiguration: ").append(toIndentedString(advancedConfiguration)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -216,7 +196,7 @@ public class ValidationRulesModal  {
     * Convert the given object to string with each line indented by 4 spaces
     * (except the first line).
     */
-    private String toIndentedString(Object o) {
+    private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
             return "null";

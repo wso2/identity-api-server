@@ -19,8 +19,6 @@ servers:
     variables:
       server-url:
         default: "localhost:9443"
-security:
-  - bearerAuth: []
 paths:
   /validation-rules:
     get:
@@ -118,7 +116,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
   /validation-rules/validate:
-    get:
+    post:
       tags:
         - Validate input value
       operationId: validateValues
@@ -209,6 +207,11 @@ components:
           $ref: '#/components/schemas/BasicValidatorModal'
         lowercaseValidator:
           $ref: '#/components/schemas/BasicValidatorModal'
+        advancedConfiguration:
+          $ref: '#/components/schemas/AdvancedConfigurationModal'
+    AdvancedConfigurationModal:
+      type: object
+      properties:
         repeatedCharactersValidator:
           $ref: '#/components/schemas/RepeatedCharactersValidatorModal'
         uniqueCharactersValidator:
