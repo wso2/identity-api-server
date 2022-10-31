@@ -2991,7 +2991,6 @@ components:
           type: array
           example:
             - 'http://idp.xyz.com'
-            - 'http://idp.abc.com'
           items:
             type: string
         userAccessTokenExpiryInSeconds:
