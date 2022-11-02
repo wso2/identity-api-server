@@ -520,7 +520,7 @@
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
         <maven.bundle.plugin.version>2.4.0</maven.bundle.plugin.version>
         <jackson-jaxrs-json-provider.version>2.13.2</jackson-jaxrs-json-provider.version>
-        <jackson-databind.version>2.14.0-rc2</jackson-databind.version>
+        <jackson-databind.version>2.13.4.2</jackson-databind.version>
         <cxf-bundle.version>3.5.0</cxf-bundle.version>
         <cxf.extensions.search.version>3.3.1</cxf.extensions.search.version>
         <jackson.version>1.9.13</jackson.version>
