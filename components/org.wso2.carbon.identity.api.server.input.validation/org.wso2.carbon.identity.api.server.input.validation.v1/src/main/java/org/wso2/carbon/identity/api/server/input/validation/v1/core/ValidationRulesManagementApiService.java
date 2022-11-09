@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.input.validation.v1.core;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,15 +24,17 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.input.validation.common.InputValidationServiceHolder;
 import org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.Mapping;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.PropertyModel;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.RuleModel;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidatorModel;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.*;
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtClientException;
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtException;
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtServerException;
-import org.wso2.carbon.identity.input.validation.mgt.model.*;
+import org.wso2.carbon.identity.input.validation.mgt.model.RulesConfiguration;
+import org.wso2.carbon.identity.input.validation.mgt.model.ValidationConfiguration;
+import org.wso2.carbon.identity.input.validation.mgt.model.ValidationContext;
+import org.wso2.carbon.identity.input.validation.mgt.model.Validator;
+import org.wso2.carbon.identity.input.validation.mgt.model.ValidatorConfiguration;
+import org.wso2.carbon.identity.input.validation.mgt.model.validators.AbstractRegExValidator;
+import org.wso2.carbon.identity.input.validation.mgt.model.validators.AbstractRulesValidator;
 
 import javax.ws.rs.core.Response;
 
@@ -41,9 +44,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.Utils.getCorrelation;
-import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.*;
+import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS;
+import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG;
+import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_VALIDATORS;
+import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.INPUT_VALIDATION_ERROR_PREFIX;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.INPUT_VALIDATION_MGT_ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX;
+import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_VALIDATION_PARAM_NOT_SUPPORTED;
+import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_VALIDATOR_NOT_SUPPORTED;
+import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.SUPPORTED_PARAMS;
 
 /**
  * Calls internal osgi services to perform input validation management related operations.
@@ -65,6 +75,12 @@ public class ValidationRulesManagementApiService {
                     .getInputValidationConfiguration(tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
+            if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find a validation configurations for tenant: " +
+                            tenantDomain, e);
+                }
+            }
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG, tenantDomain);
         }
     }
@@ -75,15 +91,19 @@ public class ValidationRulesManagementApiService {
      * @param validationConfigModel Validation Configuration Model.
      * @param tenantDomain          Tenant domain name.
      */
-    public List<ValidationConfigModel> updateInputValidationConfiguration(List<ValidationConfigModel> validationConfigModel,
-                                                   String tenantDomain) {
+    public List<ValidationConfigModel> updateInputValidationConfiguration(
+            List<ValidationConfigModel> validationConfigModel, String tenantDomain) {
 
         try {
             List<ValidationConfiguration> requestDTO = buildRequestDTOFromValidationRequest(validationConfigModel);
+            validateProperties(requestDTO, tenantDomain);
             List<ValidationConfiguration> configurations = InputValidationServiceHolder.getInputValidationMgtService()
                     .updateInputValidationConfiguration(requestDTO, tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to update validation configuration for tenant: " + tenantDomain, e);
+            }
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG, tenantDomain);
         }
     }
@@ -95,36 +115,34 @@ public class ValidationRulesManagementApiService {
      */
     public List<ValidatorModel> getValidators(String tenantDomain) {
 
+        List<ValidatorConfiguration> validators;
         try {
-            List<ValidatorConfiguration> validators = InputValidationServiceHolder.getInputValidationMgtService()
-                    .getValidators(tenantDomain);
-            return buildValidationResponse(validators);
+            validators = InputValidationServiceHolder.getInputValidationMgtService()
+                    .getValidatorConfigurations(tenantDomain);
+            return buildValidatorResponse(validators);
         } catch (InputValidationMgtException e) {
-            throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG, tenantDomain);
+            if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find a validator configurations for tenant: " +
+                            tenantDomain, e);
+                }
+            }
+            throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_GETTING_VALIDATORS, tenantDomain);
         }
     }
 
-    private List<ValidatorModel> buildValidationResponse(List<ValidatorConfiguration> validators) {
+    /**
+     * Method to build validator response object.
+     *
+     * @param validators    List of validator configurations.
+     * @return  Response object of validators.
+     */
+    private List<ValidatorModel> buildValidatorResponse(List<ValidatorConfiguration> validators) {
 
         List<ValidatorModel> response = new ArrayList<>();
         for (ValidatorConfiguration configuration : validators) {
-            ValidatorModel validator = new ValidatorModel();
-            validator.setName(configuration.getName());
-            validator.setType(configuration.getType());
-
-            List<Property> propertiesConfig = configuration.getProperties();
-            List<PropertyModel> properties = new ArrayList<>();
-            for (Property property : propertiesConfig) {
-                PropertyModel model = new PropertyModel();
-                model.setName(property.getName());
-                model.setDescription(property.getDescription());
-                model.setDisplayName(property.getDisplayName());
-                model.setType(property.getType());
-                model.setDisplayOrder(property.getDisplayOrder());
-
-                properties.add(model);
-            }
-            validator.setProperties(properties);
+            ObjectMapper mapper = new ObjectMapper();
+            ValidatorModel validator = mapper.convertValue(configuration, ValidatorModel.class);
             response.add(validator);
         }
         return response;
@@ -142,18 +160,20 @@ public class ValidationRulesManagementApiService {
 
         List<ValidationConfiguration> requestDTO = new ArrayList<>();
         for (ValidationConfigModel configModel: validationConfigModels) {
-            ValidationConfiguration configurationDTO = new ValidationConfiguration();
-
-            configurationDTO.setField(configModel.getField());
-
             // Ensure the validation configuration is configured with either rules or regex.
             if ((configModel.getRules() != null && configModel.getRegEx() != null) ||
                     (configModel.getRules() == null && configModel.getRegEx() == null)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not configure validation with both rules and regex empty " +
+                            "or available.");
+                }
                 throw new InputValidationMgtClientException(ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX.getCode(),
                         ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX.getMessage(),
                         ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX.getDescription());
             }
 
+            ValidationConfiguration configurationDTO = new ValidationConfiguration();
+            configurationDTO.setField(configModel.getField());
             if (configModel.getRules() != null) {
                 configurationDTO.setRules(buildRulesDTO(configModel.getRules()));
             }
@@ -175,7 +195,7 @@ public class ValidationRulesManagementApiService {
 
             Map<String, String> rulesMap =
                     rule.getProperties().stream()
-                            .collect(Collectors.toMap(Mapping::getKey, Mapping::getValue));
+                            .collect(Collectors.toMap(MappingModel::getKey, MappingModel::getValue));
             ruleDTO.setProperties(rulesMap);
             rulesDTO.add(ruleDTO);
         }
@@ -185,7 +205,8 @@ public class ValidationRulesManagementApiService {
     /**
      * Method to build response.
      *
-     * @param configurations@return ValidationConfigModal.
+     * @param configurations    Configurations.
+     * @return ValidationConfigModal.
      */
     private List<ValidationConfigModel> buildResponse(List<ValidationConfiguration> configurations) {
 
@@ -203,16 +224,21 @@ public class ValidationRulesManagementApiService {
             }
             response.add(configModel);
         }
-
         return response;
     }
 
+    /**
+     * Method to build rules model.
+     *
+     * @param rulesConfigurations   Rule configurations.
+     * @return  List of rules.
+     */
     private List<RuleModel> buildRulesModel(List<RulesConfiguration> rulesConfigurations) {
 
         List<RuleModel> rules = new ArrayList<>();
         for (RulesConfiguration ruleConfig: rulesConfigurations) {
 
-            List<Mapping> properties =
+            List<MappingModel> properties =
                     ruleConfig.getProperties().entrySet().stream()
                             .filter(property -> property.getValue() != null && !"null".equals(property.getValue()))
                             .map(this::getMapping)
@@ -224,12 +250,76 @@ public class ValidationRulesManagementApiService {
         }
         return rules;
     }
-    private Mapping getMapping(Map.Entry entry) {
 
-        Mapping mapping = new Mapping();
+    /**
+     * Method to get mapping.
+     *
+     * @param entry Entry with mapping details.
+     * @return  Mapping of property and value.
+     */
+    private MappingModel getMapping(Map.Entry entry) {
+
+        MappingModel mapping = new MappingModel();
         mapping.setKey((String) entry.getKey());
         mapping.setValue((String) entry.getValue());
         return mapping;
+    }
+
+    /**
+     * Method to validate properties.
+     *
+     * @param configurations    Validation configuration.
+     * @param tenantDomain      Tenant domain name.
+     * @throws InputValidationMgtClientException If an error occurred when validating configurations.
+     */
+    private void validateProperties(List<ValidationConfiguration> configurations, String tenantDomain)
+            throws InputValidationMgtClientException {
+
+        for (ValidationConfiguration config: configurations) {
+            if (!SUPPORTED_PARAMS.contains(config.getField())) {
+                throw new InputValidationMgtClientException(ERROR_VALIDATION_PARAM_NOT_SUPPORTED.getCode(),
+                        String.format(ERROR_VALIDATION_PARAM_NOT_SUPPORTED.getDescription(), config.getField(), tenantDomain));
+            }
+            boolean isRules = false;
+            List<RulesConfiguration> rules = new ArrayList<>();
+            if (config.getRules() != null) {
+                isRules = true;
+                rules = config.getRules();
+            } else if (config.getRegEx() != null) {
+                rules = config.getRegEx();
+            }
+            validateProperties(isRules, rules, tenantDomain);
+        }
+    }
+
+    /**
+     * Method to validate rules configuration.
+     *
+     * @param isRules       Type of validation.
+     * @param rules         List of rule configs.
+     * @param tenantDomain  Tenant domain name.
+     * @throws InputValidationMgtClientException If an error occurred when validating rules.
+     */
+    private void validateProperties(boolean isRules, List<RulesConfiguration> rules, String tenantDomain)
+            throws InputValidationMgtClientException {
+
+        Map<String, Validator> allValidators = InputValidationServiceHolder.getInputValidationMgtService()
+                .getValidators(tenantDomain);
+        ValidationContext context;
+        for (RulesConfiguration rule: rules) {
+            Validator validator = allValidators.get(rule.getValidator());
+            if ((isRules && validator instanceof AbstractRulesValidator && validator.canHandle(rule.getValidator()))
+                    || (!isRules && validator instanceof AbstractRegExValidator &&
+                    validator.canHandle(rule.getValidator()))) {
+
+                context = new ValidationContext("field", tenantDomain, rule.getProperties(), null);
+                validator.validateProps(context);
+            } else {
+                throw new InputValidationMgtClientException(ERROR_VALIDATOR_NOT_SUPPORTED.getCode(),
+                        String.format(ERROR_VALIDATOR_NOT_SUPPORTED.getDescription(), rule.getValidator(),
+                                isRules ? "rules" : "regex"));
+            }
+        }
     }
 
     /**

@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.Mapping;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.MappingModel;
 import javax.validation.constraints.*;
 
 
@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.*;
 public class RuleModel  {
   
     private String validator;
-    private List<Mapping> properties = new ArrayList<>();
+    private List<MappingModel> properties = new ArrayList<>();
 
 
     /**
@@ -61,25 +61,25 @@ public class RuleModel  {
 
     /**
     **/
-    public RuleModel properties(List<Mapping> properties) {
+    public RuleModel properties(List<MappingModel> properties) {
 
         this.properties = properties;
         return this;
     }
     
-    @ApiModelProperty(example = "[{\"key\":\"min.length\",\"value\":5},{\"key\":\"max.length\",\"value\":15}]", required = true, value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("properties")
     @Valid
     @NotNull(message = "Property properties cannot be null.")
 
-    public List<Mapping> getProperties() {
+    public List<MappingModel> getProperties() {
         return properties;
     }
-    public void setProperties(List<Mapping> properties) {
+    public void setProperties(List<MappingModel> properties) {
         this.properties = properties;
     }
 
-    public RuleModel addPropertiesItem(Mapping propertiesItem) {
+    public RuleModel addPropertiesItem(MappingModel propertiesItem) {
         this.properties.add(propertiesItem);
         return this;
     }

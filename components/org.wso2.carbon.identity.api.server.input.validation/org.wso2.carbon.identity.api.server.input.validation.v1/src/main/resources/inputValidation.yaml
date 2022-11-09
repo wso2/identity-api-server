@@ -47,6 +47,25 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ValidationConfiguration'
+            examples:
+              Rules:
+                value:
+                  - field: password
+                    rules:
+                      - validator: LengthValidator
+                        properties:
+                          - key: min.length
+                            value: 5
+                          - key: max.length
+                            value: 15
+              Regex:
+                value:
+                  - field: password
+                    regEx:
+                      - validator: JavaRegExValidator
+                        properties:
+                          - key: java.regex
+                            value: (?=.*[A-Z])
         description: Represents the password validation criteria.
         required: true
       responses:
@@ -90,8 +109,12 @@ components:
       properties:
         name:
           type: string
+          example: LengthValidator
         type:
           type: string
+          enum:
+            - RULE
+            - REGEX
         properties:
           type: array
           items:
@@ -101,14 +124,19 @@ components:
       properties:
         name:
           type: string
+          example: min.length
         description:
           type: string
+          example: Minimum length required
         displayName:
           type: string
+          example: Minimum limit
         type:
           type: string
+          example: int
         displayOrder:
-          type: int
+          type: integer
+          example: 1
     ValidationConfiguration:
       type: array
       items:
@@ -141,13 +169,8 @@ components:
         properties:
           type: array
           items:
-            $ref: '#/components/schemas/Mapping'
-          example:
-            - key: min.length
-              value: 5
-            - key: max.length
-              value: 15
-    Mapping:
+            $ref: '#/components/schemas/MappingModel'
+    MappingModel:
       type: object
       required:
         - key
@@ -195,3 +218,23 @@ components:
         'application/json':
           schema:
             $ref: '#/components/schemas/ValidationConfiguration'
+          examples:
+            Rules:
+              value:
+                - field: password
+                  rules:
+                    - validator: LengthValidator
+                      properties:
+                        - key: min.length
+                          value: 5
+                        - key: max.length
+                          value: 15
+            Regex:
+              value:
+                - field: password
+                  regEx:
+                    - validator: JavaRegExValidator
+                      properties:
+                        - key: java.regex
+                          value: (?=.*[A-Z])
+

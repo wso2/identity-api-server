@@ -36,9 +36,6 @@ public class ValidationManagementConstants {
         ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS("60001",
                 "Validation configurations are not configured.",
                 "Validation configurations are not configured for organization: %s."),
-        ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX("60002",
-                "Invalid configuration format",
-                "Validation configurations can be configured with one of them: rules or regex."),
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG("65001",
                 "Error while getting input validation configurations.",
@@ -47,7 +44,7 @@ public class ValidationManagementConstants {
                 "Unable to update input validation configurations.",
                 "Error while updating input validation configurations for organization: %s."),
         ERROR_CODE_ERROR_GETTING_VALIDATORS("65003",
-                "Unable to retrieve exisitng validators.",
+                "Unable to retrieve existing validators.",
                 "Error while retrieving validators for organization: %s.");
         private final String code;
         private final String message;

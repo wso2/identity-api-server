@@ -30,14 +30,14 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class Mapping  {
+public class MappingModel  {
   
     private String key;
     private String value;
 
     /**
     **/
-    public Mapping key(String key) {
+    public MappingModel key(String key) {
 
         this.key = key;
         return this;
@@ -57,7 +57,7 @@ public class Mapping  {
 
     /**
     **/
-    public Mapping value(String value) {
+    public MappingModel value(String value) {
 
         this.value = value;
         return this;
@@ -86,9 +86,9 @@ public class Mapping  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Mapping mapping = (Mapping) o;
-        return Objects.equals(this.key, mapping.key) &&
-            Objects.equals(this.value, mapping.value);
+        MappingModel mappingModel = (MappingModel) o;
+        return Objects.equals(this.key, mappingModel.key) &&
+            Objects.equals(this.value, mappingModel.value);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class Mapping  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class Mapping {\n");
+        sb.append("class MappingModel {\n");
         
         sb.append("    key: ").append(toIndentedString(key)).append("\n");
         sb.append("    value: ").append(toIndentedString(value)).append("\n");

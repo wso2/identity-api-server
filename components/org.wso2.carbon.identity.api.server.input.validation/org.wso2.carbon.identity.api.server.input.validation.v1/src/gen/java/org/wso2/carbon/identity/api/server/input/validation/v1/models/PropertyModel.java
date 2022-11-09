@@ -36,7 +36,7 @@ public class PropertyModel  {
     private String description;
     private String displayName;
     private String type;
-    private Integer displayOrder = null;
+    private Integer displayOrder;
 
     /**
     **/
@@ -46,7 +46,7 @@ public class PropertyModel  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "min.length", value = "")
     @JsonProperty("name")
     @Valid
     public String getName() {
@@ -64,7 +64,7 @@ public class PropertyModel  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "Minimum length required", value = "")
     @JsonProperty("description")
     @Valid
     public String getDescription() {
@@ -82,7 +82,7 @@ public class PropertyModel  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "Minimum limit", value = "")
     @JsonProperty("displayName")
     @Valid
     public String getDisplayName() {
@@ -100,7 +100,7 @@ public class PropertyModel  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "int", value = "")
     @JsonProperty("type")
     @Valid
     public String getType() {
@@ -118,7 +118,7 @@ public class PropertyModel  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "1", value = "")
     @JsonProperty("displayOrder")
     @Valid
     public Integer getDisplayOrder() {

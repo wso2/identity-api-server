@@ -36,7 +36,40 @@ import javax.xml.bind.annotation.*;
 public class ValidatorModel  {
   
     private String name;
-    private String type;
+
+@XmlType(name="TypeEnum")
+@XmlEnum(String.class)
+public enum TypeEnum {
+
+    @XmlEnumValue("RULE") RULE(String.valueOf("RULE")), @XmlEnumValue("REGEX") REGEX(String.valueOf("REGEX"));
+
+
+    private String value;
+
+    TypeEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static TypeEnum fromValue(String value) {
+        for (TypeEnum b : TypeEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private TypeEnum type;
     private List<PropertyModel> properties = null;
 
 
@@ -48,7 +81,7 @@ public class ValidatorModel  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "LengthValidator", value = "")
     @JsonProperty("name")
     @Valid
     public String getName() {
@@ -60,7 +93,7 @@ public class ValidatorModel  {
 
     /**
     **/
-    public ValidatorModel type(String type) {
+    public ValidatorModel type(TypeEnum type) {
 
         this.type = type;
         return this;
@@ -69,10 +102,10 @@ public class ValidatorModel  {
     @ApiModelProperty(value = "")
     @JsonProperty("type")
     @Valid
-    public String getType() {
+    public TypeEnum getType() {
         return type;
     }
-    public void setType(String type) {
+    public void setType(TypeEnum type) {
         this.type = type;
     }
 
