@@ -25,8 +25,9 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.Error;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidateRequest;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModal;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidatorModel;
 import org.wso2.carbon.identity.api.server.input.validation.v1.ValidationRulesApiService;
 
 import javax.validation.Valid;
@@ -49,19 +50,35 @@ public class ValidationRulesApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get input validation Rules ", notes = "Get input validation configurations. ", response = ValidationConfigModal.class, tags={ "Input Validations Rules", })
+    @ApiOperation(value = "", notes = "Get validation rules for user inputs", response = ValidationConfigModel.class, responseContainer = "List", tags={ "Get Validation Rules", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ValidationConfigModal.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 200, message = "Configurations successfully updated.", response = ValidationConfigModel.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class),
-        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
+        @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getValidationConfiguration() {
+    public Response getValidationRules() {
 
-        return delegate.getValidationConfiguration();
+        return delegate.getValidationRules();
+    }
+
+    @Valid
+    @GET
+    @Path("/validators")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "", notes = "Get all validators", response = ValidatorModel.class, responseContainer = "List", tags={ "Get all validators", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Configurations successfully updated.", response = ValidatorModel.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public Response getValidators() {
+
+        return delegate.getValidators();
     }
 
     @Valid
@@ -69,39 +86,17 @@ public class ValidationRulesApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update Input Validation Rules ", notes = "This API provides the capability to update the input validation rules.<br> ", response = Void.class, tags={ "Input Validations Rules", })
+    @ApiOperation(value = "", notes = "Update validation rules for user inputs", response = ValidationConfigModel.class, responseContainer = "List", tags={ "Update Validation Rules" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "Successful response.", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 200, message = "Configurations successfully updated.", response = ValidationConfigModel.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class),
-        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
+        @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response updateInputValidationConfiguration(@ApiParam(value = "This represents the input validation rules." ,required=true) @Valid ValidationConfigModal validationConfigModal) {
+    public Response updateValidationRules(@ApiParam(value = "Represents the password validation criteria." ,required=true) @Valid List<ValidationConfigModel> validationConfigModel) {
 
-        return delegate.updateInputValidationConfiguration(validationConfigModal );
-    }
-
-    @Valid
-    @POST
-    @Path("/validate")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Validate user input values ", notes = "", response = Void.class, tags={ "Validate input value" })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = Void.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class),
-        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
-    })
-    public Response validateValues(@ApiParam(value = "This represents the input validation rules." ,required=true) @Valid ValidateRequest validateRequest) {
-
-        return delegate.validateValues(validateRequest );
+        return delegate.updateValidationRules(validationConfigModel );
     }
 
 }

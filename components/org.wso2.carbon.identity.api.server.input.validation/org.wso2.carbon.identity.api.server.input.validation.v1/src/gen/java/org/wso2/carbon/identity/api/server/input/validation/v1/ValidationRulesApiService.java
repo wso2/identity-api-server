@@ -18,32 +18,24 @@
 
 package org.wso2.carbon.identity.api.server.input.validation.v1;
 
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidateRequest;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModal;
+import org.wso2.carbon.identity.api.server.input.validation.v1.*;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.*;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.Error;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidatorModel;
 import javax.ws.rs.core.Response;
+
 
 public interface ValidationRulesApiService {
 
-      /**
-       * Method to get validation configuration.
-       *
-       * @return  Validation Configuration.
-       */
-      public Response getValidationConfiguration();
+      public Response getValidationRules();
 
-      /**
-       * Method to update validation configuration.
-       *
-       * @param validationConfigModal    Validation configuration.
-       * @return  Validation Configuration.
-       */
-      public Response updateInputValidationConfiguration(ValidationConfigModal validationConfigModal);
+      public Response getValidators();
 
-      /**
-       * Method to validate inputs.
-       *
-       * @param validateRequest     Validation request with value.
-       * @return  Status of validity.
-       */
-      public Response validateValues(ValidateRequest validateRequest);
+      public Response updateValidationRules(List<ValidationConfigModel> validationConfigModel);
 }

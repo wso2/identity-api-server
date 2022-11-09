@@ -20,15 +20,15 @@ package org.wso2.carbon.identity.api.server.input.validation.common.factory;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.input.validation.mgt.services.InputValidationManager;
+import org.wso2.carbon.identity.input.validation.mgt.services.InputValidationManagementService;
 
 /**
  * Factory Beans serve as a factory for creating other beans within the IOC container. This factory bean is used to
- * instantiate the InputValidationManager type of object inside the container.
+ * instantiate the InputValidationManagementService type of object inside the container.
  */
-public class InputValidationOSGiServiceFactory extends AbstractFactoryBean<InputValidationManager> {
+public class InputValidationOSGiServiceFactory extends AbstractFactoryBean<InputValidationManagementService> {
 
-    private InputValidationManager inputValidationManager;
+    private InputValidationManagementService inputValidationMgtService;
 
     @Override
     public Class<?> getObjectType() {
@@ -37,18 +37,19 @@ public class InputValidationOSGiServiceFactory extends AbstractFactoryBean<Input
     }
 
     @Override
-    protected InputValidationManager createInstance() throws Exception {
+    protected InputValidationManagementService createInstance() throws Exception {
 
-        if (this.inputValidationManager == null) {
-            InputValidationManager taskOperationService = (InputValidationManager) PrivilegedCarbonContext.
-                    getThreadLocalCarbonContext().getOSGiService(InputValidationManager.class, null);
+        if (this.inputValidationMgtService == null) {
+            InputValidationManagementService taskOperationService =
+                    (InputValidationManagementService) PrivilegedCarbonContext.
+                    getThreadLocalCarbonContext().getOSGiService(InputValidationManagementService.class, null);
 
             if (taskOperationService != null) {
-                this.inputValidationManager = taskOperationService;
+                this.inputValidationMgtService = taskOperationService;
             } else {
                 throw new Exception("Unable to retrieve ConfigurationManager service.");
             }
         }
-        return this.inputValidationManager;
+        return this.inputValidationMgtService;
     }
 }

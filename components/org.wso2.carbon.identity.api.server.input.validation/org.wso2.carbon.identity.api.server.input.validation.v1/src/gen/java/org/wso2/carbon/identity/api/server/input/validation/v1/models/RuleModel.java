@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.Mapping;
 import javax.validation.constraints.*;
 
 
@@ -30,51 +33,61 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class BasicValidatorModal  {
+public class RuleModel  {
   
-    private Integer min;
-    private Integer max;
+    private String validator;
+    private List<Mapping> properties = new ArrayList<>();
+
 
     /**
     **/
-    public BasicValidatorModal min(Integer min) {
+    public RuleModel validator(String validator) {
 
-        this.min = min;
+        this.validator = validator;
         return this;
     }
     
-    @ApiModelProperty(example = "1", value = "")
-    @JsonProperty("min")
+    @ApiModelProperty(example = "lengthValidator", required = true, value = "")
+    @JsonProperty("validator")
     @Valid
-    public Integer getMin() {
-        return min;
+    @NotNull(message = "Property validator cannot be null.")
+
+    public String getValidator() {
+        return validator;
     }
-    public void setMin(Integer min) {
-        this.min = min;
+    public void setValidator(String validator) {
+        this.validator = validator;
     }
 
     /**
     **/
-    public BasicValidatorModal max(Integer max) {
+    public RuleModel properties(List<Mapping> properties) {
 
-        this.max = max;
+        this.properties = properties;
         return this;
     }
     
-    @ApiModelProperty(example = "5", value = "")
-    @JsonProperty("max")
+    @ApiModelProperty(example = "[{\"key\":\"min.length\",\"value\":5},{\"key\":\"max.length\",\"value\":15}]", required = true, value = "")
+    @JsonProperty("properties")
     @Valid
-    public Integer getMax() {
-        return max;
+    @NotNull(message = "Property properties cannot be null.")
+
+    public List<Mapping> getProperties() {
+        return properties;
     }
-    public void setMax(Integer max) {
-        this.max = max;
+    public void setProperties(List<Mapping> properties) {
+        this.properties = properties;
     }
 
+    public RuleModel addPropertiesItem(Mapping propertiesItem) {
+        this.properties.add(propertiesItem);
+        return this;
+    }
 
+    
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(java.lang.Object o) {
 
         if (this == o) {
             return true;
@@ -82,24 +95,24 @@ public class BasicValidatorModal  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BasicValidatorModal basicValidatorModal = (BasicValidatorModal) o;
-        return Objects.equals(this.min, basicValidatorModal.min) &&
-            Objects.equals(this.max, basicValidatorModal.max);
+        RuleModel ruleModel = (RuleModel) o;
+        return Objects.equals(this.validator, ruleModel.validator) &&
+            Objects.equals(this.properties, ruleModel.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(min, max);
+        return Objects.hash(validator, properties);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class BasicValidatorModal {\n");
+        sb.append("class RuleModel {\n");
         
-        sb.append("    min: ").append(toIndentedString(min)).append("\n");
-        sb.append("    max: ").append(toIndentedString(max)).append("\n");
+        sb.append("    validator: ").append(toIndentedString(validator)).append("\n");
+        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -108,7 +121,7 @@ public class BasicValidatorModal  {
     * Convert the given object to string with each line indented by 4 spaces
     * (except the first line).
     */
-    private String toIndentedString(Object o) {
+    private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
             return "null";

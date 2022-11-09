@@ -23,239 +23,137 @@ paths:
   /validation-rules:
     get:
       tags:
-        - Input Validations Rules
-      operationId: getValidationConfiguration
-      summary: |
-        Get input validation Rules
-      description: |
-        Get input validation configurations.
+        - Get Validation Rules
+      description: Get validation rules for user inputs
+      operationId: getValidationRules
       responses:
         '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationConfigModal'
+          $ref: '#/components/responses/Success'
         '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/ServerError'
     put:
       tags:
-        - Input Validations Rules
-      summary: |
-        Update Input Validation Rules
-      operationId: updateInputValidationConfiguration
-      description: >
-        This API provides the capability to update the input validation rules.<br>
+        - Update Validation Rules
+      description: Update validation rules for user inputs
+      operationId: updateValidationRules
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ValidationConfigModal'
-        description: This represents the input validation rules.
-        required: true
-      responses:
-        '201':
-          description: Successful response.
-          headers:
-            Location:
-              description: This denotes the location of the newly-added rules.
-              schema:
-                type: string
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /validation-rules/validate:
-    post:
-      tags:
-        - Validate input value
-      operationId: validateValues
-      summary: |
-        Validate user input values
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ValidateRequest'
-        description: This represents the input validation rules.
+              $ref: '#/components/schemas/ValidationConfiguration'
+        description: Represents the password validation criteria.
         required: true
       responses:
         '200':
-          description: OK
+          $ref: '#/components/responses/Success'
         '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Server Error
+          $ref: '#/components/responses/ServerError'
+  /validation-rules/validators:
+    get:
+      tags:
+        - Get all validators
+      description: Get all validators
+      operationId: getValidators
+      responses:
+        '200':
+          description: Configurations successfully updated.
           content:
-            application/json:
+            'application/json':
               schema:
-                $ref: '#/components/schemas/Error'
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ValidatorModel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
 components:
-  securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
-    OAuth2:
-      type: oauth2
-      flows:
-        authorizationCode:
-          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
-          tokenUrl: 'http://localhost:9763/oauth2/token'
-          scopes: {}
   schemas:
-    ValidationConfigModal:
+    ValidatorModel:
       type: object
-      properties:
-        password:
-          $ref: '#/components/schemas/PasswordValidationModal'
-    PasswordValidationModal:
-      type: object
-      properties:
-        rules:
-          $ref: '#/components/schemas/ValidationRulesModal'
-        regEx:
-          $ref: '#/components/schemas/ValidationRegExModal'
-    ValidationRegExModal:
-      type: object
-      properties:
-        jsRegExValidator:
-          type: string
-          example: /^[a-zA-Z0-9!@#$%^&*]{6,16}$/
-        javaRegExValidator:
-          type: string
-          example: ^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{6, 16}$
-    ValidationRulesModal:
-      type: object
-      properties:
-        lengthValidator:
-          $ref: '#/components/schemas/BasicValidatorModal'
-        specialCharactersValidator:
-          $ref: '#/components/schemas/BasicValidatorModal'
-        numeralsValidator:
-          $ref: '#/components/schemas/BasicValidatorModal'
-        upperCaseValidator:
-          $ref: '#/components/schemas/BasicValidatorModal'
-        lowercaseValidator:
-          $ref: '#/components/schemas/BasicValidatorModal'
-        advancedConfiguration:
-          $ref: '#/components/schemas/AdvancedConfigurationModal'
-    AdvancedConfigurationModal:
-      type: object
-      properties:
-        repeatedCharactersValidator:
-          $ref: '#/components/schemas/RepeatedCharactersValidatorModal'
-        uniqueCharactersValidator:
-          $ref: '#/components/schemas/UniqueCharactersValidatorModal'
-    BasicValidatorModal:
-      type: object
-      properties:
-        min:
-          type: integer
-          example: 1
-        max:
-          type: integer
-          example: 5
-    RepeatedCharactersValidatorModal:
-      type: object
-      properties:
-        enabled:
-          type: boolean
-          example: true
-        case-sensitive:
-          type: boolean
-          example: true
-        max-consecutive-length:
-          type: integer
-          example: 1
-    UniqueCharactersValidatorModal:
-      type: object
-      properties:
-        enabled:
-          type: boolean
-          example: true
-        case-sensitive:
-          type: boolean
-          example: true
-        min-unique-characters:
-          type: integer
-          example: 5
-    ValidateRequest:
-      type: object
-      required:
-        - name
-        - value
       properties:
         name:
+          type: string
+        type:
+          type: string
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyModel'
+    PropertyModel:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        displayName:
+          type: string
+        type:
+          type: string
+        displayOrder:
+          type: int
+    ValidationConfiguration:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationConfigModel'
+    ValidationConfigModel:
+      type: object
+      required:
+        - field
+      properties:
+        field:
+          type: string
+          example: password
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleModel'
+        regEx:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleModel'
+    RuleModel:
+      type: object
+      required:
+        - validator
+        - properties
+      properties:
+        validator:
+          type: string
+          example: lengthValidator
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/Mapping'
+          example:
+            - key: min.length
+              value: 5
+            - key: max.length
+              value: 15
+    Mapping:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
           type: string
         value:
           type: string
@@ -296,4 +194,4 @@ components:
       content:
         'application/json':
           schema:
-            $ref: '#/components/schemas/ValidationConfigModal'
+            $ref: '#/components/schemas/ValidationConfiguration'

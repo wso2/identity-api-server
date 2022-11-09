@@ -23,14 +23,22 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.input.validation.common.InputValidationServiceHolder;
 import org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.*;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.Mapping;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.PropertyModel;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.RuleModel;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidatorModel;
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtClientException;
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtException;
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtServerException;
 import org.wso2.carbon.identity.input.validation.mgt.model.*;
-import org.wso2.carbon.identity.input.validation.mgt.model.AdvancedConfiguration;
 
 import javax.ws.rs.core.Response;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.Utils.getCorrelation;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.*;
@@ -50,13 +58,12 @@ public class ValidationRulesManagementApiService {
      * @param tenantDomain  Tenant Domain.
      * @return ValidationConfigModal.
      */
-    public ValidationConfigModal getValidationConfiguration(String tenantDomain) {
+    public List<ValidationConfigModel> getValidationConfiguration(String tenantDomain) {
 
-        InputValidationConfiguration validationDTO;
         try {
-            validationDTO = InputValidationServiceHolder.getInputValidationManager()
+            List<ValidationConfiguration> configurations = InputValidationServiceHolder.getInputValidationMgtService()
                     .getInputValidationConfiguration(tenantDomain);
-            return buildResponse(validationDTO);
+            return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG, tenantDomain);
         }
@@ -65,18 +72,17 @@ public class ValidationRulesManagementApiService {
     /**
      * Method to update input validation configuration.
      *
-     * @param configuration Input validation configuration.
-     * @param tenantDomain  Tenant domain.
-     * @return Validation configuration.
+     * @param validationConfigModel Validation Configuration Model.
+     * @param tenantDomain          Tenant domain name.
      */
-    public ValidationConfigModal updateInputValidationConfiguration(ValidationConfigModal configuration,
-                                                                    String tenantDomain) {
+    public List<ValidationConfigModel> updateInputValidationConfiguration(List<ValidationConfigModel> validationConfigModel,
+                                                   String tenantDomain) {
 
-        InputValidationConfiguration validationDTO = buildRequestDTOFromValidationRequest(configuration);
         try {
-            validationDTO = InputValidationServiceHolder.getInputValidationManager()
-                    .updateInputValidationConfiguration(validationDTO, tenantDomain);
-            return buildResponse(validationDTO);
+            List<ValidationConfiguration> requestDTO = buildRequestDTOFromValidationRequest(validationConfigModel);
+            List<ValidationConfiguration> configurations = InputValidationServiceHolder.getInputValidationMgtService()
+                    .updateInputValidationConfiguration(requestDTO, tenantDomain);
+            return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG, tenantDomain);
         }
@@ -85,264 +91,145 @@ public class ValidationRulesManagementApiService {
     /**
      * Method to validate input values.
      *
-     * @param validateRequest   Object contains the params to be validated.
      * @param tenantDomain      Tenant domain.
      */
-    public void validateValues(ValidateRequest validateRequest, String tenantDomain) {
+    public List<ValidatorModel> getValidators(String tenantDomain) {
 
-        ValidationParam param = new ValidationParam(validateRequest.getName(), validateRequest.getValue());
         try {
-            InputValidationServiceHolder.getInputValidationManager()
-                    .validateValues(tenantDomain, param);
+            List<ValidatorConfiguration> validators = InputValidationServiceHolder.getInputValidationMgtService()
+                    .getValidators(tenantDomain);
+            return buildValidationResponse(validators);
         } catch (InputValidationMgtException e) {
-            throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_VALIDATING_PARAM, tenantDomain);
+            throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG, tenantDomain);
         }
+    }
+
+    private List<ValidatorModel> buildValidationResponse(List<ValidatorConfiguration> validators) {
+
+        List<ValidatorModel> response = new ArrayList<>();
+        for (ValidatorConfiguration configuration : validators) {
+            ValidatorModel validator = new ValidatorModel();
+            validator.setName(configuration.getName());
+            validator.setType(configuration.getType());
+
+            List<Property> propertiesConfig = configuration.getProperties();
+            List<PropertyModel> properties = new ArrayList<>();
+            for (Property property : propertiesConfig) {
+                PropertyModel model = new PropertyModel();
+                model.setName(property.getName());
+                model.setDescription(property.getDescription());
+                model.setDisplayName(property.getDisplayName());
+                model.setType(property.getType());
+                model.setDisplayOrder(property.getDisplayOrder());
+
+                properties.add(model);
+            }
+            validator.setProperties(properties);
+            response.add(validator);
+        }
+        return response;
     }
 
     /**
      * Method to build RequestDTO from validation request.
      *
-     * @param configuration ValidationConfigModal.
-     * @return  inputValidationConfiguration.
+     * @param validationConfigModels    Validation configuration request.
+     * @return  list of validation configurations.
      */
-    private InputValidationConfiguration buildRequestDTOFromValidationRequest(ValidationConfigModal configuration) {
+    private List<ValidationConfiguration> buildRequestDTOFromValidationRequest(
+            List<ValidationConfigModel> validationConfigModels
+    ) throws InputValidationMgtClientException {
 
-        InputValidationConfiguration inputValidationConfiguration = new InputValidationConfiguration();
-        PasswordValidator passwordValidatorDTO = new PasswordValidator();
+        List<ValidationConfiguration> requestDTO = new ArrayList<>();
+        for (ValidationConfigModel configModel: validationConfigModels) {
+            ValidationConfiguration configurationDTO = new ValidationConfiguration();
 
-        PasswordValidationModal passwordConfigReq = configuration.getPassword();
-        if (passwordConfigReq.getRules() != null) {
-            passwordValidatorDTO.setRulesValidator(buildPasswordRulesDTO(passwordConfigReq.getRules()));
-        } else if (passwordConfigReq.getRegEx() != null) {
-            passwordValidatorDTO.setRegExValidator(buildRegExDTO(passwordConfigReq.getRegEx()));
-        }
+            configurationDTO.setField(configModel.getField());
 
-        inputValidationConfiguration.setPasswordValidator(passwordValidatorDTO);
-        return inputValidationConfiguration;
-    }
-
-    /**
-     * Method to build password rules DTO.
-     *
-     * @param passwordRulesReq  password rules request.
-     * @return RulesValidator.
-     */
-    private RulesValidator buildPasswordRulesDTO(ValidationRulesModal passwordRulesReq) {
-
-        RulesValidator passwordRulesValidatorDTO = new RulesValidator();
-        boolean caseSensitive = false;
-
-        if (passwordRulesReq.getLengthValidator() != null) {
-            passwordRulesValidatorDTO.setLengthValidator(buildLengthValidatorDTO(passwordRulesReq.getLengthValidator()));
-        }
-        if(passwordRulesReq.getLowercaseValidator() != null) {
-            passwordRulesValidatorDTO.setLowerCaseValidator(buildLengthValidatorDTO(passwordRulesReq.getLowercaseValidator()));
-        }
-        if(passwordRulesReq.getUpperCaseValidator() != null) {
-            passwordRulesValidatorDTO.setUpperCaseValidator(buildLengthValidatorDTO(passwordRulesReq.getUpperCaseValidator()));
-        }
-        if(passwordRulesReq.getNumeralsValidator() != null) {
-            passwordRulesValidatorDTO.setNumeralsValidator(buildLengthValidatorDTO(passwordRulesReq.getNumeralsValidator()));
-        }
-        if(passwordRulesReq.getSpecialCharactersValidator() != null) {
-            passwordRulesValidatorDTO.setSpecialCharacterValidator(buildLengthValidatorDTO(passwordRulesReq.getSpecialCharactersValidator()));
-        }
-        if (passwordRulesReq.getAdvancedConfiguration() == null) {
-            return passwordRulesValidatorDTO;
-        }
-        // Create advance configDTO
-        AdvancedConfigurationModal advancedConfigModal = passwordRulesReq.getAdvancedConfiguration();
-        AdvancedConfiguration advancedConfigDTO = new AdvancedConfiguration();
-
-        if (advancedConfigModal.getRepeatedCharactersValidator() != null &&
-                advancedConfigModal.getRepeatedCharactersValidator().getEnabled() != null &&
-                advancedConfigModal.getRepeatedCharactersValidator().getEnabled() &&
-                advancedConfigModal.getRepeatedCharactersValidator().getMaxConsecutiveLength() != null) {
-
-            RepeatedCharactersValidatorModal repeatedChrValidator = advancedConfigModal.getRepeatedCharactersValidator();
-            RepeatedCharacterValidator repeatedCharacterValidatorDTO = new RepeatedCharacterValidator();
-            repeatedCharacterValidatorDTO.setEnable(true);
-            repeatedCharacterValidatorDTO.setMaxConsecutiveLength(repeatedChrValidator.getMaxConsecutiveLength());
-
-            if (repeatedChrValidator.getCaseSensitive() != null) {
-                caseSensitive = repeatedChrValidator.getCaseSensitive();
+            // Ensure the validation configuration is configured with either rules or regex.
+            if ((configModel.getRules() != null && configModel.getRegEx() != null) ||
+                    (configModel.getRules() == null && configModel.getRegEx() == null)) {
+                throw new InputValidationMgtClientException(ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX.getCode(),
+                        ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX.getMessage(),
+                        ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX.getDescription());
             }
-            repeatedCharacterValidatorDTO.setCaseSensitive(caseSensitive);
-            advancedConfigDTO.setRepeatedCharacterValidator(repeatedCharacterValidatorDTO);
-            passwordRulesValidatorDTO.setAdvancedConfiguration(advancedConfigDTO);
-        }
 
-        if (advancedConfigModal.getUniqueCharactersValidator() != null &&
-                advancedConfigModal.getUniqueCharactersValidator().getEnabled() != null &&
-                advancedConfigModal.getUniqueCharactersValidator().getEnabled() &&
-                advancedConfigModal.getUniqueCharactersValidator().getMinUniqueCharacters()!= null) {
-
-            UniqueCharactersValidatorModal uniqueChrValidatorReq = advancedConfigModal.getUniqueCharactersValidator();
-            UniqueCharacterValidator uniqueChrValidatorDTO = new UniqueCharacterValidator();
-            uniqueChrValidatorDTO.setEnable(true);
-            uniqueChrValidatorDTO.setMinUniqueCharacter(uniqueChrValidatorReq.getMinUniqueCharacters());
-
-            if (uniqueChrValidatorReq.getCaseSensitive() != null) {
-                caseSensitive = uniqueChrValidatorReq.getCaseSensitive();
+            if (configModel.getRules() != null) {
+                configurationDTO.setRules(buildRulesDTO(configModel.getRules()));
             }
-            uniqueChrValidatorDTO.setCaseSensitive(caseSensitive);
-            advancedConfigDTO.setUniqueCharacterValidator(uniqueChrValidatorDTO);
-            passwordRulesValidatorDTO.setAdvancedConfiguration(advancedConfigDTO);
-        }
 
-        return passwordRulesValidatorDTO;
+            if (configModel.getRegEx() != null) {
+                configurationDTO.setRegEx(buildRulesDTO(configModel.getRegEx()));
+            }
+            requestDTO.add(configurationDTO);
+        }
+        return requestDTO;
     }
 
-    /**
-     * Method to build regEx DTO.
-     *
-     * @param requestRegEx  regex request object.
-     * @return RegExValidator.
-     */
-    private RegExValidator buildRegExDTO(ValidationRegExModal requestRegEx) {
+    private List<RulesConfiguration> buildRulesDTO(List<RuleModel> rules) {
 
-        RegExValidator regExValidatorDTO = new RegExValidator();
-        if (StringUtils.isNotEmpty(requestRegEx.getJavaRegExValidator())) {
-            regExValidatorDTO.setJavaRegExPattern(requestRegEx.getJavaRegExValidator());
-        }
-        if (StringUtils.isNotEmpty(requestRegEx.getJsRegExValidator())) {
-            regExValidatorDTO.setJsRegExPattern(requestRegEx.getJsRegExValidator());
-        }
+        List<RulesConfiguration> rulesDTO = new ArrayList<>();
+        for (RuleModel rule: rules) {
+            RulesConfiguration ruleDTO = new RulesConfiguration();
+            ruleDTO.setValidator(rule.getValidator());
 
-        return regExValidatorDTO;
-    }
-
-    /**
-     * Method to build length validator object.
-     *
-     * @param validatorRequest  Validator request object.
-     * @return DefaultValidator.
-     */
-    private DefaultValidator buildLengthValidatorDTO(BasicValidatorModal validatorRequest) {
-
-        DefaultValidator validator = new DefaultValidator();
-        if (validatorRequest.getMax() != null) {
-            validator.setMax(validatorRequest.getMax());
+            Map<String, String> rulesMap =
+                    rule.getProperties().stream()
+                            .collect(Collectors.toMap(Mapping::getKey, Mapping::getValue));
+            ruleDTO.setProperties(rulesMap);
+            rulesDTO.add(ruleDTO);
         }
-        if (validatorRequest.getMin() != null) {
-            validator.setMin(validatorRequest.getMin());
-        }
-        return validator;
+        return rulesDTO;
     }
 
     /**
      * Method to build response.
      *
-     * @param validationDTO InputValidationConfiguration.
-     * @return ValidationConfigModal.
+     * @param configurations@return ValidationConfigModal.
      */
-    private ValidationConfigModal buildResponse(InputValidationConfiguration validationDTO) {
+    private List<ValidationConfigModel> buildResponse(List<ValidationConfiguration> configurations) {
 
-        ValidationConfigModal response = new ValidationConfigModal();
-        PasswordValidationModal pswValModal = new PasswordValidationModal();
-        if (validationDTO.getPasswordValidator().getRulesValidator() != null) {
-            RulesValidator validatorDTO = validationDTO.getPasswordValidator().getRulesValidator();
-            pswValModal.setRules(buildPasswordRulesResponse(validatorDTO));
-        } else if (validationDTO.getPasswordValidator().getRegExValidator() != null) {
-            RegExValidator regexDTO = validationDTO.getPasswordValidator().getRegExValidator();
-            ValidationRegExModal passwordValidationModalRegEx = new ValidationRegExModal();
-            if (StringUtils.isNotEmpty(regexDTO.getJavaRegExPattern())) {
-                passwordValidationModalRegEx.setJavaRegExValidator(regexDTO.getJavaRegExPattern());
+        List<ValidationConfigModel> response = new ArrayList<>();
+
+        for (ValidationConfiguration configuration: configurations) {
+            ValidationConfigModel configModel = new ValidationConfigModel();
+            configModel.setField(configuration.getField());
+
+            if (configuration.getRules() != null) {
+                configModel.setRules(buildRulesModel(configuration.getRules()));
             }
-            if (StringUtils.isNotEmpty(regexDTO.getJsRegExPattern())) {
-                passwordValidationModalRegEx.setJsRegExValidator(regexDTO.getJsRegExPattern());
+            if (configModel.getRegEx() != null) {
+                configModel.setRules(buildRulesModel(configuration.getRegEx()));
             }
-            pswValModal.setRegEx(passwordValidationModalRegEx);
+            response.add(configModel);
         }
-        response.setPassword(pswValModal);
 
         return response;
     }
 
-    /**
-     * Method to build password rules response.
-     *
-     * @param rulesValidator    Rules validator.
-     * @return  ValidationRulesModal.
-     */
-    private ValidationRulesModal buildPasswordRulesResponse(RulesValidator rulesValidator) {
+    private List<RuleModel> buildRulesModel(List<RulesConfiguration> rulesConfigurations) {
 
-        ValidationRulesModal validationRulesModal = new ValidationRulesModal();
+        List<RuleModel> rules = new ArrayList<>();
+        for (RulesConfiguration ruleConfig: rulesConfigurations) {
 
-        // Set length Validator
-        if (rulesValidator.getLengthValidator() != null) {
-            validationRulesModal.setLengthValidator(buildBasicValidatorResponse(rulesValidator.getLengthValidator()));
+            List<Mapping> properties =
+                    ruleConfig.getProperties().entrySet().stream()
+                            .filter(property -> property.getValue() != null && !"null".equals(property.getValue()))
+                            .map(this::getMapping)
+                            .collect(Collectors.toList());
+            RuleModel rule = new RuleModel();
+            rule.setValidator(ruleConfig.getValidator());
+            rule.setProperties(properties);
+            rules.add(rule);
         }
-        // Set uppercase validator.
-        if (rulesValidator.getUpperCaseValidator() != null) {
-            validationRulesModal.setUpperCaseValidator(buildBasicValidatorResponse(rulesValidator
-                    .getUpperCaseValidator()));
-        }
-        // Set lowercase validator.
-        if (rulesValidator.getLowerCaseValidator() != null) {
-            validationRulesModal.setLowercaseValidator(buildBasicValidatorResponse(rulesValidator
-                    .getLowerCaseValidator()));
-        }
-        // Set numerals validator.
-        if (rulesValidator.getNumeralsValidator() != null) {
-            validationRulesModal.setNumeralsValidator(buildBasicValidatorResponse(rulesValidator
-                    .getNumeralsValidator()));
-        }
-        // Set special character validator.
-        if (rulesValidator.getSpecialCharacterValidator() != null) {
-            validationRulesModal.setSpecialCharactersValidator(buildBasicValidatorResponse(rulesValidator
-                    .getSpecialCharacterValidator()));
-        }
-        if (rulesValidator.getAdvancedConfiguration() == null) {
-            return validationRulesModal;
-        }
-
-        // Set advanced configurations.
-        AdvancedConfiguration advancedConfig = rulesValidator.getAdvancedConfiguration();
-        AdvancedConfigurationModal advancedConfigModal = new AdvancedConfigurationModal();
-
-        // Set unique character validator.
-        if (advancedConfig.getUniqueCharacterValidator() != null) {
-            CharacterSequenceValidator uniqueChrValidator = advancedConfig.getUniqueCharacterValidator();
-            if (uniqueChrValidator.isEnable()) {
-                UniqueCharactersValidatorModal uniqueChrValidatorModal = new UniqueCharactersValidatorModal();
-                uniqueChrValidatorModal.setEnabled(true);
-                uniqueChrValidatorModal.setCaseSensitive(uniqueChrValidator.isCaseSensitive());
-                uniqueChrValidatorModal.setMinUniqueCharacters(
-                        ((UniqueCharacterValidator)uniqueChrValidator).getMinUniqueCharacter());
-                advancedConfigModal.setUniqueCharactersValidator(uniqueChrValidatorModal);
-                validationRulesModal.setAdvancedConfiguration(advancedConfigModal);
-            }
-        }
-        // Set repeated character validator.
-        if (advancedConfig.getRepeatedCharacterValidator() != null) {
-            CharacterSequenceValidator repeatedChrValidator = advancedConfig.getRepeatedCharacterValidator();
-            if (repeatedChrValidator.isEnable()) {
-                RepeatedCharactersValidatorModal repeatedChrValidatorModal = new RepeatedCharactersValidatorModal();
-                repeatedChrValidatorModal.setEnabled(true);
-                repeatedChrValidatorModal.setCaseSensitive(repeatedChrValidator.isCaseSensitive());
-                repeatedChrValidatorModal.setMaxConsecutiveLength(
-                        ((RepeatedCharacterValidator)repeatedChrValidator).getMaxConsecutiveLength());
-                advancedConfigModal.setRepeatedCharactersValidator(repeatedChrValidatorModal);
-                validationRulesModal.setAdvancedConfiguration(advancedConfigModal);
-            }
-        }
-        return validationRulesModal;
+        return rules;
     }
+    private Mapping getMapping(Map.Entry entry) {
 
-    /**
-     * Method to build basic validation object.
-     *
-     * @param defaultValidator  DefaultValidator.
-     * @return BasicValidatorModal.
-     */
-    private BasicValidatorModal buildBasicValidatorResponse(DefaultValidator defaultValidator) {
-
-        BasicValidatorModal response = new BasicValidatorModal();
-        response.setMax(defaultValidator.getMax());
-        response.setMin(defaultValidator.getMin());
-
-        return response;
+        Mapping mapping = new Mapping();
+        mapping.setKey((String) entry.getKey());
+        mapping.setValue((String) entry.getValue());
+        return mapping;
     }
 
     /**

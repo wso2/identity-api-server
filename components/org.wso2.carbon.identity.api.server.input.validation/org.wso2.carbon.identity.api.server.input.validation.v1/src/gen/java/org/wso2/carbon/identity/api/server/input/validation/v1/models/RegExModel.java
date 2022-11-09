@@ -30,51 +30,51 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class ValidationRegExModal  {
+public class RegExModel  {
   
-    private String jsRegExValidator;
-    private String javaRegExValidator;
+    private String validator;
+    private String pattern;
 
     /**
     **/
-    public ValidationRegExModal jsRegExValidator(String jsRegExValidator) {
+    public RegExModel validator(String validator) {
 
-        this.jsRegExValidator = jsRegExValidator;
+        this.validator = validator;
         return this;
     }
     
-    @ApiModelProperty(example = "/^[a-zA-Z0-9!@#$%^&*]{6,16}$/", value = "")
-    @JsonProperty("jsRegExValidator")
+    @ApiModelProperty(example = "javaValidator", value = "")
+    @JsonProperty("validator")
     @Valid
-    public String getJsRegExValidator() {
-        return jsRegExValidator;
+    public String getValidator() {
+        return validator;
     }
-    public void setJsRegExValidator(String jsRegExValidator) {
-        this.jsRegExValidator = jsRegExValidator;
+    public void setValidator(String validator) {
+        this.validator = validator;
     }
 
     /**
     **/
-    public ValidationRegExModal javaRegExValidator(String javaRegExValidator) {
+    public RegExModel pattern(String pattern) {
 
-        this.javaRegExValidator = javaRegExValidator;
+        this.pattern = pattern;
         return this;
     }
     
-    @ApiModelProperty(example = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\\\S+$).{6, 16}$", value = "")
-    @JsonProperty("javaRegExValidator")
+    @ApiModelProperty(example = "*", value = "")
+    @JsonProperty("pattern")
     @Valid
-    public String getJavaRegExValidator() {
-        return javaRegExValidator;
+    public String getPattern() {
+        return pattern;
     }
-    public void setJavaRegExValidator(String javaRegExValidator) {
-        this.javaRegExValidator = javaRegExValidator;
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
     }
 
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(java.lang.Object o) {
 
         if (this == o) {
             return true;
@@ -82,24 +82,24 @@ public class ValidationRegExModal  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ValidationRegExModal validationRegExModal = (ValidationRegExModal) o;
-        return Objects.equals(this.jsRegExValidator, validationRegExModal.jsRegExValidator) &&
-            Objects.equals(this.javaRegExValidator, validationRegExModal.javaRegExValidator);
+        RegExModel regExModel = (RegExModel) o;
+        return Objects.equals(this.validator, regExModel.validator) &&
+            Objects.equals(this.pattern, regExModel.pattern);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(jsRegExValidator, javaRegExValidator);
+        return Objects.hash(validator, pattern);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ValidationRegExModal {\n");
+        sb.append("class RegExModel {\n");
         
-        sb.append("    jsRegExValidator: ").append(toIndentedString(jsRegExValidator)).append("\n");
-        sb.append("    javaRegExValidator: ").append(toIndentedString(javaRegExValidator)).append("\n");
+        sb.append("    validator: ").append(toIndentedString(validator)).append("\n");
+        sb.append("    pattern: ").append(toIndentedString(pattern)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -108,7 +108,7 @@ public class ValidationRegExModal  {
     * Convert the given object to string with each line indented by 4 spaces
     * (except the first line).
     */
-    private String toIndentedString(Object o) {
+    private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
             return "null";

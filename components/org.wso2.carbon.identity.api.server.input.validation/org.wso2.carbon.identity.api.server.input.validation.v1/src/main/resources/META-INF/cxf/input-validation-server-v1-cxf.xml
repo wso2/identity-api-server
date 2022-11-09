@@ -24,6 +24,6 @@
     <bean id="inputValidationServiceFactoryBean" class="org.wso2.carbon.identity.api.server.input.validation.common.factory.InputValidationOSGiServiceFactory"/>
 
     <bean id="InputValidationServiceHolderBean" class="org.wso2.carbon.identity.api.server.input.validation.common.InputValidationServiceHolder">
-        <property name="inputValidationManager" ref="inputValidationServiceFactoryBean"/>
+        <property name="inputValidationMgtService" ref="inputValidationServiceFactoryBean"/>
     </bean>
 </beans>

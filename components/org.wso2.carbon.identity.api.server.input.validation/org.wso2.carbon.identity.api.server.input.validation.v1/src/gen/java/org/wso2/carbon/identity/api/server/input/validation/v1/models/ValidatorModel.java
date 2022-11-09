@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.PropertyModel;
 import javax.validation.constraints.*;
 
 
@@ -30,24 +33,24 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class ValidateRequest  {
+public class ValidatorModel  {
   
     private String name;
-    private String value;
+    private String type;
+    private List<PropertyModel> properties = null;
+
 
     /**
     **/
-    public ValidateRequest name(String name) {
+    public ValidatorModel name(String name) {
 
         this.name = name;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("name")
     @Valid
-    @NotNull(message = "Property name cannot be null.")
-
     public String getName() {
         return name;
     }
@@ -57,28 +60,52 @@ public class ValidateRequest  {
 
     /**
     **/
-    public ValidateRequest value(String value) {
+    public ValidatorModel type(String type) {
 
-        this.value = value;
+        this.type = type;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("value")
+    @ApiModelProperty(value = "")
+    @JsonProperty("type")
     @Valid
-    @NotNull(message = "Property value cannot be null.")
-
-    public String getValue() {
-        return value;
+    public String getType() {
+        return type;
     }
-    public void setValue(String value) {
-        this.value = value;
+    public void setType(String type) {
+        this.type = type;
     }
 
+    /**
+    **/
+    public ValidatorModel properties(List<PropertyModel> properties) {
 
+        this.properties = properties;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("properties")
+    @Valid
+    public List<PropertyModel> getProperties() {
+        return properties;
+    }
+    public void setProperties(List<PropertyModel> properties) {
+        this.properties = properties;
+    }
+
+    public ValidatorModel addPropertiesItem(PropertyModel propertiesItem) {
+        if (this.properties == null) {
+            this.properties = new ArrayList<>();
+        }
+        this.properties.add(propertiesItem);
+        return this;
+    }
+
+    
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(java.lang.Object o) {
 
         if (this == o) {
             return true;
@@ -86,24 +113,26 @@ public class ValidateRequest  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ValidateRequest validateRequest = (ValidateRequest) o;
-        return Objects.equals(this.name, validateRequest.name) &&
-            Objects.equals(this.value, validateRequest.value);
+        ValidatorModel validatorModel = (ValidatorModel) o;
+        return Objects.equals(this.name, validatorModel.name) &&
+            Objects.equals(this.type, validatorModel.type) &&
+            Objects.equals(this.properties, validatorModel.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, value);
+        return Objects.hash(name, type, properties);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ValidateRequest {\n");
+        sb.append("class ValidatorModel {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
-        sb.append("    value: ").append(toIndentedString(value)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -112,7 +141,7 @@ public class ValidateRequest  {
     * Convert the given object to string with each line indented by 4 spaces
     * (except the first line).
     */
-    private String toIndentedString(Object o) {
+    private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
             return "null";

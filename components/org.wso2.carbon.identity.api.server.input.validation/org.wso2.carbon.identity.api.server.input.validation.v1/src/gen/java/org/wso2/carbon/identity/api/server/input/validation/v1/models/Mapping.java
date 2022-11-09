@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.PasswordValidationModal;
 import javax.validation.constraints.*;
 
 
@@ -31,32 +30,55 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class ValidationConfigModal  {
+public class Mapping  {
   
-    private PasswordValidationModal password;
+    private String key;
+    private String value;
 
     /**
     **/
-    public ValidationConfigModal password(PasswordValidationModal password) {
+    public Mapping key(String key) {
 
-        this.password = password;
+        this.key = key;
         return this;
     }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("password")
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("key")
     @Valid
-    public PasswordValidationModal getPassword() {
-        return password;
+    @NotNull(message = "Property key cannot be null.")
+
+    public String getKey() {
+        return key;
     }
-    public void setPassword(PasswordValidationModal password) {
-        this.password = password;
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    /**
+    **/
+    public Mapping value(String value) {
+
+        this.value = value;
+        return this;
+    }
+    
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("value")
+    @Valid
+    @NotNull(message = "Property value cannot be null.")
+
+    public String getValue() {
+        return value;
+    }
+    public void setValue(String value) {
+        this.value = value;
     }
 
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(java.lang.Object o) {
 
         if (this == o) {
             return true;
@@ -64,22 +86,24 @@ public class ValidationConfigModal  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ValidationConfigModal validationConfigModal = (ValidationConfigModal) o;
-        return Objects.equals(this.password, validationConfigModal.password);
+        Mapping mapping = (Mapping) o;
+        return Objects.equals(this.key, mapping.key) &&
+            Objects.equals(this.value, mapping.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(password);
+        return Objects.hash(key, value);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ValidationConfigModal {\n");
+        sb.append("class Mapping {\n");
         
-        sb.append("    password: ").append(toIndentedString(password)).append("\n");
+        sb.append("    key: ").append(toIndentedString(key)).append("\n");
+        sb.append("    value: ").append(toIndentedString(value)).append("\n");
         sb.append("}");
         return sb.toString();
     }
@@ -88,7 +112,7 @@ public class ValidationConfigModal  {
     * Convert the given object to string with each line indented by 4 spaces
     * (except the first line).
     */
-    private String toIndentedString(Object o) {
+    private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
             return "null";

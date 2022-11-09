@@ -22,8 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationRegExModal;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationRulesModal;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.RuleModel;
 import javax.validation.constraints.*;
 
 
@@ -32,14 +33,37 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class PasswordValidationModal  {
+public class ValidationConfigModel  {
   
-    private ValidationRulesModal rules;
-    private ValidationRegExModal regEx;
+    private String field;
+    private List<RuleModel> rules = null;
+
+    private List<RuleModel> regEx = null;
+
 
     /**
     **/
-    public PasswordValidationModal rules(ValidationRulesModal rules) {
+    public ValidationConfigModel field(String field) {
+
+        this.field = field;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "password", required = true, value = "")
+    @JsonProperty("field")
+    @Valid
+    @NotNull(message = "Property field cannot be null.")
+
+    public String getField() {
+        return field;
+    }
+    public void setField(String field) {
+        this.field = field;
+    }
+
+    /**
+    **/
+    public ValidationConfigModel rules(List<RuleModel> rules) {
 
         this.rules = rules;
         return this;
@@ -48,16 +72,24 @@ public class PasswordValidationModal  {
     @ApiModelProperty(value = "")
     @JsonProperty("rules")
     @Valid
-    public ValidationRulesModal getRules() {
+    public List<RuleModel> getRules() {
         return rules;
     }
-    public void setRules(ValidationRulesModal rules) {
+    public void setRules(List<RuleModel> rules) {
         this.rules = rules;
     }
 
-    /**
+    public ValidationConfigModel addRulesItem(RuleModel rulesItem) {
+        if (this.rules == null) {
+            this.rules = new ArrayList<>();
+        }
+        this.rules.add(rulesItem);
+        return this;
+    }
+
+        /**
     **/
-    public PasswordValidationModal regEx(ValidationRegExModal regEx) {
+    public ValidationConfigModel regEx(List<RuleModel> regEx) {
 
         this.regEx = regEx;
         return this;
@@ -66,17 +98,25 @@ public class PasswordValidationModal  {
     @ApiModelProperty(value = "")
     @JsonProperty("regEx")
     @Valid
-    public ValidationRegExModal getRegEx() {
+    public List<RuleModel> getRegEx() {
         return regEx;
     }
-    public void setRegEx(ValidationRegExModal regEx) {
+    public void setRegEx(List<RuleModel> regEx) {
         this.regEx = regEx;
     }
 
+    public ValidationConfigModel addRegExItem(RuleModel regExItem) {
+        if (this.regEx == null) {
+            this.regEx = new ArrayList<>();
+        }
+        this.regEx.add(regExItem);
+        return this;
+    }
 
+    
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(java.lang.Object o) {
 
         if (this == o) {
             return true;
@@ -84,22 +124,24 @@ public class PasswordValidationModal  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        PasswordValidationModal passwordValidationModal = (PasswordValidationModal) o;
-        return Objects.equals(this.rules, passwordValidationModal.rules) &&
-            Objects.equals(this.regEx, passwordValidationModal.regEx);
+        ValidationConfigModel validationConfigModel = (ValidationConfigModel) o;
+        return Objects.equals(this.field, validationConfigModel.field) &&
+            Objects.equals(this.rules, validationConfigModel.rules) &&
+            Objects.equals(this.regEx, validationConfigModel.regEx);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(rules, regEx);
+        return Objects.hash(field, rules, regEx);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class PasswordValidationModal {\n");
+        sb.append("class ValidationConfigModel {\n");
         
+        sb.append("    field: ").append(toIndentedString(field)).append("\n");
         sb.append("    rules: ").append(toIndentedString(rules)).append("\n");
         sb.append("    regEx: ").append(toIndentedString(regEx)).append("\n");
         sb.append("}");
@@ -110,7 +152,7 @@ public class PasswordValidationModal  {
     * Convert the given object to string with each line indented by 4 spaces
     * (except the first line).
     */
-    private String toIndentedString(Object o) {
+    private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
             return "null";

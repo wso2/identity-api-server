@@ -19,11 +19,12 @@ package org.wso2.carbon.identity.api.server.input.validation.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.input.validation.v1.ValidationRulesApiService;
 import org.wso2.carbon.identity.api.server.input.validation.v1.core.ValidationRulesManagementApiService;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidateRequest;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModal;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
+
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * Implementation of ValidationRulesApiService.
@@ -34,7 +35,7 @@ public class ValidationRulesApiServiceImpl implements ValidationRulesApiService 
     private ValidationRulesManagementApiService validationRulesManagementApiService;
 
     @Override
-    public Response getValidationConfiguration() {
+    public Response getValidationRules() {
 
         String tenantDomain = getTenantDomainFromContext();
         return Response.ok().entity(validationRulesManagementApiService
@@ -42,19 +43,18 @@ public class ValidationRulesApiServiceImpl implements ValidationRulesApiService 
     }
 
     @Override
-    public Response updateInputValidationConfiguration(ValidationConfigModal validationConfig) {
+    public Response getValidators() {
 
         String tenantDomain = getTenantDomainFromContext();
         return Response.ok().entity(validationRulesManagementApiService
-                .updateInputValidationConfiguration(validationConfig, tenantDomain)).build();
+                .getValidators(tenantDomain)).build();
     }
 
     @Override
-    public Response validateValues(ValidateRequest validateRequest) {
+    public Response updateValidationRules(List<ValidationConfigModel> validationConfigModels) {
 
         String tenantDomain = getTenantDomainFromContext();
-        validationRulesManagementApiService
-                .validateValues(validateRequest, tenantDomain);
-        return Response.ok().build();
+        return Response.ok().entity(validationRulesManagementApiService
+                .updateInputValidationConfiguration(validationConfigModels, tenantDomain)).build();
     }
 }

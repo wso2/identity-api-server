@@ -18,32 +18,32 @@
 
 package org.wso2.carbon.identity.api.server.input.validation.common;
 
-import org.wso2.carbon.identity.input.validation.mgt.services.InputValidationManager;
+import org.wso2.carbon.identity.input.validation.mgt.services.InputValidationManagementService;
 
 /**
  * Service holder class for input validation management.
  */
 public class InputValidationServiceHolder {
 
-    private static InputValidationManager inputValidationManager;
+    private static InputValidationManagementService inputValidationMgtService;
 
     /**
-     * Get InputValidationManager OSGi service.
+     * Get InputValidationMgtService OSGi service.
      *
-     * @return Input Validation Manager.
+     * @return Input Validation Management Service.
      */
-    public static InputValidationManager getInputValidationManager() {
+    public static InputValidationManagementService getInputValidationMgtService() {
 
-        return inputValidationManager;
+        return inputValidationMgtService;
     }
 
     /**
-     * Set InputValidationManager OSGi service.
+     * Set InputValidationMgtService OSGi service.
      *
-     * @param inputValidationManager Input Validation Manager.
+     * @param inputValidationMgtService Input Validation Management Service.
      */
-    public static void setInputValidationManager(InputValidationManager inputValidationManager) {
+    public static void setInputValidationMgtService(InputValidationManagementService inputValidationMgtService) {
 
-        InputValidationServiceHolder.inputValidationManager = inputValidationManager;
+        InputValidationServiceHolder.inputValidationMgtService = inputValidationMgtService;
     }
 }
