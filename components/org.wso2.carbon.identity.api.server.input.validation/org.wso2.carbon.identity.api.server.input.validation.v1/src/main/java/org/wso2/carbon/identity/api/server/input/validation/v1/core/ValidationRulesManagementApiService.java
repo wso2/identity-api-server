@@ -186,6 +186,12 @@ public class ValidationRulesManagementApiService {
         return requestDTO;
     }
 
+    /**
+     * Method to build rules object.
+     *
+     * @param rules List of rules.
+     * @return  List of rules configuration.
+     */
     private List<RulesConfiguration> buildRulesDTO(List<RuleModel> rules) {
 
         List<RulesConfiguration> rulesDTO = new ArrayList<>();
@@ -288,7 +294,7 @@ public class ValidationRulesManagementApiService {
             } else if (config.getRegEx() != null) {
                 rules = config.getRegEx();
             }
-            validateProperties(isRules, rules, tenantDomain);
+            validateProperties(config.getField(), isRules, rules, tenantDomain);
         }
     }
 
@@ -300,7 +306,7 @@ public class ValidationRulesManagementApiService {
      * @param tenantDomain  Tenant domain name.
      * @throws InputValidationMgtClientException If an error occurred when validating rules.
      */
-    private void validateProperties(boolean isRules, List<RulesConfiguration> rules, String tenantDomain)
+    private void validateProperties(String field, boolean isRules, List<RulesConfiguration> rules, String tenantDomain)
             throws InputValidationMgtClientException {
 
         Map<String, Validator> allValidators = InputValidationServiceHolder.getInputValidationMgtService()
@@ -312,7 +318,7 @@ public class ValidationRulesManagementApiService {
                     || (!isRules && validator instanceof AbstractRegExValidator &&
                     validator.canHandle(rule.getValidator()))) {
 
-                context = new ValidationContext("field", tenantDomain, rule.getProperties(), null);
+                context = new ValidationContext(field, tenantDomain, rule.getProperties(), null);
                 validator.validateProps(context);
             } else {
                 throw new InputValidationMgtClientException(ERROR_VALIDATOR_NOT_SUPPORTED.getCode(),
