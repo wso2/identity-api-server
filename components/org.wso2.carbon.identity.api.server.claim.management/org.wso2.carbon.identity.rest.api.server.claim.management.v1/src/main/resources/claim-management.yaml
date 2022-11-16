@@ -514,33 +514,33 @@ parameters:
     in: query
     name: limit
     required: false
-    description: Maximum number of records to return.
+    description: Maximum number of records to return. <br><b> This option is not yet supported. </b>
     type: integer
     format: int32
   offsetQueryParam:
     in: query
     name: offset
     required: false
-    description: Number of records to skip for pagination.
+    description: Number of records to skip for pagination. <br><b> This option is not yet supported. </b>
     type: integer
     format: int32
   filterQueryParam:
     in: query
     name: filter
     required: false
-    description: Condition to filter the retrieval of records.
+    description: Condition to filter the retrieval of records. <br><b> This option is not yet supported. </b>
     type: string
   sortQueryParam:
     in: query
     name: sort
     required: false
-    description: Define the order by which the retrieved records should be sorted.
+    description: Define the order by which the retrieved records should be sorted. <br><b> This option is not yet supported. </b>
     type: string
   attributesQueryParam:
     in: query
     name: attributes
     required: false
-    description: Define only the required attributes to be sent in the response object.
+    description: Define only the required attributes to be sent in the response object.  <br><b> This option is not yet supported. </b>
     type: string
   excludeIdentityClaimsQueryParam:
     in: query
