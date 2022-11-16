@@ -16,23 +16,18 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.WorkflowEnginesApiService;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.core.WorkFLowEngineService;
 
 import javax.ws.rs.core.Response;
 
 /**
  * API service implementation of workflow engine operations.
  */
-public class WorkflowEnginesApiServiceImpl extends WorkflowEnginesApiService {
-
-    @Autowired
-    private WorkFLowEngineService workFLowEngineService;
+public class WorkflowEnginesApiServiceImpl implements WorkflowEnginesApiService {
 
     @Override
     public Response searchWorkFlowEngines() {
 
-        return Response.ok().entity(workFLowEngineService.listWorkflowEngines()).build();
+        return Response.status(Response.Status.GONE).build();
     }
 }

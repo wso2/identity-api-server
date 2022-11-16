@@ -16,20 +16,10 @@
 
 package org.wso2.carbon.identity.rest.api.server.workflow.engine.v1;
 
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.*;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.dto.*;
-
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.dto.ErrorDTO;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.dto.WorkFlowEngineDTO;
-
-import java.util.List;
-
-import java.io.InputStream;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-
 import javax.ws.rs.core.Response;
 
-public abstract class WorkflowEnginesApiService {
-    public abstract Response searchWorkFlowEngines();
-}
 
+public interface WorkflowEnginesApiService {
+
+      public Response searchWorkFlowEngines();
+}

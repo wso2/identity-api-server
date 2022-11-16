@@ -17,52 +17,32 @@
 package org.wso2.carbon.identity.rest.api.server.workflow.engine.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.dto.*;
 import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.WorkflowEnginesApiService;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.factories.WorkflowEnginesApiServiceFactory;
 
-import io.swagger.annotations.ApiParam;
-
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.dto.ErrorDTO;
-import org.wso2.carbon.identity.rest.api.server.workflow.engine.v1.dto.WorkFlowEngineDTO;
-
-import java.util.List;
-
-import java.io.InputStream;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-
-import javax.ws.rs.core.Response;
+import javax.validation.Valid;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import io.swagger.annotations.*;
 
 @Path("/workflow-engines")
+@Api(description = "The workflow-engines API")
 
-
-@io.swagger.annotations.Api(value = "/workflow-engines", description = "the workflow-engines API")
 public class WorkflowEnginesApi  {
 
-   @Autowired
-   private WorkflowEnginesApiService delegate;
+    @Autowired
+    private WorkflowEnginesApiService delegate;
 
+    @Valid
     @GET
     
     
     
-    @io.swagger.annotations.ApiOperation(value = "Retrieve all the available workflow engines.", notes = "Retrieve metadata information of all the workflow engines in the system.\n\n  <b>Permission required:</b>\n    * /permission/admin/manage/humantask/viewtasks\n", response = WorkFlowEngineDTO.class, responseContainer = "List")
-    @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "search results matching criteria"),
-        
-        @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized"),
-        
-        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden"),
-        
-        @io.swagger.annotations.ApiResponse(code = 404, message = "The specified resource is not found"),
-        
-        @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error") })
+    @ApiOperation(value = "Removed from API", notes = "Retrieve metadata information of all the workflow engines in the system. (Removed from API) ", response = Void.class, tags={  })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 410, message = "Gone", response = Void.class)
+    })
+    public Response searchWorkFlowEngines() {
 
-    public Response searchWorkFlowEngines()
-    {
-    return delegate.searchWorkFlowEngines();
+        return delegate.searchWorkFlowEngines();
     }
 }
-
