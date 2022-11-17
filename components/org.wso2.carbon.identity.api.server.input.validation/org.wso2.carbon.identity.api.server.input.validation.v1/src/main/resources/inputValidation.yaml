@@ -107,14 +107,14 @@ components:
     ValidatorModel:
       type: object
       properties:
-        name:
-          type: string
-          example: LengthValidator
         type:
           type: string
           enum:
             - RULE
             - REGEX
+        name:
+          type: string
+          example: LengthValidator
         properties:
           type: array
           items:

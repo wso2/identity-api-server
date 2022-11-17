@@ -33,9 +33,25 @@ import javax.ws.rs.core.Response;
 
 public interface ValidationRulesApiService {
 
+      /**
+       * Method to get configured validation rules.
+       *
+       * @return  List of configured validation rules.
+       */
       public Response getValidationRules();
 
+      /**
+       * Method to get available validator configurations.
+       *
+       * @return  List of validator configurations.
+       */
       public Response getValidators();
 
+      /**
+       * Method to update validation rules.
+       *
+       * @param validationConfigModel     List of validation rules to be updated.
+       * @return  Updated validation rules.
+       */
       public Response updateValidationRules(List<ValidationConfigModel> validationConfigModel);
 }

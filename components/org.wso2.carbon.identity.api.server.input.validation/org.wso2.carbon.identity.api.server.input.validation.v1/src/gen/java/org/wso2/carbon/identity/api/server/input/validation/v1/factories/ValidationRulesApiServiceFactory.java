@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.input.validation.v1.factories;
 import org.wso2.carbon.identity.api.server.input.validation.v1.ValidationRulesApiService;
 import org.wso2.carbon.identity.api.server.input.validation.v1.impl.ValidationRulesApiServiceImpl;
 
+/**
+ * Factory to return validationRulesApiService.
+ */
 public class ValidationRulesApiServiceFactory {
 
    private final static ValidationRulesApiService service = new ValidationRulesApiServiceImpl();
 
-   public static ValidationRulesApiService getValidationRulesApi()
-   {
+   /**
+    * Method to get ValidationRulesApiService.
+    *
+    * @return  ValidationRulesApiService.
+    */
+   public static ValidationRulesApiService getValidationRulesApi() {
+
       return service;
    }
 }

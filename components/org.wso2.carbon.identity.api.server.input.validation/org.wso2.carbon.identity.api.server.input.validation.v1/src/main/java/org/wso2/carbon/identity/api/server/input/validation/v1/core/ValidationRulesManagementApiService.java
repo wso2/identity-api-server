@@ -197,7 +197,7 @@ public class ValidationRulesManagementApiService {
         List<RulesConfiguration> rulesDTO = new ArrayList<>();
         for (RuleModel rule: rules) {
             RulesConfiguration ruleDTO = new RulesConfiguration();
-            ruleDTO.setValidator(rule.getValidator());
+            ruleDTO.setValidatorName(rule.getValidator());
 
             Map<String, String> rulesMap =
                     rule.getProperties().stream()
@@ -250,7 +250,7 @@ public class ValidationRulesManagementApiService {
                             .map(this::getMapping)
                             .collect(Collectors.toList());
             RuleModel rule = new RuleModel();
-            rule.setValidator(ruleConfig.getValidator());
+            rule.setValidator(ruleConfig.getValidatorName());
             rule.setProperties(properties);
             rules.add(rule);
         }
@@ -313,16 +313,16 @@ public class ValidationRulesManagementApiService {
                 .getValidators(tenantDomain);
         ValidationContext context;
         for (RulesConfiguration rule: rules) {
-            Validator validator = allValidators.get(rule.getValidator());
-            if ((isRules && validator instanceof AbstractRulesValidator && validator.canHandle(rule.getValidator()))
+            Validator validator = allValidators.get(rule.getValidatorName());
+            if ((isRules && validator instanceof AbstractRulesValidator && validator.canHandle(rule.getValidatorName()))
                     || (!isRules && validator instanceof AbstractRegExValidator &&
-                    validator.canHandle(rule.getValidator()))) {
+                    validator.canHandle(rule.getValidatorName()))) {
 
                 context = new ValidationContext(field, tenantDomain, rule.getProperties(), null);
                 validator.validateProps(context);
             } else {
                 throw new InputValidationMgtClientException(ERROR_VALIDATOR_NOT_SUPPORTED.getCode(),
-                        String.format(ERROR_VALIDATOR_NOT_SUPPORTED.getDescription(), rule.getValidator(),
+                        String.format(ERROR_VALIDATOR_NOT_SUPPORTED.getDescription(), rule.getValidatorName(),
                                 isRules ? "rules" : "regex"));
             }
         }

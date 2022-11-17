@@ -35,7 +35,6 @@ import javax.xml.bind.annotation.*;
 
 public class ValidatorModel  {
   
-    private String name;
 
 @XmlType(name="TypeEnum")
 @XmlEnum(String.class)
@@ -70,26 +69,9 @@ public enum TypeEnum {
 }
 
     private TypeEnum type;
+    private String name;
     private List<PropertyModel> properties = null;
 
-
-    /**
-    **/
-    public ValidatorModel name(String name) {
-
-        this.name = name;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "LengthValidator", value = "")
-    @JsonProperty("name")
-    @Valid
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
 
     /**
     **/
@@ -107,6 +89,24 @@ public enum TypeEnum {
     }
     public void setType(TypeEnum type) {
         this.type = type;
+    }
+
+    /**
+    **/
+    public ValidatorModel name(String name) {
+
+        this.name = name;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "LengthValidator", value = "")
+    @JsonProperty("name")
+    @Valid
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -147,14 +147,14 @@ public enum TypeEnum {
             return false;
         }
         ValidatorModel validatorModel = (ValidatorModel) o;
-        return Objects.equals(this.name, validatorModel.name) &&
-            Objects.equals(this.type, validatorModel.type) &&
+        return Objects.equals(this.type, validatorModel.type) &&
+            Objects.equals(this.name, validatorModel.name) &&
             Objects.equals(this.properties, validatorModel.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, properties);
+        return Objects.hash(type, name, properties);
     }
 
     @Override
@@ -163,8 +163,8 @@ public enum TypeEnum {
         StringBuilder sb = new StringBuilder();
         sb.append("class ValidatorModel {\n");
         
-        sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
