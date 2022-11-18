@@ -23,9 +23,8 @@ import org.wso2.carbon.identity.api.server.input.validation.v1.models.Validation
 
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 
-import javax.ws.rs.core.Response;
 import java.util.List;
-
+import javax.ws.rs.core.Response;
 /**
  * Implementation of ValidationRulesApiService.
  */

@@ -24,7 +24,10 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.input.validation.common.InputValidationServiceHolder;
 import org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants;
-import org.wso2.carbon.identity.api.server.input.validation.v1.models.*;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.MappingModel;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.RuleModel;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidatorModel;
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtClientException;
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtException;
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtServerException;
@@ -36,18 +39,18 @@ import org.wso2.carbon.identity.input.validation.mgt.model.ValidatorConfiguratio
 import org.wso2.carbon.identity.input.validation.mgt.model.validators.AbstractRegExValidator;
 import org.wso2.carbon.identity.input.validation.mgt.model.validators.AbstractRulesValidator;
 
-import javax.ws.rs.core.Response;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.core.Response;
+
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.Utils.getCorrelation;
-import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_VALIDATORS;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG;
+import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.INPUT_VALIDATION_ERROR_PREFIX;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.INPUT_VALIDATION_MGT_ERROR_CODE_DELIMITER;
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX;
@@ -284,7 +287,8 @@ public class ValidationRulesManagementApiService {
         for (ValidationConfiguration config: configurations) {
             if (!SUPPORTED_PARAMS.contains(config.getField())) {
                 throw new InputValidationMgtClientException(ERROR_VALIDATION_PARAM_NOT_SUPPORTED.getCode(),
-                        String.format(ERROR_VALIDATION_PARAM_NOT_SUPPORTED.getDescription(), config.getField(), tenantDomain));
+                        String.format(ERROR_VALIDATION_PARAM_NOT_SUPPORTED.getDescription(), config.getField(),
+                                tenantDomain));
             }
             boolean isRules = false;
             List<RulesConfiguration> rules = new ArrayList<>();
