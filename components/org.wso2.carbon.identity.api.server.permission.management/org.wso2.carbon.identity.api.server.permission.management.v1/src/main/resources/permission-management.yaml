@@ -335,44 +335,6 @@ components:
           resourcePath: "/permission/admin/manage/identity/identitymgt/create"
         - displayName: Delete
           resourcePath: "/permission/admin/manage/identity/identitymgt/delete"
-        - displayName: Workflow Management
-          resourcePath: "/permission/admin/manage/identity/workflow"
-        - displayName: Associations
-          resourcePath: "/permission/admin/manage/identity/workflow/association"
-        - displayName: View
-          resourcePath: "/permission/admin/manage/identity/workflow/association/view"
-        - displayName: Delete
-          resourcePath: "/permission/admin/manage/identity/workflow/association/delete"
-        - displayName: Create
-          resourcePath: "/permission/admin/manage/identity/workflow/association/create"
-        - displayName: Update
-          resourcePath: "/permission/admin/manage/identity/workflow/association/update"
-        - displayName: Workflows
-          resourcePath: "/permission/admin/manage/identity/workflow/definition"
-        - displayName: Create
-          resourcePath: "/permission/admin/manage/identity/workflow/definition/create"
-        - displayName: Delete
-          resourcePath: "/permission/admin/manage/identity/workflow/definition/delete"
-        - displayName: View
-          resourcePath: "/permission/admin/manage/identity/workflow/definition/view"
-        - displayName: Update
-          resourcePath: "/permission/admin/manage/identity/workflow/definition/update"
-        - displayName: BPS Profiles
-          resourcePath: "/permission/admin/manage/identity/workflow/profile"
-        - displayName: View
-          resourcePath: "/permission/admin/manage/identity/workflow/profile/view"
-        - displayName: Create
-          resourcePath: "/permission/admin/manage/identity/workflow/profile/create"
-        - displayName: Delete
-          resourcePath: "/permission/admin/manage/identity/workflow/profile/delete"
-        - displayName: Update
-          resourcePath: "/permission/admin/manage/identity/workflow/profile/update"
-        - displayName: Monitor
-          resourcePath: "/permission/admin/manage/identity/workflow/monitor"
-        - displayName: View
-          resourcePath: "/permission/admin/manage/identity/workflow/monitor/view"
-        - displayName: Delete
-          resourcePath: "/permission/admin/manage/identity/workflow/monitor/delete"
         - displayName: Email Management
           resourcePath: "/permission/admin/manage/identity/emailmgt"
         - displayName: Update
@@ -515,16 +477,6 @@ components:
           resourcePath: "/permission/admin/manage/topic/purgeTopic"
         - displayName: Add Topic/SubTopic
           resourcePath: "/permission/admin/manage/topic/addTopic"
-        - displayName: HumanTask
-          resourcePath: "/permission/admin/manage/humantask"
-        - displayName: Manage HumanTask Packages
-          resourcePath: "/permission/admin/manage/humantask/packages"
-        - displayName: View Task List
-          resourcePath: "/permission/admin/manage/humantask/viewtasks"
-        - displayName: Add HumanTask
-          resourcePath: "/permission/admin/manage/humantask/add"
-        - displayName: Manage HumanTasks
-          resourcePath: "/permission/admin/manage/humantask/task"
     Permission:
       type: object
       properties:
