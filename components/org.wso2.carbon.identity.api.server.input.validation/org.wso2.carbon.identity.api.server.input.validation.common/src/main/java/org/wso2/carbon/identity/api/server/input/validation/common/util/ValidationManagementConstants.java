@@ -25,7 +25,7 @@ public class ValidationManagementConstants {
 
     public static final String INPUT_VALIDATION_ERROR_PREFIX = "IVM-";
     public static final String INPUT_VALIDATION_MGT_ERROR_CODE_DELIMITER = "-";
-
+    public static final String CORRELATION_ID = "Correlation-ID";
 
     /**
      * Enums for error messages.
@@ -46,6 +46,7 @@ public class ValidationManagementConstants {
         ERROR_CODE_ERROR_GETTING_VALIDATORS("65003",
                 "Unable to retrieve existing validators.",
                 "Error while retrieving validators for organization: %s.");
+
         private final String code;
         private final String message;
         private final String description;

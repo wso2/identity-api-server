@@ -22,6 +22,8 @@ import org.slf4j.MDC;
 
 import java.util.UUID;
 
+import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.CORRELATION_ID;
+
 /**
  * Util class.
  */
@@ -35,7 +37,7 @@ public class Utils {
     public static String getCorrelation() {
 
         if (isCorrelationIDPresent()) {
-            return MDC.get("Correlation-ID");
+            return MDC.get(CORRELATION_ID);
         }
         return UUID.randomUUID().toString();
     }
@@ -47,6 +49,6 @@ public class Utils {
      */
     public static boolean isCorrelationIDPresent() {
 
-        return MDC.get("Correlation-ID") != null;
+        return MDC.get(CORRELATION_ID) != null;
     }
 }

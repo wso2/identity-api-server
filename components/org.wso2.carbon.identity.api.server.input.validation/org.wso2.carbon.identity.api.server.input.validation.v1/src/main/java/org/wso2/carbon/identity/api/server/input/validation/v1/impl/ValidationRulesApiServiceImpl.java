@@ -25,6 +25,7 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
 
 import java.util.List;
 import javax.ws.rs.core.Response;
+
 /**
  * Implementation of ValidationRulesApiService.
  */

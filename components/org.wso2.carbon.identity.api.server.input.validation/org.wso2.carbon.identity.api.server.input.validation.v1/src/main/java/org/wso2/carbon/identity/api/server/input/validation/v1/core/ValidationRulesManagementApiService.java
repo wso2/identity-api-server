@@ -63,7 +63,7 @@ import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.SUPP
  */
 public class ValidationRulesManagementApiService {
 
-    private static final Log log = LogFactory.getLog(ValidationRulesManagementApiService.class);
+    private static final Log LOGGER = LogFactory.getLog(ValidationRulesManagementApiService.class);
 
     /**
      * Method to get input validation configuration.
@@ -79,8 +79,8 @@ public class ValidationRulesManagementApiService {
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
             if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Can not find a validation configurations for tenant: " +
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Can not find a validation configurations for tenant: " +
                             tenantDomain, e);
                 }
             }
@@ -104,8 +104,8 @@ public class ValidationRulesManagementApiService {
                     .updateInputValidationConfiguration(requestDTO, tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unable to update validation configuration for tenant: " + tenantDomain, e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Unable to update validation configuration for tenant: " + tenantDomain, e);
             }
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG, tenantDomain);
         }
@@ -114,7 +114,7 @@ public class ValidationRulesManagementApiService {
     /**
      * Method to validate input values.
      *
-     * @param tenantDomain      Tenant domain.
+     * @param tenantDomain  Tenant domain.
      */
     public List<ValidatorModel> getValidators(String tenantDomain) {
 
@@ -125,8 +125,8 @@ public class ValidationRulesManagementApiService {
             return buildValidatorResponse(validators);
         } catch (InputValidationMgtException e) {
             if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Can not find a validator configurations for tenant: " +
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Can not find a validator configurations for tenant: " +
                             tenantDomain, e);
                 }
             }
@@ -166,8 +166,8 @@ public class ValidationRulesManagementApiService {
             // Ensure the validation configuration is configured with either rules or regex.
             if ((configModel.getRules() != null && configModel.getRegEx() != null) ||
                     (configModel.getRules() == null && configModel.getRegEx() == null)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Can not configure validation with both rules and regex empty " +
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Can not configure validation with both rules and regex empty " +
                             "or available.");
                 }
                 throw new InputValidationMgtClientException(ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX.getCode(),
@@ -347,7 +347,7 @@ public class ValidationRulesManagementApiService {
         ErrorResponse errorResponse;
         Response.Status status;
         if (exception instanceof InputValidationMgtClientException) {
-            errorResponse = getErrorBuilder(errorEnum, data).build(log, exception.getMessage());
+            errorResponse = getErrorBuilder(errorEnum, data).build(LOGGER, exception.getMessage());
             if (exception.getErrorCode() != null) {
                 String errorCode = exception.getErrorCode();
                 errorCode = errorCode.contains(INPUT_VALIDATION_MGT_ERROR_CODE_DELIMITER) ? errorCode :
@@ -366,7 +366,7 @@ public class ValidationRulesManagementApiService {
                 status = Response.Status.BAD_REQUEST;
             }
         } else if (exception instanceof InputValidationMgtServerException) {
-            errorResponse = getErrorBuilder(errorEnum, data).build(log, exception, errorEnum.getDescription());
+            errorResponse = getErrorBuilder(errorEnum, data).build(LOGGER, exception, errorEnum.getDescription());
             if (exception.getErrorCode() != null) {
                 String errorCode = exception.getErrorCode();
                 errorCode = errorCode.contains(INPUT_VALIDATION_MGT_ERROR_CODE_DELIMITER) ? errorCode :
@@ -377,7 +377,7 @@ public class ValidationRulesManagementApiService {
             errorResponse.setRef(getCorrelation());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
-            errorResponse = getErrorBuilder(errorEnum, data).build(log, exception, errorEnum.getDescription());
+            errorResponse = getErrorBuilder(errorEnum, data).build(LOGGER, exception, errorEnum.getDescription());
             errorResponse.setRef(getCorrelation());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
