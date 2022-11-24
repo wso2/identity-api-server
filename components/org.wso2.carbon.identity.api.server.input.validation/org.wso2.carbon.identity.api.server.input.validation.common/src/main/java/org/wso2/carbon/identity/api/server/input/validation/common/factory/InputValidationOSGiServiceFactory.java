@@ -44,11 +44,10 @@ public class InputValidationOSGiServiceFactory extends AbstractFactoryBean<Input
                     (InputValidationManagementService) PrivilegedCarbonContext.
                     getThreadLocalCarbonContext().getOSGiService(InputValidationManagementService.class, null);
 
-            if (taskOperationService != null) {
-                this.inputValidationMgtService = taskOperationService;
-            } else {
+            if (taskOperationService == null) {
                 throw new Exception("Unable to retrieve ConfigurationManager service.");
             }
+            this.inputValidationMgtService = taskOperationService;
         }
         return this.inputValidationMgtService;
     }
