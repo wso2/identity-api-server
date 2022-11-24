@@ -1,0 +1,240 @@
+openapi: 3.0.0
+info:
+  description: >
+    This document specifies an **Input Validation RESTful API** for **WSO2
+    Identity Server**.
+  version: "v1"
+  title: WSO2 Identity Server - Input Validation Rest API
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+servers:
+  - url: 'https://{host-name}/api/server/v1'
+    variables:
+      server-url:
+        default: "localhost:9443"
+paths:
+  /validation-rules:
+    get:
+      tags:
+        - Get Validation Rules
+      description: Get validation rules for user inputs
+      operationId: getValidationRules
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags:
+        - Update Validation Rules
+      description: Update validation rules for user inputs
+      operationId: updateValidationRules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationConfiguration'
+            examples:
+              Rules:
+                value:
+                  - field: password
+                    rules:
+                      - validator: LengthValidator
+                        properties:
+                          - key: min.length
+                            value: 5
+                          - key: max.length
+                            value: 15
+              Regex:
+                value:
+                  - field: password
+                    regEx:
+                      - validator: JavaRegExValidator
+                        properties:
+                          - key: java.regex
+                            value: (?=.*[A-Z])
+        description: Represents the password validation criteria.
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /validation-rules/validators:
+    get:
+      tags:
+        - Get all validators
+      description: Get all validators
+      operationId: getValidators
+      responses:
+        '200':
+          description: Configurations successfully updated.
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ValidatorModel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+components:
+  schemas:
+    ValidatorModel:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - RULE
+            - REGEX
+        name:
+          type: string
+          example: LengthValidator
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropertyModel'
+    PropertyModel:
+      type: object
+      properties:
+        name:
+          type: string
+          example: min.length
+        description:
+          type: string
+          example: Minimum length required
+        displayName:
+          type: string
+          example: Minimum limit
+        type:
+          type: string
+          example: int
+        displayOrder:
+          type: integer
+          example: 1
+    ValidationConfiguration:
+      type: array
+      items:
+        $ref: '#/components/schemas/ValidationConfigModel'
+    ValidationConfigModel:
+      type: object
+      required:
+        - field
+      properties:
+        field:
+          type: string
+          example: password
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleModel'
+        regEx:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleModel'
+    RuleModel:
+      type: object
+      required:
+        - validator
+        - properties
+      properties:
+        validator:
+          type: string
+          example: lengthValidator
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/MappingModel'
+    MappingModel:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: VR-60001
+        message:
+          type: string
+          example: Some Error Message
+        description:
+          type: string
+          example: Some Error Description
+  responses:
+    Unauthorized:
+      description: Unauthorized
+    Forbidden:
+      description: Resource Forbidden
+    ServerError:
+      description: Internal Server Error
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid Input Request
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    Success:
+      description: Configurations successfully updated.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/ValidationConfiguration'
+          examples:
+            Rules:
+              value:
+                - field: password
+                  rules:
+                    - validator: LengthValidator
+                      properties:
+                        - key: min.length
+                          value: 5
+                        - key: max.length
+                          value: 15
+            Regex:
+              value:
+                - field: password
+                  regEx:
+                    - validator: JavaRegExValidator
+                      properties:
+                        - key: java.regex
+                          value: (?=.*[A-Z])
+
