@@ -70,6 +70,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response getConfiguredAuthenticators(String applicationId) {
+
+        return Response.ok().entity(applicationManagementService
+                .getConfiguredAuthenticators(applicationId)).build();
+    }
+
+    @Override
     public Response getApplicationTemplate(String templateId) {
 
         return Response.ok().entity(applicationManagementService.getApplicationTemplateById(templateId)).build();

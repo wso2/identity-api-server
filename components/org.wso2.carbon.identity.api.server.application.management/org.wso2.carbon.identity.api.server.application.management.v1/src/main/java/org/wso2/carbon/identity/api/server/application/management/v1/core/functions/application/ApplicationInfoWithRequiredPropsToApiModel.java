@@ -50,6 +50,8 @@ public class ApplicationInfoWithRequiredPropsToApiModel implements Function<Appl
                 .image(applicationResponseModel.getImageUrl())
                 .accessUrl(applicationResponseModel.getAccessUrl())
                 .access(getAccessForApplicationListItems(applicationResponseModel.getName()))
+                .clientId(applicationResponseModel.getClientId())
+                .issuer(applicationResponseModel.getIssuer())
                 .advancedConfigurations(getAdvancedConfigurations(applicationResponseModel))
                 .templateId(applicationResponseModel.getTemplateId())
                 .self(getApplicationLocation(applicationResponseModel.getId()));

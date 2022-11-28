@@ -110,4 +110,15 @@
             <Bug pattern="PATH_TRAVERSAL_IN" />
         </Match>
     </FindBugsFilter>
+    <!--
+       The following exclusions are added as in java 11 and java 17,
+       findbugs shows the bug of unused fields, but the unused fields
+       cannot be removed as they are used inside unused but public classes.
+    -->
+    <FindBugsFilter>
+        <Match>
+            <Class name="org.wso2.carbon.identity.rest.api.server.challenge.v1.ApiException" />
+            <Bug pattern="URF_UNREAD_FIELD"/>
+        </Match>
+    </FindBugsFilter>
 </FindBugsFilter>
