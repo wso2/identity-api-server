@@ -53,6 +53,8 @@ import static org.wso2.carbon.identity.api.server.input.validation.common.util.V
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.INPUT_VALIDATION_ERROR_PREFIX;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.INPUT_VALIDATION_MGT_ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.Configs.MIN_LENGTH;
+import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.Configs.PASSWORD;
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX;
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_VALIDATION_PARAM_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_VALIDATOR_NOT_SUPPORTED;
@@ -78,11 +80,9 @@ public class ValidationRulesManagementApiService {
                     .getInputValidationConfiguration(tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
-            if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Can not find a validation configurations for tenant: " +
-                            tenantDomain, e);
-                }
+            if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().contains(e.getErrorCode())) {
+                // Return default configurations.
+                return getDefaultConfiguration();
             }
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG, tenantDomain);
         }
@@ -124,7 +124,7 @@ public class ValidationRulesManagementApiService {
                     .getValidatorConfigurations(tenantDomain);
             return buildValidatorResponse(validators);
         } catch (InputValidationMgtException e) {
-            if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().equals(e.getErrorCode())) {
+            if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().contains(e.getErrorCode())) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Can not find a validator configurations for tenant: " +
                             tenantDomain, e);
@@ -149,6 +149,54 @@ public class ValidationRulesManagementApiService {
             response.add(validator);
         }
         return response;
+    }
+
+    /**
+     * Get default configurations.
+     *
+     * @return  default configurations.
+     */
+    private List<ValidationConfigModel> getDefaultConfiguration() {
+
+        // Build default configs.
+        List<ValidationConfigModel> configurations = new ArrayList<>();
+
+        ValidationConfigModel configuration = new ValidationConfigModel();
+        configuration.setField(PASSWORD);
+        List<RuleModel> rules = new ArrayList<>();
+
+        rules.add(getRuleModel("LengthValidator", MIN_LENGTH, "8"));
+        rules.add(getRuleModel("NumeralValidator", MIN_LENGTH, "1"));
+        rules.add(getRuleModel("UpperCaseValidator", MIN_LENGTH, "1"));
+        rules.add(getRuleModel("LowerCaseValidator", MIN_LENGTH, "1"));
+        rules.add(getRuleModel("SpecialCharacterValidator", MIN_LENGTH, "1"));
+        configuration.setRules(rules);
+
+        configurations.add(configuration);
+        return configurations;
+    }
+
+    /**
+     * Get rule model.
+     *
+     * @param validatorName Validator name.
+     * @param property      Property name.
+     * @param value         Property value.
+     *
+     * @return  rule model.
+     */
+    private RuleModel getRuleModel(String validatorName, String property, String value) {
+
+        RuleModel rule = new RuleModel();
+        rule.setValidator(validatorName);
+        List<MappingModel> properties = new ArrayList<>();
+        MappingModel mapping = new MappingModel();
+        mapping.setKey(property);
+        mapping.setValue(value);
+        properties.add(mapping);
+        rule.setProperties(properties);
+
+        return rule;
     }
 
     /**
@@ -360,7 +408,7 @@ public class ValidationRulesManagementApiService {
                 errorResponse.setMessage(exception.getMessage());
                 errorResponse.setDescription(exception.getDescription());
             }
-            if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().equals(exception.getErrorCode())) {
+            if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().contains(exception.getErrorCode())) {
                 status = Response.Status.NOT_FOUND;
             } else {
                 status = Response.Status.BAD_REQUEST;
