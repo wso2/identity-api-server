@@ -2730,7 +2730,6 @@ components:
           type: array
           example:
             - Role based scope validator
-            - XACML Scope Validator
           items:
             type: string
     OAuth2PKCEConfiguration:

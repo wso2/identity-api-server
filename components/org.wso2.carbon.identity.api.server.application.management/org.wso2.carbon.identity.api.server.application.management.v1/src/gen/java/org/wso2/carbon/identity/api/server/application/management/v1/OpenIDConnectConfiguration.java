@@ -357,7 +357,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"XACMLScopeValidator\",\"RoleBasedScopeValidator\"]", value = "")
+    @ApiModelProperty(example = "[\"RoleBasedScopeValidator\"]", value = "")
     @JsonProperty("scopeValidators")
     @Valid
     public List<String> getScopeValidators() {
