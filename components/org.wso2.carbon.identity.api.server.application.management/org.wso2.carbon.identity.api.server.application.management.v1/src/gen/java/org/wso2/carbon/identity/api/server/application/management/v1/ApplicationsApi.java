@@ -16,44 +16,37 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
-import org.apache.cxf.jaxrs.ext.search.SearchContext;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+
 import java.io.InputStream;
 
-import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
-import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
-import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
-import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
-import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.Error;
-import java.io.File;
-import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
-import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
-import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
-import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
-
 import javax.validation.Valid;
-import javax.ws.rs.*;
+import javax.validation.constraints.Min;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.PATCH;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
 
 @Path("/applications")
 @Api(description = "The applications API")
@@ -327,6 +320,34 @@ public class ApplicationsApi  {
     public Response exportApplication(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId,     @Valid@ApiParam(value = "Specifies whether to export secrets when exporting an application. ", defaultValue="false") @DefaultValue("false")  @QueryParam("exportSecrets") Boolean exportSecrets) {
 
         return delegate.exportApplication(applicationId,  exportSecrets );
+    }
+
+    @Valid
+    @GET
+    @Path("/{applicationId}/exportFile")
+
+    @Produces({ "application/octet-stream" })
+    @ApiOperation(value = "Export application as an XML file ", notes = "This API provides the capability to retrieve the application as an XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = Object.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "Applications", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = Object.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public ResponseEntity<Resource> exportApplicationAsFile(
+            @HeaderParam("Accept") String fileType,
+            @ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId,
+            @Valid@ApiParam(value = "Specifies whether to export secrets when exporting an application. "
+                    , defaultValue="false") @DefaultValue("false") @QueryParam("exportSecrets") Boolean exportSecrets) {
+
+        return delegate.exportApplicationAsFile(fileType, applicationId,  exportSecrets );
     }
 
     @Valid

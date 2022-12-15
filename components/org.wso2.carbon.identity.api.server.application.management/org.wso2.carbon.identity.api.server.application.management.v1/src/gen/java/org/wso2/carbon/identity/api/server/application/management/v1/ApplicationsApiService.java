@@ -17,6 +17,8 @@
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -74,6 +76,9 @@ public interface ApplicationsApiService {
       public Response deleteWSTrustConfiguration(String applicationId);
 
       public Response exportApplication(String applicationId, Boolean exportSecrets);
+      public ResponseEntity<Resource> exportApplicationAsFile(String fileType, String applicationId,
+                                                              Boolean exportSecrets);
+
 
       public Response getAdaptiveAuthTemplates();
 

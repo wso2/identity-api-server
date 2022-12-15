@@ -15,6 +15,8 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -27,6 +29,8 @@ import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
@@ -111,6 +115,7 @@ import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementExcepti
 import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -173,6 +178,8 @@ public class ServerApplicationManagementService {
     private static final String WS_TRUST_TEMPLATE_ID = "061a3de4-8c08-4878-84a6-24245f11bf0e";
     private static final String STS_TEMPLATE_NOT_FOUND_MESSAGE = "Request template with id: %s could " +
             "not be found since the WS-Trust connector has not been configured.";
+    public static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
+    public static final String MEDIA_TYPE_APPLICATION_YAML = "application/yaml";
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -422,6 +429,58 @@ public class ServerApplicationManagementService {
             String msg = "Error exporting application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
         }
+    }
+
+    /**
+     * Export an application identified by the applicationId, as an XML string.
+     *
+     * @param applicationId ID of the application to be exported.
+     * @param exportSecrets If True, all hashed or encrypted secrets will also be exported.
+     * @return XML string of the application.
+     */
+    public TransferResource exportApplicationAsFile(String fileType, String applicationId, Boolean exportSecrets) {
+
+        if (StringUtils.isBlank(fileType)) {
+            throw new UnsupportedOperationException("No valid media type found");
+        }
+
+        ServiceProvider serviceProvider;
+        try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            serviceProvider = getApplicationManagementService().exportSPFromAppID(
+                    applicationId, exportSecrets, tenantDomain);
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error exporting application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
+        }
+
+        if (serviceProvider == null) {
+            throw new UnsupportedOperationException("No valid service provider found");
+        }
+        return  generateFileFromModel(fileType, serviceProvider);
+    }
+
+    private TransferResource generateFileFromModel(String fileType, ServiceProvider serviceProvider) {
+
+        String fileName = serviceProvider.getApplicationID() + "_export";
+        String value = "";
+        switch (fileType) {
+            case MEDIA_TYPE_APPLICATION_YAML:
+                Yaml yaml = new Yaml();
+                value = yaml.dump(serviceProvider);
+                break;
+            default:
+                ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
+                try {
+                    value = objectMapper.writeValueAsString(serviceProvider);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                break;
+        }
+
+        return new TransferResource(fileName, new ByteArrayResource(value.getBytes(StandardCharsets.UTF_8)),
+                MediaType.APPLICATION_OCTET_STREAM);
     }
 
     /**
