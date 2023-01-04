@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.16-SNAPSHOT</version>
+    <version>1.2.21-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -419,8 +419,20 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.input.validation.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.secret.mgt.core</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.input.validation.mgt</artifactId>
                 <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -520,7 +532,7 @@
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
         <maven.bundle.plugin.version>2.4.0</maven.bundle.plugin.version>
         <jackson-jaxrs-json-provider.version>2.13.2</jackson-jaxrs-json-provider.version>
-        <jackson-databind.version>2.14.0-rc2</jackson-databind.version>
+        <jackson-databind.version>2.13.4.2</jackson-databind.version>
         <cxf-bundle.version>3.5.0</cxf-bundle.version>
         <cxf.extensions.search.version>3.3.1</cxf.extensions.search.version>
         <jackson.version>1.9.13</jackson.version>
@@ -530,7 +542,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.5.25</identity.governance.version>
-        <carbon.identity.framework.version>5.25.14</carbon.identity.framework.version>
+        <carbon.identity.framework.version>5.25.62</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
@@ -571,6 +583,7 @@
         <module>components/org.wso2.carbon.identity.api.server.authenticators</module>
         <module>components/org.wso2.carbon.identity.api.server.secret.management</module>
         <module>components/org.wso2.carbon.identity.api.server.branding.preference.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.input.validation</module>
     </modules>
 
 </project>
