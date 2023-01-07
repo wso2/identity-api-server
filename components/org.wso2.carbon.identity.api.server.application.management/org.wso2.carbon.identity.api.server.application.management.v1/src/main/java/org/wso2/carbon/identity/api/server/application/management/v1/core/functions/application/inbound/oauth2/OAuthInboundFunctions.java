@@ -36,6 +36,7 @@ import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
 import org.wso2.carbon.identity.oauth.IdentityOAuthClientException;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
+import org.wso2.carbon.identity.oauth2.internal.OAuth2ServiceComponentHolder;
 
 import java.util.List;
 import java.util.UUID;
@@ -87,6 +88,13 @@ public class OAuthInboundFunctions {
 
                 if (!StringUtils.equals(oauthApp.getOauthConsumerSecret(), oidcConfigModel.getClientSecret())) {
                     throw buildBadRequestError("Invalid ClientSecret provided for update.");
+                }
+
+                if (OAuth2ServiceComponentHolder.isLegacyAudienceEnabled()) {
+                    if (oidcConfigModel.getAccessToken().getAudience().size() != 0) {
+                        throw buildBadRequestError("Cannot set audiences for access token if legacy audiences " +
+                                "are enabled.");
+                    }
                 }
 
                 OAuthConsumerAppDTO appToUpdate = new ApiModelToOAuthConsumerApp().apply(application
