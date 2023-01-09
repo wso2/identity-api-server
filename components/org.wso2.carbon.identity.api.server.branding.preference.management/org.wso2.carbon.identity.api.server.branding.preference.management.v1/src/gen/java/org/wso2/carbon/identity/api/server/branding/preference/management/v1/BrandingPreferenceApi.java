@@ -117,6 +117,30 @@ public class BrandingPreferenceApi  {
     }
 
     @Valid
+    @GET
+    @Path("/resolve")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Resolve branding preference of a organization.", notes = "This API provides the capability to retrieve the branding preference of a organization/specific application.<br> If there is no branding preference available for the requested locale, API will check for the default locale('en-US') and return it.<br> If there is no branding preference available for the requested application, API will check for the organization's branding preference and return it.<br>   <b>Permission required:</b> <br>     * None <br>   <b>Scope required:</b> <br>     * None ", response = BrandingPreferenceModel.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Branding Preference", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = BrandingPreferenceModel.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response resolveBrandingPreference(    @Valid@ApiParam(value = "Type to filter the retrieval of themes.", allowableValues="ORG, APP, CUSTOM", defaultValue="ORG") @DefaultValue("ORG")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of themes.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of themes.", defaultValue="en-US") @DefaultValue("en-US")  @QueryParam("locale") String locale) {
+
+        return delegate.resolveBrandingPreference(type,  name,  locale );
+    }
+
+    @Valid
     @PUT
     
     @Consumes({ "application/json" })

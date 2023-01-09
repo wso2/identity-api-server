@@ -163,7 +163,41 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-
+  '/branding-preference/resolve':
+    get:
+      tags:
+        - Branding Preference
+      operationId: resolveBrandingPreference
+      summary: Resolve branding preference of a organization.
+      description: |
+        This API provides the capability to retrieve the branding preference of a organization/specific application.<br>
+        If there is no branding preference available for the requested locale, API will check for the default locale('en-US') and return it.<br>
+        If there is no branding preference available for the requested application, API will check for the organization's branding preference and return it.<br>
+          <b>Permission required:</b> <br>
+            * None <br>
+          <b>Scope required:</b> <br>
+            * None
+      parameters:
+        - $ref: '#/components/parameters/typeQueryParam'
+        - $ref: '#/components/parameters/nameQueryParam'
+        - $ref: '#/components/parameters/localeQueryParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/BrandingPreferenceModel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
 components:
   parameters:
     typeQueryParam:

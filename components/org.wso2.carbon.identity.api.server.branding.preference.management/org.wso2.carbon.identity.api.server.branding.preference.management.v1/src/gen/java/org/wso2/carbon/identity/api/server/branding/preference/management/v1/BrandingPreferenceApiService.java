@@ -37,5 +37,7 @@ public interface BrandingPreferenceApiService {
 
       public Response getBrandingPreference(String type, String name, String locale);
 
+      public Response resolveBrandingPreference(String type, String name, String locale);
+
       public Response updateBrandingPreference(BrandingPreferenceModel brandingPreferenceModel);
 }
