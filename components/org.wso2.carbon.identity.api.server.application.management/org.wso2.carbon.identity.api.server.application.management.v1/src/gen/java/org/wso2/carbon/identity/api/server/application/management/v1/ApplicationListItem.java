@@ -36,6 +36,8 @@ public class ApplicationListItem  {
     private String description;
     private String image;
     private String accessUrl;
+    private String clientId;
+    private String issuer;
 
 @XmlType(name="AccessEnum")
 @XmlEnum(String.class)
@@ -72,8 +74,6 @@ public enum AccessEnum {
     private AccessEnum access = AccessEnum.READ;
     private String self;
     private AdvancedApplicationConfiguration advancedConfigurations;
-    private String clientId;
-    private String issuer;
     private String templateId;
 
     /**
@@ -168,6 +168,42 @@ public enum AccessEnum {
 
     /**
     **/
+    public ApplicationListItem clientId(String clientId) {
+
+        this.clientId = clientId;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "SmrrDNXRYf1lMmDlnleeHTuXx_Ea", value = "")
+    @JsonProperty("clientId")
+    @Valid
+    public String getClientId() {
+        return clientId;
+    }
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    /**
+    **/
+    public ApplicationListItem issuer(String issuer) {
+
+        this.issuer = issuer;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "http://idp.example.com/metadata.php", value = "")
+    @JsonProperty("issuer")
+    @Valid
+    public String getIssuer() {
+        return issuer;
+    }
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
+    }
+
+    /**
+    **/
     public ApplicationListItem access(AccessEnum access) {
 
         this.access = access;
@@ -221,44 +257,6 @@ public enum AccessEnum {
     }
 
     /**
-     **/
-    public ApplicationListItem clientId(String clientId) {
-
-        this.clientId = clientId;
-        return this;
-    }
-
-    @ApiModelProperty(example = "SmrrDNXRYf1lMmDlnleeHTuXx_Ea", value = "")
-    @JsonProperty("clientId")
-    @Valid
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    /**
-     **/
-    public ApplicationListItem issuer(String issuer) {
-
-        this.issuer = issuer;
-        return this;
-    }
-
-    @ApiModelProperty(example = "http://idp.example.com/metadata.php", value = "")
-    @JsonProperty("issuer")
-    @Valid
-    public String getIssuer() {
-        return issuer;
-    }
-
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
-    }
-
-    /**
     **/
     public ApplicationListItem templateId(String templateId) {
 
@@ -303,9 +301,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, access, self,
-                advancedConfigurations, templateId);
+        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, access, self, advancedConfigurations, templateId);
     }
 
     @Override
