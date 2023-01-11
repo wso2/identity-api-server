@@ -41,7 +41,7 @@ public class ApplicationModel  {
     private String imageUrl;
     private String accessUrl;
     private String templateId;
-    private Boolean isManagementApp;
+    private Boolean isManagementApp = false;
     private ClaimConfiguration claimConfiguration;
     private InboundProtocols inboundProtocolConfiguration;
     private AuthenticationSequence authenticationSequence;
@@ -158,16 +158,19 @@ public class ApplicationModel  {
         this.templateId = templateId;
     }
 
+    /**
+    * Decides whether the application used to access System APIs
+    **/
     public ApplicationModel isManagementApp(Boolean isManagementApp) {
 
         this.isManagementApp = isManagementApp;
         return this;
     }
-
+    
     @ApiModelProperty(example = "false", value = "Decides whether the application used to access System APIs")
     @JsonProperty("isManagementApp")
     @Valid
-    public Boolean isManagementApp() {
+    public Boolean getIsManagementApp() {
         return isManagementApp;
     }
     public void setIsManagementApp(Boolean isManagementApp) {
