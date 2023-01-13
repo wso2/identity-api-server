@@ -168,9 +168,9 @@ paths:
       tags:
         - Branding Preference
       operationId: resolveBrandingPreference
-      summary: Resolve branding preference of a organization.
+      summary: Resolve branding preference of an organization.
       description: |
-        This API provides the capability to retrieve the branding preference of a organization/specific application.<br>
+        This API provides the capability to retrieve the branding preference of an organization/specific application.<br>
         If there is no branding preference available for the requested locale, API will check for the default locale('en-US') and return it.<br>
         If there is no branding preference available for the requested application, API will check for the organization's branding preference and return it.<br>
           <b>Permission required:</b> <br>

@@ -121,7 +121,7 @@ public class BrandingPreferenceApi  {
     @Path("/resolve")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Resolve branding preference of a organization.", notes = "This API provides the capability to retrieve the branding preference of a organization/specific application.<br> If there is no branding preference available for the requested locale, API will check for the default locale('en-US') and return it.<br> If there is no branding preference available for the requested application, API will check for the organization's branding preference and return it.<br>   <b>Permission required:</b> <br>     * None <br>   <b>Scope required:</b> <br>     * None ", response = BrandingPreferenceModel.class, authorizations = {
+    @ApiOperation(value = "Resolve branding preference of an organization.", notes = "This API provides the capability to retrieve the branding preference of an organization/specific application.<br> If there is no branding preference available for the requested locale, API will check for the default locale('en-US') and return it.<br> If there is no branding preference available for the requested application, API will check for the organization's branding preference and return it.<br>   <b>Permission required:</b> <br>     * None <br>   <b>Scope required:</b> <br>     * None ", response = BrandingPreferenceModel.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

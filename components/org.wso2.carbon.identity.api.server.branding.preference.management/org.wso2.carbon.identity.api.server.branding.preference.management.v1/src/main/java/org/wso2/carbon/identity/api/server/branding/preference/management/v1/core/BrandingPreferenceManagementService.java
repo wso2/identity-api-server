@@ -172,9 +172,11 @@ public class BrandingPreferenceManagementService {
      */
     public BrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale) {
 
-        // Currently this API provides the support to only configure organization wise branding preference
-        // for 'en-US' locale.
-        // So always retrieve customized default branding preference.
+        /*
+         Currently this API provides the support to only configure organization wise branding preference
+         for 'en-US' locale.
+         So always retrieve customized default branding preference.
+        */
         String tenantDomain = getTenantDomainFromContext();
         try {
             // Get default branding preference.
