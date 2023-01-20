@@ -56,6 +56,7 @@ import static org.wso2.carbon.identity.api.server.input.validation.common.util.V
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX;
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_VALIDATION_PARAM_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_VALIDATOR_NOT_SUPPORTED;
+import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_VALIDATOR_NOT_SUPPORTED_FOR_FIELD;
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.SUPPORTED_PARAMS;
 
 /**
@@ -340,6 +341,11 @@ public class ValidationRulesManagementApiService {
                     || (!isRules && validator instanceof AbstractRegExValidator &&
                     validator.canHandle(rule.getValidatorName()))) {
 
+                if (!validator.isAllowedField(field)) {
+                    throw new InputValidationMgtClientException(ERROR_VALIDATOR_NOT_SUPPORTED_FOR_FIELD.getCode(),
+                            String.format(ERROR_VALIDATOR_NOT_SUPPORTED_FOR_FIELD.getDescription(),
+                                    rule.getValidatorName(), field));
+                }
                 context = new ValidationContext(field, tenantDomain, rule.getProperties(), null);
                 validator.validateProps(context);
             } else {
