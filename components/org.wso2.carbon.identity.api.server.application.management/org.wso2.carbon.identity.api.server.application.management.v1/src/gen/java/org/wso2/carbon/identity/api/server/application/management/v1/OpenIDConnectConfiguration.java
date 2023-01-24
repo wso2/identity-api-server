@@ -177,7 +177,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"https://app.example.com/callback1\",\"https://app.example.com/callback2\"]", value = "Authorized redirect URIs")
+    @ApiModelProperty(example = "[\"regexp=(https://app.example.com/callback1|https://app.example.com/callback2)\"]", value = "Authorized redirect URIs")
     @JsonProperty("callbackURLs")
     @Valid
     public List<String> getCallbackURLs() {
@@ -204,7 +204,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"https://app.example.com/js\"]", value = "Authorized JavaScript origins. CORS requests will be allowed to these origins.")
+    @ApiModelProperty(example = "[\"https://app.example.com\"]", value = "Authorized JavaScript origins. CORS requests will be allowed to these origins.")
     @JsonProperty("allowedOrigins")
     @Valid
     public List<String> getAllowedOrigins() {
@@ -357,7 +357,7 @@ public enum StateEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"XACMLScopeValidator\",\"RoleBasedScopeValidator\"]", value = "")
+    @ApiModelProperty(example = "[\"Role based scope validator\",\"XACML Scope Validator\"]", value = "")
     @JsonProperty("scopeValidators")
     @Valid
     public List<String> getScopeValidators() {
