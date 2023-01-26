@@ -16,6 +16,7 @@
 package org.wso2.carbon.identity.api.server.application.management.common;
 
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.auth.attribute.handler.AuthAttributeHandlerManager;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
@@ -36,6 +37,7 @@ public class ApplicationManagementServiceHolder {
     private static OAuthServerConfiguration oAuthServerConfiguration;
     private static TemplateManager templateManager;
     private static CORSManagementService corsManagementService;
+    private static AuthAttributeHandlerManager authAttributeHandlerManager;
     private static RealmService realmService;
 
     public static ApplicationManagementService getApplicationManagementService() {
@@ -106,6 +108,16 @@ public class ApplicationManagementServiceHolder {
     public static void setCorsManagementService(CORSManagementService corsManagementService) {
 
         ApplicationManagementServiceHolder.corsManagementService = corsManagementService;
+    }
+
+    public static AuthAttributeHandlerManager getAuthAttributeHandlerManager() {
+
+        return authAttributeHandlerManager;
+    }
+
+    public static void setAuthAttributeHandlerManager(AuthAttributeHandlerManager authAttributeHandlerManager) {
+
+        ApplicationManagementServiceHolder.authAttributeHandlerManager = authAttributeHandlerManager;
     }
 
     /**

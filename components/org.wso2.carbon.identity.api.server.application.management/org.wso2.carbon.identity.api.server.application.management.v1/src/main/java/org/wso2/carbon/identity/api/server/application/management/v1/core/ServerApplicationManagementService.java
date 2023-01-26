@@ -52,11 +52,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Provisionin
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.UserRegistrant;
+import org.wso2.carbon.identity.api.server.application.management.v1.UserRegistrantsList;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationBasicInfoToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationInfoWithRequiredPropsToApiModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.AuthAttributeHolderToUserRegistrant;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
@@ -89,6 +92,9 @@ import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.common.model.User;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.auth.attribute.handler.exception.AuthAttributeHandlerClientException;
+import org.wso2.carbon.identity.auth.attribute.handler.exception.AuthAttributeHandlerException;
+import org.wso2.carbon.identity.auth.attribute.handler.model.AuthAttributeHolder;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceSearchBean;
 import org.wso2.carbon.identity.configuration.mgt.core.search.ComplexCondition;
@@ -263,7 +269,6 @@ public class ServerApplicationManagementService {
                                 .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
                                 .collect(Collectors.toList()));
             }
-
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error listing applications of tenantDomain: " + tenantDomain;
             throw handleIdentityApplicationManagementException(e, msg);
@@ -301,7 +306,7 @@ public class ServerApplicationManagementService {
 
     private void validateRequiredAttributes(List<String> requestedAttributeList) {
 
-        for (String attribute: requestedAttributeList) {
+        for (String attribute : requestedAttributeList) {
             if (!(SUPPORTED_REQUIRED_ATTRIBUTES.contains(attribute))) {
                 ErrorMessage errorEnum = ErrorMessage.NON_EXISTING_REQ_ATTRIBUTES;
                 throw Utils.buildBadRequestError(errorEnum.getCode(), errorEnum.getDescription());
@@ -310,7 +315,7 @@ public class ServerApplicationManagementService {
     }
 
     private List<ServiceProvider> getSpWithRequiredAttributes(ApplicationBasicInfo[] filteredAppList,
-                                                                  List<String> requestedAttributeList)
+                                                              List<String> requestedAttributeList)
             throws IdentityApplicationManagementException {
 
         List<ServiceProvider> serviceProviderList = new ArrayList<>();
@@ -322,7 +327,6 @@ public class ServerApplicationManagementService {
         }
         return serviceProviderList;
     }
-
 
     private int validateAndGetOffset(Integer offset) {
 
@@ -359,7 +363,7 @@ public class ServerApplicationManagementService {
      * Get the authenticators configured for an application.
      *
      * @param applicationId ID of the application to be exported.
-     * @return  configured authenticators.
+     * @return configured authenticators.
      */
     public ArrayList<ConfiguredAuthenticatorsModal> getConfiguredAuthenticators(String applicationId) {
 
@@ -372,21 +376,21 @@ public class ServerApplicationManagementService {
                 throw buildClientError(ErrorMessage.APPLICATION_NOT_FOUND, applicationId);
             }
 
-            for (AuthenticationStep step: authenticationSteps) {
+            for (AuthenticationStep step : authenticationSteps) {
                 ArrayList<ConfiguredAuthenticator> localAuthenticators = new ArrayList<>();
                 ArrayList<ConfiguredAuthenticator> federatedAuthenticators = new ArrayList<>();
                 ConfiguredAuthenticatorsModal configuredAuthenticatorsModal = new ConfiguredAuthenticatorsModal();
                 configuredAuthenticatorsModal.stepId(step.getStepOrder());
 
-                for (LocalAuthenticatorConfig localAuthenticatorConfig: step.getLocalAuthenticatorConfigs()) {
+                for (LocalAuthenticatorConfig localAuthenticatorConfig : step.getLocalAuthenticatorConfigs()) {
                     ConfiguredAuthenticator authenticator = new ConfiguredAuthenticator();
                     authenticator.setName(localAuthenticatorConfig.getDisplayName());
                     authenticator.setType(localAuthenticatorConfig.getName());
                     localAuthenticators.add(authenticator);
                 }
 
-                for (IdentityProvider federatedAuthenticator: step.getFederatedIdentityProviders()) {
-                    for (FederatedAuthenticatorConfig federatedAuthenticatorConfig: federatedAuthenticator
+                for (IdentityProvider federatedAuthenticator : step.getFederatedIdentityProviders()) {
+                    for (FederatedAuthenticatorConfig federatedAuthenticatorConfig : federatedAuthenticator
                             .getFederatedAuthenticatorConfigs()) {
                         ConfiguredAuthenticator authenticator = new ConfiguredAuthenticator();
                         authenticator.setName(federatedAuthenticator.getIdentityProviderName());
@@ -1009,7 +1013,7 @@ public class ServerApplicationManagementService {
     /**
      * Update the application owner.
      *
-     * @param applicationId Application ID.
+     * @param applicationId    Application ID.
      * @param applicationOwner UUID of the new application owner.
      */
     public void changeApplicationOwner(String applicationId, ApplicationOwner applicationOwner) {
@@ -1147,7 +1151,7 @@ public class ServerApplicationManagementService {
 
         List<ApplicationListItem> applicationListItems = new ArrayList<>();
         for (ServiceProvider serviceProvider : serviceProviderList) {
-            ApplicationResponseModel  applicationResponseModel =
+            ApplicationResponseModel applicationResponseModel =
                     new ServiceProviderToApiModel().apply(serviceProvider);
             if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(TEMPLATE_ID))) {
                 applicationResponseModel.templateId(null);
@@ -1413,5 +1417,50 @@ public class ServerApplicationManagementService {
                     ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getMessage(),
                     ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getDescription());
         }
+    }
+
+    /**
+     * This method will retrieve the user registrants configured for the given application id by calling the backend
+     * services.
+     *
+     * @param applicationId The application id
+     * @return the user registrants list object
+     */
+    public UserRegistrantsList getConfiguredUserRegistrants(String applicationId) {
+
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving the user registrants configured for the application," + applicationId);
+            }
+            List<AuthAttributeHolder> availableAuthAttributeHolders =
+                    ApplicationManagementServiceHolder.getAuthAttributeHandlerManager()
+                    .getAvailableAuthAttributeHolders(applicationId);
+            List<UserRegistrant> userRegistrants = availableAuthAttributeHolders.stream().map(new
+                    AuthAttributeHolderToUserRegistrant()).collect(Collectors.toList());
+            return new UserRegistrantsList()
+                    .totalResults(userRegistrants.size())
+                    .userRegistrants(userRegistrants);
+        } catch (AuthAttributeHandlerException e) {
+            throw handleAuthAttributeHandlerException(e, "Server encountered an error while retrieving the " +
+                    "registrants configured for the application " + applicationId);
+        }
+    }
+
+    private APIError handleAuthAttributeHandlerException(AuthAttributeHandlerException e, String msg) {
+
+        if (e instanceof AuthAttributeHandlerClientException) {
+            throw buildClientError(e, msg);
+        }
+        throw buildServerError(e, msg);
+    }
+
+    private APIError buildServerError(AuthAttributeHandlerException e, String message) {
+
+        return Utils.buildServerError(UNEXPECTED_SERVER_ERROR.getCode(), message, e.getMessage(), e);
+    }
+
+    private APIError buildClientError(AuthAttributeHandlerException e, String message) {
+
+        return Utils.buildClientError(INVALID_REQUEST.getCode(), message, e.getMessage());
     }
 }
