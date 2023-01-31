@@ -148,25 +148,6 @@ public class ValidationRulesManagementApiService {
     }
 
     /**
-     * Get configurations from user store.
-     *
-     * @return configurations.
-     */
-    private List<ValidationConfigModel> getConfigurationsFromUserStore(String tenantDomain) {
-
-        try {
-            List<ValidationConfiguration> configurations = InputValidationServiceHolder.getInputValidationMgtService()
-                    .getConfigurationFromUserStore(tenantDomain);
-            if (configurations != null) {
-                return buildResponse(configurations);
-            }
-        } catch (InputValidationMgtException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
-
-    /**
      * Method to build RequestDTO from validation request.
      *
      * @param validationConfigModels    Validation configuration request.
