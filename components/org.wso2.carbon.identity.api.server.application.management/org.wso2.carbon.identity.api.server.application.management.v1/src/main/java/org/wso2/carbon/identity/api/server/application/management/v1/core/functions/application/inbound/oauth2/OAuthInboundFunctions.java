@@ -91,7 +91,7 @@ public class OAuthInboundFunctions {
                 }
 
                 if (OAuth2ServiceComponentHolder.isLegacyAudienceEnabled()) {
-                    if (oidcConfigModel.getAccessToken().getAudience().size() != 0) {
+                    if (oidcConfigModel.getAccessToken().getAudience() != null) {
                         throw buildBadRequestError("Cannot set audiences for access token if legacy audiences " +
                                 "are enabled.");
                     }
