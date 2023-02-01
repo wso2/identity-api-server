@@ -180,13 +180,13 @@ public enum AccessEnum {
     }
 
     /**
-     **/
+    **/
     public ApplicationResponseModel clientId(String clientId) {
 
         this.clientId = clientId;
         return this;
     }
-
+    
     @ApiModelProperty(example = "SmrrDNXRYf1lMmDlnleeHTuXx_Ea", value = "")
     @JsonProperty("clientId")
     @Valid
@@ -198,13 +198,13 @@ public enum AccessEnum {
     }
 
     /**
-     **/
+    **/
     public ApplicationResponseModel issuer(String issuer) {
 
         this.issuer = issuer;
         return this;
     }
-
+    
     @ApiModelProperty(example = "http://idp.example.com/metadata.php", value = "")
     @JsonProperty("issuer")
     @Valid
@@ -233,17 +233,20 @@ public enum AccessEnum {
         this.templateId = templateId;
     }
 
+    /**
+    * Decides whether the application used to access System APIs
+    **/
     public ApplicationResponseModel isManagementApp(Boolean isManagementApp) {
 
         this.isManagementApp = isManagementApp;
         return this;
     }
-
+    
     @ApiModelProperty(example = "false", value = "Decides whether the application used to access System APIs")
     @JsonProperty("isManagementApp")
     @Valid
-    public Boolean isManagementApp() {
-        return this.isManagementApp;
+    public Boolean getIsManagementApp() {
+        return isManagementApp;
     }
     public void setIsManagementApp(Boolean isManagementApp) {
         this.isManagementApp = isManagementApp;

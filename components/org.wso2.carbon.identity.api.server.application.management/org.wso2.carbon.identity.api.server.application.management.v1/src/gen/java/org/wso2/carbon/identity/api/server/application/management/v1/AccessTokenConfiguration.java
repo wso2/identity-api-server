@@ -100,7 +100,7 @@ public class AccessTokenConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "[\"sso-session\",\"cookie\"]", value = "OAuth2 access token and refresh token can be bound to an external attribute during the token generation so that it can be optionally validated during the API invocation.")
+    @ApiModelProperty(example = "cookie", value = "OAuth2 access token and refresh token can be bound to an external attribute during the token generation so that it can be optionally validated during the API invocation.")
     @JsonProperty("bindingType")
     @Valid
     public String getBindingType() {

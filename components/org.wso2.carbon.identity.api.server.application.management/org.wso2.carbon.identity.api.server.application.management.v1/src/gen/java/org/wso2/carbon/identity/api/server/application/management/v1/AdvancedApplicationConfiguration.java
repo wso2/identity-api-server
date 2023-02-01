@@ -41,8 +41,9 @@ public class AdvancedApplicationConfiguration  {
     private Boolean skipLogoutConsent;
     private Boolean returnAuthenticatedIdpList;
     private Boolean enableAuthorization;
-    private List<AdditionalSpProperty> additionalSpProperties = null;
     private Boolean fragment;
+    private List<AdditionalSpProperty> additionalSpProperties = null;
+
 
     /**
     * Decides whether the application is accessible across tenants.
@@ -184,7 +185,7 @@ public class AdvancedApplicationConfiguration  {
         this.fragment = fragment;
         return this;
     }
-
+    
     @ApiModelProperty(example = "false", value = "Decides whether application is a fragment application.")
     @JsonProperty("fragment")
     @Valid
@@ -202,6 +203,7 @@ public class AdvancedApplicationConfiguration  {
         this.additionalSpProperties = additionalSpProperties;
         return this;
     }
+    
     @ApiModelProperty(value = "")
     @JsonProperty("additionalSpProperties")
     @Valid
@@ -212,14 +214,15 @@ public class AdvancedApplicationConfiguration  {
         this.additionalSpProperties = additionalSpProperties;
     }
 
-    public AdvancedApplicationConfiguration addAdditionalSpPropertiesItem(AdditionalSpProperty
-                                                                                  additionalSpPropertiesItem) {
+    public AdvancedApplicationConfiguration addAdditionalSpPropertiesItem(AdditionalSpProperty additionalSpPropertiesItem) {
         if (this.additionalSpProperties == null) {
             this.additionalSpProperties = new ArrayList<>();
         }
         this.additionalSpProperties.add(additionalSpPropertiesItem);
         return this;
     }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -244,8 +247,7 @@ public class AdvancedApplicationConfiguration  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent,
-                returnAuthenticatedIdpList, enableAuthorization, fragment, additionalSpProperties);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, returnAuthenticatedIdpList, enableAuthorization, fragment, additionalSpProperties);
     }
 
     @Override
