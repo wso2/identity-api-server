@@ -24,17 +24,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
-import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationOwner;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
-import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
@@ -76,7 +73,7 @@ public interface ApplicationsApiService {
       public Response deleteWSTrustConfiguration(String applicationId);
 
       public Response exportApplication(String applicationId, Boolean exportSecrets);
-      public ResponseEntity<Resource> exportApplicationAsFile(String fileType, String applicationId,
+      public Response exportApplicationAsFile(String fileType, String applicationId,
                                                               Boolean exportSecrets);
 
 
@@ -88,9 +85,9 @@ public interface ApplicationsApiService {
 
       public Response getApplication(String applicationId);
 
-      public Response getApplicationTemplate(String templateId);
-
       public Response getConfiguredAuthenticators(String applicationId);
+
+      public Response getApplicationTemplate(String templateId);
 
       public Response getCustomInboundConfiguration(String applicationId, String inboundProtocolId);
 

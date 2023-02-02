@@ -19,10 +19,8 @@ package org.wso2.carbon.identity.api.server.application.management.v1.impl;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
@@ -211,18 +209,21 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public ResponseEntity<Resource> exportApplicationAsFile(String fileType, String applicationId
+    public Response exportApplicationAsFile(String fileType, String applicationId
             , Boolean exportSecrets) {
 
         TransferResource transferResource = applicationManagementService.exportApplicationAsFile(fileType,
                 applicationId, exportSecrets);
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
+        return Response.ok()
+                .type(MediaType.APPLICATION_OCTET_STREAM_VALUE)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
                         + transferResource.getResourceName() + "\"")
-                .body(transferResource.getResource());
-
+                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
+                .entity(transferResource.getResource().getByteArray())
+                .build();
     }
 
     @Override

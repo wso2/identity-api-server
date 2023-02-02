@@ -26,8 +26,6 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 
 import java.io.InputStream;
 
@@ -326,7 +324,7 @@ public class ApplicationsApi  {
     @GET
     @Path("/{applicationId}/exportFile")
 
-    @Produces({ "application/octet-stream" })
+    @Produces({ "application/octet-stream", "application/json", "application/yaml" })
     @ApiOperation(value = "Export application as an XML file ", notes = "This API provides the capability to retrieve the application as an XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = Object.class, authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
@@ -341,7 +339,7 @@ public class ApplicationsApi  {
             @ApiResponse(code = 404, message = "Not Found", response = Error.class),
             @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public ResponseEntity<Resource> exportApplicationAsFile(
+    public Response exportApplicationAsFile(
             @HeaderParam("Accept") String fileType,
             @ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId,
             @Valid@ApiParam(value = "Specifies whether to export secrets when exporting an application. "
@@ -396,7 +394,7 @@ public class ApplicationsApi  {
     public Response getAllApplicationTemplates(    @Valid@ApiParam(value = "Maximum number of records to return. ")
                                                        @QueryParam("limit") Integer limit,     @Valid@ApiParam(value
             = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset, @Context
-            SearchContext searchContext) {
+                                                   SearchContext searchContext) {
 
         return delegate.getAllApplicationTemplates(limit,  offset, searchContext );
     }
@@ -825,7 +823,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response importApplicationForUpdate(@Multipart(value = "file", required = false) InputStream fileInputStream,@Multipart(value = "file" , required = false) Attachment fileDetail) {
+    public Response importApplicationForUpdate(@Multipart(value = "file", required = false) InputStream fileInputStream, @Multipart(value = "file" , required = false) Attachment fileDetail) {
 
         return delegate.importApplicationForUpdate(fileInputStream, fileDetail );
     }

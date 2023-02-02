@@ -180,6 +180,8 @@ public class ServerApplicationManagementService {
             "not be found since the WS-Trust connector has not been configured.";
     public static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
     public static final String MEDIA_TYPE_APPLICATION_YAML = "application/yaml";
+    public static final String YML_FILE_NAME = "_export.yml";
+    public static final String JSON_FILE_NAME = "_export.json";
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -462,12 +464,13 @@ public class ServerApplicationManagementService {
 
     private TransferResource generateFileFromModel(String fileType, ServiceProvider serviceProvider) {
 
-        String fileName = serviceProvider.getApplicationID() + "_export";
+        StringBuilder fileNameSB = new StringBuilder(serviceProvider.getApplicationResourceId());
         String value = "";
         switch (fileType) {
             case MEDIA_TYPE_APPLICATION_YAML:
                 Yaml yaml = new Yaml();
                 value = yaml.dump(serviceProvider);
+                fileNameSB.append(YML_FILE_NAME);
                 break;
             default:
                 ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
@@ -476,11 +479,12 @@ public class ServerApplicationManagementService {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+                fileNameSB.append(JSON_FILE_NAME);
                 break;
         }
 
-        return new TransferResource(fileName, new ByteArrayResource(value.getBytes(StandardCharsets.UTF_8)),
-                MediaType.APPLICATION_OCTET_STREAM);
+        return new TransferResource(fileNameSB.toString(), new ByteArrayResource(value.getBytes
+                (StandardCharsets.UTF_8)), MediaType.APPLICATION_OCTET_STREAM);
     }
 
     /**
