@@ -1428,13 +1428,14 @@ public class ServerApplicationManagementService {
      */
     public UserRegistrantsList getConfiguredUserRegistrants(String applicationId) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             if (log.isDebugEnabled()) {
                 log.debug("Retrieving the user registrants configured for the application," + applicationId);
             }
             List<AuthAttributeHolder> availableAuthAttributeHolders =
                     ApplicationManagementServiceHolder.getAuthAttributeHandlerManager()
-                    .getAvailableAuthAttributeHolders(applicationId);
+                    .getAvailableAuthAttributeHolders(applicationId, tenantDomain);
             List<UserRegistrant> userRegistrants = availableAuthAttributeHolders.stream().map(new
                     AuthAttributeHolderToUserRegistrant()).collect(Collectors.toList());
             return new UserRegistrantsList()

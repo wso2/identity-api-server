@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
+
 /**
  * Converts the backend model AuthAttributeHolder into the corresponding API model object.
  */
@@ -42,7 +44,7 @@ public class AuthAttributeHolderToUserRegistrant implements Function<AuthAttribu
                 AuthAttributeToApiModel()).collect(Collectors.toList());
 
         return new UserRegistrant()
-                .id("some-dummy-id-need-from-be")
+                .id(base64URLEncode(authAttributeHolder.getHandlerName()))
                 .name(authAttributeHolder.getHandlerName())
                 .authAttributes(authAttributes);
     }
