@@ -68,6 +68,40 @@ public enum SchemeEnum {
     private String userstore = "PRIMARY";
     private Boolean associateLocalUser = false;
 
+@XmlType(name="SyncAttributeEnum")
+@XmlEnum(String.class)
+public enum SyncAttributeEnum {
+
+    @XmlEnumValue("ALL") ALL(String.valueOf("ALL")), @XmlEnumValue("NONE") NONE(String.valueOf("NONE")), @XmlEnumValue("NEW") NEW(String.valueOf("NEW"));
+
+
+    private String value;
+
+    SyncAttributeEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static SyncAttributeEnum fromValue(String value) {
+        for (SyncAttributeEnum b : SyncAttributeEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private SyncAttributeEnum syncAttribute = SyncAttributeEnum.ALL;
+
     /**
     **/
     public JustInTimeProvisioning isEnabled(Boolean isEnabled) {
@@ -142,6 +176,24 @@ public enum SchemeEnum {
         this.associateLocalUser = associateLocalUser;
     }
 
+    /**
+    **/
+    public JustInTimeProvisioning syncAttribute(SyncAttributeEnum syncAttribute) {
+
+        this.syncAttribute = syncAttribute;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("syncAttribute")
+    @Valid
+    public SyncAttributeEnum getSyncAttribute() {
+        return syncAttribute;
+    }
+    public void setSyncAttribute(SyncAttributeEnum syncAttribute) {
+        this.syncAttribute = syncAttribute;
+    }
+
 
 
     @Override
@@ -157,12 +209,13 @@ public enum SchemeEnum {
         return Objects.equals(this.isEnabled, justInTimeProvisioning.isEnabled) &&
             Objects.equals(this.scheme, justInTimeProvisioning.scheme) &&
             Objects.equals(this.userstore, justInTimeProvisioning.userstore) &&
-            Objects.equals(this.associateLocalUser, justInTimeProvisioning.associateLocalUser);
+            Objects.equals(this.associateLocalUser, justInTimeProvisioning.associateLocalUser) &&
+            Objects.equals(this.syncAttribute, justInTimeProvisioning.syncAttribute);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser);
+        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser, syncAttribute);
     }
 
     @Override
@@ -175,6 +228,7 @@ public enum SchemeEnum {
         sb.append("    scheme: ").append(toIndentedString(scheme)).append("\n");
         sb.append("    userstore: ").append(toIndentedString(userstore)).append("\n");
         sb.append("    associateLocalUser: ").append(toIndentedString(associateLocalUser)).append("\n");
+        sb.append("    syncAttribute: ").append(toIndentedString(syncAttribute)).append("\n");
         sb.append("}");
         return sb.toString();
     }

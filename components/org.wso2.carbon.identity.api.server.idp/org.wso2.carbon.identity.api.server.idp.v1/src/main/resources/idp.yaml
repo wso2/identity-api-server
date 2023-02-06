@@ -2422,6 +2422,13 @@ components:
           type: boolean
           default: false
           example: true
+        syncAttribute:
+          type: string
+          enum:
+            - ALL
+            - NONE
+            - NEW
+          default: ALL
     ConnectedApps:
       type: object
       properties:
