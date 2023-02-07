@@ -72,7 +72,7 @@ public enum SchemeEnum {
 @XmlEnum(String.class)
 public enum SyncAttributeEnum {
 
-    @XmlEnumValue("ALL") ALL(String.valueOf("ALL")), @XmlEnumValue("NONE") NONE(String.valueOf("NONE")), @XmlEnumValue("NEW") NEW(String.valueOf("NEW"));
+    @XmlEnumValue("ALL") ALL(String.valueOf("ALL")), @XmlEnumValue("NONE") NONE(String.valueOf("NONE")), @XmlEnumValue("PRESERVE_LOCAL") PRESERVE_LOCAL(String.valueOf("PRESERVE_LOCAL"));
 
 
     private String value;
