@@ -27,6 +27,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.Error;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModelForField;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidatorModel;
 import org.wso2.carbon.identity.api.server.input.validation.v1.ValidationRulesApiService;
 
@@ -65,6 +66,25 @@ public class ValidationRulesApi  {
 
     @Valid
     @GET
+    @Path("/{field}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "", notes = "Get validation rules for user inputs", response = ValidationConfigModel.class, tags={ "Get Validation Rules for a field", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Configurations successfully updated for the field.", response = ValidationConfigModel.class),
+        @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Field not found", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public Response getValidationRulesForField(@ApiParam(value = "name of the field",required=true) @PathParam("field") String field) {
+
+        return delegate.getValidationRulesForField(field );
+    }
+
+    @Valid
+    @GET
     @Path("/validators")
     
     @Produces({ "application/json" })
@@ -97,6 +117,25 @@ public class ValidationRulesApi  {
     public Response updateValidationRules(@ApiParam(value = "Represents the password validation criteria." ,required=true) @Valid List<ValidationConfigModel> validationConfigModel) {
 
         return delegate.updateValidationRules(validationConfigModel );
+    }
+
+    @Valid
+    @PUT
+    @Path("/{field}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "", notes = "Update validation rules for user inputs for a field", response = ValidationConfigModel.class, tags={ "Update Validation Rules for a field" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Configurations successfully updated for the field.", response = ValidationConfigModel.class),
+        @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Field not found", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public Response updateValidationRulesForField(@ApiParam(value = "name of the field",required=true) @PathParam("field") String field, @ApiParam(value = "Represents the password validation criteria." ,required=true) @Valid ValidationConfigModelForField validationConfigModelForField) {
+
+        return delegate.updateValidationRulesForField(field,  validationConfigModelForField );
     }
 
 }

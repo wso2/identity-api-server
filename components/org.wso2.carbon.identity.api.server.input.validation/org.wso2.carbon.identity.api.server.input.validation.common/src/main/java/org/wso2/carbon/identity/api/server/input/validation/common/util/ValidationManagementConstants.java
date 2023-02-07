@@ -36,6 +36,9 @@ public class ValidationManagementConstants {
         ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS("60001",
                 "Validation configurations are not configured.",
                 "Validation configurations are not configured for organization: %s."),
+        ERROR_CODE_FIELD_NOT_EXISTS("60002",
+                "Field is not found.",
+                "Invalid or unsupported field %s is provided."),
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG("65001",
                 "Error while getting input validation configurations.",
