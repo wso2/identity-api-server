@@ -163,6 +163,40 @@ public class BrandingPreferenceManagementService {
     }
 
     /**
+     * Retrieve the resolved branding preferences.
+     *
+     * @param type   Resource Type.
+     * @param name   Name.
+     * @param locale Language preference.
+     * @return The resolved branding preference resource. If not exists return the default preferences.
+     */
+    public BrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale) {
+
+        /*
+         Currently this API provides the support to only configure organization wise branding preference
+         for 'en-US' locale.
+         So always retrieve customized default branding preference.
+        */
+        String tenantDomain = getTenantDomainFromContext();
+        try {
+            // Get default branding preference.
+            BrandingPreference responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
+                    resolveBrandingPreference(ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
+
+            return buildBrandingResponseFromResponseDTO(responseDTO);
+        } catch (BrandingPreferenceMgtException e) {
+            if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find a branding preference configurations for tenant: " + tenantDomain, e);
+                }
+                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS,
+                        tenantDomain);
+            }
+            throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE, tenantDomain);
+        }
+    }
+
+    /**
      * Update branding preferences.
      *
      * @param brandingPreferenceModel Branding Preference Model with new preferences.

@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidatorM
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtClientException;
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtException;
 import org.wso2.carbon.identity.input.validation.mgt.exceptions.InputValidationMgtServerException;
+import org.wso2.carbon.identity.input.validation.mgt.model.FieldValidationConfigurationHandler;
 import org.wso2.carbon.identity.input.validation.mgt.model.RulesConfiguration;
 import org.wso2.carbon.identity.input.validation.mgt.model.ValidationConfiguration;
 import org.wso2.carbon.identity.input.validation.mgt.model.ValidationContext;
@@ -56,6 +57,7 @@ import static org.wso2.carbon.identity.api.server.input.validation.common.util.V
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_CODE_CONFIGURE_EITHER_RULES_OR_REGEX;
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_VALIDATION_PARAM_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_VALIDATOR_NOT_SUPPORTED;
+import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.ErrorMessages.ERROR_VALIDATOR_NOT_SUPPORTED_FOR_FIELD;
 import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.SUPPORTED_PARAMS;
 
 /**
@@ -78,11 +80,6 @@ public class ValidationRulesManagementApiService {
                     .getInputValidationConfiguration(tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
-            if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().contains(e.getErrorCode())
-                    && getConfigurationsFromUserStore(tenantDomain) != null) {
-                // Return configurations from user store.
-                return getConfigurationsFromUserStore(tenantDomain);
-            }
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG, tenantDomain);
         }
     }
@@ -148,25 +145,6 @@ public class ValidationRulesManagementApiService {
             response.add(validator);
         }
         return response;
-    }
-
-    /**
-     * Get configurations from user store.
-     *
-     * @return configurations.
-     */
-    private List<ValidationConfigModel> getConfigurationsFromUserStore(String tenantDomain) {
-
-        try {
-            List<ValidationConfiguration> configurations = InputValidationServiceHolder.getInputValidationMgtService()
-                    .getConfigurationFromUserStore(tenantDomain);
-            if (configurations != null) {
-                return buildResponse(configurations);
-            }
-        } catch (InputValidationMgtException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
     }
 
     /**
@@ -340,12 +318,26 @@ public class ValidationRulesManagementApiService {
                     || (!isRules && validator instanceof AbstractRegExValidator &&
                     validator.canHandle(rule.getValidatorName()))) {
 
+                // Check whether validator is allowed for the field.
+                if (!validator.isAllowedField(field)) {
+                    throw new InputValidationMgtClientException(ERROR_VALIDATOR_NOT_SUPPORTED_FOR_FIELD.getCode(),
+                            String.format(ERROR_VALIDATOR_NOT_SUPPORTED_FOR_FIELD.getDescription(),
+                                    rule.getValidatorName(), field));
+                }
                 context = new ValidationContext(field, tenantDomain, rule.getProperties(), null);
                 validator.validateProps(context);
             } else {
                 throw new InputValidationMgtClientException(ERROR_VALIDATOR_NOT_SUPPORTED.getCode(),
                         String.format(ERROR_VALIDATOR_NOT_SUPPORTED.getDescription(), rule.getValidatorName(),
                                 isRules ? "rules" : "regex"));
+            }
+        }
+
+        // Validate provided validation is allowed for the field.
+        for (FieldValidationConfigurationHandler handler: InputValidationServiceHolder.getInputValidationMgtService()
+                .getFieldValidationConfigurationHandlers().values()) {
+            if (handler.canHandle(field)) {
+                handler.validateValidationConfiguration(rules);
             }
         }
     }
