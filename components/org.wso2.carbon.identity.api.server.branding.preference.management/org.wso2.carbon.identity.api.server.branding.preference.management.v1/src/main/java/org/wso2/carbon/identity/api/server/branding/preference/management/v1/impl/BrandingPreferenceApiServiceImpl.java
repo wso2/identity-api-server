@@ -120,6 +120,18 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     }
 
     @Override
+    public Response resolveBrandingPreference(String type, String name, String locale) {
+
+        if (type != null) {
+            if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+        }
+        return Response.ok()
+                .entity(brandingPreferenceManagementService.resolveBrandingPreference(type, name, locale)).build();
+    }
+
+    @Override
     public Response updateBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
 
         if (StringUtils.isBlank(brandingPreferenceModel.getType().toString())) {

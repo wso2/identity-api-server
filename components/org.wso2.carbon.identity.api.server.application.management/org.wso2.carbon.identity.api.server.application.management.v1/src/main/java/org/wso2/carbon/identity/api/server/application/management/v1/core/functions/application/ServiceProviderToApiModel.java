@@ -100,8 +100,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .description(application.getDescription())
                     .imageUrl(application.getImageUrl())
                     .accessUrl(application.getAccessUrl())
-                    .clientId(getClientId(application))
-                    .issuer(getIssuer(application))
+                    .clientId(getInboundKey(application, "oauth2"))
+                    .issuer(getInboundKey(application, "samlsso"))
                     .templateId(application.getTemplateId())
                     .isManagementApp(application.isManagementApp())
                     .claimConfiguration(buildClaimConfiguration(application))
@@ -443,30 +443,14 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return ApplicationResponseModel.AccessEnum.WRITE;
     }
 
-    private String getClientId(ServiceProvider application) {
+    private String getInboundKey(ServiceProvider application, String authType) {
 
         if (application.getInboundAuthenticationConfig() != null) {
             InboundAuthenticationRequestConfig[] authRequestConfigs = application.getInboundAuthenticationConfig()
                     .getInboundAuthenticationRequestConfigs();
 
             if (authRequestConfigs != null && authRequestConfigs.length > 0) {
-                if (authRequestConfigs[0].getInboundAuthType().equals("oauth2")) {
-                    return authRequestConfigs[0].getInboundAuthKey();
-                }
-            }
-        }
-
-        return StringUtils.EMPTY;
-    }
-
-    private String getIssuer(ServiceProvider application) {
-
-        if (application.getInboundAuthenticationConfig() != null) {
-            InboundAuthenticationRequestConfig[] authRequestConfigs = application.getInboundAuthenticationConfig()
-                    .getInboundAuthenticationRequestConfigs();
-
-            if (authRequestConfigs != null && authRequestConfigs.length > 0) {
-                if (authRequestConfigs[0].getInboundAuthType().equals("samlsso")) {
+                if (authRequestConfigs[0].getInboundAuthType().equals(authType)) {
                     return authRequestConfigs[0].getInboundAuthKey();
                 }
             }
