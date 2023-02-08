@@ -68,16 +68,16 @@ public enum SchemeEnum {
     private String userstore = "PRIMARY";
     private Boolean associateLocalUser = false;
 
-@XmlType(name="SyncAttributeEnum")
+@XmlType(name="AttributeSyncMethodEnum")
 @XmlEnum(String.class)
-public enum SyncAttributeEnum {
+public enum AttributeSyncMethodEnum {
 
-    @XmlEnumValue("ALL") ALL(String.valueOf("ALL")), @XmlEnumValue("NONE") NONE(String.valueOf("NONE")), @XmlEnumValue("PRESERVE_LOCAL") PRESERVE_LOCAL(String.valueOf("PRESERVE_LOCAL"));
+    @XmlEnumValue("OVERRIDE_ALL") OVERRIDE_ALL(String.valueOf("OVERRIDE_ALL")), @XmlEnumValue("NONE") NONE(String.valueOf("NONE")), @XmlEnumValue("PRESERVE_LOCAL") PRESERVE_LOCAL(String.valueOf("PRESERVE_LOCAL"));
 
 
     private String value;
 
-    SyncAttributeEnum(String v) {
+    AttributeSyncMethodEnum(String v) {
         value = v;
     }
 
@@ -90,8 +90,8 @@ public enum SyncAttributeEnum {
         return String.valueOf(value);
     }
 
-    public static SyncAttributeEnum fromValue(String value) {
-        for (SyncAttributeEnum b : SyncAttributeEnum.values()) {
+    public static AttributeSyncMethodEnum fromValue(String value) {
+        for (AttributeSyncMethodEnum b : AttributeSyncMethodEnum.values()) {
             if (b.value.equals(value)) {
                 return b;
             }
@@ -100,7 +100,7 @@ public enum SyncAttributeEnum {
     }
 }
 
-    private SyncAttributeEnum syncAttribute = SyncAttributeEnum.ALL;
+    private AttributeSyncMethodEnum attributeSyncMethod = AttributeSyncMethodEnum.OVERRIDE_ALL;
 
     /**
     **/
@@ -178,20 +178,20 @@ public enum SyncAttributeEnum {
 
     /**
     **/
-    public JustInTimeProvisioning syncAttribute(SyncAttributeEnum syncAttribute) {
+    public JustInTimeProvisioning attributeSyncMethod(AttributeSyncMethodEnum attributeSyncMethod) {
 
-        this.syncAttribute = syncAttribute;
+        this.attributeSyncMethod = attributeSyncMethod;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("syncAttribute")
+    @JsonProperty("attributeSyncMethod")
     @Valid
-    public SyncAttributeEnum getSyncAttribute() {
-        return syncAttribute;
+    public AttributeSyncMethodEnum getAttributeSyncMethod() {
+        return attributeSyncMethod;
     }
-    public void setSyncAttribute(SyncAttributeEnum syncAttribute) {
-        this.syncAttribute = syncAttribute;
+    public void setAttributeSyncMethod(AttributeSyncMethodEnum attributeSyncMethod) {
+        this.attributeSyncMethod = attributeSyncMethod;
     }
 
 
@@ -210,12 +210,12 @@ public enum SyncAttributeEnum {
             Objects.equals(this.scheme, justInTimeProvisioning.scheme) &&
             Objects.equals(this.userstore, justInTimeProvisioning.userstore) &&
             Objects.equals(this.associateLocalUser, justInTimeProvisioning.associateLocalUser) &&
-            Objects.equals(this.syncAttribute, justInTimeProvisioning.syncAttribute);
+            Objects.equals(this.attributeSyncMethod, justInTimeProvisioning.attributeSyncMethod);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser, syncAttribute);
+        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser, attributeSyncMethod);
     }
 
     @Override
@@ -228,7 +228,7 @@ public enum SyncAttributeEnum {
         sb.append("    scheme: ").append(toIndentedString(scheme)).append("\n");
         sb.append("    userstore: ").append(toIndentedString(userstore)).append("\n");
         sb.append("    associateLocalUser: ").append(toIndentedString(associateLocalUser)).append("\n");
-        sb.append("    syncAttribute: ").append(toIndentedString(syncAttribute)).append("\n");
+        sb.append("    attributeSyncMethod: ").append(toIndentedString(attributeSyncMethod)).append("\n");
         sb.append("}");
         return sb.toString();
     }

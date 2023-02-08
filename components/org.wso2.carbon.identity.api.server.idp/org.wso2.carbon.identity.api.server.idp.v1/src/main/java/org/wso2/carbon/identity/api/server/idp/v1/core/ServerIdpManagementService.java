@@ -1649,7 +1649,7 @@ public class ServerIdpManagementService {
                     break;
             }
             jitConfig.setAssociateLocalUserEnabled(jit.getAssociateLocalUser());
-            jitConfig.setSyncAttributeMethod(jit.getSyncAttribute().toString());
+            jitConfig.setAttributeSyncMethod(jit.getAttributeSyncMethod().toString());
             identityProvider.setJustInTimeProvisioningConfig(jitConfig);
         }
     }
@@ -2202,12 +2202,12 @@ public class ServerIdpManagementService {
                 jitConfig.setUserstore(idp.getJustInTimeProvisioningConfig().getProvisioningUserStore());
             }
             jitConfig.setAssociateLocalUser(idp.getJustInTimeProvisioningConfig().isAssociateLocalUserEnabled());
-            if (idp.getJustInTimeProvisioningConfig().getSyncAttributeMethod() == null) {
-                jitConfig.setSyncAttribute(JustInTimeProvisioning.SyncAttributeEnum.valueOf(
+            if (idp.getJustInTimeProvisioningConfig().getAttributeSyncMethod() == null) {
+                jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(
                         FrameworkConstants.SYNC_ALL));
             } else {
-                jitConfig.setSyncAttribute(JustInTimeProvisioning.SyncAttributeEnum.valueOf(
-                        idp.getJustInTimeProvisioningConfig().getSyncAttributeMethod()));
+                jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(
+                        idp.getJustInTimeProvisioningConfig().getAttributeSyncMethod()));
             }
         }
         return jitConfig;

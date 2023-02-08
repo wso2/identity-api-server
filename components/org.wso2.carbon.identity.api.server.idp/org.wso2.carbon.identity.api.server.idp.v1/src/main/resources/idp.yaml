@@ -2422,13 +2422,13 @@ components:
           type: boolean
           default: false
           example: true
-        syncAttribute:
+        attributeSyncMethod:
           type: string
           enum:
-            - ALL
+            - OVERRIDE_ALL
             - NONE
             - PRESERVE_LOCAL
-          default: ALL
+          default: OVERRIDE_ALL
     ConnectedApps:
       type: object
       properties:
