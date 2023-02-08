@@ -215,7 +215,7 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
                                                  FederatedAuthenticatorPUTRequest federatedAuthenticatorPUTRequest) {
 
         return Response.ok().entity(idpManagementService.updateFederatedAuthenticator(identityProviderId,
-                        federatedAuthenticatorId, federatedAuthenticatorPUTRequest))
+                federatedAuthenticatorId, federatedAuthenticatorPUTRequest))
                 .build();
     }
 
@@ -247,7 +247,7 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
                                             OutboundConnectorPUTRequest outboundConnectorPUTRequest) {
 
         return Response.ok().entity(idpManagementService.updateOutboundConnector(identityProviderId,
-                        outboundProvisioningConnectorId, outboundConnectorPUTRequest))
+                 outboundProvisioningConnectorId, outboundConnectorPUTRequest))
                 .build();
     }
 
