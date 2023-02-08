@@ -89,12 +89,12 @@ public class ValidationRulesManagementApiService {
      * Method to get input validation configuration.
      *
      * @param tenantDomain  Tenant Domain.
-     * @return ValidationConfigModal.
+     * @return ValidationConfigModel.
      */
     public ValidationConfigModel getValidationConfigurationForField(String tenantDomain, String field) {
 
         try {
-            isFieldFound(field);
+            isFieldSupported(field);
             ValidationConfiguration configuration = InputValidationServiceHolder.getInputValidationMgtService()
                     .getInputValidationConfigurationForField(tenantDomain, field);
             return buildResponse(configuration);
@@ -119,9 +119,6 @@ public class ValidationRulesManagementApiService {
                     .updateInputValidationConfiguration(requestDTO, tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Unable to update validation configuration for tenant: " + tenantDomain, e);
-            }
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG, tenantDomain);
         }
     }
@@ -137,7 +134,7 @@ public class ValidationRulesManagementApiService {
             ValidationConfigModel validationConfigModel, String tenantDomain) {
 
         try {
-            isFieldFound(validationConfigModel.getField());
+            isFieldSupported(validationConfigModel.getField());
             List<ValidationConfigModel> configModels = new ArrayList<>();
             configModels.add(validationConfigModel);
             List<ValidationConfiguration> requestDTO = buildRequestDTOFromValidationRequest(configModels);
@@ -146,9 +143,6 @@ public class ValidationRulesManagementApiService {
                     .updateValidationConfiguration(requestDTO.get(0), tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Unable to update validation configuration for tenant: " + tenantDomain, e);
-            }
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG, tenantDomain);
         }
     }
@@ -489,7 +483,7 @@ public class ValidationRulesManagementApiService {
      * @return True if given field is supported.
      * @throws InputValidationMgtClientException if field is not supported or invalid.
      */
-    private boolean isFieldFound(String field) throws InputValidationMgtClientException {
+    private boolean isFieldSupported(String field) throws InputValidationMgtClientException {
 
         if (SUPPORTED_PARAMS.contains(field)) {
             return true;
