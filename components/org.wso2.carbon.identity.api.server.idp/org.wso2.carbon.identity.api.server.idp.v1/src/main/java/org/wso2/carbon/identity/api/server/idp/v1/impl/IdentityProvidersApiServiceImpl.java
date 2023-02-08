@@ -247,7 +247,7 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
                                             OutboundConnectorPUTRequest outboundConnectorPUTRequest) {
 
         return Response.ok().entity(idpManagementService.updateOutboundConnector(identityProviderId,
-                 outboundProvisioningConnectorId, outboundConnectorPUTRequest))
+                outboundProvisioningConnectorId, outboundConnectorPUTRequest))
                 .build();
     }
 
