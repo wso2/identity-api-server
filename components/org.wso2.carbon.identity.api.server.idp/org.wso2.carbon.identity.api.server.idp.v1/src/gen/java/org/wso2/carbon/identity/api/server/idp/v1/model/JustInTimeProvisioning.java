@@ -68,6 +68,40 @@ public enum SchemeEnum {
     private String userstore = "PRIMARY";
     private Boolean associateLocalUser = false;
 
+@XmlType(name="AttributeSyncMethodEnum")
+@XmlEnum(String.class)
+public enum AttributeSyncMethodEnum {
+
+    @XmlEnumValue("OVERRIDE_ALL") OVERRIDE_ALL(String.valueOf("OVERRIDE_ALL")), @XmlEnumValue("NONE") NONE(String.valueOf("NONE")), @XmlEnumValue("PRESERVE_LOCAL") PRESERVE_LOCAL(String.valueOf("PRESERVE_LOCAL"));
+
+
+    private String value;
+
+    AttributeSyncMethodEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static AttributeSyncMethodEnum fromValue(String value) {
+        for (AttributeSyncMethodEnum b : AttributeSyncMethodEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private AttributeSyncMethodEnum attributeSyncMethod = AttributeSyncMethodEnum.OVERRIDE_ALL;
+
     /**
     **/
     public JustInTimeProvisioning isEnabled(Boolean isEnabled) {
@@ -142,6 +176,24 @@ public enum SchemeEnum {
         this.associateLocalUser = associateLocalUser;
     }
 
+    /**
+    **/
+    public JustInTimeProvisioning attributeSyncMethod(AttributeSyncMethodEnum attributeSyncMethod) {
+
+        this.attributeSyncMethod = attributeSyncMethod;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("attributeSyncMethod")
+    @Valid
+    public AttributeSyncMethodEnum getAttributeSyncMethod() {
+        return attributeSyncMethod;
+    }
+    public void setAttributeSyncMethod(AttributeSyncMethodEnum attributeSyncMethod) {
+        this.attributeSyncMethod = attributeSyncMethod;
+    }
+
 
 
     @Override
@@ -157,12 +209,13 @@ public enum SchemeEnum {
         return Objects.equals(this.isEnabled, justInTimeProvisioning.isEnabled) &&
             Objects.equals(this.scheme, justInTimeProvisioning.scheme) &&
             Objects.equals(this.userstore, justInTimeProvisioning.userstore) &&
-            Objects.equals(this.associateLocalUser, justInTimeProvisioning.associateLocalUser);
+            Objects.equals(this.associateLocalUser, justInTimeProvisioning.associateLocalUser) &&
+            Objects.equals(this.attributeSyncMethod, justInTimeProvisioning.attributeSyncMethod);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser);
+        return Objects.hash(isEnabled, scheme, userstore, associateLocalUser, attributeSyncMethod);
     }
 
     @Override
@@ -175,6 +228,7 @@ public enum SchemeEnum {
         sb.append("    scheme: ").append(toIndentedString(scheme)).append("\n");
         sb.append("    userstore: ").append(toIndentedString(userstore)).append("\n");
         sb.append("    associateLocalUser: ").append(toIndentedString(associateLocalUser)).append("\n");
+        sb.append("    attributeSyncMethod: ").append(toIndentedString(attributeSyncMethod)).append("\n");
         sb.append("}");
         return sb.toString();
     }
