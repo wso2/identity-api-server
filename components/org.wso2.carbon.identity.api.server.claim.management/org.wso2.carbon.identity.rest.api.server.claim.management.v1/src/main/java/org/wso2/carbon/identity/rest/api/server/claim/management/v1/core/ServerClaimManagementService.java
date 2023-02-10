@@ -659,7 +659,7 @@ public class ServerClaimManagementService {
         return externalClaimResDTOList;
     }
 
-    private LocalClaimResDTO getLocalClaimResDTO(LocalClaim localClaim) {
+    private LocalClaimResDTO getLocalClaimResDTO(LocalClaim localClaim) throws ClaimMetadataException {
 
         LocalClaimResDTO localClaimResDTO = new LocalClaimResDTO();
 
@@ -707,22 +707,20 @@ public class ServerClaimManagementService {
         return localClaimResDTO;
     }
 
-    private List<AssociatedExternalClaimDTO> fetchAssociatedExternalClaims(String localClaimURI) {
+    private List<AssociatedExternalClaimDTO> fetchAssociatedExternalClaims(String localClaimURI)
+            throws ClaimMetadataException {
 
         List<AssociatedExternalClaimDTO> associatedExternalClaimDTOS = new ArrayList<>();
-        try {
-            List<Claim> associatedExternalClaimList = getClaimMetadataManagementService().
-                    getMappedExternalClaimsForLocalClaim(localClaimURI, ContextLoader.getTenantDomainFromContext());
-            for (Claim claim: associatedExternalClaimList) {
-                associatedExternalClaimDTOS.add(getAssociatedExternalClaimResDTO(claim));
-            }
-            return associatedExternalClaimDTOS;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        List<Claim> associatedExternalClaimList = getClaimMetadataManagementService().
+                getMappedExternalClaimsForLocalClaim(localClaimURI, ContextLoader.getTenantDomainFromContext());
+        for (Claim claim: associatedExternalClaimList) {
+            associatedExternalClaimDTOS.add(getAssociatedExternalClaimResDTO(claim));
         }
+        return associatedExternalClaimDTOS;
     }
 
-    private List<LocalClaimResDTO> getLocalClaimResDTOs(List<LocalClaim> localClaimList) {
+    private List<LocalClaimResDTO> getLocalClaimResDTOs(List<LocalClaim> localClaimList)
+            throws ClaimMetadataException {
 
         List<LocalClaimResDTO> localClaimResDTOList = new ArrayList<>();
 
