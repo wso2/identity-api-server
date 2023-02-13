@@ -51,6 +51,7 @@ import static org.wso2.carbon.identity.api.server.input.validation.common.util.U
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_VALIDATORS;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG;
+import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_FIELD_NOT_EXISTS;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.ErrorMessage.ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.INPUT_VALIDATION_ERROR_PREFIX;
 import static org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants.INPUT_VALIDATION_MGT_ERROR_CODE_DELIMITER;
@@ -85,6 +86,24 @@ public class ValidationRulesManagementApiService {
     }
 
     /**
+     * Method to get input validation configuration.
+     *
+     * @param tenantDomain  Tenant Domain.
+     * @return ValidationConfigModel.
+     */
+    public ValidationConfigModel getValidationConfigurationForField(String tenantDomain, String field) {
+
+        try {
+            isFieldSupported(field);
+            ValidationConfiguration configuration = InputValidationServiceHolder.getInputValidationMgtService()
+                    .getInputValidationConfigurationForField(tenantDomain, field);
+            return buildResponse(configuration);
+        } catch (InputValidationMgtException e) {
+            throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_GETTING_VALIDATION_CONFIG, tenantDomain);
+        }
+    }
+
+    /**
      * Method to update input validation configuration.
      *
      * @param validationConfigModel Validation Configuration Model.
@@ -100,9 +119,30 @@ public class ValidationRulesManagementApiService {
                     .updateInputValidationConfiguration(requestDTO, tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Unable to update validation configuration for tenant: " + tenantDomain, e);
-            }
+            throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG, tenantDomain);
+        }
+    }
+
+    /**
+     * Method to update input validation configuration.
+     *
+     * @param validationConfigModel Validation Configuration Model.
+     * @param tenantDomain          Tenant domain name.
+     * @return ValidationConfigModel for the field.
+     */
+    public ValidationConfigModel updateInputValidationConfigurationForField(
+            ValidationConfigModel validationConfigModel, String tenantDomain) {
+
+        try {
+            isFieldSupported(validationConfigModel.getField());
+            List<ValidationConfigModel> configModels = new ArrayList<>();
+            configModels.add(validationConfigModel);
+            List<ValidationConfiguration> requestDTO = buildRequestDTOFromValidationRequest(configModels);
+            validateProperties(requestDTO, tenantDomain);
+            ValidationConfiguration configurations = InputValidationServiceHolder.getInputValidationMgtService()
+                    .updateValidationConfiguration(requestDTO.get(0), tenantDomain);
+            return buildResponse(configurations);
+        } catch (InputValidationMgtException e) {
             throw handleInputValidationMgtException(e, ERROR_CODE_ERROR_UPDATING_VALIDATION_CONFIG, tenantDomain);
         }
     }
@@ -218,18 +258,30 @@ public class ValidationRulesManagementApiService {
         List<ValidationConfigModel> response = new ArrayList<>();
 
         for (ValidationConfiguration configuration: configurations) {
-            ValidationConfigModel configModel = new ValidationConfigModel();
-            configModel.setField(configuration.getField());
-
-            if (configuration.getRules() != null) {
-                configModel.setRules(buildRulesModel(configuration.getRules()));
-            }
-            if (configModel.getRegEx() != null) {
-                configModel.setRules(buildRulesModel(configuration.getRegEx()));
-            }
-            response.add(configModel);
+            response.add(buildResponse(configuration));
         }
         return response;
+    }
+
+    /**
+     * Method to build response for single field.
+     *
+     * @param configuration    Configuration of the field.
+     * @return ValidationConfigModal of the field.
+     */
+    private ValidationConfigModel buildResponse(ValidationConfiguration configuration) {
+
+        ValidationConfigModel configModel = new ValidationConfigModel();
+        configModel.setField(configuration.getField());
+
+        if (configuration.getRules() != null) {
+            configModel.setRules(buildRulesModel(configuration.getRules()));
+        }
+        if (configModel.getRegEx() != null) {
+            configModel.setRules(buildRulesModel(configuration.getRegEx()));
+        }
+
+        return configModel;
     }
 
     /**
@@ -370,7 +422,8 @@ public class ValidationRulesManagementApiService {
                 errorResponse.setMessage(exception.getMessage());
                 errorResponse.setDescription(exception.getDescription());
             }
-            if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().contains(exception.getErrorCode())) {
+            if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().contains(exception.getErrorCode()) ||
+                    ERROR_CODE_FIELD_NOT_EXISTS.getCode().contains(exception.getErrorCode())) {
                 status = Response.Status.NOT_FOUND;
             } else {
                 status = Response.Status.BAD_REQUEST;
@@ -421,5 +474,21 @@ public class ValidationRulesManagementApiService {
         } else {
             return error.getDescription();
         }
+    }
+
+    /**
+     * Check whether field is supported for validation configurations.
+     *
+     * @param field     Field name.
+     * @return True if given field is supported.
+     * @throws InputValidationMgtClientException if field is not supported or invalid.
+     */
+    private boolean isFieldSupported(String field) throws InputValidationMgtClientException {
+
+        if (SUPPORTED_PARAMS.contains(field)) {
+            return true;
+        }
+        throw new InputValidationMgtClientException(ERROR_CODE_FIELD_NOT_EXISTS.getCode(), ERROR_CODE_FIELD_NOT_EXISTS
+                .getMessage(), String.format(ERROR_CODE_FIELD_NOT_EXISTS.getDescription(), field));
     }
 }
