@@ -69,6 +69,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningClaim;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
+import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.common.model.CertificateInfo;
 import org.wso2.carbon.identity.application.common.model.ClaimConfig;
@@ -1648,6 +1649,7 @@ public class ServerIdpManagementService {
                     break;
             }
             jitConfig.setAssociateLocalUserEnabled(jit.getAssociateLocalUser());
+            jitConfig.setAttributeSyncMethod(jit.getAttributeSyncMethod().toString());
             identityProvider.setJustInTimeProvisioningConfig(jitConfig);
         }
     }
@@ -2200,6 +2202,13 @@ public class ServerIdpManagementService {
                 jitConfig.setUserstore(idp.getJustInTimeProvisioningConfig().getProvisioningUserStore());
             }
             jitConfig.setAssociateLocalUser(idp.getJustInTimeProvisioningConfig().isAssociateLocalUserEnabled());
+            if (idp.getJustInTimeProvisioningConfig().getAttributeSyncMethod() == null) {
+                jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(
+                        FrameworkConstants.OVERRIDE_ALL));
+            } else {
+                jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(
+                        idp.getJustInTimeProvisioningConfig().getAttributeSyncMethod()));
+            }
         }
         return jitConfig;
     }
