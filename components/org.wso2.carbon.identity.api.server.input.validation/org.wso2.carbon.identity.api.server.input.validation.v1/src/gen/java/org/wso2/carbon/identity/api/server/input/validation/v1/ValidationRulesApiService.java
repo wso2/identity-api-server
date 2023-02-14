@@ -27,6 +27,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.Error;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModelForField;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidatorModel;
 import javax.ws.rs.core.Response;
 
@@ -39,6 +40,14 @@ public interface ValidationRulesApiService {
        * @return  List of configured validation rules.
        */
       public Response getValidationRules();
+
+      /**
+       * Method to get configured validation rules for a field.
+       *
+       * @param field   Field that validation configurations need to be retrieved.
+       * @return  List of configured validation rules for the field.
+       */
+      public Response getValidationRulesForField(String field);
 
       /**
        * Method to get available validator configurations.
@@ -54,4 +63,14 @@ public interface ValidationRulesApiService {
        * @return  Updated validation rules.
        */
       public Response updateValidationRules(List<ValidationConfigModel> validationConfigModel);
+
+      /**
+       * Method to update validation rules for a field.
+       *
+       * @param field                             Field that validations need to be updated.
+       * @param validationConfigModelForField     List of validation rules to be updated for the field.
+       * @return  Updated validation rules for the field.
+       */
+      public Response updateValidationRulesForField(String field,
+                                                    ValidationConfigModelForField validationConfigModelForField);
 }
