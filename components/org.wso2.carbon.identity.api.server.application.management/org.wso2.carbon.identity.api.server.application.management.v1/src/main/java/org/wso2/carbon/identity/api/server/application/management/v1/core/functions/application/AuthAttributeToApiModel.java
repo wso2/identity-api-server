@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
 import org.wso2.carbon.identity.auth.attribute.handler.model.AuthAttribute;
+import org.wso2.carbon.identity.auth.attribute.handler.model.AuthAttributeType;
 
 import java.util.function.Function;
 
@@ -32,9 +33,11 @@ public class AuthAttributeToApiModel implements Function<AuthAttribute,
     public org.wso2.carbon.identity.api.server.application.management.v1.AuthAttribute apply
             (AuthAttribute authAttribute) {
 
+        AuthAttributeType attributeType = authAttribute.getType() == null ? AuthAttributeType.STRING :
+                authAttribute.getType();
         return new org.wso2.carbon.identity.api.server.application.management.v1.AuthAttribute()
                 .attribute(authAttribute.getAttribute())
-                .attributeType(authAttribute.getType().toString())
+                .attributeType(attributeType.toString())
                 .isClaim(authAttribute.isClaim())
                 .isCredential(authAttribute.isConfidential());
     }

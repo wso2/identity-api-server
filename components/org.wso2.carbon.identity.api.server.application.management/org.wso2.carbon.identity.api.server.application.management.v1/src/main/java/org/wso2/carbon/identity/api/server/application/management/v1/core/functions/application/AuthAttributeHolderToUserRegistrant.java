@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthAttribute;
 import org.wso2.carbon.identity.api.server.application.management.v1.UserRegistrant;
 import org.wso2.carbon.identity.auth.attribute.handler.model.AuthAttributeHolder;
@@ -35,13 +33,14 @@ import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
  */
 public class AuthAttributeHolderToUserRegistrant implements Function<AuthAttributeHolder, UserRegistrant> {
 
-    private static final Log log = LogFactory.getLog(AuthAttributeHolderToUserRegistrant.class);
-
     @Override
     public UserRegistrant apply(AuthAttributeHolder authAttributeHolder) {
 
-        List<AuthAttribute> authAttributes = authAttributeHolder.getAuthAttributes().stream().map(new
-                AuthAttributeToApiModel()).collect(Collectors.toList());
+        List<AuthAttribute> authAttributes = null;
+        if (authAttributeHolder.getAuthAttributes() != null) {
+            authAttributes = authAttributeHolder.getAuthAttributes().stream().map(new
+                    AuthAttributeToApiModel()).collect(Collectors.toList());
+        }
 
         return new UserRegistrant()
                 .id(base64URLEncode(authAttributeHolder.getHandlerName()))

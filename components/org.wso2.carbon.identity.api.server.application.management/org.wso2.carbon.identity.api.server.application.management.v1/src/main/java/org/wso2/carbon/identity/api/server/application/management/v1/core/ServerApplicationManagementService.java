@@ -1431,7 +1431,7 @@ public class ServerApplicationManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             if (log.isDebugEnabled()) {
-                log.debug("Retrieving the user registrants configured for the application," + applicationId);
+                log.debug("Retrieving the user registrants configured for the application: " + applicationId);
             }
             List<AuthAttributeHolder> availableAuthAttributeHolders =
                     ApplicationManagementServiceHolder.getAuthAttributeHandlerManager()
@@ -1443,7 +1443,7 @@ public class ServerApplicationManagementService {
                     .userRegistrants(userRegistrants);
         } catch (AuthAttributeHandlerException e) {
             throw handleAuthAttributeHandlerException(e, "Server encountered an error while retrieving the " +
-                    "registrants configured for the application " + applicationId);
+                    "registrants configured for the application: " + applicationId);
         }
     }
 
