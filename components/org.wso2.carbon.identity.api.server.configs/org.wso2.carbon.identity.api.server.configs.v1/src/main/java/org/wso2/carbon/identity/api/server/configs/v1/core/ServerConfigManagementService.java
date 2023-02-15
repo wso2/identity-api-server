@@ -33,13 +33,18 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
+import org.wso2.carbon.identity.api.server.configs.common.factory.JWTAuthenticationMgtOGSiServiceFactory;
+import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthenticatorException;
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.function.JWTConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorProperty;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ProvisioningConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RealmConfig;
@@ -88,6 +93,7 @@ import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.CONFIGS_AUTHENTICATOR_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.CONFIGS_SCHEMAS_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.configs.common.Constants.ErrorMessage.ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_SEPERATOR;
 
 /**
@@ -409,7 +415,7 @@ public class ServerConfigManagementService {
     /**
      * Get schemas supported by the server.
      *
-     * @return  List of schema metadata.
+     * @return List of schema metadata.
      */
     public List<SchemaListItem> getSchemas() {
 
@@ -425,7 +431,7 @@ public class ServerConfigManagementService {
     /**
      * Get attributes of a schema.
      *
-     * @param schemaId  Schema ID.
+     * @param schemaId Schema ID.
      * @return Schema attribute list.
      */
     public Schema getSchema(String schemaId) {
@@ -901,5 +907,122 @@ public class ServerConfigManagementService {
             message = error.description();
         }
         return message;
+    }
+
+    public JWTValidatorConfig getPrivateKeyJWTValidatorConfiguration() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            if (JWTAuthenticationMgtOGSiServiceFactory.getInstance() != null) {
+
+                return new JWTValidatorConfig()
+                        .enableTokenReuse(JWTAuthenticationMgtOGSiServiceFactory.getInstance()
+                                .getPrivateKeyJWTClientAuthenticatorConfiguration(tenantDomain).isEnableTokenReuse());
+            } else {
+                throw new JWTClientAuthenticatorException(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message(),
+                        ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.code());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message())) {
+                throw handleNotFoundError();
+            } else {
+                throw JWTConnectorUtil.handlePrivateKeyJWTValidationException(e,
+                        Constants.ErrorMessage.ERROR_CODE_PRIVATE_KEY_JWT_VALIDATOR_CONFIG_RETRIEVE,
+                        null);
+            }
+        }
+    }
+
+    /**
+     * Patch the Private Key JWT validation Authenticator config of a tenant.
+     *
+     * @param privateKeyJWTValidatorPatchList List of patch operations.
+     */
+    public void patchPrivateKeyJWTValidatorSConfig(List<JWTKeyValidatorPatch> privateKeyJWTValidatorPatchList) {
+
+        if (CollectionUtils.isEmpty(privateKeyJWTValidatorPatchList)) {
+            return;
+        }
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        JWTValidatorConfig jwtValidatorConfig = null;
+        try {
+            if (JWTAuthenticationMgtOGSiServiceFactory.getInstance() != null) {
+                jwtValidatorConfig = JWTConnectorUtil.getJWTValidatorConfig(tenantDomain);
+            } else {
+                throw new JWTClientAuthenticatorException(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message(),
+                        ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.code());
+            }
+        } catch (Exception e) {
+            if (e.getMessage().equals(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message())) {
+                throw handleNotFoundError();
+            } else {
+                throw JWTConnectorUtil.handlePrivateKeyJWTValidationException(e,
+                        Constants.ErrorMessage.ERROR_CODE_CORS_CONFIG_RETRIEVE, null);
+            }
+        }
+
+        try {
+            for (JWTKeyValidatorPatch jwtKeyValidatorPatch : privateKeyJWTValidatorPatchList) {
+                String path = jwtKeyValidatorPatch.getPath();
+                JWTKeyValidatorPatch.OperationEnum operation = jwtKeyValidatorPatch.getOperation();
+                Boolean value = jwtKeyValidatorPatch.getValue();
+
+                // We support only 'REPLACE' and 'ADD' patch operations.
+                if (operation == JWTKeyValidatorPatch.OperationEnum.REPLACE) {
+                    if (path.matches(Constants.PRIVATE_KEY_JWT_VALIDATION_CONFIG_TOKEN_REUSE)) {
+                        jwtValidatorConfig.setEnableTokenReuse(value);
+                        ;
+                    } else {
+                        // Throw an error if any other patch operations are sent in the request.
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                    }
+                } else if (operation == JWTKeyValidatorPatch.OperationEnum.ADD) {
+                    if (path.matches(Constants.PRIVATE_KEY_JWT_VALIDATION_CONFIG_TOKEN_REUSE)) {
+                        jwtValidatorConfig.setEnableTokenReuse(value);
+                    } else {
+                        // Throw an error if any other patch operations are sent in the request.
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                    }
+                } else {
+                    // Throw an error if any other patch operations are sent in the request.
+                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                            .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                }
+            }
+
+            // Set the patched configuration object as the new CORS configuration for the tenant.
+            if (JWTAuthenticationMgtOGSiServiceFactory.getInstance() != null) {
+                JWTAuthenticationMgtOGSiServiceFactory.getInstance()
+                        .setPrivateKeyJWTClientAuthenticatorConfiguration
+                                (JWTConnectorUtil.getJWTDaoConfig(jwtValidatorConfig),
+                                        tenantDomain);
+            }
+        } catch (Exception e) {
+                throw JWTConnectorUtil.handlePrivateKeyJWTValidationException(e,
+                        Constants.ErrorMessage.ERROR_CODE_PRIVATE_KEY_JWT_VALIDATOR_CONFIG_UPDATE, null);
+        }
+    }
+
+    /**
+     * Extract the required arguments and build a not found error.
+     *
+     * @return APIError with exception code, message and description.
+     */
+    private APIError handleNotFoundError() {
+
+        Constants.ErrorMessage errorEnum = ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND;
+
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorEnum.code())
+                .withMessage(errorEnum.message())
+                .withDescription(errorEnum.description())
+                .build(log, errorEnum.description());
+
+        Response.Status status = Response.Status.NOT_FOUND;
+        return new APIError(status, errorResponse);
     }
 }
