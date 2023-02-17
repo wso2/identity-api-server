@@ -162,6 +162,11 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
 import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
 import static org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages.ERROR_CODE_INVALID_APP_ID;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.StringWriter;
+
 /**
  * Calls internal osgi services to perform server application management related operations.
  */
@@ -180,8 +185,10 @@ public class ServerApplicationManagementService {
             "not be found since the WS-Trust connector has not been configured.";
     public static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
     public static final String MEDIA_TYPE_APPLICATION_YAML = "application/yaml";
+    public static final String MEDIA_TYPE_APPLICATION_XML = "application/xml";
     public static final String YML_FILE_NAME = "_export.yml";
     public static final String JSON_FILE_NAME = "_export.json";
+    public static final String XML_FILE_NAME = "_export.xml";
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -471,6 +478,20 @@ public class ServerApplicationManagementService {
                 Yaml yaml = new Yaml();
                 value = yaml.dump(serviceProvider);
                 fileNameSB.append(YML_FILE_NAME);
+                break;
+            case MEDIA_TYPE_APPLICATION_XML:
+                JAXBContext jaxbContext = null;
+                try {
+                    jaxbContext = JAXBContext.newInstance(ServiceProvider.class);
+                    Marshaller marshaller = jaxbContext.createMarshaller();
+                    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                    StringWriter stringWriter = new StringWriter();
+                    marshaller.marshal(serviceProvider, stringWriter);
+                    value = stringWriter.toString();
+                } catch (JAXBException e) {
+                    throw new RuntimeException(e);
+                }
+                fileNameSB.append(XML_FILE_NAME);
                 break;
             default:
                 ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());

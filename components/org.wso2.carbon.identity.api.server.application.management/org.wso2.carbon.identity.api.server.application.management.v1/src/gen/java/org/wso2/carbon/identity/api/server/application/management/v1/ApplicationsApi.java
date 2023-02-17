@@ -324,7 +324,7 @@ public class ApplicationsApi  {
     @GET
     @Path("/{applicationId}/exportFile")
 
-    @Produces({ "application/octet-stream", "application/json", "application/yaml" })
+    @Produces({ "application/octet-stream", "application/json", "application/yaml", "application/xml" })
     @ApiOperation(value = "Export application as an XML file ", notes = "This API provides the capability to retrieve the application as an XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = Object.class, authorizations = {
             @Authorization(value = "BasicAuth"),
             @Authorization(value = "OAuth2", scopes = {
