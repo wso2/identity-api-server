@@ -189,6 +189,7 @@ public class ServerApplicationManagementService {
     public static final String YML_FILE_NAME = "_export.yml";
     public static final String JSON_FILE_NAME = "_export.json";
     public static final String XML_FILE_NAME = "_export.xml";
+    public static final String DEFAULT_EXPORT_MEDIA_TYPE = "xml";
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -517,7 +518,20 @@ public class ServerApplicationManagementService {
      */
     public String importApplication(InputStream fileInputStream, Attachment fileDetail) {
 
-        return doImportApplication(fileInputStream, fileDetail, false);
+        return doImportApplication(fileInputStream, fileDetail, DEFAULT_EXPORT_MEDIA_TYPE, false);
+    }
+
+    /**
+     * Create a new application by importing a file with given file type (xml or yaml).
+     *
+     * @param fileInputStream File to be imported as an input stream.
+     * @param fileDetail      File details.
+     * @param fileType        File type
+     * @return Unique identifier of the created application.
+     */
+    public String importApplication(InputStream fileInputStream, Attachment fileDetail, String fileType) {
+
+        return doImportApplication(fileInputStream, fileDetail, fileType, false);
     }
 
     /**
@@ -529,10 +543,11 @@ public class ServerApplicationManagementService {
      */
     public String importApplicationForUpdate(InputStream fileInputStream, Attachment fileDetail) {
 
-        return doImportApplication(fileInputStream, fileDetail, true);
+        return doImportApplication(fileInputStream, fileDetail, DEFAULT_EXPORT_MEDIA_TYPE, true);
     }
 
-    private String doImportApplication(InputStream fileInputStream, Attachment fileDetail, boolean isAppUpdate) {
+    private String doImportApplication(InputStream fileInputStream, Attachment fileDetail, String fileType,
+                                       boolean isAppUpdate) {
 
         try {
             SpFileContent spFileContent = buildSpFileContent(fileInputStream, fileDetail);
@@ -541,7 +556,7 @@ public class ServerApplicationManagementService {
             String username = ContextLoader.getUsernameFromContext();
 
             ImportResponse importResponse = getApplicationManagementService()
-                    .importSPApplication(spFileContent, tenantDomain, username, isAppUpdate);
+                    .importSPApplication(spFileContent, tenantDomain, username, fileType, isAppUpdate);
 
             if (importResponse.getResponseCode() == ImportResponse.FAILED) {
                 throw handleErrorResponse(importResponse);
