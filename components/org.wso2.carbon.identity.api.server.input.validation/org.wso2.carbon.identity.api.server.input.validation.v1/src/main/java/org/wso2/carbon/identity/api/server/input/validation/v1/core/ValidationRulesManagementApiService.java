@@ -277,8 +277,8 @@ public class ValidationRulesManagementApiService {
         if (configuration.getRules() != null) {
             configModel.setRules(buildRulesModel(configuration.getRules()));
         }
-        if (configModel.getRegEx() != null) {
-            configModel.setRules(buildRulesModel(configuration.getRegEx()));
+        if (configuration.getRegEx() != null) {
+            configModel.setRegEx(buildRulesModel(configuration.getRegEx()));
         }
 
         return configModel;
