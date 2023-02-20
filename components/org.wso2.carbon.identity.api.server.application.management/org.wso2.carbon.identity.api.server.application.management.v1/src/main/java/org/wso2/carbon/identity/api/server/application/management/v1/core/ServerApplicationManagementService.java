@@ -92,6 +92,7 @@ import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.common.model.User;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.auth.attribute.handler.AuthAttributeHandlerConstants;
 import org.wso2.carbon.identity.auth.attribute.handler.exception.AuthAttributeHandlerClientException;
 import org.wso2.carbon.identity.auth.attribute.handler.exception.AuthAttributeHandlerException;
 import org.wso2.carbon.identity.auth.attribute.handler.model.AuthAttributeHolder;
@@ -1442,26 +1443,35 @@ public class ServerApplicationManagementService {
                     .totalResults(userRegistrants.size())
                     .userRegistrants(userRegistrants);
         } catch (AuthAttributeHandlerException e) {
-            throw handleAuthAttributeHandlerException(e, "Server encountered an error while retrieving the " +
-                    "registrants configured for the application: " + applicationId);
+            throw handleAuthAttributeHandlerException(e, applicationId, tenantDomain);
         }
     }
 
-    private APIError handleAuthAttributeHandlerException(AuthAttributeHandlerException e, String msg) {
+    private APIError handleAuthAttributeHandlerException(AuthAttributeHandlerException e, String applicationId, String
+            tenantDomain) {
 
         if (e instanceof AuthAttributeHandlerClientException) {
-            throw buildClientError(e, msg);
+            throw buildClientError(e, applicationId, tenantDomain);
         }
-        throw buildServerError(e, msg);
+        throw buildServerError(e, applicationId, tenantDomain);
     }
 
-    private APIError buildServerError(AuthAttributeHandlerException e, String message) {
+    private APIError buildServerError(AuthAttributeHandlerException e, String applicationId, String tenantDomain) {
 
-        return Utils.buildServerError(UNEXPECTED_SERVER_ERROR.getCode(), message, e.getMessage(), e);
+        return Utils.buildServerError(
+                ErrorMessage.ERROR_RETRIEVING_USER_REGISTRANTS.getCode(),
+                ErrorMessage.ERROR_RETRIEVING_USER_REGISTRANTS.getMessage(),
+                buildFormattedDescription(ErrorMessage.ERROR_RETRIEVING_USER_REGISTRANTS.getDescription(),
+                        applicationId, tenantDomain), e);
     }
 
-    private APIError buildClientError(AuthAttributeHandlerException e, String message) {
+    private APIError buildClientError(AuthAttributeHandlerException e, String applicationId, String tenantDomain) {
 
-        return Utils.buildClientError(INVALID_REQUEST.getCode(), message, e.getMessage());
+        if (AuthAttributeHandlerConstants.ErrorMessages.ERROR_CODE_SERVICE_PROVIDER_NOT_FOUND.getCode()
+                .equals(e.getErrorCode())) {
+            throw buildClientError(ErrorMessage.APPLICATION_NOT_FOUND, applicationId, tenantDomain);
+        }
+        return Utils.buildClientError(INVALID_REQUEST.getCode(), "Error while retrieving user registrants.",
+                e.getMessage());
     }
 }
