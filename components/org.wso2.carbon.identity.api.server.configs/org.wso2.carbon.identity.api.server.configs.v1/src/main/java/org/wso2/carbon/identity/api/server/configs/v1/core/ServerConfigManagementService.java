@@ -909,6 +909,11 @@ public class ServerConfigManagementService {
         return message;
     }
 
+    /**
+     * Get the private key JWT validator configuration.
+     *
+     * @return JWTValidatorConfig  JWTValidatorConfig.
+     */
     public JWTValidatorConfig getPrivateKeyJWTValidatorConfiguration() {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -918,12 +923,12 @@ public class ServerConfigManagementService {
                 return new JWTValidatorConfig()
                         .enableTokenReuse(JWTAuthenticationMgtOGSiServiceFactory.getInstance()
                                 .getPrivateKeyJWTClientAuthenticatorConfiguration(tenantDomain).isEnableTokenReuse());
-            } else {
-                throw new JWTClientAuthenticatorException(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message(),
-                        ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.code());
             }
+            throw new JWTClientAuthenticatorException(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message(),
+                    ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.code());
+
         } catch (Exception e) {
-            if (e.getMessage().equals(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message())) {
+            if (ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message().equals(e.getMessage())) {
                 throw handleNotFoundError();
             } else {
                 throw JWTConnectorUtil.handlePrivateKeyJWTValidationException(e,
@@ -1001,8 +1006,8 @@ public class ServerConfigManagementService {
                                         tenantDomain);
             }
         } catch (Exception e) {
-                throw JWTConnectorUtil.handlePrivateKeyJWTValidationException(e,
-                        Constants.ErrorMessage.ERROR_CODE_PRIVATE_KEY_JWT_VALIDATOR_CONFIG_UPDATE, null);
+            throw JWTConnectorUtil.handlePrivateKeyJWTValidationException(e,
+                    Constants.ErrorMessage.ERROR_CODE_PRIVATE_KEY_JWT_VALIDATOR_CONFIG_UPDATE, null);
         }
     }
 

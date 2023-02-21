@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.configs.common.factory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
 
@@ -29,6 +31,7 @@ import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClie
 public class JWTAuthenticationMgtOGSiServiceFactory {
 
     private static JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService = null;
+    private static final Log log = LogFactory.getLog(JWTAuthenticationMgtOGSiServiceFactory.class);
 
 
     /**
@@ -44,6 +47,10 @@ public class JWTAuthenticationMgtOGSiServiceFactory {
             runtime when the JWTClientAuthenticatorMgtService is not available in the product. */
 
             try {
+                // Call class for name to check the class is available in the run time.
+                // This method will call only once at the first api call.
+                Class.forName("org.wso2.carbon.identity.oauth2.token.handler." +
+                        "clientauth.jwt.core.JWTClientAuthenticatorMgtService");
                 JWTClientAuthenticatorMgtService taskOperationService
                         = (JWTClientAuthenticatorMgtService) PrivilegedCarbonContext.
                         getThreadLocalCarbonContext().getOSGiService
@@ -52,9 +59,13 @@ public class JWTAuthenticationMgtOGSiServiceFactory {
                     jwtClientAuthenticatorMgtService = taskOperationService;
                 }
 
-            } catch (NullPointerException e) {
+            } catch (NullPointerException | ClassNotFoundException  e) {
                 /* Catch block without implementation so that the JWTClientAuthenticatorMgtService will be set to null
                    in-turn helps in validating the rest API requests. */
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to find the JWTClientAuthenticatorMgtService. " +
+                            "JWTClientAuthenticatorMgtService is not available in the server.");
+                }
             }
         }
         return jwtClientAuthenticatorMgtService;
