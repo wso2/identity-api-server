@@ -189,7 +189,7 @@ public class ServerApplicationManagementService {
     public static final String YML_FILE_NAME = "_export.yml";
     public static final String JSON_FILE_NAME = "_export.json";
     public static final String XML_FILE_NAME = "_export.xml";
-    public static final String DEFAULT_EXPORT_MEDIA_TYPE = "xml";
+    public static final String MEDIA_TYPE_XML = "xml";
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -442,11 +442,12 @@ public class ServerApplicationManagementService {
     }
 
     /**
-     * Export an application identified by the applicationId, as an XML string.
+     * Export an application identified by the applicationId, in the given format.
      *
+     * @param fileType The format of the exported string.
      * @param applicationId ID of the application to be exported.
      * @param exportSecrets If True, all hashed or encrypted secrets will also be exported.
-     * @return XML string of the application.
+     * @return string of the application in the given format.
      */
     public TransferResource exportApplicationAsFile(String fileType, String applicationId, Boolean exportSecrets) {
 
@@ -464,9 +465,6 @@ public class ServerApplicationManagementService {
             throw handleIdentityApplicationManagementException(e, msg);
         }
 
-        if (serviceProvider == null) {
-            throw new UnsupportedOperationException("No valid service provider found");
-        }
         return  generateFileFromModel(fileType, serviceProvider);
     }
 
@@ -505,8 +503,11 @@ public class ServerApplicationManagementService {
                 break;
         }
 
-        return new TransferResource(fileNameSB.toString(), new ByteArrayResource(value.getBytes
-                (StandardCharsets.UTF_8)), MediaType.APPLICATION_OCTET_STREAM);
+        return new TransferResource(
+                fileNameSB.toString(),
+                new ByteArrayResource(value.getBytes(StandardCharsets.UTF_8)),
+                MediaType.APPLICATION_OCTET_STREAM
+        );
     }
 
     /**
@@ -518,7 +519,7 @@ public class ServerApplicationManagementService {
      */
     public String importApplication(InputStream fileInputStream, Attachment fileDetail) {
 
-        return doImportApplication(fileInputStream, fileDetail, DEFAULT_EXPORT_MEDIA_TYPE, false);
+        return importApplication(fileInputStream, fileDetail, MEDIA_TYPE_XML);
     }
 
     /**
@@ -526,7 +527,7 @@ public class ServerApplicationManagementService {
      *
      * @param fileInputStream File to be imported as an input stream.
      * @param fileDetail      File details.
-     * @param fileType        File type
+     * @param fileType        File type.
      * @return Unique identifier of the created application.
      */
     public String importApplication(InputStream fileInputStream, Attachment fileDetail, String fileType) {
@@ -543,7 +544,7 @@ public class ServerApplicationManagementService {
      */
     public String importApplicationForUpdate(InputStream fileInputStream, Attachment fileDetail) {
 
-        return doImportApplication(fileInputStream, fileDetail, DEFAULT_EXPORT_MEDIA_TYPE, true);
+        return doImportApplication(fileInputStream, fileDetail, MEDIA_TYPE_XML, true);
     }
 
     private String doImportApplication(InputStream fileInputStream, Attachment fileDetail, String fileType,

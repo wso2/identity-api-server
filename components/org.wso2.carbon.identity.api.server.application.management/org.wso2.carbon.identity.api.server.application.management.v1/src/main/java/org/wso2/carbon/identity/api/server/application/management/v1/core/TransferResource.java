@@ -9,7 +9,6 @@ import org.springframework.http.MediaType;
 public class TransferResource {
 
     private String resourceName;
-
     private MediaType resourceType;
     private ByteArrayResource resource;
 

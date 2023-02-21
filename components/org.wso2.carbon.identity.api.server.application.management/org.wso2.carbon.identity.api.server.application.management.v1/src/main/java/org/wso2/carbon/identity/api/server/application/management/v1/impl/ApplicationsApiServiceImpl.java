@@ -209,11 +209,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response exportApplicationAsFile(String fileType, String applicationId
-            , Boolean exportSecrets) {
+    public Response exportApplicationAsFile(String fileType, String applicationId, Boolean exportSecrets) {
 
-        TransferResource transferResource = applicationManagementService.exportApplicationAsFile(fileType,
-                applicationId, exportSecrets);
+        TransferResource transferResource = applicationManagementService.exportApplicationAsFile(
+                fileType,
+                applicationId,
+                exportSecrets
+        );
 
         return Response.ok()
                 .type(MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -235,6 +237,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Override
     public Response importApplication(InputStream fileInputStream, Attachment fileDetail, String fileType) {
+
         String resourceId = applicationManagementService.importApplication(fileInputStream, fileDetail, fileType);
         return Response.created(getResourceLocation(resourceId)).build();
     }

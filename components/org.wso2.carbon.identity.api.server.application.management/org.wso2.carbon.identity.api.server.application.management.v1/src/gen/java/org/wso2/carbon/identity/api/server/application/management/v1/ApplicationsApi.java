@@ -345,7 +345,7 @@ public class ApplicationsApi  {
             @Valid@ApiParam(value = "Specifies whether to export secrets when exporting an application. "
                     , defaultValue="false") @DefaultValue("false") @QueryParam("exportSecrets") Boolean exportSecrets) {
 
-        return delegate.exportApplicationAsFile(fileType, applicationId,  exportSecrets );
+        return delegate.exportApplicationAsFile(fileType,  applicationId,  exportSecrets );
     }
 
     @Valid
@@ -800,7 +800,7 @@ public class ApplicationsApi  {
     })
     public Response importApplication(@Multipart(value = "file", required = false) InputStream fileInputStream,@Multipart(value = "file" , required = false) Attachment fileDetail) {
 
-        return delegate.importApplication(fileInputStream, fileDetail );
+        return delegate.importApplication(fileInputStream,  fileDetail );
     }
 
     @Valid
@@ -825,7 +825,7 @@ public class ApplicationsApi  {
     })
     public Response importApplicationForUpdate(@Multipart(value = "file", required = false) InputStream fileInputStream, @Multipart(value = "file" , required = false) Attachment fileDetail) {
 
-        return delegate.importApplicationForUpdate(fileInputStream, fileDetail );
+        return delegate.importApplicationForUpdate(fileInputStream,  fileDetail );
     }
 
     @Valid
@@ -847,11 +847,12 @@ public class ApplicationsApi  {
             @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response importApplicationFromFile(
-            //todo
+            //todo : get file type from fileDetail or Content-Type header instead of path parameter
             @PathParam("fileType") String fileType,
             @Multipart(value = "file", required = false) InputStream fileInputStream,
-            @Multipart(value = "file" , required = false) Attachment fileDetail) {
-        return delegate.importApplication(fileInputStream, fileDetail, fileType);
+            @Multipart(value = "file" , required = false) Attachment fileDetail){
+
+        return delegate.importApplication(fileInputStream,  fileDetail,  fileType );
     }
 
     @Valid
