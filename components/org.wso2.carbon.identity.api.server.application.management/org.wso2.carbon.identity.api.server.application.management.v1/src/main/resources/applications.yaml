@@ -547,6 +547,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /applications/{applicationId}/user-registrants:
+    get:
+      tags:
+        - User registrants
+      summary: |
+        Get the list of user registrants configured for the given application.
+      operationId: getConfiguredUserRegistrants
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistrantsList'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /applications/resident:
     get:
       tags:
@@ -2211,7 +2254,7 @@ components:
       description: |
         Specifies the required parameters in the response.
         Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', and 'issuer' attributes.
-        
+
         /applications?attributes=advancedConfigurations,templateId,clientId
       schema:
         type: string
@@ -2322,7 +2365,7 @@ components:
           type: string
           example: "/t/wso2.com/api/server/v1/applications/85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
         advancedConfigurations:
-            $ref: '#/components/schemas/AdvancedApplicationConfiguration'
+          $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         templateId:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
@@ -2554,20 +2597,20 @@ components:
       items:
         $ref: "#/components/schemas/AdditionalSpProperty"
     AdditionalSpProperty:
-        type: object
-        required:
-          - name
-          - value
-        properties:
-          name:
-            type: string
-            example: "isInternalApp"
-          value:
-              type: string
-              example: "true"
-          displayName:
-              type: string
-              example: "Internal Application"
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+          example: "isInternalApp"
+        value:
+          type: string
+          example: "true"
+        displayName:
+          type: string
+          example: "Internal Application"
     Certificate:
       type: object
       properties:
@@ -3415,6 +3458,49 @@ components:
           example: "85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
       required:
         - id
+
+    UserRegistrantsList:
+      type: object
+      properties:
+        totalResults:
+          type: integer
+          description: "Number of user registrants."
+          example: 2
+        userRegistrants:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRegistrant'
+
+    UserRegistrant:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "8we2f4b8-0d22-8234-l4n7-1682a91b12cn"
+        name:
+          type: string
+          example: "BasicAuthAttributeHandler"
+        authAttributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthAttribute'
+
+    AuthAttribute:
+      type: object
+      properties:
+        attribute:
+          type: string
+          example: "password"
+        isClaim:
+          type: boolean
+          example: true
+        isConfidential:
+          type: boolean
+          example: true
+        attributeType:
+          type: string
+          example: "string"
+
     Error:
       type: object
       properties:

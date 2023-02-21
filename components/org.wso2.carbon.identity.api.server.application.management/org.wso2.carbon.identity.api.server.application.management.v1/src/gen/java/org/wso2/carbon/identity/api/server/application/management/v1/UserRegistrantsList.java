@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.UserRegistrant;
 import javax.validation.constraints.*;
 
 
@@ -30,49 +33,58 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class InboundSCIMProvisioningConfiguration  {
+public class UserRegistrantsList  {
   
-    private Boolean proxyMode;
-    private String provisioningUserstoreDomain;
+    private Integer totalResults;
+    private List<UserRegistrant> userRegistrants = null;
+
 
     /**
+    * Number of user registrants.
     **/
-    public InboundSCIMProvisioningConfiguration proxyMode(Boolean proxyMode) {
+    public UserRegistrantsList totalResults(Integer totalResults) {
 
-        this.proxyMode = proxyMode;
+        this.totalResults = totalResults;
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "")
-    @JsonProperty("proxyMode")
+    @ApiModelProperty(example = "2", value = "Number of user registrants.")
+    @JsonProperty("totalResults")
     @Valid
-    public Boolean getProxyMode() {
-        return proxyMode;
+    public Integer getTotalResults() {
+        return totalResults;
     }
-    public void setProxyMode(Boolean proxyMode) {
-        this.proxyMode = proxyMode;
+    public void setTotalResults(Integer totalResults) {
+        this.totalResults = totalResults;
     }
 
     /**
-    * This property becomes only applicable if the proxy-mode config is set to false
     **/
-    public InboundSCIMProvisioningConfiguration provisioningUserstoreDomain(String provisioningUserstoreDomain) {
+    public UserRegistrantsList userRegistrants(List<UserRegistrant> userRegistrants) {
 
-        this.provisioningUserstoreDomain = provisioningUserstoreDomain;
+        this.userRegistrants = userRegistrants;
         return this;
     }
     
-    @ApiModelProperty(example = "PRIMARY", value = "This property becomes only applicable if the proxy-mode config is set to false")
-    @JsonProperty("provisioningUserstoreDomain")
+    @ApiModelProperty(value = "")
+    @JsonProperty("userRegistrants")
     @Valid
-    public String getProvisioningUserstoreDomain() {
-        return provisioningUserstoreDomain;
+    public List<UserRegistrant> getUserRegistrants() {
+        return userRegistrants;
     }
-    public void setProvisioningUserstoreDomain(String provisioningUserstoreDomain) {
-        this.provisioningUserstoreDomain = provisioningUserstoreDomain;
+    public void setUserRegistrants(List<UserRegistrant> userRegistrants) {
+        this.userRegistrants = userRegistrants;
     }
 
+    public UserRegistrantsList addUserRegistrantsItem(UserRegistrant userRegistrantsItem) {
+        if (this.userRegistrants == null) {
+            this.userRegistrants = new ArrayList<>();
+        }
+        this.userRegistrants.add(userRegistrantsItem);
+        return this;
+    }
 
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -83,24 +95,24 @@ public class InboundSCIMProvisioningConfiguration  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        InboundSCIMProvisioningConfiguration inboundSCIMProvisioningConfiguration = (InboundSCIMProvisioningConfiguration) o;
-        return Objects.equals(this.proxyMode, inboundSCIMProvisioningConfiguration.proxyMode) &&
-            Objects.equals(this.provisioningUserstoreDomain, inboundSCIMProvisioningConfiguration.provisioningUserstoreDomain);
+        UserRegistrantsList userRegistrantsList = (UserRegistrantsList) o;
+        return Objects.equals(this.totalResults, userRegistrantsList.totalResults) &&
+            Objects.equals(this.userRegistrants, userRegistrantsList.userRegistrants);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(proxyMode, provisioningUserstoreDomain);
+        return Objects.hash(totalResults, userRegistrants);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class InboundSCIMProvisioningConfiguration {\n");
+        sb.append("class UserRegistrantsList {\n");
         
-        sb.append("    proxyMode: ").append(toIndentedString(proxyMode)).append("\n");
-        sb.append("    provisioningUserstoreDomain: ").append(toIndentedString(provisioningUserstoreDomain)).append("\n");
+        sb.append("    totalResults: ").append(toIndentedString(totalResults)).append("\n");
+        sb.append("    userRegistrants: ").append(toIndentedString(userRegistrants)).append("\n");
         sb.append("}");
         return sb.toString();
     }

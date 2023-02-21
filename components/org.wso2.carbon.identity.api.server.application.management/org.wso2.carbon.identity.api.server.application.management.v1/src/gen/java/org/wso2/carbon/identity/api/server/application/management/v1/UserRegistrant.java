@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthAttribute;
 import javax.validation.constraints.*;
 
 
@@ -32,53 +33,72 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class IdpInitiatedSingleLogout  {
+public class UserRegistrant  {
   
-    private Boolean enabled = false;
-    private List<String> returnToUrls = null;
+    private String id;
+    private String name;
+    private List<AuthAttribute> authAttributes = null;
 
 
     /**
     **/
-    public IdpInitiatedSingleLogout enabled(Boolean enabled) {
+    public UserRegistrant id(String id) {
 
-        this.enabled = enabled;
+        this.id = id;
         return this;
     }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("enabled")
+    @ApiModelProperty(example = "8we2f4b8-0d22-8234-l4n7-1682a91b12cn", value = "")
+    @JsonProperty("id")
     @Valid
-    public Boolean getEnabled() {
-        return enabled;
+    public String getId() {
+        return id;
     }
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
     **/
-    public IdpInitiatedSingleLogout returnToUrls(List<String> returnToUrls) {
+    public UserRegistrant name(String name) {
 
-        this.returnToUrls = returnToUrls;
+        this.name = name;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "BasicAuthAttributeHandler", value = "")
+    @JsonProperty("name")
+    @Valid
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+    **/
+    public UserRegistrant authAttributes(List<AuthAttribute> authAttributes) {
+
+        this.authAttributes = authAttributes;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("returnToUrls")
+    @JsonProperty("authAttributes")
     @Valid
-    public List<String> getReturnToUrls() {
-        return returnToUrls;
+    public List<AuthAttribute> getAuthAttributes() {
+        return authAttributes;
     }
-    public void setReturnToUrls(List<String> returnToUrls) {
-        this.returnToUrls = returnToUrls;
+    public void setAuthAttributes(List<AuthAttribute> authAttributes) {
+        this.authAttributes = authAttributes;
     }
 
-    public IdpInitiatedSingleLogout addReturnToUrlsItem(String returnToUrlsItem) {
-        if (this.returnToUrls == null) {
-            this.returnToUrls = new ArrayList<>();
+    public UserRegistrant addAuthAttributesItem(AuthAttribute authAttributesItem) {
+        if (this.authAttributes == null) {
+            this.authAttributes = new ArrayList<>();
         }
-        this.returnToUrls.add(returnToUrlsItem);
+        this.authAttributes.add(authAttributesItem);
         return this;
     }
 
@@ -93,24 +113,26 @@ public class IdpInitiatedSingleLogout  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        IdpInitiatedSingleLogout idpInitiatedSingleLogout = (IdpInitiatedSingleLogout) o;
-        return Objects.equals(this.enabled, idpInitiatedSingleLogout.enabled) &&
-            Objects.equals(this.returnToUrls, idpInitiatedSingleLogout.returnToUrls);
+        UserRegistrant userRegistrant = (UserRegistrant) o;
+        return Objects.equals(this.id, userRegistrant.id) &&
+            Objects.equals(this.name, userRegistrant.name) &&
+            Objects.equals(this.authAttributes, userRegistrant.authAttributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabled, returnToUrls);
+        return Objects.hash(id, name, authAttributes);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class IdpInitiatedSingleLogout {\n");
+        sb.append("class UserRegistrant {\n");
         
-        sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
-        sb.append("    returnToUrls: ").append(toIndentedString(returnToUrls)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    authAttributes: ").append(toIndentedString(authAttributes)).append("\n");
         sb.append("}");
         return sb.toString();
     }
