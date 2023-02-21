@@ -66,7 +66,7 @@ public class UserRegistrant  {
         return this;
     }
     
-    @ApiModelProperty(example = "Username Password", value = "")
+    @ApiModelProperty(example = "BasicAuthAttributeHandler", value = "")
     @JsonProperty("name")
     @Valid
     public String getName() {

@@ -39,6 +39,6 @@ public class AuthAttributeToApiModel implements Function<AuthAttribute,
                 .attribute(authAttribute.getAttribute())
                 .attributeType(attributeType.toString())
                 .isClaim(authAttribute.isClaim())
-                .isCredential(authAttribute.isConfidential());
+                .isConfidential(authAttribute.isConfidential());
     }
 }

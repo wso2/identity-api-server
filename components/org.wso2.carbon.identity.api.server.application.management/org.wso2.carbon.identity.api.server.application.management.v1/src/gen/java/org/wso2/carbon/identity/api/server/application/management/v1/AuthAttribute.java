@@ -34,7 +34,7 @@ public class AuthAttribute  {
   
     private String attribute;
     private Boolean isClaim;
-    private Boolean isCredential;
+    private Boolean isConfidential;
     private String attributeType;
 
     /**
@@ -75,20 +75,20 @@ public class AuthAttribute  {
 
     /**
     **/
-    public AuthAttribute isCredential(Boolean isCredential) {
+    public AuthAttribute isConfidential(Boolean isConfidential) {
 
-        this.isCredential = isCredential;
+        this.isConfidential = isConfidential;
         return this;
     }
     
     @ApiModelProperty(example = "true", value = "")
-    @JsonProperty("isCredential")
+    @JsonProperty("isConfidential")
     @Valid
-    public Boolean getIsCredential() {
-        return isCredential;
+    public Boolean getIsConfidential() {
+        return isConfidential;
     }
-    public void setIsCredential(Boolean isCredential) {
-        this.isCredential = isCredential;
+    public void setIsConfidential(Boolean isConfidential) {
+        this.isConfidential = isConfidential;
     }
 
     /**
@@ -123,13 +123,13 @@ public class AuthAttribute  {
         AuthAttribute authAttribute = (AuthAttribute) o;
         return Objects.equals(this.attribute, authAttribute.attribute) &&
             Objects.equals(this.isClaim, authAttribute.isClaim) &&
-            Objects.equals(this.isCredential, authAttribute.isCredential) &&
+            Objects.equals(this.isConfidential, authAttribute.isConfidential) &&
             Objects.equals(this.attributeType, authAttribute.attributeType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(attribute, isClaim, isCredential, attributeType);
+        return Objects.hash(attribute, isClaim, isConfidential, attributeType);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class AuthAttribute  {
         
         sb.append("    attribute: ").append(toIndentedString(attribute)).append("\n");
         sb.append("    isClaim: ").append(toIndentedString(isClaim)).append("\n");
-        sb.append("    isCredential: ").append(toIndentedString(isCredential)).append("\n");
+        sb.append("    isConfidential: ").append(toIndentedString(isConfidential)).append("\n");
         sb.append("    attributeType: ").append(toIndentedString(attributeType)).append("\n");
         sb.append("}");
         return sb.toString();

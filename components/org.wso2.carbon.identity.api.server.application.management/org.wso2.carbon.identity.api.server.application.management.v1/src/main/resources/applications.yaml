@@ -3479,7 +3479,7 @@ components:
           example: "8we2f4b8-0d22-8234-l4n7-1682a91b12cn"
         name:
           type: string
-          example: "Username Password"
+          example: "BasicAuthAttributeHandler"
         authAttributes:
           type: array
           items:
