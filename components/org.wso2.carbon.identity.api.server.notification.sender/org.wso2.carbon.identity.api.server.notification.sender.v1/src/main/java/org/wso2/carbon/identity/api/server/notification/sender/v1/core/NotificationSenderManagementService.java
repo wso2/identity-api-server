@@ -326,7 +326,7 @@ public class NotificationSenderManagementService {
                 .withCode(errorCode)
                 .withMessage(e.getMessage())
                 .withDescription(e.getDescription())
-                .build(log, e.getMessage());
+                .build(log, e, e.getMessage());
 
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
         return new APIError(status, errorResponse);
