@@ -77,7 +77,6 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     @Override
     public Response getPrivatKeyJWTValidationConfiguration() {
 
-        // do some magic!
         return Response.ok().entity(configManagementService.getPrivateKeyJWTValidatorConfiguration()).build();
 
     }
