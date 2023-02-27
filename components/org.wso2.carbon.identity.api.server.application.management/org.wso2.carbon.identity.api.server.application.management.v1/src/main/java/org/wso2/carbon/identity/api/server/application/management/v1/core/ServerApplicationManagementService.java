@@ -92,6 +92,7 @@ import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.common.model.User;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
 import org.wso2.carbon.identity.auth.attribute.handler.exception.AuthAttributeHandlerClientException;
 import org.wso2.carbon.identity.auth.attribute.handler.exception.AuthAttributeHandlerException;
 import org.wso2.carbon.identity.auth.attribute.handler.model.AuthAttributeHolder;
@@ -522,6 +523,18 @@ public class ServerApplicationManagementService {
         ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
         try {
             applicationId = getApplicationManagementService().createApplication(application, tenantDomain, username);
+
+            // Update owner for B2B Self Service applications.
+            if (application.isB2BSelfServiceApp()) {
+                String systemUserID = org.wso2.carbon.identity.organization.management.service.util.Utils
+                                .getB2BSelfServiceSystemUser(tenantDomain);
+                if (StringUtils.isNotEmpty(systemUserID)) {
+                    ApplicationOwner systemOwner = new ApplicationOwner();
+                    systemOwner.id(systemUserID);
+                    changeApplicationOwner(applicationId, systemOwner);
+                }
+            }
+
             if (applicationModel.getInboundProtocolConfiguration() != null &&
                     applicationModel.getInboundProtocolConfiguration().getOidc() != null) {
                 OAuthInboundFunctions.updateCorsOrigins(applicationId, applicationModel
