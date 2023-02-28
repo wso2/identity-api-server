@@ -20,13 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
-import java.util.List;
 
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
@@ -172,6 +173,30 @@ public class ConfigsApi  {
 
     @Valid
     @GET
+    @Path("/jwt-key-validator")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the tenant private key jwt authentication configuration.", notes = "Retrieve the tenant private key jwt authentication configuration.", response = JWTValidatorConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Private Key JWY validation Authenticators", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = JWTValidatorConfig.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getPrivatKeyJWTValidationConfiguration() {
+
+        return delegate.getPrivatKeyJWTValidationConfiguration();
+    }
+
+    @Valid
+    @GET
     @Path("/schemas/{schema-id}")
     
     @Produces({ "application/json" })
@@ -289,6 +314,30 @@ public class ConfigsApi  {
     public Response patchConfigs(@ApiParam(value = "" ,required=true) @Valid List<Patch> patch) {
 
         return delegate.patchConfigs(patch );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/jwt-key-validator")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch the tenant private key jwt authentication configuration.", notes = "Patch the tenant private key jwt authentication configuration.  A JSONPatch as defined by RFC 6902.", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Private Key JWY validation Authenticators", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchPrivatKeyJWTValidationConfiguration(@ApiParam(value = "" ,required=true) @Valid List<JWTKeyValidatorPatch> jwTKeyValidatorPatch) {
+
+        return delegate.patchPrivatKeyJWTValidationConfiguration(jwTKeyValidatorPatch );
     }
 
     @Valid

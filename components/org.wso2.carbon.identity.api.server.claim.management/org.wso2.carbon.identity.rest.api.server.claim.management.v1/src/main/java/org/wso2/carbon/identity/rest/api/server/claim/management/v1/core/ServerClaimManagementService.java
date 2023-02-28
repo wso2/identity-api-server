@@ -29,13 +29,11 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataClientException;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.AttributeMapping;
-import org.wso2.carbon.identity.claim.metadata.mgt.model.Claim;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.ClaimDialect;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
 import org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
-import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AssociatedExternalClaimDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeMappingDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectResDTO;
@@ -637,15 +635,6 @@ public class ServerClaimManagementService {
         return externalClaimResDTO;
     }
 
-    private AssociatedExternalClaimDTO getAssociatedExternalClaimResDTO(Claim claim) {
-
-        AssociatedExternalClaimDTO associatedExternalClaimDTO = new AssociatedExternalClaimDTO();
-        associatedExternalClaimDTO.setId(base64EncodeId(claim.getClaimURI()));
-        associatedExternalClaimDTO.setClaimDialectURI(claim.getClaimDialectURI());
-        associatedExternalClaimDTO.setClaimURI(claim.getClaimURI());
-        return associatedExternalClaimDTO;
-    }
-
     private List<ExternalClaimResDTO> getExternalClaimResDTOs(List<ExternalClaim> externalClaimList) {
 
         List<ExternalClaimResDTO> externalClaimResDTOList = new ArrayList<>();
@@ -659,7 +648,7 @@ public class ServerClaimManagementService {
         return externalClaimResDTOList;
     }
 
-    private LocalClaimResDTO getLocalClaimResDTO(LocalClaim localClaim) throws ClaimMetadataException {
+    private LocalClaimResDTO getLocalClaimResDTO(LocalClaim localClaim) {
 
         LocalClaimResDTO localClaimResDTO = new LocalClaimResDTO();
 
@@ -703,24 +692,11 @@ public class ServerClaimManagementService {
         }
         localClaimResDTO.setAttributeMapping(attributeMappingDTOs);
         localClaimResDTO.setProperties(mapToProperties(claimProperties));
-        localClaimResDTO.setAssociatedExternalClaims(fetchAssociatedExternalClaims(localClaim.getClaimURI()));
+
         return localClaimResDTO;
     }
 
-    private List<AssociatedExternalClaimDTO> fetchAssociatedExternalClaims(String localClaimURI)
-            throws ClaimMetadataException {
-
-        List<AssociatedExternalClaimDTO> associatedExternalClaimDTOS = new ArrayList<>();
-        List<Claim> associatedExternalClaimList = getClaimMetadataManagementService().
-                getMappedExternalClaimsForLocalClaim(localClaimURI, ContextLoader.getTenantDomainFromContext());
-        for (Claim claim: associatedExternalClaimList) {
-            associatedExternalClaimDTOS.add(getAssociatedExternalClaimResDTO(claim));
-        }
-        return associatedExternalClaimDTOS;
-    }
-
-    private List<LocalClaimResDTO> getLocalClaimResDTOs(List<LocalClaim> localClaimList)
-            throws ClaimMetadataException {
+    private List<LocalClaimResDTO> getLocalClaimResDTOs(List<LocalClaim> localClaimList) {
 
         List<LocalClaimResDTO> localClaimResDTOList = new ArrayList<>();
 
