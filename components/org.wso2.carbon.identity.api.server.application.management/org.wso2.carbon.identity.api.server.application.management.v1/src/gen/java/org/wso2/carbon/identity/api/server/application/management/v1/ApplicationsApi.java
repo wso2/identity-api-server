@@ -340,7 +340,7 @@ public class ApplicationsApi  {
             @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
     public Response exportApplicationAsFile(
-            @HeaderParam("Accept") String fileType,
+            @HeaderParam(value="Accept") @DefaultValue("xml") String fileType,
             @ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId,
             @Valid@ApiParam(value = "Specifies whether to export secrets when exporting an application. "
                     , defaultValue="false") @DefaultValue("false") @QueryParam("exportSecrets") Boolean exportSecrets) {
@@ -798,7 +798,8 @@ public class ApplicationsApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response importApplication(@Multipart(value = "file", required = false) InputStream fileInputStream,@Multipart(value = "file" , required = false) Attachment fileDetail) {
+    public Response importApplication(@Multipart(value = "file", required = false) InputStream fileInputStream,
+                                      @Multipart(value = "file" , required = false) Attachment fileDetail) {
 
         return delegate.importApplication(fileInputStream,  fileDetail );
     }
@@ -823,36 +824,10 @@ public class ApplicationsApi  {
         @ApiResponse(code = 409, message = "Conflict", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response importApplicationForUpdate(@Multipart(value = "file", required = false) InputStream fileInputStream, @Multipart(value = "file" , required = false) Attachment fileDetail) {
+    public Response importApplicationForUpdate(@Multipart(value = "file", required = false) InputStream fileInputStream,
+                                               @Multipart(value = "file" , required = false) Attachment fileDetail) {
 
         return delegate.importApplicationForUpdate(fileInputStream,  fileDetail );
-    }
-
-    @Valid
-    @POST
-    @Path("/import/{fileType}")
-    @Consumes({ "multipart/form-data" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Create application from an exported file ", notes = "This API provides the capability to store the application information, provided as a file. ", response = Void.class, authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-            })
-    }, tags={ "Applications", })
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successfully created.", response = Void.class),
-            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
-            @ApiResponse(code = 409, message = "Conflict", response = Error.class),
-            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response importApplicationFromFile(
-            //todo : get file type from fileDetail or Content-Type header instead of path parameter
-            @PathParam("fileType") String fileType,
-            @Multipart(value = "file", required = false) InputStream fileInputStream,
-            @Multipart(value = "file" , required = false) Attachment fileDetail){
-
-        return delegate.importApplication(fileInputStream,  fileDetail,  fileType );
     }
 
     @Valid

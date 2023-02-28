@@ -113,10 +113,7 @@ public interface ApplicationsApiService {
 
       public Response getWSTrustMetadata();
 
-      @Deprecated
       public Response importApplication(InputStream fileInputStream, Attachment fileDetail);
-
-      public Response importApplication(InputStream fileInputStream, Attachment fileDetail, String fileType);
 
       public Response importApplicationForUpdate(InputStream fileInputStream, Attachment fileDetail);
 

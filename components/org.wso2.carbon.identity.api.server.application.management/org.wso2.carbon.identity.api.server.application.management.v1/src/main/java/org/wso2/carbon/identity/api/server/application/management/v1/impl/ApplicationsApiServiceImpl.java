@@ -236,13 +236,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response importApplication(InputStream fileInputStream, Attachment fileDetail, String fileType) {
-
-        String resourceId = applicationManagementService.importApplication(fileInputStream, fileDetail, fileType);
-        return Response.created(getResourceLocation(resourceId)).build();
-    }
-
-    @Override
     public Response importApplicationForUpdate(InputStream fileInputStream, Attachment fileDetail) {
 
         String resourceId = applicationManagementService.importApplicationForUpdate(fileInputStream, fileDetail);

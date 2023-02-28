@@ -186,10 +186,9 @@ public class ServerApplicationManagementService {
     public static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
     public static final String MEDIA_TYPE_APPLICATION_YAML = "application/yaml";
     public static final String MEDIA_TYPE_APPLICATION_XML = "application/xml";
-    public static final String YML_FILE_NAME = "_export.yml";
-    public static final String JSON_FILE_NAME = "_export.json";
-    public static final String XML_FILE_NAME = "_export.xml";
-    public static final String MEDIA_TYPE_XML = "xml";
+    public static final String YML_FILE_EXTENSION = ".yml";
+    public static final String JSON_FILE_EXTENSION = ".json";
+    public static final String XML_FILE_EXTENSION = ".xml";
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -470,13 +469,13 @@ public class ServerApplicationManagementService {
 
     private TransferResource generateFileFromModel(String fileType, ServiceProvider serviceProvider) {
 
-        StringBuilder fileNameSB = new StringBuilder(serviceProvider.getApplicationResourceId());
+        StringBuilder fileNameSB = new StringBuilder(serviceProvider.getApplicationName());
         String value = "";
         switch (fileType) {
             case MEDIA_TYPE_APPLICATION_YAML:
                 Yaml yaml = new Yaml();
                 value = yaml.dump(serviceProvider);
-                fileNameSB.append(YML_FILE_NAME);
+                fileNameSB.append(YML_FILE_EXTENSION);
                 break;
             case MEDIA_TYPE_APPLICATION_XML:
                 JAXBContext jaxbContext = null;
@@ -490,7 +489,7 @@ public class ServerApplicationManagementService {
                 } catch (JAXBException e) {
                     throw new RuntimeException(e);
                 }
-                fileNameSB.append(XML_FILE_NAME);
+                fileNameSB.append(XML_FILE_EXTENSION);
                 break;
             default:
                 ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
@@ -499,7 +498,7 @@ public class ServerApplicationManagementService {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                fileNameSB.append(JSON_FILE_NAME);
+                fileNameSB.append(JSON_FILE_EXTENSION);
                 break;
         }
 
@@ -519,20 +518,7 @@ public class ServerApplicationManagementService {
      */
     public String importApplication(InputStream fileInputStream, Attachment fileDetail) {
 
-        return importApplication(fileInputStream, fileDetail, MEDIA_TYPE_XML);
-    }
-
-    /**
-     * Create a new application by importing a file with given file type (xml or yaml).
-     *
-     * @param fileInputStream File to be imported as an input stream.
-     * @param fileDetail      File details.
-     * @param fileType        File type.
-     * @return Unique identifier of the created application.
-     */
-    public String importApplication(InputStream fileInputStream, Attachment fileDetail, String fileType) {
-
-        return doImportApplication(fileInputStream, fileDetail, fileType, false);
+        return doImportApplication(fileInputStream, fileDetail, false);
     }
 
     /**
@@ -544,17 +530,17 @@ public class ServerApplicationManagementService {
      */
     public String importApplicationForUpdate(InputStream fileInputStream, Attachment fileDetail) {
 
-        return doImportApplication(fileInputStream, fileDetail, MEDIA_TYPE_XML, true);
+        return doImportApplication(fileInputStream, fileDetail, true);
     }
 
-    private String doImportApplication(InputStream fileInputStream, Attachment fileDetail, String fileType,
-                                       boolean isAppUpdate) {
+    private String doImportApplication(InputStream fileInputStream, Attachment fileDetail, boolean isAppUpdate) {
 
         try {
             SpFileContent spFileContent = buildSpFileContent(fileInputStream, fileDetail);
 
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String username = ContextLoader.getUsernameFromContext();
+            String fileType = fileDetail.getDataHandler().getContentType();
 
             ImportResponse importResponse = getApplicationManagementService()
                     .importSPApplication(spFileContent, tenantDomain, username, fileType, isAppUpdate);
