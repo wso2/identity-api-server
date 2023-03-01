@@ -16,6 +16,7 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -116,6 +117,7 @@ import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -474,11 +476,15 @@ public class ServerApplicationManagementService {
         switch (fileType) {
             case MEDIA_TYPE_APPLICATION_YAML:
                 Yaml yaml = new Yaml();
-                value = yaml.dump(serviceProvider);
+                try {
+                    value = yaml.dump(serviceProvider);
+                } catch (NullPointerException | YAMLException | ClassCastException e) {
+                    throw new RuntimeException(e);
+                }
                 fileNameSB.append(YML_FILE_EXTENSION);
                 break;
             case MEDIA_TYPE_APPLICATION_XML:
-                JAXBContext jaxbContext = null;
+                JAXBContext jaxbContext;
                 try {
                     jaxbContext = JAXBContext.newInstance(ServiceProvider.class);
                     Marshaller marshaller = jaxbContext.createMarshaller();
@@ -486,7 +492,7 @@ public class ServerApplicationManagementService {
                     StringWriter stringWriter = new StringWriter();
                     marshaller.marshal(serviceProvider, stringWriter);
                     value = stringWriter.toString();
-                } catch (JAXBException e) {
+                } catch (NullPointerException | JAXBException e) {
                     throw new RuntimeException(e);
                 }
                 fileNameSB.append(XML_FILE_EXTENSION);
@@ -495,7 +501,7 @@ public class ServerApplicationManagementService {
                 ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
                 try {
                     value = objectMapper.writeValueAsString(serviceProvider);
-                } catch (IOException e) {
+                } catch (NullPointerException | JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
                 fileNameSB.append(JSON_FILE_EXTENSION);
