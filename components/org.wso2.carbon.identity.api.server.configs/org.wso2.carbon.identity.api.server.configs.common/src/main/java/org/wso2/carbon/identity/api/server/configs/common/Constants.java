@@ -49,6 +49,11 @@ public class Constants {
     public static final String CORS_CONFIG_MAX_AGE_PATH_REGEX = "^/maxAge$";
 
     /**
+     * PATCH operation path for Private Key JWT Validation configuration.
+     */
+    public static final String PRIVATE_KEY_JWT_VALIDATION_CONFIG_TOKEN_REUSE = "/enableTokenReuse";
+
+    /**
      * Enum for error messages.
      */
     public enum ErrorMessage {
@@ -85,7 +90,22 @@ public class Constants {
                 "Server encountered an error while retrieving the CORS configuration."),
         ERROR_CODE_CORS_CONFIG_UPDATE("65002",
                 "Unable to update CORS configuration.",
-                "Server encountered an error while updating the CORS configuration.");
+                "Server encountered an error while updating the CORS configuration."),
+
+        /**
+         * Private Key JWT Validation errors.
+         */
+        ERROR_CODE_PRIVATE_KEY_JWT_VALIDATOR_CONFIG_RETRIEVE("65006",
+                                                "Unable to retrieve Private Key JWT Validation configuration.",
+                                                "Server encountered an error while retrieving the " +
+                                                        "Private Key JWT Validation configuration."),
+        ERROR_CODE_PRIVATE_KEY_JWT_VALIDATOR_CONFIG_UPDATE("65007",
+                                              "Unable to update Private Key JWT Validation configuration.",
+                                              "Server encountered an error while updating the " +
+                                                      "Private Key JWT Validation configuration."),
+        ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND("60505",
+                "Private Key JWT Authenticator is not supported.",
+                "Private Key JWT Authenticator service is unavailable at the moment.");
 
         private final String code;
         private final String message;

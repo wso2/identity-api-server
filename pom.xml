@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.31-SNAPSHOT</version>
+    <version>1.2.36-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -116,6 +116,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.governance</groupId>
                 <artifactId>org.wso2.carbon.identity.recovery</artifactId>
+                <version>${identity.governance.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.governance</groupId>
+                <artifactId>org.wso2.carbon.identity.auth.attribute.handler</artifactId>
                 <version>${identity.governance.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -383,6 +389,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.extension.identity.oauth.addons</groupId>
+                <artifactId>org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt</artifactId>
+                <version>${org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.fetch.remote</groupId>
                 <artifactId>org.wso2.carbon.identity.remotefetch.core</artifactId>
                 <version>${org.wso2.carbon.identity.remotefetch.version}</version>
@@ -541,8 +553,8 @@
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
-        <identity.governance.version>1.5.25</identity.governance.version>
-        <carbon.identity.framework.version>5.25.109</carbon.identity.framework.version>
+        <identity.governance.version>1.8.18</identity.governance.version>
+        <carbon.identity.framework.version>5.25.105</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
@@ -554,6 +566,7 @@
         <carbon.kernel.version>4.9.0</carbon.kernel.version>
         <carbon.multitenancy.version>4.9.10</carbon.multitenancy.version>
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
+        <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.4.21</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
         <org.wso2.carbon.event.publisher.version>5.2.15</org.wso2.carbon.event.publisher.version>
         <identity.branding.preference.management.version>1.0.4</identity.branding.preference.management.version>
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->

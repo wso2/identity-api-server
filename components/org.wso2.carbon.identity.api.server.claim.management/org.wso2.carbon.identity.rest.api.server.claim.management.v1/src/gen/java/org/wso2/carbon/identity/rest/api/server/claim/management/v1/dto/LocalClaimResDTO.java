@@ -19,11 +19,9 @@ package org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto;
 import io.swagger.annotations.ApiModel;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeMappingDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.PropertyDTO;
+import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
 
 import javax.validation.Valid;
@@ -65,9 +63,6 @@ public class LocalClaimResDTO {
 
     @Valid 
     private Boolean supportedByDefault = null;
-
-    @Valid
-    private List<AssociatedExternalClaimDTO> associatedExternalClaims = new ArrayList<>();
 
     @Valid 
     private List<AttributeMappingDTO> attributeMapping = new ArrayList<AttributeMappingDTO>();
@@ -219,16 +214,6 @@ public class LocalClaimResDTO {
         this.properties = properties;
     }
 
-    /**
-     * Define list of associated external claims.
-     **/
-    @ApiModelProperty(value = "Define list of mapped external claims")
-    @JsonProperty("associatedExternalClaims")
-    public List<AssociatedExternalClaimDTO> getAssociatedExternalClaims() {return associatedExternalClaims;}
-
-    public void setAssociatedExternalClaims(List<AssociatedExternalClaimDTO> associatedExternalClaims) {
-        this.associatedExternalClaims = associatedExternalClaims;
-    }
     @Override
     public String toString() {
 
@@ -245,7 +230,6 @@ public class LocalClaimResDTO {
         sb.append("    regEx: ").append(regEx).append("\n");
         sb.append("    required: ").append(required).append("\n");
         sb.append("    supportedByDefault: ").append(supportedByDefault).append("\n");
-        sb.append("    associatedExternalClaims: ").append(associatedExternalClaims).append("\n");
         sb.append("    attributeMapping: ").append(attributeMapping).append("\n");
         sb.append("    properties: ").append(properties).append("\n");
         
