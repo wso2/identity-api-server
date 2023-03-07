@@ -367,10 +367,11 @@ public class ServerApplicationManagementService {
      */
     public ArrayList<ConfiguredAuthenticatorsModal> getConfiguredAuthenticators(String applicationId) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         ArrayList<ConfiguredAuthenticatorsModal> response = new ArrayList<>();
         try {
             AuthenticationStep[] authenticationSteps = getApplicationManagementService()
-                    .getConfiguredAuthenticators(applicationId);
+                    .getConfiguredAuthenticators(applicationId, tenantDomain);
 
             if (authenticationSteps == null) {
                 throw buildClientError(ErrorMessage.APPLICATION_NOT_FOUND, applicationId);
