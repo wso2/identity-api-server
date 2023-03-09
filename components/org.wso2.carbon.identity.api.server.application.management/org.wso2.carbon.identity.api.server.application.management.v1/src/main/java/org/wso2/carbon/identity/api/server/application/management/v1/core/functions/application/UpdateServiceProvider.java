@@ -19,10 +19,13 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApp
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.IdpAppRoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+
+import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
@@ -42,6 +45,7 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
 
         patchClaimConfiguration(serviceProvider, applicationPatchModel.getClaimConfiguration());
         patchAuthenticationSequence(applicationPatchModel.getAuthenticationSequence(), serviceProvider);
+        patchIdpAppRoleConfigurations(applicationPatchModel.getIdpAppRoleConfigurations(), serviceProvider);
         patchAdvancedConfiguration(serviceProvider, applicationPatchModel.getAdvancedConfigurations());
         patchProvisioningConfiguration(applicationPatchModel.getProvisioningConfigurations(), serviceProvider);
     }
@@ -58,6 +62,14 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
 
         if (authenticationSequence != null) {
             new UpdateAuthenticationSequence().apply(serviceProvider, authenticationSequence);
+        }
+    }
+
+    private void patchIdpAppRoleConfigurations(List<IdpAppRoleConfig> idpAppRoleConfigurations,
+                                               ServiceProvider serviceProvider) {
+
+        if (idpAppRoleConfigurations != null) {
+            new UpdateIdpAppRoleConfigurations().apply(serviceProvider, idpAppRoleConfigurations);
         }
     }
 

@@ -2450,6 +2450,8 @@ components:
           $ref: '#/components/schemas/InboundProtocolsListResponse'
         authenticationSequence:
           $ref: '#/components/schemas/AuthenticationSequence'
+        idpAppRoleConfigurations:
+          $ref: '#/components/schemas/IdpAppRoleConfigurations'
         advancedConfigurations:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
@@ -2483,6 +2485,8 @@ components:
           $ref: '#/components/schemas/ClaimConfiguration'
         authenticationSequence:
           $ref: '#/components/schemas/AuthenticationSequence'
+        idpAppRoleConfigurations:
+          $ref: '#/components/schemas/IdpAppRoleConfigurations'
         advancedConfigurations:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
@@ -3211,6 +3215,27 @@ components:
         authenticator:
           type: string
           example: basic
+
+    IdpAppRoleConfigurations:
+      type: array
+      items:
+        $ref: '#/components/schemas/IdpAppRoleConfig'
+      minItems: 0
+
+    IdpAppRoleConfig:
+      type: object
+      required:
+        - idp
+        - isMappingEnabled
+      properties:
+        idp:
+          type: string
+          example: googleIdP
+        useAppRoleMappings:
+          type: boolean
+          example: false
+          default: false
+
 
     AuthProtocolMetadata:
       type: object

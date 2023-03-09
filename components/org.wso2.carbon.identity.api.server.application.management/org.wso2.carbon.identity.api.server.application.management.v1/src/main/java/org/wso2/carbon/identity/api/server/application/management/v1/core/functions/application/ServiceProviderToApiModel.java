@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Certificate
 import org.wso2.carbon.identity.api.server.application.management.v1.Claim;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
+import org.wso2.carbon.identity.api.server.application.management.v1.IdpAppRoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
@@ -40,6 +41,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
+import org.wso2.carbon.identity.application.common.model.AppRoleMappingConfig;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
@@ -109,6 +111,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .advancedConfigurations(buildAdvancedAppConfiguration(application))
                     .provisioningConfigurations(buildProvisioningConfiguration(application))
                     .authenticationSequence(buildAuthenticationSequence(application))
+                    .idpAppRoleConfigurations(buildIdpAppRoleConfigurations(application))
                     .access(getAccess(application.getApplicationName()));
         }
     }
@@ -150,6 +153,21 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         authSequence.setRequestPathAuthenticators(requestPathAuthenticators);
 
         return authSequence;
+    }
+
+    private List<IdpAppRoleConfig> buildIdpAppRoleConfigurations(ServiceProvider application) {
+
+        AppRoleMappingConfig[] applicationRoleMappingConfig = application.getApplicationRoleMappingConfig();
+
+        if (applicationRoleMappingConfig != null) {
+            return Arrays.stream(applicationRoleMappingConfig).map(appRoleMappingConfig -> {
+                IdpAppRoleConfig idpAppRoleConfig = new IdpAppRoleConfig();
+                idpAppRoleConfig.setIdp(appRoleMappingConfig.getIdPName());
+                idpAppRoleConfig.setUseAppRoleMappings(appRoleMappingConfig.isUseAppRoleMappings());
+                return idpAppRoleConfig;
+            }).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     private List<String> getRequestPathAuthenticators(ServiceProvider application) {

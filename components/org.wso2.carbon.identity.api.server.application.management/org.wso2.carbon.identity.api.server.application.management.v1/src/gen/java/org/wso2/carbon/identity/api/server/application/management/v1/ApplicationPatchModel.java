@@ -22,9 +22,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.IdpAppRoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import javax.validation.constraints.*;
 
@@ -43,6 +46,7 @@ public class ApplicationPatchModel  {
     private String templateId;
     private ClaimConfiguration claimConfiguration;
     private AuthenticationSequence authenticationSequence;
+    private List<IdpAppRoleConfig> idpAppRoleConfigurations = null;
     private AdvancedApplicationConfiguration advancedConfigurations;
     private ProvisioningConfiguration provisioningConfigurations;
 
@@ -174,6 +178,32 @@ public class ApplicationPatchModel  {
 
     /**
     **/
+    public ApplicationPatchModel idpAppRoleConfigurations(List<IdpAppRoleConfig> idpAppRoleConfigurations) {
+
+        this.idpAppRoleConfigurations = idpAppRoleConfigurations;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("idpAppRoleConfigurations")
+    @Valid @Size(min=0)
+    public List<IdpAppRoleConfig> getIdpAppRoleConfigurations() {
+        return idpAppRoleConfigurations;
+    }
+    public void setIdpAppRoleConfigurations(List<IdpAppRoleConfig> idpAppRoleConfigurations) {
+        this.idpAppRoleConfigurations = idpAppRoleConfigurations;
+    }
+
+    public ApplicationPatchModel addIdpAppRoleConfigurationsItem(IdpAppRoleConfig idpAppRoleConfigurationsItem) {
+        if (this.idpAppRoleConfigurations == null) {
+            this.idpAppRoleConfigurations = new ArrayList<>();
+        }
+        this.idpAppRoleConfigurations.add(idpAppRoleConfigurationsItem);
+        return this;
+    }
+
+        /**
+    **/
     public ApplicationPatchModel advancedConfigurations(AdvancedApplicationConfiguration advancedConfigurations) {
 
         this.advancedConfigurations = advancedConfigurations;
@@ -227,13 +257,14 @@ public class ApplicationPatchModel  {
             Objects.equals(this.templateId, applicationPatchModel.templateId) &&
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
             Objects.equals(this.authenticationSequence, applicationPatchModel.authenticationSequence) &&
+            Objects.equals(this.idpAppRoleConfigurations, applicationPatchModel.idpAppRoleConfigurations) &&
             Objects.equals(this.advancedConfigurations, applicationPatchModel.advancedConfigurations) &&
             Objects.equals(this.provisioningConfigurations, applicationPatchModel.provisioningConfigurations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, imageUrl, accessUrl, templateId, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, imageUrl, accessUrl, templateId, claimConfiguration, authenticationSequence, idpAppRoleConfigurations, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -249,6 +280,7 @@ public class ApplicationPatchModel  {
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
+        sb.append("    idpAppRoleConfigurations: ").append(toIndentedString(idpAppRoleConfigurations)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
         sb.append("    provisioningConfigurations: ").append(toIndentedString(provisioningConfigurations)).append("\n");
         sb.append("}");
