@@ -41,6 +41,7 @@ public class UserRegistrant  {
 
 
     /**
+    * Unique id for the user registrant based on its name.
     **/
     public UserRegistrant id(String id) {
 
@@ -48,7 +49,7 @@ public class UserRegistrant  {
         return this;
     }
     
-    @ApiModelProperty(example = "8we2f4b8-0d22-8234-l4n7-1682a91b12cn", value = "")
+    @ApiModelProperty(example = "8we2f4b8-0d22-8234-l4n7-1682a91b12cn", value = "Unique id for the user registrant based on its name.")
     @JsonProperty("id")
     @Valid
     public String getId() {
@@ -59,6 +60,7 @@ public class UserRegistrant  {
     }
 
     /**
+    * Name of the user registrant.
     **/
     public UserRegistrant name(String name) {
 
@@ -66,7 +68,7 @@ public class UserRegistrant  {
         return this;
     }
     
-    @ApiModelProperty(example = "BasicAuthAttributeHandler", value = "")
+    @ApiModelProperty(example = "BasicAuthAttributeHandler", value = "Name of the user registrant.")
     @JsonProperty("name")
     @Valid
     public String getName() {
