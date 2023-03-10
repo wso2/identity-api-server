@@ -2578,6 +2578,10 @@ components:
           type: boolean
           example: false
           description: Decides whether user consent needs to be skipped during logout flows.
+        useExternalConsentManagement:
+          type: boolean
+          example: false
+          description: Decides whether user consent needs to be handle externally.
         returnAuthenticatedIdpList:
           type: boolean
           example: false
