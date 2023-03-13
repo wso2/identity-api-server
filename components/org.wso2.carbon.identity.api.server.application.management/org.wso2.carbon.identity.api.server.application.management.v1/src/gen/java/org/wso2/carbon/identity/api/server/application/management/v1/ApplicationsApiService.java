@@ -19,21 +19,22 @@
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
+import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationOwner;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
@@ -76,9 +77,8 @@ public interface ApplicationsApiService {
       public Response deleteWSTrustConfiguration(String applicationId);
 
       public Response exportApplication(String applicationId, Boolean exportSecrets);
-      public Response exportApplicationAsFile(String fileType, String applicationId,
-                                                              Boolean exportSecrets);
 
+      public Response exportApplicationAsFile(String applicationId, Boolean exportSecrets, String accept);
 
       public Response getAdaptiveAuthTemplates();
 
@@ -87,7 +87,7 @@ public interface ApplicationsApiService {
       public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String attributes);
 
       public Response getApplication(String applicationId);
-  
+
       public Response getApplicationTemplate(String templateId);
 
       public Response getConfiguredAuthenticators(String applicationId);

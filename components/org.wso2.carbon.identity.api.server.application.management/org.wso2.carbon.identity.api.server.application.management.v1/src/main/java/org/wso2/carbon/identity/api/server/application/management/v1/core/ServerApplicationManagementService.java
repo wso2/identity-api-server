@@ -192,12 +192,14 @@ public class ServerApplicationManagementService {
     private static final String WS_TRUST_TEMPLATE_ID = "061a3de4-8c08-4878-84a6-24245f11bf0e";
     private static final String STS_TEMPLATE_NOT_FOUND_MESSAGE = "Request template with id: %s could " +
             "not be found since the WS-Trust connector has not been configured.";
-    public static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
-    public static final String MEDIA_TYPE_APPLICATION_YAML = "application/yaml";
-    public static final String MEDIA_TYPE_APPLICATION_XML = "application/xml";
-    public static final String YML_FILE_EXTENSION = ".yml";
-    public static final String JSON_FILE_EXTENSION = ".json";
-    public static final String XML_FILE_EXTENSION = ".xml";
+
+    // Export related constants.
+    private static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
+    private static final String MEDIA_TYPE_APPLICATION_YAML = "application/yaml";
+    private static final String MEDIA_TYPE_APPLICATION_XML = "application/xml";
+    private static final String YML_FILE_EXTENSION = ".yml";
+    private static final String JSON_FILE_EXTENSION = ".json";
+    private static final String XML_FILE_EXTENSION = ".xml";
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -450,12 +452,16 @@ public class ServerApplicationManagementService {
     /**
      * Export an application identified by the applicationId, in the given format.
      *
-     * @param fileType The format of the exported string.
+     * @param fileType      The format of the exported string.
      * @param applicationId ID of the application to be exported.
      * @param exportSecrets If True, all hashed or encrypted secrets will also be exported.
      * @return string of the application in the given format.
      */
     public TransferResource exportApplicationAsFile(String fileType, String applicationId, Boolean exportSecrets) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Exporting application: " + applicationId + " as a file of type: " + fileType);
+        }
 
         if (StringUtils.isBlank(fileType)) {
             throw new UnsupportedOperationException("No valid media type found");
@@ -471,20 +477,29 @@ public class ServerApplicationManagementService {
             throw handleIdentityApplicationManagementException(e, msg);
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug("Application: " + applicationId + " exported successfully.");
+        }
+
         return  generateFileFromModel(fileType, serviceProvider);
     }
 
     private TransferResource generateFileFromModel(String fileType, ServiceProvider serviceProvider) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Generating file from model: " + serviceProvider.getApplicationName());
+        }
+
         StringBuilder fileNameSB = new StringBuilder(serviceProvider.getApplicationName());
-        String value = "";
+        String fileContent = "";
+
         switch (fileType) {
             case MEDIA_TYPE_APPLICATION_YAML:
                 Yaml yaml = new Yaml();
                 try {
-                    value = yaml.dump(serviceProvider);
-                } catch (NullPointerException | YAMLException | ClassCastException e) {
-                    throw new RuntimeException(e);
+                    fileContent = yaml.dump(serviceProvider);
+                } catch (YAMLException e) {
+                    throw Utils.buildServerError("Error exporting application from YAML file.", e);
                 }
                 fileNameSB.append(YML_FILE_EXTENSION);
                 break;
@@ -496,26 +511,34 @@ public class ServerApplicationManagementService {
                     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
                     StringWriter stringWriter = new StringWriter();
                     marshaller.marshal(serviceProvider, stringWriter);
-                    value = stringWriter.toString();
-                } catch (NullPointerException | JAXBException e) {
-                    throw new RuntimeException(e);
+                    fileContent = stringWriter.toString();
+                } catch (JAXBException e) {
+                    throw Utils.buildServerError("Error exporting application from XML file.", e);
                 }
                 fileNameSB.append(XML_FILE_EXTENSION);
                 break;
-            default:
+            case MEDIA_TYPE_APPLICATION_JSON:
                 ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
                 try {
-                    value = objectMapper.writeValueAsString(serviceProvider);
-                } catch (NullPointerException | JsonProcessingException e) {
-                    throw new RuntimeException(e);
+                    fileContent = objectMapper.writeValueAsString(serviceProvider);
+                } catch (JsonProcessingException e) {
+                    throw Utils.buildServerError("Error exporting application from JSON file.", e);
                 }
                 fileNameSB.append(JSON_FILE_EXTENSION);
                 break;
+            default:
+                throw Utils.buildServerError("Unsupported media type: " + fileType + "."
+                        + " Supported media types are " + MEDIA_TYPE_APPLICATION_XML + ", "
+                        + MEDIA_TYPE_APPLICATION_JSON + ", " + MEDIA_TYPE_APPLICATION_YAML + ".");
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully generated file: " + fileNameSB);
         }
 
         return new TransferResource(
                 fileNameSB.toString(),
-                new ByteArrayResource(value.getBytes(StandardCharsets.UTF_8)),
+                new ByteArrayResource(fileContent.getBytes(StandardCharsets.UTF_8)),
                 MediaType.APPLICATION_OCTET_STREAM
         );
     }
@@ -546,6 +569,10 @@ public class ServerApplicationManagementService {
 
     private String doImportApplication(InputStream fileInputStream, Attachment fileDetail, boolean isAppUpdate) {
 
+        if (log.isDebugEnabled()) {
+            log.debug("Importing application from file: " + fileDetail.getContentDisposition().getFilename());
+        }
+
         try {
             SpFileContent spFileContent = buildSpFileContent(fileInputStream, fileDetail);
 
@@ -567,6 +594,10 @@ public class ServerApplicationManagementService {
             throw handleIdentityApplicationManagementException(e, "Error importing application from XML file.");
         } finally {
             IOUtils.closeQuietly(fileInputStream);
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully imported application from file: "
+                            + fileDetail.getContentDisposition().getFilename());
+            }
         }
     }
 
