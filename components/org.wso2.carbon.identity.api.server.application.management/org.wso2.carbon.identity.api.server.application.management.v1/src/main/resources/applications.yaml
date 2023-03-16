@@ -2582,6 +2582,10 @@ components:
           type: boolean
           example: false
           description: Decides whether user consent needs to be handle externally.
+        externalConsentURL:
+          type: String
+          example: "https://example.com/consent"
+          description: Redirect URL for external consenr management.
         returnAuthenticatedIdpList:
           type: boolean
           example: false

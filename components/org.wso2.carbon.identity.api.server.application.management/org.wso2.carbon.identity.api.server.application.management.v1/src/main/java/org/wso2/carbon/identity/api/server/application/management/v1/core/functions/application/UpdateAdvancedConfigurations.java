@@ -51,6 +51,8 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(advancedConfigurations.getSkipLogoutConsent(), config::setSkipLogoutConsent);
             setIfNotNull(advancedConfigurations.getUseExternalConsentManagement(),
                     config::setUseExternalConsentManagement);
+            setIfNotNull(advancedConfigurations.getExternalConsentURL(),
+                    config::setExetrnalConsentUrl);
             setIfNotNull(advancedConfigurations.getReturnAuthenticatedIdpList(),
                     config::setAlwaysSendBackAuthenticatedListOfIdPs);
             setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);

@@ -69,8 +69,10 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.TEMPLATE_ID_SP_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.USE_USER_ID_FOR_DEFAULT_SUBJECT;
 import static org.wso2.carbon.identity.application.mgt.dao.impl.ApplicationDAOImpl.USE_DOMAIN_IN_ROLES;
+import static org.wso2.carbon.identity.base.IdentityConstants.EXTERNAL_CONSENT_URL;
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_CONSENT;
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_LOGOUT_CONSENT;
+import static org.wso2.carbon.identity.base.IdentityConstants.USE_EXTERNAL_CONSENT_MANAGEMENT;
 
 /**
  * Converts the backend model ServiceProvider into the corresponding API model object.
@@ -361,6 +363,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .skipLoginConsent(authConfig.isSkipConsent())
                 .skipLogoutConsent(authConfig.isSkipLogoutConsent())
                 .useExternalConsentManagement(authConfig.isExternalConsentManagement())
+                .externalConsentURL(authConfig.getExternalConsentUrl())
                 .certificate(getCertificate(serviceProvider))
                 .fragment(isFragmentApp(serviceProvider))
                 .additionalSpProperties(getSpProperties(serviceProvider));
@@ -393,6 +396,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     Arrays.stream(propertyList).collect(Collectors.toList());
             spPropertyList.removeIf(property -> SKIP_CONSENT.equals(property.getName()));
             spPropertyList.removeIf(property -> SKIP_LOGOUT_CONSENT.equals(property.getName()));
+            spPropertyList.removeIf(property -> USE_EXTERNAL_CONSENT_MANAGEMENT.equals(property.getName()));
+            spPropertyList.removeIf(property -> EXTERNAL_CONSENT_URL.equals(property.getName()));
             spPropertyList.removeIf(property -> USE_DOMAIN_IN_ROLES.equals(property.getName()));
             spPropertyList.removeIf(property -> USE_USER_ID_FOR_DEFAULT_SUBJECT.equals(property.getName()));
             spPropertyList.removeIf(property -> TEMPLATE_ID_SP_PROPERTY_NAME.equals(property.getName()));
