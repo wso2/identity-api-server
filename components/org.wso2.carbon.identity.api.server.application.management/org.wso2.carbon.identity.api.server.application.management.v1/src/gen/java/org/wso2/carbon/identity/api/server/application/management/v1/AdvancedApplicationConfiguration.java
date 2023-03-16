@@ -163,7 +163,6 @@ public class AdvancedApplicationConfiguration  {
     }
 
     /**
-     * Decides whether user consent needs to be handles externally.
      **/
     public AdvancedApplicationConfiguration externalConsentURL(String externalConsentURL) {
 
@@ -171,7 +170,7 @@ public class AdvancedApplicationConfiguration  {
         return this;
     }
 
-    @ApiModelProperty(example = "", value = "Decides whether user consent needs to be handled externally.")
+    @ApiModelProperty(example = "https://example.com/consent", value = "Redirect URL for external consent management")
     @JsonProperty("externalConsentURL")
     @Valid
     public String getExternalConsentURL() {

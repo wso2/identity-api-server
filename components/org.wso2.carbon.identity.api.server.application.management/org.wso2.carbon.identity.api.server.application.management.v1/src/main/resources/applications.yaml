@@ -2585,7 +2585,7 @@ components:
         externalConsentURL:
           type: String
           example: "https://example.com/consent"
-          description: Redirect URL for external consenr management.
+          description: Redirect URL for external consent management.
         returnAuthenticatedIdpList:
           type: boolean
           example: false
