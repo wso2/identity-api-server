@@ -19,7 +19,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
+import org.wso2.carbon.identity.api.server.application.management.v1.ExternalConsentManagementConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
+import org.wso2.carbon.identity.application.common.model.ExternalConsentManagementConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
@@ -49,14 +51,11 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             LocalAndOutboundAuthenticationConfig config = getLocalAndOutboundConfig(serviceProvider);
             setIfNotNull(advancedConfigurations.getSkipLoginConsent(), config::setSkipConsent);
             setIfNotNull(advancedConfigurations.getSkipLogoutConsent(), config::setSkipLogoutConsent);
-            setIfNotNull(advancedConfigurations.getUseExternalConsentManagement(),
-                    config::setUseExternalConsentManagement);
-            setIfNotNull(advancedConfigurations.getExternalConsentURL(),
-                    config::setExetrnalConsentUrl);
             setIfNotNull(advancedConfigurations.getReturnAuthenticatedIdpList(),
                     config::setAlwaysSendBackAuthenticatedListOfIdPs);
             setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
-
+            updateExternalConsentManagement(advancedConfigurations.getExternalConsentManagement(),
+                    config);
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
         }
     }
@@ -81,6 +80,27 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                 serviceProvider.setCertificateContent(null);
             }
         }
+    }
+
+    private void updateExternalConsentManagement(ExternalConsentManagementConfiguration externalConsentMgtApiModel,
+                                                 LocalAndOutboundAuthenticationConfig config) {
+
+        ExternalConsentManagementConfig externalConsentManagementConfig =
+                getExternalConsentManagementConfig(config);
+        if (externalConsentMgtApiModel != null) {
+            setIfNotNull(externalConsentMgtApiModel.getEnabled(), externalConsentManagementConfig::setEnabled);
+            setIfNotNull(externalConsentMgtApiModel.getConsentUrl(),
+                    externalConsentManagementConfig::setExternalConsentUrl);
+        }
+    }
+
+    private ExternalConsentManagementConfig getExternalConsentManagementConfig (
+            LocalAndOutboundAuthenticationConfig config) {
+
+        if (config.getExternalConsentManagement() == null) {
+            config.setExternalConsentManagement(new ExternalConsentManagementConfig());
+        }
+        return config.getExternalConsentManagement();
     }
 
 

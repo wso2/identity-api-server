@@ -19,20 +19,13 @@
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
-import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
-import javax.validation.constraints.*;
 
 
-import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
-import javax.xml.bind.annotation.*;
 
 public class AdvancedApplicationConfiguration  {
   
@@ -41,12 +34,11 @@ public class AdvancedApplicationConfiguration  {
     private Certificate certificate;
     private Boolean skipLoginConsent;
     private Boolean skipLogoutConsent;
-    private Boolean useExternalConsentManagement;
-    private String externalConsentURL;
     private Boolean returnAuthenticatedIdpList;
     private Boolean enableAuthorization;
     private Boolean fragment;
     private List<AdditionalSpProperty> additionalSpProperties = null;
+    private ExternalConsentManagementConfiguration externalConsentManagement;
 
 
     /**
@@ -113,7 +105,7 @@ public class AdvancedApplicationConfiguration  {
         this.skipLoginConsent = skipLoginConsent;
         return this;
     }
-    
+
     @ApiModelProperty(example = "false", value = "Decides whether user consent needs to be skipped during login flows.")
     @JsonProperty("skipLoginConsent")
     @Valid
@@ -132,7 +124,7 @@ public class AdvancedApplicationConfiguration  {
         this.skipLogoutConsent = skipLogoutConsent;
         return this;
     }
-    
+
     @ApiModelProperty(example = "false", value = "Decides whether user consent needs to be skipped during logout flows.")
     @JsonProperty("skipLogoutConsent")
     @Valid
@@ -144,40 +136,22 @@ public class AdvancedApplicationConfiguration  {
     }
 
     /**
-     * Decides whether user consent needs to be handles externally.
      **/
-    public AdvancedApplicationConfiguration useExternalConsentManagement(Boolean useExternalConsentManagement) {
+    public AdvancedApplicationConfiguration externalConsentManagement(ExternalConsentManagementConfiguration
+                                                                              externalConsentManagement) {
 
-        this.useExternalConsentManagement = useExternalConsentManagement;
+        this.externalConsentManagement = externalConsentManagement;
         return this;
     }
 
-    @ApiModelProperty(example = "false", value = "Decides whether user consent needs to be handled externally.")
-    @JsonProperty("useExternalConsentManagement")
+    @ApiModelProperty(value = "")
+    @JsonProperty("externalConsentManagement")
     @Valid
-    public Boolean getUseExternalConsentManagement() {
-        return useExternalConsentManagement;
+    public ExternalConsentManagementConfiguration getExternalConsentManagement() {
+        return externalConsentManagement;
     }
-    public void setUseExternalConsentManagement(Boolean useExternalConsentManagement) {
-        this.useExternalConsentManagement = useExternalConsentManagement;
-    }
-
-    /**
-     **/
-    public AdvancedApplicationConfiguration externalConsentURL(String externalConsentURL) {
-
-        this.externalConsentURL = externalConsentURL;
-        return this;
-    }
-
-    @ApiModelProperty(example = "https://example.com/consent", value = "Redirect URL for external consent management")
-    @JsonProperty("externalConsentURL")
-    @Valid
-    public String getExternalConsentURL() {
-        return externalConsentURL;
-    }
-    public void setExternalConsentURL(String externalConsentURL) {
-        this.externalConsentURL = externalConsentURL;
+    public void setExternalConsentManagement(ExternalConsentManagementConfiguration externalConsentManagement) {
+        this.externalConsentManagement = externalConsentManagement;
     }
 
     /**
@@ -280,8 +254,7 @@ public class AdvancedApplicationConfiguration  {
             Objects.equals(this.certificate, advancedApplicationConfiguration.certificate) &&
             Objects.equals(this.skipLoginConsent, advancedApplicationConfiguration.skipLoginConsent) &&
             Objects.equals(this.skipLogoutConsent, advancedApplicationConfiguration.skipLogoutConsent) &&
-            Objects.equals(this.useExternalConsentManagement, advancedApplicationConfiguration.useExternalConsentManagement) &&
-            Objects.equals(this.externalConsentURL, advancedApplicationConfiguration.externalConsentURL) &&
+            Objects.equals(this.externalConsentManagement, advancedApplicationConfiguration.externalConsentManagement) &&
             Objects.equals(this.returnAuthenticatedIdpList, advancedApplicationConfiguration.returnAuthenticatedIdpList) &&
             Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization) &&
             Objects.equals(this.fragment, advancedApplicationConfiguration.fragment) &&
@@ -290,7 +263,7 @@ public class AdvancedApplicationConfiguration  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, useExternalConsentManagement, externalConsentURL, returnAuthenticatedIdpList, enableAuthorization, fragment, additionalSpProperties);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, externalConsentManagement, returnAuthenticatedIdpList, enableAuthorization, fragment, additionalSpProperties);
     }
 
     @Override
@@ -304,8 +277,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    certificate: ").append(toIndentedString(certificate)).append("\n");
         sb.append("    skipLoginConsent: ").append(toIndentedString(skipLoginConsent)).append("\n");
         sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");
-        sb.append("    useExternalConsentManagement: ").append(toIndentedString(useExternalConsentManagement)).append("\n");
-        sb.append("    externalConsentURL: ").append(toIndentedString(externalConsentURL)).append("\n");
+        sb.append("    externalConsentManagement: ").append(toIndentedString(externalConsentManagement)).append("\n");
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");
         sb.append("    enableAuthorization: ").append(toIndentedString(enableAuthorization)).append("\n");
         sb.append("    fragment: ").append(toIndentedString(fragment)).append("\n");

@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Certificate
 import org.wso2.carbon.identity.api.server.application.management.v1.Claim;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
+import org.wso2.carbon.identity.api.server.application.management.v1.ExternalConsentManagementConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
@@ -42,6 +43,7 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
+import org.wso2.carbon.identity.application.common.model.ExternalConsentManagementConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
@@ -362,11 +364,23 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
                 .skipLoginConsent(authConfig.isSkipConsent())
                 .skipLogoutConsent(authConfig.isSkipLogoutConsent())
-                .useExternalConsentManagement(authConfig.isExternalConsentManagement())
-                .externalConsentURL(authConfig.getExternalConsentUrl())
+                .externalConsentManagement(getExternalConsentManagement(authConfig))
                 .certificate(getCertificate(serviceProvider))
                 .fragment(isFragmentApp(serviceProvider))
                 .additionalSpProperties(getSpProperties(serviceProvider));
+    }
+
+    private ExternalConsentManagementConfiguration getExternalConsentManagement(
+            LocalAndOutboundAuthenticationConfig authConfig) {
+
+        ExternalConsentManagementConfig consentConfig = authConfig.getExternalConsentManagement();
+        if (consentConfig == null) {
+            consentConfig = new ExternalConsentManagementConfig();
+        }
+
+        return new ExternalConsentManagementConfiguration()
+                .enabled(consentConfig.isEnabled())
+                .consentUrl(consentConfig.getExternalConsentUrl());
     }
 
     private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {
