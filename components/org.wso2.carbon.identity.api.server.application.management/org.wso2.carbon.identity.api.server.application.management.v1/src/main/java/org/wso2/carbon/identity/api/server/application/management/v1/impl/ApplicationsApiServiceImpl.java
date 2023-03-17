@@ -22,7 +22,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
-import org.wso2.carbon.identity.api.server.application.management.v1.*;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationOwner;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
+import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
+import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
+import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.TransferResource;
@@ -204,9 +218,9 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response exportApplicationAsFile(String applicationId, Boolean exportSecrets, String fileType) {
 
         TransferResource transferResource = applicationManagementService.exportApplicationAsFile(
-                fileType,
                 applicationId,
-                exportSecrets
+                exportSecrets,
+                fileType
         );
 
         return Response.ok()

@@ -452,15 +452,15 @@ public class ServerApplicationManagementService {
     /**
      * Export an application identified by the applicationId, in the given format.
      *
-     * @param fileType      The format of the exported string.
      * @param applicationId ID of the application to be exported.
      * @param exportSecrets If True, all hashed or encrypted secrets will also be exported.
+     * @param fileType      The format of the exported string.
      * @return string of the application in the given format.
      */
-    public TransferResource exportApplicationAsFile(String fileType, String applicationId, Boolean exportSecrets) {
+    public TransferResource exportApplicationAsFile(String applicationId, Boolean exportSecrets, String fileType) {
 
         if (log.isDebugEnabled()) {
-            log.debug("Exporting application: " + applicationId + " as a file of type: " + fileType);
+            log.debug("Exporting service provider from application ID " + applicationId);
         }
 
         if (StringUtils.isBlank(fileType)) {
@@ -477,17 +477,20 @@ public class ServerApplicationManagementService {
             throw handleIdentityApplicationManagementException(e, msg);
         }
 
+        TransferResource transferResource = generateFileFromModel(fileType, serviceProvider);
+
         if (log.isDebugEnabled()) {
-            log.debug("Application: " + applicationId + " exported successfully.");
+            log.debug("Successfully exported: " + serviceProvider.getApplicationName() + " as a file of type: " +
+                    fileType);
         }
 
-        return  generateFileFromModel(fileType, serviceProvider);
+        return transferResource;
     }
 
     private TransferResource generateFileFromModel(String fileType, ServiceProvider serviceProvider) {
 
         if (log.isDebugEnabled()) {
-            log.debug("Generating file from model: " + serviceProvider.getApplicationName());
+            log.debug("Generating file content from model for application: " + serviceProvider.getApplicationName());
         }
 
         StringBuilder fileNameSB = new StringBuilder(serviceProvider.getApplicationName());
@@ -532,10 +535,6 @@ public class ServerApplicationManagementService {
                         + MEDIA_TYPE_APPLICATION_JSON + ", " + MEDIA_TYPE_APPLICATION_YAML + ".");
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully generated file: " + fileNameSB);
-        }
-
         return new TransferResource(
                 fileNameSB.toString(),
                 new ByteArrayResource(fileContent.getBytes(StandardCharsets.UTF_8)),
@@ -569,10 +568,6 @@ public class ServerApplicationManagementService {
 
     private String doImportApplication(InputStream fileInputStream, Attachment fileDetail, boolean isAppUpdate) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Importing application from file: " + fileDetail.getContentDisposition().getFilename());
-        }
-
         try {
             SpFileContent spFileContent = buildSpFileContent(fileInputStream, fileDetail);
 
@@ -594,10 +589,6 @@ public class ServerApplicationManagementService {
             throw handleIdentityApplicationManagementException(e, "Error importing application from XML file.");
         } finally {
             IOUtils.closeQuietly(fileInputStream);
-            if (log.isDebugEnabled()) {
-                log.debug("Successfully imported application from file: "
-                            + fileDetail.getContentDisposition().getFilename());
-            }
         }
     }
 

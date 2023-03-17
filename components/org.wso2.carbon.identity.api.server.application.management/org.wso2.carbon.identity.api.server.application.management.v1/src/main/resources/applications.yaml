@@ -452,9 +452,9 @@ paths:
         - Applications
       operationId: exportApplicationAsFile
       summary: |
-        Export application as an XML file
+        Export application in XML, YAML, or JSON file formats.
       description: |
-        This API provides the capability to retrieve the application as an XML file.<br>
+        This API provides the capability to retrieve the application in XML, YAML, or JSON format.<br>
           <b>Permission required:</b> <br>
               * /permission/admin/manage/identity/applicationmgt/view <br>
           <b>Scope required:</b> <br>

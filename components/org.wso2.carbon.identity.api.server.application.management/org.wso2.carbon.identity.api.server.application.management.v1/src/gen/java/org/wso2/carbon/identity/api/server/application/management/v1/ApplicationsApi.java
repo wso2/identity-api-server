@@ -340,7 +340,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/exportFile")
     
     @Produces({ "application/json", "application/yaml", "application/xml", "application/octet-stream" })
-    @ApiOperation(value = "Export application as an XML file ", notes = "This API provides the capability to retrieve the application as an XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = String.class, authorizations = {
+    @ApiOperation(value = "Export application in XML, YAML, or JSON file formats. ", notes = "This API provides the capability to retrieve the application in XML, YAML, or JSON format.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = String.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
