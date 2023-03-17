@@ -533,7 +533,7 @@ public class ServerApplicationManagementService {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("Successfully generated file: " + fileNameSB);
+            log.debug("Successfully generated content for file: " + fileNameSB);
         }
 
         return new TransferResource(
