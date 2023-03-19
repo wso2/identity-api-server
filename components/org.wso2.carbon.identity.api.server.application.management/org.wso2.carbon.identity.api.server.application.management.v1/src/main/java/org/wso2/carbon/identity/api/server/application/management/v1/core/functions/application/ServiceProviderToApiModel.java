@@ -159,15 +159,15 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         AppRoleMappingConfig[] applicationRoleMappingConfig = application.getApplicationRoleMappingConfig();
 
-        if (applicationRoleMappingConfig != null) {
-            return Arrays.stream(applicationRoleMappingConfig).map(appRoleMappingConfig -> {
-                IdpAppRoleConfig idpAppRoleConfig = new IdpAppRoleConfig();
-                idpAppRoleConfig.setIdp(appRoleMappingConfig.getIdPName());
-                idpAppRoleConfig.setUseAppRoleMappings(appRoleMappingConfig.isUseAppRoleMappings());
-                return idpAppRoleConfig;
-            }).collect(Collectors.toList());
+        if (applicationRoleMappingConfig == null) {
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
+        return Arrays.stream(applicationRoleMappingConfig).map(appRoleMappingConfig -> {
+            IdpAppRoleConfig idpAppRoleConfig = new IdpAppRoleConfig();
+            idpAppRoleConfig.setIdp(appRoleMappingConfig.getIdPName());
+            idpAppRoleConfig.setUseAppRoleMappings(appRoleMappingConfig.isUseAppRoleMappings());
+            return idpAppRoleConfig;
+        }).collect(Collectors.toList());
     }
 
     private List<String> getRequestPathAuthenticators(ServiceProvider application) {

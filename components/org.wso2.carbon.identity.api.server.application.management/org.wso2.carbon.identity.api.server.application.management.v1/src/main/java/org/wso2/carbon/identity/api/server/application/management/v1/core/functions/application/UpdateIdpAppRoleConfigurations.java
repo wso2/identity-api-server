@@ -27,11 +27,12 @@ import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Update the Identity Provider Application Role Configurations.
+ * Update the Identity Provider application role configurations in Service Provider model from the API model.
  */
 public class UpdateIdpAppRoleConfigurations implements UpdateFunction<ServiceProvider, List<IdpAppRoleConfig>> {
 
@@ -43,28 +44,36 @@ public class UpdateIdpAppRoleConfigurations implements UpdateFunction<ServicePro
         }
     }
 
-     private void updateIdpAppRoleConfigurations(ServiceProvider serviceProvider,
-                                                 List<IdpAppRoleConfig> idpAppRoleConfigurations) {
+    /**
+     * Update the Identity Provider application role configurations in Service Provider model from the API model.
+     *
+     * @param serviceProvider          Service Provider to be updated.
+     * @param idpAppRoleConfigurations Identity Provider application role configurations from API model.
+     */
+    private void updateIdpAppRoleConfigurations(ServiceProvider serviceProvider,
+                                                List<IdpAppRoleConfig> idpAppRoleConfigurations) {
 
-         List<String> attributeStepFIdPs =  getAttributeStepFIdPs(serviceProvider);
-         AppRoleMappingConfig[] appRoleMappingConfigs = getApplicationRoleMappingConfig(
-                 attributeStepFIdPs, idpAppRoleConfigurations);
-         serviceProvider.setApplicationRoleMappingConfig(appRoleMappingConfigs);
-     }
+        List<String> attributeStepFIdPs = getAttributeStepFIdPs(serviceProvider);
+        AppRoleMappingConfig[] appRoleMappingConfigs = getApplicationRoleMappingConfig(
+                attributeStepFIdPs, idpAppRoleConfigurations);
+        serviceProvider.setApplicationRoleMappingConfig(appRoleMappingConfigs);
+    }
 
-    private List<String> getAttributeStepFIdPs (ServiceProvider serviceProvider) {
+    /**
+     * Get the federated identity provider names in the attribute step.
+     *
+     * @param serviceProvider Service Provider to be updated.
+     * @return List of federated identity provider names in the attribute step.
+     */
+    private List<String> getAttributeStepFIdPs(ServiceProvider serviceProvider) {
 
         AuthenticationStep attributeAuthStep = serviceProvider.getLocalAndOutBoundAuthenticationConfig().
                 getAuthenticationStepForAttributes();
         IdentityProvider[] authStepFederatedIdentityProviders = null;
         if (attributeAuthStep == null) {
-            for (AuthenticationStep authenticationStep : serviceProvider.getLocalAndOutBoundAuthenticationConfig().
-                    getAuthenticationSteps()) {
-                if (authenticationStep.isAttributeStep()) {
-                        attributeAuthStep = authenticationStep;
-                    break;
-                }
-            }
+            attributeAuthStep = Lists.newArrayList(serviceProvider.getLocalAndOutBoundAuthenticationConfig().
+                            getAuthenticationSteps()).stream().filter(AuthenticationStep::isAttributeStep).findFirst()
+                    .orElse(null);
         }
         if (attributeAuthStep != null) {
             authStepFederatedIdentityProviders = attributeAuthStep.getFederatedIdentityProviders();
@@ -73,19 +82,29 @@ public class UpdateIdpAppRoleConfigurations implements UpdateFunction<ServicePro
             return Arrays.stream(authStepFederatedIdentityProviders).
                     map(IdentityProvider::getIdentityProviderName).collect(Collectors.toList());
         }
-        return Lists.newArrayList();
+        return Collections.emptyList();
     }
 
-    private AppRoleMappingConfig[] getApplicationRoleMappingConfig (List<String> attributeStepFIdPs,
-                                                                    List<IdpAppRoleConfig>  idpAppRoleConfigs) {
+    /**
+     * Get the application role mapping configurations for the service provider to be updated.
+     *
+     * @param attributeStepFIdPs List of federated identity provider names in the attribute step.
+     * @param idpAppRoleConfigs  List of IdpAppRoleConfig
+     * @return AppRoleMappingConfig[]
+     */
+    private AppRoleMappingConfig[] getApplicationRoleMappingConfig(List<String> attributeStepFIdPs,
+                                                                   List<IdpAppRoleConfig> idpAppRoleConfigs) {
 
-        return attributeStepFIdPs.stream().map(FIdPName -> {
-            AppRoleMappingConfig appRoleMappingConfig = new AppRoleMappingConfig();
-            appRoleMappingConfig.setIdPName(FIdPName);
-            idpAppRoleConfigs.stream().filter(idpAppRoleConfig -> FIdPName.equals(idpAppRoleConfig.getIdp()))
-                    .findFirst().ifPresent(idpAppRoleConfig -> appRoleMappingConfig.setUseAppRoleMappings(
-                            idpAppRoleConfig.getUseAppRoleMappings()));
-            return appRoleMappingConfig;
-        }).toArray(AppRoleMappingConfig[]::new);
+        return attributeStepFIdPs.stream()
+                .map(FIdPName -> {
+                    AppRoleMappingConfig appRoleMappingConfig = new AppRoleMappingConfig();
+                    appRoleMappingConfig.setIdPName(FIdPName);
+                    idpAppRoleConfigs.stream()
+                            .filter(idpAppRoleConfig -> FIdPName.equals(idpAppRoleConfig.getIdp()))
+                            .findFirst()
+                            .ifPresent(idpAppRoleConfig -> appRoleMappingConfig.setUseAppRoleMappings(
+                                    idpAppRoleConfig.getUseAppRoleMappings()));
+                    return appRoleMappingConfig;
+                }).toArray(AppRoleMappingConfig[]::new);
     }
 }

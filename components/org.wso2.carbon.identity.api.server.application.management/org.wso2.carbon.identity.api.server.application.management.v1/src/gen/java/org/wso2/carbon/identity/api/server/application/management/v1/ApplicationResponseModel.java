@@ -319,6 +319,7 @@ public enum AccessEnum {
     }
 
     /**
+    * Decides whether the attribute step FIdPs use app role mappings.
     **/
     public ApplicationResponseModel idpAppRoleConfigurations(List<IdpAppRoleConfig> idpAppRoleConfigurations) {
 
@@ -326,7 +327,7 @@ public enum AccessEnum {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "Decides whether the attribute step FIdPs use app role mappings.")
     @JsonProperty("idpAppRoleConfigurations")
     @Valid @Size(min=0)
     public List<IdpAppRoleConfig> getIdpAppRoleConfigurations() {

@@ -24,18 +24,22 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
+/**
+ * Decides whether an FIdP use app role mappings.
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
+@ApiModel(description = "Decides whether an FIdP use app role mappings.")
 public class IdpAppRoleConfig  {
   
     private String idp;
     private Boolean useAppRoleMappings = false;
 
     /**
+    * FIdP name.
     **/
     public IdpAppRoleConfig idp(String idp) {
 
@@ -43,7 +47,7 @@ public class IdpAppRoleConfig  {
         return this;
     }
     
-    @ApiModelProperty(example = "googleIdP", required = true, value = "")
+    @ApiModelProperty(example = "googleIdP", required = true, value = "FIdP name.")
     @JsonProperty("idp")
     @Valid
     @NotNull(message = "Property idp cannot be null.")
@@ -56,6 +60,7 @@ public class IdpAppRoleConfig  {
     }
 
     /**
+    * FIdP use application role mappings.
     **/
     public IdpAppRoleConfig useAppRoleMappings(Boolean useAppRoleMappings) {
 
@@ -63,9 +68,11 @@ public class IdpAppRoleConfig  {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "")
+    @ApiModelProperty(example = "false", required = true, value = "FIdP use application role mappings.")
     @JsonProperty("useAppRoleMappings")
     @Valid
+    @NotNull(message = "Property useAppRoleMappings cannot be null.")
+
     public Boolean getUseAppRoleMappings() {
         return useAppRoleMappings;
     }

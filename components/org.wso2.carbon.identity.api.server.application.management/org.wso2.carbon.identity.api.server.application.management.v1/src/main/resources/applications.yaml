@@ -3218,24 +3218,27 @@ components:
 
     IdpAppRoleConfigurations:
       type: array
+      description: Decides whether the attribute step FIdPs use app role mappings.
       items:
         $ref: '#/components/schemas/IdpAppRoleConfig'
       minItems: 0
 
     IdpAppRoleConfig:
       type: object
+      description: Decides whether an FIdP use app role mappings.
       required:
         - idp
-        - isMappingEnabled
+        - useAppRoleMappings
       properties:
         idp:
           type: string
+          description: FIdP name.
           example: googleIdP
         useAppRoleMappings:
           type: boolean
+          description: FIdP use application role mappings.
           example: false
           default: false
-
 
     AuthProtocolMetadata:
       type: object

@@ -177,6 +177,7 @@ public class ApplicationPatchModel  {
     }
 
     /**
+    * Decides whether the attribute step FIdPs use app role mappings.
     **/
     public ApplicationPatchModel idpAppRoleConfigurations(List<IdpAppRoleConfig> idpAppRoleConfigurations) {
 
@@ -184,7 +185,7 @@ public class ApplicationPatchModel  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "Decides whether the attribute step FIdPs use app role mappings.")
     @JsonProperty("idpAppRoleConfigurations")
     @Valid @Size(min=0)
     public List<IdpAppRoleConfig> getIdpAppRoleConfigurations() {
