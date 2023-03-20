@@ -124,10 +124,13 @@ import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -174,7 +177,7 @@ import static org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages.ERRO
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import java.io.StringWriter;
+import javax.xml.bind.Unmarshaller;
 
 /**
  * Calls internal osgi services to perform server application management related operations.
@@ -193,13 +196,13 @@ public class ServerApplicationManagementService {
     private static final String STS_TEMPLATE_NOT_FOUND_MESSAGE = "Request template with id: %s could " +
             "not be found since the WS-Trust connector has not been configured.";
 
-    // Export related constants.
-    private static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
-    private static final String MEDIA_TYPE_APPLICATION_YAML = "application/yaml";
-    private static final String MEDIA_TYPE_APPLICATION_XML = "application/xml";
+    // Export and Import related constants.
     private static final String YML_FILE_EXTENSION = ".yml";
     private static final String JSON_FILE_EXTENSION = ".json";
     private static final String XML_FILE_EXTENSION = ".xml";
+    private static final String[] VALID_MEDIA_TYPES_XML = {"application/xml", "text/xml"};
+    private static final String[] VALID_MEDIA_TYPES_YAML = {"application/yaml", "text/yaml", "application/x-yaml"};
+    private static final String[] VALID_MEDIA_TYPES_JSON = {"application/json", "text/json"};
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -496,43 +499,39 @@ public class ServerApplicationManagementService {
         StringBuilder fileNameSB = new StringBuilder(serviceProvider.getApplicationName());
         String fileContent = "";
 
-        switch (fileType) {
-            case MEDIA_TYPE_APPLICATION_YAML:
-                Yaml yaml = new Yaml();
-                try {
-                    fileContent = yaml.dump(serviceProvider);
-                } catch (YAMLException e) {
-                    throw Utils.buildServerError("Error exporting application from YAML file.", e);
-                }
-                fileNameSB.append(YML_FILE_EXTENSION);
-                break;
-            case MEDIA_TYPE_APPLICATION_XML:
-                JAXBContext jaxbContext;
-                try {
-                    jaxbContext = JAXBContext.newInstance(ServiceProvider.class);
-                    Marshaller marshaller = jaxbContext.createMarshaller();
-                    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-                    StringWriter stringWriter = new StringWriter();
-                    marshaller.marshal(serviceProvider, stringWriter);
-                    fileContent = stringWriter.toString();
-                } catch (JAXBException e) {
-                    throw Utils.buildServerError("Error exporting application from XML file.", e);
-                }
-                fileNameSB.append(XML_FILE_EXTENSION);
-                break;
-            case MEDIA_TYPE_APPLICATION_JSON:
-                ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
-                try {
-                    fileContent = objectMapper.writeValueAsString(serviceProvider);
-                } catch (JsonProcessingException e) {
-                    throw Utils.buildServerError("Error exporting application from JSON file.", e);
-                }
-                fileNameSB.append(JSON_FILE_EXTENSION);
-                break;
-            default:
-                throw Utils.buildServerError("Unsupported media type: " + fileType + "."
-                        + " Supported media types are " + MEDIA_TYPE_APPLICATION_XML + ", "
-                        + MEDIA_TYPE_APPLICATION_JSON + ", " + MEDIA_TYPE_APPLICATION_YAML + ".");
+        if (Arrays.asList(VALID_MEDIA_TYPES_XML).contains(fileType)) {
+            JAXBContext jaxbContext;
+            try {
+                jaxbContext = JAXBContext.newInstance(ServiceProvider.class);
+                Marshaller marshaller = jaxbContext.createMarshaller();
+                marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                StringWriter stringWriter = new StringWriter();
+                marshaller.marshal(serviceProvider, stringWriter);
+                fileContent = stringWriter.toString();
+            } catch (JAXBException e) {
+                throw Utils.buildServerError("Error exporting application from XML file.", e);
+            }
+            fileNameSB.append(XML_FILE_EXTENSION);
+        } else if (Arrays.asList(VALID_MEDIA_TYPES_YAML).contains(fileType)) {
+            Yaml yaml = new Yaml();
+            try {
+                fileContent = yaml.dump(serviceProvider);
+            } catch (YAMLException e) {
+                throw Utils.buildServerError("Error exporting application from YAML file.", e);
+            }
+            fileNameSB.append(YML_FILE_EXTENSION);
+        } else if (Arrays.asList(VALID_MEDIA_TYPES_JSON).contains(fileType)) {
+            ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
+            try {
+                fileContent = objectMapper.writeValueAsString(serviceProvider);
+            } catch (JsonProcessingException e) {
+                throw Utils.buildServerError("Error exporting application from JSON file.", e);
+            }
+            fileNameSB.append(JSON_FILE_EXTENSION);
+        } else {
+            throw Utils.buildServerError("Unsupported media type: " + fileType + "."
+                    + " Supported media types are " + Arrays.toString(VALID_MEDIA_TYPES_XML) + ", "
+                    + Arrays.toString(VALID_MEDIA_TYPES_YAML) + ", " + Arrays.toString(VALID_MEDIA_TYPES_JSON));
         }
 
         return new TransferResource(
@@ -575,8 +574,10 @@ public class ServerApplicationManagementService {
             String username = ContextLoader.getUsernameFromContext();
             String fileType = fileDetail.getDataHandler().getContentType();
 
+            ServiceProvider serviceProvider = parseSP(spFileContent, fileType, tenantDomain);
+
             ImportResponse importResponse = getApplicationManagementService()
-                    .importSPApplication(spFileContent, tenantDomain, username, fileType, isAppUpdate);
+                    .importSPApplication(serviceProvider, tenantDomain, username, isAppUpdate);
 
             if (importResponse.getResponseCode() == ImportResponse.FAILED) {
                 throw handleErrorResponse(importResponse);
@@ -584,11 +585,73 @@ public class ServerApplicationManagementService {
                 return importResponse.getApplicationResourceId();
             }
         } catch (IOException e) {
-            throw Utils.buildServerError("Error importing application from XML file.", e);
+            throw Utils.buildServerError("Error importing application from file.", e);
         } catch (IdentityApplicationManagementException e) {
-            throw handleIdentityApplicationManagementException(e, "Error importing application from XML file.");
+            throw handleIdentityApplicationManagementException(e, "Error importing application from file.");
         } finally {
             IOUtils.closeQuietly(fileInputStream);
+        }
+    }
+
+    private ServiceProvider parseSP(SpFileContent spFileContent, String fileType, String tenantDomain)
+            throws IdentityApplicationManagementException {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Parsing service provider from file: " + spFileContent.getFileName() + " of type: " + fileType);
+        }
+
+        if (StringUtils.isEmpty(spFileContent.getContent())) {
+            throw new IdentityApplicationManagementException(String.format(
+                    "Empty Service Provider configuration file " + " %s uploaded by tenant: %s",
+                    spFileContent.getFileName(), tenantDomain));
+        }
+
+        if (Arrays.asList(VALID_MEDIA_TYPES_XML).contains(fileType)) {
+            return parseServiceProviderFromXml(spFileContent, tenantDomain);
+        } else if (Arrays.asList(VALID_MEDIA_TYPES_YAML).contains(fileType)) {
+            return parseServiceProviderFromYaml(spFileContent, tenantDomain);
+        } else if (Arrays.asList(VALID_MEDIA_TYPES_JSON).contains(fileType)) {
+            return parseServiceProviderFromJson(spFileContent, tenantDomain);
+        } else {
+            log.warn("Unsupported file type " + fileType + " for file " + spFileContent.getFileName() + " . " +
+                    "Defaulting to XML parsing");
+            return parseServiceProviderFromXml(spFileContent, tenantDomain);
+        }
+    }
+
+    private ServiceProvider parseServiceProviderFromXml(SpFileContent spFileContent, String tenantDomain)
+            throws IdentityApplicationManagementException {
+
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(ServiceProvider.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            return (ServiceProvider) unmarshaller.unmarshal(new StringReader(spFileContent.getContent()));
+        } catch (JAXBException e) {
+            throw new IdentityApplicationManagementException(String.format("Error in reading XML Service Provider " +
+                    "configuration file %s uploaded by tenant: %s", spFileContent.getFileName(), tenantDomain), e);
+        }
+    }
+
+    private ServiceProvider parseServiceProviderFromYaml(SpFileContent spFileContent, String tenantDomain)
+            throws IdentityApplicationManagementException {
+
+        try {
+            Yaml yaml = new Yaml(new Constructor(ServiceProvider.class));
+            return yaml.loadAs(spFileContent.getContent(), ServiceProvider.class);
+        } catch (YAMLException e) {
+            throw new IdentityApplicationManagementException(String.format("Error in reading YAML Service Provider " +
+                    "configuration file %s uploaded by tenant: %s", spFileContent.getFileName(), tenantDomain), e);
+        }
+    }
+
+    private ServiceProvider parseServiceProviderFromJson(SpFileContent spFileContent, String tenantDomain)
+            throws IdentityApplicationManagementException {
+
+        try {
+            return new ObjectMapper().readValue(spFileContent.getContent(), ServiceProvider.class);
+        } catch (JsonProcessingException e) {
+            throw new IdentityApplicationManagementException(String.format("Error in reading JSON Service Provider " +
+                    "configuration file %s uploaded by tenant: %s", spFileContent.getFileName(), tenantDomain), e);
         }
     }
 
