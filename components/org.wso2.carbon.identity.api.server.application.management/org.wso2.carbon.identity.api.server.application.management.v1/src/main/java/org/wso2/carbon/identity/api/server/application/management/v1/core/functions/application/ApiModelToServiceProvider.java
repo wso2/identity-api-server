@@ -45,6 +45,7 @@ public class ApiModelToServiceProvider implements Function<ApplicationModel, Ser
         application.setAccessUrl(applicationModel.getAccessUrl());
         application.setTemplateId(applicationModel.getTemplateId());
         setIfNotNull(applicationModel.getIsManagementApp(), application::setManagementApp);
+        setIfNotNull(applicationModel.getIsB2BSelfServiceApp(), application::setB2BSelfServiceApp);
 
 
         addAdvancedConfigurationToApplication(application, applicationModel.getAdvancedConfigurations());

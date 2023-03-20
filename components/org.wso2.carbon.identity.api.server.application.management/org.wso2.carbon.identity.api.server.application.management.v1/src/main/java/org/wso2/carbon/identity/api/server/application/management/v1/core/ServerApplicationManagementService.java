@@ -97,7 +97,6 @@ import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.common.model.User;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
-import org.wso2.carbon.identity.auth.attribute.handler.AuthAttributeHandlerConstants;
 import org.wso2.carbon.identity.auth.attribute.handler.exception.AuthAttributeHandlerClientException;
 import org.wso2.carbon.identity.auth.attribute.handler.exception.AuthAttributeHandlerException;
 import org.wso2.carbon.identity.auth.attribute.handler.model.AuthAttributeHolder;
@@ -391,10 +390,11 @@ public class ServerApplicationManagementService {
      */
     public ArrayList<ConfiguredAuthenticatorsModal> getConfiguredAuthenticators(String applicationId) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         ArrayList<ConfiguredAuthenticatorsModal> response = new ArrayList<>();
         try {
             AuthenticationStep[] authenticationSteps = getApplicationManagementService()
-                    .getConfiguredAuthenticators(applicationId);
+                    .getConfiguredAuthenticators(applicationId, tenantDomain);
 
             if (authenticationSteps == null) {
                 throw buildClientError(ErrorMessage.APPLICATION_NOT_FOUND, applicationId);
@@ -699,6 +699,18 @@ public class ServerApplicationManagementService {
         ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
         try {
             applicationId = getApplicationManagementService().createApplication(application, tenantDomain, username);
+
+            // Update owner for B2B Self Service applications.
+            if (application.isB2BSelfServiceApp()) {
+                String systemUserID = org.wso2.carbon.identity.organization.management.service.util.Utils
+                                .getB2BSelfServiceSystemUser(tenantDomain);
+                if (StringUtils.isNotEmpty(systemUserID)) {
+                    ApplicationOwner systemOwner = new ApplicationOwner();
+                    systemOwner.id(systemUserID);
+                    changeApplicationOwner(applicationId, systemOwner);
+                }
+            }
+
             if (applicationModel.getInboundProtocolConfiguration() != null &&
                     applicationModel.getInboundProtocolConfiguration().getOidc() != null) {
                 OAuthInboundFunctions.updateCorsOrigins(applicationId, applicationModel
@@ -1613,7 +1625,7 @@ public class ServerApplicationManagementService {
             }
             List<AuthAttributeHolder> availableAuthAttributeHolders =
                     ApplicationManagementServiceHolder.getAuthAttributeHandlerManager()
-                    .getAvailableAuthAttributeHolders(applicationId, tenantDomain);
+                    .getAvailableAuthAttributeHolders(applicationId);
             List<UserRegistrant> userRegistrants = availableAuthAttributeHolders.stream().map(new
                     AuthAttributeHolderToUserRegistrant()).collect(Collectors.toList());
             return new UserRegistrantsList()
@@ -1624,8 +1636,8 @@ public class ServerApplicationManagementService {
         }
     }
 
-    private APIError handleAuthAttributeHandlerException(AuthAttributeHandlerException e, String applicationId, String
-            tenantDomain) {
+    private APIError handleAuthAttributeHandlerException(AuthAttributeHandlerException e, String applicationId,
+                                                         String tenantDomain) {
 
         if (e instanceof AuthAttributeHandlerClientException) {
             throw buildClientError(e, applicationId, tenantDomain);
@@ -1644,11 +1656,7 @@ public class ServerApplicationManagementService {
 
     private APIError buildClientError(AuthAttributeHandlerException e, String applicationId, String tenantDomain) {
 
-        if (AuthAttributeHandlerConstants.ErrorMessages.ERROR_CODE_SERVICE_PROVIDER_NOT_FOUND.getCode()
-                .equals(e.getErrorCode())) {
-            throw buildClientError(ErrorMessage.APPLICATION_NOT_FOUND, applicationId, tenantDomain);
-        }
-        return Utils.buildClientError(INVALID_REQUEST.getCode(), "Error while retrieving user registrants.",
-                e.getMessage());
+        return Utils.buildClientError(INVALID_REQUEST.getCode(), "Error while retrieving user registrants for the " +
+                "application: " + applicationId + " in the tenant domain: " + tenantDomain + ".", e.getMessage());
     }
 }

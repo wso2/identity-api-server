@@ -2478,6 +2478,11 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to access System APIs
+        isB2BSelfServiceApp:
+          default: false
+          type: boolean
+          example: false
+          description: Decides whether the application used to for B2B self service
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocolConfiguration:
@@ -2523,6 +2528,10 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to access System APIs
+        isB2BSelfServiceApp:
+          type: boolean
+          example: false
+          description: Decides whether the application used to for B2B self service
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocols:
@@ -3555,9 +3564,11 @@ components:
       properties:
         id:
           type: string
+          description: "Unique id for the user registrant based on its name."
           example: "8we2f4b8-0d22-8234-l4n7-1682a91b12cn"
         name:
           type: string
+          description: "Name of the user registrant."
           example: "BasicAuthAttributeHandler"
         authAttributes:
           type: array
@@ -3566,19 +3577,24 @@ components:
 
     AuthAttribute:
       type: object
+      description: "The authentication attributes required by a user registrant."
       properties:
         attribute:
           type: string
+          description: "Name of the attribute."
           example: "password"
         isClaim:
           type: boolean
+          description: "Defines whether the attribute is a claim."
           example: true
         isConfidential:
           type: boolean
+          description: "Defines whether the attribute contains confidential data."
           example: true
         attributeType:
           type: string
-          example: "string"
+          description: "Data type of value of the attribute."
+          example: "STRING"
 
     Error:
       type: object
