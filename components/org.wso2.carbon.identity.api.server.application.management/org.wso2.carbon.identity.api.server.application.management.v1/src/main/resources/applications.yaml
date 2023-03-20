@@ -2399,6 +2399,11 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to access System APIs
+        isB2BSelfServiceApp:
+          default: false
+          type: boolean
+          example: false
+          description: Decides whether the application used to for B2B self service
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocolConfiguration:
@@ -2444,6 +2449,10 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to access System APIs
+        isB2BSelfServiceApp:
+          type: boolean
+          example: false
+          description: Decides whether the application used to for B2B self service
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocols:

@@ -522,6 +522,18 @@ public class ServerApplicationManagementService {
         ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
         try {
             applicationId = getApplicationManagementService().createApplication(application, tenantDomain, username);
+
+            // Update owner for B2B Self Service applications.
+            if (application.isB2BSelfServiceApp()) {
+                String systemUserID = org.wso2.carbon.identity.organization.management.service.util.Utils
+                                .getB2BSelfServiceSystemUser(tenantDomain);
+                if (StringUtils.isNotEmpty(systemUserID)) {
+                    ApplicationOwner systemOwner = new ApplicationOwner();
+                    systemOwner.id(systemUserID);
+                    changeApplicationOwner(applicationId, systemOwner);
+                }
+            }
+
             if (applicationModel.getInboundProtocolConfiguration() != null &&
                     applicationModel.getInboundProtocolConfiguration().getOidc() != null) {
                 OAuthInboundFunctions.updateCorsOrigins(applicationId, applicationModel
