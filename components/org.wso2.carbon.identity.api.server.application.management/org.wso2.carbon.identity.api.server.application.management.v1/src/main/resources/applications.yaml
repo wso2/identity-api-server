@@ -2635,6 +2635,7 @@ components:
           default: false
         consentUrl:
           type: string
+          example: "https://example.com/consent"
           description: >-
             External consent management URL.
     InboundProtocols:
