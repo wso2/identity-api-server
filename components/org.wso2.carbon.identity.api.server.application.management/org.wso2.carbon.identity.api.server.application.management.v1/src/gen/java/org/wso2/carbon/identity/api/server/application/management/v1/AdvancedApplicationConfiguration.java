@@ -45,7 +45,7 @@ public class AdvancedApplicationConfiguration  {
     private Boolean enableAuthorization;
     private Boolean fragment;
     private List<AdditionalSpProperty> additionalSpProperties = null;
-    private ExternalConsentManagementConfiguration externalConsentManagement;
+    private ExternalizedConsentPageConfiguration externalizedConsentPage;
 
 
     /**
@@ -144,21 +144,21 @@ public class AdvancedApplicationConfiguration  {
 
     /**
      **/
-    public AdvancedApplicationConfiguration externalConsentManagement(ExternalConsentManagementConfiguration
-                                                                              externalConsentManagement) {
+    public AdvancedApplicationConfiguration externalizedConsentPage(ExternalizedConsentPageConfiguration
+                                                                            externalizedConsentPage) {
 
-        this.externalConsentManagement = externalConsentManagement;
+        this.externalizedConsentPage = externalizedConsentPage;
         return this;
     }
 
     @ApiModelProperty(value = "")
-    @JsonProperty("externalConsentManagement")
+    @JsonProperty("externalizedConsentPage")
     @Valid
-    public ExternalConsentManagementConfiguration getExternalConsentManagement() {
-        return externalConsentManagement;
+    public ExternalizedConsentPageConfiguration getExternalizedConsentPage() {
+        return externalizedConsentPage;
     }
-    public void setExternalConsentManagement(ExternalConsentManagementConfiguration externalConsentManagement) {
-        this.externalConsentManagement = externalConsentManagement;
+    public void setExternalizedConsentPage(ExternalizedConsentPageConfiguration externalizedConsentPage) {
+        this.externalizedConsentPage = externalizedConsentPage;
     }
 
     /**
@@ -261,7 +261,7 @@ public class AdvancedApplicationConfiguration  {
             Objects.equals(this.certificate, advancedApplicationConfiguration.certificate) &&
             Objects.equals(this.skipLoginConsent, advancedApplicationConfiguration.skipLoginConsent) &&
             Objects.equals(this.skipLogoutConsent, advancedApplicationConfiguration.skipLogoutConsent) &&
-            Objects.equals(this.externalConsentManagement, advancedApplicationConfiguration.externalConsentManagement) &&
+            Objects.equals(this.externalizedConsentPage, advancedApplicationConfiguration.externalizedConsentPage) &&
             Objects.equals(this.returnAuthenticatedIdpList, advancedApplicationConfiguration.returnAuthenticatedIdpList) &&
             Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization) &&
             Objects.equals(this.fragment, advancedApplicationConfiguration.fragment) &&
@@ -270,7 +270,7 @@ public class AdvancedApplicationConfiguration  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, externalConsentManagement, returnAuthenticatedIdpList, enableAuthorization, fragment, additionalSpProperties);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, externalizedConsentPage, returnAuthenticatedIdpList, enableAuthorization, fragment, additionalSpProperties);
     }
 
     @Override
@@ -284,7 +284,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    certificate: ").append(toIndentedString(certificate)).append("\n");
         sb.append("    skipLoginConsent: ").append(toIndentedString(skipLoginConsent)).append("\n");
         sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");
-        sb.append("    externalConsentManagement: ").append(toIndentedString(externalConsentManagement)).append("\n");
+        sb.append("    externalizedConsentPage: ").append(toIndentedString(externalizedConsentPage)).append("\n");
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");
         sb.append("    enableAuthorization: ").append(toIndentedString(enableAuthorization)).append("\n");
         sb.append("    fragment: ").append(toIndentedString(fragment)).append("\n");

@@ -24,21 +24,21 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.Valid;
 import java.util.Objects;
 
-public class ExternalConsentManagementConfiguration {
+public class ExternalizedConsentPageConfiguration {
 
     private boolean enabled;
     private String consentUrl;
 
     /**
-     * Decide whether external consent management is enabled.
+     * Decide whether externalized consent page is enabled.
      **/
-    public ExternalConsentManagementConfiguration enabled(boolean enabled) {
+    public ExternalizedConsentPageConfiguration enabled(boolean enabled) {
 
         this.enabled = enabled;
         return this;
     }
 
-    @ApiModelProperty(value = "Decide whether external consent management is enabled.")
+    @ApiModelProperty(value = "Decide whether externalized consent page is enabled.")
     @JsonProperty("enabled")
     @Valid
     public boolean getEnabled() {
@@ -51,7 +51,7 @@ public class ExternalConsentManagementConfiguration {
     /**
      * Consent URL.
      **/
-    public ExternalConsentManagementConfiguration consentUrl(String consentUrl) {
+    public ExternalizedConsentPageConfiguration consentUrl(String consentUrl) {
 
         this.consentUrl = consentUrl;
         return this;
@@ -76,9 +76,10 @@ public class ExternalConsentManagementConfiguration {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ExternalConsentManagementConfiguration externalConsentManagement = (ExternalConsentManagementConfiguration) o;
-        return Objects.equals(this.enabled, externalConsentManagement.enabled) &&
-                Objects.equals(this.consentUrl, externalConsentManagement.consentUrl);
+        ExternalizedConsentPageConfiguration externalizedConsentPageConfiguration =
+                (ExternalizedConsentPageConfiguration) o;
+        return Objects.equals(this.enabled, externalizedConsentPageConfiguration.enabled) &&
+                Objects.equals(this.consentUrl, externalizedConsentPageConfiguration.consentUrl);
     }
 
     @Override
@@ -90,7 +91,7 @@ public class ExternalConsentManagementConfiguration {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ExternalConsentManagementConfiguration {\n");
+        sb.append("class ExternalizedConsentPageConfiguration {\n");
 
         sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
         sb.append("    consentUrl: ").append(toIndentedString(consentUrl)).append("\n");

@@ -19,9 +19,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
-import org.wso2.carbon.identity.api.server.application.management.v1.ExternalConsentManagementConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ExternalizedConsentPageConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
-import org.wso2.carbon.identity.application.common.model.ExternalConsentManagementConfig;
+import org.wso2.carbon.identity.application.common.model.ExternalizedConsentPageConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
@@ -54,8 +54,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(advancedConfigurations.getReturnAuthenticatedIdpList(),
                     config::setAlwaysSendBackAuthenticatedListOfIdPs);
             setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
-            updateExternalConsentManagement(advancedConfigurations.getExternalConsentManagement(),
-                    config);
+            updateExternalizedConsentPage(advancedConfigurations.getExternalizedConsentPage(), config);
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
         }
     }
@@ -82,25 +81,24 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
         }
     }
 
-    private void updateExternalConsentManagement(ExternalConsentManagementConfiguration externalConsentMgtApiModel,
+    private void updateExternalizedConsentPage(ExternalizedConsentPageConfiguration externalizedConsentPageApiModel,
                                                  LocalAndOutboundAuthenticationConfig config) {
 
-        ExternalConsentManagementConfig externalConsentManagementConfig =
-                getExternalConsentManagementConfig(config);
-        if (externalConsentMgtApiModel != null) {
-            setIfNotNull(externalConsentMgtApiModel.getEnabled(), externalConsentManagementConfig::setEnabled);
-            setIfNotNull(externalConsentMgtApiModel.getConsentUrl(),
+        ExternalizedConsentPageConfig externalConsentManagementConfig = getExternalizedConsentPageConfig(config);
+        if (externalizedConsentPageApiModel != null) {
+            setIfNotNull(externalizedConsentPageApiModel.getEnabled(), externalConsentManagementConfig::setEnabled);
+            setIfNotNull(externalizedConsentPageApiModel.getConsentUrl(),
                     externalConsentManagementConfig::setExternalConsentUrl);
         }
     }
 
-    private ExternalConsentManagementConfig getExternalConsentManagementConfig (
+    private ExternalizedConsentPageConfig getExternalizedConsentPageConfig (
             LocalAndOutboundAuthenticationConfig config) {
 
-        if (config.getExternalConsentManagement() == null) {
-            config.setExternalConsentManagement(new ExternalConsentManagementConfig());
+        if (config.getExternalizedConsentPageConfig() == null) {
+            config.setExternalizedConsentPageConfig(new ExternalizedConsentPageConfig());
         }
-        return config.getExternalConsentManagement();
+        return config.getExternalizedConsentPageConfig();
     }
 
 
