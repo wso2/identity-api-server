@@ -54,6 +54,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(advancedConfigurations.getReturnAuthenticatedIdpList(),
                     config::setAlwaysSendBackAuthenticatedListOfIdPs);
             setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
+
             updateExternalizedConsentPage(advancedConfigurations.getExternalizedConsentPage(), config);
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
         }
