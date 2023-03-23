@@ -88,8 +88,8 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
         ExternalizedConsentPageConfig externalConsentManagementConfig = getExternalizedConsentPageConfig(config);
         if (externalizedConsentPageApiModel != null) {
             setIfNotNull(externalizedConsentPageApiModel.getEnabled(), externalConsentManagementConfig::setEnabled);
-            setIfNotNull(externalizedConsentPageApiModel.getConsentUrl(),
-                    externalConsentManagementConfig::setExternalConsentUrl);
+            setIfNotNull(externalizedConsentPageApiModel.getConsentPageUrl(),
+                    externalConsentManagementConfig::setExternalConsentPageUrl);
         }
     }
 

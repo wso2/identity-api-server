@@ -2633,7 +2633,7 @@ components:
           description: >-
             Decides whether external consent management is enabled.
           default: false
-        consentUrl:
+        consentPageUrl:
           type: string
           example: "https://example.com/consent"
           description: >-

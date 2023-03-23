@@ -27,7 +27,7 @@ import java.util.Objects;
 public class ExternalizedConsentPageConfiguration {
 
     private boolean enabled;
-    private String consentUrl;
+    private String consentPageUrl;
 
     /**
      * Decide whether externalized consent page is enabled.
@@ -51,20 +51,20 @@ public class ExternalizedConsentPageConfiguration {
     /**
      * Consent URL.
      **/
-    public ExternalizedConsentPageConfiguration consentUrl(String consentUrl) {
+    public ExternalizedConsentPageConfiguration consentPageUrl(String consentPageUrl) {
 
-        this.consentUrl = consentUrl;
+        this.consentPageUrl = consentPageUrl;
         return this;
     }
 
     @ApiModelProperty(value = "Consent URL.")
     @JsonProperty("consentUrl")
     @Valid
-    public String getConsentUrl() {
-        return consentUrl;
+    public String getConsentPageUrl() {
+        return consentPageUrl;
     }
-    public void setConsentUrl(String consentUrl) {
-        this.consentUrl = consentUrl;
+    public void setConsentPageUrl(String consentPageUrl) {
+        this.consentPageUrl = consentPageUrl;
     }
 
     @Override
@@ -79,12 +79,12 @@ public class ExternalizedConsentPageConfiguration {
         ExternalizedConsentPageConfiguration externalizedConsentPageConfiguration =
                 (ExternalizedConsentPageConfiguration) o;
         return Objects.equals(this.enabled, externalizedConsentPageConfiguration.enabled) &&
-                Objects.equals(this.consentUrl, externalizedConsentPageConfiguration.consentUrl);
+                Objects.equals(this.consentPageUrl, externalizedConsentPageConfiguration.consentPageUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabled, consentUrl);
+        return Objects.hash(enabled, consentPageUrl);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class ExternalizedConsentPageConfiguration {
         sb.append("class ExternalizedConsentPageConfiguration {\n");
 
         sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
-        sb.append("    consentUrl: ").append(toIndentedString(consentUrl)).append("\n");
+        sb.append("    consentUrl: ").append(toIndentedString(consentPageUrl)).append("\n");
         sb.append("}");
         return sb.toString();
     }
