@@ -379,8 +379,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         }
 
         return new ExternalizedConsentPageConfiguration()
-                .enabled(consentConfig.isEnabled())
-                .consentPageUrl(consentConfig.getExternalConsentPageUrl());
+                .enabled(consentConfig.isEnabledExternalizedConsentPage())
+                .consentPageUrl(consentConfig.getExternalizedConsentPageUrl());
     }
 
     private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {
