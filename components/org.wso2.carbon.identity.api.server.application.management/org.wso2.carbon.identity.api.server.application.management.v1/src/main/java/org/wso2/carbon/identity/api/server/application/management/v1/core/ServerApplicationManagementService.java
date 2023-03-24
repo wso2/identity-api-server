@@ -606,17 +606,27 @@ public class ServerApplicationManagementService {
                     spFileContent.getFileName(), tenantDomain));
         }
 
-        if (Arrays.asList(VALID_MEDIA_TYPES_XML).contains(fileType)) {
+        if (containsValidMediaType(fileType, VALID_MEDIA_TYPES_XML)) {
             return parseServiceProviderFromXml(spFileContent, tenantDomain);
-        } else if (Arrays.asList(VALID_MEDIA_TYPES_YAML).contains(fileType)) {
+        } else if (containsValidMediaType(fileType, VALID_MEDIA_TYPES_YAML)) {
             return parseServiceProviderFromYaml(spFileContent, tenantDomain);
-        } else if (Arrays.asList(VALID_MEDIA_TYPES_JSON).contains(fileType)) {
+        } else if (containsValidMediaType(fileType, VALID_MEDIA_TYPES_JSON)) {
             return parseServiceProviderFromJson(spFileContent, tenantDomain);
         } else {
             log.warn("Unsupported file type " + fileType + " for file " + spFileContent.getFileName() + " . " +
                     "Defaulting to XML parsing");
             return parseServiceProviderFromXml(spFileContent, tenantDomain);
         }
+    }
+
+    private boolean containsValidMediaType(String fileType, String[] mediaTypes) {
+
+        for (String mediaType : mediaTypes) {
+            if (fileType.contains(mediaType)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private ServiceProvider parseServiceProviderFromXml(SpFileContent spFileContent, String tenantDomain)
