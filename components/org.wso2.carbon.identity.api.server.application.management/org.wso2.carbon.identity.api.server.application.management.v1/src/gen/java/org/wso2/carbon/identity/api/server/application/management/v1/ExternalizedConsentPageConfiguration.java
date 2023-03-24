@@ -57,8 +57,8 @@ public class ExternalizedConsentPageConfiguration {
         return this;
     }
 
-    @ApiModelProperty(value = "Consent URL.")
-    @JsonProperty("consentUrl")
+    @ApiModelProperty(value = "Consent Page URL.")
+    @JsonProperty("consentPageUrl")
     @Valid
     public String getConsentPageUrl() {
         return consentPageUrl;
@@ -94,7 +94,7 @@ public class ExternalizedConsentPageConfiguration {
         sb.append("class ExternalizedConsentPageConfiguration {\n");
 
         sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
-        sb.append("    consentUrl: ").append(toIndentedString(consentPageUrl)).append("\n");
+        sb.append("    consentPageUrl: ").append(toIndentedString(consentPageUrl)).append("\n");
         sb.append("}");
         return sb.toString();
     }
