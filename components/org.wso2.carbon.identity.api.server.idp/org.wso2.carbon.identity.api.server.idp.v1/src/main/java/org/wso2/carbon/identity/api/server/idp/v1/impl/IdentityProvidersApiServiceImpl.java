@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementServic
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.Groups;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderTemplate;
@@ -112,6 +113,12 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     public Response getFederatedAuthenticators(String identityProviderId) {
 
         return Response.ok().entity(idpManagementService.getFederatedAuthenticators(identityProviderId)).build();
+    }
+
+    @Override
+    public Response getGroupConfig(String identityProviderId) {
+
+        return Response.ok().entity(idpManagementService.getGroupConfig(identityProviderId)).build();
     }
 
     @Override
@@ -225,6 +232,12 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
 
         return Response.ok().entity(idpManagementService.updateFederatedAuthenticators(identityProviderId,
                 federatedAuthenticatorRequest)).build();
+    }
+
+    @Override
+    public Response updateGroupConfig(String identityProviderId, Groups groups) {
+
+        return Response.ok().entity(idpManagementService.updateGroupConfig(identityProviderId, groups)).build();
     }
 
     @Override

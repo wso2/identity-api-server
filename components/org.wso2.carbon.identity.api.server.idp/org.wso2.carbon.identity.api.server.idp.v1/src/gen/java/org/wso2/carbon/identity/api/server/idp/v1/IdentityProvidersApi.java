@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.idp.v1;
 
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
+import java.util.List;
 
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApps;
@@ -29,6 +32,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticator;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.Groups;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
@@ -255,6 +259,30 @@ public class IdentityProvidersApi  {
     public Response getFederatedAuthenticators(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId) {
 
         return delegate.getFederatedAuthenticators(identityProviderId );
+    }
+
+    @Valid
+    @GET
+    @Path("/{identity-provider-id}/groups")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Group config of an identity provider ", notes = "This API provides the group config of an identity provider. This is a list of groups the idp can return.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = Groups.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Groups", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = Groups.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getGroupConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId) {
+
+        return delegate.getGroupConfig(identityProviderId );
     }
 
     @Valid
@@ -666,6 +694,30 @@ public class IdentityProvidersApi  {
     public Response updateFederatedAuthenticators(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the federated authenticator to be updated" ,required=true) @Valid FederatedAuthenticatorRequest federatedAuthenticatorRequest) {
 
         return delegate.updateFederatedAuthenticators(identityProviderId,  federatedAuthenticatorRequest );
+    }
+
+    @Valid
+    @PUT
+    @Path("/{identity-provider-id}/groups")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update the group config of an identity provider ", notes = "This API provides the capability to update the group config of an identity provider by specifying the identity provider ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = Groups.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Groups", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = Groups.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateGroupConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the group config to be updated." ,required=true) @Valid Groups groups) {
+
+        return delegate.updateGroupConfig(identityProviderId,  groups );
     }
 
     @Valid

@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.idp.v1.model;
 
@@ -23,6 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.Groups;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
 import javax.validation.constraints.*;
@@ -49,6 +52,7 @@ public class IdentityProviderResponse  {
     private String idpIssuerName;
     private Claims claims;
     private Roles roles;
+    private Groups groups;
     private FederatedAuthenticatorListResponse federatedAuthenticators;
     private ProvisioningResponse provisioning;
 
@@ -306,6 +310,24 @@ public class IdentityProviderResponse  {
 
     /**
     **/
+    public IdentityProviderResponse groups(Groups groups) {
+
+        this.groups = groups;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("groups")
+    @Valid
+    public Groups getGroups() {
+        return groups;
+    }
+    public void setGroups(Groups groups) {
+        this.groups = groups;
+    }
+
+    /**
+    **/
     public IdentityProviderResponse federatedAuthenticators(FederatedAuthenticatorListResponse federatedAuthenticators) {
 
         this.federatedAuthenticators = federatedAuthenticators;
@@ -366,13 +388,14 @@ public class IdentityProviderResponse  {
             Objects.equals(this.idpIssuerName, identityProviderResponse.idpIssuerName) &&
             Objects.equals(this.claims, identityProviderResponse.claims) &&
             Objects.equals(this.roles, identityProviderResponse.roles) &&
+            Objects.equals(this.groups, identityProviderResponse.groups) &&
             Objects.equals(this.federatedAuthenticators, identityProviderResponse.federatedAuthenticators) &&
             Objects.equals(this.provisioning, identityProviderResponse.provisioning);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, templateId, isEnabled, isPrimary, image, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, federatedAuthenticators, provisioning);
+        return Objects.hash(id, name, description, templateId, isEnabled, isPrimary, image, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning);
     }
 
     @Override
@@ -395,6 +418,7 @@ public class IdentityProviderResponse  {
         sb.append("    idpIssuerName: ").append(toIndentedString(idpIssuerName)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
         sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
+        sb.append("    groups: ").append(toIndentedString(groups)).append("\n");
         sb.append("    federatedAuthenticators: ").append(toIndentedString(federatedAuthenticators)).append("\n");
         sb.append("    provisioning: ").append(toIndentedString(provisioning)).append("\n");
         sb.append("}");
