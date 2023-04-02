@@ -1267,7 +1267,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Groups'
+                $ref: '#/components/schemas/IdPGroupsConfig'
         '400':
           description: Bad Request
           content:
@@ -1321,7 +1321,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Groups'
+                $ref: '#/components/schemas/IdPGroupsConfig'
         '400':
           description: Bad Request
           content:
@@ -1348,7 +1348,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Groups'
+              $ref: '#/components/schemas/IdPGroupsConfig'
         description: This represents the group config to be updated.
         required: true
   '/identity-providers/{identity-provider-id}/provisioning/jit':
@@ -1944,7 +1944,7 @@ components:
         $ref: '#/components/schemas/Patch'
     Patch:
       description: A JSONPatch as defined by RFC 6902. Patch operation is supported only for root level attributes of
-       an identity provider.
+        an identity provider.
       required:
         - operation
         - path
@@ -2027,7 +2027,7 @@ components:
         roles:
           $ref: '#/components/schemas/Roles'
         groups:
-          $ref: '#/components/schemas/Groups'
+          $ref: '#/components/schemas/IdPGroupsConfig'
         federatedAuthenticators:
           $ref: '#/components/schemas/FederatedAuthenticatorRequest'
         provisioning:
@@ -2075,7 +2075,7 @@ components:
         roles:
           $ref: '#/components/schemas/Roles'
         groups:
-          $ref: '#/components/schemas/Groups'
+          $ref: '#/components/schemas/IdPGroupsConfig'
         federatedAuthenticators:
           $ref: '#/components/schemas/FederatedAuthenticatorListResponse'
         provisioning:
@@ -2098,13 +2098,13 @@ components:
             $ref: '#/components/schemas/Link'
           example:
             [
-                {
-                    "href": "identity-provider?offset=50&limit=10",
-                    "rel": "next",
-                },  {
-                    "href": "identity-provider?offset=30&limit=10",
-                    "rel": "previous",
-                }
+              {
+                "href": "identity-provider?offset=50&limit=10",
+                "rel": "next",
+              },  {
+              "href": "identity-provider?offset=30&limit=10",
+              "rel": "previous",
+            }
             ]
         identityProviders:
           type: array
@@ -2148,7 +2148,7 @@ components:
         roles:
           $ref: '#/components/schemas/Roles'
         groups:
-          $ref: '#/components/schemas/Groups'
+          $ref: '#/components/schemas/IdPGroupsConfig'
         federatedAuthenticators:
           $ref: '#/components/schemas/FederatedAuthenticatorListResponse'
         provisioning:
@@ -2466,14 +2466,26 @@ components:
         localRole:
           type: string
           example: manager
-    Groups:
+    IdPGroupsConfig:
+      type: array
+      description: IdP groups supported by the IdP.
+      items:
+        $ref: '#/components/schemas/IdPGroup'
+      minItems: 0
+    IdPGroup:
       type: object
+      required:
+        - name
+      description: Represents an IdP group supported by an Identity Provider.
       properties:
-        groupsList:
-          type: array
-          items:
-            type: string
-            example: google-admin
+        name:
+          type: string
+          description: Name of the IdP group
+          example: google-admin
+        id:
+          type: string
+          description: UUID of the IdP group
+          example: 6b1f8513-3de0-4f28-9cad-b7400dbc94ae
     Claims:
       type: object
       properties:
@@ -2571,13 +2583,13 @@ components:
             $ref: '#/components/schemas/Link'
           example:
             [
-                {
-                    "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=50&limit=10",
-                    "rel": "next"
-                },  {
-                    "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=30&limit=10",
-                    "rel": "previous"
-                }
+              {
+                "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=50&limit=10",
+                "rel": "next"
+              },  {
+              "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=30&limit=10",
+              "rel": "previous"
+            }
             ]
         connectedApps:
           type: array
@@ -2610,10 +2622,10 @@ components:
             $ref: '#/components/schemas/Link'
           example:
             [
-            {
-              "href": "identity-provider/templates?offset=50&limit=10",
-              "rel": "next",
-            },  {
+              {
+                "href": "identity-provider/templates?offset=50&limit=10",
+                "rel": "next",
+              },  {
               "href": "identity-provider/templates?offset=30&limit=10",
               "rel": "previous",
             }

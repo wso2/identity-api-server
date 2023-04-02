@@ -32,7 +32,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticator;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
-import org.wso2.carbon.identity.api.server.idp.v1.model.Groups;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
@@ -266,14 +266,14 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/groups")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Group config of an identity provider ", notes = "This API provides the group config of an identity provider. This is a list of groups the idp can return.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = Groups.class, authorizations = {
+    @ApiOperation(value = "Group config of an identity provider ", notes = "This API provides the group config of an identity provider. This is a list of groups the idp can return.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = IdPGroup.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Groups", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response", response = Groups.class),
+        @ApiResponse(code = 200, message = "Successful response", response = IdPGroup.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -701,23 +701,23 @@ public class IdentityProvidersApi  {
     @Path("/{identity-provider-id}/groups")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the group config of an identity provider ", notes = "This API provides the capability to update the group config of an identity provider by specifying the identity provider ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = Groups.class, authorizations = {
+    @ApiOperation(value = "Update the group config of an identity provider ", notes = "This API provides the capability to update the group config of an identity provider by specifying the identity provider ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = IdPGroup.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Groups", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response", response = Groups.class),
+        @ApiResponse(code = 200, message = "Successful response", response = IdPGroup.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateGroupConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the group config to be updated." ,required=true) @Valid Groups groups) {
+    public Response updateGroupConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the group config to be updated." ,required=true) @Valid List<IdPGroup> idPGroup) {
 
-        return delegate.updateGroupConfig(identityProviderId,  groups );
+        return delegate.updateGroupConfig(identityProviderId,  idPGroup );
     }
 
     @Valid

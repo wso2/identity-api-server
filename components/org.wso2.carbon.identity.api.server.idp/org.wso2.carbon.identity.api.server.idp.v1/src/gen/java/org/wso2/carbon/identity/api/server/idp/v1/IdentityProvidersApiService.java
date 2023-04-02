@@ -32,7 +32,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticator;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
-import org.wso2.carbon.identity.api.server.idp.v1.model.Groups;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
@@ -108,7 +108,7 @@ public interface IdentityProvidersApiService {
 
       public Response updateFederatedAuthenticators(String identityProviderId, FederatedAuthenticatorRequest federatedAuthenticatorRequest);
 
-      public Response updateGroupConfig(String identityProviderId, Groups groups);
+      public Response updateGroupConfig(String identityProviderId, List<IdPGroup> idPGroup);
 
       public Response updateIDPTemplate(String templateId, IdentityProviderTemplate identityProviderTemplate);
 

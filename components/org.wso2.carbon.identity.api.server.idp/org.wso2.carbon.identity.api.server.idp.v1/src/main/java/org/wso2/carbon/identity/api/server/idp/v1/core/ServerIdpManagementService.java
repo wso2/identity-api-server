@@ -46,7 +46,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorLi
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
-import org.wso2.carbon.identity.api.server.idp.v1.model.Groups;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListItem;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
@@ -76,7 +76,6 @@ import org.wso2.carbon.identity.application.common.model.CertificateInfo;
 import org.wso2.carbon.identity.application.common.model.ClaimConfig;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
-import org.wso2.carbon.identity.application.common.model.IdPGroupConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.IdentityProviderProperty;
 import org.wso2.carbon.identity.application.common.model.JustInTimeProvisioningConfig;
@@ -856,12 +855,11 @@ public class ServerIdpManagementService {
      * @param idpId Identity Provider resource ID.
      * @return Groups of the Identity Provider.
      */
-    public Groups getGroupConfig(String idpId) {
+    public List<IdPGroup> getGroupConfig(String idpId) {
 
         try {
-            IdentityProvider identityProvider =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager()
+                    .getIdPByResourceId(idpId, ContextLoader.getTenantDomainFromContext(), true);
             if (identityProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -879,12 +877,11 @@ public class ServerIdpManagementService {
      * @param groups IdP Groups from the request.
      * @return Updated IdP Groups.
      */
-    public Groups updateGroupConfig(String idpId, Groups groups) {
+    public List<IdPGroup> updateGroupConfig(String idpId, List<IdPGroup> groups) {
 
         try {
-            IdentityProvider idP =
-                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
-                            .getTenantDomainFromContext(), true);
+            IdentityProvider idP = IdentityProviderServiceHolder.getIdentityProviderManager()
+                    .getIdPByResourceId(idpId, ContextLoader.getTenantDomainFromContext(), true);
             if (idP == null) {
                 throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
                         idpId);
@@ -1806,18 +1803,26 @@ public class ServerIdpManagementService {
      * @param idp    Identity Provider to be updated.
      * @param groups Groups returned from the request.
      */
-    private void updateGroups(IdentityProvider idp, Groups groups) {
+    private void updateGroups(IdentityProvider idp, List<IdPGroup> groups) {
 
-        if (groups != null) {
-            IdPGroupConfig idPGroupConfig = new IdPGroupConfig();
-
-            idPGroupConfig.setIdpGroups(
-                    groups.getGroupsList()
-                            .stream()
-                            .filter(StringUtils::isNotBlank)
-                            .toArray(String[]::new));
-            idp.setIdPGroupConfig(idPGroupConfig);
+        if (groups == null || groups.isEmpty()) {
+            idp.setIdPGroupConfig(null);
+            return;
         }
+        //For each group in groups, check if the group name is not null or empty and then add it to the idPGroupConfig
+        // array.
+        idp.setIdPGroupConfig(groups
+                .stream()
+                .filter(group -> StringUtils.isNotBlank(group.getName()))
+                .map(group -> {
+                    org.wso2.carbon.identity.application.common.model.IdPGroup idPGroup =
+                            new org.wso2.carbon.identity.application.common.model.IdPGroup();
+                    idPGroup.setIdpGroupName(group.getName());
+                    if (StringUtils.isNotBlank(group.getId())) {
+                        idPGroup.setIdpGroupId(group.getId());
+                    }
+                    return idPGroup;
+                }).toArray(org.wso2.carbon.identity.application.common.model.IdPGroup[]::new));
     }
 
     private Function<org.wso2.carbon.identity.api.server.idp.v1.model.Property, Property> propertyToInternal
@@ -2193,15 +2198,20 @@ public class ServerIdpManagementService {
      * @param identityProvider Identity Provider.
      * @return Groups of the Identity Provider.
      */
-    private Groups createGroupResponse(IdentityProvider identityProvider) {
+    private List<IdPGroup> createGroupResponse(IdentityProvider identityProvider) {
 
-        IdPGroupConfig idPGroupConfig = identityProvider.getIdPGroupConfig();
-        Groups groupConfig = new Groups();
-
+        org.wso2.carbon.identity.application.common.model.IdPGroup[] idPGroupConfig =
+                identityProvider.getIdPGroupConfig();
+        List<IdPGroup> groupConfigAPIModel = new ArrayList<>();
         if (idPGroupConfig != null) {
-            Arrays.stream(idPGroupConfig.getIdpGroups()).forEach(groupConfig::addGroupsListItem);
+            Arrays.stream(idPGroupConfig).forEach(idPGroup -> {
+                IdPGroup idPGroupAPIModel = new IdPGroup();
+                idPGroupAPIModel.setName(idPGroup.getIdpGroupName());
+                idPGroupAPIModel.setId(idPGroup.getIdpGroupId());
+                groupConfigAPIModel.add(idPGroupAPIModel);
+            });
         }
-        return groupConfig;
+        return groupConfigAPIModel;
     }
 
     private FederatedAuthenticatorListResponse createFederatedAuthenticatorResponse(IdentityProvider idp) {

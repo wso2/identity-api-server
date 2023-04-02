@@ -22,10 +22,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
-import org.wso2.carbon.identity.api.server.idp.v1.model.Groups;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
 import javax.validation.constraints.*;
@@ -50,7 +52,8 @@ public class IdentityProviderPOSTRequest  {
     private String idpIssuerName;
     private Claims claims;
     private Roles roles;
-    private Groups groups;
+    private List<IdPGroup> groups = null;
+
     private FederatedAuthenticatorRequest federatedAuthenticators;
     private ProvisioningRequest provisioning;
 
@@ -273,24 +276,33 @@ public class IdentityProviderPOSTRequest  {
     }
 
     /**
+    * IdP groups supported by the IdP.
     **/
-    public IdentityProviderPOSTRequest groups(Groups groups) {
+    public IdentityProviderPOSTRequest groups(List<IdPGroup> groups) {
 
         this.groups = groups;
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "IdP groups supported by the IdP.")
     @JsonProperty("groups")
-    @Valid
-    public Groups getGroups() {
+    @Valid @Size(min=0)
+    public List<IdPGroup> getGroups() {
         return groups;
     }
-    public void setGroups(Groups groups) {
+    public void setGroups(List<IdPGroup> groups) {
         this.groups = groups;
     }
 
-    /**
+    public IdentityProviderPOSTRequest addGroupsItem(IdPGroup groupsItem) {
+        if (this.groups == null) {
+            this.groups = new ArrayList<>();
+        }
+        this.groups.add(groupsItem);
+        return this;
+    }
+
+        /**
     **/
     public IdentityProviderPOSTRequest federatedAuthenticators(FederatedAuthenticatorRequest federatedAuthenticators) {
 

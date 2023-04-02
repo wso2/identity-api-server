@@ -22,48 +22,63 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
 import javax.validation.constraints.*;
 
+/**
+ * Represents an IdP group supported by an Identity Provider.
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
-public class Groups  {
+@ApiModel(description = "Represents an IdP group supported by an Identity Provider.")
+public class IdPGroup  {
   
-    private List<String> groupsList = null;
-
+    private String name;
+    private String id;
 
     /**
+    * Name of the IdP group
     **/
-    public Groups groupsList(List<String> groupsList) {
+    public IdPGroup name(String name) {
 
-        this.groupsList = groupsList;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("groupsList")
+    @ApiModelProperty(example = "google-admin", required = true, value = "Name of the IdP group")
+    @JsonProperty("name")
     @Valid
-    public List<String> getGroupsList() {
-        return groupsList;
+    @NotNull(message = "Property name cannot be null.")
+
+    public String getName() {
+        return name;
     }
-    public void setGroupsList(List<String> groupsList) {
-        this.groupsList = groupsList;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Groups addGroupsListItem(String groupsListItem) {
-        if (this.groupsList == null) {
-            this.groupsList = new ArrayList<>();
-        }
-        this.groupsList.add(groupsListItem);
+    /**
+    * UUID of the IdP group
+    **/
+    public IdPGroup id(String id) {
+
+        this.id = id;
         return this;
     }
-
     
+    @ApiModelProperty(example = "6b1f8513-3de0-4f28-9cad-b7400dbc94ae", value = "UUID of the IdP group")
+    @JsonProperty("id")
+    @Valid
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -74,22 +89,24 @@ public class Groups  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Groups groups = (Groups) o;
-        return Objects.equals(this.groupsList, groups.groupsList);
+        IdPGroup idPGroup = (IdPGroup) o;
+        return Objects.equals(this.name, idPGroup.name) &&
+            Objects.equals(this.id, idPGroup.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupsList);
+        return Objects.hash(name, id);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class Groups {\n");
+        sb.append("class IdPGroup {\n");
         
-        sb.append("    groupsList: ").append(toIndentedString(groupsList)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("}");
         return sb.toString();
     }
