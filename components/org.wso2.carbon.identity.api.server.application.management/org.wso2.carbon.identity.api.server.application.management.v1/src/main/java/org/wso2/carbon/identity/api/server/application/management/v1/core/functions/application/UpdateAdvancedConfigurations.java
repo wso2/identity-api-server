@@ -89,34 +89,32 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
 
         ExternalizedConsentPageConfig externalConsentManagementConfig = getExternalizedConsentPageConfig(config);
         if (externalizedConsentPageApiModel != null) {
-            if (isValidConsentPageUrl(externalizedConsentPageApiModel.getConsentPageUrl())) {
-                setIfNotNull(externalizedConsentPageApiModel.getEnabled(),
-                        externalConsentManagementConfig::setEnabled);
-                setIfNotNull(externalizedConsentPageApiModel.getConsentPageUrl(),
-                        externalConsentManagementConfig::setConsentPageUrl);
-            } else {
-                throw buildBadRequestError("Only https consent page urls are allowed ");
-            }
+            validateConsentPageUrl(externalizedConsentPageApiModel.getConsentPageUrl());
+            setIfNotNull(externalizedConsentPageApiModel.getEnabled(), externalConsentManagementConfig::setEnabled);
+            setIfNotNull(externalizedConsentPageApiModel.getConsentPageUrl(),
+                    externalConsentManagementConfig::setConsentPageUrl);
         }
     }
 
     /**
-     * Check the consent page URL is valid or not.
+     * Validate the external consent page URL.
      *
      * @param consentPageUrl Consent page URL.
-     * @return True if the consent page URL is valid.
      */
-    private boolean isValidConsentPageUrl(String consentPageUrl) {
+    private void validateConsentPageUrl(String consentPageUrl) {
 
+        boolean isVaild = true;
         try {
             URL url = new URL(consentPageUrl);
-            if ("https".equals(url.getProtocol())) {
-                return true;
-            } else {
-                return false;
+            if (!url.getProtocol().equals("https")) {
+                isVaild = false;
             }
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Invalid consent page URL.");
+            isVaild = false;
+        }
+        if (!isVaild) {
+            throw buildBadRequestError("Invalid External Consent Page URL is found. Only https urls are " +
+                    "allowed.");
         }
     }
 
