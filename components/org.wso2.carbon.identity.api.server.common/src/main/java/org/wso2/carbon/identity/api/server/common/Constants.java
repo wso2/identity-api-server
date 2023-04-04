@@ -34,6 +34,14 @@ public class Constants {
 
     public static final String REGEX_COMMA = ",";
 
+    // Export and Import related constants.
+    public static final String YAML_FILE_EXTENSION = ".yml";
+    public static final String JSON_FILE_EXTENSION = ".json";
+    public static final String XML_FILE_EXTENSION = ".xml";
+    public static final String[] VALID_MEDIA_TYPES_XML = {"application/xml", "text/xml"};
+    public static final String[] VALID_MEDIA_TYPES_YAML = {"application/yaml", "text/yaml", "application/x-yaml"};
+    public static final String[] VALID_MEDIA_TYPES_JSON = {"application/json", "text/json"};
+
     /**
      * Enum for server error prefixes.
      */

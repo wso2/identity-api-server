@@ -163,6 +163,30 @@ public class IdentityProvidersApi  {
 
     @Valid
     @GET
+    @Path("/{identity-provider-id}/export")
+    
+    @Produces({ "application/json", "application/yaml", "application/xml", "application/octet-stream" })
+    @ApiOperation(value = "Export identity provider in XML, YAML, or JSON file formats. ", notes = "This API provides the capability to retrieve the identity provider as a XML, YAML, or JSON file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/view <br>   <b>Scope required:</b> <br>       * internal_idp_view ", response = String.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Identity Providers", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = String.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response exportIDP(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Specifies whether to export secrets when exporting an identity provider. ", defaultValue="false") @DefaultValue("false")  @QueryParam("exportSecrets") Boolean exportSecrets,     @Valid @ApiParam(value = "Content type of the file. " , allowableValues="application/json, application/xml, application/yaml, application/x-yaml, text/yaml, text/xml, text/json", defaultValue="application/yaml")@HeaderParam("Accept") String accept) {
+
+        return delegate.exportIDP(identityProviderId,  exportSecrets,  accept );
+    }
+
+    @Valid
+    @GET
     @Path("/{identity-provider-id}/claims")
     
     @Produces({ "application/json" })
@@ -570,6 +594,55 @@ public class IdentityProvidersApi  {
     public Response getRoleConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId) {
 
         return delegate.getRoleConfig(identityProviderId );
+    }
+
+    @Valid
+    @POST
+    @Path("/import")
+    @Consumes({ "multipart/form-data" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Create identity provider from an exported XML, YAML or JSON file ", notes = "This API provides the capability to import an identity provider from the information provided as a file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/create <br>   <b>Scope required:</b> <br>       * internal_idp_create ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Identity Providers", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Successfully created.", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response importIDP(@Multipart(value = "file", required = false) InputStream fileInputStream,@Multipart(value = "file" , required = false) Attachment fileDetail) {
+
+        return delegate.importIDP(fileInputStream, fileDetail );
+    }
+
+    @Valid
+    @PUT
+    @Path("/import")
+    @Consumes({ "multipart/form-data" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update identity provider from an exported YAML, XML or JSON file ", notes = "This API provides the capability to update an identity provider from information that has been exported as an YAML, XML or JSON file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/update <br>   <b>Scope required:</b> <br>       * internal_idp_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Identity Providers", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully Updated.", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response importIDPForUpdate(@Multipart(value = "file", required = false) InputStream fileInputStream,@Multipart(value = "file" , required = false) Attachment fileDetail) {
+
+        return delegate.importIDPForUpdate(fileInputStream, fileDetail );
     }
 
     @Valid

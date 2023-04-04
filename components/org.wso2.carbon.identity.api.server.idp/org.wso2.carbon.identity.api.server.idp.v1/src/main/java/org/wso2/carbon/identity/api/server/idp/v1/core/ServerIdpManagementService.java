@@ -18,20 +18,26 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1.core;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
+import org.springframework.http.MediaType;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.FileContent;
+import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.idp.common.Constants;
@@ -105,8 +111,14 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 import org.wso2.carbon.user.core.UserCoreConstants;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
@@ -122,9 +134,19 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
+import static org.wso2.carbon.identity.api.server.common.Constants.JSON_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.common.Constants.VALID_MEDIA_TYPES_JSON;
+import static org.wso2.carbon.identity.api.server.common.Constants.VALID_MEDIA_TYPES_XML;
+import static org.wso2.carbon.identity.api.server.common.Constants.VALID_MEDIA_TYPES_YAML;
+import static org.wso2.carbon.identity.api.server.common.Constants.XML_FILE_EXTENSION;
+import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.ErrorMessage.ERROR_CODE_IDP_LIMIT_REACHED;
@@ -273,6 +295,271 @@ public class ServerIdpManagementService {
                     ContextLoader.getTenantDomainFromContext());
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_DELETING_IDP, identityProviderId);
+        }
+    }
+
+    /**
+     * Export an identity provider identified by the identityProviderId, in the given format.
+     *
+     * @param idpId         ID of the identity provider to be exported.
+     * @param exportSecrets If True, all hashed or encrypted secrets will also be exported.
+     * @param fileType      The format of the exported string.
+     * @return TransferResource object of the identity provider in the given format.
+     */
+    public FileContent exportIDP(String idpId, Boolean exportSecrets, String fileType) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Exporting identity provider from idp ID " + idpId);
+        }
+        if (StringUtils.isBlank(fileType)) {
+            throw new UnsupportedOperationException("No valid media type found");
+        }
+
+        IdentityProvider identityProvider;
+        try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId,
+                            tenantDomain, true);
+            if (identityProvider == null) {
+                throw handleException(Response.Status.NOT_FOUND,
+                        Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND, idpId);
+            }
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP, idpId);
+        }
+
+        if (!exportSecrets) {
+            removeSecretsFromIDP(identityProvider);
+        }
+
+        FileContent fileContent;
+        try {
+            fileContent = generateFileFromModel(fileType, identityProvider);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_IDP, idpId);
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Successfully exported IdP: %s as a file type of %s.",
+                    identityProvider.getIdentityProviderName(), fileType));
+        }
+        return fileContent;
+    }
+
+    private void removeSecretsFromIDP(IdentityProvider identityProvider) {
+
+        FederatedAuthenticatorConfig defaultAuthenticatorConfigs = identityProvider.getDefaultAuthenticatorConfig();
+        removeSecretsFromAuthenticator(defaultAuthenticatorConfigs);
+
+        FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs = identityProvider
+                .getFederatedAuthenticatorConfigs();
+        for (FederatedAuthenticatorConfig federatedAuthenticatorConfig : federatedAuthenticatorConfigs) {
+            removeSecretsFromAuthenticator(federatedAuthenticatorConfig);
+        }
+    }
+
+    private void removeSecretsFromAuthenticator(FederatedAuthenticatorConfig authenticator) {
+
+        if (authenticator != null) {
+            Property[] authenticatorProperties = authenticator.getProperties();
+            if (authenticatorProperties != null) {
+                for (Property property : authenticatorProperties) {
+                    for (String sensitiveKeyword : Constants.SECRETS_TO_MASK) {
+                        if (property.getName().toLowerCase().contains(sensitiveKeyword)) {
+                            property.setValue(Constants.MASKING_VALUE);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private FileContent generateFileFromModel(String fileType, IdentityProvider identityProvider)
+            throws IdentityProviderManagementException {
+
+        StringBuilder fileNameSB = new StringBuilder(identityProvider.getIdentityProviderName());
+        String fileContent = "";
+        if (log.isDebugEnabled()) {
+            log.debug("Parsing IdP object to file content of type: " + fileType);
+        }
+
+        if (Util.containsValidMediaType(fileType, VALID_MEDIA_TYPES_XML)) {
+            fileContent = parseIdpToXml(identityProvider, fileNameSB);
+        } else if (Util.containsValidMediaType(fileType, VALID_MEDIA_TYPES_JSON)) {
+            fileContent = parseIdpToJson(identityProvider, fileNameSB);
+        } else if (Util.containsValidMediaType(fileType, VALID_MEDIA_TYPES_YAML)) {
+            fileContent = parseIdpToYaml(identityProvider, fileNameSB);
+        } else {
+            log.warn("Unsupported file type: " + fileType + " requested for export. Defaulting to YAML parsing.");
+            fileContent = parseIdpToYaml(identityProvider, fileNameSB);
+        }
+        return new FileContent(fileNameSB.toString(), MediaType.APPLICATION_OCTET_STREAM_VALUE, fileContent);
+    }
+
+    private String parseIdpToXml(IdentityProvider identityProvider, StringBuilder fileName)
+            throws IdentityProviderManagementException {
+
+        JAXBContext jaxbContext;
+        fileName.append(XML_FILE_EXTENSION);
+        try {
+            jaxbContext = JAXBContext.newInstance(IdentityProvider.class);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            StringWriter stringWriter = new StringWriter();
+            marshaller.marshal(identityProvider, stringWriter);
+            return stringWriter.toString();
+        } catch (JAXBException e) {
+            throw new IdentityProviderManagementException(
+                    "Error exporting identity provider to XML file.", e);
+        }
+    }
+
+    private String parseIdpToJson(IdentityProvider identityProvider, StringBuilder fileName)
+            throws IdentityProviderManagementException {
+
+        fileName.append(JSON_FILE_EXTENSION);
+        ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
+        try {
+            return objectMapper.writeValueAsString(identityProvider);
+        } catch (JsonProcessingException e) {
+            throw new IdentityProviderManagementClientException(
+                    "Error exporting identity provider to JSON file.", e);
+        }
+    }
+
+    private String parseIdpToYaml(IdentityProvider identityProvider, StringBuilder fileName)
+            throws IdentityProviderManagementException {
+
+        fileName.append(YAML_FILE_EXTENSION);
+        Yaml yaml = new Yaml();
+        try {
+            return yaml.dump(identityProvider);
+        } catch (YAMLException e) {
+            throw new IdentityProviderManagementException(
+                    "Error exporting identity provider to YAML file.", e);
+        }
+    }
+
+    /**
+     * Create a new identity provider by importing an XML, YAML or JSON configuration file.
+     *
+     * @param fileInputStream File to be imported as an input stream.
+     * @param fileDetail      File details.
+     * @return Unique identifier of the created identity provider.
+     */
+    public String importIDP(InputStream fileInputStream, Attachment fileDetail) {
+
+        try {
+            return doImportIDP(fileInputStream, fileDetail, false);
+        } catch (IdentityProviderManagementClientException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_IDP, null);
+        }
+    }
+
+    /**
+     * Update an existing identity provider by importing an XML, YAML or JSON configuration file.
+     *
+     * @param fileInputStream File to be imported as an input stream.
+     * @param fileDetail      File details.
+     * @return Unique identifier of the updated identity provider.
+     */
+    public String importIDPForUpdate(InputStream fileInputStream, Attachment fileDetail) {
+
+        try {
+            return doImportIDP(fileInputStream, fileDetail, true);
+        } catch (IdentityProviderManagementClientException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_IDP, null);
+        }
+    }
+
+    private String doImportIDP(InputStream fileInputStream, Attachment fileDetail, boolean isAppUpdate)
+            throws IdentityProviderManagementClientException {
+
+        IdentityProvider identityProvider;
+        try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            FileContent idpFileContent = new FileContent(fileDetail.getDataHandler().getName(),
+                    fileDetail.getDataHandler().getContentType(),
+                    IOUtils.toString(fileInputStream, StandardCharsets.UTF_8.name()));
+
+            identityProvider = generateModelFromFile(idpFileContent);
+
+            if (isAppUpdate) {
+                identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(
+                        identityProvider.getResourceId(), identityProvider, tenantDomain);
+            } else {
+                identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().addIdPWithResourceId(
+                        identityProvider, tenantDomain);
+            }
+        } catch (IOException e) {
+            throw new IdentityProviderManagementClientException("Error while reading identity provider " +
+                    "configurations from file during import.", e);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_IDP, null);
+        } finally {
+            IOUtils.closeQuietly(fileInputStream);
+        }
+        return identityProvider.getResourceId();
+    }
+
+    private IdentityProvider generateModelFromFile(FileContent fileContent)
+            throws IdentityProviderManagementClientException {
+
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("Parsing identity provider from file: %s of type: %s.", fileContent.getFileName(),
+                    fileContent.getFileType()));
+        }
+        if (StringUtils.isEmpty(fileContent.getContent())) {
+            throw new IdentityProviderManagementClientException(String.format(
+                    "Empty Identity Provider configuration file %s uploaded.", fileContent.getFileName()));
+        }
+
+        if (Util.containsValidMediaType(fileContent.getFileType(), VALID_MEDIA_TYPES_XML)) {
+            return parseIdpFromXml(fileContent);
+        } else if (Util.containsValidMediaType(fileContent.getFileType(), VALID_MEDIA_TYPES_YAML)) {
+            return parseIdpFromYaml(fileContent);
+        } else if (Util.containsValidMediaType(fileContent.getFileType(), VALID_MEDIA_TYPES_JSON)) {
+            return parseIdpFromJson(fileContent);
+        } else {
+            log.warn(String.format("Unsupported file type %s for file %s. Defaulting to XML parsing.",
+                    fileContent.getFileType(), fileContent.getFileName()));
+            return parseIdpFromXml(fileContent);
+        }
+    }
+
+    private IdentityProvider parseIdpFromXml(FileContent fileContent)
+            throws IdentityProviderManagementClientException {
+
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(IdentityProvider.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            return (IdentityProvider) unmarshaller.unmarshal(new StringReader(fileContent.getContent()));
+        } catch (JAXBException e) {
+            throw new IdentityProviderManagementClientException(String.format("Error in reading XML file " +
+                    "configuration for Identity Provider: %s.", fileContent.getFileName()), e);
+        }
+    }
+
+    private IdentityProvider parseIdpFromYaml(FileContent fileContent)
+            throws IdentityProviderManagementClientException {
+
+        try {
+            Yaml yaml = new Yaml(new Constructor(IdentityProvider.class));
+            return yaml.loadAs(fileContent.getContent(), IdentityProvider.class);
+        } catch (YAMLException e) {
+            throw new IdentityProviderManagementClientException(String.format("Error in reading YAML file " +
+                    "configuration for Identity Provider: %s.", fileContent.getFileName()), e);
+        }
+    }
+
+    private IdentityProvider parseIdpFromJson(FileContent fileContent)
+            throws IdentityProviderManagementClientException {
+
+        try {
+            return new ObjectMapper().readValue(fileContent.getContent(), IdentityProvider.class);
+        } catch (JsonProcessingException e) {
+            throw new IdentityProviderManagementClientException(String.format("Error in reading JSON file " +
+                    "configuration for Identity Provider: %s.", fileContent.getFileName()), e);
         }
     }
 

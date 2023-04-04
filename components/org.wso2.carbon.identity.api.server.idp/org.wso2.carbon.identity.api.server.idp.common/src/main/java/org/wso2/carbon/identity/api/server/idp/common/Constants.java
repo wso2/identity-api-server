@@ -91,6 +91,10 @@ public class Constants {
     public static final String TENANT_DOMAIN_KEY = "tenantDomain";
     public static final String SEARCH_VALUE_AUTHENTICATION_PROVISIONING = SERV_PROVISIONING + "," + SERV_AUTHENTICATION;
 
+    // IdP Export constants.
+    public static final String[] SECRETS_TO_MASK = {"secret", "password", "privatekey"};
+    public static final String MASKING_VALUE = "********";
+
     /**
      * Enum for error messages.
      */
@@ -150,6 +154,12 @@ public class Constants {
         ERROR_CODE_ERROR_RETRIEVING_IDP("65003",
                 "Unable to retrieve identity provider.",
                 "Server encountered an error while retrieving the identity provider for identifier %s."),
+        ERROR_CODE_ERROR_EXPORTING_IDP("65006",
+                "Unable to export identity provider.",
+                "Server encountered an error while exporting the identity provider for identifier %s."),
+        ERROR_CODE_ERROR_IMPORTING_IDP("65007",
+                "Unable to import identity provider.",
+                "Server encountered an error while importing the identity provider for identifier %s."),
         ERROR_CODE_ERROR_RETRIEVING_META_AUTHENTICATORS("65021",
                 "Unable to retrieve meta federated authenticator list.",
                 "Server encountered an error while retrieving the meta federated authenticators."),

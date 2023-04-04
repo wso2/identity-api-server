@@ -60,6 +60,8 @@ public interface IdentityProvidersApiService {
 
       public Response deleteIDPTemplate(String templateId);
 
+      public Response exportIDP(String identityProviderId, Boolean exportSecrets, String accept);
+
       public Response getClaimConfig(String identityProviderId);
 
       public Response getConnectedApps(String identityProviderId, Integer limit, Integer offset);
@@ -93,6 +95,10 @@ public interface IdentityProvidersApiService {
       public Response getProvisioningConfig(String identityProviderId);
 
       public Response getRoleConfig(String identityProviderId);
+
+      public Response importIDP(InputStream fileInputStream, Attachment fileDetail);
+
+      public Response importIDPForUpdate(InputStream fileInputStream, Attachment fileDetail);
 
       public Response patchIDP(String identityProviderId, List<Patch> patch);
 

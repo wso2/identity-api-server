@@ -146,4 +146,21 @@ public class Util {
 
         return calculateOffsetForPreviousLink(newOffset, limit, total);
     }
+
+    /**
+     * Check whether the given file type is valid.
+     *
+     * @param fileType            File type.
+     * @param supportedMediaTypes Supported media types.
+     * @return True if the given file type contains at least one supported media type.
+     */
+    public static boolean containsValidMediaType(String fileType, String[] supportedMediaTypes) {
+
+        for (String supportedMediaType : supportedMediaTypes) {
+            if (fileType.contains(supportedMediaType)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
