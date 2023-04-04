@@ -62,17 +62,8 @@ public class ExternalizedConsentPageConfiguration {
     @ApiModelProperty(value = "Consent Page URL.")
     @JsonProperty("consentPageUrl")
     @Valid
-    public String getConsentPageUrl() {
-        return consentPageUrl;
-    }
-    public void setConsentPageUrl(String consentPageUrl) {
-
-        if (isValidConsentPageUrl(consentPageUrl)) {
-            this.consentPageUrl = consentPageUrl;
-        } else {
-            throw new IllegalArgumentException("Invalid consent page URL.");
-        }
-    }
+    public String getConsentPageUrl() {return consentPageUrl;}
+    public void setConsentPageUrl(String consentPageUrl) {this.consentPageUrl = consentPageUrl;}
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -91,6 +82,7 @@ public class ExternalizedConsentPageConfiguration {
 
     @Override
     public int hashCode() {
+
         return Objects.hash(enabled, consentPageUrl);
     }
 
@@ -116,25 +108,5 @@ public class ExternalizedConsentPageConfiguration {
             return "null";
         }
         return o.toString().replace("\n", "\n");
-    }
-
-    /**
-     * Check the consent page URL is valid or not.
-     *
-     * @param consentPageUrl Consent page URL.
-     * @return True if the consent page URL is valid.
-     */
-    private boolean isValidConsentPageUrl(String consentPageUrl) {
-
-        try {
-            URL url = new URL(consentPageUrl);
-            if ("https".equals(url.getProtocol())) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Invalid consent page URL.");
-        }
     }
 }

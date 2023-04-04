@@ -25,6 +25,8 @@ import org.wso2.carbon.identity.application.common.model.ExternalizedConsentPage
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_SUPPORTED;
@@ -87,10 +89,35 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
 
         ExternalizedConsentPageConfig externalConsentManagementConfig = getExternalizedConsentPageConfig(config);
         if (externalizedConsentPageApiModel != null) {
-            setIfNotNull(externalizedConsentPageApiModel.getEnabled(),
-                    externalConsentManagementConfig::setEnabled);
-            setIfNotNull(externalizedConsentPageApiModel.getConsentPageUrl(),
-                    externalConsentManagementConfig::setConsentPageUrl);
+            if (isValidConsentPageUrl(externalizedConsentPageApiModel.getConsentPageUrl())) {
+                setIfNotNull(externalizedConsentPageApiModel.getEnabled(),
+                        externalConsentManagementConfig::setEnabled);
+                setIfNotNull(externalizedConsentPageApiModel.getConsentPageUrl(),
+                        externalConsentManagementConfig::setConsentPageUrl);
+            } else {
+                throw buildBadRequestError("Only https consent page urls are " +
+                        "allowed ");
+            }
+        }
+    }
+
+    /**
+     * Check the consent page URL is valid or not.
+     *
+     * @param consentPageUrl Consent page URL.
+     * @return True if the consent page URL is valid.
+     */
+    private boolean isValidConsentPageUrl(String consentPageUrl) {
+
+        try {
+            URL url = new URL(consentPageUrl);
+            if ("https".equals(url.getProtocol())) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Invalid consent page URL.");
         }
     }
 
