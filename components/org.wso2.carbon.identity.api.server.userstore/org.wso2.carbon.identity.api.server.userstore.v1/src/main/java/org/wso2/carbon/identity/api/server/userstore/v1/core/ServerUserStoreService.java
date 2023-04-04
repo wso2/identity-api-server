@@ -68,6 +68,7 @@ import org.wso2.carbon.user.core.UserStoreConfigConstants;
 import org.wso2.carbon.user.core.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -282,6 +283,12 @@ public class ServerUserStoreService {
 
         RealmService realmService = UserStoreConfigServiceHolder.getInstance().getRealmService();
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+        if (tenantId != MultitenantConstants.SUPER_TENANT_ID) {
+            throw handleException(Response.Status.FORBIDDEN,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_PRIMARY_USERSTORE);
+        }
+
         RealmConfiguration realmConfiguration;
         try {
             realmConfiguration = realmService.getTenantUserRealm(tenantId).getRealmConfiguration();
