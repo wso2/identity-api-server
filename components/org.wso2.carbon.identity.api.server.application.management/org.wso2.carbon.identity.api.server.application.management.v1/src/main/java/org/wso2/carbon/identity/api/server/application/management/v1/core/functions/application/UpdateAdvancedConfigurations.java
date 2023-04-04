@@ -95,8 +95,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                 setIfNotNull(externalizedConsentPageApiModel.getConsentPageUrl(),
                         externalConsentManagementConfig::setConsentPageUrl);
             } else {
-                throw buildBadRequestError("Only https consent page urls are " +
-                        "allowed ");
+                throw buildBadRequestError("Only https consent page urls are allowed ");
             }
         }
     }
