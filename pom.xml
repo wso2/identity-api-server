@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.36</version>
+    <version>1.2.42-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -40,7 +40,7 @@
         <developerConnection>scm:git:https://github.com/wso2/identity-api-server.git
         </developerConnection>
         <connection>scm:git:https://github.com/wso2/identity-api-server.git</connection>
-        <tag>v1.2.36</tag>
+        <tag>HEAD</tag>
     </scm>
 
 
@@ -471,6 +471,12 @@
                 <version>${identity.branding.preference.management.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.organization.management.core</groupId>
+                <artifactId>org.wso2.carbon.identity.organization.management.service</artifactId>
+                <version>${org.wso2.carbon.identity.organization.management.core.version}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -572,6 +578,12 @@
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
+
+        <!-- Organization management core Version -->
+        <org.wso2.carbon.identity.organization.management.core.version>1.0.42
+        </org.wso2.carbon.identity.organization.management.core.version>
+        <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
+        </org.wso2.carbon.identity.organization.management.core.version.range>
     </properties>
 
     <modules>

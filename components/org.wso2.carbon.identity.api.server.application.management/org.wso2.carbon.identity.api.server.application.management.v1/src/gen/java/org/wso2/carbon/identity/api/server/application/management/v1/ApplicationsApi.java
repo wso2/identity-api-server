@@ -337,6 +337,30 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/{applicationId}/exportFile")
+    
+    @Produces({ "application/json", "application/yaml", "application/xml", "application/octet-stream" })
+    @ApiOperation(value = "Export application in XML, YAML, or JSON file formats. ", notes = "This API provides the capability to retrieve the application in XML, YAML, or JSON format.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = String.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Applications", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = String.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response exportApplicationAsFile(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId,     @Valid@ApiParam(value = "Specifies whether to export secrets when exporting an application. ", defaultValue="false") @DefaultValue("false")  @QueryParam("exportSecrets") Boolean exportSecrets,     @Valid @ApiParam(value = "Content type of the file. " , allowableValues="application/json, application/xml, application/yaml, application/x-yaml, text/yaml", defaultValue="application/xml")@HeaderParam("Accept") String accept) {
+
+        return delegate.exportApplicationAsFile(applicationId,  exportSecrets,  accept );
+    }
+
+    @Valid
+    @GET
     @Path("/meta/adaptive-auth-templates")
     
     @Produces({ "application/json" })
@@ -381,7 +405,7 @@ public class ApplicationsApi  {
     public Response getAllApplicationTemplates(    @Valid@ApiParam(value = "Maximum number of records to return. ")
                                                        @QueryParam("limit") Integer limit,     @Valid@ApiParam(value
             = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset, @Context
-            SearchContext searchContext) {
+                                                   SearchContext searchContext) {
 
         return delegate.getAllApplicationTemplates(limit,  offset, searchContext );
     }
