@@ -22,17 +22,22 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.application.management</artifactId>
-        <version>1.2.36</version>
+        <version>1.2.42-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <name>WSO2 Identity Server - Applications Rest API</name>
     <description>WSO2 Identity Server - Applications Rest API</description>
     <artifactId>org.wso2.carbon.identity.api.server.application.management.v1</artifactId>
-    <version>1.2.36</version>
+    <version>1.2.42-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.organization.management.core</groupId>
+            <artifactId>org.wso2.carbon.identity.organization.management.service</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
