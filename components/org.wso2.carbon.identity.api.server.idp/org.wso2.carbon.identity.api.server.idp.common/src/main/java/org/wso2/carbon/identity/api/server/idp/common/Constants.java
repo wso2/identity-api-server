@@ -91,10 +91,6 @@ public class Constants {
     public static final String TENANT_DOMAIN_KEY = "tenantDomain";
     public static final String SEARCH_VALUE_AUTHENTICATION_PROVISIONING = SERV_PROVISIONING + "," + SERV_AUTHENTICATION;
 
-    // IdP Export constants.
-    public static final String[] SECRETS_TO_MASK = {"secret", "password", "privatekey"};
-    public static final String MASKING_VALUE = "********";
-
     /**
      * Enum for error messages.
      */

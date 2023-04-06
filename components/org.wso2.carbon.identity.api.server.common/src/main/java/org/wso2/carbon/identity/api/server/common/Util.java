@@ -159,7 +159,7 @@ public class Util {
             return Constants.MEDIA_TYPE_XML;
         } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_JSON)) {
             return Constants.MEDIA_TYPE_JSON;
-        } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_YAML)){
+        } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_YAML)) {
             return Constants.MEDIA_TYPE_YAML;
         } else {
             return Constants.MEDIA_TYPE_UNSUPPORTED;

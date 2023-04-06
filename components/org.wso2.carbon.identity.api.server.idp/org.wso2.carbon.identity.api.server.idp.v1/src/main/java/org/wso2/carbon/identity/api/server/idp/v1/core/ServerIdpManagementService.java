@@ -129,6 +129,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -166,6 +167,9 @@ import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.Co
 public class ServerIdpManagementService {
 
     private static final Log log = LogFactory.getLog(ServerIdpManagementService.class);
+
+    private static final String[] SECRETS_TO_MASK = {"secret", "password", "privatekey"};
+    private static final String MASKING_VALUE = "********";
 
     /**
      * Get list of identity providers.
@@ -364,9 +368,9 @@ public class ServerIdpManagementService {
             Property[] authenticatorProperties = authenticator.getProperties();
             if (authenticatorProperties != null) {
                 for (Property property : authenticatorProperties) {
-                    for (String sensitiveKeyword : Constants.SECRETS_TO_MASK) {
-                        if (property.getName().toLowerCase().contains(sensitiveKeyword)) {
-                            property.setValue(Constants.MASKING_VALUE);
+                    for (String sensitiveKeyword : SECRETS_TO_MASK) {
+                        if (property.getName().toLowerCase(Locale.ENGLISH).contains(sensitiveKeyword)) {
+                            property.setValue(MASKING_VALUE);
                         }
                     }
                 }
