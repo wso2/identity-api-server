@@ -969,6 +969,13 @@ public class ServerClaimManagementService {
                 throw handleClaimManagementClientError(ERROR_CODE_EMPTY_MAPPED_ATTRIBUTES_IN_LOCAL_CLAIM,
                         BAD_REQUEST, attributeMappingDTO.getUserstore());
             }
+            if (IdentityUtil.getHostName().contains("asgardeo.io") || IdentityUtil.getHostName().contains("asg.io")) {
+                if (!primaryUserstoreDomainName.equalsIgnoreCase(attributeMappingDTO.getUserstore())) {
+                    throw handleClaimManagementClientError(ERROR_CODE_INVALID_USERSTORE.getCode(), "You can only use"
+                                    + " 'PRIMARY' userstore domain in the claim mapping.", BAD_REQUEST,
+                            attributeMappingDTO.getUserstore());
+                }
+            }
             if (!isUserStoreExists(attributeMappingDTO.getUserstore())) {
                 throw handleClaimManagementClientError(ERROR_CODE_INVALID_USERSTORE, BAD_REQUEST,
                         attributeMappingDTO.getUserstore());
