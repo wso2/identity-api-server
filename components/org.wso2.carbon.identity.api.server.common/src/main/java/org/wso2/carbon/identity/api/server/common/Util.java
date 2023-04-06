@@ -148,13 +148,25 @@ public class Util {
     }
 
     /**
-     * Check whether the given file type is valid.
+     * Resolve the valid media type for the given file type.
      *
-     * @param fileType            File type.
-     * @param supportedMediaTypes Supported media types.
-     * @return True if the given file type contains at least one supported media type.
+     * @param fileType File type.
+     * @return Media type.
      */
-    public static boolean containsValidMediaType(String fileType, String[] supportedMediaTypes) {
+    public static String getMediaType(String fileType) {
+
+        if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_XML)) {
+            return Constants.MEDIA_TYPE_XML;
+        } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_JSON)) {
+            return Constants.MEDIA_TYPE_JSON;
+        } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_YAML)){
+            return Constants.MEDIA_TYPE_YAML;
+        } else {
+            return Constants.MEDIA_TYPE_UNSUPPORTED;
+        }
+    }
+
+    private static boolean containsValidMediaType(String fileType, String[] supportedMediaTypes) {
 
         for (String supportedMediaType : supportedMediaTypes) {
             if (fileType.contains(supportedMediaType)) {

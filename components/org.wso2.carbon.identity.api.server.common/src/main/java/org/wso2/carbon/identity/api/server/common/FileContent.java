@@ -19,7 +19,7 @@
 package org.wso2.carbon.identity.api.server.common;
 
 /**
- * Holds file name, type and content of the uploaded or exported file configuration.
+ * Holds file name, type and content of the uploaded or exported resource file configuration.
  */
 public class FileContent {
 
@@ -31,16 +31,6 @@ public class FileContent {
 
         this.fileName = fileName;
         this.fileType = fileType;
-        this.content = content;
-    }
-
-    public String getContent() {
-
-        return content;
-    }
-
-    public void setContent(String content) {
-
         this.content = content;
     }
 
@@ -62,5 +52,15 @@ public class FileContent {
     public void setFileType(String fileType) {
 
         this.fileType = fileType;
+    }
+
+    public String getContent() {
+
+        return content;
+    }
+
+    public void setContent(String content) {
+
+        this.content = content;
     }
 }

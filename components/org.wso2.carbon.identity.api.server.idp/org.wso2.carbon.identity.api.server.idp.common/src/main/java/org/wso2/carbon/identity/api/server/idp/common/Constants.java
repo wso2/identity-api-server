@@ -159,7 +159,7 @@ public class Constants {
                 "Server encountered an error while exporting the identity provider for identifier %s."),
         ERROR_CODE_ERROR_IMPORTING_IDP("65007",
                 "Unable to import identity provider.",
-                "Server encountered an error while importing the identity provider for identifier %s."),
+                "Server encountered an error while importing the identity provider."),
         ERROR_CODE_ERROR_RETRIEVING_META_AUTHENTICATORS("65021",
                 "Unable to retrieve meta federated authenticator list.",
                 "Server encountered an error while retrieving the meta federated authenticators."),

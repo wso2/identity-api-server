@@ -141,10 +141,10 @@ import javax.xml.bind.Unmarshaller;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.common.Constants.JSON_FILE_EXTENSION;
+import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_JSON;
+import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_XML;
+import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_YAML;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.common.Constants.VALID_MEDIA_TYPES_JSON;
-import static org.wso2.carbon.identity.api.server.common.Constants.VALID_MEDIA_TYPES_XML;
-import static org.wso2.carbon.identity.api.server.common.Constants.VALID_MEDIA_TYPES_YAML;
 import static org.wso2.carbon.identity.api.server.common.Constants.XML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
@@ -304,7 +304,7 @@ public class ServerIdpManagementService {
      * @param idpId         ID of the identity provider to be exported.
      * @param exportSecrets If True, all hashed or encrypted secrets will also be exported.
      * @param fileType      The format of the exported string.
-     * @return TransferResource object of the identity provider in the given format.
+     * @return FileContent object of the identity provider in the given format.
      */
     public FileContent exportIDP(String idpId, Boolean exportSecrets, String fileType) {
 
@@ -383,15 +383,21 @@ public class ServerIdpManagementService {
             log.debug("Parsing IdP object to file content of type: " + fileType);
         }
 
-        if (Util.containsValidMediaType(fileType, VALID_MEDIA_TYPES_XML)) {
-            fileContent = parseIdpToXml(identityProvider, fileNameSB);
-        } else if (Util.containsValidMediaType(fileType, VALID_MEDIA_TYPES_JSON)) {
-            fileContent = parseIdpToJson(identityProvider, fileNameSB);
-        } else if (Util.containsValidMediaType(fileType, VALID_MEDIA_TYPES_YAML)) {
-            fileContent = parseIdpToYaml(identityProvider, fileNameSB);
-        } else {
-            log.warn("Unsupported file type: " + fileType + " requested for export. Defaulting to YAML parsing.");
-            fileContent = parseIdpToYaml(identityProvider, fileNameSB);
+        switch (Util.getMediaType(fileType)) {
+            case MEDIA_TYPE_XML:
+                fileContent = parseIdpToXml(identityProvider, fileNameSB);
+                break;
+            case MEDIA_TYPE_JSON:
+                fileContent = parseIdpToJson(identityProvider, fileNameSB);
+                break;
+            case MEDIA_TYPE_YAML:
+                fileContent = parseIdpToYaml(identityProvider, fileNameSB);
+                break;
+            default:
+                log.warn(String.format("Unsupported file type: %s requested for export. Defaulting to YAML parsing.",
+                        fileType));
+                fileContent = parseIdpToYaml(identityProvider, fileNameSB);
+                break;
         }
         return new FileContent(fileNameSB.toString(), MediaType.APPLICATION_OCTET_STREAM_VALUE, fileContent);
     }
@@ -410,7 +416,7 @@ public class ServerIdpManagementService {
             return stringWriter.toString();
         } catch (JAXBException e) {
             throw new IdentityProviderManagementException(
-                    "Error exporting identity provider to XML file.", e);
+                    "Error when parsing identity provider to XML file.", e);
         }
     }
 
@@ -423,7 +429,7 @@ public class ServerIdpManagementService {
             return objectMapper.writeValueAsString(identityProvider);
         } catch (JsonProcessingException e) {
             throw new IdentityProviderManagementClientException(
-                    "Error exporting identity provider to JSON file.", e);
+                    "Error when parsing identity provider to JSON file.", e);
         }
     }
 
@@ -436,7 +442,7 @@ public class ServerIdpManagementService {
             return yaml.dump(identityProvider);
         } catch (YAMLException e) {
             throw new IdentityProviderManagementException(
-                    "Error exporting identity provider to YAML file.", e);
+                    "Error when parsing identity provider to YAML file.", e);
         }
     }
 
@@ -491,9 +497,8 @@ public class ServerIdpManagementService {
                 identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().addIdPWithResourceId(
                         identityProvider, tenantDomain);
             }
-        } catch (IOException e) {
-            throw new IdentityProviderManagementClientException("Error while reading identity provider " +
-                    "configurations from file during import.", e);
+        } catch (IOException | IdentityProviderManagementClientException e) {
+            throw new IdentityProviderManagementClientException("Provided input file is not in the correct format", e);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_IDP, null);
         } finally {
@@ -514,16 +519,17 @@ public class ServerIdpManagementService {
                     "Empty Identity Provider configuration file %s uploaded.", fileContent.getFileName()));
         }
 
-        if (Util.containsValidMediaType(fileContent.getFileType(), VALID_MEDIA_TYPES_XML)) {
-            return parseIdpFromXml(fileContent);
-        } else if (Util.containsValidMediaType(fileContent.getFileType(), VALID_MEDIA_TYPES_YAML)) {
-            return parseIdpFromYaml(fileContent);
-        } else if (Util.containsValidMediaType(fileContent.getFileType(), VALID_MEDIA_TYPES_JSON)) {
-            return parseIdpFromJson(fileContent);
-        } else {
-            log.warn(String.format("Unsupported file type %s for file %s. Defaulting to XML parsing.",
-                    fileContent.getFileType(), fileContent.getFileName()));
-            return parseIdpFromXml(fileContent);
+        switch (Util.getMediaType(fileContent.getFileType())) {
+            case MEDIA_TYPE_XML:
+                return parseIdpFromXml(fileContent);
+            case MEDIA_TYPE_JSON:
+                return parseIdpFromJson(fileContent);
+            case MEDIA_TYPE_YAML:
+                return parseIdpFromYaml(fileContent);
+            default:
+                log.warn(String.format("Unsupported media type %s for file %s. Defaulting to XML parsing.",
+                        fileContent.getFileType(), fileContent.getFileName()));
+                return parseIdpFromYaml(fileContent);
         }
     }
 
