@@ -86,7 +86,7 @@ components:
           type: boolean
           description: Admin banner enabled status.
           example: true
-        content:
+        bannerContent:
           type: string
           description: Admin banner content.
           example: Unauthorized use of this tool is strictly prohibited
