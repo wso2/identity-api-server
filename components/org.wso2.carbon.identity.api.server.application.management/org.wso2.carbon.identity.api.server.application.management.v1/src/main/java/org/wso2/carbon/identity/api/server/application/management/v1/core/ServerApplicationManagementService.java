@@ -18,7 +18,6 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -117,6 +116,7 @@ import org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
+import org.wso2.carbon.identity.oauth.dao.OAuthAppDO;
 import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
@@ -125,7 +125,6 @@ import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementExcepti
 import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
-import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -133,6 +132,8 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -148,6 +149,11 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
@@ -498,11 +504,16 @@ public class ServerApplicationManagementService {
         String fileContent = "";
 
         if (Arrays.asList(VALID_MEDIA_TYPES_XML).contains(fileType)) {
+            JAXBContext jaxbContext;
             try {
-                XmlMapper xmlMapper = new XmlMapper();
-                xmlMapper.registerSubtypes(SAMLSSOServiceProviderDTO.class);
-                fileContent = xmlMapper.writeValueAsString(serviceProvider);
-            } catch (JsonProcessingException e) {
+                jaxbContext = JAXBContext.newInstance(ServiceProvider.class,
+                        SAMLSSOServiceProviderDTO.class, OAuthAppDO.class);
+                Marshaller marshaller = jaxbContext.createMarshaller();
+                marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                StringWriter stringWriter = new StringWriter();
+                marshaller.marshal(serviceProvider, stringWriter);
+                fileContent = stringWriter.toString();
+            } catch (JAXBException e) {
                 throw Utils.buildServerError("Error exporting application from XML file.", e);
             }
             fileNameSB.append(XML_FILE_EXTENSION);
@@ -516,7 +527,7 @@ public class ServerApplicationManagementService {
             fileNameSB.append(YML_FILE_EXTENSION);
         } else if (Arrays.asList(VALID_MEDIA_TYPES_JSON).contains(fileType)) {
             ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
-            objectMapper.registerSubtypes(SAMLSSOServiceProviderDTO.class);
+            objectMapper.registerSubtypes(SAMLSSOServiceProviderDTO.class, OAuthAppDO.class);
             try {
                 fileContent = objectMapper.writeValueAsString(serviceProvider);
             } catch (JsonProcessingException e) {
@@ -539,18 +550,16 @@ public class ServerApplicationManagementService {
     private Yaml createCustomYamlObject() {
         Constructor constructor = new Constructor();
 
-        TypeDescription serviceProviderDesc = new TypeDescription(ServiceProvider.class);
-        serviceProviderDesc.addPropertyParameters("inboundAuthenticationConfig", InboundAuthenticationConfig.class);
-        constructor.addTypeDescription(serviceProviderDesc);
+        TypeDescription samlssoDescription = new TypeDescription(InboundConfigurationProtocol.class);
+        samlssoDescription.putListPropertyType("type", SAMLSSOServiceProviderDTO.class);
+        constructor.addTypeDescription(samlssoDescription);
 
-        TypeDescription protocolDescription = new TypeDescription(InboundConfigurationProtocol.class);
-        protocolDescription.putListPropertyType("type", SAMLSSOServiceProviderDTO.class);
-        constructor.addTypeDescription(protocolDescription);
+        TypeDescription oauthDescription = new TypeDescription(InboundConfigurationProtocol.class);
+        oauthDescription.putListPropertyType("type", OAuthAppDO.class);
+        constructor.addTypeDescription(oauthDescription);
 
-        DumperOptions options = new DumperOptions();
-        options.setPrettyFlow(true);
         CustomRepresenter representer = new CustomRepresenter();
-        return new Yaml(constructor, representer, options);
+        return new Yaml(constructor, representer);
     }
 
     /**
@@ -645,10 +654,11 @@ public class ServerApplicationManagementService {
             throws IdentityApplicationManagementException {
 
         try {
-            XmlMapper xmlMapper = new XmlMapper();
-            xmlMapper.registerSubtypes(SAMLSSOServiceProviderDTO.class);
-            return xmlMapper.readValue(spFileContent.getContent(), ServiceProvider.class);
-        } catch (JsonProcessingException e) {
+            JAXBContext jaxbContext = JAXBContext.newInstance(ServiceProvider.class, SAMLSSOServiceProviderDTO.class,
+                    OAuthAppDO.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            return (ServiceProvider) unmarshaller.unmarshal(new StringReader(spFileContent.getContent()));
+        } catch (JAXBException e) {
             throw new IdentityApplicationManagementException(String.format("Error in reading XML Service Provider " +
                     "configuration file %s uploaded by tenant: %s", spFileContent.getFileName(), tenantDomain), e);
         }
@@ -672,8 +682,7 @@ public class ServerApplicationManagementService {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            //todo : extending this for other inbound configurations
-            objectMapper.registerSubtypes(SAMLSSOServiceProviderDTO.class);
+            objectMapper.registerSubtypes(SAMLSSOServiceProviderDTO.class, OAuthAppDO.class);
             return objectMapper.readValue(spFileContent.getContent(), ServiceProvider.class);
         } catch (JsonProcessingException e) {
             throw new IdentityApplicationManagementException(String.format("Error in reading JSON Service Provider " +
