@@ -28,7 +28,7 @@ public class AdminAdvisoryManagementServiceHolder {
     private static AdminAdvisoryManagementService adminAdvisoryManagementService;
 
     /**
-     *  Get admin advisory management service.
+     * Get admin advisory management service.
      */
     public static AdminAdvisoryManagementService getAdminAdvisoryManagementService() {
 
@@ -36,16 +36,17 @@ public class AdminAdvisoryManagementServiceHolder {
     }
 
     /**
-     *  Set admin advisory management service.
+     * Set admin advisory management service.
      *
-     * @param  adminAdvisoryManagementService  the admin advisory management service
+     * @param adminAdvisoryManagementService the admin advisory management service
      */
     public static void setAdminAdvisoryManagementService
-            (AdminAdvisoryManagementService adminAdvisoryManagementService) {
+    (AdminAdvisoryManagementService adminAdvisoryManagementService) {
 
         AdminAdvisoryManagementServiceHolder.adminAdvisoryManagementService = adminAdvisoryManagementService;
     }
 
     private AdminAdvisoryManagementServiceHolder() {
+
     }
 }
