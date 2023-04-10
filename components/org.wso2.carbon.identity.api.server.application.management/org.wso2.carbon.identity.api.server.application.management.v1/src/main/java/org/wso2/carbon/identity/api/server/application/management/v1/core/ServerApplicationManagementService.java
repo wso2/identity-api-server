@@ -206,6 +206,8 @@ public class ServerApplicationManagementService {
     private static final String[] VALID_MEDIA_TYPES_XML = {"application/xml", "text/xml"};
     private static final String[] VALID_MEDIA_TYPES_YAML = {"application/yaml", "text/yaml", "application/x-yaml"};
     private static final String[] VALID_MEDIA_TYPES_JSON = {"application/json", "text/json"};
+    private static final Class<?>[] INBOUND_CONFIG_PROTOCOLS = new Class<?>[] {ServiceProvider.class,
+                                                                SAMLSSOServiceProviderDTO.class, OAuthAppDO.class};
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -506,10 +508,22 @@ public class ServerApplicationManagementService {
         if (Arrays.asList(VALID_MEDIA_TYPES_XML).contains(fileType)) {
             JAXBContext jaxbContext;
             try {
-                jaxbContext = JAXBContext.newInstance(ServiceProvider.class,
-                        SAMLSSOServiceProviderDTO.class, OAuthAppDO.class);
+                jaxbContext = JAXBContext.newInstance(INBOUND_CONFIG_PROTOCOLS);
                 Marshaller marshaller = jaxbContext.createMarshaller();
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                marshaller.setListener(new Marshaller.Listener() {
+                    @Override
+                    public void beforeMarshal(Object source) {
+                        if (source instanceof InboundAuthenticationConfig) {
+                            InboundAuthenticationConfig config = (InboundAuthenticationConfig) source;
+                            for (InboundAuthenticationRequestConfig requestConfig
+                                        : config.getInboundAuthenticationRequestConfigs()) {
+                                requestConfig.setInboundConfiguration(null);
+                            }
+                        }
+                    }
+                });
+
                 StringWriter stringWriter = new StringWriter();
                 marshaller.marshal(serviceProvider, stringWriter);
                 fileContent = stringWriter.toString();
@@ -527,7 +541,7 @@ public class ServerApplicationManagementService {
             fileNameSB.append(YML_FILE_EXTENSION);
         } else if (Arrays.asList(VALID_MEDIA_TYPES_JSON).contains(fileType)) {
             ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
-            objectMapper.registerSubtypes(SAMLSSOServiceProviderDTO.class, OAuthAppDO.class);
+            objectMapper.registerSubtypes(INBOUND_CONFIG_PROTOCOLS);
             try {
                 fileContent = objectMapper.writeValueAsString(serviceProvider);
             } catch (JsonProcessingException e) {
@@ -550,15 +564,14 @@ public class ServerApplicationManagementService {
     private Yaml createCustomYamlObject() {
         Constructor constructor = new Constructor();
 
-        TypeDescription samlssoDescription = new TypeDescription(InboundConfigurationProtocol.class);
-        samlssoDescription.putListPropertyType("type", SAMLSSOServiceProviderDTO.class);
-        constructor.addTypeDescription(samlssoDescription);
-
-        TypeDescription oauthDescription = new TypeDescription(InboundConfigurationProtocol.class);
-        oauthDescription.putListPropertyType("type", OAuthAppDO.class);
-        constructor.addTypeDescription(oauthDescription);
-
         CustomRepresenter representer = new CustomRepresenter();
+
+        for (Class<?> protocol : INBOUND_CONFIG_PROTOCOLS) {
+            TypeDescription description = new TypeDescription(InboundConfigurationProtocol.class);
+            description.putListPropertyType("type", protocol);
+            constructor.addTypeDescription(description);
+        }
+
         return new Yaml(constructor, representer);
     }
 
@@ -654,8 +667,7 @@ public class ServerApplicationManagementService {
             throws IdentityApplicationManagementException {
 
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(ServiceProvider.class, SAMLSSOServiceProviderDTO.class,
-                    OAuthAppDO.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(INBOUND_CONFIG_PROTOCOLS);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             return (ServiceProvider) unmarshaller.unmarshal(new StringReader(spFileContent.getContent()));
         } catch (JAXBException e) {
@@ -681,8 +693,7 @@ public class ServerApplicationManagementService {
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-
-            objectMapper.registerSubtypes(SAMLSSOServiceProviderDTO.class, OAuthAppDO.class);
+            objectMapper.registerSubtypes(INBOUND_CONFIG_PROTOCOLS);
             return objectMapper.readValue(spFileContent.getContent(), ServiceProvider.class);
         } catch (JsonProcessingException e) {
             throw new IdentityApplicationManagementException(String.format("Error in reading JSON Service Provider " +
