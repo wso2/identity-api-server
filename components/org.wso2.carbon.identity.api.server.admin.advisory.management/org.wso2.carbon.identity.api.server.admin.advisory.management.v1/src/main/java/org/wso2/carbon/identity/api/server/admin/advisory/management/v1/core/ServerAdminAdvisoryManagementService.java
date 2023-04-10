@@ -34,7 +34,6 @@ import javax.ws.rs.core.Response;
 
 /**
  * Call internal osgi services to perform admin advisory management related operations.
- *
  */
 public class ServerAdminAdvisoryManagementService {
 
