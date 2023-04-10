@@ -27,11 +27,19 @@ public class AdminAdvisoryManagementServiceHolder {
 
     private static AdminAdvisoryManagementService adminAdvisoryManagementService;
 
+    /**
+     *  Get admin advisory management service.
+     */
     public static AdminAdvisoryManagementService getAdminAdvisoryManagementService() {
 
         return adminAdvisoryManagementService;
     }
 
+    /**
+     *  Set admin advisory management service.
+     *
+     * @param  adminAdvisoryManagementService  the admin advisory management service
+     */
     public static void setAdminAdvisoryManagementService
             (AdminAdvisoryManagementService adminAdvisoryManagementService) {
 

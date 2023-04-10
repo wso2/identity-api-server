@@ -33,6 +33,11 @@ public class AdminAdvisoryManagementApiServiceImpl implements AdminAdvisoryManag
     @Autowired
     private ServerAdminAdvisoryManagementService adminAdvisoryManagementService;
 
+    /**
+     * Endpoint to get the admin advisory banner configuration.
+     *
+     * @return Response instance.
+     */
     @Override
     public Response getAdminAdvisoryConfig() {
 

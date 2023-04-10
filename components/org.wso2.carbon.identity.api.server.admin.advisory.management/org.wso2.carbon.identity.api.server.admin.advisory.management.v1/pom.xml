@@ -23,6 +23,7 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+<!--            Uncomment the following plugin to generate the API after a change is done to the swagger contract-->
 <!--            <plugin>-->
 <!--                <groupId>org.openapitools</groupId>-->
 <!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->
