@@ -42,6 +42,7 @@ public class Constants {
     public static final String MEDIA_TYPE_XML = "xml";
     public static final String MEDIA_TYPE_YAML = "yaml";
     public static final String MEDIA_TYPE_UNSUPPORTED = "unsupported";
+    public static final String MASKING_VALUE = "********";
     static final String[] VALID_MEDIA_TYPES_XML = {"application/xml", "text/xml"};
     static final String[] VALID_MEDIA_TYPES_YAML = {"application/yaml", "text/yaml", "application/x-yaml"};
     static final String[] VALID_MEDIA_TYPES_JSON = {"application/json", "text/json"};
