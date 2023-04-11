@@ -503,50 +503,16 @@ public class ServerApplicationManagementService {
         }
 
         StringBuilder fileNameSB = new StringBuilder(serviceProvider.getApplicationName());
-        String fileContent = "";
+        String fileContent;
 
         if (Arrays.asList(VALID_MEDIA_TYPES_XML).contains(fileType)) {
-            JAXBContext jaxbContext;
-            try {
-                jaxbContext = JAXBContext.newInstance(INBOUND_CONFIG_PROTOCOLS);
-                Marshaller marshaller = jaxbContext.createMarshaller();
-                marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-                marshaller.setListener(new Marshaller.Listener() {
-                    @Override
-                    public void beforeMarshal(Object source) {
-                        if (source instanceof InboundAuthenticationConfig) {
-                            InboundAuthenticationConfig config = (InboundAuthenticationConfig) source;
-                            for (InboundAuthenticationRequestConfig requestConfig
-                                        : config.getInboundAuthenticationRequestConfigs()) {
-                                requestConfig.setInboundConfiguration(null);
-                            }
-                        }
-                    }
-                });
-
-                StringWriter stringWriter = new StringWriter();
-                marshaller.marshal(serviceProvider, stringWriter);
-                fileContent = stringWriter.toString();
-            } catch (JAXBException e) {
-                throw Utils.buildServerError("Error exporting application from XML file.", e);
-            }
+            fileContent = parseXmlFromServiceProvider(serviceProvider);
             fileNameSB.append(XML_FILE_EXTENSION);
         } else if (Arrays.asList(VALID_MEDIA_TYPES_YAML).contains(fileType)) {
-            Yaml yaml = createCustomYamlObject();
-            try {
-                fileContent = yaml.dump(serviceProvider);
-            } catch (YAMLException e) {
-                throw Utils.buildServerError("Error exporting application from YAML file.", e);
-            }
+            fileContent = parseYamlFromServiceProvider(serviceProvider);
             fileNameSB.append(YML_FILE_EXTENSION);
         } else if (Arrays.asList(VALID_MEDIA_TYPES_JSON).contains(fileType)) {
-            ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
-            objectMapper.registerSubtypes(INBOUND_CONFIG_PROTOCOLS);
-            try {
-                fileContent = objectMapper.writeValueAsString(serviceProvider);
-            } catch (JsonProcessingException e) {
-                throw Utils.buildServerError("Error exporting application from JSON file.", e);
-            }
+            fileContent = parseJsonFromServiceProvider(serviceProvider);
             fileNameSB.append(JSON_FILE_EXTENSION);
         } else {
             throw Utils.buildServerError("Unsupported media type: " + fileType + "."
@@ -561,18 +527,61 @@ public class ServerApplicationManagementService {
         );
     }
 
-    private Yaml createCustomYamlObject() {
-        Constructor constructor = new Constructor();
+    private String parseXmlFromServiceProvider(ServiceProvider serviceProvider) {
 
+        JAXBContext jaxbContext;
+        try {
+            jaxbContext = JAXBContext.newInstance(INBOUND_CONFIG_PROTOCOLS);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.setListener(new Marshaller.Listener() {
+                @Override
+                public void beforeMarshal(Object source) {
+                    if (source instanceof InboundAuthenticationConfig) {
+                        InboundAuthenticationConfig config = (InboundAuthenticationConfig) source;
+                        for (InboundAuthenticationRequestConfig requestConfig
+                                : config.getInboundAuthenticationRequestConfigs()) {
+                            requestConfig.setInboundConfiguration(null);
+                        }
+                    }
+                }
+            });
+            StringWriter stringWriter = new StringWriter();
+            marshaller.marshal(serviceProvider, stringWriter);
+            return stringWriter.toString();
+        } catch (JAXBException e) {
+            throw Utils.buildServerError("Error exporting application from XML file.", e);
+        }
+    }
+
+    private String parseYamlFromServiceProvider(ServiceProvider serviceProvider) {
+
+        Constructor constructor = new Constructor();
         CustomRepresenter representer = new CustomRepresenter();
 
         for (Class<?> protocol : INBOUND_CONFIG_PROTOCOLS) {
             TypeDescription description = new TypeDescription(InboundConfigurationProtocol.class);
-            description.putListPropertyType("type", protocol);
+            description.addPropertyParameters("type", protocol);
             constructor.addTypeDescription(description);
         }
 
-        return new Yaml(constructor, representer);
+        Yaml yaml = new Yaml(constructor, representer);
+        try {
+            return yaml.dump(serviceProvider);
+        } catch (YAMLException e) {
+            throw Utils.buildServerError("Error exporting application from YAML file.", e);
+        }
+    }
+
+    private String parseJsonFromServiceProvider(ServiceProvider serviceProvider) {
+
+        ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
+        objectMapper.registerSubtypes(INBOUND_CONFIG_PROTOCOLS);
+        try {
+            return objectMapper.writeValueAsString(serviceProvider);
+        } catch (JsonProcessingException e) {
+            throw Utils.buildServerError("Error exporting application from JSON file.", e);
+        }
     }
 
     /**

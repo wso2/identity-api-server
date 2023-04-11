@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.representer.Representer;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,14 +29,19 @@ import java.util.stream.Collectors;
  * The CustomRepresenter class for YAML serialization.
  */
 public class CustomRepresenter extends Representer {
+
+    private static final String[] PROPERTIES_TO_REMOVE = {"inboundConfiguration"};
+
     @Override
-    protected Set<Property> getProperties(Class<? extends Object> type) {
+    protected Set<Property> getProperties(Class<?> type) {
+
         Set<Property> properties = super.getProperties(type);
 
-        // Remove the property inboundConfiguration.
+        // Remove the specified properties.
         properties = properties.stream()
-                .filter(property -> !property.getName().equals("inboundConfiguration"))
+                .filter(property -> !Arrays.asList(PROPERTIES_TO_REMOVE).contains(property.getName()))
                 .collect(Collectors.toSet());
+
         return properties;
     }
 }
