@@ -55,9 +55,8 @@ public class AdminAdvisoryManagementApi  {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Admin advisory banner configuration.", response = AdminAdvisoryConfig.class,
                 responseContainer = "List"),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class),
-        @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
     public Response getAdminAdvisoryConfig() {
 
