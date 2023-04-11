@@ -3392,7 +3392,7 @@ public class ServerIdpManagementService {
             throws IdentityProviderManagementException {
 
         StringBuilder fileNameSB = new StringBuilder(identityProvider.getIdentityProviderName());
-        String fileContent = "";
+        String fileContent;
         if (log.isDebugEnabled()) {
             log.debug("Parsing IdP object to file content of type: " + fileType);
         }
@@ -3473,8 +3473,10 @@ public class ServerIdpManagementService {
             identityProvider = generateModelFromFile(idpFileContent);
 
             if (isAppUpdate) {
+                IdentityProvider oldIdentityProvider = IdentityProviderServiceHolder.getIdentityProviderManager()
+                        .getIdPByName(identityProvider.getIdentityProviderName(), tenantDomain, true);
                 identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(
-                        identityProvider.getResourceId(), identityProvider, tenantDomain);
+                        oldIdentityProvider.getResourceId(), identityProvider, tenantDomain);
             } else {
                 identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().addIdPWithResourceId(
                         identityProvider, tenantDomain);
@@ -3523,8 +3525,8 @@ public class ServerIdpManagementService {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             return (IdentityProvider) unmarshaller.unmarshal(new StringReader(fileContent.getContent()));
         } catch (JAXBException e) {
-            throw new IdentityProviderManagementClientException(String.format("Error in reading XML file " +
-                    "configuration for Identity Provider: %s.", fileContent.getFileName()), e);
+            throw new IdentityProviderManagementClientException(String.format("Error in reading " +
+                    "XML file configuration for Identity Provider: %s.", fileContent.getFileName()), e);
         }
     }
 
@@ -3546,8 +3548,8 @@ public class ServerIdpManagementService {
         try {
             return new ObjectMapper().readValue(fileContent.getContent(), IdentityProvider.class);
         } catch (JsonProcessingException e) {
-            throw new IdentityProviderManagementClientException(String.format("Error in reading JSON file " +
-                    "configuration for Identity Provider: %s.", fileContent.getFileName()), e);
+            throw new IdentityProviderManagementClientException(String.format("Error in reading JSON " +
+                    "file configuration for Identity Provider: %s.", fileContent.getFileName()), e);
         }
     }
 }
