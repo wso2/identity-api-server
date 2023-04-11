@@ -36,17 +36,21 @@ paths:
                 type: object
                 items:
                   $ref: '#/components/schemas/AdminAdvisoryConfig'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
-        '501':
-          $ref: '#/components/responses/NotImplemented'
 
 servers:
   - url: https://localhost:9443/t/{tenant-domain}/api/server/v1/
 components:
   responses:
+    BadRequest:
+      description: Invalid input in the request.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
     Unauthorized:
       description: Unauthorized.
     Forbidden:
@@ -108,4 +112,3 @@ components:
         traceId:
           type: string
           example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
-
