@@ -85,14 +85,9 @@ public class ServerAdminAdvisoryManagementService {
 
     private String buildErrorDescription(AdminAdvisoryConstants.ErrorMessage errorEnum, String... data) {
 
-        String errorDescription;
-
         if (ArrayUtils.isNotEmpty(data)) {
-            errorDescription = String.format(errorEnum.getDescription(), data);
-        } else {
-            errorDescription = errorEnum.getDescription();
+            return String.format(errorEnum.getDescription(), data);
         }
-
-        return errorDescription;
+        return errorEnum.getDescription();
     }
 }
