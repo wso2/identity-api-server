@@ -148,7 +148,7 @@ public class Util {
     }
 
     /**
-     * Resolve the valid media type for the given file type.
+     * Resolves the valid media type for a given file type.
      *
      * @param fileType File type.
      * @return Media type.
