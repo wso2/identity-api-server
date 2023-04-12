@@ -30,7 +30,8 @@ import java.util.stream.Collectors;
  */
 public class CustomRepresenter extends Representer {
 
-    private static final String[] PROPERTIES_TO_REMOVE = {"inboundConfiguration"};
+    private static final String[] PROPERTIES_TO_REMOVE = {"inboundConfiguration", "applicationID", "owner",
+            "tenantDomain", "id", "idpProperties", "resourceId", "spProperties", "applicationResourceId"};
 
     @Override
     protected Set<Property> getProperties(Class<?> type) {
