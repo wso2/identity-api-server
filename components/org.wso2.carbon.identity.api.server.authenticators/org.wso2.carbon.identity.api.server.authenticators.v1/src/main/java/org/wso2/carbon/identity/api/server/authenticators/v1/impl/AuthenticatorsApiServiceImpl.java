@@ -41,4 +41,11 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
 
         return Response.ok().entity(authenticatorManagementService.getTags()).build();
     }
+
+    @Override
+    public Response getConnectedAppsOfLocalAuthenticator(String authenticatorId) {
+
+        return Response.ok().entity(authenticatorManagementService
+                .getConnectedAppsOfLocalAuthenticator(authenticatorId)).build();
+    }
 }

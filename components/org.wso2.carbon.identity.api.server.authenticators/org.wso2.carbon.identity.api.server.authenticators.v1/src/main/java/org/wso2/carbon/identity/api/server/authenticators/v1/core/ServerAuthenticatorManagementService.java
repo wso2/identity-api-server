@@ -169,6 +169,17 @@ public class ServerAuthenticatorManagementService {
         }
     }
 
+    public boolean getConnectedAppsOfLocalAuthenticator(String authenticatorId) {
+
+        try {
+            AuthenticatorsServiceHolder.getInstance().getApplicationManagementService()
+                    .getConnectedAppsForLocalAuthenticator(authenticatorId, ContextLoader.getTenantDomainFromContext());
+        } catch (IdentityApplicationManagementException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
+    }
+
     private List<Authenticator> buildAuthenticatorsListResponse(String filter, List<String> requestedAttributeList,
                                                                 String localAuthNames,
                                                                 String authenticatorNameFilterOperator,
