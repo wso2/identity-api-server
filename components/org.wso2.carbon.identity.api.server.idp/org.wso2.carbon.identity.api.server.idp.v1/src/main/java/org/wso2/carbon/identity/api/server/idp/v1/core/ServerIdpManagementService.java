@@ -303,11 +303,11 @@ public class ServerIdpManagementService {
      * Export an identity provider identified by the Identity Provider ID, in the given format.
      *
      * @param idpId         ID of the identity provider to be exported.
-     * @param exportSecrets If True, all hashed or encrypted secrets will be exported and if False, they will be masked.
+     * @param exportSecrets If true, all hashed or encrypted secrets will be exported and if false, they will be masked.
      * @param fileType      The format of the exported string.
      * @return FileContent object of the identity provider in the requested format.
      */
-    public FileContent exportIDP(String idpId, Boolean exportSecrets, String fileType) {
+    public FileContent exportIDP(String idpId, boolean exportSecrets, String fileType) {
 
         if (log.isDebugEnabled()) {
             log.debug("Exporting identity provider from idp ID " + idpId);

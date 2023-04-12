@@ -161,9 +161,8 @@ public class Util {
             return Constants.MEDIA_TYPE_JSON;
         } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_YAML)) {
             return Constants.MEDIA_TYPE_YAML;
-        } else {
-            return Constants.MEDIA_TYPE_UNSUPPORTED;
         }
+        return Constants.MEDIA_TYPE_UNSUPPORTED;
     }
 
     private static boolean containsValidMediaType(String fileType, String[] supportedMediaTypes) {
