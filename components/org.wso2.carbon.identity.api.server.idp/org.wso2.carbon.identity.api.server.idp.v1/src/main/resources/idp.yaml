@@ -142,7 +142,7 @@ paths:
               $ref: '#/components/schemas/IdentityProviderPOSTRequest'
         description: This represents the identity provider to be created.
         required: true
-  /identity-providers/import:
+  /identity-providers/file:
     post:
       tags:
         - Identity Providers
@@ -155,7 +155,7 @@ paths:
               * /permission/admin/manage/identity/idpmgt/create <br>
           <b>Scope required:</b> <br>
               * internal_idp_create
-      operationId: importIDP
+      operationId: importIDPFromFile
       requestBody:
         content:
           multipart/form-data:
@@ -192,19 +192,90 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  '/identity-providers/file/{identity-provider-id}':
+    get:
+      tags:
+        - Identity Providers
+      summary: |
+        Export identity provider in XML, YAML, or JSON file formats
+      description: |
+        This API provides the capability to retrieve the identity provider as a XML, YAML, or JSON file.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/idpmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_idp_view
+      operationId: exportIDPToFile
+      parameters:
+        - name: identity-provider-id
+          in: path
+          description: ID of the identity provider.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/excludeSecretsQueryParam'
+        - $ref: '#/components/parameters/fileTypeHeaderParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: string
+              example: 'Sample application configuration in the requested format'
+            application/yaml:
+              schema:
+                type: string
+              example: 'Sample application configuration in the requested format'
+            application/xml:
+              schema:
+                type: string
+              example: 'Sample application configuration in the requested format'
+            application/octet-stream:
+              schema:
+                type: string
+              example: 'Sample application configuration in the requested format'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       tags:
         - Identity Providers
       summary: |
         Update identity provider from an exported YAML, XML or JSON file
       description: >
-        This API provides the capability to update an identity provider from information that has been exported as an
-        YAML, XML or JSON file.<br>
+        This API provides the capability to update an existing identity provider from
+        the information provided as a file.<br>
           <b>Permission required:</b> <br>
               * /permission/admin/manage/identity/idpmgt/update <br>
           <b>Scope required:</b> <br>
               * internal_idp_update
-      operationId: importIDPForUpdate
+      operationId: updateIDPFromFile
+      parameters:
+        - name: identity-provider-id
+          in: path
+          description: ID of the identity provider.
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           multipart/form-data:
@@ -587,70 +658,6 @@ paths:
       responses:
         '204':
           description: Successfully Deleted
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  '/identity-providers/{identity-provider-id}/export':
-    get:
-      tags:
-        - Identity Providers
-      summary: |
-        Export identity provider in XML, YAML, or JSON file formats.
-      description: |
-        This API provides the capability to retrieve the identity provider as a XML, YAML, or JSON file.<br>
-          <b>Permission required:</b> <br>
-              * /permission/admin/manage/identity/idpmgt/view <br>
-          <b>Scope required:</b> <br>
-              * internal_idp_view
-      operationId: exportIDP
-      parameters:
-        - name: identity-provider-id
-          in: path
-          description: ID of the identity provider.
-          required: true
-          schema:
-            type: string
-        - $ref: '#/components/parameters/exportSecretsQueryParam'
-        - $ref: '#/components/parameters/fileTypeHeaderParam'
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: string
-              example: 'Sample application configuration in the requested format'
-            application/yaml:
-              schema:
-                type: string
-              example: 'Sample application configuration in the requested format'
-            application/xml:
-              schema:
-                type: string
-              example: 'Sample application configuration in the requested format'
-            application/octet-stream:
-              schema:
-                type: string
-              example: 'Sample application configuration in the requested format'
         '400':
           description: Bad Request
           content:
@@ -1913,15 +1920,15 @@ components:
       schema:
         type: boolean
         default: false
-    exportSecretsQueryParam:
+    excludeSecretsQueryParam:
       in: query
-      name: exportSecrets
+      name: excludeSecrets
       required: false
       description: |
-        Specifies whether to export secrets when exporting an identity provider.
+        Specifies whether to exclude secrets when exporting an identity provider.
       schema:
         type: boolean
-        default: false
+        default: true
     fileTypeHeaderParam:
       in: header
       name: Accept

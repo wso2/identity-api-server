@@ -38,14 +38,14 @@ public class Constants {
     public static final String YAML_FILE_EXTENSION = ".yml";
     public static final String JSON_FILE_EXTENSION = ".json";
     public static final String XML_FILE_EXTENSION = ".xml";
-    public static final String MEDIA_TYPE_JSON = "json";
-    public static final String MEDIA_TYPE_XML = "xml";
-    public static final String MEDIA_TYPE_YAML = "yaml";
+    public static final String MEDIA_TYPE_JSON = "application/json";
+    public static final String MEDIA_TYPE_XML = "application/xml";
+    public static final String MEDIA_TYPE_YAML = "application/yaml";
     public static final String MEDIA_TYPE_UNSUPPORTED = "unsupported";
     public static final String MASKING_VALUE = "********";
-    static final String[] VALID_MEDIA_TYPES_XML = {"application/xml", "text/xml"};
-    static final String[] VALID_MEDIA_TYPES_YAML = {"application/yaml", "text/yaml", "application/x-yaml"};
-    static final String[] VALID_MEDIA_TYPES_JSON = {"application/json", "text/json"};
+    static final String[] VALID_MEDIA_TYPES_JSON = {MEDIA_TYPE_JSON, "text/json"};
+    static final String[] VALID_MEDIA_TYPES_XML = {MEDIA_TYPE_XML, "text/xml"};
+    static final String[] VALID_MEDIA_TYPES_YAML = {MEDIA_TYPE_YAML, "text/yaml", "application/x-yaml"};
 
     /**
      * Enum for server error prefixes.
