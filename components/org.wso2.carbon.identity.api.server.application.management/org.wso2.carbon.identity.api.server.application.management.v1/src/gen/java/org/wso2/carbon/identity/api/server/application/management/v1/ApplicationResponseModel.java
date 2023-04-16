@@ -49,6 +49,7 @@ public class ApplicationResponseModel  {
     private String issuer;
     private String templateId;
     private Boolean isManagementApp;
+    private Boolean isB2BSelfServiceApp;
     private ClaimConfiguration claimConfiguration;
     private List<InboundProtocolListItem> inboundProtocols = null;
 
@@ -257,6 +258,23 @@ public enum AccessEnum {
     }
 
     /**
+    * Decides whether the application used to for B2B self service
+    **/
+    public ApplicationResponseModel isB2BSelfServiceApp(Boolean isB2BSelfServiceApp) {
+
+        this.isB2BSelfServiceApp = isB2BSelfServiceApp;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "Decides whether the application used to for B2B self service")
+    @JsonProperty("isB2BSelfServiceApp")
+    @Valid
+    public Boolean getIsB2BSelfServiceApp() {
+
+        return isB2BSelfServiceApp;
+    }
+
+    /**
     **/
     public ApplicationResponseModel claimConfiguration(ClaimConfiguration claimConfiguration) {
 
@@ -326,7 +344,7 @@ public enum AccessEnum {
         this.idpAppRoleConfigurations = idpAppRoleConfigurations;
         return this;
     }
-    
+
     @ApiModelProperty(value = "Decides whether the attribute step FIdPs use app role mappings.")
     @JsonProperty("idpAppRoleConfigurations")
     @Valid @Size(min=0)
@@ -420,6 +438,7 @@ public enum AccessEnum {
             Objects.equals(this.issuer, applicationResponseModel.issuer) &&
             Objects.equals(this.templateId, applicationResponseModel.templateId) &&
             Objects.equals(this.isManagementApp, applicationResponseModel.isManagementApp) &&
+            Objects.equals(this.isB2BSelfServiceApp, applicationResponseModel.isB2BSelfServiceApp) &&
             Objects.equals(this.claimConfiguration, applicationResponseModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocols, applicationResponseModel.inboundProtocols) &&
             Objects.equals(this.authenticationSequence, applicationResponseModel.authenticationSequence) &&
@@ -431,7 +450,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, claimConfiguration, inboundProtocols, authenticationSequence, idpAppRoleConfigurations, advancedConfigurations, provisioningConfigurations, access);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, isB2BSelfServiceApp, claimConfiguration, inboundProtocols, authenticationSequence, idpAppRoleConfigurations, advancedConfigurations, provisioningConfigurations, access);
     }
 
     @Override
@@ -449,6 +468,7 @@ public enum AccessEnum {
         sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
+        sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocols: ").append(toIndentedString(inboundProtocols)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
