@@ -159,6 +159,12 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return authSequence;
     }
 
+    /**
+     * Build idp application role configurations API model from the given application.
+     *
+     * @param application Service Provider for which the Idp Application Role Configurations API model is built.
+     * @return List of idp application role configurations.
+     */
     private List<IdpAppRoleConfig> buildIdpAppRoleConfigurations(ServiceProvider application) {
 
         AppRoleMappingConfig[] applicationRoleMappingConfig = application.getApplicationRoleMappingConfig();

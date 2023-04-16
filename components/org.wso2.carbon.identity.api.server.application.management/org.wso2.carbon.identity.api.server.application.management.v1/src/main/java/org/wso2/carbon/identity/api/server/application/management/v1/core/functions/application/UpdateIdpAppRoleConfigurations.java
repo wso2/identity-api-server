@@ -89,8 +89,8 @@ public class UpdateIdpAppRoleConfigurations implements UpdateFunction<ServicePro
      * Get the application role mapping configurations for the service provider to be updated.
      *
      * @param attributeStepFIdPs List of federated identity provider names in the attribute step.
-     * @param idpAppRoleConfigs  List of IdpAppRoleConfig
-     * @return AppRoleMappingConfig[]
+     * @param idpAppRoleConfigs  List of IdpAppRoleConfig.
+     * @return AppRoleMappingConfig[] array of application role mapping configurations.
      */
     private AppRoleMappingConfig[] getApplicationRoleMappingConfig(List<String> attributeStepFIdPs,
                                                                    List<IdpAppRoleConfig> idpAppRoleConfigs) {
