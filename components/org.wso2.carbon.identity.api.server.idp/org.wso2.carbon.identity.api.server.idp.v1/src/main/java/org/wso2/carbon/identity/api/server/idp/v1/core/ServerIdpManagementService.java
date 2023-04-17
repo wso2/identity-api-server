@@ -3467,7 +3467,7 @@ public class ServerIdpManagementService {
     }
 
     private IdentityProvider getIDPFromFile(InputStream fileInputStream, Attachment fileDetail)
-            throws IdentityProviderManagementClientException{
+            throws IdentityProviderManagementClientException {
 
         try {
             FileContent idpFileContent = new FileContent(fileDetail.getDataHandler().getName(),
