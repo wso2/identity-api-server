@@ -316,11 +316,13 @@ public class ServerIdpManagementService {
         }
 
         IdentityProvider identityProvider;
+        IdentityProvider idpToExport;
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId,
                             tenantDomain, true);
-            if (identityProvider == null) {
+            idpToExport = createIdPClone(identityProvider);
+            if (idpToExport == null) {
                 throw handleException(Response.Status.NOT_FOUND,
                         Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND, idpId);
             }
@@ -329,12 +331,12 @@ public class ServerIdpManagementService {
         }
 
         if (excludeSecrets) {
-            removeSecretsFromIDP(identityProvider);
+            removeSecretsFromIDP(idpToExport);
         }
 
         FileContent fileContent;
         try {
-            fileContent = generateFileFromModel(fileType, identityProvider);
+            fileContent = generateFileFromModel(fileType, idpToExport);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_IDP, idpId);
         }
@@ -3375,25 +3377,34 @@ public class ServerIdpManagementService {
     private void removeSecretsFromIDP(IdentityProvider identityProvider) {
 
         FederatedAuthenticatorConfig defaultAuthenticatorConfigs = identityProvider.getDefaultAuthenticatorConfig();
-        removeSecretsFromAuthenticator(defaultAuthenticatorConfigs);
+        if (defaultAuthenticatorConfigs != null) {
+            removeSecretsFromProperties(defaultAuthenticatorConfigs.getProperties());
+        }
 
-        FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs = identityProvider
-                .getFederatedAuthenticatorConfigs();
-        for (FederatedAuthenticatorConfig federatedAuthenticatorConfig : federatedAuthenticatorConfigs) {
-            removeSecretsFromAuthenticator(federatedAuthenticatorConfig);
+        for (FederatedAuthenticatorConfig federatedAuthenticatorConfig : identityProvider
+                .getFederatedAuthenticatorConfigs()) {
+            removeSecretsFromProperties(federatedAuthenticatorConfig.getProperties());
+        }
+
+        ProvisioningConnectorConfig defaultProvisioningConnectorConfig = identityProvider
+                .getDefaultProvisioningConnectorConfig();
+        if (defaultProvisioningConnectorConfig != null) {
+            removeSecretsFromProperties(defaultProvisioningConnectorConfig.getProvisioningProperties());
+        }
+
+        for (ProvisioningConnectorConfig provisioningConnectorConfig : identityProvider
+                .getProvisioningConnectorConfigs()) {
+            removeSecretsFromProperties(provisioningConnectorConfig.getProvisioningProperties());
         }
     }
 
-    private void removeSecretsFromAuthenticator(FederatedAuthenticatorConfig authenticator) {
+    private void removeSecretsFromProperties(Property[] properties) {
 
-        if (authenticator != null) {
-            Property[] authenticatorProperties = authenticator.getProperties();
-            for (Property property : authenticatorProperties) {
-                if (property.isConfidential()) {
-                    property.setValue(MASKING_VALUE);
-                }
+        Arrays.asList(properties).forEach(property -> {
+            if (property.isConfidential()) {
+                property.setValue(MASKING_VALUE);
             }
-        }
+        });
     }
 
     private FileContent generateFileFromModel(String fileType, IdentityProvider identityProvider)
