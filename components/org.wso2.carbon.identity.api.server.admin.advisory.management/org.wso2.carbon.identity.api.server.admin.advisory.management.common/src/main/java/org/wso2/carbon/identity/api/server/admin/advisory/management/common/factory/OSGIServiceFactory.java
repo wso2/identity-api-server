@@ -19,8 +19,8 @@
 package org.wso2.carbon.identity.api.server.admin.advisory.management.common.factory;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
+import org.wso2.carbon.admin.advisory.mgt.service.AdminAdvisoryManagementService;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.mgt.services.AdminAdvisoryManagementService;
 
 /**
  * Factory Beans serve as a factory for creating other beans within the IOC container. This factory bean is used to

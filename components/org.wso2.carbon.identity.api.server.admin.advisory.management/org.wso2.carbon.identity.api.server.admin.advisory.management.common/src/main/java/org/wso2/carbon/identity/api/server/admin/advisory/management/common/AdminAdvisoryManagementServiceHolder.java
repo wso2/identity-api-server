@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.admin.advisory.management.common;
 
-import org.wso2.carbon.identity.mgt.services.AdminAdvisoryManagementService;
+import org.wso2.carbon.admin.advisory.mgt.service.AdminAdvisoryManagementService;
 
 /**
  * Service holder class for admin advisory management.

@@ -21,14 +21,14 @@ package org.wso2.carbon.identity.api.server.admin.advisory.management.v1.core;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.admin.advisory.mgt.dto.AdminAdvisoryBannerDTO;
+import org.wso2.carbon.admin.advisory.mgt.exception.AdminAdvisoryMgtException;
+import org.wso2.carbon.admin.advisory.mgt.service.AdminAdvisoryManagementService;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.common.AdminAdvisoryConstants;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.common.AdminAdvisoryManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.model.AdminAdvisoryConfig;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.mgt.IdentityMgtServiceException;
-import org.wso2.carbon.identity.mgt.dto.AdminAdvisoryBannerDTO;
-import org.wso2.carbon.identity.mgt.services.AdminAdvisoryManagementService;
 
 import javax.ws.rs.core.Response;
 
@@ -53,7 +53,7 @@ public class ServerAdminAdvisoryManagementService {
 
             return buildAdminAdvisoryConfigResponse(adminAdvisoryBannerDTO);
 
-        } catch (IdentityMgtServiceException e) {
+        } catch (AdminAdvisoryMgtException e) {
             AdminAdvisoryConstants.ErrorMessage errorEnum =
                     AdminAdvisoryConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_BANNER_CONFIG;
             Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
