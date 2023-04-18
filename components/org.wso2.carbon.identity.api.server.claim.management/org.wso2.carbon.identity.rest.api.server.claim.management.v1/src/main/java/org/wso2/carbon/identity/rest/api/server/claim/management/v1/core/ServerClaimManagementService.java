@@ -118,6 +118,8 @@ public class ServerClaimManagementService {
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_EXTERNAL_CLAIM_URI.getCode(),
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_LOCAL_CLAIM_URI.getCode()
     );
+    private static final boolean BIND_TO_PRIMARY_USERSTORE = Boolean.parseBoolean(IdentityUtil.getProperty(
+            "ClaimManagement.BindToPrimaryUserStore"));
 
     /**
      * Add a claim dialect.
@@ -969,10 +971,12 @@ public class ServerClaimManagementService {
                 throw handleClaimManagementClientError(ERROR_CODE_EMPTY_MAPPED_ATTRIBUTES_IN_LOCAL_CLAIM,
                         BAD_REQUEST, attributeMappingDTO.getUserstore());
             }
-            if (IdentityUtil.getHostName().contains("asgardeo.io") || IdentityUtil.getHostName().contains("asg.io")) {
+            if (BIND_TO_PRIMARY_USERSTORE) {
+                // If the `ClaimManagement.BindToPrimaryUserStore` is enabled, we can only use the primary userstore
+                // for the claim mapping.
                 if (!primaryUserstoreDomainName.equalsIgnoreCase(attributeMappingDTO.getUserstore())) {
                     throw handleClaimManagementClientError(ERROR_CODE_INVALID_USERSTORE.getCode(), "You can only use"
-                                    + " 'PRIMARY' userstore domain in the claim mapping.", BAD_REQUEST,
+                                    + " 'PRIMARY' userstore for the claim mapping.", BAD_REQUEST,
                             attributeMappingDTO.getUserstore());
                 }
             }
