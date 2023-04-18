@@ -26,6 +26,9 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.authenticators.common.AuthenticatorsServiceHolder;
 import org.wso2.carbon.identity.api.server.authenticators.common.Constants;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApp;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApps;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.Link;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.NameFilter;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -47,15 +50,21 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
+import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.authenticators.common.Constants.AUTHENTICATOR_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 
 /**
@@ -169,15 +178,97 @@ public class ServerAuthenticatorManagementService {
         }
     }
 
-    public boolean getConnectedAppsOfLocalAuthenticator(String authenticatorId) {
+    public ConnectedApps getConnectedAppsOfLocalAuthenticator(String authenticatorId, Integer limit, Integer offset) {
 
         try {
-            AuthenticatorsServiceHolder.getInstance().getApplicationManagementService()
-                    .getConnectedAppsForLocalAuthenticator(authenticatorId, ContextLoader.getTenantDomainFromContext());
+            ConnectedAppsResult connectedAppsResult = AuthenticatorsServiceHolder.getInstance()
+                    .getApplicationManagementService()
+                    .getConnectedAppsForLocalAuthenticator(authenticatorId, ContextLoader.getTenantDomainFromContext(),
+                            limit, offset);
+            return createConnectedAppsResponse(authenticatorId, connectedAppsResult);
         } catch (IdentityApplicationManagementException e) {
-            throw new RuntimeException(e);
+            throw handleApplicationMgtException(e, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS, "null");
         }
-        return true;
+    }
+
+    private ConnectedApps createConnectedAppsResponse(String resourceId, ConnectedAppsResult connectedAppsResult) {
+
+        ConnectedApps connectedAppsResponse = new ConnectedApps();
+        if (connectedAppsResult == null) {
+            return connectedAppsResponse;
+        }
+        List<ConnectedApp> connectedAppList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(connectedAppsResult.getApps())) {
+            for (String app : connectedAppsResult.getApps()) {
+                ConnectedApp listItem = new ConnectedApp();
+                listItem.setAppId(app);
+                listItem.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
+                        "/applications/%s", app)).toString());
+                connectedAppList.add(listItem);
+            }
+            connectedAppsResponse.setConnectedApps(connectedAppList);
+            connectedAppsResponse.setCount(connectedAppList.size());
+        } else {
+            connectedAppsResponse.setCount(0);
+        }
+
+        connectedAppsResponse.setTotalResults(connectedAppsResult.getTotalAppCount());
+        connectedAppsResponse.setStartIndex(connectedAppsResult.getOffSet() + 1);
+        connectedAppsResponse.setLinks(createLinks(V1_API_PATH_COMPONENT + AUTHENTICATOR_PATH_COMPONENT +
+                        Constants.PATH_SEPERATOR + resourceId + "/connected-apps", connectedAppsResult.getLimit(),
+                connectedAppsResult.getOffSet(), connectedAppsResult.getTotalAppCount(), null));
+        return connectedAppsResponse;
+    }
+
+    private List<Link> createLinks(String url, int limit, int offset, int total, String filter) {
+
+        List<Link> links = new ArrayList<>();
+
+        // Next Link
+        if (limit > 0 && offset >= 0 && (offset + limit) < total) {
+            links.add(buildPageLink(new StringBuilder(url), Constants.PAGE_LINK_REL_NEXT, (offset +
+                    limit), limit, filter));
+        }
+
+        // Previous Link
+        // Previous link matters only if offset and limit are greater than 0.
+        if (offset > 0 && limit > 0) {
+            if ((offset - limit) >= 0) { // A previous page of size 'limit' exists
+                links.add(buildPageLink(new StringBuilder(url), Constants.PAGE_LINK_REL_PREVIOUS,
+                        calculateOffsetForPreviousLink(offset, limit, total), limit, filter));
+            } else { // A previous page exists but it's size is less than the specified limit
+                links.add(buildPageLink(new StringBuilder(url), Constants.PAGE_LINK_REL_PREVIOUS, 0, offset, filter));
+            }
+        }
+
+        return links;
+    }
+
+    private Link buildPageLink(StringBuilder url, String rel, int offset, int limit, String filter) {
+
+        if (StringUtils.isNotBlank(filter)) {
+            try {
+                url.append(String.format(Constants.PAGINATION_WITH_FILTER_LINK_FORMAT, offset, limit, URLEncoder
+                        .encode(filter, StandardCharsets.UTF_8.name())));
+            } catch (UnsupportedEncodingException e) {
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                        .ERROR_CODE_BUILDING_LINKS, "Unable to url-encode filter: " + filter);
+            }
+        } else {
+            url.append(String.format(Constants.PAGINATION_LINK_FORMAT, offset, limit));
+        }
+        return new Link().rel(rel).href(ContextLoader.buildURIForBody((url.toString())).toString());
+    }
+
+    private int calculateOffsetForPreviousLink(int offset, int limit, int total) {
+
+        int newOffset = (offset - limit);
+        if (newOffset < total) {
+            return newOffset;
+        }
+
+        return calculateOffsetForPreviousLink(newOffset, limit, total);
     }
 
     private List<Authenticator> buildAuthenticatorsListResponse(String filter, List<String> requestedAttributeList,

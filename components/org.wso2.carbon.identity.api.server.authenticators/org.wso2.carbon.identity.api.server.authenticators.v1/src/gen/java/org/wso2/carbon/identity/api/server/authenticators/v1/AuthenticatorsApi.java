@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2021, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -110,9 +110,9 @@ public class AuthenticatorsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getConnectedAppsOfLocalAuthenticator(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId) {
+    public Response getConnectedAppsOfLocalAuthenticator(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_ ")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_ ")  @QueryParam("offset") Integer offset) {
 
-        return delegate.getConnectedAppsOfLocalAuthenticator(authenticatorId );
+        return delegate.getConnectedAppsOfLocalAuthenticator(authenticatorId,  limit,  offset );
     }
 
 }

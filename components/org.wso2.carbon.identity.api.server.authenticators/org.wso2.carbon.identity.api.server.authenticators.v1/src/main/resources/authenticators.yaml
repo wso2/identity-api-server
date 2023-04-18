@@ -58,6 +58,8 @@ paths:
       description: |
         By passing in the appropriate authenticator ID, you can retrieve connected app details
       parameters:
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/offsetQueryParam'
         - name: authenticator-id
           in: path
           description: ID of an authenticator
@@ -231,6 +233,20 @@ components:
         count:
           type: integer
           example: 10
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+          example:
+            [
+              {
+                "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=50&limit=10",
+                "rel": "next"
+              },  {
+                "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=30&limit=10",
+                "rel": "previous"
+              }
+            ]
         connectedApps:
           type: array
           items:
@@ -244,7 +260,19 @@ components:
         self:
           type: string
           example: connected-app-url
-
+    Link:
+      type: object
+      properties:
+        href:
+          type: string
+          description: Path to the target resource.
+          example: >-
+            '/t/carbon.super/api/server/v1/identity-providers/394b8adcce24c64a8a09a8d80abf8c337bd253de'
+        rel:
+          type: string
+          description: Describes how the current context is related to the target resource.
+          example: identity-providers
+      readOnly: true
   #-----------------------------------------------------
   # Descriptions of Authenticators API responses.
   #-----------------------------------------------------

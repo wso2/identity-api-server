@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApp;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.Link;
 import javax.validation.constraints.*;
 
 
@@ -38,6 +39,7 @@ public class ConnectedApps  {
     private Integer totalResults;
     private Integer startIndex;
     private Integer count;
+    private List<Link> links = null;
     private List<ConnectedApp> connectedApps = null;
 
 
@@ -97,6 +99,32 @@ public class ConnectedApps  {
 
     /**
     **/
+    public ConnectedApps links(List<Link> links) {
+
+        this.links = links;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[{\"href\":\"identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=50&limit=10\",\"rel\":\"next\"},{\"href\":\"identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=30&limit=10\",\"rel\":\"previous\"}]", value = "")
+    @JsonProperty("links")
+    @Valid
+    public List<Link> getLinks() {
+        return links;
+    }
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
+
+    public ConnectedApps addLinksItem(Link linksItem) {
+        if (this.links == null) {
+            this.links = new ArrayList<>();
+        }
+        this.links.add(linksItem);
+        return this;
+    }
+
+        /**
+    **/
     public ConnectedApps connectedApps(List<ConnectedApp> connectedApps) {
 
         this.connectedApps = connectedApps;
@@ -136,12 +164,13 @@ public class ConnectedApps  {
         return Objects.equals(this.totalResults, connectedApps.totalResults) &&
             Objects.equals(this.startIndex, connectedApps.startIndex) &&
             Objects.equals(this.count, connectedApps.count) &&
+            Objects.equals(this.links, connectedApps.links) &&
             Objects.equals(this.connectedApps, connectedApps.connectedApps);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(totalResults, startIndex, count, connectedApps);
+        return Objects.hash(totalResults, startIndex, count, links, connectedApps);
     }
 
     @Override
@@ -153,6 +182,7 @@ public class ConnectedApps  {
         sb.append("    totalResults: ").append(toIndentedString(totalResults)).append("\n");
         sb.append("    startIndex: ").append(toIndentedString(startIndex)).append("\n");
         sb.append("    count: ").append(toIndentedString(count)).append("\n");
+        sb.append("    links: ").append(toIndentedString(links)).append("\n");
         sb.append("    connectedApps: ").append(toIndentedString(connectedApps)).append("\n");
         sb.append("}");
         return sb.toString();
