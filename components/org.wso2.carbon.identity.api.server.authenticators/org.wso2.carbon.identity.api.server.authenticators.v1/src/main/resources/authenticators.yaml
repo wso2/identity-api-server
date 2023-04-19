@@ -267,7 +267,7 @@ components:
           type: string
           description: Path to the target resource.
           example: >-
-            '/t/carbon.super/api/server/v1/identity-providers/394b8adcce24c64a8a09a8d80abf8c337bd253de'
+            '/t/carbon.super/api/server/v1/authenticators/394b8adcce24c64a8a09a8d80abf8c337bd253de'
         rel:
           type: string
           description: Describes how the current context is related to the target resource.
