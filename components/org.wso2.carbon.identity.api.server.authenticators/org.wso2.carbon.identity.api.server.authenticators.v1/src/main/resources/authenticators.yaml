@@ -271,7 +271,7 @@ components:
         rel:
           type: string
           description: Describes how the current context is related to the target resource.
-          example: identity-providers
+          example: authenticators
       readOnly: true
   #-----------------------------------------------------
   # Descriptions of Authenticators API responses.
