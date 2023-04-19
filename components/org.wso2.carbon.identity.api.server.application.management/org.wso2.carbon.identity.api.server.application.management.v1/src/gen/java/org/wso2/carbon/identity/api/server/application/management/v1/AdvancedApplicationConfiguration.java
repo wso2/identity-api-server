@@ -305,7 +305,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    skipLoginConsent: ").append(toIndentedString(skipLoginConsent)).append("\n");
         sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");
         sb.append("    externalizedConsentPage: ").append(toIndentedString(externalizedConsentPage)).append("\n");
-        sb.append("    useExternalConsentPAge: ").append(toIndentedString(useExternalConsentPage)).append("\n");
+        sb.append("    useExternalConsentPage: ").append(toIndentedString(useExternalConsentPage)).append("\n");
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");
         sb.append("    enableAuthorization: ").append(toIndentedString(enableAuthorization)).append("\n");
         sb.append("    fragment: ").append(toIndentedString(fragment)).append("\n");
