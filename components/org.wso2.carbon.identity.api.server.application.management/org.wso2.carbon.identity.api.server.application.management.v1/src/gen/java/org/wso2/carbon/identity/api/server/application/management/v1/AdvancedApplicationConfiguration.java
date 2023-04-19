@@ -46,7 +46,7 @@ public class AdvancedApplicationConfiguration  {
     private Boolean fragment;
     private List<AdditionalSpProperty> additionalSpProperties = null;
     private ExternalizedConsentPageConfiguration externalizedConsentPage;
-
+    private Boolean useExternalConsentPage;
 
     /**
     * Decides whether the application is accessible across tenants.
@@ -140,6 +140,25 @@ public class AdvancedApplicationConfiguration  {
     }
     public void setSkipLogoutConsent(Boolean skipLogoutConsent) {
         this.skipLogoutConsent = skipLogoutConsent;
+    }
+
+    /**
+     * Decides whether user needs to use external consent page.
+     **/
+    public AdvancedApplicationConfiguration useExternalConsentPage(Boolean useExternalConsentPage) {
+
+        this.useExternalConsentPage = useExternalConsentPage;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "Decides whether user needs to use external consent page.")
+    @JsonProperty("useExternalConsentPage")
+    @Valid
+    public Boolean getUseExternalConsentPage() {
+        return useExternalConsentPage;
+    }
+    public void setUseExternalConsentPage(Boolean useExternalConsentPage) {
+        this.useExternalConsentPage = useExternalConsentPage;
     }
 
     /**
@@ -262,6 +281,7 @@ public class AdvancedApplicationConfiguration  {
             Objects.equals(this.skipLoginConsent, advancedApplicationConfiguration.skipLoginConsent) &&
             Objects.equals(this.skipLogoutConsent, advancedApplicationConfiguration.skipLogoutConsent) &&
             Objects.equals(this.externalizedConsentPage, advancedApplicationConfiguration.externalizedConsentPage) &&
+            Objects.equals(this.useExternalConsentPage, advancedApplicationConfiguration.useExternalConsentPage) &&
             Objects.equals(this.returnAuthenticatedIdpList, advancedApplicationConfiguration.returnAuthenticatedIdpList) &&
             Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization) &&
             Objects.equals(this.fragment, advancedApplicationConfiguration.fragment) &&
@@ -270,7 +290,7 @@ public class AdvancedApplicationConfiguration  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, externalizedConsentPage, returnAuthenticatedIdpList, enableAuthorization, fragment, additionalSpProperties);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, externalizedConsentPage, useExternalConsentPage, returnAuthenticatedIdpList, enableAuthorization, fragment, additionalSpProperties);
     }
 
     @Override
@@ -285,6 +305,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    skipLoginConsent: ").append(toIndentedString(skipLoginConsent)).append("\n");
         sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");
         sb.append("    externalizedConsentPage: ").append(toIndentedString(externalizedConsentPage)).append("\n");
+        sb.append("    useExternalConsentPAge: ").append(toIndentedString(useExternalConsentPage)).append("\n");
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");
         sb.append("    enableAuthorization: ").append(toIndentedString(enableAuthorization)).append("\n");
         sb.append("    fragment: ").append(toIndentedString(fragment)).append("\n");

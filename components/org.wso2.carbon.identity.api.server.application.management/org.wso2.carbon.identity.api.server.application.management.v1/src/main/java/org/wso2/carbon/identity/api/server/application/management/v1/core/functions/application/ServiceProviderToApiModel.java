@@ -75,6 +75,7 @@ import static org.wso2.carbon.identity.base.IdentityConstants.EXTERNAL_CONSENT_P
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_CONSENT;
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_LOGOUT_CONSENT;
 import static org.wso2.carbon.identity.base.IdentityConstants.USE_EXTERNALIZED_CONSENT_PAGE;
+import static org.wso2.carbon.identity.base.IdentityConstants.USE_EXTERNAL_CONSENT_PAGE;
 
 /**
  * Converts the backend model ServiceProvider into the corresponding API model object.
@@ -365,6 +366,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .skipLoginConsent(authConfig.isSkipConsent())
                 .skipLogoutConsent(authConfig.isSkipLogoutConsent())
                 .externalizedConsentPage(getExternalizedConsentPage(authConfig))
+                .useExternalConsentPage(authConfig.isUseExternalConsentPage())
                 .certificate(getCertificate(serviceProvider))
                 .fragment(isFragmentApp(serviceProvider))
                 .additionalSpProperties(getSpProperties(serviceProvider));
@@ -412,6 +414,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             spPropertyList.removeIf(property -> SKIP_LOGOUT_CONSENT.equals(property.getName()));
             spPropertyList.removeIf(property -> USE_EXTERNALIZED_CONSENT_PAGE.equals(property.getName()));
             spPropertyList.removeIf(property -> EXTERNAL_CONSENT_PAGE_URL.equals(property.getName()));
+            spPropertyList.removeIf(property -> USE_EXTERNAL_CONSENT_PAGE.equals(property.getName()));
             spPropertyList.removeIf(property -> USE_DOMAIN_IN_ROLES.equals(property.getName()));
             spPropertyList.removeIf(property -> USE_USER_ID_FOR_DEFAULT_SUBJECT.equals(property.getName()));
             spPropertyList.removeIf(property -> TEMPLATE_ID_SP_PROPERTY_NAME.equals(property.getName()));
