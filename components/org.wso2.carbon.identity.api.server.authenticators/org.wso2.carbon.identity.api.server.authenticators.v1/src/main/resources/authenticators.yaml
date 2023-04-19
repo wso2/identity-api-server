@@ -240,10 +240,10 @@ components:
           example:
             [
               {
-                "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=50&limit=10",
+                "href": "authenticator/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=50&limit=10",
                 "rel": "next"
               },  {
-                "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=30&limit=10",
+                "href": "authenticator/provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=30&limit=10",
                 "rel": "previous"
               }
             ]
@@ -259,7 +259,7 @@ components:
           example: app-id
         self:
           type: string
-          example: connected-app-url
+          example: /t/org/api/server/v1/applications/c74d74b2-cb62-4abd-ad66-6c45daeb561c
     Link:
       type: object
       properties:
