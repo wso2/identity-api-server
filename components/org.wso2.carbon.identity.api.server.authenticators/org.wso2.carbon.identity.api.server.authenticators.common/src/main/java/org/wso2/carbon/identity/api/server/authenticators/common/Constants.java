@@ -94,7 +94,7 @@ public class Constants {
                                           "%s"),
         ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS("65011",
                 "Unable to retrieve authenticator connected applications.",
-                "Server encountered an error while retrieving the authenticator connected applications %s.");
+                "Server encountered an error while retrieving the authenticator connected applications for : %s.");
 
         private final String code;
         private final String message;

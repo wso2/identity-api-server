@@ -188,7 +188,7 @@ public class ServerAuthenticatorManagementService {
             return createConnectedAppsResponse(authenticatorId, connectedAppsResult);
         } catch (IdentityApplicationManagementException e) {
             throw handleApplicationMgtException(e, Constants.ErrorMessage
-                    .ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS, "null");
+                    .ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS, authenticatorId);
         }
     }
 
@@ -200,11 +200,11 @@ public class ServerAuthenticatorManagementService {
         }
         List<ConnectedApp> connectedAppList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(connectedAppsResult.getApps())) {
-            for (String app : connectedAppsResult.getApps()) {
+            for (String appId : connectedAppsResult.getApps()) {
                 ConnectedApp listItem = new ConnectedApp();
-                listItem.setAppId(app);
+                listItem.setAppId(appId);
                 listItem.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
-                        "/applications/%s", app)).toString());
+                        "/applications/%s", appId)).toString());
                 connectedAppList.add(listItem);
             }
             connectedAppsResponse.setConnectedApps(connectedAppList);
