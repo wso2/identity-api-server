@@ -45,7 +45,6 @@ paths:
       responses:
         '200':
           description: Successful Response
-
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -87,8 +86,6 @@ components:
         status:
           type: string
           example: 'APPROVED'
-
-
   #--------------------------------------------------------
   # Descriptions of error responses.
   #--------------------------------------------------------

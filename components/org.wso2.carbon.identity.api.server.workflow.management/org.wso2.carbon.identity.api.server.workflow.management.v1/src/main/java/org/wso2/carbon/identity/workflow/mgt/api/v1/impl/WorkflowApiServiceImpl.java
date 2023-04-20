@@ -28,18 +28,22 @@ import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
+/**
+ *  Initialize the patch request and process the call back
+ */
 public class WorkflowApiServiceImpl implements WorkflowApiService {
 
     @Autowired
     private WorkflowManagementService workflowManagementService;
 
     @Override
-    public Response workflowWorkflowIdPatch(String workflowId, WorkflowApprovalPatchRequest workflowApprovalPatchRequest) {
+    public Response workflowWorkflowIdPatch(String workflowId,
+                                            WorkflowApprovalPatchRequest workflowApprovalPatchRequest) {
 
         try {
-            workflowManagementService.approveWorkflowRequest(workflowId,workflowApprovalPatchRequest);
+            workflowManagementService.approveWorkflowRequest(workflowId, workflowApprovalPatchRequest);
         } catch (WorkflowException e) {
-           throw new RuntimeException();
+            throw new RuntimeException();
         }
 
         return Response.ok().entity("Success").build();
