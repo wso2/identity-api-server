@@ -1,0 +1,126 @@
+openapi: 3.0.0
+info:
+  version: "v1"
+  title: 'Workflow Management API Definition'
+  description: 'This is the REST API for managing workflow requests'
+  contact:
+    name: WSO2
+    url: 'https://wso2.com/ciam-suite/private-ciam-cloud/b2b-ciam'
+    email: iam-dev@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'https://localhost:9443/workflow'
+
+security:
+  - OAuth2: []
+  - BasicAuth: []
+
+tags:
+  - name: workflow
+    description: Operations for the workflow requests.
+
+paths:
+  /workflow/{workflow-id}:
+    patch:
+      tags:
+        - me
+      summary: |
+        Update the workflow request status.
+      description: |
+        This API provides the capability to update the workflow request status.
+      parameters:
+        - name: workflow-id
+          in: path
+          description: ID of the workflow request.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/workflowApprovalPatchRequest'
+      responses:
+        '200':
+          description: Successful Response
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: UOM-00000
+          description: An error code.
+        message:
+          type: string
+          example: Some Error Message
+          description: An error message.
+        description:
+          type: string
+          example: Some Error Description
+          description: An error description.
+        traceId:
+          type: string
+          example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
+          description: An error trace identifier.
+    workflowApprovalPatchRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          example: 'APPROVED'
+
+
+  #--------------------------------------------------------
+  # Descriptions of error responses.
+  #--------------------------------------------------------
+  responses:
+    NotFound:
+      description: Resource is not found.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Authentication information is missing or invalid.
+    Forbidden:
+      description: Access forbidden.
+    ServerError:
+      description: Internal server error.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  #-----------------------------------------------------
+  # Applicable authentication mechanisms.
+  #-----------------------------------------------------
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
+          scopes: {}
