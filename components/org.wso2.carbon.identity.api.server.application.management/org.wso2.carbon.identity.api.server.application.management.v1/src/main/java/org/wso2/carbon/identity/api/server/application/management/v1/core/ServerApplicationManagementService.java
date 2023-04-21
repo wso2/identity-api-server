@@ -747,6 +747,20 @@ public class ServerApplicationManagementService {
             validateCORSOrigins(applicationModel.getInboundProtocolConfiguration().getOidc().getAllowedOrigins());
         }
 
+        /*
+         * Validate the useExternalConsentPage property.
+         * We are only allowed to use external consent page for OIDC applications.
+         */
+        if (applicationModel.getInboundProtocolConfiguration() != null &&
+                applicationModel.getInboundProtocolConfiguration().getSaml() != null) {
+            if (applicationModel.getAdvancedConfigurations() != null && applicationModel.getAdvancedConfigurations()
+                    .getUseExternalConsentPage() != null &&
+                    applicationModel.getAdvancedConfigurations().getUseExternalConsentPage()) {
+                throw buildBadRequestError("Use external consent page is not supported for SAML " +
+                        "applications.");
+            }
+        }
+
         String username = ContextLoader.getUsernameFromContext();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
