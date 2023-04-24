@@ -29,7 +29,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Certificate
 import org.wso2.carbon.identity.api.server.application.management.v1.Claim;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
-import org.wso2.carbon.identity.api.server.application.management.v1.ExternalizedConsentPageConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
@@ -43,7 +42,6 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
-import org.wso2.carbon.identity.application.common.model.ExternalizedConsentPageConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
@@ -71,10 +69,8 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.TEMPLATE_ID_SP_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.USE_USER_ID_FOR_DEFAULT_SUBJECT;
 import static org.wso2.carbon.identity.application.mgt.dao.impl.ApplicationDAOImpl.USE_DOMAIN_IN_ROLES;
-import static org.wso2.carbon.identity.base.IdentityConstants.EXTERNAL_CONSENT_PAGE_URL;
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_CONSENT;
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_LOGOUT_CONSENT;
-import static org.wso2.carbon.identity.base.IdentityConstants.USE_EXTERNALIZED_CONSENT_PAGE;
 import static org.wso2.carbon.identity.base.IdentityConstants.USE_EXTERNAL_CONSENT_PAGE;
 
 /**
@@ -365,24 +361,10 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
                 .skipLoginConsent(authConfig.isSkipConsent())
                 .skipLogoutConsent(authConfig.isSkipLogoutConsent())
-                .externalizedConsentPage(getExternalizedConsentPage(authConfig))
                 .useExternalConsentPage(authConfig.isUseExternalConsentPage())
                 .certificate(getCertificate(serviceProvider))
                 .fragment(isFragmentApp(serviceProvider))
                 .additionalSpProperties(getSpProperties(serviceProvider));
-    }
-
-    private ExternalizedConsentPageConfiguration getExternalizedConsentPage(
-            LocalAndOutboundAuthenticationConfig authConfig) {
-
-        ExternalizedConsentPageConfig consentConfig = authConfig.getExternalizedConsentPageConfig();
-        if (consentConfig == null) {
-            consentConfig = new ExternalizedConsentPageConfig();
-        }
-
-        return new ExternalizedConsentPageConfiguration()
-                .enabled(consentConfig.isEnabled())
-                .consentPageUrl(consentConfig.getConsentPageUrl());
     }
 
     private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {
@@ -412,8 +394,6 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     Arrays.stream(propertyList).collect(Collectors.toList());
             spPropertyList.removeIf(property -> SKIP_CONSENT.equals(property.getName()));
             spPropertyList.removeIf(property -> SKIP_LOGOUT_CONSENT.equals(property.getName()));
-            spPropertyList.removeIf(property -> USE_EXTERNALIZED_CONSENT_PAGE.equals(property.getName()));
-            spPropertyList.removeIf(property -> EXTERNAL_CONSENT_PAGE_URL.equals(property.getName()));
             spPropertyList.removeIf(property -> USE_EXTERNAL_CONSENT_PAGE.equals(property.getName()));
             spPropertyList.removeIf(property -> USE_DOMAIN_IN_ROLES.equals(property.getName()));
             spPropertyList.removeIf(property -> USE_USER_ID_FOR_DEFAULT_SUBJECT.equals(property.getName()));
