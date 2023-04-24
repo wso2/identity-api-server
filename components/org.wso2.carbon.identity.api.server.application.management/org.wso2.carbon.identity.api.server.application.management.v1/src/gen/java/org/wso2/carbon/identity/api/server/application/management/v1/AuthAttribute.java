@@ -24,12 +24,15 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
+/**
+ * The authentication attributes required by a user registrant.
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
+@ApiModel(description = "The authentication attributes required by a user registrant.")
 public class AuthAttribute  {
   
     private String attribute;
@@ -38,6 +41,7 @@ public class AuthAttribute  {
     private String attributeType;
 
     /**
+    * Name of the attribute.
     **/
     public AuthAttribute attribute(String attribute) {
 
@@ -45,7 +49,7 @@ public class AuthAttribute  {
         return this;
     }
     
-    @ApiModelProperty(example = "password", value = "")
+    @ApiModelProperty(example = "password", value = "Name of the attribute.")
     @JsonProperty("attribute")
     @Valid
     public String getAttribute() {
@@ -56,6 +60,7 @@ public class AuthAttribute  {
     }
 
     /**
+    * Defines whether the attribute is a claim.
     **/
     public AuthAttribute isClaim(Boolean isClaim) {
 
@@ -63,7 +68,7 @@ public class AuthAttribute  {
         return this;
     }
     
-    @ApiModelProperty(example = "true", value = "")
+    @ApiModelProperty(example = "true", value = "Defines whether the attribute is a claim.")
     @JsonProperty("isClaim")
     @Valid
     public Boolean getIsClaim() {
@@ -74,6 +79,7 @@ public class AuthAttribute  {
     }
 
     /**
+    * Defines whether the attribute contains confidential data.
     **/
     public AuthAttribute isConfidential(Boolean isConfidential) {
 
@@ -81,7 +87,7 @@ public class AuthAttribute  {
         return this;
     }
     
-    @ApiModelProperty(example = "true", value = "")
+    @ApiModelProperty(example = "true", value = "Defines whether the attribute contains confidential data.")
     @JsonProperty("isConfidential")
     @Valid
     public Boolean getIsConfidential() {
@@ -92,6 +98,7 @@ public class AuthAttribute  {
     }
 
     /**
+    * Data type of value of the attribute.
     **/
     public AuthAttribute attributeType(String attributeType) {
 
@@ -99,7 +106,7 @@ public class AuthAttribute  {
         return this;
     }
     
-    @ApiModelProperty(example = "string", value = "")
+    @ApiModelProperty(example = "STRING", value = "Data type of value of the attribute.")
     @JsonProperty("attributeType")
     @Valid
     public String getAttributeType() {

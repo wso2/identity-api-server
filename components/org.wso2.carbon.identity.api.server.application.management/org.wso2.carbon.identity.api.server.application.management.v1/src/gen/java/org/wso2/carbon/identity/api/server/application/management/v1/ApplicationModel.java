@@ -44,6 +44,7 @@ public class ApplicationModel  {
     private String accessUrl;
     private String templateId;
     private Boolean isManagementApp = false;
+    private Boolean isB2BSelfServiceApp = false;
     private ClaimConfiguration claimConfiguration;
     private InboundProtocols inboundProtocolConfiguration;
     private AuthenticationSequence authenticationSequence;
@@ -168,7 +169,7 @@ public class ApplicationModel  {
         this.isManagementApp = isManagementApp;
         return this;
     }
-    
+
     @ApiModelProperty(example = "false", value = "Decides whether the application used to access System APIs")
     @JsonProperty("isManagementApp")
     @Valid
@@ -177,6 +178,23 @@ public class ApplicationModel  {
     }
     public void setIsManagementApp(Boolean isManagementApp) {
         this.isManagementApp = isManagementApp;
+    }
+
+    /**
+    * Decides whether the application used to for B2B self service
+    **/
+    public ApplicationModel isB2BSelfServiceApp(Boolean isB2BSelfServiceApp) {
+
+        this.isB2BSelfServiceApp = isB2BSelfServiceApp;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "Decides whether the application used to for B2B self service")
+    @JsonProperty("isB2BSelfServiceApp")
+    @Valid
+    public Boolean getIsB2BSelfServiceApp() {
+
+        return isB2BSelfServiceApp;
     }
 
     /**
@@ -288,6 +306,7 @@ public class ApplicationModel  {
             Objects.equals(this.accessUrl, applicationModel.accessUrl) &&
             Objects.equals(this.templateId, applicationModel.templateId) &&
             Objects.equals(this.isManagementApp, applicationModel.isManagementApp) &&
+            Objects.equals(this.isB2BSelfServiceApp, applicationModel.isB2BSelfServiceApp) &&
             Objects.equals(this.claimConfiguration, applicationModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocolConfiguration, applicationModel.inboundProtocolConfiguration) &&
             Objects.equals(this.authenticationSequence, applicationModel.authenticationSequence) &&
@@ -297,7 +316,7 @@ public class ApplicationModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, isManagementApp, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, isManagementApp, isB2BSelfServiceApp, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -313,6 +332,7 @@ public class ApplicationModel  {
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
+        sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocolConfiguration: ").append(toIndentedString(inboundProtocolConfiguration)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");

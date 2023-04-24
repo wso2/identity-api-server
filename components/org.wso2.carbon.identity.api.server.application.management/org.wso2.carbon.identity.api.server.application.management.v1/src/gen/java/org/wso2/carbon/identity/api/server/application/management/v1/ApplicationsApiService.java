@@ -78,6 +78,8 @@ public interface ApplicationsApiService {
 
       public Response exportApplication(String applicationId, Boolean exportSecrets);
 
+      public Response exportApplicationAsFile(String applicationId, Boolean exportSecrets, String accept);
+
       public Response getAdaptiveAuthTemplates();
 
       public Response getAllApplicationTemplates(Integer limit, Integer offset, SearchContext searchContext);

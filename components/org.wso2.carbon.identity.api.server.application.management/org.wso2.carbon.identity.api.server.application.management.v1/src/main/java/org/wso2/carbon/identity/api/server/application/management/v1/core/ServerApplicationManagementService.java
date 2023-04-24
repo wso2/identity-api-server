@@ -15,6 +15,9 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -27,6 +30,8 @@ import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
@@ -86,6 +91,7 @@ import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.ImportResponse;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
+import org.wso2.carbon.identity.application.common.model.InboundConfigurationProtocol;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
@@ -110,6 +116,8 @@ import org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
+import org.wso2.carbon.identity.oauth.dao.OAuthAppDO;
+import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
 import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementClientException;
@@ -117,9 +125,15 @@ import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementExcepti
 import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.yaml.snakeyaml.TypeDescription;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -135,6 +149,11 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
@@ -179,6 +198,16 @@ public class ServerApplicationManagementService {
     private static final String WS_TRUST_TEMPLATE_ID = "061a3de4-8c08-4878-84a6-24245f11bf0e";
     private static final String STS_TEMPLATE_NOT_FOUND_MESSAGE = "Request template with id: %s could " +
             "not be found since the WS-Trust connector has not been configured.";
+
+    // Export and Import related constants.
+    private static final String YML_FILE_EXTENSION = ".yml";
+    private static final String JSON_FILE_EXTENSION = ".json";
+    private static final String XML_FILE_EXTENSION = ".xml";
+    private static final String[] VALID_MEDIA_TYPES_XML = {"application/xml", "text/xml"};
+    private static final String[] VALID_MEDIA_TYPES_YAML = {"application/yaml", "text/yaml", "application/x-yaml"};
+    private static final String[] VALID_MEDIA_TYPES_JSON = {"application/json", "text/json"};
+    private static final Class<?>[] INBOUND_CONFIG_PROTOCOLS = new Class<?>[] {ServiceProvider.class,
+                                                                SAMLSSOServiceProviderDTO.class, OAuthAppDO.class};
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -367,10 +396,11 @@ public class ServerApplicationManagementService {
      */
     public ArrayList<ConfiguredAuthenticatorsModal> getConfiguredAuthenticators(String applicationId) {
 
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         ArrayList<ConfiguredAuthenticatorsModal> response = new ArrayList<>();
         try {
             AuthenticationStep[] authenticationSteps = getApplicationManagementService()
-                    .getConfiguredAuthenticators(applicationId);
+                    .getConfiguredAuthenticators(applicationId, tenantDomain);
 
             if (authenticationSteps == null) {
                 throw buildClientError(ErrorMessage.APPLICATION_NOT_FOUND, applicationId);
@@ -429,6 +459,132 @@ public class ServerApplicationManagementService {
     }
 
     /**
+     * Export an application identified by the applicationId, in the given format.
+     *
+     * @param applicationId ID of the application to be exported.
+     * @param exportSecrets If True, all hashed or encrypted secrets will also be exported.
+     * @param fileType      The format of the exported string.
+     * @return string of the application in the given format.
+     */
+    public TransferResource exportApplicationAsFile(String applicationId, Boolean exportSecrets, String fileType) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Exporting service provider from application ID " + applicationId);
+        }
+
+        if (StringUtils.isBlank(fileType)) {
+            throw new UnsupportedOperationException("No valid media type found");
+        }
+
+        ServiceProvider serviceProvider;
+        try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            serviceProvider = getApplicationManagementService().exportSPFromAppID(
+                    applicationId, exportSecrets, tenantDomain);
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error exporting application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
+        }
+
+        TransferResource transferResource = generateFileFromModel(fileType, serviceProvider);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully exported: " + serviceProvider.getApplicationName() + " as a file of type: " +
+                    fileType);
+        }
+
+        return transferResource;
+    }
+
+    private TransferResource generateFileFromModel(String fileType, ServiceProvider serviceProvider) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Generating file content from model for application: " + serviceProvider.getApplicationName());
+        }
+
+        StringBuilder fileNameSB = new StringBuilder(serviceProvider.getApplicationName());
+        String fileContent;
+
+        if (Arrays.asList(VALID_MEDIA_TYPES_XML).contains(fileType)) {
+            fileContent = parseXmlFromServiceProvider(serviceProvider);
+            fileNameSB.append(XML_FILE_EXTENSION);
+        } else if (Arrays.asList(VALID_MEDIA_TYPES_YAML).contains(fileType)) {
+            fileContent = parseYamlFromServiceProvider(serviceProvider);
+            fileNameSB.append(YML_FILE_EXTENSION);
+        } else if (Arrays.asList(VALID_MEDIA_TYPES_JSON).contains(fileType)) {
+            fileContent = parseJsonFromServiceProvider(serviceProvider);
+            fileNameSB.append(JSON_FILE_EXTENSION);
+        } else {
+            throw Utils.buildServerError("Unsupported media type: " + fileType + "."
+                    + " Supported media types are " + Arrays.toString(VALID_MEDIA_TYPES_XML) + ", "
+                    + Arrays.toString(VALID_MEDIA_TYPES_YAML) + ", " + Arrays.toString(VALID_MEDIA_TYPES_JSON));
+        }
+
+        return new TransferResource(
+                fileNameSB.toString(),
+                new ByteArrayResource(fileContent.getBytes(StandardCharsets.UTF_8)),
+                MediaType.APPLICATION_OCTET_STREAM
+        );
+    }
+
+    private String parseXmlFromServiceProvider(ServiceProvider serviceProvider) {
+
+        JAXBContext jaxbContext;
+        try {
+            jaxbContext = JAXBContext.newInstance(INBOUND_CONFIG_PROTOCOLS);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.setListener(new Marshaller.Listener() {
+                @Override
+                public void beforeMarshal(Object source) {
+                    if (source instanceof InboundAuthenticationConfig) {
+                        InboundAuthenticationConfig config = (InboundAuthenticationConfig) source;
+                        for (InboundAuthenticationRequestConfig requestConfig
+                                : config.getInboundAuthenticationRequestConfigs()) {
+                            requestConfig.setInboundConfiguration(null);
+                        }
+                    }
+                }
+            });
+            StringWriter stringWriter = new StringWriter();
+            marshaller.marshal(serviceProvider, stringWriter);
+            return stringWriter.toString();
+        } catch (JAXBException e) {
+            throw Utils.buildServerError("Error exporting application from XML file.", e);
+        }
+    }
+
+    private String parseYamlFromServiceProvider(ServiceProvider serviceProvider) {
+
+        Constructor constructor = new Constructor();
+        CustomRepresenter representer = new CustomRepresenter();
+
+        for (Class<?> protocol : INBOUND_CONFIG_PROTOCOLS) {
+            TypeDescription description = new TypeDescription(InboundConfigurationProtocol.class);
+            description.addPropertyParameters("type", protocol);
+            constructor.addTypeDescription(description);
+        }
+
+        Yaml yaml = new Yaml(constructor, representer);
+        try {
+            return yaml.dump(serviceProvider);
+        } catch (YAMLException e) {
+            throw Utils.buildServerError("Error exporting application from YAML file.", e);
+        }
+    }
+
+    private String parseJsonFromServiceProvider(ServiceProvider serviceProvider) {
+
+        ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
+        objectMapper.registerSubtypes(INBOUND_CONFIG_PROTOCOLS);
+        try {
+            return objectMapper.writeValueAsString(serviceProvider);
+        } catch (JsonProcessingException e) {
+            throw Utils.buildServerError("Error exporting application from JSON file.", e);
+        }
+    }
+
+    /**
      * Create a new application by importing an XML configuration file.
      *
      * @param fileInputStream File to be imported as an input stream.
@@ -459,9 +615,12 @@ public class ServerApplicationManagementService {
 
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String username = ContextLoader.getUsernameFromContext();
+            String fileType = fileDetail.getDataHandler().getContentType();
+
+            ServiceProvider serviceProvider = parseSP(spFileContent, fileType, tenantDomain);
 
             ImportResponse importResponse = getApplicationManagementService()
-                    .importSPApplication(spFileContent, tenantDomain, username, isAppUpdate);
+                    .importSPApplication(serviceProvider, tenantDomain, username, isAppUpdate);
 
             if (importResponse.getResponseCode() == ImportResponse.FAILED) {
                 throw handleErrorResponse(importResponse);
@@ -469,11 +628,85 @@ public class ServerApplicationManagementService {
                 return importResponse.getApplicationResourceId();
             }
         } catch (IOException e) {
-            throw Utils.buildServerError("Error importing application from XML file.", e);
+            throw Utils.buildServerError("Error importing application from file.", e);
         } catch (IdentityApplicationManagementException e) {
-            throw handleIdentityApplicationManagementException(e, "Error importing application from XML file.");
+            throw handleIdentityApplicationManagementException(e, "Error importing application from file.");
         } finally {
             IOUtils.closeQuietly(fileInputStream);
+        }
+    }
+
+    private ServiceProvider parseSP(SpFileContent spFileContent, String fileType, String tenantDomain)
+            throws IdentityApplicationManagementException {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Parsing service provider from file: " + spFileContent.getFileName() + " of type: " + fileType);
+        }
+
+        if (StringUtils.isEmpty(spFileContent.getContent())) {
+            throw new IdentityApplicationManagementException(String.format(
+                    "Empty Service Provider configuration file " + " %s uploaded by tenant: %s",
+                    spFileContent.getFileName(), tenantDomain));
+        }
+
+        if (containsValidMediaType(fileType, VALID_MEDIA_TYPES_XML)) {
+            return parseServiceProviderFromXml(spFileContent, tenantDomain);
+        } else if (containsValidMediaType(fileType, VALID_MEDIA_TYPES_YAML)) {
+            return parseServiceProviderFromYaml(spFileContent, tenantDomain);
+        } else if (containsValidMediaType(fileType, VALID_MEDIA_TYPES_JSON)) {
+            return parseServiceProviderFromJson(spFileContent, tenantDomain);
+        } else {
+            log.warn("Unsupported file type " + fileType + " for file " + spFileContent.getFileName() + " . " +
+                    "Defaulting to XML parsing");
+            return parseServiceProviderFromXml(spFileContent, tenantDomain);
+        }
+    }
+
+    private boolean containsValidMediaType(String fileType, String[] mediaTypes) {
+
+        for (String mediaType : mediaTypes) {
+            if (fileType.contains(mediaType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private ServiceProvider parseServiceProviderFromXml(SpFileContent spFileContent, String tenantDomain)
+            throws IdentityApplicationManagementException {
+
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(INBOUND_CONFIG_PROTOCOLS);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            return (ServiceProvider) unmarshaller.unmarshal(new StringReader(spFileContent.getContent()));
+        } catch (JAXBException e) {
+            throw new IdentityApplicationManagementException(String.format("Error in reading XML Service Provider " +
+                    "configuration file %s uploaded by tenant: %s", spFileContent.getFileName(), tenantDomain), e);
+        }
+    }
+
+    private ServiceProvider parseServiceProviderFromYaml(SpFileContent spFileContent, String tenantDomain)
+            throws IdentityApplicationManagementException {
+
+        try {
+            Yaml yaml = new Yaml(new Constructor(ServiceProvider.class));
+            return yaml.loadAs(spFileContent.getContent(), ServiceProvider.class);
+        } catch (YAMLException e) {
+            throw new IdentityApplicationManagementException(String.format("Error in reading YAML Service Provider " +
+                    "configuration file %s uploaded by tenant: %s", spFileContent.getFileName(), tenantDomain), e);
+        }
+    }
+
+    private ServiceProvider parseServiceProviderFromJson(SpFileContent spFileContent, String tenantDomain)
+            throws IdentityApplicationManagementException {
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerSubtypes(INBOUND_CONFIG_PROTOCOLS);
+            return objectMapper.readValue(spFileContent.getContent(), ServiceProvider.class);
+        } catch (JsonProcessingException e) {
+            throw new IdentityApplicationManagementException(String.format("Error in reading JSON Service Provider " +
+                    "configuration file %s uploaded by tenant: %s", spFileContent.getFileName(), tenantDomain), e);
         }
     }
 
@@ -521,6 +754,18 @@ public class ServerApplicationManagementService {
         ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
         try {
             applicationId = getApplicationManagementService().createApplication(application, tenantDomain, username);
+
+            // Update owner for B2B Self Service applications.
+            if (application.isB2BSelfServiceApp()) {
+                String systemUserID = org.wso2.carbon.identity.organization.management.service.util.Utils
+                                .getB2BSelfServiceSystemUser(tenantDomain);
+                if (StringUtils.isNotEmpty(systemUserID)) {
+                    ApplicationOwner systemOwner = new ApplicationOwner();
+                    systemOwner.id(systemUserID);
+                    changeApplicationOwner(applicationId, systemOwner);
+                }
+            }
+
             if (applicationModel.getInboundProtocolConfiguration() != null &&
                     applicationModel.getInboundProtocolConfiguration().getOidc() != null) {
                 OAuthInboundFunctions.updateCorsOrigins(applicationId, applicationModel
