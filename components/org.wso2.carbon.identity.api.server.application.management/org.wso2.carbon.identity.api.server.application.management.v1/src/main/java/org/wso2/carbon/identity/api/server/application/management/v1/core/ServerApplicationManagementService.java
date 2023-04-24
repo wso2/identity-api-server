@@ -162,6 +162,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
@@ -756,8 +757,8 @@ public class ServerApplicationManagementService {
             if (applicationModel.getAdvancedConfigurations() != null && applicationModel.getAdvancedConfigurations()
                     .getUseExternalConsentPage() != null &&
                     applicationModel.getAdvancedConfigurations().getUseExternalConsentPage()) {
-                throw buildBadRequestError("Use external consent page is not supported for SAML " +
-                        "applications.");
+                throw buildBadRequestError(USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED.getCode(),
+                        USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED.getDescription());
             }
         }
 
