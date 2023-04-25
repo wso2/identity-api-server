@@ -44,6 +44,8 @@ public interface UserstoresApiService {
 
       public Response deleteUserStore(String userstoreDomainId);
 
+      public Response exportUserStoreToFile(String userstoreDomainId, String accept);
+
       public Response getAvailableUserStoreTypes();
 
       public Response getPrimaryUserStore();
@@ -56,6 +58,8 @@ public interface UserstoresApiService {
 
       public Response getUserStoreManagerProperties(String typeId);
 
+      public Response importUserStoreFromFile(InputStream fileInputStream, Attachment fileDetail);
+
       public Response patchUserStore(String userstoreDomainId, List<PatchDocument> patchDocument);
 
       public Response testRDBMSConnection(RDBMSConnectionReq rdBMSConnectionReq);
@@ -63,4 +67,6 @@ public interface UserstoresApiService {
       public Response updateAttributeMappings(String userstoreDomainId, List<ClaimAttributeMapping> claimAttributeMapping);
 
       public Response updateUserStore(String userstoreDomainId, UserStoreReq userStoreReq);
+
+      public Response updateUserStoreFromFile(String userstoreDomainId, InputStream fileInputStream, Attachment fileDetail);
 }

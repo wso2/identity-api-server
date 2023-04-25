@@ -16,7 +16,11 @@
 
 package org.wso2.carbon.identity.api.server.userstore.v1.impl;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.FileContent;
 import org.wso2.carbon.identity.api.server.userstore.v1.UserstoresApiService;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
@@ -25,7 +29,9 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
 
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
@@ -54,6 +60,24 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
         serverUserStoreService.deleteUserStore(userstoreDomainId);
         return Response.noContent().build();
     }
+
+    @Override
+    public Response exportUserStoreToFile(String userstoreDomainId, String accept) {
+
+        FileContent fileContent = serverUserStoreService.exportUserStore(userstoreDomainId, accept);
+
+        return Response.ok()
+                .type(fileContent.getFileType())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+                        + fileContent.getFileName() + "\"")
+                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
+                .entity(fileContent.getContent().getBytes(StandardCharsets.UTF_8))
+                .build();
+    }
+
+
 
     @Override
     public Response getAvailableUserStoreTypes() {
@@ -109,6 +133,15 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     }
 
     @Override
+    public Response importUserStoreFromFile(InputStream fileInputStream, Attachment fileDetail) {
+
+        String resourceId = serverUserStoreService.importUserStore(fileInputStream, fileDetail);
+        URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + USER_STORE_PATH_COMPONENT +
+                "/" + resourceId);
+        return Response.created(location).build();
+    }
+
+    @Override
     public Response patchUserStore(String userstoreDomainId, List<PatchDocument> patchDocument) {
 
         return Response.ok().entity(serverUserStoreService.patchUserStore(userstoreDomainId, patchDocument)).build();
@@ -124,6 +157,16 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     public Response updateUserStore(String userstoreDomainId, UserStoreReq userStoreReq) {
 
         return Response.ok().entity(serverUserStoreService.editUserStore(userstoreDomainId, userStoreReq)).build();
+    }
+
+    @Override
+    public Response updateUserStoreFromFile(String userstoreDomainId, InputStream fileInputStream, Attachment fileDetail) {
+
+        String resourceId =
+                serverUserStoreService.updateUserStoreFromFile(userstoreDomainId, fileInputStream, fileDetail);
+        URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + USER_STORE_PATH_COMPONENT +
+                "/" + resourceId);
+        return Response.created(location).build();
     }
 
     private URI getResourceLocation(String id) {

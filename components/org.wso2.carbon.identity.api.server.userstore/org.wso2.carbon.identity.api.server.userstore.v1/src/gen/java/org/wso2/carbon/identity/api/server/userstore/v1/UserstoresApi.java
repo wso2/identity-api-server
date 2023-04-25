@@ -100,6 +100,31 @@ public class UserstoresApi  {
 
     @Valid
     @GET
+    @Path("/{userstore-domain-id}/file")
+    
+    @Produces({ "application/json", "application/yaml", "application/xml", "application/octet-stream" })
+    @ApiOperation(value = "Export the configurations of secondary user store based on its domain id in XML, YAML, or JSON file formats ", notes = "This API provides the capability to retrieve the configurations of secondary user store based on its domain id as a XML, YAML, or JSON file.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/view <br> <b>Scope required:</b> <br>     * internal_userstore_view ", response = UserStoreConfigurationsRes.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "User Store", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response.", response = UserStoreConfigurationsRes.class),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 409, message = "Element Already Exists.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response exportUserStoreToFile(@ApiParam(value = "ID of the user store domain.",required=true) @PathParam("userstore-domain-id") String userstoreDomainId,     @Valid @ApiParam(value = "Content type of the file. " , allowableValues="application/json, application/xml, application/yaml, application/x-yaml, text/yaml, text/xml, text/json", defaultValue="application/yaml")@HeaderParam("Accept") String accept) {
+
+        return delegate.exportUserStoreToFile(userstoreDomainId,  accept );
+    }
+
+    @Valid
+    @GET
     @Path("/meta/types")
     
     @Produces({ "application/json" })
@@ -235,6 +260,30 @@ public class UserstoresApi  {
     }
 
     @Valid
+    @POST
+    @Path("/file")
+    @Consumes({ "multipart/form-data" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Import a secondary user store from a file ", notes = "This API provides the capability to import an identity provider from the information provided as a YAML, JSON or XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/userstore/config/create <br>   <b>Scope required:</b> <br>       * internal_userstore_create ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "User Store", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Successful response", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
+        @ApiResponse(code = 409, message = "Element Already Exists.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response importUserStoreFromFile(@Multipart(value = "file", required = false) InputStream fileInputStream,@Multipart(value = "file" , required = false) Attachment fileDetail) {
+
+        return delegate.importUserStoreFromFile(fileInputStream, fileDetail );
+    }
+
+    @Valid
     @PATCH
     @Path("/{userstore-domain-id}")
     @Consumes({ "application/json" })
@@ -326,6 +375,30 @@ public class UserstoresApi  {
     public Response updateUserStore(@ApiParam(value = "Current domain id of the user store",required=true) @PathParam("userstore-domain-id") String userstoreDomainId, @ApiParam(value = "The secondary user store values which are needed to be edited for a given domain id." ) @Valid UserStoreReq userStoreReq) {
 
         return delegate.updateUserStore(userstoreDomainId,  userStoreReq );
+    }
+
+    @Valid
+    @PUT
+    @Path("/{userstore-domain-id}/file")
+    @Consumes({ "multipart/form-data" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update user store from an uploaded file ", notes = "This API provides the capability to update an existing user store from the information provided as a YAML, JSON or XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/userstore/config/update <br>   <b>Scope required:</b> <br>       * internal_userstore_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "User Store" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successfully Updated.", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response updateUserStoreFromFile(@ApiParam(value = "ID of the user store.",required=true) @PathParam("userstore-domain-id") String userstoreDomainId, @Multipart(value = "file", required = false) InputStream fileInputStream,@Multipart(value = "file" , required = false) Attachment fileDetail) {
+
+        return delegate.updateUserStoreFromFile(userstoreDomainId,  fileInputStream, fileDetail );
     }
 
 }

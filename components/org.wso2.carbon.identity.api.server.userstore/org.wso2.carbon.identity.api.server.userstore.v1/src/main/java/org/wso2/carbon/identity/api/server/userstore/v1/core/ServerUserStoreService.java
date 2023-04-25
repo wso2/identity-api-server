@@ -16,35 +16,28 @@
 
 package org.wso2.carbon.identity.api.server.userstore.v1.core;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.FileContent;
+import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConfigServiceHolder;
 import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.functions.userstore.AttributeMappingsToApiModel;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.AddUserStorePropertiesRes;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.Attribute;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStoreClassesRes;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.ConnectionEstablishedResponse;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.PropertiesRes;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.RDBMSConnectionReq;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreAttributeMappingResponse;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreConfigurationsRes;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreListResponse;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStorePropertiesRes;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
-import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreResponse;
+import org.wso2.carbon.identity.api.server.userstore.v1.model.*;
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataClientException;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
@@ -68,7 +61,14 @@ import org.wso2.carbon.user.core.UserStoreConfigConstants;
 import org.wso2.carbon.user.core.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.error.YAMLException;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,10 +80,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
-import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
-import static org.wso2.carbon.identity.api.server.common.Constants.REGEX_COMMA;
-import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.common.Constants.*;
 import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.ErrorMessage.ERROR_CODE_USER_STORE_LIMIT_REACHED;
 
 /**
@@ -204,6 +206,101 @@ public class ServerUserStoreService {
                     UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_USER_STORE;
             throw handleIdentityUserStoreMgtException(e, errorEnum);
         }
+    }
+
+    /**
+     * Export a user store identified by the domain ID, in the given format.
+     *
+     * @param domainId domain ID of the user store to be exported.
+     * @param fileType The format of the exported string.
+     * @return FileContent object of the user store in the requested format.
+     */
+    public FileContent exportUserStore(String domainId, String fileType) {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Exporting user store from the domain ID: " + domainId);
+        }
+        if (StringUtils.isBlank(fileType)) {
+            throw new UnsupportedOperationException("No valid media type found");
+        }
+
+        UserStoreConfigurationsRes userStoreConfigurationsRes = getUserStoreByDomainId(domainId);
+
+        if (userStoreConfigurationsRes == null) {
+            throw handleException(Response.Status.NOT_FOUND,
+                        UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_USER_STORE);
+        }
+
+        UserStoreConfigurations userStoreConfigsToExport = new UserStoreConfigurations();
+        userStoreConfigsToExport.setName(userStoreConfigurationsRes.getName());
+        userStoreConfigsToExport.setDescription(userStoreConfigurationsRes.getDescription());
+        userStoreConfigsToExport.setTypeId(userStoreConfigurationsRes.getTypeId());
+        userStoreConfigsToExport.setClaimAttributeMappings(userStoreConfigurationsRes.getClaimAttributeMappings());
+
+        for (AddUserStorePropertiesRes propertyRes : userStoreConfigurationsRes.getProperties()) {
+            org.wso2.carbon.identity.api.server.userstore.v1.model.Property property = new org.wso2.carbon.identity
+                    .api.server.userstore.v1.model.Property();
+            property.setName(propertyRes.getName());
+            property.setValue(propertyRes.getValue());
+            userStoreConfigsToExport.addPropertiesItem(property);
+        }
+
+        FileContent fileContent;
+        try {
+            fileContent = generateFileFromModel(fileType, userStoreConfigsToExport);
+        } catch (UserStoreException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_EXPORTING_USER_STORE);
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Successfully exported userstore: %s as a file type of %s.",
+                    userStoreConfigsToExport.getName(), fileType));
+        }
+        return fileContent;
+    }
+
+    /**
+     * Create a new user store by importing an YAML, JSON or XML configuration file.
+     *
+     * @param fileInputStream File to be imported as an input stream.
+     * @param fileDetail      File details.
+     * @return Unique identifier of the created user store.
+     */
+    public String importUserStore(InputStream fileInputStream, Attachment fileDetail) {
+
+        UserStoreReq userStoreConfigs;
+        try {
+            userStoreConfigs = getUserStoreFromFile(fileInputStream, fileDetail);
+        } catch (UserStoreException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_USER_STORE);
+        }
+
+        UserStoreResponse userStoreResponse = addUserStore(userStoreConfigs);
+        return userStoreResponse.getId();
+    }
+
+    /**
+     * Update an existing user store from an YAML, JSON or XML configuration file.
+     *
+     * @param userstoreDomainID Resource ID of the user store to be updated.
+     * @param fileInputStream    File to be imported as an input stream.
+     * @param fileDetail         File details.
+     * @return Unique identifier of the updated user store.
+     */
+    public String updateUserStoreFromFile(String userstoreDomainID, InputStream fileInputStream,
+                                          Attachment fileDetail) {
+
+        UserStoreReq userStoreConfigs;
+        try {
+            userStoreConfigs = getUserStoreFromFile(fileInputStream, fileDetail);
+        } catch (UserStoreException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    UserStoreConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_USER_STORE);
+        }
+        UserStoreResponse userStoreResponse = editUserStore(userstoreDomainID, userStoreConfigs);
+        return userStoreResponse.getId();
     }
 
     /**
@@ -1387,5 +1484,159 @@ public class ServerUserStoreService {
             }
         }
         return userstoreMappings;
+    }
+
+    private FileContent generateFileFromModel(String fileType, UserStoreConfigurations userStoreConfigs)
+            throws UserStoreException {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Parsing user store object to file content of type: " + fileType);
+        }
+        String mediaType = Util.getMediaType(fileType);
+        switch (mediaType) {
+            case MEDIA_TYPE_XML:
+                return parseUserStoreToXml(userStoreConfigs);
+            case MEDIA_TYPE_JSON:
+                return parseUserStoreToJson(userStoreConfigs);
+            case MEDIA_TYPE_YAML:
+                return parseUserStoreToYaml(userStoreConfigs);
+            default:
+                LOG.warn(String.format("Using the default YAML parsing for requested file type: %s for export.",
+                        fileType));
+                return parseUserStoreToYaml(userStoreConfigs);
+        }
+    }
+
+    private FileContent parseUserStoreToYaml(UserStoreConfigurations userStoreConfigs)
+            throws UserStoreException {
+
+        StringBuilder fileNameSB = new StringBuilder(userStoreConfigs.getName());
+        fileNameSB.append(YAML_FILE_EXTENSION);
+        Yaml yaml = new Yaml();
+        try {
+            return new FileContent(fileNameSB.toString(), MEDIA_TYPE_YAML, yaml.dump(userStoreConfigs));
+        } catch (YAMLException e) {
+            throw new UserStoreException(
+                    "Error when parsing user store to YAML file.", e);
+        }
+    }
+
+    private FileContent parseUserStoreToXml(UserStoreConfigurations userStoreConfigs)
+            throws UserStoreException {
+
+        StringBuilder fileNameSB = new StringBuilder(userStoreConfigs.getName());
+        fileNameSB.append(XML_FILE_EXTENSION);
+
+        JAXBContext jaxbContext;
+        try {
+            jaxbContext = JAXBContext.newInstance(UserStoreConfigurations.class);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            StringWriter stringWriter = new StringWriter();
+            marshaller.marshal(userStoreConfigs, stringWriter);
+            return new FileContent(fileNameSB.toString(), MEDIA_TYPE_XML, stringWriter.toString());
+        } catch (JAXBException e) {
+            throw new UserStoreException(
+                    "Error when parsing user store to XML file.", e);
+        }
+    }
+
+    private FileContent parseUserStoreToJson(UserStoreConfigurations userStoreConfigs)
+            throws UserStoreException {
+
+        StringBuilder fileNameSB = new StringBuilder(userStoreConfigs.getName());
+        fileNameSB.append(JSON_FILE_EXTENSION);
+        ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
+        try {
+            return new FileContent(fileNameSB.toString(), MEDIA_TYPE_JSON,
+                    objectMapper.writeValueAsString(userStoreConfigs));
+        } catch (JsonProcessingException e) {
+            throw new UserStoreException(
+                    "Error when parsing user store to JSON file.", e);
+        }
+    }
+
+    private UserStoreReq getUserStoreFromFile(InputStream fileInputStream, Attachment fileDetail)
+            throws UserStoreException {
+
+        UserStoreConfigurations userStoreConfigs;
+        try {
+            FileContent userStoreFileContent = new FileContent(fileDetail.getDataHandler().getName(),
+                    fileDetail.getDataHandler().getContentType(),
+                    IOUtils.toString(fileInputStream, StandardCharsets.UTF_8.name()));
+            userStoreConfigs = generateModelFromFile(userStoreFileContent);
+        } catch (IOException | UserStoreException e) {
+            throw new UserStoreException("Provided input file is not in the correct format", e);
+        } finally {
+            IOUtils.closeQuietly(fileInputStream);
+        }
+
+        UserStoreReq userStoreConfigsToImport = new UserStoreReq();
+        userStoreConfigsToImport.setName(userStoreConfigs.getName());
+        userStoreConfigsToImport.setDescription(userStoreConfigs.getDescription());
+        userStoreConfigsToImport.setTypeId(userStoreConfigs.getTypeId());
+        userStoreConfigsToImport.setClaimAttributeMappings(userStoreConfigs.getClaimAttributeMappings());
+        userStoreConfigsToImport.setProperties(userStoreConfigs.getProperties());
+
+        return userStoreConfigsToImport;
+    }
+
+    private UserStoreConfigurations generateModelFromFile(FileContent fileContent)
+            throws UserStoreException {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Parsing user store from file: %s of type: %s.", fileContent.getFileName(),
+                    fileContent.getFileType()));
+        }
+        if (StringUtils.isEmpty(fileContent.getContent())) {
+            throw new UserStoreException(String.format(
+                    "Empty user store configuration file %s uploaded.", fileContent.getFileName()));
+        }
+
+        switch (Util.getMediaType(fileContent.getFileType())) {
+            case MEDIA_TYPE_XML:
+                return parseUserStoreFromXml(fileContent);
+            case MEDIA_TYPE_JSON:
+                return parseUserStoreFromJson(fileContent);
+            case MEDIA_TYPE_YAML:
+                return parseUserStoreFromYaml(fileContent);
+            default:
+                LOG.warn(String.format("Unsupported media type %s for file %s. Defaulting to YAML parsing.",
+                        fileContent.getFileType(), fileContent.getFileName()));
+                return parseUserStoreFromYaml(fileContent);
+        }
+    }
+
+    private UserStoreConfigurations parseUserStoreFromXml(FileContent fileContent) throws UserStoreException {
+
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(UserStoreConfigurations.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            return (UserStoreConfigurations) unmarshaller.unmarshal(new StringReader(fileContent.getContent()));
+        } catch (JAXBException e) {
+            throw new UserStoreException(String.format("Error in reading " +
+                    "XML file configuration for user store: %s.", fileContent.getFileName()), e);
+        }
+    }
+
+    private UserStoreConfigurations parseUserStoreFromYaml(FileContent fileContent) throws UserStoreException {
+
+        try {
+            Yaml yaml = new Yaml(new Constructor(UserStoreConfigurations.class));
+            return yaml.loadAs(fileContent.getContent(), UserStoreConfigurations.class);
+        } catch (YAMLException e) {
+            throw new UserStoreException(String.format("Error in reading YAML file " +
+                    "configuration for user store: %s.", fileContent.getFileName()), e);
+        }
+    }
+
+    private UserStoreConfigurations parseUserStoreFromJson(FileContent fileContent) throws UserStoreException {
+
+        try {
+            return new ObjectMapper().readValue(fileContent.getContent(), UserStoreConfigurations.class);
+        } catch (JsonProcessingException e) {
+            throw new UserStoreException(String.format("Error in reading JSON " +
+                    "file configuration for user store: %s.", fileContent.getFileName()), e);
+        }
     }
 }
