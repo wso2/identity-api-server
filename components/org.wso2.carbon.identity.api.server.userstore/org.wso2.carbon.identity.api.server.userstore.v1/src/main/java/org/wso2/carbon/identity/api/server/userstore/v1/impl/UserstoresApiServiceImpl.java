@@ -160,7 +160,8 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
     }
 
     @Override
-    public Response updateUserStoreFromFile(String userstoreDomainId, InputStream fileInputStream, Attachment fileDetail) {
+    public Response updateUserStoreFromFile(String userstoreDomainId, InputStream fileInputStream,
+                                            Attachment fileDetail) {
 
         String resourceId =
                 serverUserStoreService.updateUserStoreFromFile(userstoreDomainId, fileInputStream, fileDetail);

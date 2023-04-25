@@ -58,6 +58,7 @@
                                 <!--<packageName>org.wso2.carbon.identity.api.server.userstore.v1</packageName>-->
                                 <!--<dateLibrary>java8</dateLibrary>-->
                                 <!--<hideGenerationTimestamp>true</hideGenerationTimestamp>-->
+                                <!--<ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>-->
                             <!--</configOptions>-->
                             <!--<output>.</output>-->
                             <!--<skipOverwrite>false</skipOverwrite>-->

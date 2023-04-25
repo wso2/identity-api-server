@@ -1,8 +1,8 @@
 package org.wso2.carbon.identity.api.server.userstore.v1.model;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * User store configurations model.

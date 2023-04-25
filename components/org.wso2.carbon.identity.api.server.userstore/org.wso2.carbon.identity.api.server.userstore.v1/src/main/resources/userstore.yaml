@@ -295,9 +295,9 @@ paths:
       tags:
         - User Store
       summary: |
-        Export the configurations of secondary user store based on its domain id in XML, YAML, or JSON file formats
+        Export a secondary user store by its domain id.
       description: |
-        This API provides the capability to retrieve the configurations of
+        This API provides the capability to retrieve the configurations of a
         secondary user store based on its domain id as a XML, YAML, or JSON file.<br>
         <b>Permission required:</b> <br>
             * /permission/admin/manage/identity/userstore/config/view <br>
@@ -319,16 +319,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserStoreConfigurationsRes'
+                type: string
+              example: 'Sample userstore configuration in the requested format'
             application/yaml:
               schema:
-                $ref: '#/components/schemas/UserStoreConfigurationsRes'
+                type: string
+              example: 'Sample userstore configuration in the requested format'
             application/xml:
               schema:
-                $ref: '#/components/schemas/UserStoreConfigurationsRes'
+                type: string
+              example: 'Sample userstore configuration in the requested format'
             application/octet-stream:
               schema:
-                $ref: '#/components/schemas/UserStoreConfigurationsRes'
+                type: string
+              example: 'Sample userstore configuration in the requested format'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -345,7 +349,7 @@ paths:
       tags:
         - User Store
       summary: |
-        Update user store from an uploaded file
+        Update user store from an uploaded file.
       description: >
         This API provides the capability to update an existing user store from
         the information provided as a YAML, JSON or XML file.<br>
@@ -373,7 +377,7 @@ paths:
           headers:
             Location:
               description: >-
-                Location of the newly created secondary userstore. userstore id is generated as base-64-url-encoded(domain-name) value.
+                Location of the updated userstore. userstore id is generated as base-64-url-encoded(domain-name) value.
               schema:
                 type: string
         '400':

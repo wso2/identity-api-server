@@ -103,14 +103,14 @@ public class UserstoresApi  {
     @Path("/{userstore-domain-id}/file")
     
     @Produces({ "application/json", "application/yaml", "application/xml", "application/octet-stream" })
-    @ApiOperation(value = "Export the configurations of secondary user store based on its domain id in XML, YAML, or JSON file formats ", notes = "This API provides the capability to retrieve the configurations of secondary user store based on its domain id as a XML, YAML, or JSON file.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/view <br> <b>Scope required:</b> <br>     * internal_userstore_view ", response = UserStoreConfigurationsRes.class, authorizations = {
+    @ApiOperation(value = "Export a secondary user store by its domain id. ", notes = "This API provides the capability to retrieve the configurations of a secondary user store based on its domain id as a XML, YAML, or JSON file.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/view <br> <b>Scope required:</b> <br>     * internal_userstore_view ", response = String.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "User Store", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful response.", response = UserStoreConfigurationsRes.class),
+        @ApiResponse(code = 200, message = "Successful response.", response = String.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden.", response = Void.class),
@@ -264,7 +264,7 @@ public class UserstoresApi  {
     @Path("/file")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Import a secondary user store from a file ", notes = "This API provides the capability to import an identity provider from the information provided as a YAML, JSON or XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/userstore/config/create <br>   <b>Scope required:</b> <br>       * internal_userstore_create ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Import a secondary user store from a file. ", notes = "This API provides the capability to import a user store from the configurations provided as a YAML, JSON or XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/userstore/config/create <br>   <b>Scope required:</b> <br>       * internal_userstore_create ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -382,7 +382,7 @@ public class UserstoresApi  {
     @Path("/{userstore-domain-id}/file")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update user store from an uploaded file ", notes = "This API provides the capability to update an existing user store from the information provided as a YAML, JSON or XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/userstore/config/update <br>   <b>Scope required:</b> <br>       * internal_userstore_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update user store from an uploaded file. ", notes = "This API provides the capability to update an existing user store from the information provided as a YAML, JSON or XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/userstore/config/update <br>   <b>Scope required:</b> <br>       * internal_userstore_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
