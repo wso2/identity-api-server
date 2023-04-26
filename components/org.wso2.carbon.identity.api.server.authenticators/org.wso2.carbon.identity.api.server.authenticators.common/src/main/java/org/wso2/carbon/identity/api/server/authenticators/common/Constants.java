@@ -27,6 +27,12 @@ public class Constants {
 
     public static final String AUTHENTICATOR_ERROR_PREFIX = "AUT-";
     public static final String FEDERATED_AUTHENTICATORS = "federatedAuthenticators";
+    public static final String AUTHENTICATOR_PATH_COMPONENT = "/authenticators";
+    public static final String PATH_SEPERATOR = "/";
+    public static final String PAGE_LINK_REL_NEXT = "next";
+    public static final String PAGE_LINK_REL_PREVIOUS = "previous";
+    public static final String PAGINATION_WITH_FILTER_LINK_FORMAT = "?offset=%d&limit=%d&filter=%s";
+    public static final String PAGINATION_LINK_FORMAT = "?offset=%d&limit=%d";
 
     /**
      * Supported filter attributes.
@@ -83,7 +89,12 @@ public class Constants {
                 "operation in filter.", "Complex query with '%s' operation for filter attribute 'tag' is not " +
                 "supported."),
         ERROR_CODE_PAGINATION_NOT_IMPLEMENTED("65009", "Pagination not supported.", "Pagination " +
-                "capabilities are not supported in this version of the API.");
+                "capabilities are not supported in this version of the API."),
+        ERROR_CODE_BUILDING_LINKS("65010", "Error building page links", "Error occurred during building page links. " +
+                                          "%s"),
+        ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS("65011",
+                "Unable to retrieve authenticator connected applications.",
+                "Server encountered an error while retrieving the authenticator connected applications for : %s.");
 
         private final String code;
         private final String message;
