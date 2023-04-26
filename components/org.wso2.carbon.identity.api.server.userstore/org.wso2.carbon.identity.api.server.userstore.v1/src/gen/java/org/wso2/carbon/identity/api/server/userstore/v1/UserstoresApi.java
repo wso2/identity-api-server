@@ -57,7 +57,7 @@ public class UserstoresApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Add a secondary user store.", notes = "This API provides the capability to add a secondary user store.  **NOTE:**    To retrieve the available user store classes/types, use the **api/server/v1/userstores/meta/types** API.   <b>Permission required:</b>   - /permission/admin ", response = UserStoreResponse.class, authorizations = {
+    @ApiOperation(value = "Add a secondary user store.", notes = "This API provides the capability to add a secondary user store.  **NOTE:**    To retrieve the available user store classes/types, use the **api/server/v1/userstores/meta/types** API.  <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/create <br> <b>Scope required:</b> <br>     * internal_userstore_create ", response = UserStoreResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -81,7 +81,7 @@ public class UserstoresApi  {
     @Path("/{userstore-domain-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete a secondary user store.", notes = "This API provides the capability to delete a secondary user store matching to the given user store domain id.   <b>Permission required:</b>  *_/permission/admin ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete a secondary user store.", notes = "This API provides the capability to delete a secondary user store matching to the given user store domain id. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/delete <br> <b>Scope required:</b> <br>     * internal_userstore_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -103,7 +103,7 @@ public class UserstoresApi  {
     @Path("/meta/types")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the available user store classes/types.", notes = "This API provides the capability to retrieve the available user store types.   <b>Permission required:</b>  *_/permission/admin ", response = AvailableUserStoreClassesRes.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve the available user store classes/types.", notes = "This API provides the capability to retrieve the available user store types. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/view <br> <b>Scope required:</b> <br>     * internal_userstore_view ", response = AvailableUserStoreClassesRes.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -124,7 +124,7 @@ public class UserstoresApi  {
     @Path("/primary")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the configurations of primary userstore.", notes = "This API provides the capability to retrieve the configurations of primary user store.    <b>Permission required:</b> *_/permission/admin ", response = UserStoreConfigurationsRes.class, authorizations = {
+    @ApiOperation(value = "Retrieve the configurations of primary userstore.", notes = "This API provides the capability to retrieve the configurations of primary user store. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/view <br> <b>Scope required:</b> <br>     * internal_userstore_view ", response = UserStoreConfigurationsRes.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -146,7 +146,7 @@ public class UserstoresApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve or list the configured secondary user stores.", notes = "This API provides the capability to list the configured secondary userstores. <b>Permission required:</b> *_/permission/admin ", response = UserStoreListResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieve or list the configured secondary user stores.", notes = "This API provides the capability to list the configured secondary userstores. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/view <br> <b>Scope required:</b> <br>     * internal_userstore_view ", response = UserStoreListResponse.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -169,7 +169,7 @@ public class UserstoresApi  {
     @Path("/meta/types/{type-id}/attributes")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the meta attributes of a user store of a given user store type.", notes = "This API provides the capability to retrieve the attribute mappings of a given user store type <b>Permission required:</b><br> *_/permission/admin/manage/identity/userstore/config/view <b>scope required:</b> * internal_userstore_view ", response = UserStoreAttributeMappingResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve the meta attributes of a user store of a given user store type.", notes = "This API provides the capability to retrieve the attribute mappings of a given user store type <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/view <br> <b>Scope required:</b> <br>     * internal_userstore_view ", response = UserStoreAttributeMappingResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -193,7 +193,7 @@ public class UserstoresApi  {
     @Path("/{userstore-domain-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the configurations of secondary user store based on its domain id.", notes = "This API provides the capability to retrieve the configurations of secondary user store based on its domain id.    <b>Permission required:</b> *_/permission/admin ", response = UserStoreConfigurationsRes.class, authorizations = {
+    @ApiOperation(value = "Retrieve the configurations of secondary user store based on its domain id.", notes = "This API provides the capability to retrieve the configurations of secondary user store based on its domain id. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/view <br> <b>Scope required:</b> <br>     * internal_userstore_view ", response = UserStoreConfigurationsRes.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -215,7 +215,7 @@ public class UserstoresApi  {
     @Path("/meta/types/{type-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve the properties of secondary user store of a given user store type.", notes = "This API provides the capability to retrieve the properties of secondary user store of a given class name.   <b>Permission required:</b>  *_/permission/admin ", response = MetaUserStoreType.class, authorizations = {
+    @ApiOperation(value = "Retrieve the properties of secondary user store of a given user store type.", notes = "This API provides the capability to retrieve the properties of secondary user store of a given class name. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/view <br> <b>Scope required:</b> <br>     * internal_userstore_view ", response = MetaUserStoreType.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -239,7 +239,7 @@ public class UserstoresApi  {
     @Path("/{userstore-domain-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Patch the secondary user store by it's domain id.", notes = "This API provides the capability to update the secondary user store's property using patch request by using its domain id.   <b>Permission required:</b>  *_/permission/admin ", response = UserStoreResponse.class, authorizations = {
+    @ApiOperation(value = "Patch the secondary user store by it's domain id.", notes = "This API provides the capability to update the secondary user store's property using patch request by using its domain id. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/update <br> <b>Scope required:</b> <br>     * internal_userstore_update ", response = UserStoreResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -263,7 +263,7 @@ public class UserstoresApi  {
     @Path("/test-connection")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Test the connection to the datasource used by a JDBC user store manager.", notes = "This API provides the capability to test the connection to the datasource used by a JDBC user store manager.    <b>Permission required:</b>   *_/permission/admin ", response = ConnectionEstablishedResponse.class, authorizations = {
+    @ApiOperation(value = "Test the connection to the datasource used by a JDBC user store manager.", notes = "This API provides the capability to test the connection to the datasource used by a JDBC user store manager. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/view <br> <b>Scope required:</b> <br>     * internal_userstore_view ", response = ConnectionEstablishedResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -285,7 +285,7 @@ public class UserstoresApi  {
     @Path("/{userstore-domain-id}/attribute-mappings")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update the secondary user store attribute mappings by it's domain id.", notes = "This API provides the capability to update the secondary user store's attribute mappings using patch request by using its domain id.  <b>Permission required:</b>  *_/permission/admin ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update the secondary user store attribute mappings by it's domain id.", notes = "This API provides the capability to update the secondary user store's attribute mappings using patch request by using its domain id. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/update <br> <b>Scope required:</b> <br>     * internal_userstore_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -309,7 +309,7 @@ public class UserstoresApi  {
     @Path("/{userstore-domain-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update a user store by its domain id.", notes = "This API provides the capability to edit a user store based on its domain id.   <b>Permission required:</b>   *_/permission/admin ", response = UserStoreResponse.class, authorizations = {
+    @ApiOperation(value = "Update a user store by its domain id.", notes = "This API provides the capability to edit a user store based on its domain id. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/update <br> <b>Scope required:</b> <br>     * internal_userstore_update ", response = UserStoreResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
