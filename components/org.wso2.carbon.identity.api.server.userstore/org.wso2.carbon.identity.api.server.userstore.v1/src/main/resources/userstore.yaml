@@ -1068,4 +1068,4 @@ components:
         file:
           type: string
           format: binary
-          description: file to upload
+          description: File uploaded during import.

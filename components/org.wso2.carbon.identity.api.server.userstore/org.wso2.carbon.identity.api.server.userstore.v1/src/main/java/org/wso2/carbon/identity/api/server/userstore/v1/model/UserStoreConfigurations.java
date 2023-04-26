@@ -2,24 +2,45 @@ package org.wso2.carbon.identity.api.server.userstore.v1.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * User store configurations model.
  **/
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(
         name = "UserStoreConfigurations"
 )
 public class UserStoreConfigurations {
 
+    @XmlElement(name = "typeName")
     private String typeName;
+
+    @XmlElement(name = "typeId")
     private String typeId;
+
+    @XmlElement(name = "name")
     private String name;
+
+    @XmlElement(name = "description")
     private String description;
+
+    @XmlElement(name = "className")
     private String className;
+
+    @XmlElement(name = "isLocal")
     private Boolean isLocal;
+
+    @XmlElementWrapper(name = "properties")
+    @XmlElement(name = "property")
     private List<Property> properties = new ArrayList<>();
 
+    @XmlElementWrapper(name = "claimAttributeMappings")
+    @XmlElement(name = "claimAttributeMapping")
     private List<ClaimAttributeMapping> claimAttributeMappings = null;
 
     public String getTypeName() {
