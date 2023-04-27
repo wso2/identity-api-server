@@ -185,6 +185,113 @@ paths:
         500:
           $ref: '#/responses/ServerError'
 
+  /claim-dialects/{dialect-id}/claims/file/{claim-id}:
+    get:
+      tags:
+        - management
+      summary: Export both local and external claims in XML, YAML, or JSON format
+      operationId: exportClaimToFile
+      description: This API provides the capability to retrieve a claim as a XML, YAML, or JSON file. <br>
+        <b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/claimmgt/metadata/view <br>
+        <b>Scope required:</b> <br>
+        * internal_claim_meta_view
+      parameters:
+        - $ref : '#/parameters/claimIdPathParam'
+        - $ref : '#/parameters/dialectIdPathParam'
+        - $ref: '#/parameters/fileTypeHeaderParam'
+      produces:
+        - application/json
+        - application/xml
+        - application/yaml
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: string
+          examples:
+            application/json: 'Sample application configuration in the requested format'
+            application/xml: 'Sample application configuration in the requested format'
+            application/yaml: 'Sample application configuration in the requested format'
+        400:
+          $ref: '#/responses/InvalidInput'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/ServerError'
+
+    put:
+      tags:
+        - management
+      summary: Update both local and external claims from XML, YAML, or JSON file
+      operationId: updateClaimFromFile
+      description: This API provides the capability to update claims from a file in XML, YAML, or JSON format. <br>
+        <b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/claimmgt/metadata/create <br>
+        <b>Scope required:</b> <br>
+        * internal_claim_meta_create
+      parameters:
+        - $ref: '#/parameters/dialectIdPathParam'
+        - $ref: '#/parameters/claimIdPathParam'
+        - name: file
+          in: formData
+          description: The file to be uploaded.
+          required: true
+          type: file
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      responses:
+        201:
+          $ref: '#/responses/Created'
+        400:
+          $ref: '#/responses/InvalidInput'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        500:
+          $ref: '#/responses/ServerError'
+
+  /claim-dialects/{dialect-id}/claims/file:
+    post:
+      tags:
+        - management
+      summary: Import both local and external claims from XML, YAML, or JSON file
+      operationId: importClaimFromFile
+      description: This API provides the capability to import claims from a file in XML, YAML, or JSON format. <br>
+        <b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/claimmgt/metadata/create <br>
+        <b>Scope required:</b> <br>
+        * internal_claim_meta_create
+      parameters:
+        - $ref: '#/parameters/dialectIdPathParam'
+        - name: file
+          in: formData
+          description: The file to be uploaded.
+          required: true
+          type: file
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      responses:
+        201:
+          $ref: '#/responses/Created'
+        400:
+          $ref: '#/responses/InvalidInput'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        500:
+          $ref: '#/responses/ServerError'
+
   /claim-dialects:
     post:
       tags:
@@ -560,6 +667,22 @@ parameters:
     required: true
     type: string
     description: Id of the claim.
+  fileTypeHeaderParam:
+    in: header
+    name: Accept
+    required: false
+    type: string
+    description: |
+      Content type of the file.
+    enum:
+      - application/json
+      - application/xml
+      - application/yaml
+      - application/x-yaml
+      - text/yaml
+      - text/xml
+      - text/json
+    default: application/yaml
 
 #-----------------------------------------------------
 # Definitions

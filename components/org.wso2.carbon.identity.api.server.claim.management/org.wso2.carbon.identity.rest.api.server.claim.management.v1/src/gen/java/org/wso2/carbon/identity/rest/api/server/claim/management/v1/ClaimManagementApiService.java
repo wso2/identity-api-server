@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2023, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,8 @@ public abstract class ClaimManagementApiService {
 
     public abstract Response deleteLocalClaim(String claimId);
 
+    public abstract Response exportClaimToFile(String claimId, String dialectId, String accept);
+
     public abstract Response getClaimDialect(String dialectId);
 
     public abstract Response getClaimDialects(Integer limit, Integer offset, String filter, String sort);
@@ -60,7 +62,11 @@ public abstract class ClaimManagementApiService {
 
     public abstract Response getLocalClaims(String attributes, Integer limit, Integer offset, String filter, String sort, Boolean excludeIdentityClaims);
 
+    public abstract Response importClaimFromFile(String dialectId, InputStream fileInputStream,Attachment fileDetail);
+
     public abstract Response updateClaimDialect(String dialectId, ClaimDialectReqDTO claimDialect);
+
+    public abstract Response updateClaimFromFile(String dialectId, String claimId, InputStream fileInputStream,Attachment fileDetail);
 
     public abstract Response updateExternalClaim(String dialectId, String claimId, ExternalClaimReqDTO externalClaim);
 

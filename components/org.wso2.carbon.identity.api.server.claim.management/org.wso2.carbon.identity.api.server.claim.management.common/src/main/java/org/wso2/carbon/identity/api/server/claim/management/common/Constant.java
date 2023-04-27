@@ -160,6 +160,17 @@ public class Constant {
         ERROR_CODE_LOCAL_CLAIM_REFERRED_BY_AN_IDP("50041",
                 "Unable to remove local claim.",
                 "Unable to delete claim as it is referred by an IDP."),
+        ERROR_CODE_ERROR_IMPORTING_CLAIM("50042",
+                "Unable to import claim.",
+                "Server encountered an error while importing the claim in dialect identifier %s."),
+        ERROR_CODE_ERROR_UPDATING_CLAIM("50043",
+                "Unable to update claim.",
+                "Server encountered an error while updating the claim for identifier %s in dialect " +
+                        "identifier %s."),
+        ERROR_CODE_ERROR_EXPORTING_CLAIM("50044",
+                "Unable to export claim.",
+                "Server encountered an error while exporting the claim for identifier %s in dialect " +
+                        "identifier %s."),
         ERROR_CODE_INVALID_IDENTIFIER("CMT-60001", "Invalid identifier",
                 "Invalid Identifier: %s"),
         ERROR_CODE_CLAIM_URI_NOT_SPECIFIED("CMT-60002", "Empty claim URI", "Claim URI is " +
