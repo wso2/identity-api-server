@@ -17,6 +17,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 )
 public class UserStoreConfigurations {
 
+    @XmlElement(name = "id")
+    private String id;
+
     @XmlElement(name = "typeName")
     private String typeName;
 
@@ -29,9 +32,6 @@ public class UserStoreConfigurations {
     @XmlElement(name = "description")
     private String description;
 
-    @XmlElement(name = "className")
-    private String className;
-
     @XmlElement(name = "isLocal")
     private Boolean isLocal;
 
@@ -42,6 +42,14 @@ public class UserStoreConfigurations {
     @XmlElementWrapper(name = "claimAttributeMappings")
     @XmlElement(name = "claimAttributeMapping")
     private List<ClaimAttributeMapping> claimAttributeMappings = null;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getTypeName() {
         return typeName;
@@ -73,14 +81,6 @@ public class UserStoreConfigurations {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
     }
 
     public Boolean getIsLocal() {

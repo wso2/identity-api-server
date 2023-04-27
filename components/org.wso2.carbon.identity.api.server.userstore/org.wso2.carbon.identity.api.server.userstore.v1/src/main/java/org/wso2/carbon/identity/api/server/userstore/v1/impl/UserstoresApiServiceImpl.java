@@ -165,9 +165,7 @@ public class UserstoresApiServiceImpl implements UserstoresApiService {
 
         String resourceId =
                 serverUserStoreService.updateUserStoreFromFile(userstoreDomainId, fileInputStream, fileDetail);
-        URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + USER_STORE_PATH_COMPONENT +
-                "/" + resourceId);
-        return Response.created(location).build();
+        return Response.ok().location(getResourceLocation(resourceId)).build();
     }
 
     private URI getResourceLocation(String id) {

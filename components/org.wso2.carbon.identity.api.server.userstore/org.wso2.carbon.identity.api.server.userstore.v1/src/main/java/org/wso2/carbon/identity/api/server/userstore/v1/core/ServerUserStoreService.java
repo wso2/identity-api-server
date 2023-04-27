@@ -255,11 +255,11 @@ public class ServerUserStoreService {
         }
 
         UserStoreConfigurations userStoreConfigsToExport = new UserStoreConfigurations();
+        userStoreConfigsToExport.setId(domainId);
         userStoreConfigsToExport.setName(userStoreConfigurationsRes.getName());
         userStoreConfigsToExport.setDescription(userStoreConfigurationsRes.getDescription());
         userStoreConfigsToExport.setTypeId(userStoreConfigurationsRes.getTypeId());
         userStoreConfigsToExport.setTypeName(userStoreConfigurationsRes.getTypeName());
-        userStoreConfigsToExport.setClassName(userStoreConfigurationsRes.getClassName());
         userStoreConfigsToExport.setIsLocal(userStoreConfigurationsRes.getIsLocal());
         userStoreConfigsToExport.setClaimAttributeMappings(userStoreConfigurationsRes.getClaimAttributeMappings());
 
