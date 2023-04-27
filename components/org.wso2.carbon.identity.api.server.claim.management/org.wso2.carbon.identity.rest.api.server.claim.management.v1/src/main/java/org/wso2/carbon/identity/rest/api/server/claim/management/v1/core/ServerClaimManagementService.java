@@ -429,16 +429,17 @@ public class ServerClaimManagementService {
         }
 
         try {
-            if (dialectId.equals(LOCAL_DIALECT_PATH)) {
-                LocalClaimReqDTO localClaimReqDTO =
-                        (LocalClaimReqDTO) getClaimFromFile(dialectId, fileInputStream, fileDetail);
+            Object claimReqDTO = getClaimFromFile(dialectId, fileInputStream, fileDetail);
+            if (claimReqDTO instanceof LocalClaimReqDTO) {
+                LocalClaimReqDTO localClaimReqDTO = (LocalClaimReqDTO) claimReqDTO;
                 updateLocalClaim(claimId, localClaimReqDTO);
                 return getResourceId(localClaimReqDTO.getClaimURI());
-            } else {
-                ExternalClaimReqDTO externalClaimReqDTO =
-                        (ExternalClaimReqDTO) getClaimFromFile(dialectId, fileInputStream, fileDetail);
+            } else if (claimReqDTO instanceof ExternalClaimReqDTO) {
+                ExternalClaimReqDTO externalClaimReqDTO = (ExternalClaimReqDTO) claimReqDTO;
                 updateExternalClaim(dialectId, claimId, externalClaimReqDTO);
                 return getResourceId(externalClaimReqDTO.getClaimURI());
+            } else {
+                throw new ClaimMetadataException("Unsupported claim type");
             }
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_UPDATING_CLAIM, claimId, dialectId);
