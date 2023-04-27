@@ -19,9 +19,7 @@ package org.wso2.carbon.identity.rest.api.server.claim.management.v1.impl;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.wso2.carbon.identity.api.server.common.FileContent;
-import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.ClaimManagementApiService;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.core.ServerClaimManagementService;
 
@@ -77,7 +75,8 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
     }
 
     @Override
-    public Response updateClaimFromFile(String dialectId, String claimId, InputStream fileInputStream, Attachment fileDetail) {
+    public Response updateClaimFromFile(String dialectId, String claimId, InputStream fileInputStream,
+                                        Attachment fileDetail) {
 
         String resourceId = claimManagementService.updateClaim(dialectId, claimId, fileInputStream, fileDetail);
         return Response.created(getResourceLocation(LOCAL_DIALECT_PATH, resourceId)).build();

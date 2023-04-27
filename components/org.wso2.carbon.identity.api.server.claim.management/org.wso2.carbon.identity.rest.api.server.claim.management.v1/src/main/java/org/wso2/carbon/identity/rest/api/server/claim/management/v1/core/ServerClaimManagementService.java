@@ -429,7 +429,7 @@ public class ServerClaimManagementService {
         }
 
         try {
-            if(dialectId.equals(LOCAL_DIALECT_PATH)){
+            if (dialectId.equals(LOCAL_DIALECT_PATH)) {
                 LocalClaimReqDTO localClaimReqDTO =
                         (LocalClaimReqDTO) getClaimFromFile(dialectId, fileInputStream, fileDetail);
                 updateLocalClaim(claimId, localClaimReqDTO);
@@ -455,12 +455,12 @@ public class ServerClaimManagementService {
         }
 
         try {
-            if(dialectId.equals(LOCAL_DIALECT_PATH)){
+            if (dialectId.equals(LOCAL_DIALECT_PATH)) {
                 return exportLocalClaim(claimId, fileType);
             } else {
                 return exportExternalClaim(claimId, dialectId, fileType);
             }
-        }catch (ClaimMetadataException e) {
+        } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_EXPORTING_CLAIM, claimId, dialectId);
         }
     }
@@ -935,7 +935,7 @@ public class ServerClaimManagementService {
 
         try {
             ClaimConfiguration claimConfiguration = getClaimFromFile(dialectId, fileInputStream, fileDetail);
-            if(dialectId.equals(LOCAL_DIALECT_PATH)){
+            if (dialectId.equals(LOCAL_DIALECT_PATH)) {
                 LocalClaimReqDTO localClaimReqDTO = getLocalClaimReqDTOFromConfig(
                                                         (LocalClaimConfiguration) claimConfiguration);
                 return addLocalClaim(localClaimReqDTO);
@@ -1039,7 +1039,7 @@ public class ServerClaimManagementService {
             throws ClaimMetadataException {
 
         try {
-            if(dialectId.equals(LOCAL_DIALECT_PATH)){
+            if (dialectId.equals(LOCAL_DIALECT_PATH)) {
                 return new ObjectMapper().readValue(fileContent.getContent(), LocalClaimConfiguration.class);
             } else {
                 return new ObjectMapper().readValue(fileContent.getContent(), ExternalClaimConfiguration.class);
@@ -1054,7 +1054,7 @@ public class ServerClaimManagementService {
             throws ClaimMetadataException {
 
         try {
-            if(dialectId.equals(LOCAL_DIALECT_PATH)){
+            if (dialectId.equals(LOCAL_DIALECT_PATH)) {
                 Yaml yaml = new Yaml(new Constructor(LocalClaimConfiguration.class));
                 return yaml.loadAs(fileContent.getContent(), LocalClaimConfiguration.class);
             } else {
