@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStore
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ConnectionEstablishedResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.Error;
+import java.io.File;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;

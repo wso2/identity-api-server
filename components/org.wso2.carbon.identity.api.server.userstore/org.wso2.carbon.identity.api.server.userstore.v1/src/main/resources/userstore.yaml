@@ -94,7 +94,7 @@ paths:
           $ref: '#/components/responses/ServerError'
         '501':
           $ref: '#/components/responses/NotImplemented'
-  /userstores/file:
+  /userstores/import:
     post:
       tags:
         - User Store
@@ -290,7 +290,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchRequest'
         required: true
-  /userstores/{userstore-domain-id}/file:
+  /userstores/{userstore-domain-id}/export:
     get:
       tags:
         - User Store
@@ -345,14 +345,15 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/ServerError'
+  /userstores/{userstore-domain-id}/import:
     put:
       tags:
         - User Store
       summary: |
-        Update user store from an uploaded file.
+        Update an existing userstore by importing user store configurations from a file.
       description: >
-        This API provides the capability to update an existing user store from
-        the information provided as a YAML, JSON or XML file.<br>
+        This API provides the capability to update an existing user store by importing
+        user store configurations provided as a YAML, JSON or XML file.<br>
           <b>Permission required:</b> <br>
               * /permission/admin/manage/identity/userstore/config/update <br>
           <b>Scope required:</b> <br>

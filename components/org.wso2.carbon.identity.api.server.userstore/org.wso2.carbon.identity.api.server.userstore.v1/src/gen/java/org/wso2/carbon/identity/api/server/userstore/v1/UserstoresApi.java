@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStore
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ConnectionEstablishedResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.Error;
+import java.io.File;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
@@ -100,7 +101,7 @@ public class UserstoresApi  {
 
     @Valid
     @GET
-    @Path("/{userstore-domain-id}/file")
+    @Path("/{userstore-domain-id}/export")
     
     @Produces({ "application/json", "application/yaml", "application/xml", "application/octet-stream" })
     @ApiOperation(value = "Export a secondary user store by its domain id. ", notes = "This API provides the capability to retrieve the configurations of a secondary user store based on its domain id as a XML, YAML, or JSON file.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/userstore/config/view <br> <b>Scope required:</b> <br>     * internal_userstore_view ", response = String.class, authorizations = {
@@ -261,7 +262,7 @@ public class UserstoresApi  {
 
     @Valid
     @POST
-    @Path("/file")
+    @Path("/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Import a secondary user store from a file. ", notes = "This API provides the capability to import a user store from the configurations provided as a YAML, JSON or XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/userstore/config/create <br>   <b>Scope required:</b> <br>       * internal_userstore_create ", response = Void.class, authorizations = {
@@ -379,10 +380,10 @@ public class UserstoresApi  {
 
     @Valid
     @PUT
-    @Path("/{userstore-domain-id}/file")
+    @Path("/{userstore-domain-id}/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update user store from an uploaded file. ", notes = "This API provides the capability to update an existing user store from the information provided as a YAML, JSON or XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/userstore/config/update <br>   <b>Scope required:</b> <br>       * internal_userstore_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update an existing userstore by importing user store configurations from a file. ", notes = "This API provides the capability to update an existing user store by importing user store configurations provided as a YAML, JSON or XML file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/userstore/config/update <br>   <b>Scope required:</b> <br>       * internal_userstore_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
