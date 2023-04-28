@@ -49,14 +49,11 @@ public class AdminAdvisoryManagementApi  {
     @Path("/banner")
     
     @Produces({ "application/json", "*/*" })
-    @ApiOperation(value = "Retrieve admin advisory banner related configurations.", notes = "Retrieve admin advisory " +
-            "banner related configurations.  <b>Permission required:</b> <br> <b>Scope required:</b> <br> ",
-            response = AdminAdvisoryConfig.class, responseContainer = "List", tags = { "Management" })
+    @ApiOperation(value = "Retrieve admin advisory banner related configurations.", notes = "Retrieve admin advisory banner related configurations.<br>  <b>Permission required:</b> <br>     * None <br>   <b>Scope required:</b> <br>     * None ", response = AdminAdvisoryConfig.class, tags={ "Management" })
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "Admin advisory banner configuration.", response = AdminAdvisoryConfig.class,
-                responseContainer = "List"),
-        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+            @ApiResponse(code = 200, message = "Admin advisory banner configuration.", response = AdminAdvisoryConfig.class),
+            @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+            @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
     public Response getAdminAdvisoryConfig() {
 

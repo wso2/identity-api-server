@@ -23,19 +23,19 @@ paths:
       summary: Retrieve admin advisory banner related configurations.
       operationId: getAdminAdvisoryConfig
       description: |
-        Retrieve admin advisory banner related configurations.
+        Retrieve admin advisory banner related configurations.<br>
 
         <b>Permission required:</b> <br>
-        <b>Scope required:</b> <br>
+            * None <br>
+          <b>Scope required:</b> <br>
+            * None
       responses:
         '200':
           description: Admin advisory banner configuration.
           content:
             application/json:
               schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/AdminAdvisoryConfig'
+                $ref: '#/components/schemas/AdminAdvisoryConfig'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
@@ -93,7 +93,7 @@ components:
         bannerContent:
           type: string
           description: Admin banner content.
-          example: Unauthorized use of this tool is strictly prohibited
+          example: Warning - unauthorized use of this tool is strictly prohibited.
     Error:
       type: object
       required:

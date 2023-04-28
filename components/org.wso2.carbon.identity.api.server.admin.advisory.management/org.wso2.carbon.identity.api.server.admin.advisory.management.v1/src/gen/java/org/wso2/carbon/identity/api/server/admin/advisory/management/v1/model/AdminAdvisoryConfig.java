@@ -42,7 +42,7 @@ public class AdminAdvisoryConfig  {
         this.enableBanner = enableBanner;
         return this;
     }
-    
+
     @ApiModelProperty(example = "true", value = "Admin banner enabled status.")
     @JsonProperty("enableBanner")
     @Valid
@@ -61,8 +61,8 @@ public class AdminAdvisoryConfig  {
         this.bannerContent = bannerContent;
         return this;
     }
-    
-    @ApiModelProperty(example = "Unauthorized use of this tool is strictly prohibited", value = "Admin banner content.")
+
+    @ApiModelProperty(example = "Warning - unauthorized use of this tool is strictly prohibited.", value = "Admin banner content.")
     @JsonProperty("bannerContent")
     @Valid
     public String getBannerContent() {
@@ -98,7 +98,7 @@ public class AdminAdvisoryConfig  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class AdminAdvisoryConfig {\n");
-        
+
         sb.append("    enableBanner: ").append(toIndentedString(enableBanner)).append("\n");
         sb.append("    bannerContent: ").append(toIndentedString(bannerContent)).append("\n");
         sb.append("}");
@@ -117,4 +117,3 @@ public class AdminAdvisoryConfig  {
         return o.toString().replace("\n", "\n");
     }
 }
-
