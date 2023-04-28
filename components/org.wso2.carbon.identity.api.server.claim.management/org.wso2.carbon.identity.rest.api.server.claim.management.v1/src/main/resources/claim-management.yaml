@@ -189,7 +189,7 @@ paths:
     get:
       tags:
         - management
-      summary: Export both local and external claims in XML, YAML, or JSON format
+      summary: Export a local or external claim as a file.
       operationId: exportClaimToFile
       description: This API provides the capability to retrieve a claim as a XML, YAML, or JSON file. <br>
         <b>Permission required:</b> <br>
