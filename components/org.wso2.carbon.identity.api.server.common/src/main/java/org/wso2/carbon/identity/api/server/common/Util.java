@@ -146,4 +146,32 @@ public class Util {
 
         return calculateOffsetForPreviousLink(newOffset, limit, total);
     }
+
+    /**
+     * Resolves the valid media type for a given file type.
+     *
+     * @param fileType File type.
+     * @return Media type.
+     */
+    public static String getMediaType(String fileType) {
+
+        if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_XML)) {
+            return Constants.MEDIA_TYPE_XML;
+        } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_JSON)) {
+            return Constants.MEDIA_TYPE_JSON;
+        } else if (containsValidMediaType(fileType, Constants.VALID_MEDIA_TYPES_YAML)) {
+            return Constants.MEDIA_TYPE_YAML;
+        }
+        return Constants.MEDIA_TYPE_UNSUPPORTED;
+    }
+
+    private static boolean containsValidMediaType(String fileType, String[] supportedMediaTypes) {
+
+        for (String supportedMediaType : supportedMediaTypes) {
+            if (fileType.contains(supportedMediaType)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

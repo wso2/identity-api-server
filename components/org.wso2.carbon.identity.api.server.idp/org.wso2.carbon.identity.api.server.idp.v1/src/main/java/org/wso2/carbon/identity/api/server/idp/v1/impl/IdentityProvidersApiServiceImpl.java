@@ -18,9 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.FileContent;
 import org.wso2.carbon.identity.api.server.idp.v1.IdentityProvidersApiService;
 import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementService;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
@@ -35,7 +38,9 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundProvisioningRequ
 import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
 
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
@@ -87,6 +92,23 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
 
         idpManagementService.deleteIDPTemplate(templateId);
         return Response.noContent().build();
+    }
+
+    @Override
+    public Response exportIDPToFile(String identityProviderId, Boolean excludeSecrets, String accept) {
+
+        FileContent fileContent = idpManagementService.exportIDP(identityProviderId,
+                excludeSecrets, accept);
+
+        return Response.ok()
+                .type(fileContent.getFileType())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+                        + fileContent.getFileName() + "\"")
+                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
+                .entity(fileContent.getContent().getBytes(StandardCharsets.UTF_8))
+                .build();
     }
 
     @Override
@@ -198,6 +220,15 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     }
 
     @Override
+    public Response importIDPFromFile(InputStream fileInputStream, Attachment fileDetail) {
+
+        String resourceId = idpManagementService.importIDP(fileInputStream, fileDetail);
+        URI location =
+                ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT + "/" + resourceId);
+        return Response.created(location).build();
+    }
+
+    @Override
     public Response patchIDP(String identityProviderId, List<Patch> patchRequest) {
 
         return Response.ok().entity(idpManagementService.patchIDP(identityProviderId, patchRequest)).build();
@@ -225,6 +256,15 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
 
         return Response.ok().entity(idpManagementService.updateFederatedAuthenticators(identityProviderId,
                 federatedAuthenticatorRequest)).build();
+    }
+
+    @Override
+    public Response updateIDPFromFile(String identityProviderId, InputStream fileInputStream, Attachment fileDetail) {
+
+        String resourceId = idpManagementService.updateIDPFromFile(identityProviderId, fileInputStream, fileDetail);
+        URI location =
+                ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT + "/" + resourceId);
+        return Response.created(location).build();
     }
 
     @Override

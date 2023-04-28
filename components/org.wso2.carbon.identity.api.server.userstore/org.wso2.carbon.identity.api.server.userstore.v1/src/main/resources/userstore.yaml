@@ -31,8 +31,10 @@ paths:
 
           To retrieve the available user store classes/types, use the **api/server/v1/userstores/meta/types** API.
 
-         <b>Permission required:</b>
-          - /permission/admin
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/create <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_create
       responses:
         '201':
           description: Successful response
@@ -68,9 +70,12 @@ paths:
       summary: Retrieve or list the configured secondary user stores.
       operationId: getSecondaryUserStores
       description: >
-        This API provides the capability to list the configured secondary userstores.
-        <b>Permission required:</b>
-        */permission/admin
+        This API provides the capability to list the configured secondary userstores.<br>
+
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/view <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_view
       parameters:
         - $ref: '#/components/parameters/limitQueryParam'
         - $ref: '#/components/parameters/offsetQueryParam'
@@ -103,10 +108,12 @@ paths:
       operationId: getPrimaryUserStore
       description: >
         This API provides the capability to retrieve the configurations of
-        primary user store.
+        primary user store.<br>
 
-          <b>Permission required:</b>
-        */permission/admin
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/view <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_view
       responses:
         '200':
           description: Successful response.
@@ -129,10 +136,12 @@ paths:
       operationId: getUserStoreByDomainId
       description: >
         This API provides the capability to retrieve the configurations of
-        secondary user store based on its domain id.
+        secondary user store based on its domain id.<br>
 
-          <b>Permission required:</b>
-        */permission/admin
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/view <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_view
       parameters:
         - $ref: '#/components/parameters/domainNamePathParam'
       responses:
@@ -155,10 +164,12 @@ paths:
       operationId: deleteUserStore
       description: >
         This API provides the capability to delete a secondary user store
-        matching to the given user store domain id.
+        matching to the given user store domain id.<br>
 
-         <b>Permission required:</b>
-         */permission/admin
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/delete <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_delete
       parameters:
         - $ref: '#/components/parameters/domainNamePathParam'
       responses:
@@ -177,10 +188,12 @@ paths:
       operationId: updateUserStore
       description: >
         This API provides the capability to edit a user store based on its
-        domain id.
+        domain id.<br>
 
-         <b>Permission required:</b>
-          */permission/admin
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/update <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_update
       parameters:
         - in: path
           name: userstore-domain-id
@@ -222,10 +235,12 @@ paths:
       operationId: patchUserStore
       description: >
         This API provides the capability to update the secondary user store's
-        property using patch request by using its domain id.
+        property using patch request by using its domain id.<br>
 
-         <b>Permission required:</b>
-         */permission/admin
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/update <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_update
       parameters:
         - $ref: '#/components/parameters/domainNamePathParam'
       responses:
@@ -259,9 +274,12 @@ paths:
       summary: Update the secondary user store attribute mappings by it's domain id.
       operationId: updateAttributeMappings
       description: >
-        This API provides the capability to update the secondary user store's attribute mappings using patch request by using its domain id.
-         <b>Permission required:</b>
-         */permission/admin
+        This API provides the capability to update the secondary user store's attribute mappings using patch request by using its domain id.<br>
+
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/update <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_update
       parameters:
         - $ref: '#/components/parameters/domainNamePathParam'
       responses:
@@ -291,11 +309,12 @@ paths:
       operationId: getAvailableUserStoreTypes
       description: >
         This API provides the capability to retrieve the available user store
-        types.
+        types.<br>
 
-         <b>Permission required:</b>
-
-        */permission/admin
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/view <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_view
       responses:
         '200':
           description: Successful Response.
@@ -318,11 +337,12 @@ paths:
       operationId: getUserStoreManagerProperties
       description: >
         This API provides the capability to retrieve the properties of secondary
-        user store of a given class name.
+        user store of a given class name.<br>
 
-         <b>Permission required:</b>
-
-        */permission/admin
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/view <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_view
       parameters:
         - in: path
           name: type-id
@@ -356,13 +376,12 @@ paths:
       operationId: getUserStoreAttributeMappings
       description: >
         This API provides the capability to retrieve the attribute mappings
-        of a given user store type
+        of a given user store type.<br>
 
-        <b>Permission required:</b><br>
-        */permission/admin/manage/identity/userstore/config/view
-
-        <b>scope required:</b>
-        * internal_userstore_view
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/view <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_view
       parameters:
         - in: path
           name: type-id
@@ -396,10 +415,12 @@ paths:
       operationId: testRDBMSConnection
       description: >
         This API provides the capability to test the connection to the
-        datasource used by a JDBC user store manager.
+        datasource used by a JDBC user store manager.<br>
 
-          <b>Permission required:</b>
-          */permission/admin
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/view <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_view
       responses:
         '200':
           description: Successful response.
