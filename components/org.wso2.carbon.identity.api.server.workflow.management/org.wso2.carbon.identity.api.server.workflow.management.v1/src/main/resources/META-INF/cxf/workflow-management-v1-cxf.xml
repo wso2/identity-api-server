@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022, WSO2 LLC. (http://www.wso2.com). All Rights Reserved.
+  ~
+  ~ This software is the property of WSO2 LLC. and its suppliers, if any.
+  ~ Dissemination of any information or reproduction of any material contained
+  ~ herein in any form is strictly forbidden, unless permitted by WSO2 expressly.
+  ~ You may not alter or remove any copyright or other notice from copies of this content.
+  -->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    <bean class="org.wso2.carbon.identity.workflow.mgt.api.v1.impl.WorkflowApiServiceImpl"/>
+    <bean class="org.wso2.carbon.identity.workflow.mgt.api.v1.core.WorkflowManagementService"/>
+
+    <bean id="WorkflowMgtServiceFactoryBean"
+          class="org.wso2.carbon.identity.workflow.mgt.api.common.factory.WorkflowManagementOSGIServiceFactory"/>
+    <bean id="WorkflowManagementServiceHolderBean"
+          class="org.wso2.carbon.identity.workflow.mgt.api.common.WorkflowManagementServiceHolder">
+        <property name="workFlowExecutorManager" ref="WorkflowMgtServiceFactoryBean"/>
+    </bean>
+</beans>

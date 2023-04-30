@@ -477,6 +477,16 @@
                 <version>${org.wso2.carbon.identity.organization.management.core.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.workflow.mgt</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.workflow.mgt.api.common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -609,6 +619,7 @@
         <module>components/org.wso2.carbon.identity.api.server.secret.management</module>
         <module>components/org.wso2.carbon.identity.api.server.branding.preference.management</module>
         <module>components/org.wso2.carbon.identity.api.server.input.validation</module>
+        <module>components/org.wso2.carbon.identity.api.server.workflow.management</module>
     </modules>
 
 </project>
