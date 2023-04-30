@@ -30,9 +30,11 @@ public class WorkflowManagementService {
      * @param workflowApprovalPatchRequest workflow request method.
      * @throws WorkflowException throw exception while approving workflow request
      */
-    public void approveWorkflowRequest(String requestId, WorkflowApprovalPatchRequest workflowApprovalPatchRequest) throws WorkflowException {
+    public void approveWorkflowRequest(String requestId, WorkflowApprovalPatchRequest workflowApprovalPatchRequest)
+            throws WorkflowException {
 
-        getWorkFlowExecutorManager().handleCallback(requestId, workflowApprovalPatchRequest.getStatus(), null);
+        getWorkFlowExecutorManager().handleCallback(requestId, workflowApprovalPatchRequest
+                .getStatus(), null);
 
     }
 
@@ -40,4 +42,5 @@ public class WorkflowManagementService {
 
         return WorkflowManagementServiceHolder.getWorkFlowExecutorManager();
     }
+
 }
