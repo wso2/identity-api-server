@@ -12,7 +12,7 @@ package org.wso2.carbon.identity.workflow.mgt.api.common;
 import org.wso2.carbon.identity.workflow.mgt.WorkFlowExecutorManager;
 
 /**
- * Service holder class for user organization management services.
+ *  Manage Call back service
  */
 public class WorkflowManagementServiceHolder {
 
