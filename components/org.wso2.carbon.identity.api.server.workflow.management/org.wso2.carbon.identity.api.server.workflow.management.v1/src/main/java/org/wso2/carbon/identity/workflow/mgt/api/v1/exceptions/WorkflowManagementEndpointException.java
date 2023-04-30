@@ -32,10 +32,6 @@ public class WorkflowManagementEndpointException extends WebApplicationException
         super(Response.status(status).build());
     }
 
-    public WorkflowManagementEndpointException(String errorCode) {
-
-    }
-
     public WorkflowManagementEndpointException() {
 
 

@@ -19,13 +19,10 @@
 package org.wso2.carbon.identity.workflow.mgt.api.v1.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.wso2.carbon.identity.workflow.mgt.api.v1.*;
+import org.wso2.carbon.identity.workflow.mgt.api.v1.WorkflowApiService;
 import org.wso2.carbon.identity.workflow.mgt.api.v1.core.WorkflowManagementService;
-import org.wso2.carbon.identity.workflow.mgt.api.v1.exceptions.WorkflowManagementEndpointException;
-import org.wso2.carbon.identity.workflow.mgt.api.v1.model.*;
+import org.wso2.carbon.identity.workflow.mgt.api.v1.model.WorkflowApprovalPatchRequest;
 import org.wso2.carbon.identity.workflow.mgt.exception.WorkflowException;
-
-import java.util.List;
 import javax.ws.rs.core.Response;
 
 /**
