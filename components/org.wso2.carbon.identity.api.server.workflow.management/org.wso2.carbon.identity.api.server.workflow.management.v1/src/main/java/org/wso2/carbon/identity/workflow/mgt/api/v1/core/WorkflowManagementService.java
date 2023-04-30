@@ -26,8 +26,8 @@ public class WorkflowManagementService {
     /**
      * Approve Workflow request.
      *
-     * @param requestId workflow request id.
-     * @param workflowApprovalPatchRequest workflow request status.
+     * @param requestId workflow request id which retrieve by the workflow payload  .
+     * @param workflowApprovalPatchRequest workflow request method.
      * @throws WorkflowException throw exception while approving workflow request
      */
     public void approveWorkflowRequest(String requestId, WorkflowApprovalPatchRequest workflowApprovalPatchRequest) throws WorkflowException {
