@@ -2666,8 +2666,10 @@ components:
           type: boolean
           example: false
           description: Decides whether user consent needs to be skipped during logout flows.
-        externalizedConsentPage:
-          $ref: '#/components/schemas/ExternalizedConsentPage'
+        useExternalConsentPage:
+          type: boolean
+          example: false
+          description: Decides whether user needs to use external consent page.
         returnAuthenticatedIdpList:
           type: boolean
           example: false
@@ -2713,19 +2715,6 @@ components:
           description: >-
             Certificate value. If type is JWKS, value should be jwks URL. If
             type is PEM, value should be the certificate in PEM format.
-    ExternalizedConsentPage:
-      type: object
-      properties:
-        enabled:
-          type: boolean
-          description: >-
-            Decides whether external consent management is enabled.
-          default: false
-        consentPageUrl:
-          type: string
-          example: "https://example.com/consent"
-          description: >-
-            External consent management URL.
     InboundProtocols:
       type: object
       properties:
