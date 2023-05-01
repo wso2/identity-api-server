@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.AppRoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationStepModel;
@@ -29,8 +30,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Certificate
 import org.wso2.carbon.identity.api.server.application.management.v1.Claim;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
-import org.wso2.carbon.identity.api.server.application.management.v1.ExternalizedConsentPageConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.IdpAppRoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
@@ -113,7 +112,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .advancedConfigurations(buildAdvancedAppConfiguration(application))
                     .provisioningConfigurations(buildProvisioningConfiguration(application))
                     .authenticationSequence(buildAuthenticationSequence(application))
-                    .idpAppRoleConfigurations(buildIdpAppRoleConfigurations(application))
+                    .appRoleConfigurations(buildAppRoleConfigurations(application))
                     .access(getAccess(application.getApplicationName()));
         }
     }
@@ -158,12 +157,12 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     }
 
     /**
-     * Build idp application role configurations API model from the given application.
+     * Build application role configurations API model from the given application.
      *
-     * @param application Service Provider for which the Idp Application Role Configurations API model is built.
-     * @return List of idp application role configurations.
+     * @param application Service Provider for which the Application Role Configurations API model is built.
+     * @return List of application role configurations.
      */
-    private List<IdpAppRoleConfig> buildIdpAppRoleConfigurations(ServiceProvider application) {
+    private List<AppRoleConfig> buildAppRoleConfigurations(ServiceProvider application) {
 
         AppRoleMappingConfig[] applicationRoleMappingConfig = application.getApplicationRoleMappingConfig();
 
@@ -171,10 +170,10 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             return Collections.emptyList();
         }
         return Arrays.stream(applicationRoleMappingConfig).map(appRoleMappingConfig -> {
-            IdpAppRoleConfig idpAppRoleConfig = new IdpAppRoleConfig();
-            idpAppRoleConfig.setIdp(appRoleMappingConfig.getIdPName());
-            idpAppRoleConfig.setUseAppRoleMappings(appRoleMappingConfig.isUseAppRoleMappings());
-            return idpAppRoleConfig;
+            AppRoleConfig appRoleConfig = new AppRoleConfig();
+            appRoleConfig.setIdp(appRoleMappingConfig.getIdPName());
+            appRoleConfig.setUseAppRoleMappings(appRoleMappingConfig.isUseAppRoleMappings());
+            return appRoleConfig;
         }).collect(Collectors.toList());
     }
 

@@ -25,15 +25,15 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
 /**
- * Decides whether an FIdP use app role mappings.
+ * Decides whether an FIdP uses app role mappings.
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Decides whether an FIdP use app role mappings.")
-public class IdpAppRoleConfig  {
+@ApiModel(description = "Decides whether an FIdP uses app role mappings.")
+public class AppRoleConfig  {
   
     private String idp;
     private Boolean useAppRoleMappings = false;
@@ -41,7 +41,7 @@ public class IdpAppRoleConfig  {
     /**
     * FIdP name.
     **/
-    public IdpAppRoleConfig idp(String idp) {
+    public AppRoleConfig idp(String idp) {
 
         this.idp = idp;
         return this;
@@ -62,7 +62,7 @@ public class IdpAppRoleConfig  {
     /**
     * FIdP use application role mappings.
     **/
-    public IdpAppRoleConfig useAppRoleMappings(Boolean useAppRoleMappings) {
+    public AppRoleConfig useAppRoleMappings(Boolean useAppRoleMappings) {
 
         this.useAppRoleMappings = useAppRoleMappings;
         return this;
@@ -91,9 +91,9 @@ public class IdpAppRoleConfig  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        IdpAppRoleConfig idpAppRoleConfig = (IdpAppRoleConfig) o;
-        return Objects.equals(this.idp, idpAppRoleConfig.idp) &&
-            Objects.equals(this.useAppRoleMappings, idpAppRoleConfig.useAppRoleMappings);
+        AppRoleConfig appRoleConfig = (AppRoleConfig) o;
+        return Objects.equals(this.idp, appRoleConfig.idp) &&
+            Objects.equals(this.useAppRoleMappings, appRoleConfig.useAppRoleMappings);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class IdpAppRoleConfig  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class IdpAppRoleConfig {\n");
+        sb.append("class AppRoleConfig {\n");
         
         sb.append("    idp: ").append(toIndentedString(idp)).append("\n");
         sb.append("    useAppRoleMappings: ").append(toIndentedString(useAppRoleMappings)).append("\n");

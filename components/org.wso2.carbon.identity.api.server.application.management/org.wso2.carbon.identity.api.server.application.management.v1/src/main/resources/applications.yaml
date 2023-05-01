@@ -2538,8 +2538,8 @@ components:
           $ref: '#/components/schemas/InboundProtocolsListResponse'
         authenticationSequence:
           $ref: '#/components/schemas/AuthenticationSequence'
-        idpAppRoleConfigurations:
-          $ref: '#/components/schemas/IdpAppRoleConfigurations'
+        appRoleConfigurations:
+          $ref: '#/components/schemas/AppRoleConfigurations'
         advancedConfigurations:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
@@ -2573,8 +2573,8 @@ components:
           $ref: '#/components/schemas/ClaimConfiguration'
         authenticationSequence:
           $ref: '#/components/schemas/AuthenticationSequence'
-        idpAppRoleConfigurations:
-          $ref: '#/components/schemas/IdpAppRoleConfigurations'
+        appRoleConfigurations:
+          $ref: '#/components/schemas/AppRoleConfigurations'
         advancedConfigurations:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
@@ -3308,16 +3308,16 @@ components:
           type: string
           example: basic
 
-    IdpAppRoleConfigurations:
+    AppRoleConfigurations:
       type: array
       description: Decides whether the attribute step FIdPs use app role mappings.
       items:
-        $ref: '#/components/schemas/IdpAppRoleConfig'
+        $ref: '#/components/schemas/AppRoleConfig'
       minItems: 0
 
-    IdpAppRoleConfig:
+    AppRoleConfig:
       type: object
-      description: Decides whether an FIdP use app role mappings.
+      description: Decides whether an FIdP uses app role mappings.
       required:
         - idp
         - useAppRoleMappings

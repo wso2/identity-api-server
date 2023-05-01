@@ -25,9 +25,9 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.AppRoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.IdpAppRoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import javax.validation.constraints.*;
 
@@ -46,7 +46,8 @@ public class ApplicationPatchModel  {
     private String templateId;
     private ClaimConfiguration claimConfiguration;
     private AuthenticationSequence authenticationSequence;
-    private List<IdpAppRoleConfig> idpAppRoleConfigurations = null;
+    private List<AppRoleConfig> appRoleConfigurations = null;
+
     private AdvancedApplicationConfiguration advancedConfigurations;
     private ProvisioningConfiguration provisioningConfigurations;
 
@@ -179,27 +180,27 @@ public class ApplicationPatchModel  {
     /**
     * Decides whether the attribute step FIdPs use app role mappings.
     **/
-    public ApplicationPatchModel idpAppRoleConfigurations(List<IdpAppRoleConfig> idpAppRoleConfigurations) {
+    public ApplicationPatchModel appRoleConfigurations(List<AppRoleConfig> appRoleConfigurations) {
 
-        this.idpAppRoleConfigurations = idpAppRoleConfigurations;
+        this.appRoleConfigurations = appRoleConfigurations;
         return this;
     }
     
     @ApiModelProperty(value = "Decides whether the attribute step FIdPs use app role mappings.")
-    @JsonProperty("idpAppRoleConfigurations")
+    @JsonProperty("appRoleConfigurations")
     @Valid @Size(min=0)
-    public List<IdpAppRoleConfig> getIdpAppRoleConfigurations() {
-        return idpAppRoleConfigurations;
+    public List<AppRoleConfig> getAppRoleConfigurations() {
+        return appRoleConfigurations;
     }
-    public void setIdpAppRoleConfigurations(List<IdpAppRoleConfig> idpAppRoleConfigurations) {
-        this.idpAppRoleConfigurations = idpAppRoleConfigurations;
+    public void setAppRoleConfigurations(List<AppRoleConfig> appRoleConfigurations) {
+        this.appRoleConfigurations = appRoleConfigurations;
     }
 
-    public ApplicationPatchModel addIdpAppRoleConfigurationsItem(IdpAppRoleConfig idpAppRoleConfigurationsItem) {
-        if (this.idpAppRoleConfigurations == null) {
-            this.idpAppRoleConfigurations = new ArrayList<>();
+    public ApplicationPatchModel addAppRoleConfigurationsItem(AppRoleConfig appRoleConfigurationsItem) {
+        if (this.appRoleConfigurations == null) {
+            this.appRoleConfigurations = new ArrayList<>();
         }
-        this.idpAppRoleConfigurations.add(idpAppRoleConfigurationsItem);
+        this.appRoleConfigurations.add(appRoleConfigurationsItem);
         return this;
     }
 
@@ -258,14 +259,14 @@ public class ApplicationPatchModel  {
             Objects.equals(this.templateId, applicationPatchModel.templateId) &&
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
             Objects.equals(this.authenticationSequence, applicationPatchModel.authenticationSequence) &&
-            Objects.equals(this.idpAppRoleConfigurations, applicationPatchModel.idpAppRoleConfigurations) &&
+            Objects.equals(this.appRoleConfigurations, applicationPatchModel.appRoleConfigurations) &&
             Objects.equals(this.advancedConfigurations, applicationPatchModel.advancedConfigurations) &&
             Objects.equals(this.provisioningConfigurations, applicationPatchModel.provisioningConfigurations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, imageUrl, accessUrl, templateId, claimConfiguration, authenticationSequence, idpAppRoleConfigurations, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, imageUrl, accessUrl, templateId, claimConfiguration, authenticationSequence, appRoleConfigurations, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -281,7 +282,7 @@ public class ApplicationPatchModel  {
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
-        sb.append("    idpAppRoleConfigurations: ").append(toIndentedString(idpAppRoleConfigurations)).append("\n");
+        sb.append("    appRoleConfigurations: ").append(toIndentedString(appRoleConfigurations)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
         sb.append("    provisioningConfigurations: ").append(toIndentedString(provisioningConfigurations)).append("\n");
         sb.append("}");
