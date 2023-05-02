@@ -99,6 +99,45 @@ paths:
           $ref: '#/components/responses/ServerError'
         '501':
           $ref: '#/components/responses/NotImplemented'
+  /userstores/import:
+    post:
+      tags:
+        - User Store
+      summary: |
+        Import a secondary user store from a file.
+      description: >
+        This API provides the capability to import a user store from
+        the configurations provided as a YAML, JSON or XML file.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/userstore/config/create <br>
+          <b>Scope required:</b> <br>
+              * internal_userstore_create
+      operationId: importUserStoreFromFile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpload'
+        description: This represents the user store to be created.
+      responses:
+        '201':
+          description: Successful response
+          headers:
+            Location:
+              description: >-
+                Location of the newly created secondary userstore. userstore id is generated as base-64-url-encoded(domain-name) value.
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
   '/userstores/primary':
     get:
       tags:
@@ -266,7 +305,107 @@ paths:
             schema:
               $ref: '#/components/schemas/PatchRequest'
         required: true
-
+  /userstores/{userstore-domain-id}/export:
+    get:
+      tags:
+        - User Store
+      summary: |
+        Export a secondary user store by its domain id.
+      description: |
+        This API provides the capability to retrieve the configurations of a
+        secondary user store based on its domain id as a XML, YAML, or JSON file.<br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/userstore/config/view <br>
+        <b>Scope required:</b> <br>
+            * internal_userstore_view
+      operationId: exportUserStoreToFile
+      parameters:
+        - name: userstore-domain-id
+          in: path
+          description: ID of the user store domain.
+          required: true
+          schema:
+            type: string
+            example: SkRCQy1TRUNPTkRBUlk
+        - $ref: '#/components/parameters/fileTypeHeaderParam'
+      responses:
+        '200':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: string
+              example: 'Sample userstore configuration in the requested format'
+            application/yaml:
+              schema:
+                type: string
+              example: 'Sample userstore configuration in the requested format'
+            application/xml:
+              schema:
+                type: string
+              example: 'Sample userstore configuration in the requested format'
+            application/octet-stream:
+              schema:
+                type: string
+              example: 'Sample userstore configuration in the requested format'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /userstores/{userstore-domain-id}/import:
+    put:
+      tags:
+        - User Store
+      summary: |
+        Update an existing userstore by importing user store configurations from a file.
+      description: >
+        This API provides the capability to update an existing user store by importing
+        user store configurations provided as a YAML, JSON or XML file.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/userstore/config/update <br>
+          <b>Scope required:</b> <br>
+              * internal_userstore_update
+      operationId: updateUserStoreFromFile
+      parameters:
+        - name: userstore-domain-id
+          in: path
+          description: ID of the user store.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpload'
+        description: This represents the user store to be updated.
+      responses:
+        '200':
+          description: Successfully Updated.
+          headers:
+            Location:
+              description: >-
+                Location of the updated userstore. userstore id is generated as base-64-url-encoded(domain-name) value.
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
   /userstores/{userstore-domain-id}/attribute-mappings:
     patch:
       tags:
@@ -502,6 +641,23 @@ components:
       description: Define set of user store attributes (as comma separated) to be returned.
       schema:
         type: string
+    fileTypeHeaderParam:
+      in: header
+      name: Accept
+      required: false
+      description: |
+        Content type of the file.
+      schema:
+        type: string
+        default: application/yaml
+        enum:
+          - application/json
+          - application/xml
+          - application/yaml
+          - application/x-yaml
+          - text/yaml
+          - text/xml
+          - text/json
   responses:
     NotFound:
       description: The specified resource is not found.
@@ -928,3 +1084,10 @@ components:
           type: string
           description: Display name of the attribute.
           example: First Name
+    FileUpload:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: File uploaded during import.
