@@ -126,6 +126,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.governance</groupId>
+                <artifactId>org.wso2.carbon.identity.idle.account.identification</artifactId>
+                <version>${identity.governance.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.event.handler.notification</groupId>
                 <artifactId>org.wso2.carbon.email.mgt</artifactId>
                 <version>${identity.event.handler.version}</version>
@@ -437,6 +443,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.idle.account.identification.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.secret.mgt.core</artifactId>
                 <version>${carbon.identity.framework.version}</version>
@@ -559,7 +571,7 @@
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
-        <identity.governance.version>1.8.23</identity.governance.version>
+        <identity.governance.version>2.0.2</identity.governance.version>
         <carbon.identity.framework.version>5.25.140</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
@@ -609,6 +621,7 @@
         <module>components/org.wso2.carbon.identity.api.server.secret.management</module>
         <module>components/org.wso2.carbon.identity.api.server.branding.preference.management</module>
         <module>components/org.wso2.carbon.identity.api.server.input.validation</module>
+        <module>components/org.wso2.carbon.identity.api.server.idle.account.identification</module>
     </modules>
 
 </project>

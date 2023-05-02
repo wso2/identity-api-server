@@ -1,0 +1,134 @@
+openapi: 3.0.0
+info:
+  description: >
+    This document specifies an **Idle accounts identification API** for **WSO2 Identity server**.
+  version: "v1"
+  title: WSO2 Identity Server - Idle Accounts Identification Rest API
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      server-url:
+        default: "localhost:9443"
+      tenant-domain:
+        default: "default"
+
+paths:
+  /inactive-users:
+    get:
+      tags:
+        - Get inactive users
+      description: Get inactive users list for a specified period.
+      operationId: getInactiveUsers
+      parameters:
+        - in: query
+          name: inactiveAfter
+          schema:
+            type: string
+          description: Latest active date of login.
+          example: 2023-01-31
+        - in: query
+          name: excludeBefore
+          schema:
+            type: string
+          description: Date to exclude the oldest inactive users.
+          example: 2023-01-01
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: 80001
+        message:
+          type: string
+          example: Some error message
+        description:
+          type: string
+          example: Some error description
+    Unauthorized:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: 401
+        message:
+          type: string
+          example: Unauthorized
+        description:
+          type: string
+          example: You are unauthorized to make this request
+    InactiveUsersList:
+      type: array
+      items:
+        $ref: '#/components/schemas/InactiveUser'
+    InactiveUser:
+      type: object
+      properties:
+        username:
+          type: string
+        userStoreDomain:
+          type: string
+        email:
+          type: string
+      required:
+        - username
+      example:
+        username: JohnDoe
+        userStoreDomain: DEFAULT
+        email: johnDoe@xmail.com
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Unauthorized'
+    Forbidden:
+      description: Resource Forbidden
+    ServerError:
+      description: Internal Server Error
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid Input Request
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    Success:
+      description: Inactive users returned successfully
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/InactiveUsersList'
