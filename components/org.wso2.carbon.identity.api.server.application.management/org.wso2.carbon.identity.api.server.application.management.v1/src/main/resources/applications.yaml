@@ -2538,6 +2538,8 @@ components:
           $ref: '#/components/schemas/InboundProtocolsListResponse'
         authenticationSequence:
           $ref: '#/components/schemas/AuthenticationSequence'
+        appRoleConfigurations:
+          $ref: '#/components/schemas/AppRoleConfigurations'
         advancedConfigurations:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
@@ -2571,6 +2573,8 @@ components:
           $ref: '#/components/schemas/ClaimConfiguration'
         authenticationSequence:
           $ref: '#/components/schemas/AuthenticationSequence'
+        appRoleConfigurations:
+          $ref: '#/components/schemas/AppRoleConfigurations'
         advancedConfigurations:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
@@ -3303,6 +3307,30 @@ components:
         authenticator:
           type: string
           example: basic
+
+    AppRoleConfigurations:
+      type: array
+      description: Decides whether the attribute step FIdPs use app role mappings.
+      items:
+        $ref: '#/components/schemas/AppRoleConfig'
+      minItems: 0
+
+    AppRoleConfig:
+      type: object
+      description: Decides whether an FIdP uses app role mappings.
+      required:
+        - idp
+        - useAppRoleMappings
+      properties:
+        idp:
+          type: string
+          description: FIdP name.
+          example: googleIdP
+        useAppRoleMappings:
+          type: boolean
+          description: FIdP use application role mappings.
+          example: false
+          default: false
 
     AuthProtocolMetadata:
       type: object

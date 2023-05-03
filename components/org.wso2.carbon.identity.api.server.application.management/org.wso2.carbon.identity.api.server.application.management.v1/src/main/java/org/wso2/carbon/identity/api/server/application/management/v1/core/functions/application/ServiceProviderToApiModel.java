@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.AppRoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationStepModel;
@@ -40,6 +41,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
+import org.wso2.carbon.identity.application.common.model.AppRoleMappingConfig;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
@@ -110,6 +112,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .advancedConfigurations(buildAdvancedAppConfiguration(application))
                     .provisioningConfigurations(buildProvisioningConfiguration(application))
                     .authenticationSequence(buildAuthenticationSequence(application))
+                    .appRoleConfigurations(buildAppRoleConfigurations(application))
                     .access(getAccess(application.getApplicationName()));
         }
     }
@@ -151,6 +154,27 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         authSequence.setRequestPathAuthenticators(requestPathAuthenticators);
 
         return authSequence;
+    }
+
+    /**
+     * Build application role configurations API model from the given application.
+     *
+     * @param application Service Provider for which the Application Role Configurations API model is built.
+     * @return List of application role configurations.
+     */
+    private List<AppRoleConfig> buildAppRoleConfigurations(ServiceProvider application) {
+
+        AppRoleMappingConfig[] applicationRoleMappingConfig = application.getApplicationRoleMappingConfig();
+
+        if (applicationRoleMappingConfig == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(applicationRoleMappingConfig).map(appRoleMappingConfig -> {
+            AppRoleConfig appRoleConfig = new AppRoleConfig();
+            appRoleConfig.setIdp(appRoleMappingConfig.getIdPName());
+            appRoleConfig.setUseAppRoleMappings(appRoleMappingConfig.isUseAppRoleMappings());
+            return appRoleConfig;
+        }).collect(Collectors.toList());
     }
 
     private List<String> getRequestPathAuthenticators(ServiceProvider application) {
