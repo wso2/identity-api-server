@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.api.server.userstore.v1.model.AvailableUserStore
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ClaimAttributeMapping;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.ConnectionEstablishedResponse;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.Error;
+import java.io.File;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.MetaUserStoreType;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.PatchDocument;
@@ -44,6 +45,8 @@ public interface UserstoresApiService {
 
       public Response deleteUserStore(String userstoreDomainId);
 
+      public Response exportUserStoreToFile(String userstoreDomainId, String accept);
+
       public Response getAvailableUserStoreTypes();
 
       public Response getPrimaryUserStore();
@@ -56,6 +59,8 @@ public interface UserstoresApiService {
 
       public Response getUserStoreManagerProperties(String typeId);
 
+      public Response importUserStoreFromFile(InputStream fileInputStream, Attachment fileDetail);
+
       public Response patchUserStore(String userstoreDomainId, List<PatchDocument> patchDocument);
 
       public Response testRDBMSConnection(RDBMSConnectionReq rdBMSConnectionReq);
@@ -63,4 +68,6 @@ public interface UserstoresApiService {
       public Response updateAttributeMappings(String userstoreDomainId, List<ClaimAttributeMapping> claimAttributeMapping);
 
       public Response updateUserStore(String userstoreDomainId, UserStoreReq userStoreReq);
+
+      public Response updateUserStoreFromFile(String userstoreDomainId, InputStream fileInputStream, Attachment fileDetail);
 }

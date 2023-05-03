@@ -60,6 +60,8 @@ public interface IdentityProvidersApiService {
 
       public Response deleteIDPTemplate(String templateId);
 
+      public Response exportIDPToFile(String identityProviderId, Boolean excludeSecrets, String accept);
+
       public Response getClaimConfig(String identityProviderId);
 
       public Response getConnectedApps(String identityProviderId, Integer limit, Integer offset);
@@ -94,6 +96,8 @@ public interface IdentityProvidersApiService {
 
       public Response getRoleConfig(String identityProviderId);
 
+      public Response importIDPFromFile(InputStream fileInputStream, Attachment fileDetail);
+
       public Response patchIDP(String identityProviderId, List<Patch> patch);
 
       public Response updateClaimConfig(String identityProviderId, Claims claims);
@@ -101,6 +105,8 @@ public interface IdentityProvidersApiService {
       public Response updateFederatedAuthenticator(String identityProviderId, String federatedAuthenticatorId, FederatedAuthenticatorPUTRequest federatedAuthenticatorPUTRequest);
 
       public Response updateFederatedAuthenticators(String identityProviderId, FederatedAuthenticatorRequest federatedAuthenticatorRequest);
+
+      public Response updateIDPFromFile(String identityProviderId, InputStream fileInputStream, Attachment fileDetail);
 
       public Response updateIDPTemplate(String templateId, IdentityProviderTemplate identityProviderTemplate);
 

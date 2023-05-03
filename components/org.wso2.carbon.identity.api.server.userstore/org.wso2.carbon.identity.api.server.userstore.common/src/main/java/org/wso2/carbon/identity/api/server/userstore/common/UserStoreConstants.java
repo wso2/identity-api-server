@@ -89,6 +89,14 @@ public class UserStoreConstants {
                 "Unable to retrieve user store attribute metadata",
                 "Server Encountered an error while retrieving user store attribute metadata",
                 Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_ERROR_EXPORTING_USER_STORE("65014",
+                "Unable to export the user store configurations.",
+                "Server Encountered an error while exporting the user store configurations.",
+                Response.Status.INTERNAL_SERVER_ERROR),
+        ERROR_CODE_ERROR_IMPORTING_USER_STORE("65015",
+                "Unable to import the secondary user store configurations.",
+                "Server Encountered an error while importing the secondary user store configurations.",
+                Response.Status.INTERNAL_SERVER_ERROR),
 
         // Client Errors - 600xx
         ERROR_CODE_DOMAIN_ID_NOT_FOUND("60001",
