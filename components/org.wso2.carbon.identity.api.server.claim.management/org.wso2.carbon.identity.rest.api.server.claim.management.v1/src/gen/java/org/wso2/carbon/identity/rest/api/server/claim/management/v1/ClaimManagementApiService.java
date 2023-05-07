@@ -48,7 +48,7 @@ public abstract class ClaimManagementApiService {
 
     public abstract Response deleteLocalClaim(String claimId);
 
-    public abstract Response exportClaimToFile(String claimId, String dialectId, String accept);
+    public abstract Response exportClaimDialectToFile(String dialectId, String accept);
 
     public abstract Response getClaimDialect(String dialectId);
 
@@ -62,11 +62,11 @@ public abstract class ClaimManagementApiService {
 
     public abstract Response getLocalClaims(String attributes, Integer limit, Integer offset, String filter, String sort, Boolean excludeIdentityClaims);
 
-    public abstract Response importClaimFromFile(String dialectId, InputStream fileInputStream,Attachment fileDetail);
+    public abstract Response importClaimDialectFromFile(InputStream fileInputStream,Attachment fileDetail);
 
     public abstract Response updateClaimDialect(String dialectId, ClaimDialectReqDTO claimDialect);
 
-    public abstract Response updateClaimFromFile(String dialectId, String claimId, InputStream fileInputStream,Attachment fileDetail);
+    public abstract Response updateClaimDialectFromFile(InputStream fileInputStream,Attachment fileDetail);
 
     public abstract Response updateExternalClaim(String dialectId, String claimId, ExternalClaimReqDTO externalClaim);
 

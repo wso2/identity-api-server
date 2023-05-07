@@ -68,18 +68,17 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
     }
 
     @Override
-    public Response importClaimFromFile(String dialectId, InputStream fileInputStream, Attachment fileDetail) {
+    public Response importClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail) {
 
-        String resourceId = claimManagementService.importClaim(dialectId, fileInputStream, fileDetail);
-        return Response.created(getResourceLocation(LOCAL_DIALECT_PATH, resourceId)).build();
+        String resourceId = claimManagementService.importClaimDialectFromFile(fileInputStream, fileDetail);
+        return Response.created(getResourceLocation(resourceId)).build();
     }
 
     @Override
-    public Response updateClaimFromFile(String dialectId, String claimId, InputStream fileInputStream,
-                                        Attachment fileDetail) {
+    public Response updateClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail) {
 
-        String resourceId = claimManagementService.updateClaim(dialectId, claimId, fileInputStream, fileDetail);
-        return Response.created(getResourceLocation(LOCAL_DIALECT_PATH, resourceId)).build();
+        String resourceId = claimManagementService.updateClaimDialectFromFile(fileInputStream, fileDetail);
+        return Response.ok().location(getResourceLocation(resourceId)).build();
     }
 
     @Override
@@ -166,9 +165,10 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
         return Response.ok().build();
     }
 
-    public Response exportClaimToFile(String claimId, String dialectId, String accept) {
+    @Override
+    public Response exportClaimDialectToFile(String dialectId, String accept) {
 
-        FileContent fileContent = claimManagementService.exportClaim(claimId, dialectId, accept);
+        FileContent fileContent = claimManagementService.exportClaimDialectToFile(dialectId, accept);
 
         return Response.ok()
                 .type(fileContent.getFileType())

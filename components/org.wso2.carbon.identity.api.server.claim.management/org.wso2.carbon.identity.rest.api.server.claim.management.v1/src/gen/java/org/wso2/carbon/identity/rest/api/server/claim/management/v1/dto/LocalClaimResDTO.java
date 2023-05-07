@@ -32,7 +32,7 @@ import javax.validation.constraints.Pattern;
     * Local claim response.
     **/
 @ApiModel(description = "Local claim response.")
-public class LocalClaimResDTO {
+public class LocalClaimResDTO extends ClaimResDTO {
 
     @Valid 
     private String id = null;
@@ -219,6 +219,7 @@ public class LocalClaimResDTO {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class LocalClaimResDTO {\n");
+        sb.append("  " + super.toString()).append("\n");
         
         sb.append("    id: ").append(id).append("\n");
         sb.append("    claimURI: ").append(claimURI).append("\n");

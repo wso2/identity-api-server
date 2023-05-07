@@ -194,10 +194,10 @@ public class ClaimManagementApi  {
 
     @Valid
     @GET
-    @Path("/{dialect-id}/claims/file/{claim-id}")
+    @Path("/{dialect-id}/export")
     @Produces({ "application/json", "application/xml", "application/yaml" })
-    @io.swagger.annotations.ApiOperation(value = "Export both local and external claims in XML, YAML, or JSON format",
-            notes = "This API provides the capability to retrieve a claim as a XML, YAML, or JSON file. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/view <br> <b>Scope required:</b> <br> * internal_claim_meta_view",
+    @io.swagger.annotations.ApiOperation(value = "Export a claim dialect with related claims in XML, YAML, or JSON format",
+            notes = "This API provides the capability to retrieve a claim dialect for a given dialect ID along with all related claims as a XML, YAML, or JSON file. <br><b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/view <br> <b>Scope required:</b> <br> * internal_claim_meta_view",
             response = String.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "Successful response"),
@@ -212,11 +212,10 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
-    public Response exportClaimToFile(@ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId,
-    @ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
+    public Response exportClaimDialectToFile(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
     @ApiParam(value = "Content type of the file.\n"  , allowableValues="{values=[application/json, application/xml, application/yaml, application/x-yaml, text/yaml, text/xml, text/json]}", defaultValue="application/yaml")@HeaderParam("Accept") String accept) {
 
-        return delegate.exportClaimToFile(claimId,dialectId,accept);
+        return delegate.exportClaimDialectToFile(dialectId,accept);
     }
 
     @Valid
@@ -373,11 +372,11 @@ public class ClaimManagementApi  {
 
     @Valid
     @POST
-    @Path("/{dialect-id}/claims/file")
+    @Path("/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Import both local and external claims from XML, YAML, or JSON file",
-            notes = "This API provides the capability to import claims from a file in XML, YAML, or JSON format. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/create <br> <b>Scope required:</b> <br> * internal_claim_meta_create",
+    @io.swagger.annotations.ApiOperation(value = "Import an external claim dialect with related claims from XML, YAML, or JSON file",
+            notes = "This API provides the capability to import claim dialect with related claims from a file in XML, YAML, or JSON format. <br><b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/create <br> <b>Scope required:</b> <br> * internal_claim_meta_create",
             response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 201, message = "Item Created."),
@@ -390,11 +389,10 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
-    public Response importClaimFromFile(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
-    @ApiParam(value = "The file to be uploaded.") @Multipart(value = "file") InputStream fileInputStream,
+    public Response importClaimDialectFromFile(@ApiParam(value = "The file to be uploaded.") @Multipart(value = "file") InputStream fileInputStream,
     @ApiParam(value = "The file to be uploaded. : details") @Multipart(value = "file" ) Attachment fileDetail) {
 
-        return delegate.importClaimFromFile(dialectId,fileInputStream,fileDetail);
+        return delegate.importClaimDialectFromFile(fileInputStream,fileDetail);
     }
 
     @Valid
@@ -423,11 +421,11 @@ public class ClaimManagementApi  {
 
     @Valid
     @PUT
-    @Path("/{dialect-id}/claims/file/{claim-id}")
+    @Path("/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Update both local and external claims from XML, YAML, or JSON file",
-            notes = "This API provides the capability to update claims from a file in XML, YAML, or JSON format. <br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/create <br> <b>Scope required:</b> <br> * internal_claim_meta_create",
+    @io.swagger.annotations.ApiOperation(value = "Update claim dialect with related claims from XML, YAML, or JSON file",
+            notes = "This API provides the capability to update a claim dialect and all related claims from a file in XML, YAML, or JSON format. <br><b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/create <br> <b>Scope required:</b> <br> * internal_claim_meta_create",
             response = void.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 201, message = "Item Created."),
@@ -440,12 +438,10 @@ public class ClaimManagementApi  {
         
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
-    public Response updateClaimFromFile(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
-    @ApiParam(value = "Id of the claim.",required=true ) @PathParam("claim-id")  String claimId,
-    @ApiParam(value = "The file to be uploaded.") @Multipart(value = "file") InputStream fileInputStream,
+    public Response updateClaimDialectFromFile(@ApiParam(value = "The file to be uploaded.") @Multipart(value = "file") InputStream fileInputStream,
     @ApiParam(value = "The file to be uploaded. : details") @Multipart(value = "file" ) Attachment fileDetail) {
 
-        return delegate.updateClaimFromFile(dialectId,claimId,fileInputStream,fileDetail);
+        return delegate.updateClaimDialectFromFile(fileInputStream,fileDetail);
     }
 
     @Valid
