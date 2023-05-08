@@ -522,7 +522,7 @@ paths:
           <b>Permission required:</b> <br>
               * /permission/admin <br>
           <b>Scope required:</b> <br>
-              * SYSTEM
+              * internal_organization_admin
       parameters:
         - name: applicationId
           in: path
