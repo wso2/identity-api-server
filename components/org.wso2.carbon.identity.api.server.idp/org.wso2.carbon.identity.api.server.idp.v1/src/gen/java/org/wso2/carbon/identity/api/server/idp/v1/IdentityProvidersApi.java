@@ -67,16 +67,16 @@ public class IdentityProvidersApi  {
 
     @Valid
     @POST
-    
+
     @Consumes({ "application/json", "application/xml" })
     @Produces({ "application/json", "application/xml" })
     @ApiOperation(value = "Add a new identity provider ", notes = "This API provides the capability to create a new identity provider. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/create <br> <b>Scope required:</b> <br>     * internal_idp_create ", response = IdentityProviderResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Identity Providers", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Successful response", response = IdentityProviderResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -97,10 +97,10 @@ public class IdentityProvidersApi  {
     @ApiOperation(value = "Create a new IdP template ", notes = "This API provides the capability to create a new IdP template. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Template management", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Successful response", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -116,15 +116,15 @@ public class IdentityProvidersApi  {
     @Valid
     @DELETE
     @Path("/{identity-provider-id}")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete an identity provider by using the identity provider's ID.  ", notes = "This API provides the capability to delete an identity provider by giving its ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/delete <br> <b>Scope required:</b> <br>     * internal_idp_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Identity Providers", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -140,15 +140,15 @@ public class IdentityProvidersApi  {
     @Valid
     @DELETE
     @Path("/templates/{template-id}")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Delete an IdP template using the template ID. ", notes = "This API provides the capability to delete an IdP template using the template ID. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Template management", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 204, message = "Successfully Deleted", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -163,16 +163,16 @@ public class IdentityProvidersApi  {
 
     @Valid
     @GET
-    @Path("/file/{identity-provider-id}")
-    
+    @Path("/{identity-provider-id}/export")
+
     @Produces({ "application/json", "application/yaml", "application/xml", "application/octet-stream" })
-    @ApiOperation(value = "Export identity provider in XML, YAML, or JSON file formats ", notes = "This API provides the capability to retrieve the identity provider as a XML, YAML, or JSON file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/view <br>   <b>Scope required:</b> <br>       * internal_idp_view ", response = String.class, authorizations = {
+    @ApiOperation(value = "Export identity provider in XML, YAML, or JSON file formats ", notes = "This API provides the capability to retrieve the identity provider if the given ID as a XML, YAML, or JSON file. Use LOCAL as the ID to export resident IDP configurations.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/view <br>   <b>Scope required:</b> <br>       * internal_idp_view ", response = String.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Identity Providers", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = String.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -188,15 +188,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/{identity-provider-id}/claims")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Claim config of an identity provider ", notes = "This API provides the claim config for an identity provider. This includes idp-to-local claim mappings, claims to be outbound provisioned, userID claim URI, and role claim URI. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = Claims.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Claims", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful Response", response = Claims.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -212,15 +212,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/{identity-provider-id}/connected-apps")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Connected applications of an identity provider ", notes = "This API provides the list of applications that use this identity provider for federated authentication/provisioning. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = ConnectedApps.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Connected Apps", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = ConnectedApps.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -236,15 +236,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/{identity-provider-id}/federated-authenticators/{federated-authenticator-id}")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve federated authenticator config of an identity provider ", notes = "This API provides the capability to retrieve the federated authenticator information of an identity provider by giving the federated authenticator's ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = FederatedAuthenticator.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Federated Authenticators", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful Response", response = FederatedAuthenticator.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -260,15 +260,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/{identity-provider-id}/federated-authenticators")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Federated authenticators of an identity provider ", notes = "This API provides a list of federated authenticators enabled for a specific identity provider identified by its ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = FederatedAuthenticatorListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Federated Authenticators", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = FederatedAuthenticatorListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -284,15 +284,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/{identity-provider-id}")
-    
+
     @Produces({ "application/json", "application/xml" })
     @ApiOperation(value = "Retrieve identity provider by identity provider's ID ", notes = "This API provides the capability to retrieve the identity provider details by using its ID. Furthermore, by specifying the \"Accept : application/xml\" header, it provides the ability to export IdP data as XML. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = IdentityProviderResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Identity Providers", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = IdentityProviderResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -308,15 +308,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/templates/{template-id}")
-    
+
     @Produces({ "application/json", "application/xml" })
     @ApiOperation(value = "Retrieve identity provider template by ID ", notes = "This API provides the capability to retrieve an identity provider template using its ID. ", response = IdentityProviderTemplate.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Template management", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = IdentityProviderTemplate.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -332,15 +332,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/templates")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "List identity provider templates ", notes = "This API provides the list of available identity provider templates. ", response = IdentityProviderTemplateListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Template management", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = IdentityProviderTemplateListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -357,16 +357,16 @@ public class IdentityProvidersApi  {
 
     @Valid
     @GET
-    
-    
+
+
     @Produces({ "application/json" })
     @ApiOperation(value = "List identity providers ", notes = "This API provides the capability to retrieve the list of identity providers.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = IdentityProviderListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Identity Providers", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful Response", response = IdentityProviderListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -383,15 +383,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/{identity-provider-id}/provisioning/jit")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Just-In-Time provisioning config of an identity provider ", notes = "This API retrieves the Just-In-Time provisioning config of an identity provider by specifying the identity provider ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = JustInTimeProvisioning.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Provisioning", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful Response", response = JustInTimeProvisioning.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -407,15 +407,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/meta/federated-authenticators/{federated-authenticator-id}")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Metadata about a supported federated authenticator ", notes = "This API provides the details of a single supported federated authenticator for an identity provider in the the identity server. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = MetaFederatedAuthenticator.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Metadata", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK", response = MetaFederatedAuthenticator.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -431,15 +431,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/meta/federated-authenticators")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Metadata about supported federated authenticators of identity providers ", notes = "This API provides the list of supported federated authenticators for an identity provider in the the identity server. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view", response = MetaFederatedAuthenticatorListItem.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Metadata", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK", response = MetaFederatedAuthenticatorListItem.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -455,15 +455,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/meta/outbound-provisioning-connectors/{outbound-provisioning-connector-id}")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Metadata about supported outbound provisioning connectors ", notes = "This API provides the details of a single supported outbound provisioning connector for an IdP in the identity server. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view", response = MetaOutboundConnector.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Metadata", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK", response = MetaOutboundConnector.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -479,15 +479,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/meta/outbound-provisioning-connectors")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Metadata about supported outbound provisioning connectors by identity providers in the identity server ", notes = "This API provides the list of supported federated authenticators for an IdP in the identity server. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view", response = MetaOutboundConnectorListItem.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Metadata", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK", response = MetaOutboundConnectorListItem.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -503,15 +503,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/{identity-provider-id}/provisioning/outbound-connectors/{outbound-provisioning-connector-id}")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve outbound provisioning connector of an identity provider ", notes = "This API provides the capability to retrieve the outbound provisioning connector information of an identity provider by specifying the provisioning connector's ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = OutboundConnector.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Provisioning", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = OutboundConnector.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -527,15 +527,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/{identity-provider-id}/provisioning/outbound-connectors")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Outbound provisioning connectors of an identity provider ", notes = "This API provides a list of outbound provisioning connectors enabled for an identity provider. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = OutboundConnectorListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Provisioning", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = OutboundConnectorListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -551,15 +551,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/{identity-provider-id}/provisioning")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Provisioning entities of an identity provider ", notes = "This API provides a list of available provisioning entities for an identity provider. This includes just-in-time provisioning config and outbound provisioning connectors <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = ProvisioningResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Provisioning", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = ProvisioningResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -575,15 +575,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/{identity-provider-id}/roles")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Role config of an identity provider ", notes = "This API provides the role config of an identity provider. This includes idp-to-local role mappings and/or a list of roles to be outbound-provisioned <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = Roles.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Roles", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = Roles.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -598,16 +598,16 @@ public class IdentityProvidersApi  {
 
     @Valid
     @POST
-    @Path("/file")
+    @Path("/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Create identity provider from an exported XML, YAML or JSON file ", notes = "This API provides the capability to import an identity provider from the information provided as a file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/create <br>   <b>Scope required:</b> <br>       * internal_idp_create ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Identity Providers", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Successfully created.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -628,10 +628,10 @@ public class IdentityProvidersApi  {
     @ApiOperation(value = "Patch an identity provider property by ID. Patch is supported only for key-value pairs ", notes = "This API provides the capability to update an identity provider property using patch request. IdP patch is supported only for key-value pairs. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = IdentityProviderResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Identity Providers", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = IdentityProviderResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -652,10 +652,10 @@ public class IdentityProvidersApi  {
     @ApiOperation(value = "Update the claims of an identity provider ", notes = "This API provides the capability to update the claim config of an existing identity provider. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = Claims.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Claims", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = Claims.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -676,10 +676,10 @@ public class IdentityProvidersApi  {
     @ApiOperation(value = "Update a federated authenticator of an identity provider by using authenticator id ", notes = "This API provides the capability to update an identity provider's federated authenticator config by specifying the authenticator ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = FederatedAuthenticator.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Federated Authenticators", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = FederatedAuthenticator.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -700,10 +700,10 @@ public class IdentityProvidersApi  {
     @ApiOperation(value = "Update Federated authenticators of an identity provider ", notes = "This API updates federated authenticators enabled for a specific identity provider identified by its ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = FederatedAuthenticatorListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Federated Authenticators", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = FederatedAuthenticatorListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -718,16 +718,16 @@ public class IdentityProvidersApi  {
 
     @Valid
     @PUT
-    @Path("/file/{identity-provider-id}")
+    @Path("/{identity-provider-id}/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update identity provider from an exported YAML, XML or JSON file ", notes = "This API provides the capability to update an existing identity provider from the information provided as a file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/update <br>   <b>Scope required:</b> <br>       * internal_idp_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update identity provider from an exported YAML, XML or JSON file ", notes = "This API provides the capability to update an existing identity provider from the information provided as a file. Use LOCAL as the ID to update resident IDP configurations.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/update <br>   <b>Scope required:</b> <br>       * internal_idp_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Identity Providers", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successfully Updated.", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -749,10 +749,10 @@ public class IdentityProvidersApi  {
     @ApiOperation(value = "Update the IdP template of a given template ID. ", notes = "This API provides the capability to update the IdP template of a given template ID. ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Template management", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successfully updated", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -774,10 +774,10 @@ public class IdentityProvidersApi  {
     @ApiOperation(value = "Update the just-in-time provisioning config of an identity provider ", notes = "This API provides the capability to update the just-in-time provisioning config of an identity provider by specifying the identity provider's ID. This includes the ability to enable/disable JIT provisioning, change provisioning userstore and enable/disable user prompts for username, password and consent. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = JustInTimeProvisioning.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Provisioning", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = JustInTimeProvisioning.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -798,10 +798,10 @@ public class IdentityProvidersApi  {
     @ApiOperation(value = "Update an outbound provisioning connector of an identity provider ", notes = "This API provides the capability to update an outbound provisioning connector config of an identity provider by specifying the provisioning connector's ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = OutboundConnector.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Provisioning", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = OutboundConnector.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -822,10 +822,10 @@ public class IdentityProvidersApi  {
     @ApiOperation(value = "Update outbound provisioning connectors of an identity provider ", notes = "This API provides updates the list of outbound provisioning connectors enabled for an identity provider. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = OutboundConnectorListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Provisioning", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = OutboundConnectorListResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -846,10 +846,10 @@ public class IdentityProvidersApi  {
     @ApiOperation(value = "Update the role config of an identity provider ", notes = "This API provides the capability to update the role config of an identity provider by specifying the identity provider ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = Roles.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Roles" })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = Roles.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),

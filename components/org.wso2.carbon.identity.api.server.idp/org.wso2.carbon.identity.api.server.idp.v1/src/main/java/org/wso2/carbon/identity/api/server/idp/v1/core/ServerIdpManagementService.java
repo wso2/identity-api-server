@@ -107,6 +107,7 @@ import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
+import org.wso2.carbon.idp.mgt.dao.IdPManagementDAO;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 import org.wso2.carbon.user.core.UserCoreConstants;
@@ -158,6 +159,7 @@ import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_SERV
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.SERV_AUTHENTICATION;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.SERV_PROVISIONING;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.TEMPLATE_MGT_ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.RESIDENT_IDP_RESERVED_NAME;
 import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
 
 /**
@@ -317,10 +319,13 @@ public class ServerIdpManagementService {
 
         IdentityProvider identityProvider;
         IdentityProvider idpToExport;
+        IdPManagementDAO dao = new IdPManagementDAO();
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId,
-                            tenantDomain, true);
+            identityProvider = idpId.equals(RESIDENT_IDP_RESERVED_NAME) ? dao.getIdPByName(null,
+                    RESIDENT_IDP_RESERVED_NAME, IdentityTenantUtil.getTenantId(tenantDomain), tenantDomain) :
+                    IdentityProviderServiceHolder.getIdentityProviderManager().
+                            getIdPByResourceId(idpId, tenantDomain, true);
             idpToExport = createIdPClone(identityProvider);
             if (idpToExport == null) {
                 throw handleException(Response.Status.NOT_FOUND,
@@ -374,19 +379,22 @@ public class ServerIdpManagementService {
      * @param identityProviderId Resource ID of the Identity Provider to be updated.
      * @param fileInputStream    File to be imported as an input stream.
      * @param fileDetail         File details.
-     * @return Unique identifier of the updated identity provider.
      */
-    public String updateIDPFromFile(String identityProviderId, InputStream fileInputStream, Attachment fileDetail) {
+    public void updateIDPFromFile(String identityProviderId, InputStream fileInputStream, Attachment fileDetail) {
 
         IdentityProvider identityProvider;
         try {
+            identityProvider = getIDPFromFile(fileInputStream, fileDetail);
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(
-                    identityProviderId, getIDPFromFile(fileInputStream, fileDetail), tenantDomain);
+            if (identityProviderId.equals(RESIDENT_IDP_RESERVED_NAME)) {
+                IdentityProviderServiceHolder.getIdentityProviderManager().updateResidentIdP(identityProvider,
+                        tenantDomain);
+            }
+            IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(identityProviderId,
+                    identityProvider, tenantDomain);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
         }
-        return identityProvider.getResourceId();
     }
 
     /**
