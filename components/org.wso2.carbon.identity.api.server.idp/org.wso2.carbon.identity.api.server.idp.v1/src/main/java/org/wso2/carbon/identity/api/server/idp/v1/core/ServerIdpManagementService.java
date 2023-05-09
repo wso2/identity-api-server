@@ -389,9 +389,10 @@ public class ServerIdpManagementService {
             if (identityProviderId.equals(RESIDENT_IDP_RESERVED_NAME)) {
                 IdentityProviderServiceHolder.getIdentityProviderManager().updateResidentIdP(identityProvider,
                         tenantDomain);
+            } else {
+                IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(identityProviderId,
+                        identityProvider, tenantDomain);
             }
-            IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(identityProviderId,
-                    identityProvider, tenantDomain);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
         }
@@ -3403,6 +3404,12 @@ public class ServerIdpManagementService {
         for (ProvisioningConnectorConfig provisioningConnectorConfig : identityProvider
                 .getProvisioningConnectorConfigs()) {
             removeSecretsFromProperties(provisioningConnectorConfig.getProvisioningProperties());
+        }
+
+        for (IdentityProviderProperty idpProperty : identityProvider.getIdpProperties()) {
+            if (idpProperty.getName().startsWith("__secret__")) {
+                idpProperty.setValue(MASKING_VALUE);
+            }
         }
     }
 
