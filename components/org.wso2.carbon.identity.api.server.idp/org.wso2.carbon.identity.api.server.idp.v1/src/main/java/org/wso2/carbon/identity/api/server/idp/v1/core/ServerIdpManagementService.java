@@ -111,9 +111,11 @@ import org.wso2.carbon.idp.mgt.dao.IdPManagementDAO;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 import org.wso2.carbon.user.core.UserCoreConstants;
+import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -3483,7 +3485,14 @@ public class ServerIdpManagementService {
 
         StringBuilder fileNameSB = new StringBuilder(identityProvider.getIdentityProviderName());
         fileNameSB.append(YAML_FILE_EXTENSION);
-        Yaml yaml = new Yaml();
+
+        Representer representer = new Representer();
+        TypeDescription typeDescription = new TypeDescription(IdentityProvider.class);
+        typeDescription.setExcludes("id", "resourceId");
+        representer.addTypeDescription(typeDescription);
+        representer.getPropertyUtils().setSkipMissingProperties(true);
+
+        Yaml yaml = new Yaml(representer);
         try {
             return new FileContent(fileNameSB.toString(), MEDIA_TYPE_YAML, yaml.dump(identityProvider));
         } catch (YAMLException e) {
