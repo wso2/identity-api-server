@@ -324,7 +324,7 @@ public class ServerIdpManagementService {
         IdPManagementDAO dao = new IdPManagementDAO();
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            identityProvider = idpId.equals(RESIDENT_IDP_RESERVED_NAME) ? dao.getIdPByName(null,
+            identityProvider = RESIDENT_IDP_RESERVED_NAME.equals(idpId) ? dao.getIdPByName(null,
                     RESIDENT_IDP_RESERVED_NAME, IdentityTenantUtil.getTenantId(tenantDomain), tenantDomain) :
                     IdentityProviderServiceHolder.getIdentityProviderManager().
                             getIdPByResourceId(idpId, tenantDomain, true);
@@ -388,7 +388,7 @@ public class ServerIdpManagementService {
         try {
             identityProvider = getIDPFromFile(fileInputStream, fileDetail);
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            if (identityProviderId.equals(RESIDENT_IDP_RESERVED_NAME)) {
+            if (RESIDENT_IDP_RESERVED_NAME.equals(identityProviderId)) {
                 IdentityProviderServiceHolder.getIdentityProviderManager().updateResidentIdP(identityProvider,
                         tenantDomain);
             } else {
@@ -3408,6 +3408,7 @@ public class ServerIdpManagementService {
             removeSecretsFromProperties(provisioningConnectorConfig.getProvisioningProperties());
         }
 
+        // Mask the secret values of the IDP properties identified by the prefix '__secret__'.
         for (IdentityProviderProperty idpProperty : identityProvider.getIdpProperties()) {
             if (idpProperty.getName().startsWith("__secret__")) {
                 idpProperty.setValue(MASKING_VALUE);
