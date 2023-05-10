@@ -163,10 +163,10 @@ public class IdentityProvidersApi  {
 
     @Valid
     @GET
-    @Path("/file/{identity-provider-id}")
+    @Path("/{identity-provider-id}/export")
     
     @Produces({ "application/json", "application/yaml", "application/xml", "application/octet-stream" })
-    @ApiOperation(value = "Export identity provider in XML, YAML, or JSON file formats ", notes = "This API provides the capability to retrieve the identity provider as a XML, YAML, or JSON file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/view <br>   <b>Scope required:</b> <br>       * internal_idp_view ", response = String.class, authorizations = {
+    @ApiOperation(value = "Export identity provider in XML, YAML, or JSON file formats ", notes = "This API provides the capability to retrieve the identity provider if the given ID as a XML, YAML, or JSON file. Use LOCAL as the ID to export resident IDP configurations.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/view <br>   <b>Scope required:</b> <br>       * internal_idp_view ", response = String.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -598,7 +598,7 @@ public class IdentityProvidersApi  {
 
     @Valid
     @POST
-    @Path("/file")
+    @Path("/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Create identity provider from an exported XML, YAML or JSON file ", notes = "This API provides the capability to import an identity provider from the information provided as a file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/create <br>   <b>Scope required:</b> <br>       * internal_idp_create ", response = Void.class, authorizations = {
@@ -718,10 +718,10 @@ public class IdentityProvidersApi  {
 
     @Valid
     @PUT
-    @Path("/file/{identity-provider-id}")
+    @Path("/{identity-provider-id}/import")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update identity provider from an exported YAML, XML or JSON file ", notes = "This API provides the capability to update an existing identity provider from the information provided as a file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/update <br>   <b>Scope required:</b> <br>       * internal_idp_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Update identity provider from an exported YAML, XML or JSON file ", notes = "This API provides the capability to update an existing identity provider from the information provided as a file. Use LOCAL as the ID to update resident IDP configurations.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/update <br>   <b>Scope required:</b> <br>       * internal_idp_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

@@ -261,10 +261,8 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     @Override
     public Response updateIDPFromFile(String identityProviderId, InputStream fileInputStream, Attachment fileDetail) {
 
-        String resourceId = idpManagementService.updateIDPFromFile(identityProviderId, fileInputStream, fileDetail);
-        URI location =
-                ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT + "/" + resourceId);
-        return Response.created(location).build();
+        idpManagementService.updateIDPFromFile(identityProviderId, fileInputStream, fileDetail);
+        return Response.ok().build();
     }
 
     @Override
