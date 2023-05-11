@@ -36,6 +36,7 @@ import org.wso2.carbon.identity.branding.preference.management.core.model.Brandi
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.APPLICATION_TYPE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_ERROR_PREFIX;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_MGT_ERROR_CODE_DELIMITER;
@@ -59,7 +60,7 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
 public class BrandingPreferenceManagementService {
 
     private static final Log log = LogFactory.getLog(BrandingPreferenceManagementService.class);
-    //TODO: Improve API to manage application level & language level theming resources in addition to the tenant level.
+    //TODO: Improve API to manage custom level & language level theming resources in addition to the tenant level.
 
     /**
      * Create a branding preference resource with a resource file.
@@ -139,15 +140,23 @@ public class BrandingPreferenceManagementService {
      */
     public BrandingPreferenceModel getBrandingPreference(String type, String name, String locale) {
 
-        /**
-         * Currently this API provides the support to only configure tenant wise branding preference for 'en-US' locale.
-         * So always retrieve customized default branding preference.
-         */
+        /*
+         Currently this API provides the support to only configure tenant wise & application wise branding preference
+         for 'en-US' locale.
+         So always use locale as default locale(en-US).
+        */
         String tenantDomain = getTenantDomainFromContext();
         try {
-            // Get default branding preference.
-            BrandingPreference responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                    getBrandingPreference(ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
+            BrandingPreference responseDTO;
+            if (APPLICATION_TYPE.equals(type)) {
+                // Get application specific branding preference.
+                responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
+                        getBrandingPreference(APPLICATION_TYPE, name, DEFAULT_LOCALE);
+            } else {
+                // Get tenant specific branding preference.(default branding preference)
+                responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
+                        getBrandingPreference(ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
+            }
 
             return buildBrandingResponseFromResponseDTO(responseDTO);
         } catch (BrandingPreferenceMgtException e) {
@@ -173,15 +182,22 @@ public class BrandingPreferenceManagementService {
     public BrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale) {
 
         /*
-         Currently this API provides the support to only configure organization wise branding preference
-         for 'en-US' locale.
-         So always retrieve customized default branding preference.
+         Currently this API provides the support to only configure organization wise & application wise
+         branding preference for 'en-US' locale.
+         So always locale as default locale(en-US).
         */
         String tenantDomain = getTenantDomainFromContext();
         try {
-            // Get default branding preference.
-            BrandingPreference responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                    resolveBrandingPreference(ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
+            BrandingPreference responseDTO;
+            if (APPLICATION_TYPE.equals(type)) {
+                // Get application specific branding preference.
+                responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
+                        resolveApplicationBrandingPreference(APPLICATION_TYPE, name, DEFAULT_LOCALE);
+            } else {
+                // Get default branding preference.
+                responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
+                        resolveBrandingPreference(ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
+            }
 
             return buildBrandingResponseFromResponseDTO(responseDTO);
         } catch (BrandingPreferenceMgtException e) {
