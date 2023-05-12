@@ -1,20 +1,18 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
- *
- * WSO2 LLC. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 package org.wso2.carbon.identity.api.server.idp.v1;
 
@@ -64,6 +62,8 @@ public interface IdentityProvidersApiService {
 
       public Response deleteIDPTemplate(String templateId);
 
+      public Response exportIDPToFile(String identityProviderId, Boolean excludeSecrets, String accept);
+
       public Response getClaimConfig(String identityProviderId);
 
       public Response getConnectedApps(String identityProviderId, Integer limit, Integer offset);
@@ -100,6 +100,8 @@ public interface IdentityProvidersApiService {
 
       public Response getRoleConfig(String identityProviderId);
 
+      public Response importIDPFromFile(InputStream fileInputStream, Attachment fileDetail);
+
       public Response patchIDP(String identityProviderId, List<Patch> patch);
 
       public Response updateClaimConfig(String identityProviderId, Claims claims);
@@ -109,6 +111,8 @@ public interface IdentityProvidersApiService {
       public Response updateFederatedAuthenticators(String identityProviderId, FederatedAuthenticatorRequest federatedAuthenticatorRequest);
 
       public Response updateGroupConfig(String identityProviderId, List<IdPGroup> idPGroup);
+
+      public Response updateIDPFromFile(String identityProviderId, InputStream fileInputStream, Attachment fileDetail);
 
       public Response updateIDPTemplate(String templateId, IdentityProviderTemplate identityProviderTemplate);
 

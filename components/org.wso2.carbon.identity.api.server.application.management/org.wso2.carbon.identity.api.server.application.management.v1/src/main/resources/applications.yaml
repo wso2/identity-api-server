@@ -522,7 +522,7 @@ paths:
           <b>Permission required:</b> <br>
               * /permission/admin <br>
           <b>Scope required:</b> <br>
-              * SYSTEM
+              * internal_organization_admin
       parameters:
         - name: applicationId
           in: path
@@ -2538,6 +2538,8 @@ components:
           $ref: '#/components/schemas/InboundProtocolsListResponse'
         authenticationSequence:
           $ref: '#/components/schemas/AuthenticationSequence'
+        appRoleConfigurations:
+          $ref: '#/components/schemas/AppRoleConfigurations'
         advancedConfigurations:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
@@ -2571,6 +2573,8 @@ components:
           $ref: '#/components/schemas/ClaimConfiguration'
         authenticationSequence:
           $ref: '#/components/schemas/AuthenticationSequence'
+        appRoleConfigurations:
+          $ref: '#/components/schemas/AppRoleConfigurations'
         advancedConfigurations:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
@@ -2666,6 +2670,10 @@ components:
           type: boolean
           example: false
           description: Decides whether user consent needs to be skipped during logout flows.
+        useExternalConsentPage:
+          type: boolean
+          example: false
+          description: Decides whether user needs to use external consent page.
         returnAuthenticatedIdpList:
           type: boolean
           example: false
@@ -3299,6 +3307,30 @@ components:
         authenticator:
           type: string
           example: basic
+
+    AppRoleConfigurations:
+      type: array
+      description: Decides whether the attribute step FIdPs use app role mappings.
+      items:
+        $ref: '#/components/schemas/AppRoleConfig'
+      minItems: 0
+
+    AppRoleConfig:
+      type: object
+      description: Decides whether an FIdP uses app role mappings.
+      required:
+        - idp
+        - useAppRoleMappings
+      properties:
+        idp:
+          type: string
+          description: FIdP name.
+          example: googleIdP
+        useAppRoleMappings:
+          type: boolean
+          description: FIdP use application role mappings.
+          example: false
+          default: false
 
     AuthProtocolMetadata:
       type: object

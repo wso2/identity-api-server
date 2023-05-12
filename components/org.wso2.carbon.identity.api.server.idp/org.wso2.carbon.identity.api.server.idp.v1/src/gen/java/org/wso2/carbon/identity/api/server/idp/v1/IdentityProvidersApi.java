@@ -1,20 +1,18 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
- *
- * WSO2 LLC. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 package org.wso2.carbon.identity.api.server.idp.v1;
 
@@ -167,6 +165,30 @@ public class IdentityProvidersApi  {
 
     @Valid
     @GET
+    @Path("/{identity-provider-id}/export")
+
+    @Produces({ "application/json", "application/yaml", "application/xml", "application/octet-stream" })
+    @ApiOperation(value = "Export identity provider in XML, YAML, or JSON file formats ", notes = "This API provides the capability to retrieve the identity provider if the given ID as a XML, YAML, or JSON file. Use LOCAL as the ID to export resident IDP configurations.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/view <br>   <b>Scope required:</b> <br>       * internal_idp_view ", response = String.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Identity Providers", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful response", response = String.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response exportIDPToFile(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Specifies whether to exclude secrets when exporting an identity provider. ", defaultValue="true") @DefaultValue("true")  @QueryParam("excludeSecrets") Boolean excludeSecrets,     @Valid @ApiParam(value = "Content type of the file. " , allowableValues="application/json, application/xml, application/yaml, application/x-yaml, text/yaml, text/xml, text/json", defaultValue="application/yaml")@HeaderParam("Accept") String accept) {
+
+        return delegate.exportIDPToFile(identityProviderId,  excludeSecrets,  accept );
+    }
+
+    @Valid
+    @GET
     @Path("/{identity-provider-id}/claims")
     
     @Produces({ "application/json" })
@@ -264,15 +286,15 @@ public class IdentityProvidersApi  {
     @Valid
     @GET
     @Path("/{identity-provider-id}/groups")
-    
+
     @Produces({ "application/json" })
     @ApiOperation(value = "Group config of an identity provider ", notes = "This API provides the group config of an identity provider. This is a list of groups the idp can return.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = IdPGroup.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Groups", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = IdPGroup.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -601,6 +623,30 @@ public class IdentityProvidersApi  {
     }
 
     @Valid
+    @POST
+    @Path("/import")
+    @Consumes({ "multipart/form-data" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Create identity provider from an exported XML, YAML or JSON file ", notes = "This API provides the capability to import an identity provider from the information provided as a file.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/create <br>   <b>Scope required:</b> <br>       * internal_idp_create ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Identity Providers", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "Successfully created.", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response importIDPFromFile(@Multipart(value = "file", required = false) InputStream fileInputStream,@Multipart(value = "file" , required = false) Attachment fileDetail) {
+
+        return delegate.importIDPFromFile(fileInputStream, fileDetail );
+    }
+
+    @Valid
     @PATCH
     @Path("/{identity-provider-id}")
     @Consumes({ "application/json" })
@@ -704,10 +750,10 @@ public class IdentityProvidersApi  {
     @ApiOperation(value = "Update the group config of an identity provider ", notes = "This API provides the capability to update the group config of an identity provider by specifying the identity provider ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = IdPGroup.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
-            
+
         })
     }, tags={ "Groups", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = IdPGroup.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -718,6 +764,31 @@ public class IdentityProvidersApi  {
     public Response updateGroupConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the group config to be updated." ,required=true) @Valid List<IdPGroup> idPGroup) {
 
         return delegate.updateGroupConfig(identityProviderId,  idPGroup );
+    }
+
+    @Valid
+    @PUT
+    @Path("/{identity-provider-id}/import")
+    @Consumes({ "multipart/form-data" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update identity provider from an exported YAML, XML or JSON file ", notes = "This API provides the capability to update an existing identity provider from the information provided as a file. Use LOCAL as the ID to update resident IDP configurations.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/idpmgt/update <br>   <b>Scope required:</b> <br>       * internal_idp_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Identity Providers", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successfully Updated.", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateIDPFromFile(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @Multipart(value = "file", required = false) InputStream fileInputStream,@Multipart(value = "file" , required = false) Attachment fileDetail) {
+
+        return delegate.updateIDPFromFile(identityProviderId,  fileInputStream, fileDetail );
     }
 
     @Valid
