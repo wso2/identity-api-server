@@ -14,10 +14,16 @@ import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccIde
 import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccIdentificationException;
 import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccIdentificationServerException;
 import org.wso2.carbon.identity.idle.account.identification.models.InactiveUserModel;
-import static org.wso2.carbon.identity.api.server.idle.account.identification.common.util.IdleAccountIdentificationConstants.ErrorMessage.ERROR_REQUIRED_PARAMETER_MISSING;
-import static org.wso2.carbon.identity.api.server.idle.account.identification.common.util.IdleAccountIdentificationConstants.ErrorMessage.ERROR_RETRIEVING_INACTIVE_USERS;
+import static org.wso2.carbon.identity.api.server.idle.account.identification.common.util.IdleAccountIdentificationConstants.DATE_EXCLUDE_BEFORE;
+import static org.wso2.carbon.identity.api.server.idle.account.identification.common.util.IdleAccountIdentificationConstants.DATE_FORMAT_REGEX;
+import static org.wso2.carbon.identity.api.server.idle.account.identification.common.util.IdleAccountIdentificationConstants.DATE_INACTIVE_AFTER;
+import static org.wso2.carbon.identity.api.server.idle.account.identification.common.util.IdleAccountIdentificationConstants.ErrorMessage;
 import static org.wso2.carbon.identity.api.server.idle.account.identification.common.util.Utils.getCorrelation;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.regex.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Response;
@@ -35,18 +41,108 @@ public class InactiveUsersManagementApiService {
      * @param inactiveAfter Latest active date of login.
      * @param excludeBefore Date to exclude the oldest inactive users.
      * @param tenantDomain  Tenant domain.
-     * @return List of inactive users.
+     * @return  List of inactive users.
      */
     public List<InactiveUser> getInactiveUsers(String inactiveAfter, String excludeBefore, String tenantDomain) {
 
         List<InactiveUserModel> inactiveUsers = null;
         try {
-            inactiveUsers = IdleAccountIdentificationServiceHolder.getIdleAccountIdentificationService()
-                    .getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain);
+            validateDates(inactiveAfter, excludeBefore);
+            LocalDateTime inactiveAfterDate = convertToDateObject(inactiveAfter, DATE_INACTIVE_AFTER);
+            LocalDateTime excludeBeforeDate = convertToDateObject(excludeBefore, DATE_EXCLUDE_BEFORE);
+            if (excludeBeforeDate == null) {
+                inactiveUsers = IdleAccountIdentificationServiceHolder.getIdleAccountIdentificationService().
+                        getInactiveUsersFromSpecificDate(inactiveAfterDate, tenantDomain);
+            } else {
+                inactiveUsers = IdleAccountIdentificationServiceHolder.getIdleAccountIdentificationService().
+                        getLimitedInactiveUsersFromSpecificDate(inactiveAfterDate, excludeBeforeDate, tenantDomain);
+            }
             return buildResponse(inactiveUsers);
         } catch (IdleAccIdentificationException e) {
-            throw handleIdleAccIdentificationException(e, ERROR_RETRIEVING_INACTIVE_USERS, tenantDomain);
+            throw handleIdleAccIdentificationException(e, ErrorMessage.ERROR_RETRIEVING_INACTIVE_USERS, tenantDomain);
         }
+    }
+
+    /**
+     * Validate the dates.
+     *
+     * @param inactiveAfter InactiveAfter date.
+     * @param excludeBefore ExcludeBefore date.
+     * @throws IdleAccIdentificationClientException IdleAccIdentificationClientException.
+     */
+    private void validateDates(String inactiveAfter, String excludeBefore) throws IdleAccIdentificationClientException {
+
+        // Check if the required parameter ''inactiveAfter' is present.
+        if (StringUtils.isEmpty(inactiveAfter)) {
+            ErrorMessage error = ErrorMessage.ERROR_REQUIRED_PARAMETER_MISSING;
+            throw new IdleAccIdentificationClientException(error.getCode(), error.getMessage(),
+                    String.format(error.getDescription(), DATE_INACTIVE_AFTER));
+        }
+
+        // Validate the date format.
+        validateDateFormat(inactiveAfter, DATE_INACTIVE_AFTER);
+        if (StringUtils.isEmpty(excludeBefore)) {
+            validateDateFormat(excludeBefore, DATE_EXCLUDE_BEFORE);
+        }
+    }
+
+    /**
+     * Validate the format of the date.
+     *
+     * @param dateString Date as a string.
+     * @param dateType   Date type.
+     * @throws IdleAccIdentificationClientException IdleAccIdentificationClientException.
+     */
+    private void validateDateFormat(String dateString, String dateType) throws IdleAccIdentificationClientException {
+
+        if (Pattern.matches(DATE_FORMAT_REGEX, dateString)) {
+            return;
+        }
+        ErrorMessage error = ErrorMessage.ERROR_DATE_REGEX_MISMATCH;
+        throw new IdleAccIdentificationClientException(error.getCode(), error.getMessage(),
+                String.format(error.getDescription(), dateType));
+    }
+
+    /**
+     * Convert date string into LocalDateTime object.
+     *
+     * @param dateString Date as a string.
+     * @param dateType   Date type.
+     * @throws IdleAccIdentificationClientException IdleAccIdentificationClientException.
+     * @return List of inactive users.
+     */
+    private LocalDateTime convertToDateObject(String dateString, String dateType)
+            throws IdleAccIdentificationClientException {
+
+        try {
+            if (StringUtils.isEmpty(dateString)) {
+                return null;
+            }
+            return LocalDate.parse(dateString).atStartOfDay();
+        } catch (DateTimeParseException e) {
+            ErrorMessage error = ErrorMessage.ERROR_INVALID_DATE;
+            throw new IdleAccIdentificationClientException(error.getCode(), error.getMessage(),
+                    String.format(error.getDescription(), dateType));
+        }
+    }
+
+    /**
+     * Build the InactiveUser list.
+     *
+     * @param inactiveUserModels List of inactive users.
+     * @return List of inactive users.
+     */
+    private List<InactiveUser> buildResponse(List<InactiveUserModel> inactiveUserModels) {
+
+        List<InactiveUser> inactiveUserList = new ArrayList<>();
+        for (InactiveUserModel inactiveUserModel : inactiveUserModels) {
+            InactiveUser inactiveUser = new InactiveUser();
+            inactiveUser.setUsername(inactiveUserModel.getUsername());
+            inactiveUser.setUserStoreDomain(inactiveUserModel.getUserStoreDomain());
+            inactiveUser.setEmail(inactiveUserModel.getEmail());
+            inactiveUserList.add(inactiveUser);
+        }
+        return inactiveUserList;
     }
 
     /**
@@ -74,7 +170,7 @@ public class InactiveUsersManagementApiService {
                 errorResponse.setMessage(exception.getMessage());
                 errorResponse.setDescription(exception.getDescription());
             }
-            if (ERROR_REQUIRED_PARAMETER_MISSING.getCode().equals(exception.getErrorCode())) {
+            if (ErrorMessage.ERROR_REQUIRED_PARAMETER_MISSING.getCode().equals(exception.getErrorCode())) {
                 status = Response.Status.NOT_FOUND;
             } else {
                 status = Response.Status.BAD_REQUEST;
@@ -123,18 +219,5 @@ public class InactiveUsersManagementApiService {
         } else {
             return error.getDescription();
         }
-    }
-
-    private List<InactiveUser> buildResponse(List<InactiveUserModel> inactiveUserModels) {
-
-        List<InactiveUser> inactiveUserList = new ArrayList<>();
-        for (InactiveUserModel inactiveUserModel : inactiveUserModels) {
-            InactiveUser inactiveUser = new InactiveUser();
-            inactiveUser.setUsername(inactiveUserModel.getUsername());
-            inactiveUser.setUserStoreDomain(inactiveUserModel.getUserStoreDomain());
-            inactiveUser.setEmail(inactiveUserModel.getEmail());
-            inactiveUserList.add(inactiveUser);
-        }
-        return inactiveUserList;
     }
 }
