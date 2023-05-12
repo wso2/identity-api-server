@@ -195,10 +195,8 @@ public class Constants {
         ERROR_CODE_ERROR_RETRIEVING_IDP_JIT("65032",
                 "Unable to retrieve identity provider JIT config.",
                 "Server encountered an error while retrieving the identity provider JIT config for identifier %s."),
-        ERROR_CODE_ERROR_RETRIEVING_IDP_GROUPS("65033",
-                "Unable to retrieve identity provider group config.",
-                "Server encountered an error while retrieving the identity " +
-                        "provider group config for identifier %s."),
+        ERROR_CODE_ERROR_RETRIEVING_IDP_GROUPS("65033", "Unable to retrieve identity provider group config.",
+                "Server encountered an error while retrieving the identity provider group config for identifier %s."),
         ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS("65042",
                 "Unable to retrieve identity provider connected applications.",
                 "Server encountered an error while retrieving the identity provider connected applications %s."),

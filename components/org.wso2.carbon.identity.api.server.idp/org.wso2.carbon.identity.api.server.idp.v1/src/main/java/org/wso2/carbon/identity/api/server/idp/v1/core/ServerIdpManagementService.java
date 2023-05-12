@@ -1933,8 +1933,10 @@ public class ServerIdpManagementService {
             idp.setIdPGroupConfig(null);
             return;
         }
-        /*For each group in groups, check if the group name is not null or empty and then add it to the idPGroupConfig
-           array*/.
+        /*
+         * For each group in groups, check if the group name is not null or empty and then add it to the idPGroupConfig
+         * array.
+         */
         idp.setIdPGroupConfig(groups
                 .stream()
                 .filter(group -> StringUtils.isNotBlank(group.getName()))
