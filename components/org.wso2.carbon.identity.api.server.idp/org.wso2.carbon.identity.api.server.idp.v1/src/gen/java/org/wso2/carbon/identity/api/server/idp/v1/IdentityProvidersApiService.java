@@ -22,6 +22,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
+import java.util.List;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Error;
@@ -29,6 +30,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticator;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderResponse;
@@ -70,6 +72,8 @@ public interface IdentityProvidersApiService {
 
       public Response getFederatedAuthenticators(String identityProviderId);
 
+      public Response getGroupConfig(String identityProviderId);
+
       public Response getIDP(String identityProviderId);
 
       public Response getIDPTemplate(String templateId);
@@ -105,6 +109,8 @@ public interface IdentityProvidersApiService {
       public Response updateFederatedAuthenticator(String identityProviderId, String federatedAuthenticatorId, FederatedAuthenticatorPUTRequest federatedAuthenticatorPUTRequest);
 
       public Response updateFederatedAuthenticators(String identityProviderId, FederatedAuthenticatorRequest federatedAuthenticatorRequest);
+
+      public Response updateGroupConfig(String identityProviderId, List<IdPGroup> idPGroup);
 
       public Response updateIDPFromFile(String identityProviderId, InputStream fileInputStream, Attachment fileDetail);
 

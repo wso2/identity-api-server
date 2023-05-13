@@ -51,6 +51,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorLi
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListItem;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
@@ -973,6 +974,54 @@ public class ServerIdpManagementService {
     }
 
     /**
+     * Get Group Configuration for API response.
+     *
+     * @param idpId Identity Provider resource ID.
+     * @return Groups of the Identity Provider.
+     */
+    public List<IdPGroup> getGroupConfig(String idpId) {
+
+        try {
+            IdentityProvider identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager()
+                    .getIdPByResourceId(idpId, ContextLoader.getTenantDomainFromContext(), true);
+            if (identityProvider == null) {
+                throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
+                        idpId);
+            }
+            return createGroupResponse(identityProvider);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_GROUPS, idpId);
+        }
+    }
+
+    /**
+     * Update IdP group configuration.
+     *
+     * @param idpId  Identity Provider resource ID.
+     * @param groups IdP Groups from the request.
+     * @return Updated IdP Groups.
+     */
+    public List<IdPGroup> updateGroupConfig(String idpId, List<IdPGroup> groups) {
+
+        try {
+            IdentityProvider idP = IdentityProviderServiceHolder.getIdentityProviderManager()
+                    .getIdPByResourceId(idpId, ContextLoader.getTenantDomainFromContext(), true);
+            if (idP == null) {
+                throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
+                        idpId);
+            }
+            updateGroups(idP, groups);
+
+            IdentityProvider updatedIdP =
+                    IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(idpId,
+                            idP, ContextLoader.getTenantDomainFromContext());
+            return createGroupResponse(updatedIdP);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_GROUPS, idpId);
+        }
+    }
+
+    /**
      * Get Provisioning configuration. Includes JIT config and outbound provisioning connectors.
      *
      * @param idpId Identity Provider resource ID.
@@ -1859,7 +1908,6 @@ public class ServerIdpManagementService {
 
                     RoleMapping internalMapping = new RoleMapping();
 
-
                     internalMapping.setLocalRole(new LocalRole(mapping.getLocalRole()));
                     internalMapping.setRemoteRole(mapping.getIdpRole());
                     idpRoles.add(mapping.getIdpRole());
@@ -1871,6 +1919,36 @@ public class ServerIdpManagementService {
             idp.setPermissionAndRoleConfig(permissionsAndRoleConfig);
             idp.setProvisioningRole(StringUtils.join(roles.getOutboundProvisioningRoles(), ","));
         }
+    }
+
+    /**
+     * Update groups of the identity provider.
+     *
+     * @param idp    Identity Provider to be updated.
+     * @param groups Groups returned from the request.
+     */
+    private void updateGroups(IdentityProvider idp, List<IdPGroup> groups) {
+
+        if (groups == null || groups.isEmpty()) {
+            idp.setIdPGroupConfig(null);
+            return;
+        }
+        /*
+         * For each group in groups, check if the group name is not null or empty and then add it to the idPGroupConfig
+         * array.
+         */
+        idp.setIdPGroupConfig(groups
+                .stream()
+                .filter(group -> StringUtils.isNotBlank(group.getName()))
+                .map(group -> {
+                    org.wso2.carbon.identity.application.common.model.IdPGroup idPGroup =
+                            new org.wso2.carbon.identity.application.common.model.IdPGroup();
+                    idPGroup.setIdpGroupName(group.getName());
+                    if (StringUtils.isNotBlank(group.getId())) {
+                        idPGroup.setIdpGroupId(group.getId());
+                    }
+                    return idPGroup;
+                }).toArray(org.wso2.carbon.identity.application.common.model.IdPGroup[]::new));
     }
 
     private Function<org.wso2.carbon.identity.api.server.idp.v1.model.Property, Property> propertyToInternal
@@ -1937,6 +2015,7 @@ public class ServerIdpManagementService {
         }
         updateClaims(idp, identityProviderPOSTRequest.getClaims());
         updateRoles(idp, identityProviderPOSTRequest.getRoles());
+        updateGroups(idp, identityProviderPOSTRequest.getGroups());
 
         List<IdentityProviderProperty> idpProperties = new ArrayList<>();
         if (StringUtils.isNotBlank(idpJWKSUri)) {
@@ -2019,6 +2098,9 @@ public class ServerIdpManagementService {
                     case Constants.ROLES:
                         identityProviderListItem.setRoles(createRoleResponse(idp));
                         break;
+                    case Constants.GROUPS:
+                        identityProviderListItem.setGroups(createGroupResponse(idp));
+                        break;
                     case Constants.FEDERATED_AUTHENTICATORS:
                         identityProviderListItem.setFederatedAuthenticators(createFederatedAuthenticatorResponse(idp));
                         break;
@@ -2094,6 +2176,7 @@ public class ServerIdpManagementService {
         idpResponse.setCertificate(createIDPCertificate(identityProvider));
         idpResponse.setClaims(createClaimResponse(identityProvider.getClaimConfig()));
         idpResponse.setRoles(createRoleResponse(identityProvider));
+        idpResponse.setGroups(createGroupResponse(identityProvider));
         idpResponse.setFederatedAuthenticators(createFederatedAuthenticatorResponse(identityProvider));
         idpResponse.setProvisioning(createProvisioningResponse(identityProvider));
         return idpResponse;
@@ -2233,6 +2316,28 @@ public class ServerIdpManagementService {
             roleConfig.setOutboundProvisioningRoles(Arrays.asList(provRoles.split(",")));
         }
         return roleConfig;
+    }
+
+    /**
+     * Create IdP Groups response for the Identity Provider.
+     *
+     * @param identityProvider Identity Provider.
+     * @return Groups of the Identity Provider.
+     */
+    private List<IdPGroup> createGroupResponse(IdentityProvider identityProvider) {
+
+        org.wso2.carbon.identity.application.common.model.IdPGroup[] idPGroupConfig =
+                identityProvider.getIdPGroupConfig();
+        List<IdPGroup> groupConfigAPIModel = new ArrayList<>();
+        if (idPGroupConfig != null) {
+            Arrays.stream(idPGroupConfig).forEach(idPGroup -> {
+                IdPGroup idPGroupAPIModel = new IdPGroup();
+                idPGroupAPIModel.setName(idPGroup.getIdpGroupName());
+                idPGroupAPIModel.setId(idPGroup.getIdpGroupId());
+                groupConfigAPIModel.add(idPGroupAPIModel);
+            });
+        }
+        return groupConfigAPIModel;
     }
 
     private FederatedAuthenticatorListResponse createFederatedAuthenticatorResponse(IdentityProvider idp) {
