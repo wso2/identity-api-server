@@ -23,9 +23,9 @@ import static org.wso2.carbon.identity.api.server.idle.account.identification.co
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.regex.Pattern;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import javax.ws.rs.core.Response;
 
 /**
@@ -81,7 +81,7 @@ public class InactiveUsersManagementApiService {
 
         // Validate the date format.
         validateDateFormat(inactiveAfter, DATE_INACTIVE_AFTER);
-        if (StringUtils.isEmpty(excludeBefore)) {
+        if (StringUtils.isNotEmpty(excludeBefore)) {
             validateDateFormat(excludeBefore, DATE_EXCLUDE_BEFORE);
         }
     }
