@@ -270,8 +270,8 @@ public class ServerClaimManagementService {
                         ContextLoader.getTenantDomainFromContext());
             } else {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Skipping db update as the old dialectURI and the new dialectURI is the same. " +
-                            "DialectURI: " + claimDialectReqDTO.getDialectURI());
+                    LOG.debug(String.format("Skipping db update as the old dialectURI and the new dialectURI is " +
+                            "the same. DialectURI: %s", claimDialectReqDTO.getDialectURI()));
                 }
             }
         } catch (ClaimMetadataException e) {
@@ -436,14 +436,14 @@ public class ServerClaimManagementService {
     public String updateClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Updating claim dialect from file.");
+            LOG.debug(String.format("Updating claim dialect from file: %s", fileDetail.getDataHandler().getName()));
         }
 
         String dialectId = null;
         try {
             ClaimDialectConfiguration dialectConfiguration = getDialectFromFile(fileInputStream, fileDetail);
             dialectId = dialectConfiguration.getId();
-            if (dialectId.equals(LOCAL_DIALECT_PATH)) {
+            if (LOCAL_DIALECT_PATH.equals(dialectId)) {
                 updateLocalClaims(dialectConfiguration.getLocalClaimReqDTOList());
             } else {
                 updateClaimDialect(dialectId, dialectConfiguration.getClaimDialectReqDTO());
@@ -489,7 +489,7 @@ public class ServerClaimManagementService {
     public FileContent exportClaimDialectToFile(String dialectId, String fileType) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Exporting Claim Dialect for ID " + dialectId + " as a " + fileType + " file.");
+            LOG.debug(String.format("Exporting Claim Dialect for ID %s as a %s file.", dialectId, fileType));
         }
         if (StringUtils.isBlank(fileType)) {
             throw handleClaimManagementClientError(ERROR_CODE_MISSING_MEDIA_TYPE, BAD_REQUEST, dialectId);
@@ -499,7 +499,7 @@ public class ServerClaimManagementService {
         List<ClaimResDTO> claimResDTOList = new ArrayList<>();
 
         try {
-            if (dialectId.equals(LOCAL_DIALECT_PATH)) {
+            if (LOCAL_DIALECT_PATH.equals(dialectId)) {
                 List<LocalClaimResDTO> localClaimResDTOList = getLocalClaimResDTOs(getClaimMetadataManagementService()
                         .getLocalClaims(ContextLoader.getTenantDomainFromContext()));
                 claimResDTOList.addAll(localClaimResDTOList);
@@ -522,7 +522,7 @@ public class ServerClaimManagementService {
             throws ClaimMetadataException {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Parsing Claim Dialect object to file content of type: " + fileType);
+            LOG.debug(String.format("Parsing Claim Dialect object to file content of type: %s", fileType));
         }
 
         String fileName = dialectConfiguration.getDialectURI();
@@ -952,21 +952,22 @@ public class ServerClaimManagementService {
     public String importClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Importing claim dialect from file: " + fileDetail.getDataHandler().getName());
+            LOG.debug(String.format("Importing claim dialect from file: %s", fileDetail.getDataHandler().getName()));
         }
 
         String dialectId;
         try {
             ClaimDialectConfiguration dialectConfiguration = getDialectFromFile(fileInputStream, fileDetail);
             dialectId = dialectConfiguration.getId();
-            if (dialectId.equals(LOCAL_DIALECT_PATH)) {
+
+            if (LOCAL_DIALECT_PATH.equals(dialectId)) {
                 throw handleClaimManagementClientError(ERROR_CODE_ERROR_IMPORTING_LOCAL_CLAIM_DIALECT, FORBIDDEN);
-            } else {
-                List<ExternalClaimReqDTO> externalClaimReqDTOList = dialectConfiguration.getExternalClaimReqDTOList();
-                String dialectURI = addClaimDialect(dialectConfiguration.getClaimDialectReqDTO());
-                for (ExternalClaimReqDTO externalClaimReqDTO : externalClaimReqDTOList) {
-                    addExternalClaim(dialectURI, externalClaimReqDTO);
-                }
+            }
+
+            List<ExternalClaimReqDTO> externalClaimReqDTOList = dialectConfiguration.getExternalClaimReqDTOList();
+            String dialectURI = addClaimDialect(dialectConfiguration.getClaimDialectReqDTO());
+            for (ExternalClaimReqDTO externalClaimReqDTO : externalClaimReqDTOList) {
+                addExternalClaim(dialectURI, externalClaimReqDTO);
             }
             return dialectId;
         } catch (ClaimMetadataException e) {
@@ -1002,19 +1003,19 @@ public class ServerClaimManagementService {
 
         switch (Util.getMediaType(fileContent.getFileType())) {
             case MEDIA_TYPE_XML:
-                return parseClaimFromXml(fileContent);
+                return parseClaimDialectFromXml(fileContent);
             case MEDIA_TYPE_JSON:
-                return parseClaimFromJson(fileContent);
+                return parseClaimDialectFromJson(fileContent);
             case MEDIA_TYPE_YAML:
-                return parseClaimFromYaml(fileContent);
+                return parseClaimDialectFromYaml(fileContent);
             default:
                 LOG.warn(String.format("Unsupported media type %s for file %s. Defaulting to YAML parsing.",
                         fileContent.getFileType(), fileContent.getFileName()));
-                return parseClaimFromYaml(fileContent);
+                return parseClaimDialectFromYaml(fileContent);
         }
     }
 
-    private ClaimDialectConfiguration parseClaimFromXml(FileContent fileContent) throws ClaimMetadataException {
+    private ClaimDialectConfiguration parseClaimDialectFromXml(FileContent fileContent) throws ClaimMetadataException {
 
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(ClaimDialectConfiguration.class);
@@ -1026,7 +1027,7 @@ public class ServerClaimManagementService {
         }
     }
 
-    private ClaimDialectConfiguration parseClaimFromJson(FileContent fileContent) throws ClaimMetadataException {
+    private ClaimDialectConfiguration parseClaimDialectFromJson(FileContent fileContent) throws ClaimMetadataException {
 
         try {
             return new ObjectMapper().readValue(fileContent.getContent(), ClaimDialectConfiguration.class);
@@ -1036,7 +1037,7 @@ public class ServerClaimManagementService {
         }
     }
 
-    private ClaimDialectConfiguration parseClaimFromYaml(FileContent fileContent) throws ClaimMetadataException {
+    private ClaimDialectConfiguration parseClaimDialectFromYaml(FileContent fileContent) throws ClaimMetadataException {
 
         try {
             Yaml yaml = new Yaml(new Constructor(ClaimDialectConfiguration.class));

@@ -43,10 +43,12 @@ public class ClaimDialectConfiguration extends ClaimDialectResDTO {
     private List<ClaimResDTO> claims;
 
     public ClaimDialectConfiguration() {
+
         super();
     }
 
     public ClaimDialectConfiguration(ClaimDialectResDTO claimDialect) {
+
         this.setDialectURI(claimDialect.getDialectURI());
         this.setId(claimDialect.getId());
         this.setLink(claimDialect.getLink());
@@ -58,7 +60,6 @@ public class ClaimDialectConfiguration extends ClaimDialectResDTO {
         this.claims = claims;
     }
 
-
     public List<ClaimResDTO> getClaims() {
 
         return claims;
@@ -66,6 +67,7 @@ public class ClaimDialectConfiguration extends ClaimDialectResDTO {
 
     @JsonIgnore
     public ClaimDialectReqDTO getClaimDialectReqDTO () {
+
         ClaimDialectReqDTO claimDialectReqDTO = new ClaimDialectReqDTO();
         claimDialectReqDTO.setDialectURI(this.getDialectURI());
         return claimDialectReqDTO;
@@ -73,6 +75,7 @@ public class ClaimDialectConfiguration extends ClaimDialectResDTO {
 
     @JsonIgnore
     public List<LocalClaimReqDTO> getLocalClaimReqDTOList () {
+
         List<LocalClaimReqDTO> localClaimReqDTOList = new ArrayList<>();
         for (ClaimResDTO claimResDTO : claims) {
             if (claimResDTO instanceof LocalClaimResDTO) {
@@ -96,6 +99,7 @@ public class ClaimDialectConfiguration extends ClaimDialectResDTO {
 
     @JsonIgnore
     public List<ExternalClaimReqDTO> getExternalClaimReqDTOList () {
+
         List<ExternalClaimReqDTO> externalClaimReqDTOList = new ArrayList<>();
         for (ClaimResDTO claimResDTO : claims) {
             if (claimResDTO instanceof ExternalClaimResDTO) {
@@ -109,4 +113,3 @@ public class ClaimDialectConfiguration extends ClaimDialectResDTO {
         return externalClaimReqDTOList;
     }
 }
-
