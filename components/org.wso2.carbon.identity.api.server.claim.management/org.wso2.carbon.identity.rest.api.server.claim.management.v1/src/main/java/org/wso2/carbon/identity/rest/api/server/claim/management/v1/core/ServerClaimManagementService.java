@@ -525,7 +525,7 @@ public class ServerClaimManagementService {
             LOG.debug(String.format("Parsing Claim Dialect object to file content of type: %s", fileType));
         }
 
-        String fileName = dialectConfiguration.getDialectURI();
+        String fileName = getFormattedFileName(dialectConfiguration.getDialectURI());
 
         String mediaType = Util.getMediaType(fileType);
         switch (mediaType) {
@@ -540,6 +540,13 @@ public class ServerClaimManagementService {
                         fileType));
                 return parseClaimDialectToYaml(dialectConfiguration, fileName);
         }
+    }
+
+    private String getFormattedFileName(String fileName) {
+
+        String formattedFileName = fileName.replaceAll("[^\\w/]+", "_");
+        formattedFileName = StringUtils.abbreviate(formattedFileName, 255);
+        return formattedFileName;
     }
 
     private FileContent parseClaimDialectToXml(ClaimDialectConfiguration dialectConfiguration, String fileName)
