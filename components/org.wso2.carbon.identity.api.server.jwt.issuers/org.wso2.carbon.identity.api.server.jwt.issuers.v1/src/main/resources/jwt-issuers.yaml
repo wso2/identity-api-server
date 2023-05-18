@@ -1,0 +1,680 @@
+openapi: 3.0.0
+info:
+  description: >
+    This document specifies an **JWT Issuer Management RESTful API** for
+    **WSO2 Identity Server**. This supports Restful APIs for identity provider management.
+    The APIs provide the capability to add/update/delete/patch identity providers in the identity server.
+    In addition, APIs are available to retrieve metadata about federated authenticators and outbound provisioning
+    connectors that can be configured for any given identity provider.
+  version: "v1"
+  title: WSO2 Identity Server - JWT Issuer Management API definition
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+security:
+  - OAuth2: []
+  - BasicAuth: []
+paths:
+  '/jwt-issuers':
+    get:
+      tags:
+        - JWT Issuers
+      summary: |
+        List JWT issuers
+      description: >
+        This API provides the capability to retrieve the list of jwt issuers.<br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/idpmgt/view <br>
+        <b>Scope required:</b> <br>
+            * internal_idp_view
+      operationId: getJwtIssuers
+      parameters:
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/offsetQueryParam'
+        - $ref: '#/components/parameters/filterQueryParam'
+        - $ref: '#/components/parameters/sortByQueryParam'
+        - $ref: '#/components/parameters/sortOrderQueryParam'
+        - $ref: '#/components/parameters/requiredAttributesQueryParam'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityProviderListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - JWT Issuers
+      summary: |
+        Add a new jwt issuer
+      description: |
+        This API provides the capability to create a jwt issuer. <br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/idpmgt/create <br>
+        <b>Scope required:</b> <br>
+            * internal_idp_create
+      operationId: addJWTIssuer
+      responses:
+        '201':
+          description: Successful response
+          headers:
+            Location:
+              description: Location of the newly created JWT issuer.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityProviderResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/IdentityProviderResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JWTIssuerPOSTRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/JWTIssuerPOSTRequest'
+        description: This represents the JWT issuer to be created.
+        required: true
+servers:
+  - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
+    variables:
+      tenant-domain:
+        default: carbon.super
+components:
+  parameters:
+    limitQueryParam:
+      in: query
+      name: limit
+      required: false
+      description: |
+        Maximum number of records to return.
+      schema:
+        type: integer
+        format: int32
+    offsetQueryParam:
+      in: query
+      name: offset
+      required: false
+      description: |
+        Number of records to skip for pagination.
+      schema:
+        type: integer
+        format: int32
+    filterQueryParam:
+      in: query
+      name: filter
+      required: false
+      description: >
+        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew'
+        and 'eq' operations and also complex queries with 'and' operations. E.g.
+        /identity-providers?filter=name+sw+"google"+and+isEnabled+eq+"true"
+      schema:
+        type: string
+    requiredAttributesQueryParam:
+      in: query
+      name: requiredAttributes
+      required: false
+      description: |
+        Specifies the required parameters in the response.
+      schema:
+        type: string
+    forceQueryParam:
+      in: query
+      name: force
+      required: false
+      description: >
+        Enforces the forceful deletion of an identity provider,
+        federated authenticator or an outbound provisioning connector even though
+        it is referred by a service provider.
+      schema:
+        type: boolean
+        default: false
+    excludeSecretsQueryParam:
+      in: query
+      name: excludeSecrets
+      required: false
+      description: |
+        Specifies whether to exclude secrets when exporting an identity provider.
+      schema:
+        type: boolean
+        default: true
+    fileTypeHeaderParam:
+      in: header
+      name: Accept
+      required: false
+      description: |
+        Content type of the file.
+      schema:
+        type: string
+        default: application/yaml
+        enum:
+          - application/json
+          - application/xml
+          - application/yaml
+          - application/x-yaml
+          - text/yaml
+          - text/xml
+          - text/json
+    sortOrderQueryParam:
+      in: query
+      name: sortOrder
+      required: false
+      description: >-
+        Define the order in which the retrieved tenants should be sorted.
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+    sortByQueryParam:
+      in: query
+      name: sortBy
+      required: false
+      description: >-
+        Attribute by which the retrieved records should be sorted. Currently sorting through _<b>domainName<b>_ only
+        supported.
+      schema:
+        type: string
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'https://localhost:9443/oauth2/token'
+          scopes: {}
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: AAA-00000
+        message:
+          type: string
+          example: Some Error Message
+        description:
+          type: string
+          example: Some Error Description
+        traceId:
+          type: string
+          example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
+    MetaProperty:
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          type: string
+          example: 'httpBinding'
+        displayName:
+          type: string
+          example: 'HTTP Binding'
+        description:
+          type: string
+          example: 'Choose the HTTP Binding or decide from incoming request'
+        type:
+          type: string
+          enum:
+            - STRING
+            - BOOLEAN
+            - INTEGER
+          example: STRING
+        displayOrder:
+          type: integer
+          example: 10
+        regex:
+          type: string
+          example: '[a-zA-Z]{3,30}'
+        isMandatory:
+          type: boolean
+          default: false
+          example: false
+        isConfidential:
+          type: boolean
+          default: false
+        options:
+          type: array
+          items:
+            type: string
+          example: ['HTTP-Redirect', 'HTTP-POST', 'As Per Request']
+        defaultValue:
+          type: string
+          example: HTTP-Redirect
+        subProperties:
+          type: array
+          items:
+            $ref: '#/components/schemas/MetaProperty'
+    Link:
+      type: object
+      properties:
+        href:
+          type: string
+          description: Path to the target resource.
+          example: >-
+            '/t/carbon.super/api/server/v1/identity-providers/394b8adcce24c64a8a09a8d80abf8c337bd253de'
+        rel:
+          type: string
+          description: Describes how the current context is related to the target resource.
+          example: identity-providers
+      readOnly: true
+    Certificate:
+      type: object
+      properties:
+        certificates:
+          type: array
+          items:
+            type: string
+        jwksUri:
+          type: string
+          example: "https://localhost:9444/oauth2/jwks"
+    IdentityProviderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '123e4567-e89b-12d3-a456-556642440000'
+        name:
+          type: string
+          example: google
+        description:
+          type: string
+        templateId:
+          type: string
+          example: '8ea23303-49c0-4253-b81f-82c0fe6fb4a0'
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+        isPrimary:
+          type: boolean
+          default: false
+        image:
+          type: string
+          example: "google-logo-url"
+        isFederationHub:
+          type: boolean
+          example: false
+        homeRealmIdentifier:
+          type: string
+          example: localhost
+        certificate:
+          $ref: '#/components/schemas/Certificate'
+        alias:
+          type: string
+          example: 'https://localhost:9444/oauth2/token'
+        idpIssuerName:
+          type: string
+          example: 'https://www.idp.com'
+        claims:
+          $ref: '#/components/schemas/Claims'
+        roles:
+          $ref: '#/components/schemas/Roles'
+        groups:
+          $ref: '#/components/schemas/IdPGroupsConfig'
+        federatedAuthenticators:
+          $ref: '#/components/schemas/FederatedAuthenticatorListResponse'
+        provisioning:
+          $ref: '#/components/schemas/ProvisioningResponse'
+    IdentityProviderListResponse:
+      type: object
+      properties:
+        totalResults:
+          type: integer
+          example: 10
+        startIndex:
+          type: integer
+          example: 1
+        count:
+          type: integer
+          example: 10
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+          example:
+            [
+              {
+                "href": "identity-provider?offset=50&limit=10",
+                "rel": "next",
+              },  {
+              "href": "identity-provider?offset=30&limit=10",
+              "rel": "previous",
+            }
+            ]
+        identityProviders:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityProviderListItem'
+    IdentityProviderListItem:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-556642440000
+        name:
+          type: string
+          example: google
+        description:
+          type: string
+          example: identity provider for google federation
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+        image:
+          type: string
+          example: "google-logo-url"
+        isPrimary:
+          type: boolean
+          example: false
+        isFederationHub:
+          type: boolean
+          example: false
+        homeRealmIdentifier:
+          type: string
+          example: localhost
+        certificate:
+          $ref: '#/components/schemas/Certificate'
+        alias:
+          type: string
+          example: 'https://localhost:9444/oauth2/token'
+        claims:
+          $ref: '#/components/schemas/Claims'
+        roles:
+          $ref: '#/components/schemas/Roles'
+        groups:
+          $ref: '#/components/schemas/IdPGroupsConfig'
+        federatedAuthenticators:
+          $ref: '#/components/schemas/FederatedAuthenticatorListResponse'
+        provisioning:
+          $ref: '#/components/schemas/ProvisioningResponse'
+        self:
+          type: string
+          example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000
+    FederatedAuthenticatorListResponse:
+      type: object
+      properties:
+        defaultAuthenticatorId:
+          type: string
+          example: U0FNTDJBdXRoZW50aWNhdG9y
+        authenticators:
+          type: array
+          items:
+            $ref: '#/components/schemas/FederatedAuthenticatorListItem'
+    FederatedAuthenticatorListItem:
+      type: object
+      properties:
+        authenticatorId:
+          type: string
+          example: U0FNTDJBdXRoZW50aWNhdG9y
+        name:
+          type: string
+          example: SAML2Authenticator
+        isEnabled:
+          type: boolean
+          default: false
+          example: true
+        tags:
+          type: array
+          items:
+            type: string
+          example: [Social Login,OIDC]
+          readOnly: true
+        self:
+          type: string
+          example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000/federated-authenticators/U0FNTDJBdXRoZW50aWNhdG9y
+    ProvisioningResponse:
+      type: object
+      properties:
+        jit:
+          $ref: '#/components/schemas/JustInTimeProvisioning'
+        outboundConnectors:
+          $ref: '#/components/schemas/OutboundConnectorListResponse'
+    OutboundConnectorListResponse:
+      type: object
+      properties:
+        defaultConnectorId:
+          type: string
+          example: U0NJTQ
+        connectors:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutboundConnectorListItem'
+    OutboundConnectorListItem:
+      type: object
+      properties:
+        connectorId:
+          type: string
+          example: U0NJTQ
+        name:
+          type: string
+          example: SCIM
+          readOnly: true
+        isEnabled:
+          type: boolean
+          default: false
+          example: true
+        self:
+          type: string
+          example: /t/carbon.super/api/server/v1/identity-providers/123e4567-e89b-12d3-a456-556642440000/provisioning/outbound-connectors/U0NJTQ
+    Roles:
+      type: object
+      properties:
+        mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleMapping'
+        outboundProvisioningRoles:
+          type: array
+          items:
+            type: string
+          example:
+            - manager
+            - hr-admin
+    RoleMapping:
+      type: object
+      properties:
+        idpRole:
+          type: string
+          example: google-manager
+        localRole:
+          type: string
+          example: manager
+    IdPGroupsConfig:
+      type: array
+      description: IdP groups supported by the IdP.
+      items:
+        $ref: '#/components/schemas/IdPGroup'
+      minItems: 0
+    IdPGroup:
+      type: object
+      required:
+        - name
+      description: Represents an IdP group supported by an Identity Provider.
+      properties:
+        name:
+          type: string
+          description: Name of the IdP group
+          example: google-admin
+        id:
+          type: string
+          description: UUID of the IdP group
+          example: 6b1f8513-3de0-4f28-9cad-b7400dbc94ae
+    Claims:
+      type: object
+      properties:
+        userIdClaim:
+          $ref: '#/components/schemas/Claim'
+        roleClaim:
+          $ref: '#/components/schemas/Claim'
+        mappings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClaimMapping'
+        provisioningClaims:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProvisioningClaim'
+    ProvisioningClaim:
+      type: object
+      properties:
+        claim:
+          $ref: '#/components/schemas/Claim'
+        defaultValue:
+          type: string
+          example: sathya
+    ClaimMapping:
+      type: object
+      properties:
+        idpClaim:
+          type: string
+          example: country
+        localClaim:
+          $ref: '#/components/schemas/Claim'
+    Claim:
+      type: object
+      required:
+        - uri
+      properties:
+        id:
+          type: string
+          example: aHR0cDovL3dzbzIub3JnL2NsYWltcy91c2VybmFtZQ
+          readOnly: true
+        uri:
+          type: string
+          example: 'http://wso2.org/claims/username'
+        displayName:
+          type: string
+          example: Username
+          readOnly: true
+    JustInTimeProvisioning:
+      type: object
+      required:
+        - isEnabled
+      properties:
+        isEnabled:
+          type: boolean
+          default: false
+          example: true
+        scheme:
+          type: string
+          enum:
+            - PROMPT_USERNAME_PASSWORD_CONSENT
+            - PROMPT_PASSWORD_CONSENT
+            - PROMPT_CONSENT
+            - PROVISION_SILENTLY
+          default: PROVISION_SILENTLY
+        userstore:
+          type: string
+          default: PRIMARY
+          example: PRIMARY
+        associateLocalUser:
+          type: boolean
+          default: false
+          example: true
+        attributeSyncMethod:
+          type: string
+          enum:
+            - OVERRIDE_ALL
+            - NONE
+            - PRESERVE_LOCAL
+          default: OVERRIDE_ALL
+    JWTIssuerPOSTRequest:
+      type: object
+      required:
+        - name
+        - idpIssuerName
+        - certificate
+      properties:
+        name:
+          type: string
+          example: google
+        description:
+          type: string
+          example: "JWT Issuer"
+        image:
+          type: string
+          example: "issuer-logo-url"
+        templateId:
+          type: string
+          example: '8ea23303-49c0-4253-b81f-82c0fe6fb4a0'
+        certificate:
+          $ref: '#/components/schemas/Certificate'
+        alias:
+          type: string
+          example: 'https://localhost:9444/oauth2/token'
+        idpIssuerName:
+          type: string
+          example: 'https://www.issuer.com'

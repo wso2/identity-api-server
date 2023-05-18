@@ -201,6 +201,34 @@ public class ServerIdpManagementService {
     }
 
     /**
+     * Get list of identity providers.
+     *
+     * @param requiredAttributes Required attributes in the IDP list response.
+     * @param limit      Items per page.
+     * @param offset     Offset.
+     * @param filter     Filter string. E.g. filter="name" sw "google" and "isEnabled" eq "true"
+     * @param sortBy     Attribute to sort the IDPs by. E.g. name
+     * @param sortOrder  Order in which IDPs should be sorted. Can be either ASC or DESC.
+     * @return IdentityProviderListResponse.
+     */
+    public IdentityProviderListResponse getJwtIssuers(String requiredAttributes, Integer limit, Integer offset,
+                                                      String filter, String sortBy, String sortOrder) {
+
+        try {
+            List<String> requestedAttributeList = null;
+            if (StringUtils.isNotBlank(requiredAttributes)) {
+                requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
+            }
+            return createIDPListResponse(
+                    IdentityProviderServiceHolder.getIdentityProviderManager().getJWTIssuers(limit, offset, filter,
+                            sortBy, sortOrder, ContextLoader.getTenantDomainFromContext(), requestedAttributeList),
+                    requestedAttributeList);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
+        }
+    }
+
+    /**
      * Add an identity provider.
      *
      * @param identityProviderPOSTRequest identityProviderPOSTRequest.

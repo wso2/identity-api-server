@@ -622,6 +622,7 @@
         <module>components/org.wso2.carbon.identity.api.server.branding.preference.management</module>
         <module>components/org.wso2.carbon.identity.api.server.input.validation</module>
         <module>components/org.wso2.carbon.identity.api.server.admin.advisory.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.jwt.issuers</module>
     </modules>
 
 </project>
