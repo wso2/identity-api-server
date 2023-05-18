@@ -489,6 +489,21 @@
                 <version>${org.wso2.carbon.identity.organization.management.core.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.extension.identity.verification</groupId>
+                <artifactId>org.wso2.carbon.extension.identity.verification.provider</artifactId>
+                <version>${identity.verification.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.extension.identity.verification</groupId>
+                <artifactId>org.wso2.carbon.extension.identity.verification.mgt</artifactId>
+                <version>${identity.verification.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.idv.provider.common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -590,6 +605,7 @@
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
+        <identity.verification.version>1.0.0</identity.verification.version>
 
         <!-- Organization management core Version -->
         <org.wso2.carbon.identity.organization.management.core.version>1.0.42
@@ -622,6 +638,7 @@
         <module>components/org.wso2.carbon.identity.api.server.branding.preference.management</module>
         <module>components/org.wso2.carbon.identity.api.server.input.validation</module>
         <module>components/org.wso2.carbon.identity.api.server.admin.advisory.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.idv.provider</module>
     </modules>
 
 </project>
