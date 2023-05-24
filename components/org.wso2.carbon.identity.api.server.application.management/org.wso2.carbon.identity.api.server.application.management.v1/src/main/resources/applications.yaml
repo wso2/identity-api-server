@@ -522,7 +522,7 @@ paths:
           <b>Permission required:</b> <br>
               * /permission/admin <br>
           <b>Scope required:</b> <br>
-              * SYSTEM
+              * internal_organization_admin
       parameters:
         - name: applicationId
           in: path
@@ -2538,6 +2538,8 @@ components:
           $ref: '#/components/schemas/InboundProtocolsListResponse'
         authenticationSequence:
           $ref: '#/components/schemas/AuthenticationSequence'
+        appRoleConfigurations:
+          $ref: '#/components/schemas/AppRoleConfigurations'
         advancedConfigurations:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
@@ -2571,6 +2573,8 @@ components:
           $ref: '#/components/schemas/ClaimConfiguration'
         authenticationSequence:
           $ref: '#/components/schemas/AuthenticationSequence'
+        appRoleConfigurations:
+          $ref: '#/components/schemas/AppRoleConfigurations'
         advancedConfigurations:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
@@ -2666,8 +2670,10 @@ components:
           type: boolean
           example: false
           description: Decides whether user consent needs to be skipped during logout flows.
-        externalizedConsentPage:
-          $ref: '#/components/schemas/ExternalizedConsentPage'
+        useExternalConsentPage:
+          type: boolean
+          example: false
+          description: Decides whether user needs to use external consent page.
         returnAuthenticatedIdpList:
           type: boolean
           example: false
@@ -2713,19 +2719,6 @@ components:
           description: >-
             Certificate value. If type is JWKS, value should be jwks URL. If
             type is PEM, value should be the certificate in PEM format.
-    ExternalizedConsentPage:
-      type: object
-      properties:
-        enabled:
-          type: boolean
-          description: >-
-            Decides whether external consent management is enabled.
-          default: false
-        consentPageUrl:
-          type: string
-          example: "https://example.com/consent"
-          description: >-
-            External consent management URL.
     InboundProtocols:
       type: object
       properties:
@@ -3314,6 +3307,30 @@ components:
         authenticator:
           type: string
           example: basic
+
+    AppRoleConfigurations:
+      type: array
+      description: Decides whether the attribute step FIdPs use app role mappings.
+      items:
+        $ref: '#/components/schemas/AppRoleConfig'
+      minItems: 0
+
+    AppRoleConfig:
+      type: object
+      description: Decides whether an FIdP uses app role mappings.
+      required:
+        - idp
+        - useAppRoleMappings
+      properties:
+        idp:
+          type: string
+          description: FIdP name.
+          example: googleIdP
+        useAppRoleMappings:
+          type: boolean
+          description: FIdP use application role mappings.
+          example: false
+          default: false
 
     AuthProtocolMetadata:
       type: object

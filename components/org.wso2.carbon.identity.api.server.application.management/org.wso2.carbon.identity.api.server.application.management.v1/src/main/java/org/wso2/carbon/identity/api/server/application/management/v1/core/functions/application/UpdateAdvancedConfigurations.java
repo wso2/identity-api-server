@@ -19,14 +19,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
-import org.wso2.carbon.identity.api.server.application.management.v1.ExternalizedConsentPageConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
-import org.wso2.carbon.identity.application.common.model.ExternalizedConsentPageConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_SUPPORTED;
@@ -56,8 +52,8 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(advancedConfigurations.getReturnAuthenticatedIdpList(),
                     config::setAlwaysSendBackAuthenticatedListOfIdPs);
             setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
+            setIfNotNull(advancedConfigurations.getUseExternalConsentPage(), config::setUseExternalConsentPage);
 
-            updateExternalizedConsentPage(advancedConfigurations.getExternalizedConsentPage(), config);
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
         }
     }
@@ -83,50 +79,6 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             }
         }
     }
-
-    private void updateExternalizedConsentPage(ExternalizedConsentPageConfiguration externalizedConsentPageApiModel,
-                                                 LocalAndOutboundAuthenticationConfig config) {
-
-        ExternalizedConsentPageConfig externalConsentManagementConfig = getExternalizedConsentPageConfig(config);
-        if (externalizedConsentPageApiModel != null) {
-            validateConsentPageUrl(externalizedConsentPageApiModel.getConsentPageUrl());
-            setIfNotNull(externalizedConsentPageApiModel.getEnabled(), externalConsentManagementConfig::setEnabled);
-            setIfNotNull(externalizedConsentPageApiModel.getConsentPageUrl(),
-                    externalConsentManagementConfig::setConsentPageUrl);
-        }
-    }
-
-    /**
-     * Validate the external consent page URL.
-     *
-     * @param consentPageUrl Consent page URL.
-     */
-    private void validateConsentPageUrl(String consentPageUrl) {
-
-        boolean isVaild = true;
-        try {
-            URL url = new URL(consentPageUrl);
-            if (!url.getProtocol().equals("https")) {
-                isVaild = false;
-            }
-        } catch (MalformedURLException e) {
-            isVaild = false;
-        }
-        if (!isVaild) {
-            throw buildBadRequestError("Invalid External Consent Page URL is found. Only https urls are " +
-                    "allowed.");
-        }
-    }
-
-    private ExternalizedConsentPageConfig getExternalizedConsentPageConfig (
-            LocalAndOutboundAuthenticationConfig config) {
-
-        if (config.getExternalizedConsentPageConfig() == null) {
-            config.setExternalizedConsentPageConfig(new ExternalizedConsentPageConfig());
-        }
-        return config.getExternalizedConsentPageConfig();
-    }
-
 
     private void handleAdditionalSpProperties(List<AdditionalSpProperty> spAdditionalProperties) {
 

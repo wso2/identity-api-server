@@ -67,6 +67,7 @@ public class Constants {
     public static final String ALIAS = "alias";
     public static final String CLAIMS = "claims";
     public static final String ROLES = "roles";
+    public static final String GROUPS = "groups";
     public static final String FEDERATED_AUTHENTICATORS = "federatedAuthenticators";
     public static final String PROVISIONING = "provisioning";
 
@@ -150,6 +151,12 @@ public class Constants {
         ERROR_CODE_ERROR_RETRIEVING_IDP("65003",
                 "Unable to retrieve identity provider.",
                 "Server encountered an error while retrieving the identity provider for identifier %s."),
+        ERROR_CODE_ERROR_EXPORTING_IDP("65006",
+                "Unable to export identity provider.",
+                "Server encountered an error while exporting the identity provider for identifier %s."),
+        ERROR_CODE_ERROR_IMPORTING_IDP("65007",
+                "Unable to import identity provider.",
+                "Server encountered an error while importing the identity provider."),
         ERROR_CODE_ERROR_RETRIEVING_META_AUTHENTICATORS("65021",
                 "Unable to retrieve meta federated authenticator list.",
                 "Server encountered an error while retrieving the meta federated authenticators."),
@@ -188,6 +195,8 @@ public class Constants {
         ERROR_CODE_ERROR_RETRIEVING_IDP_JIT("65032",
                 "Unable to retrieve identity provider JIT config.",
                 "Server encountered an error while retrieving the identity provider JIT config for identifier %s."),
+        ERROR_CODE_ERROR_RETRIEVING_IDP_GROUPS("65033", "Unable to retrieve identity provider group config.",
+                "Server encountered an error while retrieving the identity provider group config for identifier %s."),
         ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS("65042",
                 "Unable to retrieve identity provider connected applications.",
                 "Server encountered an error while retrieving the identity provider connected applications %s."),
@@ -226,6 +235,10 @@ public class Constants {
                 "Attribute filtering capability is not supported in this version of the API."),
         ERROR_CODE_BUILDING_LINKS("65042", "Error building page links", "Error occurred during building page links. " +
                 "%s"),
+        ERROR_CODE_ERROR_UPDATING_IDP_GROUPS("65036",
+                "Unable to update identity provider groups.",
+                "Server encountered an error while updating the identity provider " +
+                        "group config for identifier %s."),
         ERROR_CODE_ERROR_LISTING_IDP_TEMPLATES("65050", "Unable to list existing identity provider " +
                 "templates.", "Error occured while listing identity provider templates."),
         ERROR_CODE_ERROR_ADDING_IDP_TEMPLATE("65051", "Unable to add IDP template.",

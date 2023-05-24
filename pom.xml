@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.42</version>
+    <version>1.2.56-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -40,7 +40,7 @@
         <developerConnection>scm:git:https://github.com/wso2/identity-api-server.git
         </developerConnection>
         <connection>scm:git:https://github.com/wso2/identity-api-server.git</connection>
-        <tag>v1.2.42</tag>
+        <tag>HEAD</tag>
     </scm>
 
 
@@ -230,6 +230,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.identity.governance.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.admin.advisory.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -467,6 +473,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.admin.advisory.mgt</artifactId>
+                <version>${carbon.kernel.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.event.publisher.core</artifactId>
                 <version>${org.wso2.carbon.event.publisher.version}</version>
@@ -488,6 +500,21 @@
                 <artifactId>org.wso2.carbon.identity.organization.management.service</artifactId>
                 <version>${org.wso2.carbon.identity.organization.management.core.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.extension.identity.verification</groupId>
+                <artifactId>org.wso2.carbon.extension.identity.verification.provider</artifactId>
+                <version>${identity.verification.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.extension.identity.verification</groupId>
+                <artifactId>org.wso2.carbon.extension.identity.verification.mgt</artifactId>
+                <version>${identity.verification.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.idv.provider.common</artifactId>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -572,16 +599,16 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.8.23</identity.governance.version>
-        <carbon.identity.framework.version>5.25.144</carbon.identity.framework.version>
+        <carbon.identity.framework.version>5.25.186</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.4.4</identity.event.handler.version>
-        <identity.inbound.oauth2.version>6.8.0</identity.inbound.oauth2.version>
-        <identity.inbound.saml2.version>5.8.44</identity.inbound.saml2.version>
+        <identity.inbound.oauth2.version>6.11.51</identity.inbound.oauth2.version>
+        <identity.inbound.saml2.version>5.11.9</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
-        <carbon.kernel.version>4.9.0</carbon.kernel.version>
+        <carbon.kernel.version>4.9.4</carbon.kernel.version>
         <carbon.multitenancy.version>4.9.10</carbon.multitenancy.version>
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
         <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.4.21</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
@@ -590,6 +617,7 @@
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
+        <identity.verification.version>1.0.0</identity.verification.version>
 
         <!-- Organization management core Version -->
         <org.wso2.carbon.identity.organization.management.core.version>1.0.42
@@ -622,6 +650,8 @@
         <module>components/org.wso2.carbon.identity.api.server.branding.preference.management</module>
         <module>components/org.wso2.carbon.identity.api.server.input.validation</module>
         <module>components/org.wso2.carbon.identity.api.server.extension.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.admin.advisory.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.idv.provider</module>
     </modules>
 
 </project>

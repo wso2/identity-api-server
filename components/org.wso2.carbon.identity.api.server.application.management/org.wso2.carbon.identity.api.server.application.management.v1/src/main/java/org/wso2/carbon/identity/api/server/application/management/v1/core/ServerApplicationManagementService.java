@@ -91,6 +91,7 @@ import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.ImportResponse;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
+import org.wso2.carbon.identity.application.common.model.InboundConfigurationProtocol;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
@@ -115,6 +116,8 @@ import org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
+import org.wso2.carbon.identity.oauth.dao.OAuthAppDO;
+import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
 import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementClientException;
@@ -122,6 +125,7 @@ import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementExcepti
 import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -146,6 +150,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.CLIENT_ID;
@@ -153,6 +162,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
@@ -172,11 +182,6 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
 import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
 import static org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages.ERROR_CODE_INVALID_APP_ID;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 /**
  * Calls internal osgi services to perform server application management related operations.
@@ -202,6 +207,8 @@ public class ServerApplicationManagementService {
     private static final String[] VALID_MEDIA_TYPES_XML = {"application/xml", "text/xml"};
     private static final String[] VALID_MEDIA_TYPES_YAML = {"application/yaml", "text/yaml", "application/x-yaml"};
     private static final String[] VALID_MEDIA_TYPES_JSON = {"application/json", "text/json"};
+    private static final Class<?>[] INBOUND_CONFIG_PROTOCOLS = new Class<?>[] {ServiceProvider.class,
+                                                                SAMLSSOServiceProviderDTO.class, OAuthAppDO.class};
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -497,36 +504,16 @@ public class ServerApplicationManagementService {
         }
 
         StringBuilder fileNameSB = new StringBuilder(serviceProvider.getApplicationName());
-        String fileContent = "";
+        String fileContent;
 
         if (Arrays.asList(VALID_MEDIA_TYPES_XML).contains(fileType)) {
-            JAXBContext jaxbContext;
-            try {
-                jaxbContext = JAXBContext.newInstance(ServiceProvider.class);
-                Marshaller marshaller = jaxbContext.createMarshaller();
-                marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-                StringWriter stringWriter = new StringWriter();
-                marshaller.marshal(serviceProvider, stringWriter);
-                fileContent = stringWriter.toString();
-            } catch (JAXBException e) {
-                throw Utils.buildServerError("Error exporting application from XML file.", e);
-            }
+            fileContent = parseXmlFromServiceProvider(serviceProvider);
             fileNameSB.append(XML_FILE_EXTENSION);
         } else if (Arrays.asList(VALID_MEDIA_TYPES_YAML).contains(fileType)) {
-            Yaml yaml = new Yaml();
-            try {
-                fileContent = yaml.dump(serviceProvider);
-            } catch (YAMLException e) {
-                throw Utils.buildServerError("Error exporting application from YAML file.", e);
-            }
+            fileContent = parseYamlFromServiceProvider(serviceProvider);
             fileNameSB.append(YML_FILE_EXTENSION);
         } else if (Arrays.asList(VALID_MEDIA_TYPES_JSON).contains(fileType)) {
-            ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
-            try {
-                fileContent = objectMapper.writeValueAsString(serviceProvider);
-            } catch (JsonProcessingException e) {
-                throw Utils.buildServerError("Error exporting application from JSON file.", e);
-            }
+            fileContent = parseJsonFromServiceProvider(serviceProvider);
             fileNameSB.append(JSON_FILE_EXTENSION);
         } else {
             throw Utils.buildServerError("Unsupported media type: " + fileType + "."
@@ -539,6 +526,63 @@ public class ServerApplicationManagementService {
                 new ByteArrayResource(fileContent.getBytes(StandardCharsets.UTF_8)),
                 MediaType.APPLICATION_OCTET_STREAM
         );
+    }
+
+    private String parseXmlFromServiceProvider(ServiceProvider serviceProvider) {
+
+        JAXBContext jaxbContext;
+        try {
+            jaxbContext = JAXBContext.newInstance(INBOUND_CONFIG_PROTOCOLS);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.setListener(new Marshaller.Listener() {
+                @Override
+                public void beforeMarshal(Object source) {
+                    if (source instanceof InboundAuthenticationConfig) {
+                        InboundAuthenticationConfig config = (InboundAuthenticationConfig) source;
+                        for (InboundAuthenticationRequestConfig requestConfig
+                                : config.getInboundAuthenticationRequestConfigs()) {
+                            requestConfig.setInboundConfiguration(null);
+                        }
+                    }
+                }
+            });
+            StringWriter stringWriter = new StringWriter();
+            marshaller.marshal(serviceProvider, stringWriter);
+            return stringWriter.toString();
+        } catch (JAXBException e) {
+            throw Utils.buildServerError("Error exporting application from XML file.", e);
+        }
+    }
+
+    private String parseYamlFromServiceProvider(ServiceProvider serviceProvider) {
+
+        Constructor constructor = new Constructor();
+        CustomRepresenter representer = new CustomRepresenter();
+
+        for (Class<?> protocol : INBOUND_CONFIG_PROTOCOLS) {
+            TypeDescription description = new TypeDescription(InboundConfigurationProtocol.class);
+            description.addPropertyParameters("type", protocol);
+            constructor.addTypeDescription(description);
+        }
+
+        Yaml yaml = new Yaml(constructor, representer);
+        try {
+            return yaml.dump(serviceProvider);
+        } catch (YAMLException e) {
+            throw Utils.buildServerError("Error exporting application from YAML file.", e);
+        }
+    }
+
+    private String parseJsonFromServiceProvider(ServiceProvider serviceProvider) {
+
+        ObjectMapper objectMapper = new ObjectMapper(new JsonFactory());
+        objectMapper.registerSubtypes(INBOUND_CONFIG_PROTOCOLS);
+        try {
+            return objectMapper.writeValueAsString(serviceProvider);
+        } catch (JsonProcessingException e) {
+            throw Utils.buildServerError("Error exporting application from JSON file.", e);
+        }
     }
 
     /**
@@ -633,7 +677,7 @@ public class ServerApplicationManagementService {
             throws IdentityApplicationManagementException {
 
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(ServiceProvider.class);
+            JAXBContext jaxbContext = JAXBContext.newInstance(INBOUND_CONFIG_PROTOCOLS);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             return (ServiceProvider) unmarshaller.unmarshal(new StringReader(spFileContent.getContent()));
         } catch (JAXBException e) {
@@ -658,7 +702,9 @@ public class ServerApplicationManagementService {
             throws IdentityApplicationManagementException {
 
         try {
-            return new ObjectMapper().readValue(spFileContent.getContent(), ServiceProvider.class);
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerSubtypes(INBOUND_CONFIG_PROTOCOLS);
+            return objectMapper.readValue(spFileContent.getContent(), ServiceProvider.class);
         } catch (JsonProcessingException e) {
             throw new IdentityApplicationManagementException(String.format("Error in reading JSON Service Provider " +
                     "configuration file %s uploaded by tenant: %s", spFileContent.getFileName(), tenantDomain), e);
@@ -700,6 +746,20 @@ public class ServerApplicationManagementService {
         if (applicationModel.getInboundProtocolConfiguration() != null &&
                 applicationModel.getInboundProtocolConfiguration().getOidc() != null) {
             validateCORSOrigins(applicationModel.getInboundProtocolConfiguration().getOidc().getAllowedOrigins());
+        }
+
+        /*
+         * Validate the useExternalConsentPage property.
+         * We are only allowed to use external consent page for OIDC applications.
+         */
+        if (applicationModel.getInboundProtocolConfiguration() != null &&
+                applicationModel.getInboundProtocolConfiguration().getSaml() != null) {
+            if (applicationModel.getAdvancedConfigurations() != null && applicationModel.getAdvancedConfigurations()
+                    .getUseExternalConsentPage() != null &&
+                    applicationModel.getAdvancedConfigurations().getUseExternalConsentPage()) {
+                throw buildBadRequestError(USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED.getCode(),
+                        USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED.getDescription());
+            }
         }
 
         String username = ContextLoader.getUsernameFromContext();
