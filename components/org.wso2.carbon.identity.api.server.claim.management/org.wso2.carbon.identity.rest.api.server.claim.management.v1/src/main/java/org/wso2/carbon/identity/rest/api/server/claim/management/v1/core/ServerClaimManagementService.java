@@ -54,9 +54,11 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.Property
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.model.ClaimDialectConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserStoreManager;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -650,7 +652,14 @@ public class ServerClaimManagementService {
 
         StringBuilder fileNameSB = new StringBuilder(fileName);
         fileNameSB.append(YAML_FILE_EXTENSION);
-        Yaml yaml = new Yaml();
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        Yaml yaml = new Yaml(new Representer() {
+            @Override
+            public DumperOptions.FlowStyle getDefaultFlowStyle() {
+                return DumperOptions.FlowStyle.BLOCK;
+            }
+        }, options);
         try {
             return new FileContent(fileNameSB.toString(), MEDIA_TYPE_YAML, yaml.dump(dialectConfiguration));
         } catch (YAMLException e) {
