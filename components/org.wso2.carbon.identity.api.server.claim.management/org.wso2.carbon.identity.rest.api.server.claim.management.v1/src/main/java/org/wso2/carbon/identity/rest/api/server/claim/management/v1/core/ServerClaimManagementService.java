@@ -654,12 +654,7 @@ public class ServerClaimManagementService {
         fileNameSB.append(YAML_FILE_EXTENSION);
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        Yaml yaml = new Yaml(new Representer() {
-            @Override
-            public DumperOptions.FlowStyle getDefaultFlowStyle() {
-                return DumperOptions.FlowStyle.BLOCK;
-            }
-        }, options);
+        Yaml yaml = new Yaml(options);
         try {
             return new FileContent(fileNameSB.toString(), MEDIA_TYPE_YAML, yaml.dump(dialectConfiguration));
         } catch (YAMLException e) {
