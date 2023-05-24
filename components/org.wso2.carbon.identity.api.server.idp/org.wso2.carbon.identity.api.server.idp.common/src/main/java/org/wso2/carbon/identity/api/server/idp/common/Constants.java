@@ -27,6 +27,8 @@ public class Constants {
 
     public static final String IDP_MANAGEMENT_PREFIX = "IDP-";
     public static final String IDP_PATH_COMPONENT = "/identity-providers";
+    public static final String TRUSTED_TOKEN_ISSUER_PATH_COMPONENT = "/trusted-token-issuers";
+
     public static final String IDP_TEMPLATE_PATH_COMPONENT = "/templates";
     public static final String PATH_SEPERATOR = "/";
     public static final String JWKS_URI = "jwksUri";
@@ -140,6 +142,9 @@ public class Constants {
                         " Recommend to use Scopes field."),
         ERROR_CODE_INVALID_OIDC_SCOPES("60038", "Invalid OIDC Scopes.",
                 "Scopes must contain 'openid'."),
+        ERROR_CODE_ERROR_LISTING_TRUSTED_TOKEN_ISSUERS("60021",
+                "Unable to list existing trusted token issuers.",
+                "Server encountered an error while listing the trusted token issuers."),
 
         // Server Error starting from 650xx.
         ERROR_CODE_ERROR_ADDING_IDP("65002",
