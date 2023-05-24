@@ -106,6 +106,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EXTERNAL_CLAIM_CONFLICT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EXTERNAL_CLAIM_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_FILTERING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_IMPORTING_EXTERNAL_CLAIMS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_INVALID_DIALECT_ID;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_INVALID_INPUT_FILE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_INVALID_USERSTORE;
@@ -115,6 +116,8 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_MISSING_MEDIA_TYPE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UPDATING_EXTERNAL_CLAIMS;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UPDATING_LOCAL_CLAIMS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
@@ -431,9 +434,10 @@ public class ServerClaimManagementService {
      *
      * @param fileInputStream   InputStream representing the uploaded claim dialect file.
      * @param fileDetail        Attachment object with metadata about the uploaded claim dialect file.
+     * @param delete            Boolean value to indicate whether to delete the existing claim dialect.
      * @return a String representing the updated claim dialect's resource identifier.
      */
-    public String updateClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail) {
+    public String updateClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail, Boolean delete) {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug(String.format("Updating claim dialect from file: %s", fileDetail.getDataHandler().getName()));
@@ -444,10 +448,10 @@ public class ServerClaimManagementService {
             ClaimDialectConfiguration dialectConfiguration = getDialectFromFile(fileInputStream, fileDetail);
             dialectId = dialectConfiguration.getId();
             if (LOCAL_DIALECT_PATH.equals(dialectId)) {
-                updateLocalClaims(dialectConfiguration.getLocalClaimReqDTOList());
+                updateLocalClaims(dialectConfiguration.getLocalClaimReqDTOList(), delete);
             } else {
                 updateClaimDialect(dialectId, dialectConfiguration.getClaimDialectReqDTO());
-                updateExternalClaims(dialectId, dialectConfiguration.getExternalClaimReqDTOList());
+                updateExternalClaims(dialectId, dialectConfiguration.getExternalClaimReqDTOList(), delete);
             }
             return dialectId;
         } catch (ClaimMetadataException e) {
@@ -455,27 +459,84 @@ public class ServerClaimManagementService {
         }
     }
 
-    private void updateLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList) throws ClaimMetadataException {
+    private void updateLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList, Boolean delete)
+            throws ClaimMetadataException {
+
+        if (delete != null && delete) {
+            deleteUnusedLocalClaims(localClaimReqDTOList);
+        }
+
+        StringBuilder failedClaimsBuilder = new StringBuilder();
 
         for (LocalClaimReqDTO localClaimReqDTO : localClaimReqDTOList) {
-            if (isLocalClaimExist(localClaimReqDTO.getClaimURI())) {
-                updateLocalClaim(getResourceId(localClaimReqDTO.getClaimURI()), localClaimReqDTO);
-            } else {
-                addLocalClaim(localClaimReqDTO);
+            String claimId = getResourceId(localClaimReqDTO.getClaimURI());
+            try {
+                if (isLocalClaimExist(claimId)) {
+                    updateLocalClaim(claimId, localClaimReqDTO);
+                } else {
+                    addLocalClaim(localClaimReqDTO);
+                }
+            } catch (APIError e) {
+                LOG.warn(String.format("Error updating local claim: %s", localClaimReqDTO.getClaimURI()), e);
+                failedClaimsBuilder.append(localClaimReqDTO.getClaimURI()).append(", ");
             }
+        }
+        String failedClaimsString = failedClaimsBuilder.toString();
+        if (!failedClaimsString.isEmpty()) {
+            throw handleClaimManagementClientError(ERROR_CODE_UPDATING_LOCAL_CLAIMS, BAD_REQUEST,
+                    failedClaimsString);
         }
     }
 
-    private void updateExternalClaims(String dialectId, List<ExternalClaimReqDTO> externalClaimReqDTOList)
+    private void deleteUnusedLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList)
             throws ClaimMetadataException {
+
+        List<String> claimURIs = localClaimReqDTOList.stream()
+                .map(LocalClaimReqDTO::getClaimURI)
+                .collect(Collectors.toList());
+
+        List<LocalClaimResDTO> existingLocalClaimResDTOList = getLocalClaimResDTOs(
+                getClaimMetadataManagementService().getLocalClaims(ContextLoader.getTenantDomainFromContext()));
+
+        List<String> existingClaimURIs = existingLocalClaimResDTOList.stream()
+                .map(LocalClaimResDTO::getClaimURI)
+                .collect(Collectors.toList());
+
+        List<String> claimsToDelete = existingClaimURIs.stream()
+                .filter(uri -> !claimURIs.contains(uri))
+                .collect(Collectors.toList());
+
+        for (String claimURI : claimsToDelete) {
+            deleteLocalClaim(getResourceId(claimURI));
+        }
+    }
+
+    private void updateExternalClaims(String dialectId, List<ExternalClaimReqDTO> externalClaimReqDTOList,
+                                      Boolean delete) throws ClaimMetadataException {
+
+        if (delete != null && delete) {
+            deleteClaimDialect(dialectId);
+        }
+
+        StringBuilder failedClaimsBuilder = new StringBuilder();
 
         for (ExternalClaimReqDTO externalClaimReqDTO : externalClaimReqDTOList) {
             String claimId = getResourceId(externalClaimReqDTO.getClaimURI());
-            if (isExternalClaimExist(dialectId, claimId)) {
-                updateExternalClaim(dialectId, claimId, externalClaimReqDTO);
-            } else {
-                addExternalClaim(dialectId, externalClaimReqDTO);
+            try {
+                if (isExternalClaimExist(dialectId, claimId)) {
+                    updateExternalClaim(dialectId, claimId, externalClaimReqDTO);
+                } else {
+                    addExternalClaim(dialectId, externalClaimReqDTO);
+                }
+            } catch (APIError e) {
+                LOG.warn(String.format("Error updating external claim: %s", externalClaimReqDTO.getClaimURI()), e);
+                failedClaimsBuilder.append(externalClaimReqDTO.getClaimURI()).append(", ");
             }
+        }
+        String failedClaimsString = failedClaimsBuilder.toString();
+        if (!failedClaimsString.isEmpty()) {
+            throw handleClaimManagementClientError(ERROR_CODE_UPDATING_EXTERNAL_CLAIMS, BAD_REQUEST,
+                    failedClaimsString);
         }
     }
 
@@ -544,7 +605,7 @@ public class ServerClaimManagementService {
 
     private String getFormattedFileName(String fileName) {
 
-        String formattedFileName = fileName.replaceAll("[^\\w/]+", "_");
+        String formattedFileName = fileName.replaceAll("[^\\w\\d]+", "_");
         formattedFileName = StringUtils.abbreviate(formattedFileName, 255);
         return formattedFileName;
     }
@@ -973,12 +1034,31 @@ public class ServerClaimManagementService {
 
             List<ExternalClaimReqDTO> externalClaimReqDTOList = dialectConfiguration.getExternalClaimReqDTOList();
             String dialectURI = addClaimDialect(dialectConfiguration.getClaimDialectReqDTO());
-            for (ExternalClaimReqDTO externalClaimReqDTO : externalClaimReqDTOList) {
-                addExternalClaim(dialectURI, externalClaimReqDTO);
-            }
+
+            importExternalClaims(dialectURI, externalClaimReqDTOList);
+
             return dialectId;
         } catch (ClaimMetadataException e) {
             throw handleClaimManagementException(e, ERROR_CODE_ERROR_IMPORTING_CLAIM_DIALECT);
+        }
+    }
+    private void importExternalClaims(String dialectURI, List<ExternalClaimReqDTO> externalClaimReqDTOList) {
+
+        StringBuilder failedClaimsBuilder = new StringBuilder();
+
+        for (ExternalClaimReqDTO externalClaimReqDTO : externalClaimReqDTOList) {
+            try {
+                addExternalClaim(dialectURI, externalClaimReqDTO);
+            } catch (APIError e) {
+                LOG.warn(String.format("Error importing external claim: %s", externalClaimReqDTO.getClaimURI()), e);
+                failedClaimsBuilder.append(externalClaimReqDTO.getClaimURI()).append(", ");
+            }
+        }
+
+        String failedClaimsString = failedClaimsBuilder.toString();
+        if (!failedClaimsString.isEmpty()) {
+            throw handleClaimManagementClientError(ERROR_CODE_IMPORTING_EXTERNAL_CLAIMS, BAD_REQUEST,
+                                                    failedClaimsString);
         }
     }
 

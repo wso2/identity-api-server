@@ -439,9 +439,10 @@ public class ClaimManagementApi  {
         @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
 
     public Response updateClaimDialectFromFile(@ApiParam(value = "The file to be uploaded.") @Multipart(value = "file") InputStream fileInputStream,
-    @ApiParam(value = "The file to be uploaded. : details") @Multipart(value = "file" ) Attachment fileDetail) {
+    @ApiParam(value = "The file to be uploaded. : details") @Multipart(value = "file" ) Attachment fileDetail,
+    @ApiParam(value = "Specify whether to allow delete or not", defaultValue="false") @QueryParam("delete")  Boolean delete) {
 
-        return delegate.updateClaimDialectFromFile(fileInputStream,fileDetail);
+        return delegate.updateClaimDialectFromFile(fileInputStream,fileDetail,delete);
     }
 
     @Valid
