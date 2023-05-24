@@ -74,7 +74,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/owner")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Change application owner ", notes = "This API provides the capability to change the application owner.<br>   <b>Permission required:</b> <br>       * /permission/admin <br>   <b>Scope required:</b> <br>       * SYSTEM ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Change application owner ", notes = "This API provides the capability to change the application owner.<br>   <b>Permission required:</b> <br>       * /permission/admin <br>   <b>Scope required:</b> <br>       * internal_organization_admin ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
