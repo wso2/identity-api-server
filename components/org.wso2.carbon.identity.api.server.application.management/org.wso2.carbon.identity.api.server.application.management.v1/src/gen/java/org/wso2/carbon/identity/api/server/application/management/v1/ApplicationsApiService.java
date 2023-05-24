@@ -48,7 +48,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApp
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.UserRegistrantsList;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import javax.ws.rs.core.Response;
@@ -91,8 +90,6 @@ public interface ApplicationsApiService {
       public Response getApplicationTemplate(String templateId);
 
       public Response getConfiguredAuthenticators(String applicationId);
-
-      public Response getConfiguredUserRegistrants(String applicationId);
 
       public Response getCustomInboundConfiguration(String applicationId, String inboundProtocolId);
 
