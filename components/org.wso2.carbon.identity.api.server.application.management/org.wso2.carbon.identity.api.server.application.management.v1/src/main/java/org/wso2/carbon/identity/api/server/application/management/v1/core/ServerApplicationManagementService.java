@@ -57,14 +57,11 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Provisionin
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.UserRegistrant;
-import org.wso2.carbon.identity.api.server.application.management.v1.UserRegistrantsList;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationBasicInfoToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApplicationInfoWithRequiredPropsToApiModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.AuthAttributeHolderToUserRegistrant;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
@@ -98,9 +95,6 @@ import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.common.model.User;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
-import org.wso2.carbon.identity.auth.attribute.handler.exception.AuthAttributeHandlerClientException;
-import org.wso2.carbon.identity.auth.attribute.handler.exception.AuthAttributeHandlerException;
-import org.wso2.carbon.identity.auth.attribute.handler.model.AuthAttributeHolder;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceSearchBean;
 import org.wso2.carbon.identity.configuration.mgt.core.search.ComplexCondition;
@@ -1677,56 +1671,5 @@ public class ServerApplicationManagementService {
                     ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getMessage(),
                     ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getDescription());
         }
-    }
-
-    /**
-     * This method will retrieve the user registrants configured for the given application id by calling the backend
-     * services.
-     *
-     * @param applicationId The application id
-     * @return the user registrants list object
-     */
-    public UserRegistrantsList getConfiguredUserRegistrants(String applicationId) {
-
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        try {
-            if (log.isDebugEnabled()) {
-                log.debug("Retrieving the user registrants configured for the application: " + applicationId);
-            }
-            List<AuthAttributeHolder> availableAuthAttributeHolders =
-                    ApplicationManagementServiceHolder.getAuthAttributeHandlerManager()
-                    .getAvailableAuthAttributeHolders(applicationId);
-            List<UserRegistrant> userRegistrants = availableAuthAttributeHolders.stream().map(new
-                    AuthAttributeHolderToUserRegistrant()).collect(Collectors.toList());
-            return new UserRegistrantsList()
-                    .totalResults(userRegistrants.size())
-                    .userRegistrants(userRegistrants);
-        } catch (AuthAttributeHandlerException e) {
-            throw handleAuthAttributeHandlerException(e, applicationId, tenantDomain);
-        }
-    }
-
-    private APIError handleAuthAttributeHandlerException(AuthAttributeHandlerException e, String applicationId,
-                                                         String tenantDomain) {
-
-        if (e instanceof AuthAttributeHandlerClientException) {
-            throw buildClientError(e, applicationId, tenantDomain);
-        }
-        throw buildServerError(e, applicationId, tenantDomain);
-    }
-
-    private APIError buildServerError(AuthAttributeHandlerException e, String applicationId, String tenantDomain) {
-
-        return Utils.buildServerError(
-                ErrorMessage.ERROR_RETRIEVING_USER_REGISTRANTS.getCode(),
-                ErrorMessage.ERROR_RETRIEVING_USER_REGISTRANTS.getMessage(),
-                buildFormattedDescription(ErrorMessage.ERROR_RETRIEVING_USER_REGISTRANTS.getDescription(),
-                        applicationId, tenantDomain), e);
-    }
-
-    private APIError buildClientError(AuthAttributeHandlerException e, String applicationId, String tenantDomain) {
-
-        return Utils.buildClientError(INVALID_REQUEST.getCode(), "Error while retrieving user registrants for the " +
-                "application: " + applicationId + " in the tenant domain: " + tenantDomain + ".", e.getMessage());
     }
 }

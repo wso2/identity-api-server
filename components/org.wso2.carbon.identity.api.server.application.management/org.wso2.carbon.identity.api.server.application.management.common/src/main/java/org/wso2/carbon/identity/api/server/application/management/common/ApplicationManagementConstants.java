@@ -125,10 +125,6 @@ public class ApplicationManagementConstants {
         ERROR_PROCESSING_REQUEST("65006",
                 "Unexpected Processing Error.",
                 "Server encountered an unexpected error when creating the application."),
-        ERROR_RETRIEVING_USER_REGISTRANTS("65007",
-                "Error while retrieving user registrants.",
-                "Server encountered an error while retrieving the user registrants of the application: %s in the " +
-                        "tenantDomain: %s."),
 
         // Server errors defined at REST API layer.
         APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED("65501",
