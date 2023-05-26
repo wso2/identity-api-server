@@ -617,7 +617,7 @@
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
-        <identity.verification.version>1.0.0</identity.verification.version>
+        <identity.verification.version>1.0.2</identity.verification.version>
 
         <!-- Organization management core Version -->
         <org.wso2.carbon.identity.organization.management.core.version>1.0.42
