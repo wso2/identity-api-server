@@ -83,12 +83,6 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response getConfiguredUserRegistrants(String applicationId) {
-
-        return Response.ok().entity(applicationManagementService.getConfiguredUserRegistrants(applicationId)).build();
-    }
-
-    @Override
     public Response getApplicationTemplate(String templateId) {
 
         return Response.ok().entity(applicationManagementService.getApplicationTemplateById(templateId)).build();

@@ -22,7 +22,7 @@
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.idp</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.2.56-SNAPSHOT</version>
+        <version>1.2.59-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -191,11 +191,6 @@
             <artifactId>cxf-rt-rs-extension-search</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.identity.framework</groupId>
-            <artifactId>org.wso2.carbon.identity.application.authentication.framework</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
-    
+
 </project>
