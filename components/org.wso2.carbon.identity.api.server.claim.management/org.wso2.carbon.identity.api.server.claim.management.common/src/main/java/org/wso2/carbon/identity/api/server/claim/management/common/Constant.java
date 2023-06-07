@@ -186,7 +186,7 @@ public class Constant {
                 "The following external claims could not be imported: %s."),
         ERROR_CODE_UPDATING_EXTERNAL_CLAIMS("50050",
                 "Some external claims were not updated.",
-                "The following external claims could not be updated: %s."),
+                "%s out of %s external claims were not updated successfully."),
         ERROR_CODE_UPDATING_LOCAL_CLAIMS("50051",
                 "Some local claims were not updated.",
                 " The following local claims could not be updated: %s."),

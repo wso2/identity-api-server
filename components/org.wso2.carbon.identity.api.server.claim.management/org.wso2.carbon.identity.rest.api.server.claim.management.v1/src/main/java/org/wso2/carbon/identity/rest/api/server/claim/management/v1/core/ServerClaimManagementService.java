@@ -33,6 +33,8 @@ import org.wso2.carbon.identity.api.server.common.FileContent;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.common.error.bulk.BulkAPIError;
+import org.wso2.carbon.identity.api.server.common.error.bulk.BulkErrorResponse;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataClientException;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.AttributeMapping;
@@ -52,6 +54,7 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalCla
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalClaimResDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.PropertyDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.model.ClaimDialectConfiguration;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.model.ClaimErrorDTO;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserStoreManager;
 import org.yaml.snakeyaml.DumperOptions;
@@ -543,7 +546,7 @@ public class ServerClaimManagementService {
             return;
         }
 
-        StringBuilder failedClaimsBuilder = new StringBuilder();
+        List<ClaimErrorDTO> errors = new ArrayList<>();
 
         for (ExternalClaimReqDTO externalClaimReqDTO : externalClaimReqDTOList) {
             String claimId = getResourceId(externalClaimReqDTO.getClaimURI());
@@ -554,14 +557,15 @@ public class ServerClaimManagementService {
                     addExternalClaim(dialectId, externalClaimReqDTO);
                 }
             } catch (APIError e) {
-                LOG.warn(String.format("Error updating external claim: %s", externalClaimReqDTO.getClaimURI()), e);
-                failedClaimsBuilder.append(externalClaimReqDTO.getClaimURI()).append(", ");
+                ClaimErrorDTO claimErrorDTO = new ClaimErrorDTO(e.getResponseEntity());
+                claimErrorDTO.setClaimURI(externalClaimReqDTO.getClaimURI());
+                errors.add(claimErrorDTO);
             }
         }
-        String failedClaimsString = failedClaimsBuilder.toString();
-        if (!failedClaimsString.isEmpty()) {
-            throw handleClaimManagementClientError(ERROR_CODE_UPDATING_EXTERNAL_CLAIMS, BAD_REQUEST,
-                    failedClaimsString);
+
+        if (!errors.isEmpty()) {
+            throw handleClaimManagementBulkClientError(ERROR_CODE_UPDATING_EXTERNAL_CLAIMS, BAD_REQUEST, errors,
+                    String.valueOf(errors.size()), String.valueOf(externalClaimReqDTOList.size()));
         }
     }
 
@@ -1276,6 +1280,15 @@ public class ServerClaimManagementService {
         return new APIError(status, errorResponse);
     }
 
+    private BulkAPIError handleClaimManagementBulkClientError(Constant.ErrorMessage errorEnum, Response.Status status,
+                                                              List<ClaimErrorDTO> apiErrors, String... data) {
+
+        BulkErrorResponse bulkErrorResponse = getBulkErrorBuilder(errorEnum, apiErrors, data)
+                .build(LOG, buildErrorDescription(errorEnum, data));
+
+        return new BulkAPIError(status, bulkErrorResponse);
+    }
+
     private APIError handleClaimManagementClientError(String errorCode, String errorMessage,
                                                       Response.Status status, String... data) {
 
@@ -1330,6 +1343,16 @@ public class ServerClaimManagementService {
                 .withCode(errorEnum.getCode())
                 .withMessage(errorEnum.getMessage())
                 .withDescription(buildErrorDescription(errorEnum, data));
+    }
+
+    private BulkErrorResponse.Builder getBulkErrorBuilder(Constant.ErrorMessage errorEnum, List<ClaimErrorDTO> errors,
+                                                          String... data) {
+
+        return new BulkErrorResponse.Builder()
+                .withCode(errorEnum.getCode())
+                .withMessage(errorEnum.getMessage())
+                .withDescription(buildErrorDescription(errorEnum, data))
+                .withFailedOperations(errors);
     }
 
     private ErrorResponse.Builder getErrorBuilder(String errorCode, String errorMessage, String... data) {
