@@ -27,6 +27,7 @@ import java.util.List;
  */
 public class BulkErrorDTO extends ErrorDTO implements Serializable {
 
+    private static final long serialVersionUID = 6110302523856444000L;
     private List<? extends ErrorDTO> failedOperations = null;
 
     @JsonProperty("failedOperations")
