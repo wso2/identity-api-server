@@ -20,6 +20,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 
+/**
+ * Claim error DTO for all the server claim API related error responses.
+ */
 public class ClaimErrorDTO extends ErrorDTO {
 
     private String claimURI = null;
