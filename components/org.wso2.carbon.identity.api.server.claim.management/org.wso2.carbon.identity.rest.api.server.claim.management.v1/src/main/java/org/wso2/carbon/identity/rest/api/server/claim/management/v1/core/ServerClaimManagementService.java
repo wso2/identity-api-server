@@ -485,7 +485,7 @@ public class ServerClaimManagementService {
     private void updateLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList, Boolean delete)
             throws ClaimMetadataException {
 
-        StringBuilder failedClaimsBuilder = new StringBuilder();
+        List<ClaimErrorDTO> errors = new ArrayList<>();
 
         for (LocalClaimReqDTO localClaimReqDTO : localClaimReqDTOList) {
             String claimId = getResourceId(localClaimReqDTO.getClaimURI());
@@ -496,25 +496,21 @@ public class ServerClaimManagementService {
                     addLocalClaim(localClaimReqDTO);
                 }
             } catch (APIError e) {
-                failedClaimsBuilder.append(localClaimReqDTO.getClaimURI()).append(" - ")
-                        .append(e.getResponseEntity().getMessage()).append(", ");
+                ClaimErrorDTO claimErrorDTO = new ClaimErrorDTO(e.getResponseEntity());
+                claimErrorDTO.setClaimURI(localClaimReqDTO.getClaimURI());
+                errors.add(claimErrorDTO);
             }
         }
         if (delete != null && delete) {
-            failedClaimsBuilder.append(deleteUnusedLocalClaims(localClaimReqDTOList));
+            deleteUnusedLocalClaims(localClaimReqDTOList, errors);
         }
-
-        String failedClaimsString = failedClaimsBuilder.toString();
-        if (failedClaimsString.endsWith(", ")) {
-            failedClaimsString = failedClaimsString.substring(0, failedClaimsString.length() - 2);
-        }
-        if (!failedClaimsString.isEmpty()) {
-            throw handleClaimManagementClientError(ERROR_CODE_UPDATING_LOCAL_CLAIMS, BAD_REQUEST,
-                    failedClaimsString);
+        if (!errors.isEmpty()) {
+            throw handleClaimManagementBulkClientError(ERROR_CODE_UPDATING_LOCAL_CLAIMS, BAD_REQUEST, errors,
+                    String.valueOf(errors.size()), String.valueOf(localClaimReqDTOList.size()));
         }
     }
 
-    private String deleteUnusedLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList)
+    private void deleteUnusedLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList, List<ClaimErrorDTO> errors)
             throws ClaimMetadataException {
 
         List<String> claimsToDelete =  getLocalClaimResDTOs(getClaimMetadataManagementService()
@@ -524,16 +520,15 @@ public class ServerClaimManagementService {
                             .noneMatch(reqDTO -> reqDTO.getClaimURI().equals(claimURI)))
                     .collect(Collectors.toList());
 
-        StringBuilder failedClaimsBuilder = new StringBuilder();
         for (String claimURI : claimsToDelete) {
             try {
                 deleteLocalClaim(getResourceId(claimURI));
             } catch (APIError e) {
-                failedClaimsBuilder.append(claimURI).append(" - ")
-                        .append(e.getResponseEntity().getMessage()).append(", ");
+                ClaimErrorDTO claimErrorDTO = new ClaimErrorDTO(e.getResponseEntity());
+                claimErrorDTO.setClaimURI(claimURI);
+                errors.add(claimErrorDTO);
             }
         }
-        return failedClaimsBuilder.toString();
     }
 
     private void updateExternalClaims(String dialectId, List<ExternalClaimReqDTO> externalClaimReqDTOList,
@@ -562,7 +557,6 @@ public class ServerClaimManagementService {
                 errors.add(claimErrorDTO);
             }
         }
-
         if (!errors.isEmpty()) {
             throw handleClaimManagementBulkClientError(ERROR_CODE_UPDATING_EXTERNAL_CLAIMS, BAD_REQUEST, errors,
                     String.valueOf(errors.size()), String.valueOf(externalClaimReqDTOList.size()));
@@ -1075,24 +1069,20 @@ public class ServerClaimManagementService {
     }
     private void importExternalClaims(String dialectID, List<ExternalClaimReqDTO> externalClaimReqDTOList) {
 
-        StringBuilder failedClaimsBuilder = new StringBuilder();
+        List<ClaimErrorDTO> errors = new ArrayList<>();
 
         for (ExternalClaimReqDTO externalClaimReqDTO : externalClaimReqDTOList) {
             try {
                 addExternalClaim(dialectID, externalClaimReqDTO);
             } catch (APIError e) {
-                failedClaimsBuilder.append(externalClaimReqDTO.getClaimURI()).append(" - ")
-                        .append(e.getResponseEntity().getMessage()).append(", ");
+                ClaimErrorDTO claimErrorDTO = new ClaimErrorDTO(e.getResponseEntity());
+                claimErrorDTO.setClaimURI(externalClaimReqDTO.getClaimURI());
+                errors.add(claimErrorDTO);
             }
         }
-
-        String failedClaimsString = failedClaimsBuilder.toString();
-        if (failedClaimsString.endsWith(", ")) {
-            failedClaimsString = failedClaimsString.substring(0, failedClaimsString.length() - 2);
-        }
-        if (!failedClaimsString.isEmpty()) {
-            throw handleClaimManagementClientError(ERROR_CODE_IMPORTING_EXTERNAL_CLAIMS, BAD_REQUEST,
-                                                    failedClaimsString);
+        if (!errors.isEmpty()) {
+            throw handleClaimManagementBulkClientError(ERROR_CODE_IMPORTING_EXTERNAL_CLAIMS, BAD_REQUEST, errors,
+                    String.valueOf(errors.size()), String.valueOf(externalClaimReqDTOList.size()));
         }
     }
 

@@ -29,6 +29,8 @@ import static org.wso2.carbon.identity.api.server.common.Util.isCorrelationIDPre
  */
 public class BulkErrorResponse extends BulkErrorDTO {
 
+    private static final long serialVersionUID = 373229260532218871L;
+
     /**
      * BulkErrorResponse Builder.
      */
