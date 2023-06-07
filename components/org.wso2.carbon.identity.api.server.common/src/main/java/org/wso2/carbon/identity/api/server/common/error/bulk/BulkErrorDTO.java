@@ -19,13 +19,12 @@ package org.wso2.carbon.identity.api.server.common.error.bulk;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * Common DTO for all the server bulk API related error responses.
  */
-public class BulkErrorDTO extends ErrorDTO implements Serializable {
+public class BulkErrorDTO extends ErrorDTO {
 
     private static final long serialVersionUID = 6110302523856444000L;
     private List<? extends ErrorDTO> failedOperations = null;
