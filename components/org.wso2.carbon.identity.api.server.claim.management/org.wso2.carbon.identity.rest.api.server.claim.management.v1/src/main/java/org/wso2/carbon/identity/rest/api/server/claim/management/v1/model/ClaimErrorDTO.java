@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
  */
 public class ClaimErrorDTO extends ErrorDTO {
 
+    private static final long serialVersionUID = 5169725164223318439L;
     private String claimURI = null;
 
     public ClaimErrorDTO() {

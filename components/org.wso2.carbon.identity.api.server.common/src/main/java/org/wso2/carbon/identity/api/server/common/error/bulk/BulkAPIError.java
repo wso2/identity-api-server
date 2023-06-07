@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response;
  */
 public class BulkAPIError extends APIError {
 
+    private static final long serialVersionUID = 7252846578071254026L;
     private final BulkErrorDTO responseEntity;
 
     public BulkAPIError(Response.Status status, BulkErrorDTO errorResponse) {
