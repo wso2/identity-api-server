@@ -103,7 +103,7 @@ components:
           resourcePath: "/permission/admin/monitor/metrics"
         - displayName: Monitor BPEL
           resourcePath: "/permission/admin/monitor/bpel"
-        - displayName: Monitor BPEL
+        - displayName: Monitor Attachment
           resourcePath: "/permission/admin/monitor/attachment"
         - displayName: Configure
           resourcePath: "/permission/admin/configure"
