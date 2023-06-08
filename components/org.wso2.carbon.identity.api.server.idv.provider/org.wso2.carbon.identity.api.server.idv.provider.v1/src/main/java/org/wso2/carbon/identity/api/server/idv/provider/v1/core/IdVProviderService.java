@@ -22,7 +22,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.extension.identity.verification.mgt.exception.IdentityVerificationClientException;
 import org.wso2.carbon.extension.identity.verification.provider.IdVProviderManager;
 import org.wso2.carbon.extension.identity.verification.provider.exception.IdVProviderMgtClientException;
 import org.wso2.carbon.extension.identity.verification.provider.exception.IdVProviderMgtException;
@@ -305,13 +304,12 @@ public class IdVProviderService {
 
     private APIError handleIdVException(IdentityException e, Constants.ErrorMessage errorEnum, String... data) {
 
-        // todo
         ErrorResponse errorResponse;
         Response.Status status;
-        if (e instanceof IdVProviderMgtClientException || e instanceof IdentityVerificationClientException) {
+        if (e instanceof IdVProviderMgtClientException) {
             status = Response.Status.BAD_REQUEST;
             errorResponse = getErrorBuilder(e, errorEnum, data)
-                    .build(log, e, buildErrorDescription(errorEnum.getDescription(), data));
+                    .build(log, buildErrorDescription(errorEnum.getDescription(), data));
         } else {
             status = Response.Status.INTERNAL_SERVER_ERROR;
             errorResponse = getErrorBuilder(e, errorEnum, data)
