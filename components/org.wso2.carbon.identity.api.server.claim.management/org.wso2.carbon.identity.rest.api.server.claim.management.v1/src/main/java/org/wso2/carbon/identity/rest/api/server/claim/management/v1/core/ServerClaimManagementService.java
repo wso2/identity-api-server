@@ -85,8 +85,11 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.ClaimM
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.CMT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_CLAIMS_NOT_FOUND_FOR_DIALECT;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_CLAIM_URI_NOT_SPECIFIED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_DIALECT_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EMPTY_EXTERNAL_CLAIM_URI;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EMPTY_LOCAL_CLAIM_URI;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EMPTY_MAPPED_ATTRIBUTES_IN_LOCAL_CLAIM;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_ADDING_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_ADDING_EXTERNAL_CLAIM;
@@ -318,7 +321,7 @@ public class ServerClaimManagementService {
 
         // Validate mandatory attributes.
         if (StringUtils.isBlank(localClaimReqDTO.getClaimURI())) {
-            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_URI_NOT_SPECIFIED,
+            throw handleClaimManagementClientError(ERROR_CODE_CLAIM_URI_NOT_SPECIFIED,
                     BAD_REQUEST);
         }
         if (StringUtils.isBlank(localClaimReqDTO.getDisplayName())) {
@@ -488,8 +491,11 @@ public class ServerClaimManagementService {
         List<ClaimErrorDTO> errors = new ArrayList<>();
 
         for (LocalClaimReqDTO localClaimReqDTO : localClaimReqDTOList) {
-            String claimId = getResourceId(localClaimReqDTO.getClaimURI());
             try {
+                if (StringUtils.isBlank(localClaimReqDTO.getClaimURI())) {
+                    throw handleClaimManagementClientError(ERROR_CODE_EMPTY_LOCAL_CLAIM_URI, BAD_REQUEST);
+                }
+                String claimId = getResourceId(localClaimReqDTO.getClaimURI());
                 if (isLocalClaimExist(claimId)) {
                     updateLocalClaim(claimId, localClaimReqDTO);
                 } else {
@@ -544,8 +550,11 @@ public class ServerClaimManagementService {
         List<ClaimErrorDTO> errors = new ArrayList<>();
 
         for (ExternalClaimReqDTO externalClaimReqDTO : externalClaimReqDTOList) {
-            String claimId = getResourceId(externalClaimReqDTO.getClaimURI());
             try {
+                if (StringUtils.isBlank(externalClaimReqDTO.getClaimURI())) {
+                    throw handleClaimManagementClientError(ERROR_CODE_EMPTY_EXTERNAL_CLAIM_URI, BAD_REQUEST);
+                }
+                String claimId = getResourceId(externalClaimReqDTO.getClaimURI());
                 if (isExternalClaimExist(dialectId, claimId)) {
                     updateExternalClaim(dialectId, claimId, externalClaimReqDTO);
                 } else {
