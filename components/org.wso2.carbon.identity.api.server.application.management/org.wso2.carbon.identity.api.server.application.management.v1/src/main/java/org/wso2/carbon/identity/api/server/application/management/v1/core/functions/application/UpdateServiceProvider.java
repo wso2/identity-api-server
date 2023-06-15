@@ -16,7 +16,6 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.AppRoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
@@ -24,8 +23,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Provisionin
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
-
-import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
@@ -45,7 +42,6 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
 
         patchClaimConfiguration(serviceProvider, applicationPatchModel.getClaimConfiguration());
         patchAuthenticationSequence(applicationPatchModel.getAuthenticationSequence(), serviceProvider);
-        patchAppRoleConfigurations(applicationPatchModel.getAppRoleConfigurations(), serviceProvider);
         patchAdvancedConfiguration(serviceProvider, applicationPatchModel.getAdvancedConfigurations());
         patchProvisioningConfiguration(applicationPatchModel.getProvisioningConfigurations(), serviceProvider);
     }
@@ -62,14 +58,6 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
 
         if (authenticationSequence != null) {
             new UpdateAuthenticationSequence().apply(serviceProvider, authenticationSequence);
-        }
-    }
-
-    private void patchAppRoleConfigurations(List<AppRoleConfig> appRoleConfigurations,
-                                               ServiceProvider serviceProvider) {
-
-        if (appRoleConfigurations != null) {
-            new UpdateAppRoleConfigurations().apply(serviceProvider, appRoleConfigurations);
         }
     }
 
