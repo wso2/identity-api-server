@@ -21,12 +21,13 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
-import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
@@ -48,6 +49,8 @@ public interface ConfigsApiService {
 
       public Response getInboundScimConfigs();
 
+      public Response getPrivatKeyJWTValidationConfiguration();
+
       public Response getSchema(String schemaId);
 
       public Response getSchemas();
@@ -57,6 +60,8 @@ public interface ConfigsApiService {
       public Response patchCORSConfiguration(List<CORSPatch> coRSPatch);
 
       public Response patchConfigs(List<Patch> patch);
+
+      public Response patchPrivatKeyJWTValidationConfiguration(List<JWTKeyValidatorPatch> jwTKeyValidatorPatch);
 
       public Response updateInboundScimConfigs(ScimConfig scimConfig);
 }

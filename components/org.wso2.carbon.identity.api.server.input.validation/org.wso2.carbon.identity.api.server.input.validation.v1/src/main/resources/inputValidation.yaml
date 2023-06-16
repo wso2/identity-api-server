@@ -66,7 +66,7 @@ paths:
                         properties:
                           - key: java.regex
                             value: (?=.*[A-Z])
-        description: Represents the password validation criteria.
+        description: Represents the validation criteria.
         required: true
       responses:
         '200':
@@ -77,6 +77,68 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /validation-rules/{field}:
+    get:
+      tags:
+        - Get Validation Rules for a field
+      description: Get validation rules for user inputs
+      operationId: getValidationRulesForField
+      parameters:
+        - name: field
+          in: path
+          description: name of the field
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessForField'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags:
+        - Update Validation Rules for a field
+      description: Update validation rules for user inputs for a field
+      operationId: updateValidationRulesForField
+      parameters:
+        - name: field
+          in: path
+          description: name of the field
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidationConfigModelForField'
+        description: Represents the validation criteria.
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessForField'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
   /validation-rules/validators:
@@ -149,6 +211,17 @@ components:
         field:
           type: string
           example: password
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleModel'
+        regEx:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleModel'
+    ValidationConfigModelForField:
+      type: object
+      properties:
         rules:
           type: array
           items:
@@ -237,4 +310,11 @@ components:
                       properties:
                         - key: java.regex
                           value: (?=.*[A-Z])
-
+    SuccessForField:
+      description: Configurations successfully updated for the field.
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/ValidationConfigModel'
+    NotFound:
+      description: Field not found

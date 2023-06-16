@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2020, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
@@ -21,15 +23,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
+import java.util.List;
 
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationOwner;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
@@ -68,7 +73,7 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/owner")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Change application owner ", notes = "This API provides the capability to change the application owner.<br>   <b>Permission required:</b> <br>       * /permission/admin <br>   <b>Scope required:</b> <br>       * SYSTEM ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Change application owner ", notes = "This API provides the capability to change the application owner.<br>   <b>Permission required:</b> <br>       * /permission/admin <br>   <b>Scope required:</b> <br>       * internal_organization_admin ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -331,6 +336,30 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/{applicationId}/exportFile")
+    
+    @Produces({ "application/json", "application/yaml", "application/xml", "application/octet-stream" })
+    @ApiOperation(value = "Export application in XML, YAML, or JSON file formats. ", notes = "This API provides the capability to retrieve the application in XML, YAML, or JSON format.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = String.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Applications", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = String.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response exportApplicationAsFile(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId,     @Valid@ApiParam(value = "Specifies whether to export secrets when exporting an application. ", defaultValue="false") @DefaultValue("false")  @QueryParam("exportSecrets") Boolean exportSecrets,     @Valid @ApiParam(value = "Content type of the file. " , allowableValues="application/json, application/xml, application/yaml, application/x-yaml, text/yaml", defaultValue="application/xml")@HeaderParam("Accept") String accept) {
+
+        return delegate.exportApplicationAsFile(applicationId,  exportSecrets,  accept );
+    }
+
+    @Valid
+    @GET
     @Path("/meta/adaptive-auth-templates")
     
     @Produces({ "application/json" })
@@ -375,7 +404,7 @@ public class ApplicationsApi  {
     public Response getAllApplicationTemplates(    @Valid@ApiParam(value = "Maximum number of records to return. ")
                                                        @QueryParam("limit") Integer limit,     @Valid@ApiParam(value
             = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset, @Context
-            SearchContext searchContext) {
+                                                   SearchContext searchContext) {
 
         return delegate.getAllApplicationTemplates(limit,  offset, searchContext );
     }
@@ -400,7 +429,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getAllApplications(    @Valid @Min(1)@ApiParam(value = "Maximum number of records to return. ", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently supports only filtering based on the 'name' attribute.  /applications?filter=name+eq+user_portal /applications?filter=name+co+prod ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _This parameter is not supported yet._ ", allowableValues="ASC, DESC")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _This parameter is not supported yet._ ")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Specifies the required parameters in the response _This parameter is not supported yet_ ")  @QueryParam("attributes") String attributes) {
+    public Response getAllApplications(    @Valid @Min(1)@ApiParam(value = "Maximum number of records to return. ", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew', and 'eq' operations with 'and', 'or' logical operators. Please note that 'and' and 'or' operators in filters follow the general precedence of logical operators ex: A and B or C and D = (A and B) or (C and D)). Currently supports only filtering based on the 'name', the 'clientId', and the 'issuer' attributes.  /applications?filter=name+eq+user_portal <br> /applications?filter=name+co+prod+or+clientId+co+123 ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _This parameter is not supported yet._ ", allowableValues="ASC, DESC")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _This parameter is not supported yet._ ")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Specifies the required parameters in the response. Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', and 'issuer' attributes.  /applications?attributes=advancedConfigurations,templateId,clientId ")  @QueryParam("attributes") String attributes) {
 
         return delegate.getAllApplications(limit,  offset,  filter,  sortOrder,  sortBy,  attributes );
     }
@@ -431,30 +460,6 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/{applicationId}/authenticators")
-
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Get configured authenticators ", notes = "This API provides the capability to retrieve the configured authenticators. ", response = ConfiguredAuthenticatorsModal.class, responseContainer = "List", authorizations = {
-            @Authorization(value = "BasicAuth"),
-            @Authorization(value = "OAuth2", scopes = {
-
-            })
-    }, tags={ "Authenticators", })
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal.class, responseContainer = "List"),
-            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response getConfiguredAuthenticators(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
-
-        return delegate.getConfiguredAuthenticators(applicationId );
-    }
-
-    @Valid
-    @GET
     @Path("/templates/{template-id}")
     
     @Produces({ "application/json", "application/xml",  })
@@ -475,6 +480,30 @@ public class ApplicationsApi  {
     public Response getApplicationTemplate(@ApiParam(value = "Application template ID. This should be a valid locale. ",required=true) @PathParam("template-id") String templateId) {
 
         return delegate.getApplicationTemplate(templateId );
+    }
+
+    @Valid
+    @GET
+    @Path("/{applicationId}/authenticators")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get configured authenticators ", notes = "This API provides the capability to retrieve the configured authenticators. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/view <br> <b>Scope required:</b> <br>     * internal_application_mgt_view ", response = ConfiguredAuthenticatorsModal.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Authenticators", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = ConfiguredAuthenticatorsModal.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getConfiguredAuthenticators(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.getConfiguredAuthenticators(applicationId );
     }
 
     @Valid

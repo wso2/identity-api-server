@@ -99,6 +99,9 @@ public class ApplicationManagementConstants {
         ADDITIONAL_SP_PROP_NOT_SUPPORTED("60506",
                 "Unsupported application property.",
                 "'additionalSpProperties' is not yet supported in this version of the API."),
+        USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED("60506",
+                "Unsupported application property.",
+                "'useExternalConsentPage' is not yet supported for SAML applications in this version of the API."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",

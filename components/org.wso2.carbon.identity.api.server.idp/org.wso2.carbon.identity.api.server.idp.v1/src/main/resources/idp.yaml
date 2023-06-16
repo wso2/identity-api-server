@@ -462,7 +462,7 @@ paths:
       tags:
         - Identity Providers
       summary: |
-        Delete an identity provider by using the identity provider's ID. 
+        Delete an identity provider by using the identity provider's ID.
       description: >
         This API provides the capability to delete an identity provider by
         giving its ID. <br>
@@ -494,6 +494,184 @@ paths:
           description: Forbidden
         '404':
           description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/identity-providers/{identity-provider-id}/export':
+    get:
+      tags:
+        - Identity Providers
+      summary: |
+        Export identity provider in XML, YAML, or JSON file formats
+      description: |
+        This API provides the capability to retrieve the identity provider if the given ID
+        as a XML, YAML, or JSON file. Use LOCAL as the ID to export resident IDP configurations.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/idpmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_idp_view
+      operationId: exportIDPToFile
+      parameters:
+        - name: identity-provider-id
+          in: path
+          description: ID of the identity provider.
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/excludeSecretsQueryParam'
+        - $ref: '#/components/parameters/fileTypeHeaderParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: string
+              example: 'Sample application configuration in the requested format'
+            application/yaml:
+              schema:
+                type: string
+              example: 'Sample application configuration in the requested format'
+            application/xml:
+              schema:
+                type: string
+              example: 'Sample application configuration in the requested format'
+            application/octet-stream:
+              schema:
+                type: string
+              example: 'Sample application configuration in the requested format'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/identity-providers/{identity-provider-id}/import':
+    put:
+      tags:
+        - Identity Providers
+      summary: |
+        Update identity provider from an exported YAML, XML or JSON file
+      description: >
+        This API provides the capability to update an existing identity provider from
+        the information provided as a file. Use LOCAL as the ID to update resident IDP configurations.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/idpmgt/update <br>
+          <b>Scope required:</b> <br>
+              * internal_idp_update
+      operationId: updateIDPFromFile
+      parameters:
+        - name: identity-provider-id
+          in: path
+          description: ID of the identity provider.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpload'
+        description: This represents the application to be updated.
+      responses:
+        '200':
+          description: Successfully Updated.
+          headers:
+            Location:
+              description: Location of the updated application.
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /identity-providers/import:
+    post:
+      tags:
+        - Identity Providers
+      summary: |
+        Create identity provider from an exported XML, YAML or JSON file
+      description: >
+        This API provides the capability to import an identity provider from
+        the information provided as a file.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/idpmgt/create <br>
+          <b>Scope required:</b> <br>
+              * internal_idp_create
+      operationId: importIDPFromFile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpload'
+        description: This represents the identity provider to be created.
+      responses:
+        '201':
+          description: Successfully created.
+          headers:
+            Location:
+              description: Location of the newly created identity provider.
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
           content:
             application/json:
               schema:
@@ -1241,6 +1419,116 @@ paths:
               $ref: '#/components/schemas/Roles'
         description: This represents the role config to be updated.
         required: true
+  '/identity-providers/{identity-provider-id}/groups':
+    get:
+      tags:
+        - Groups
+      summary: |
+        Group config of an identity provider
+      description: >
+        This API provides the group config of an identity provider. This is a list of groups the idp can return.<br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/idpmgt/view <br>
+        <b>Scope required:</b> <br>
+            * internal_idp_view
+      operationId: getGroupConfig
+      parameters:
+        - name: identity-provider-id
+          in: path
+          description: ID of the identity provider.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdPGroupsConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Groups
+      summary: |
+        Update the group config of an identity provider
+      description: >
+        This API provides the capability to update the group config of an
+        identity provider by specifying the identity provider ID. <br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/idpmgt/update <br>
+        <b>Scope required:</b> <br>
+            * internal_idp_update
+      operationId: updateGroupConfig
+      parameters:
+        - name: identity-provider-id
+          in: path
+          description: ID of the identity provider.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            Location:
+              description: Location of the updated group config.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdPGroupsConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdPGroupsConfig'
+        description: This represents the group config to be updated.
+        required: true
   '/identity-providers/{identity-provider-id}/provisioning/jit':
     get:
       tags:
@@ -1690,6 +1978,286 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  '/trusted-token-issuers':
+    get:
+      tags:
+        - Trusted Token Issuers
+      summary: |
+        List Trusted Token issuers
+      description: >
+        This API provides the capability to retrieve the list of token issuers.<br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/idpmgt/view <br>
+        <b>Scope required:</b> <br>
+            * internal_idp_view
+      operationId: getTrustedTokenIssuers
+      parameters:
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/offsetQueryParam'
+        - $ref: '#/components/parameters/filterQueryParam'
+        - $ref: '#/components/parameters/sortByQueryParam'
+        - $ref: '#/components/parameters/sortOrderQueryParam'
+        - $ref: '#/components/parameters/requiredAttributesQueryParam'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityProviderListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Trusted Token Issuers
+      summary: |
+        Add a new trusted token issuer
+      description: |
+        This API provides the capability to create a token issuer. <br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/idpmgt/create <br>
+        <b>Scope required:</b> <br>
+            * internal_idp_create
+      operationId: addTrustedTokenIssuer
+      responses:
+        '201':
+          description: Successful response
+          headers:
+            Location:
+              description: Location of the newly created Token issuer.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrustedTokenIssuerResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TrustedTokenIssuerResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrustedTokenIssuerPOSTRequest'
+        description: This represents the trusted Token issuer to be created.
+        required: true
+
+  '/trusted-token-issuers/{trusted-token-issuer-id}':
+    get:
+      tags:
+        - Trusted Token Issuers
+      summary: |
+        Retrieve identity provider by trusted token issuer's ID
+      description: >
+        This API provides the capability to retrieve the trusted Token issuer details by using its ID.<br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/idpmgt/view <br>
+        <b>Scope required:</b> <br>
+            * internal_idp_view
+      operationId: getTrustedTokenIssuer
+      parameters:
+        - name: trusted-token-issuer-id
+          in: path
+          description: ID of the trusted Token issuer.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrustedTokenIssuerResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TrustedTokenIssuerResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Trusted Token Issuers
+      summary: >
+        Patch a trusted Token issuer property by ID. Patch is supported only for key-value pairs
+      description: >
+        This API provides the capability to update a trusted Token issuer property
+        using patch request. Trusted Token issuer patch is supported only for key-value pairs. <br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/idpmgt/update <br>
+        <b>Scope required:</b> <br>
+            * internal_idp_update
+      operationId: patchTrustedTokenIssuer
+      parameters:
+        - name: trusted-token-issuer-id
+          in: path
+          description: ID of the trusted Token issuer.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          headers:
+            Location:
+              description: Location of the updated trusted Token issuer.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrustedTokenIssuerResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchRequest'
+        required: true
+    delete:
+      tags:
+        - Trusted Token Issuers
+      summary: |
+        Delete a trusted Token issuer by using the trusted token issuer's ID.
+      description: >
+        This API provides the capability to delete a trusted Token issuer by
+        giving its ID. <br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/idpmgt/delete <br>
+        <b>Scope required:</b> <br>
+            * internal_idp_delete
+      operationId: deleteTrustedTokenIssuer
+      parameters:
+        - name: trusted-token-issuer-id
+          in: path
+          description: ID of the trusted Token issuer
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/forceQueryParam'
+      responses:
+        '204':
+          description: Successfully Deleted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 servers:
   - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
     variables:
@@ -1744,6 +2312,52 @@ components:
       schema:
         type: boolean
         default: false
+    excludeSecretsQueryParam:
+      in: query
+      name: excludeSecrets
+      required: false
+      description: |
+        Specifies whether to exclude secrets when exporting an identity provider.
+      schema:
+        type: boolean
+        default: true
+    fileTypeHeaderParam:
+      in: header
+      name: Accept
+      required: false
+      description: |
+        Content type of the file.
+      schema:
+        type: string
+        default: application/yaml
+        enum:
+          - application/json
+          - application/xml
+          - application/yaml
+          - application/x-yaml
+          - text/yaml
+          - text/xml
+          - text/json
+    sortOrderQueryParam:
+      in: query
+      name: sortOrder
+      required: false
+      description: >-
+        Define the order in which the retrieved tenants should be sorted.
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+    sortByQueryParam:
+      in: query
+      name: sortBy
+      required: false
+      description: >-
+        Attribute by which the retrieved records should be sorted. Currently sorting through _<b>domainName<b>_ only
+        supported.
+      schema:
+        type: string
   securitySchemes:
     BasicAuth:
       type: http
@@ -1834,7 +2448,7 @@ components:
         $ref: '#/components/schemas/Patch'
     Patch:
       description: A JSONPatch as defined by RFC 6902. Patch operation is supported only for root level attributes of
-       an identity provider.
+        an identity provider.
       required:
         - operation
         - path
@@ -1916,6 +2530,8 @@ components:
           $ref: '#/components/schemas/Claims'
         roles:
           $ref: '#/components/schemas/Roles'
+        groups:
+          $ref: '#/components/schemas/IdPGroupsConfig'
         federatedAuthenticators:
           $ref: '#/components/schemas/FederatedAuthenticatorRequest'
         provisioning:
@@ -1962,6 +2578,8 @@ components:
           $ref: '#/components/schemas/Claims'
         roles:
           $ref: '#/components/schemas/Roles'
+        groups:
+          $ref: '#/components/schemas/IdPGroupsConfig'
         federatedAuthenticators:
           $ref: '#/components/schemas/FederatedAuthenticatorListResponse'
         provisioning:
@@ -1984,13 +2602,13 @@ components:
             $ref: '#/components/schemas/Link'
           example:
             [
-                {
-                    "href": "identity-provider?offset=50&limit=10",
-                    "rel": "next",
-                },  {
-                    "href": "identity-provider?offset=30&limit=10",
-                    "rel": "previous",
-                }
+              {
+                "href": "identity-provider?offset=50&limit=10",
+                "rel": "next",
+              },  {
+              "href": "identity-provider?offset=30&limit=10",
+              "rel": "previous",
+            }
             ]
         identityProviders:
           type: array
@@ -2033,6 +2651,8 @@ components:
           $ref: '#/components/schemas/Claims'
         roles:
           $ref: '#/components/schemas/Roles'
+        groups:
+          $ref: '#/components/schemas/IdPGroupsConfig'
         federatedAuthenticators:
           $ref: '#/components/schemas/FederatedAuthenticatorListResponse'
         provisioning:
@@ -2350,6 +2970,26 @@ components:
         localRole:
           type: string
           example: manager
+    IdPGroupsConfig:
+      type: array
+      description: IdP groups supported by the IdP.
+      items:
+        $ref: '#/components/schemas/IdPGroup'
+      minItems: 0
+    IdPGroup:
+      type: object
+      required:
+        - name
+      description: Represents an IdP group supported by an Identity Provider.
+      properties:
+        name:
+          type: string
+          description: Name of the IdP group
+          example: google-admin
+        id:
+          type: string
+          description: UUID of the IdP group
+          example: 6b1f8513-3de0-4f28-9cad-b7400dbc94ae
     Claims:
       type: object
       properties:
@@ -2422,6 +3062,13 @@ components:
           type: boolean
           default: false
           example: true
+        attributeSyncMethod:
+          type: string
+          enum:
+            - OVERRIDE_ALL
+            - NONE
+            - PRESERVE_LOCAL
+          default: OVERRIDE_ALL
     ConnectedApps:
       type: object
       properties:
@@ -2440,13 +3087,13 @@ components:
             $ref: '#/components/schemas/Link'
           example:
             [
-                {
-                    "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=50&limit=10",
-                    "rel": "next"
-                },  {
-                    "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=30&limit=10",
-                    "rel": "previous"
-                }
+              {
+                "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=50&limit=10",
+                "rel": "next"
+              },  {
+              "href": "identity-provider/123e4567-e89b-12d3-a456-556642440000/connected-apps?offset=30&limit=10",
+              "rel": "previous"
+            }
             ]
         connectedApps:
           type: array
@@ -2479,10 +3126,10 @@ components:
             $ref: '#/components/schemas/Link'
           example:
             [
-            {
-              "href": "identity-provider/templates?offset=50&limit=10",
-              "rel": "next",
-            },  {
+              {
+                "href": "identity-provider/templates?offset=50&limit=10",
+                "rel": "next",
+              },  {
               "href": "identity-provider/templates?offset=30&limit=10",
               "rel": "previous",
             }
@@ -2549,6 +3196,91 @@ components:
       required:
         - name
         - idp
+    TrustedTokenIssuerPOSTRequest:
+      type: object
+      required:
+        - name
+        - issuer
+        - certificate
+      properties:
+        name:
+          type: string
+          example: google
+        description:
+          type: string
+          example: "Trusted Token Issuer"
+        image:
+          type: string
+          example: "issuer-logo-url"
+        templateId:
+          type: string
+          example: '8ea23303-49c0-4253-b81f-82c0fe6fb4a0'
+        certificate:
+          $ref: '#/components/schemas/Certificate'
+        alias:
+          type: string
+          example: 'https://localhost:9444/oauth2/token'
+        issuer:
+          type: string
+          example: 'https://www.issuer.com'
+        claims:
+          $ref: '#/components/schemas/Claims'
+    TrustedTokenIssuerResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '123e4567-e89b-12d3-a456-556642440000'
+        name:
+          type: string
+          example: google
+        description:
+          type: string
+        templateId:
+          type: string
+          example: '8ea23303-49c0-4253-b81f-82c0fe6fb4a0'
+        isEnabled:
+          type: boolean
+          default: true
+          example: true
+        isPrimary:
+          type: boolean
+          default: false
+        image:
+          type: string
+          example: "google-logo-url"
+        isFederationHub:
+          type: boolean
+          example: false
+        homeRealmIdentifier:
+          type: string
+          example: localhost
+        certificate:
+          $ref: '#/components/schemas/Certificate'
+        alias:
+          type: string
+          example: 'https://localhost:9444/oauth2/token'
+        issuer:
+          type: string
+          example: 'https://www.idp.com'
+        claims:
+          $ref: '#/components/schemas/Claims'
+        roles:
+          $ref: '#/components/schemas/Roles'
+        groups:
+          $ref: '#/components/schemas/IdPGroupsConfig'
+        federatedAuthenticators:
+          $ref: '#/components/schemas/FederatedAuthenticatorListResponse'
+        provisioning:
+          $ref: '#/components/schemas/ProvisioningResponse'
+
     Service:
       type: string
       example: 'Authentication'
+    FileUpload:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: file to upload

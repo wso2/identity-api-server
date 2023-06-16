@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
@@ -41,7 +43,8 @@ public class ApplicationModel  {
     private String imageUrl;
     private String accessUrl;
     private String templateId;
-    private Boolean isManagementApp;
+    private Boolean isManagementApp = false;
+    private Boolean isB2BSelfServiceApp = false;
     private ClaimConfiguration claimConfiguration;
     private InboundProtocols inboundProtocolConfiguration;
     private AuthenticationSequence authenticationSequence;
@@ -158,6 +161,9 @@ public class ApplicationModel  {
         this.templateId = templateId;
     }
 
+    /**
+    * Decides whether the application used to access System APIs
+    **/
     public ApplicationModel isManagementApp(Boolean isManagementApp) {
 
         this.isManagementApp = isManagementApp;
@@ -167,11 +173,28 @@ public class ApplicationModel  {
     @ApiModelProperty(example = "false", value = "Decides whether the application used to access System APIs")
     @JsonProperty("isManagementApp")
     @Valid
-    public Boolean isManagementApp() {
+    public Boolean getIsManagementApp() {
         return isManagementApp;
     }
     public void setIsManagementApp(Boolean isManagementApp) {
         this.isManagementApp = isManagementApp;
+    }
+
+    /**
+    * Decides whether the application used to for B2B self service
+    **/
+    public ApplicationModel isB2BSelfServiceApp(Boolean isB2BSelfServiceApp) {
+
+        this.isB2BSelfServiceApp = isB2BSelfServiceApp;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "Decides whether the application used to for B2B self service")
+    @JsonProperty("isB2BSelfServiceApp")
+    @Valid
+    public Boolean getIsB2BSelfServiceApp() {
+
+        return isB2BSelfServiceApp;
     }
 
     /**
@@ -283,6 +306,7 @@ public class ApplicationModel  {
             Objects.equals(this.accessUrl, applicationModel.accessUrl) &&
             Objects.equals(this.templateId, applicationModel.templateId) &&
             Objects.equals(this.isManagementApp, applicationModel.isManagementApp) &&
+            Objects.equals(this.isB2BSelfServiceApp, applicationModel.isB2BSelfServiceApp) &&
             Objects.equals(this.claimConfiguration, applicationModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocolConfiguration, applicationModel.inboundProtocolConfiguration) &&
             Objects.equals(this.authenticationSequence, applicationModel.authenticationSequence) &&
@@ -292,7 +316,7 @@ public class ApplicationModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, isManagementApp, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, isManagementApp, isB2BSelfServiceApp, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -308,6 +332,7 @@ public class ApplicationModel  {
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
+        sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocolConfiguration: ").append(toIndentedString(inboundProtocolConfiguration)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");

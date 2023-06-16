@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2021, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Error;
 import org.wso2.carbon.identity.api.server.authenticators.v1.AuthenticatorsApiService;
 
@@ -76,7 +77,7 @@ public class AuthenticatorsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Authenticators" })
+    }, tags={ "Authenticators", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = String.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
@@ -88,6 +89,30 @@ public class AuthenticatorsApi  {
     public Response authenticatorsMetaTagsGet() {
 
         return delegate.authenticatorsMetaTagsGet();
+    }
+
+    @Valid
+    @GET
+    @Path("/{authenticator-id}/connected-apps")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get connected apps by authenticator ID", notes = "By passing in the appropriate authenticator ID, you can retrieve connected app details ", response = ConnectedApps.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Connected apps of local authenticators" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = ConnectedApps.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getConnectedAppsOfLocalAuthenticator(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_ ")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_ ")  @QueryParam("offset") Integer offset) {
+
+        return delegate.getConnectedAppsOfLocalAuthenticator(authenticatorId,  limit,  offset );
     }
 
 }

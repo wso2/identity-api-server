@@ -71,6 +71,7 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
 import static org.wso2.carbon.identity.application.mgt.dao.impl.ApplicationDAOImpl.USE_DOMAIN_IN_ROLES;
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_CONSENT;
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_LOGOUT_CONSENT;
+import static org.wso2.carbon.identity.base.IdentityConstants.USE_EXTERNAL_CONSENT_PAGE;
 
 /**
  * Converts the backend model ServiceProvider into the corresponding API model object.
@@ -100,8 +101,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .description(application.getDescription())
                     .imageUrl(application.getImageUrl())
                     .accessUrl(application.getAccessUrl())
-                    .clientId(getClientId(application))
-                    .issuer(getIssuer(application))
+                    .clientId(getInboundKey(application, "oauth2"))
+                    .issuer(getInboundKey(application, "samlsso"))
                     .templateId(application.getTemplateId())
                     .isManagementApp(application.isManagementApp())
                     .claimConfiguration(buildClaimConfiguration(application))
@@ -360,6 +361,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
                 .skipLoginConsent(authConfig.isSkipConsent())
                 .skipLogoutConsent(authConfig.isSkipLogoutConsent())
+                .useExternalConsentPage(authConfig.isUseExternalConsentPage())
                 .certificate(getCertificate(serviceProvider))
                 .fragment(isFragmentApp(serviceProvider))
                 .additionalSpProperties(getSpProperties(serviceProvider));
@@ -392,6 +394,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     Arrays.stream(propertyList).collect(Collectors.toList());
             spPropertyList.removeIf(property -> SKIP_CONSENT.equals(property.getName()));
             spPropertyList.removeIf(property -> SKIP_LOGOUT_CONSENT.equals(property.getName()));
+            spPropertyList.removeIf(property -> USE_EXTERNAL_CONSENT_PAGE.equals(property.getName()));
             spPropertyList.removeIf(property -> USE_DOMAIN_IN_ROLES.equals(property.getName()));
             spPropertyList.removeIf(property -> USE_USER_ID_FOR_DEFAULT_SUBJECT.equals(property.getName()));
             spPropertyList.removeIf(property -> TEMPLATE_ID_SP_PROPERTY_NAME.equals(property.getName()));
@@ -443,30 +446,14 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return ApplicationResponseModel.AccessEnum.WRITE;
     }
 
-    private String getClientId(ServiceProvider application) {
+    private String getInboundKey(ServiceProvider application, String authType) {
 
         if (application.getInboundAuthenticationConfig() != null) {
             InboundAuthenticationRequestConfig[] authRequestConfigs = application.getInboundAuthenticationConfig()
                     .getInboundAuthenticationRequestConfigs();
 
             if (authRequestConfigs != null && authRequestConfigs.length > 0) {
-                if (authRequestConfigs[0].getInboundAuthType().equals("oauth2")) {
-                    return authRequestConfigs[0].getInboundAuthKey();
-                }
-            }
-        }
-
-        return StringUtils.EMPTY;
-    }
-
-    private String getIssuer(ServiceProvider application) {
-
-        if (application.getInboundAuthenticationConfig() != null) {
-            InboundAuthenticationRequestConfig[] authRequestConfigs = application.getInboundAuthenticationConfig()
-                    .getInboundAuthenticationRequestConfigs();
-
-            if (authRequestConfigs != null && authRequestConfigs.length > 0) {
-                if (authRequestConfigs[0].getInboundAuthType().equals("samlsso")) {
+                if (authRequestConfigs[0].getInboundAuthType().equals(authType)) {
                     return authRequestConfigs[0].getInboundAuthKey();
                 }
             }

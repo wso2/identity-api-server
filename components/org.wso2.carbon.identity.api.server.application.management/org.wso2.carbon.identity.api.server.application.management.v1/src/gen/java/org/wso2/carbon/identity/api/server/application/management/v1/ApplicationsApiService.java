@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
@@ -22,14 +24,17 @@ import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
+import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationOwner;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
@@ -72,6 +77,8 @@ public interface ApplicationsApiService {
 
       public Response exportApplication(String applicationId, Boolean exportSecrets);
 
+      public Response exportApplicationAsFile(String applicationId, Boolean exportSecrets, String accept);
+
       public Response getAdaptiveAuthTemplates();
 
       public Response getAllApplicationTemplates(Integer limit, Integer offset, SearchContext searchContext);
@@ -80,9 +87,9 @@ public interface ApplicationsApiService {
 
       public Response getApplication(String applicationId);
 
-      public Response getConfiguredAuthenticators(String applicationId);
-
       public Response getApplicationTemplate(String templateId);
+
+      public Response getConfiguredAuthenticators(String applicationId);
 
       public Response getCustomInboundConfiguration(String applicationId, String inboundProtocolId);
 

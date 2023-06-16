@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.com).
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -97,7 +97,7 @@ public class AdditionalSpProperty  {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(java.lang.Object o) {
 
         if (this == o) {
             return true;
@@ -133,7 +133,7 @@ public class AdditionalSpProperty  {
     * Convert the given object to string with each line indented by 4 spaces
     * (except the first line).
     */
-    private String toIndentedString(Object o) {
+    private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
             return "null";

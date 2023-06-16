@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.input.validation.v1.ValidationRulesApiService;
 import org.wso2.carbon.identity.api.server.input.validation.v1.core.ValidationRulesManagementApiService;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModel;
+import org.wso2.carbon.identity.api.server.input.validation.v1.models.ValidationConfigModelForField;
 
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 
@@ -42,6 +43,20 @@ public class ValidationRulesApiServiceImpl implements ValidationRulesApiService 
                 .getValidationConfiguration(tenantDomain)).build();
     }
 
+    /**
+     * Method to get configured validation rules for a field.
+     *
+     * @param field   Field that validation configurations need to be retrieved.
+     * @return  List of configured validation rules for the field.
+     */
+    @Override
+    public Response getValidationRulesForField(String field) {
+
+        String tenantDomain = getTenantDomainFromContext();
+        return Response.ok().entity(validationRulesManagementApiService
+                .getValidationConfigurationForField(tenantDomain, field)).build();
+    }
+
     @Override
     public Response getValidators() {
 
@@ -56,5 +71,25 @@ public class ValidationRulesApiServiceImpl implements ValidationRulesApiService 
         String tenantDomain = getTenantDomainFromContext();
         return Response.ok().entity(validationRulesManagementApiService
                 .updateInputValidationConfiguration(validationConfigModels, tenantDomain)).build();
+    }
+
+    /**
+     * Method to update validation rules for a field.
+     *
+     * @param field                             Field that validations need to be updated.
+     * @param validationConfigModelForField     List of validation rules to be updated for the field.
+     * @return  Updated validation rules for the field.
+     */
+    @Override
+    public Response updateValidationRulesForField(String field, ValidationConfigModelForField
+            validationConfigModelForField) {
+
+        String tenantDomain = getTenantDomainFromContext();
+        ValidationConfigModel validationConfigModel = new ValidationConfigModel();
+        validationConfigModel.setField(field);
+        validationConfigModel.setRules(validationConfigModelForField.getRules());
+        validationConfigModel.setRegEx(validationConfigModelForField.getRegEx());
+        return Response.ok().entity(validationRulesManagementApiService
+                .updateInputValidationConfigurationForField(validationConfigModel, tenantDomain)).build();
     }
 }

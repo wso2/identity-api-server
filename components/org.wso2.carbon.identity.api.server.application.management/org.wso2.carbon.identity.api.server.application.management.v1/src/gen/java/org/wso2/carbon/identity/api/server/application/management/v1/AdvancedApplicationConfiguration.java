@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
@@ -41,8 +43,9 @@ public class AdvancedApplicationConfiguration  {
     private Boolean skipLogoutConsent;
     private Boolean returnAuthenticatedIdpList;
     private Boolean enableAuthorization;
-    private List<AdditionalSpProperty> additionalSpProperties = null;
     private Boolean fragment;
+    private List<AdditionalSpProperty> additionalSpProperties = null;
+    private Boolean useExternalConsentPage;
 
     /**
     * Decides whether the application is accessible across tenants.
@@ -108,7 +111,7 @@ public class AdvancedApplicationConfiguration  {
         this.skipLoginConsent = skipLoginConsent;
         return this;
     }
-    
+
     @ApiModelProperty(example = "false", value = "Decides whether user consent needs to be skipped during login flows.")
     @JsonProperty("skipLoginConsent")
     @Valid
@@ -127,7 +130,7 @@ public class AdvancedApplicationConfiguration  {
         this.skipLogoutConsent = skipLogoutConsent;
         return this;
     }
-    
+
     @ApiModelProperty(example = "false", value = "Decides whether user consent needs to be skipped during logout flows.")
     @JsonProperty("skipLogoutConsent")
     @Valid
@@ -136,6 +139,25 @@ public class AdvancedApplicationConfiguration  {
     }
     public void setSkipLogoutConsent(Boolean skipLogoutConsent) {
         this.skipLogoutConsent = skipLogoutConsent;
+    }
+
+    /**
+     * Decides whether user needs to use external consent page.
+     **/
+    public AdvancedApplicationConfiguration useExternalConsentPage(Boolean useExternalConsentPage) {
+
+        this.useExternalConsentPage = useExternalConsentPage;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "Decides whether user needs to use external consent page.")
+    @JsonProperty("useExternalConsentPage")
+    @Valid
+    public Boolean getUseExternalConsentPage() {
+        return useExternalConsentPage;
+    }
+    public void setUseExternalConsentPage(Boolean useExternalConsentPage) {
+        this.useExternalConsentPage = useExternalConsentPage;
     }
 
     /**
@@ -184,7 +206,7 @@ public class AdvancedApplicationConfiguration  {
         this.fragment = fragment;
         return this;
     }
-
+    
     @ApiModelProperty(example = "false", value = "Decides whether application is a fragment application.")
     @JsonProperty("fragment")
     @Valid
@@ -202,6 +224,7 @@ public class AdvancedApplicationConfiguration  {
         this.additionalSpProperties = additionalSpProperties;
         return this;
     }
+    
     @ApiModelProperty(value = "")
     @JsonProperty("additionalSpProperties")
     @Valid
@@ -212,14 +235,15 @@ public class AdvancedApplicationConfiguration  {
         this.additionalSpProperties = additionalSpProperties;
     }
 
-    public AdvancedApplicationConfiguration addAdditionalSpPropertiesItem(AdditionalSpProperty
-                                                                                  additionalSpPropertiesItem) {
+    public AdvancedApplicationConfiguration addAdditionalSpPropertiesItem(AdditionalSpProperty additionalSpPropertiesItem) {
         if (this.additionalSpProperties == null) {
             this.additionalSpProperties = new ArrayList<>();
         }
         this.additionalSpProperties.add(additionalSpPropertiesItem);
         return this;
     }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -236,6 +260,7 @@ public class AdvancedApplicationConfiguration  {
             Objects.equals(this.certificate, advancedApplicationConfiguration.certificate) &&
             Objects.equals(this.skipLoginConsent, advancedApplicationConfiguration.skipLoginConsent) &&
             Objects.equals(this.skipLogoutConsent, advancedApplicationConfiguration.skipLogoutConsent) &&
+            Objects.equals(this.useExternalConsentPage, advancedApplicationConfiguration.useExternalConsentPage) &&
             Objects.equals(this.returnAuthenticatedIdpList, advancedApplicationConfiguration.returnAuthenticatedIdpList) &&
             Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization) &&
             Objects.equals(this.fragment, advancedApplicationConfiguration.fragment) &&
@@ -244,8 +269,7 @@ public class AdvancedApplicationConfiguration  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent,
-                returnAuthenticatedIdpList, enableAuthorization, fragment, additionalSpProperties);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, useExternalConsentPage, returnAuthenticatedIdpList, enableAuthorization, fragment, additionalSpProperties);
     }
 
     @Override
@@ -259,6 +283,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    certificate: ").append(toIndentedString(certificate)).append("\n");
         sb.append("    skipLoginConsent: ").append(toIndentedString(skipLoginConsent)).append("\n");
         sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");
+        sb.append("    useExternalConsentPage: ").append(toIndentedString(useExternalConsentPage)).append("\n");
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");
         sb.append("    enableAuthorization: ").append(toIndentedString(enableAuthorization)).append("\n");
         sb.append("    fragment: ").append(toIndentedString(fragment)).append("\n");

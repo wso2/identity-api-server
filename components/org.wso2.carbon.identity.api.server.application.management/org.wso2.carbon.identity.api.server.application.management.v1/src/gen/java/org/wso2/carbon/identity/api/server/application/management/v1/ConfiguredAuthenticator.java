@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -31,18 +31,18 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class ConfiguredAuthenticator  {
-
+  
     private String name;
     private String type;
 
     /**
-     **/
+    **/
     public ConfiguredAuthenticator name(String name) {
 
         this.name = name;
         return this;
     }
-
+    
     @ApiModelProperty(example = "googleIdP", value = "")
     @JsonProperty("name")
     @Valid
@@ -54,13 +54,13 @@ public class ConfiguredAuthenticator  {
     }
 
     /**
-     **/
+    **/
     public ConfiguredAuthenticator type(String type) {
 
         this.type = type;
         return this;
     }
-
+    
     @ApiModelProperty(example = "GoogleAuthenticator", value = "")
     @JsonProperty("type")
     @Valid
@@ -84,7 +84,7 @@ public class ConfiguredAuthenticator  {
         }
         ConfiguredAuthenticator configuredAuthenticator = (ConfiguredAuthenticator) o;
         return Objects.equals(this.name, configuredAuthenticator.name) &&
-                Objects.equals(this.type, configuredAuthenticator.type);
+            Objects.equals(this.type, configuredAuthenticator.type);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class ConfiguredAuthenticator  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class ConfiguredAuthenticator {\n");
-
+        
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("}");
@@ -105,9 +105,9 @@ public class ConfiguredAuthenticator  {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
-     */
+    * Convert the given object to string with each line indented by 4 spaces
+    * (except the first line).
+    */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
@@ -116,3 +116,4 @@ public class ConfiguredAuthenticator  {
         return o.toString().replace("\n", "\n");
     }
 }
+

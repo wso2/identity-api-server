@@ -52,6 +52,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(advancedConfigurations.getReturnAuthenticatedIdpList(),
                     config::setAlwaysSendBackAuthenticatedListOfIdPs);
             setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
+            setIfNotNull(advancedConfigurations.getUseExternalConsentPage(), config::setUseExternalConsentPage);
 
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
         }
@@ -78,7 +79,6 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             }
         }
     }
-
 
     private void handleAdditionalSpProperties(List<AdditionalSpProperty> spAdditionalProperties) {
 

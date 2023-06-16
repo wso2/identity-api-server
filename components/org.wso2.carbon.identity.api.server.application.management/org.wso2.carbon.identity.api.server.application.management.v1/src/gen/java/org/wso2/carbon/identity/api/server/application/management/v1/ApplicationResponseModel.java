@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.application.management.v1;
 
@@ -46,6 +48,7 @@ public class ApplicationResponseModel  {
     private String issuer;
     private String templateId;
     private Boolean isManagementApp;
+    private Boolean isB2BSelfServiceApp;
     private ClaimConfiguration claimConfiguration;
     private List<InboundProtocolListItem> inboundProtocols = null;
 
@@ -180,13 +183,13 @@ public enum AccessEnum {
     }
 
     /**
-     **/
+    **/
     public ApplicationResponseModel clientId(String clientId) {
 
         this.clientId = clientId;
         return this;
     }
-
+    
     @ApiModelProperty(example = "SmrrDNXRYf1lMmDlnleeHTuXx_Ea", value = "")
     @JsonProperty("clientId")
     @Valid
@@ -198,13 +201,13 @@ public enum AccessEnum {
     }
 
     /**
-     **/
+    **/
     public ApplicationResponseModel issuer(String issuer) {
 
         this.issuer = issuer;
         return this;
     }
-
+    
     @ApiModelProperty(example = "http://idp.example.com/metadata.php", value = "")
     @JsonProperty("issuer")
     @Valid
@@ -233,20 +236,40 @@ public enum AccessEnum {
         this.templateId = templateId;
     }
 
+    /**
+    * Decides whether the application used to access System APIs
+    **/
     public ApplicationResponseModel isManagementApp(Boolean isManagementApp) {
 
         this.isManagementApp = isManagementApp;
         return this;
     }
-
+    
     @ApiModelProperty(example = "false", value = "Decides whether the application used to access System APIs")
     @JsonProperty("isManagementApp")
     @Valid
-    public Boolean isManagementApp() {
-        return this.isManagementApp;
+    public Boolean getIsManagementApp() {
+        return isManagementApp;
     }
     public void setIsManagementApp(Boolean isManagementApp) {
         this.isManagementApp = isManagementApp;
+    }
+
+    /**
+    * Decides whether the application used to for B2B self service
+    **/
+    public ApplicationResponseModel isB2BSelfServiceApp(Boolean isB2BSelfServiceApp) {
+
+        this.isB2BSelfServiceApp = isB2BSelfServiceApp;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "Decides whether the application used to for B2B self service")
+    @JsonProperty("isB2BSelfServiceApp")
+    @Valid
+    public Boolean getIsB2BSelfServiceApp() {
+
+        return isB2BSelfServiceApp;
     }
 
     /**
@@ -386,6 +409,7 @@ public enum AccessEnum {
             Objects.equals(this.issuer, applicationResponseModel.issuer) &&
             Objects.equals(this.templateId, applicationResponseModel.templateId) &&
             Objects.equals(this.isManagementApp, applicationResponseModel.isManagementApp) &&
+            Objects.equals(this.isB2BSelfServiceApp, applicationResponseModel.isB2BSelfServiceApp) &&
             Objects.equals(this.claimConfiguration, applicationResponseModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocols, applicationResponseModel.inboundProtocols) &&
             Objects.equals(this.authenticationSequence, applicationResponseModel.authenticationSequence) &&
@@ -396,7 +420,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, isB2BSelfServiceApp, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
     }
 
     @Override
@@ -414,6 +438,7 @@ public enum AccessEnum {
         sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
+        sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocols: ").append(toIndentedString(inboundProtocols)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");

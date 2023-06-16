@@ -19,6 +19,8 @@ package org.wso2.carbon.identity.api.server.application.management.v1.impl;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
@@ -37,12 +39,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Servic
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.TransferResource;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 /**
@@ -202,6 +206,26 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
         return Response.ok().entity(
                 applicationManagementService.exportApplication(applicationId, exportSecrets)).build();
+    }
+
+    @Override
+    public Response exportApplicationAsFile(String applicationId, Boolean exportSecrets, String fileType) {
+
+        TransferResource transferResource = applicationManagementService.exportApplicationAsFile(
+                applicationId,
+                exportSecrets,
+                fileType
+        );
+
+        return Response.ok()
+                .type(MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+                        + transferResource.getResourceName() + "\"")
+                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
+                .entity(transferResource.getResource().getByteArray())
+                .build();
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -34,7 +34,7 @@ import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
 public class ConfiguredAuthenticatorsModal  {
-
+  
     private Integer stepId;
     private List<ConfiguredAuthenticator> localAuthenticators = null;
 
@@ -42,13 +42,13 @@ public class ConfiguredAuthenticatorsModal  {
 
 
     /**
-     **/
+    **/
     public ConfiguredAuthenticatorsModal stepId(Integer stepId) {
 
         this.stepId = stepId;
         return this;
     }
-
+    
     @ApiModelProperty(example = "1", value = "")
     @JsonProperty("stepId")
     @Valid
@@ -60,13 +60,13 @@ public class ConfiguredAuthenticatorsModal  {
     }
 
     /**
-     **/
+    **/
     public ConfiguredAuthenticatorsModal localAuthenticators(List<ConfiguredAuthenticator> localAuthenticators) {
 
         this.localAuthenticators = localAuthenticators;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("localAuthenticators")
     @Valid
@@ -85,14 +85,14 @@ public class ConfiguredAuthenticatorsModal  {
         return this;
     }
 
-    /**
-     **/
+        /**
+    **/
     public ConfiguredAuthenticatorsModal federatedAuthenticators(List<ConfiguredAuthenticator> federatedAuthenticators) {
 
         this.federatedAuthenticators = federatedAuthenticators;
         return this;
     }
-
+    
     @ApiModelProperty(value = "")
     @JsonProperty("federatedAuthenticators")
     @Valid
@@ -111,7 +111,7 @@ public class ConfiguredAuthenticatorsModal  {
         return this;
     }
 
-
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -124,8 +124,8 @@ public class ConfiguredAuthenticatorsModal  {
         }
         ConfiguredAuthenticatorsModal configuredAuthenticatorsModal = (ConfiguredAuthenticatorsModal) o;
         return Objects.equals(this.stepId, configuredAuthenticatorsModal.stepId) &&
-                Objects.equals(this.localAuthenticators, configuredAuthenticatorsModal.localAuthenticators) &&
-                Objects.equals(this.federatedAuthenticators, configuredAuthenticatorsModal.federatedAuthenticators);
+            Objects.equals(this.localAuthenticators, configuredAuthenticatorsModal.localAuthenticators) &&
+            Objects.equals(this.federatedAuthenticators, configuredAuthenticatorsModal.federatedAuthenticators);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class ConfiguredAuthenticatorsModal  {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class ConfiguredAuthenticatorsModal {\n");
-
+        
         sb.append("    stepId: ").append(toIndentedString(stepId)).append("\n");
         sb.append("    localAuthenticators: ").append(toIndentedString(localAuthenticators)).append("\n");
         sb.append("    federatedAuthenticators: ").append(toIndentedString(federatedAuthenticators)).append("\n");
@@ -147,9 +147,9 @@ public class ConfiguredAuthenticatorsModal  {
     }
 
     /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
-     */
+    * Convert the given object to string with each line indented by 4 spaces
+    * (except the first line).
+    */
     private String toIndentedString(java.lang.Object o) {
 
         if (o == null) {
@@ -158,3 +158,4 @@ public class ConfiguredAuthenticatorsModal  {
         return o.toString().replace("\n", "\n");
     }
 }
+
