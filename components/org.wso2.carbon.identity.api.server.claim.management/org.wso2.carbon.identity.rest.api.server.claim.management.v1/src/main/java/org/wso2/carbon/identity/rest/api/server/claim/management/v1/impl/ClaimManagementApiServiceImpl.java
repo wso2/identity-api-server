@@ -75,9 +75,11 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
     }
 
     @Override
-    public Response updateClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail, Boolean delete) {
+    public Response updateClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail,
+                                               Boolean preserveClaims) {
 
-        String resourceId = claimManagementService.updateClaimDialectFromFile(fileInputStream, fileDetail, delete);
+        String resourceId = claimManagementService.updateClaimDialectFromFile(fileInputStream, fileDetail,
+                                                                              preserveClaims);
         return Response.ok().location(getResourceLocation(resourceId)).build();
     }
 

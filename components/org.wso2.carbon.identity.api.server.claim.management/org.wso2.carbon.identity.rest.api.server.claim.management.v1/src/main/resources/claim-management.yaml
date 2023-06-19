@@ -238,7 +238,7 @@ paths:
         * internal_claim_meta_create
       parameters:
         - $ref: '#/parameters/fileParam'
-        - $ref: '#/parameters/allowDelete'
+        - $ref: '#/parameters/preserveClaimsParam'
       consumes:
         - multipart/form-data
       produces:
@@ -681,10 +681,10 @@ parameters:
     description: The file to be uploaded.
     required: true
     type: file
-  allowDelete:
-    name: delete
+  preserveClaimsParam:
+    name: preserveClaims
     in: query
-    description: Specify whether to allow delete or not
+    description: Specify whether to merge and preserve the claims or completely replace the existing claims set.
     required: false
     type: boolean
     default: false

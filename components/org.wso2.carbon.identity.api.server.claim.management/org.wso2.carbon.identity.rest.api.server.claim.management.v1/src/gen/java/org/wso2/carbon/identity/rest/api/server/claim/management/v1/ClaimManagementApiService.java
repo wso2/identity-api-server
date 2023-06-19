@@ -66,7 +66,7 @@ public abstract class ClaimManagementApiService {
 
     public abstract Response updateClaimDialect(String dialectId, ClaimDialectReqDTO claimDialect);
 
-    public abstract Response updateClaimDialectFromFile(InputStream fileInputStream,Attachment fileDetail, Boolean delete);
+    public abstract Response updateClaimDialectFromFile(InputStream fileInputStream,Attachment fileDetail, Boolean preserveClaims);
 
     public abstract Response updateExternalClaim(String dialectId, String claimId, ExternalClaimReqDTO externalClaim);
 

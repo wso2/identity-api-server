@@ -440,9 +440,9 @@ public class ClaimManagementApi  {
 
     public Response updateClaimDialectFromFile(@ApiParam(value = "The file to be uploaded.") @Multipart(value = "file") InputStream fileInputStream,
     @ApiParam(value = "The file to be uploaded. : details") @Multipart(value = "file" ) Attachment fileDetail,
-    @ApiParam(value = "Specify whether to allow delete or not", defaultValue="false") @QueryParam("delete")  Boolean delete) {
+    @ApiParam(value = "Specify whether to merge and preserve the claims or completely replace the existing claims set.", defaultValue="false") @QueryParam("preserveClaims")  Boolean preserveClaims) {
 
-        return delegate.updateClaimDialectFromFile(fileInputStream,fileDetail,delete);
+        return delegate.updateClaimDialectFromFile(fileInputStream,fileDetail,preserveClaims);
     }
 
     @Valid

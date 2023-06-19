@@ -85,11 +85,8 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.ClaimM
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.CMT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_CLAIMS_NOT_FOUND_FOR_DIALECT;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_CLAIM_URI_NOT_SPECIFIED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_DIALECT_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EMPTY_EXTERNAL_CLAIM_URI;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EMPTY_LOCAL_CLAIM_URI;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EMPTY_MAPPED_ATTRIBUTES_IN_LOCAL_CLAIM;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_ADDING_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_ADDING_EXTERNAL_CLAIM;
@@ -97,10 +94,6 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_DELETING_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_DELETING_EXTERNAL_CLAIM;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_DELETING_LOCAL_CLAIM;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_CLAIM_DIALECT;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_LOCAL_CLAIM_DIALECT;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_PARSING_CLAIM_DIALECT;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_READING_FILE_CONTENT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_DIALECTS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_EXTERNAL_CLAIM;
@@ -113,18 +106,12 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EXTERNAL_CLAIM_CONFLICT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_EXTERNAL_CLAIM_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_FILTERING_NOT_IMPLEMENTED;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_IMPORTING_EXTERNAL_CLAIMS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_INVALID_DIALECT_ID;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_INVALID_INPUT_FILE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_INVALID_USERSTORE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_LOCAL_CLAIM_CONFLICT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_LOCAL_CLAIM_NOT_FOUND;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_MISSING_FILE_CONTENT;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_MISSING_MEDIA_TYPE;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UPDATING_EXTERNAL_CLAIMS;
-import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UPDATING_LOCAL_CLAIMS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
@@ -321,7 +308,7 @@ public class ServerClaimManagementService {
 
         // Validate mandatory attributes.
         if (StringUtils.isBlank(localClaimReqDTO.getClaimURI())) {
-            throw handleClaimManagementClientError(ERROR_CODE_CLAIM_URI_NOT_SPECIFIED,
+            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_CLAIM_URI_NOT_SPECIFIED,
                     BAD_REQUEST);
         }
         if (StringUtils.isBlank(localClaimReqDTO.getDisplayName())) {
@@ -460,24 +447,27 @@ public class ServerClaimManagementService {
      *
      * @param fileInputStream   InputStream representing the uploaded claim dialect file.
      * @param fileDetail        Attachment object with metadata about the uploaded claim dialect file.
-     * @param delete            Boolean value to indicate whether to delete the existing claim dialect.
+     * @param preserveClaims    Boolean value to indicate whether to merge and preserve the claims
+     *                          or completely replace the existing claims set.
      * @return a String representing the updated claim dialect's resource identifier.
      */
-    public String updateClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail, Boolean delete) {
+    public String updateClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail,
+                                             Boolean preserveClaims) {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug(String.format("Updating claim dialect from file: %s", fileDetail.getDataHandler().getName()));
         }
 
+        preserveClaims = (preserveClaims != null) ? preserveClaims : Boolean.FALSE;
         String dialectId = null;
         try {
             ClaimDialectConfiguration dialectConfiguration = getDialectFromFile(fileInputStream, fileDetail);
             dialectId = dialectConfiguration.getId();
             if (LOCAL_DIALECT_PATH.equals(dialectId)) {
-                updateLocalClaims(dialectConfiguration.getLocalClaimReqDTOList(), delete);
+                updateLocalClaims(dialectConfiguration.getLocalClaimReqDTOList(), preserveClaims);
             } else {
                 updateClaimDialect(dialectId, dialectConfiguration.getClaimDialectReqDTO());
-                updateExternalClaims(dialectId, dialectConfiguration.getExternalClaimReqDTOList(), delete);
+                updateExternalClaims(dialectId, dialectConfiguration.getExternalClaimReqDTOList(), preserveClaims);
             }
             return dialectId;
         } catch (ClaimMetadataException e) {
@@ -485,7 +475,7 @@ public class ServerClaimManagementService {
         }
     }
 
-    private void updateLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList, Boolean delete)
+    private void updateLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList, boolean preserveClaims)
             throws ClaimMetadataException {
 
         List<ClaimErrorDTO> errors = new ArrayList<>();
@@ -493,7 +483,8 @@ public class ServerClaimManagementService {
         for (LocalClaimReqDTO localClaimReqDTO : localClaimReqDTOList) {
             try {
                 if (StringUtils.isBlank(localClaimReqDTO.getClaimURI())) {
-                    throw handleClaimManagementClientError(ERROR_CODE_EMPTY_LOCAL_CLAIM_URI, BAD_REQUEST);
+                    throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_EMPTY_LOCAL_CLAIM_URI,
+                            BAD_REQUEST);
                 }
                 String claimId = getResourceId(localClaimReqDTO.getClaimURI());
                 if (isLocalClaimExist(claimId)) {
@@ -507,12 +498,12 @@ public class ServerClaimManagementService {
                 errors.add(claimErrorDTO);
             }
         }
-        if (delete != null && delete) {
+        if (preserveClaims) {
             deleteUnusedLocalClaims(localClaimReqDTOList, errors);
         }
         if (!errors.isEmpty()) {
-            throw handleClaimManagementBulkClientError(ERROR_CODE_UPDATING_LOCAL_CLAIMS, BAD_REQUEST, errors,
-                    String.valueOf(errors.size()), String.valueOf(localClaimReqDTOList.size()));
+            throw handleClaimManagementBulkClientError(Constant.ErrorMessage.ERROR_CODE_UPDATING_LOCAL_CLAIMS,
+                    BAD_REQUEST, errors, String.valueOf(errors.size()), String.valueOf(localClaimReqDTOList.size()));
         }
     }
 
@@ -538,9 +529,9 @@ public class ServerClaimManagementService {
     }
 
     private void updateExternalClaims(String dialectId, List<ExternalClaimReqDTO> externalClaimReqDTOList,
-                                      Boolean delete) throws ClaimMetadataException {
+                                      boolean preserveClaims) throws ClaimMetadataException {
 
-        if (delete != null && delete) {
+        if (preserveClaims) {
             deleteClaimDialect(dialectId);
             dialectId = addClaimDialect(base64DecodeId(dialectId));
             importExternalClaims(dialectId, externalClaimReqDTOList);
@@ -552,7 +543,8 @@ public class ServerClaimManagementService {
         for (ExternalClaimReqDTO externalClaimReqDTO : externalClaimReqDTOList) {
             try {
                 if (StringUtils.isBlank(externalClaimReqDTO.getClaimURI())) {
-                    throw handleClaimManagementClientError(ERROR_CODE_EMPTY_EXTERNAL_CLAIM_URI, BAD_REQUEST);
+                    throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_EMPTY_EXTERNAL_CLAIM_URI,
+                            BAD_REQUEST);
                 }
                 String claimId = getResourceId(externalClaimReqDTO.getClaimURI());
                 if (isExternalClaimExist(dialectId, claimId)) {
@@ -567,8 +559,8 @@ public class ServerClaimManagementService {
             }
         }
         if (!errors.isEmpty()) {
-            throw handleClaimManagementBulkClientError(ERROR_CODE_UPDATING_EXTERNAL_CLAIMS, BAD_REQUEST, errors,
-                    String.valueOf(errors.size()), String.valueOf(externalClaimReqDTOList.size()));
+            throw handleClaimManagementBulkClientError(Constant.ErrorMessage.ERROR_CODE_UPDATING_EXTERNAL_CLAIMS,
+                    BAD_REQUEST, errors, String.valueOf(errors.size()), String.valueOf(externalClaimReqDTOList.size()));
         }
     }
 
@@ -585,7 +577,8 @@ public class ServerClaimManagementService {
             LOG.debug(String.format("Exporting Claim Dialect for ID %s as a %s file.", dialectId, fileType));
         }
         if (StringUtils.isBlank(fileType)) {
-            throw handleClaimManagementClientError(ERROR_CODE_MISSING_MEDIA_TYPE, BAD_REQUEST, dialectId);
+            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_MISSING_MEDIA_TYPE, BAD_REQUEST,
+                                                   dialectId);
         }
 
         ClaimDialectConfiguration dialectConfiguration = new ClaimDialectConfiguration(getClaimDialect(dialectId));
@@ -657,8 +650,8 @@ public class ServerClaimManagementService {
             String xmlContent = writer.toString();
             return new FileContent(fileNameSB.toString(), MEDIA_TYPE_XML, xmlContent);
         } catch (JAXBException e) {
-            throw new ClaimMetadataException(String.format(ERROR_CODE_ERROR_PARSING_CLAIM_DIALECT.toString(),
-                    MEDIA_TYPE_XML), e);
+            throw new ClaimMetadataException(String.format(
+                      Constant.ErrorMessage.ERROR_CODE_ERROR_PARSING_CLAIM_DIALECT.toString(), MEDIA_TYPE_XML), e);
         }
     }
 
@@ -672,8 +665,8 @@ public class ServerClaimManagementService {
             return new FileContent(fileNameSB.toString(), MEDIA_TYPE_JSON,
                     objectMapper.writeValueAsString(dialectConfiguration));
         } catch (JsonProcessingException e) {
-            throw new ClaimMetadataException(String.format(ERROR_CODE_ERROR_PARSING_CLAIM_DIALECT.toString(),
-                    MEDIA_TYPE_JSON), e);
+            throw new ClaimMetadataException(String.format(
+                      Constant.ErrorMessage.ERROR_CODE_ERROR_PARSING_CLAIM_DIALECT.toString(), MEDIA_TYPE_JSON), e);
         }
     }
 
@@ -688,8 +681,8 @@ public class ServerClaimManagementService {
         try {
             return new FileContent(fileNameSB.toString(), MEDIA_TYPE_YAML, yaml.dump(dialectConfiguration));
         } catch (YAMLException e) {
-            throw new ClaimMetadataException(String.format(ERROR_CODE_ERROR_PARSING_CLAIM_DIALECT.toString(),
-                    MEDIA_TYPE_YAML), e);
+            throw new ClaimMetadataException(String.format(
+                      Constant.ErrorMessage.ERROR_CODE_ERROR_PARSING_CLAIM_DIALECT.toString(), MEDIA_TYPE_YAML), e);
         }
     }
 
@@ -1063,7 +1056,8 @@ public class ServerClaimManagementService {
             dialectId = dialectConfiguration.getId();
 
             if (LOCAL_DIALECT_PATH.equals(dialectId)) {
-                throw handleClaimManagementClientError(ERROR_CODE_ERROR_IMPORTING_LOCAL_CLAIM_DIALECT, FORBIDDEN);
+                throw handleClaimManagementClientError(
+                        Constant.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_LOCAL_CLAIM_DIALECT, FORBIDDEN);
             }
 
             List<ExternalClaimReqDTO> externalClaimReqDTOList = dialectConfiguration.getExternalClaimReqDTOList();
@@ -1073,7 +1067,7 @@ public class ServerClaimManagementService {
 
             return dialectId;
         } catch (ClaimMetadataException e) {
-            throw handleClaimManagementException(e, ERROR_CODE_ERROR_IMPORTING_CLAIM_DIALECT);
+            throw handleClaimManagementException(e, Constant.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_CLAIM_DIALECT);
         }
     }
     private void importExternalClaims(String dialectID, List<ExternalClaimReqDTO> externalClaimReqDTOList) {
@@ -1090,8 +1084,8 @@ public class ServerClaimManagementService {
             }
         }
         if (!errors.isEmpty()) {
-            throw handleClaimManagementBulkClientError(ERROR_CODE_IMPORTING_EXTERNAL_CLAIMS, BAD_REQUEST, errors,
-                    String.valueOf(errors.size()), String.valueOf(externalClaimReqDTOList.size()));
+            throw handleClaimManagementBulkClientError(Constant.ErrorMessage.ERROR_CODE_IMPORTING_EXTERNAL_CLAIMS,
+                    BAD_REQUEST, errors, String.valueOf(errors.size()), String.valueOf(externalClaimReqDTOList.size()));
         }
     }
 
@@ -1104,7 +1098,7 @@ public class ServerClaimManagementService {
                     IOUtils.toString(fileInputStream, StandardCharsets.UTF_8.name()));
             return generateModelFromFile(claimFileContent);
         } catch (IOException | ClaimMetadataClientException e) {
-            throw new ClaimMetadataException(ERROR_CODE_INVALID_INPUT_FILE.toString(), e);
+            throw new ClaimMetadataException(Constant.ErrorMessage.ERROR_CODE_INVALID_INPUT_FILE.toString(), e);
         } finally {
             IOUtils.closeQuietly(fileInputStream);
         }
@@ -1117,7 +1111,7 @@ public class ServerClaimManagementService {
                     fileContent.getFileType()));
         }
         if (StringUtils.isEmpty(fileContent.getContent())) {
-            throw handleClaimManagementClientError(ERROR_CODE_MISSING_FILE_CONTENT, BAD_REQUEST,
+            throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_MISSING_FILE_CONTENT, BAD_REQUEST,
                     fileContent.getFileName());
         }
 
@@ -1142,8 +1136,8 @@ public class ServerClaimManagementService {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             return (ClaimDialectConfiguration) unmarshaller.unmarshal(new StringReader(fileContent.getContent()));
         } catch (JAXBException e) {
-            throw new ClaimMetadataException(String.format(ERROR_CODE_ERROR_READING_FILE_CONTENT.toString(),
-                    MEDIA_TYPE_XML), e);
+            throw new ClaimMetadataException(String.format(
+                      Constant.ErrorMessage.ERROR_CODE_ERROR_READING_FILE_CONTENT.toString(), MEDIA_TYPE_XML), e);
         }
     }
 
@@ -1152,8 +1146,8 @@ public class ServerClaimManagementService {
         try {
             return new ObjectMapper().readValue(fileContent.getContent(), ClaimDialectConfiguration.class);
         } catch (JsonProcessingException e) {
-            throw new ClaimMetadataException(String.format(ERROR_CODE_ERROR_READING_FILE_CONTENT.toString(),
-                    MEDIA_TYPE_JSON), e);
+            throw new ClaimMetadataException(String.format(
+                      Constant.ErrorMessage.ERROR_CODE_ERROR_READING_FILE_CONTENT.toString(), MEDIA_TYPE_JSON), e);
         }
     }
 
@@ -1163,8 +1157,8 @@ public class ServerClaimManagementService {
             Yaml yaml = new Yaml(new Constructor(ClaimDialectConfiguration.class));
             return yaml.loadAs(fileContent.getContent(), ClaimDialectConfiguration.class);
         } catch (YAMLException e) {
-            throw new ClaimMetadataException(String.format(ERROR_CODE_ERROR_READING_FILE_CONTENT.toString(),
-                    MEDIA_TYPE_YAML), e);
+            throw new ClaimMetadataException(String.format(
+                      Constant.ErrorMessage.ERROR_CODE_ERROR_READING_FILE_CONTENT.toString(), MEDIA_TYPE_YAML), e);
         }
     }
 
