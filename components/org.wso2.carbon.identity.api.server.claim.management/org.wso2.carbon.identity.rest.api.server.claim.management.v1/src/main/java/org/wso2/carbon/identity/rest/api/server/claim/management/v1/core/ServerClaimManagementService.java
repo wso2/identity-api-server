@@ -447,7 +447,7 @@ public class ServerClaimManagementService {
      *
      * @param fileInputStream   InputStream representing the uploaded claim dialect file.
      * @param fileDetail        Attachment object with metadata about the uploaded claim dialect file.
-     * @param preserveClaims    Boolean value to indicate whether to merge and preserve the claims
+     * @param preserveClaims    Boolean value to indicate whether to merge and preserve the existing claims
      *                          or completely replace the existing claims set.
      * @return a String representing the updated claim dialect's resource identifier.
      */
