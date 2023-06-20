@@ -499,7 +499,7 @@ public class ServerClaimManagementService {
             }
         }
         if (preserveClaims) {
-            deleteUnusedLocalClaims(localClaimReqDTOList, errors);
+            deleteObsoleteLocalClaims(localClaimReqDTOList, errors);
         }
         if (!errors.isEmpty()) {
             throw handleClaimManagementBulkClientError(Constant.ErrorMessage.ERROR_CODE_UPDATING_LOCAL_CLAIMS,
@@ -507,7 +507,7 @@ public class ServerClaimManagementService {
         }
     }
 
-    private void deleteUnusedLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList, List<ClaimErrorDTO> errors)
+    private void deleteObsoleteLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList, List<ClaimErrorDTO> errors)
             throws ClaimMetadataException {
 
         List<String> claimsToDelete =  getLocalClaimResDTOs(getClaimMetadataManagementService()
