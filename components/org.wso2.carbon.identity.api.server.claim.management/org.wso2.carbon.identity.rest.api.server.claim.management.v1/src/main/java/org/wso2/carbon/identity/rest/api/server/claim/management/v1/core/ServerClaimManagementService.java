@@ -1093,10 +1093,10 @@ public class ServerClaimManagementService {
             throws ClaimMetadataException {
 
         try {
-            FileContent claimFileContent = new FileContent(fileDetail.getDataHandler().getName(),
+            FileContent claimDialectFileContent = new FileContent(fileDetail.getDataHandler().getName(),
                     fileDetail.getDataHandler().getContentType(),
                     IOUtils.toString(fileInputStream, StandardCharsets.UTF_8.name()));
-            return generateModelFromFile(claimFileContent);
+            return generateModelFromFile(claimDialectFileContent);
         } catch (IOException | ClaimMetadataClientException e) {
             throw new ClaimMetadataException(Constant.ErrorMessage.ERROR_CODE_INVALID_INPUT_FILE.toString(), e);
         } finally {
