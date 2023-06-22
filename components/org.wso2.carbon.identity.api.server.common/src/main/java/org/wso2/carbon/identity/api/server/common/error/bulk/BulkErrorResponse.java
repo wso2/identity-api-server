@@ -37,14 +37,11 @@ public class BulkErrorResponse extends BulkErrorDTO {
      * BulkErrorResponse Builder.
      */
     public static class Builder {
+
         private String code;
         private String message;
         private String description;
         private List<? extends ErrorDTO> failedOperations;
-
-        public Builder() {
-            // The constructor is intentionally left empty as there are no initializations required.
-        }
 
         public BulkErrorResponse.Builder withCode(String code) {
 
@@ -103,13 +100,12 @@ public class BulkErrorResponse extends BulkErrorDTO {
         public BulkErrorResponse build(Log log, String message) {
 
             BulkErrorResponse error = build();
-            String errorMessageFormat = "errorCode: %s | message: %s";
-            String errorMsg = String.format(errorMessageFormat, error.getCode(), message);
-            if (!isCorrelationIDPresent()) {
-                errorMsg = String.format("correlationID: %s | %s", error.getRef(), errorMsg);
-            }
-
             if (log.isDebugEnabled()) {
+                String errorMessageFormat = "errorCode: %s | message: %s";
+                String errorMsg = String.format(errorMessageFormat, error.getCode(), message);
+                if (!isCorrelationIDPresent()) {
+                    errorMsg = String.format("correlationID: %s | %s", error.getRef(), errorMsg);
+                }
                 log.debug(errorMsg);
             }
             return error;
