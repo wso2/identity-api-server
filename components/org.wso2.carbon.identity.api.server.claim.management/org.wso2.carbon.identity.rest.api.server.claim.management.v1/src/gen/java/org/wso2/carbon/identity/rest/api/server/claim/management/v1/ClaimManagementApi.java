@@ -194,6 +194,32 @@ public class ClaimManagementApi  {
 
     @Valid
     @GET
+    @Path("/{dialect-id}/export")
+    @Produces({ "application/json", "application/xml", "application/yaml" })
+    @io.swagger.annotations.ApiOperation(value = "Export a claim dialect with related claims in XML, YAML, or JSON format",
+            notes = "This API provides the capability to retrieve a claim dialect for a given dialect ID along with all related claims as a XML, YAML, or JSON file. <br><b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/view <br> <b>Scope required:</b> <br> * internal_claim_meta_view",
+            response = String.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 200, message = "Successful response"),
+        
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid input request."),
+        
+        @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
+        
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "The specified resource is not found."),
+        
+        @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
+
+    public Response exportClaimDialectToFile(@ApiParam(value = "Id of the claim dialect.",required=true ) @PathParam("dialect-id")  String dialectId,
+    @ApiParam(value = "Content type of the file.\n"  , allowableValues="{values=[application/json, application/xml, application/yaml, application/x-yaml, text/yaml, text/xml, text/json]}", defaultValue="application/yaml")@HeaderParam("Accept") String accept) {
+
+        return delegate.exportClaimDialectToFile(dialectId,accept);
+    }
+
+    @Valid
+    @GET
     @Path("/{dialect-id}")
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Retrieve claim dialect.",
@@ -345,6 +371,31 @@ public class ClaimManagementApi  {
     }
 
     @Valid
+    @POST
+    @Path("/import")
+    @Consumes({ "multipart/form-data" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Import an external claim dialect with related claims from XML, YAML, or JSON file",
+            notes = "This API provides the capability to import claim dialect with related claims from a file in XML, YAML, or JSON format. <br><b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/create <br> <b>Scope required:</b> <br> * internal_claim_meta_create",
+            response = void.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 201, message = "Item Created."),
+        
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid input request."),
+        
+        @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
+        
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
+        
+        @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
+
+    public Response importClaimDialectFromFile(@ApiParam(value = "The file to be uploaded.") @Multipart(value = "file") InputStream fileInputStream,
+    @ApiParam(value = "The file to be uploaded. : details") @Multipart(value = "file" ) Attachment fileDetail) {
+
+        return delegate.importClaimDialectFromFile(fileInputStream,fileDetail);
+    }
+
+    @Valid
     @PUT
     @Path("/{dialect-id}")
     @Consumes({ "application/json" })
@@ -366,6 +417,32 @@ public class ClaimManagementApi  {
     @ApiParam(value = "Updated claim dialect."  ) @Valid ClaimDialectReqDTO claimDialect) {
 
         return delegate.updateClaimDialect(dialectId,claimDialect);
+    }
+
+    @Valid
+    @PUT
+    @Path("/import")
+    @Consumes({ "multipart/form-data" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Update claim dialect with related claims from XML, YAML, or JSON file",
+            notes = "This API provides the capability to update a claim dialect and all related claims from a file in XML, YAML, or JSON format. <br><b>Permission required:</b> <br> * /permission/admin/manage/identity/claimmgt/metadata/create <br> <b>Scope required:</b> <br> * internal_claim_meta_create",
+            response = void.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 201, message = "Item Created."),
+        
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Invalid input request."),
+        
+        @io.swagger.annotations.ApiResponse(code = 401, message = "Unauthorized."),
+        
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Resource Forbidden."),
+        
+        @io.swagger.annotations.ApiResponse(code = 500, message = "Internal Server Error.") })
+
+    public Response updateClaimDialectFromFile(@ApiParam(value = "The file to be uploaded.") @Multipart(value = "file") InputStream fileInputStream,
+    @ApiParam(value = "The file to be uploaded. : details") @Multipart(value = "file" ) Attachment fileDetail,
+    @ApiParam(value = "Specify whether to merge and preserve the claims or completely replace the existing claims set.", defaultValue="false") @QueryParam("preserveClaims")  Boolean preserveClaims) {
+
+        return delegate.updateClaimDialectFromFile(fileInputStream,fileDetail,preserveClaims);
     }
 
     @Valid

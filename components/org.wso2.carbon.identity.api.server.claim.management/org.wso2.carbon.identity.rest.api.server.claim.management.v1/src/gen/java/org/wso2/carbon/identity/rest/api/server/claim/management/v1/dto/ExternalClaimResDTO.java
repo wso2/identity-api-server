@@ -28,7 +28,7 @@ import javax.validation.constraints.Pattern;
     * External claim response.
     **/
 @ApiModel(description = "External claim response.")
-public class ExternalClaimResDTO {
+public class ExternalClaimResDTO extends ClaimResDTO {
 
     @Valid 
     private String id = null;
@@ -95,6 +95,7 @@ public class ExternalClaimResDTO {
 
         StringBuilder sb = new StringBuilder();
         sb.append("class ExternalClaimResDTO {\n");
+        sb.append("  " + super.toString()).append("\n");
         
         sb.append("    id: ").append(id).append("\n");
         sb.append("    claimURI: ").append(claimURI).append("\n");
