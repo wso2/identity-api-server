@@ -141,26 +141,7 @@ public class SAMLInboundFunctions {
 
         SAMLSSOServiceProviderDTO samlssoServiceProviderDTO = getSamlSsoServiceProviderDTO(saml2Configuration, false);
 
-        InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
-        samlInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.SAML2);
-        samlInbound.setInboundAuthKey(samlssoServiceProviderDTO.getIssuer());
-        if (samlssoServiceProviderDTO.isEnableAttributeProfile()) {
-            Property[] properties = new Property[1];
-            Property property = new Property();
-            property.setName(ATTRIBUTE_CONSUMING_SERVICE_INDEX);
-            if (StringUtils.isNotBlank(samlssoServiceProviderDTO.getAttributeConsumingServiceIndex())) {
-                property.setValue(samlssoServiceProviderDTO.getAttributeConsumingServiceIndex());
-            } else {
-                try {
-                    property.setValue(Integer.toString(IdentityUtil.getRandomInteger()));
-                } catch (IdentityException e) {
-                    handleException(e);
-                }
-            }
-            properties[0] = property;
-            samlInbound.setProperties(properties);
-        }
-        return samlInbound;
+        return returnSAMLInbound(samlssoServiceProviderDTO);
     }
 
     public static InboundAuthenticationRequestConfig createSAMLInbound(
@@ -173,26 +154,7 @@ public class SAMLInboundFunctions {
             serviceProvider.setCertificateContent(base64Encode(samlssoServiceProviderDTO.getCertificateContent()));
         }
 
-        InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
-        samlInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.SAML2);
-        samlInbound.setInboundAuthKey(samlssoServiceProviderDTO.getIssuer());
-        if (samlssoServiceProviderDTO.isEnableAttributeProfile()) {
-            Property[] properties = new Property[1];
-            Property property = new Property();
-            property.setName(ATTRIBUTE_CONSUMING_SERVICE_INDEX);
-            if (StringUtils.isNotBlank(samlssoServiceProviderDTO.getAttributeConsumingServiceIndex())) {
-                property.setValue(samlssoServiceProviderDTO.getAttributeConsumingServiceIndex());
-            } else {
-                try {
-                    property.setValue(Integer.toString(IdentityUtil.getRandomInteger()));
-                } catch (IdentityException e) {
-                    handleException(e);
-                }
-            }
-            properties[0] = property;
-            samlInbound.setProperties(properties);
-        }
-        return samlInbound;
+        return returnSAMLInbound(samlssoServiceProviderDTO);
     }
 
     public static InboundAuthenticationRequestConfig updateSAMLInbound(
@@ -204,6 +166,12 @@ public class SAMLInboundFunctions {
         if (samlssoServiceProviderDTO.getCertificateContent() != null) {
             serviceProvider.setCertificateContent(base64Encode(samlssoServiceProviderDTO.getCertificateContent()));
         }
+
+        return returnSAMLInbound(samlssoServiceProviderDTO);
+    }
+
+    private static InboundAuthenticationRequestConfig returnSAMLInbound(
+            SAMLSSOServiceProviderDTO samlssoServiceProviderDTO) {
 
         InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
         samlInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.SAML2);
