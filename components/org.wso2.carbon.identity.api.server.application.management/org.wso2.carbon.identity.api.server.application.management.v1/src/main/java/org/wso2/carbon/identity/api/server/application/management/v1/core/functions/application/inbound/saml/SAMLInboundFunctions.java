@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,15 +66,17 @@ public class SAMLInboundFunctions {
         try {
             validateSingleSignOnProfileBindings(saml2Configuration);
             if (currentIssuer != null) {
-                // Delete the current app.
                 oldSAMLSp = getSamlSsoConfigService().getServiceProvider(currentIssuer);
-                getSamlSsoConfigService().removeServiceProvider(currentIssuer);
             }
         } catch (IdentityException e) {
             throw handleException(e);
         }
 
         try {
+            if (currentIssuer != null) {
+                // This is an update.
+                return updateSAMLInbound(application, saml2Configuration);
+            }
             return createSAMLInbound(application, saml2Configuration);
         } catch (APIError error) {
             // Try to rollback by recreating the previous SAML SP.
@@ -137,7 +139,7 @@ public class SAMLInboundFunctions {
     /* @Deprecated. Please use {@link #createSAMLInbound(ServiceProvider, SAML2Configuration)} instead. */
     public static InboundAuthenticationRequestConfig createSAMLInbound(SAML2Configuration saml2Configuration) {
 
-        SAMLSSOServiceProviderDTO samlssoServiceProviderDTO = getSamlSsoServiceProviderDTO(saml2Configuration);
+        SAMLSSOServiceProviderDTO samlssoServiceProviderDTO = getSamlSsoServiceProviderDTO(saml2Configuration, false);
 
         InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
         samlInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.SAML2);
@@ -164,7 +166,39 @@ public class SAMLInboundFunctions {
     public static InboundAuthenticationRequestConfig createSAMLInbound(
             ServiceProvider serviceProvider, SAML2Configuration saml2Configuration) {
 
-        SAMLSSOServiceProviderDTO samlssoServiceProviderDTO = getSamlSsoServiceProviderDTO(saml2Configuration);
+        SAMLSSOServiceProviderDTO samlssoServiceProviderDTO = getSamlSsoServiceProviderDTO(saml2Configuration, false);
+
+        // Set certificate if available.
+        if (samlssoServiceProviderDTO.getCertificateContent() != null) {
+            serviceProvider.setCertificateContent(base64Encode(samlssoServiceProviderDTO.getCertificateContent()));
+        }
+
+        InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
+        samlInbound.setInboundAuthType(FrameworkConstants.StandardInboundProtocols.SAML2);
+        samlInbound.setInboundAuthKey(samlssoServiceProviderDTO.getIssuer());
+        if (samlssoServiceProviderDTO.isEnableAttributeProfile()) {
+            Property[] properties = new Property[1];
+            Property property = new Property();
+            property.setName(ATTRIBUTE_CONSUMING_SERVICE_INDEX);
+            if (StringUtils.isNotBlank(samlssoServiceProviderDTO.getAttributeConsumingServiceIndex())) {
+                property.setValue(samlssoServiceProviderDTO.getAttributeConsumingServiceIndex());
+            } else {
+                try {
+                    property.setValue(Integer.toString(IdentityUtil.getRandomInteger()));
+                } catch (IdentityException e) {
+                    handleException(e);
+                }
+            }
+            properties[0] = property;
+            samlInbound.setProperties(properties);
+        }
+        return samlInbound;
+    }
+
+    public static InboundAuthenticationRequestConfig updateSAMLInbound(
+            ServiceProvider serviceProvider, SAML2Configuration saml2Configuration) {
+
+        SAMLSSOServiceProviderDTO samlssoServiceProviderDTO = getSamlSsoServiceProviderDTO(saml2Configuration, true);
 
         // Set certificate if available.
         if (samlssoServiceProviderDTO.getCertificateContent() != null) {
@@ -219,43 +253,43 @@ public class SAMLInboundFunctions {
         }
     }
 
-    private static SAMLSSOServiceProviderDTO createSAMLSpWithManualConfiguration(SAML2ServiceProvider saml2SpModel) {
+    private static SAMLSSOServiceProviderDTO createSAMLSpWithManualConfiguration(SAML2ServiceProvider saml2SpModel,
+                                                                                 boolean isUpdate) {
 
         SAMLSSOServiceProviderDTO serviceProviderDTO = new ApiModelToSAMLSSOServiceProvider().apply(saml2SpModel);
         try {
-            SAMLSSOServiceProviderDTO addedSAMLSp = getSamlSsoConfigService().createServiceProvider(serviceProviderDTO);
-            return addedSAMLSp;
+            if (isUpdate) {
+                return getSamlSsoConfigService().updateServiceProvider(serviceProviderDTO);
+            }
+            return getSamlSsoConfigService().createServiceProvider(serviceProviderDTO);
         } catch (IdentityException e) {
             throw handleException(e);
         }
     }
 
-    private static SAMLSSOServiceProviderDTO createSAMLSpWithMetadataFile(String encodedMetaFileContent) {
+    private static SAMLSSOServiceProviderDTO createSAMLSpWithMetadataFile(String encodedMetaFileContent,
+                                                                         boolean isUpdate) {
 
         try {
             byte[] metaData = Base64.getDecoder().decode(encodedMetaFileContent.getBytes(StandardCharsets.UTF_8));
             String base64DecodedMetadata = new String(metaData, StandardCharsets.UTF_8);
 
-            return createSAMLSpWithMetadataContent(base64DecodedMetadata);
+            if (isUpdate) {
+                return getSamlSsoConfigService().updateRPServiceProvider(base64DecodedMetadata);
+            }
+            return getSamlSsoConfigService().uploadRPServiceProvider(base64DecodedMetadata);
         } catch (IdentitySAML2SSOException e) {
             throw handleException(e);
         }
     }
 
-    private static SAMLSSOServiceProviderDTO createSAMLSpWithMetadataContent(String metadataContent)
-            throws IdentitySAML2SSOException {
-
-        SAMLSSOServiceProviderDTO serviceProviderDTO =
-                getSamlSsoConfigService().uploadRPServiceProvider(metadataContent);
-        return serviceProviderDTO;
-    }
-
-    private static SAMLSSOServiceProviderDTO createSAMLSpWithMetadataUrl(String metadataUrl) {
+    private static SAMLSSOServiceProviderDTO createSAMLSpWithMetadataUrl(String metadataUrl, boolean isUpdate) {
 
         try {
-            SAMLSSOServiceProviderDTO serviceProviderDTO =
-                    getSamlSsoConfigService().createServiceProviderWithMetadataURL(metadataUrl);
-            return serviceProviderDTO;
+            if (isUpdate) {
+                return getSamlSsoConfigService().updateServiceProviderWithMetadataURL(metadataUrl);
+            }
+            return getSamlSsoConfigService().createServiceProviderWithMetadataURL(metadataUrl);
         } catch (IdentitySAML2SSOException e) {
             throw handleException(e);
         }
@@ -309,17 +343,17 @@ public class SAMLInboundFunctions {
                 (StandardCharsets.UTF_8));
     }
 
-    private static SAMLSSOServiceProviderDTO getSamlSsoServiceProviderDTO(SAML2Configuration saml2Configuration)
-            throws APIError {
+    private static SAMLSSOServiceProviderDTO getSamlSsoServiceProviderDTO(SAML2Configuration saml2Configuration,
+                                                                          boolean isUpdate) throws APIError {
 
         SAML2ServiceProvider samlManualConfiguration = saml2Configuration.getManualConfiguration();
 
         if (saml2Configuration.getMetadataFile() != null) {
-            return createSAMLSpWithMetadataFile(saml2Configuration.getMetadataFile());
+            return createSAMLSpWithMetadataFile(saml2Configuration.getMetadataFile(), isUpdate);
         } else if (saml2Configuration.getMetadataURL() != null) {
-            return createSAMLSpWithMetadataUrl(saml2Configuration.getMetadataURL());
+            return createSAMLSpWithMetadataUrl(saml2Configuration.getMetadataURL(), isUpdate);
         } else if (samlManualConfiguration != null) {
-            return createSAMLSpWithManualConfiguration(samlManualConfiguration);
+            return createSAMLSpWithManualConfiguration(samlManualConfiguration, isUpdate);
         } else {
             throw Utils.buildBadRequestError("Invalid SAML2 Configuration. One of metadataFile, metaDataUrl or " +
                     "serviceProvider manual configuration needs to be present.");
