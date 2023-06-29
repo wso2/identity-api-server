@@ -193,7 +193,7 @@ public class ServerIdpManagementService {
             }
             return createIDPListResponse(
                     IdentityProviderServiceHolder.getIdentityProviderManager().getIdPs(limit, offset, filter,
-                            sortBy, sortOrder, ContextLoader.getTenantDomainFromContext(), requestedAttributeList),
+                            sortOrder, sortBy, ContextLoader.getTenantDomainFromContext(), requestedAttributeList),
                     requestedAttributeList);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
