@@ -2771,7 +2771,7 @@ public class ServerIdpManagementService {
      * @param oidcAuthenticatorProperties Authenticator properties of OIDC authenticator.
      */
     private void validateDuplicateOpenIDConnectScopes(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
-                                                     oidcAuthenticatorProperties) {
+                                                              oidcAuthenticatorProperties) {
 
         if (oidcAuthenticatorProperties != null) {
             boolean scopesFieldFilled = false;
@@ -2796,12 +2796,12 @@ public class ServerIdpManagementService {
     }
 
     /**
-     * Verify if scopes contain `openid`
+     * Verify if scopes contain `openid`.
      *
      * @param oidcAuthenticatorProperties Authenticator properties of OIDC authenticator.
      */
     private void validateDefaultOpenIDConnectScopes(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
-                                                     oidcAuthenticatorProperties) {
+                                                            oidcAuthenticatorProperties) {
 
         if (oidcAuthenticatorProperties != null) {
             for (org.wso2.carbon.identity.api.server.idp.v1
