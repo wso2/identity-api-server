@@ -243,7 +243,7 @@ public class SAMLInboundFunctions {
             String base64DecodedMetadata = new String(metaData, StandardCharsets.UTF_8);
 
             if (isUpdate) {
-                return getSamlSsoConfigService().updateRPServiceProvider(base64DecodedMetadata);
+                return getSamlSsoConfigService().updateRPServiceProviderWithMetadata(base64DecodedMetadata);
             }
             return getSamlSsoConfigService().uploadRPServiceProvider(base64DecodedMetadata);
         } catch (IdentitySAML2SSOException e) {
