@@ -29,7 +29,7 @@
     <name>WSO2 Identity Server - Applications Rest API</name>
     <description>WSO2 Identity Server - Applications Rest API</description>
     <artifactId>org.wso2.carbon.identity.api.server.application.management.v1</artifactId>
-    <version>1.2.62</version>
+    <version>1.2.63-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
