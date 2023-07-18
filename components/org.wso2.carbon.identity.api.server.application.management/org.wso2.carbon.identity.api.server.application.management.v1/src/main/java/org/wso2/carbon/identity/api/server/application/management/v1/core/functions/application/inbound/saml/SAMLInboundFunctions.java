@@ -113,7 +113,7 @@ public class SAMLInboundFunctions {
 
         SAMLSSOServiceProviderDTO samlssoServiceProviderDTO = getSamlSsoServiceProviderDTO(saml2Configuration);
 
-        return returnSAMLInbound(samlssoServiceProviderDTO);
+        return createInboundAuthenticationRequestConfig(samlssoServiceProviderDTO);
     }
 
     public static InboundAuthenticationRequestConfig createSAMLInbound(
@@ -126,7 +126,7 @@ public class SAMLInboundFunctions {
             serviceProvider.setCertificateContent(base64Encode(samlssoServiceProviderDTO.getCertificateContent()));
         }
 
-        return returnSAMLInbound(samlssoServiceProviderDTO);
+        return createInboundAuthenticationRequestConfig(samlssoServiceProviderDTO);
     }
 
     public static InboundAuthenticationRequestConfig updateSAMLInbound(
@@ -140,10 +140,10 @@ public class SAMLInboundFunctions {
             serviceProvider.setCertificateContent(base64Encode(samlssoServiceProviderDTO.getCertificateContent()));
         }
 
-        return returnSAMLInbound(samlssoServiceProviderDTO);
+        return createInboundAuthenticationRequestConfig(samlssoServiceProviderDTO);
     }
 
-    private static InboundAuthenticationRequestConfig returnSAMLInbound(
+    private static InboundAuthenticationRequestConfig createInboundAuthenticationRequestConfig(
             SAMLSSOServiceProviderDTO samlssoServiceProviderDTO) {
 
         InboundAuthenticationRequestConfig samlInbound = new InboundAuthenticationRequestConfig();
