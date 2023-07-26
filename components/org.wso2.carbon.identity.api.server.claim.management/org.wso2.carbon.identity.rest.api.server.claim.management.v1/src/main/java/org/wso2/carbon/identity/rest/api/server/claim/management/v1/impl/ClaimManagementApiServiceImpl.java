@@ -16,7 +16,10 @@
 
 package org.wso2.carbon.identity.rest.api.server.claim.management.v1.impl;
 
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.wso2.carbon.identity.api.server.common.FileContent;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.ClaimManagementApiService;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.core.ServerClaimManagementService;
 
@@ -24,7 +27,10 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDia
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ExternalClaimReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalClaimReqDTO;
 
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.CMT_PATH_COMPONENT;
@@ -59,6 +65,22 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
 
         String resourceId = claimManagementService.addLocalClaim(localClaim);
         return Response.created(getResourceLocation(LOCAL_DIALECT_PATH, resourceId)).build();
+    }
+
+    @Override
+    public Response importClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail) {
+
+        String resourceId = claimManagementService.importClaimDialectFromFile(fileInputStream, fileDetail);
+        return Response.created(getResourceLocation(resourceId)).build();
+    }
+
+    @Override
+    public Response updateClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail,
+                                               Boolean preserveClaims) {
+
+        String resourceId = claimManagementService.updateClaimDialectFromFile(fileInputStream, fileDetail,
+                                                                              preserveClaims);
+        return Response.ok().location(getResourceLocation(resourceId)).build();
     }
 
     @Override
@@ -143,6 +165,22 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
 
         claimManagementService.updateLocalClaim(claimId, localClaim);
         return Response.ok().build();
+    }
+
+    @Override
+    public Response exportClaimDialectToFile(String dialectId, String accept) {
+
+        FileContent fileContent = claimManagementService.exportClaimDialectToFile(dialectId, accept);
+
+        return Response.ok()
+                .type(fileContent.getFileType())
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+                        + fileContent.getFileName() + "\"")
+                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
+                .entity(fileContent.getContent().getBytes(StandardCharsets.UTF_8))
+                .build();
     }
 
     private URI getResourceLocation(String dialectId) {

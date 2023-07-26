@@ -185,6 +185,105 @@ paths:
         500:
           $ref: '#/responses/ServerError'
 
+  /claim-dialects/{dialect-id}/export:
+    get:
+      tags:
+        - management
+      summary: Export a claim dialect with related claims in XML, YAML, or JSON format
+      operationId: exportClaimDialectToFile
+      description: This API provides the capability to retrieve a claim dialect for a given dialect ID along with all 
+        related claims as a XML, YAML, or JSON file. 
+        <br><b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/claimmgt/metadata/view <br>
+        <b>Scope required:</b> <br>
+        * internal_claim_meta_view
+      parameters:
+        - $ref : '#/parameters/dialectIdPathParam'
+        - $ref: '#/parameters/fileTypeHeaderParam'
+      produces:
+        - application/json
+        - application/xml
+        - application/yaml
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: string
+          examples:
+            application/json: 'Sample claim dialect configurations in the requested format'
+            application/xml: 'Sample claim dialect configurations in the requested format'
+            application/yaml: 'Sample claim dialect configurations in the requested format'
+        400:
+          $ref: '#/responses/InvalidInput'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/ServerError'
+
+  /claim-dialects/import:
+    put:
+      tags:
+        - management
+      summary: Update claim dialect with related claims from XML, YAML, or JSON file
+      operationId: updateClaimDialectFromFile
+      description: This API provides the capability to update a claim dialect and all related claims from a file 
+        in XML, YAML, or JSON format. 
+        <br><b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/claimmgt/metadata/create <br>
+        <b>Scope required:</b> <br>
+        * internal_claim_meta_create
+      parameters:
+        - $ref: '#/parameters/fileParam'
+        - $ref: '#/parameters/preserveClaimsParam'
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      responses:
+        201:
+          $ref: '#/responses/Created'
+        400:
+          $ref: '#/responses/InvalidInput'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        500:
+          $ref: '#/responses/ServerError'
+
+    post:
+      tags:
+        - management
+      summary: Import an external claim dialect with related claims from XML, YAML, or JSON file
+      operationId: importClaimDialectFromFile
+      description: This API provides the capability to import claim dialect with related claims from a file 
+        in XML, YAML, or JSON format. 
+        <br><b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/claimmgt/metadata/create <br>
+        <b>Scope required:</b> <br>
+        * internal_claim_meta_create
+      parameters:
+        - $ref: '#/parameters/fileParam'
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      responses:
+        201:
+          $ref: '#/responses/Created'
+        400:
+          $ref: '#/responses/InvalidInput'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        500:
+          $ref: '#/responses/ServerError'
+
   /claim-dialects:
     post:
       tags:
@@ -560,6 +659,35 @@ parameters:
     required: true
     type: string
     description: Id of the claim.
+  fileTypeHeaderParam:
+    in: header
+    name: Accept
+    required: false
+    type: string
+    description: |
+      Content type of the file.
+    enum:
+      - application/json
+      - application/xml
+      - application/yaml
+      - application/x-yaml
+      - text/yaml
+      - text/xml
+      - text/json
+    default: application/yaml
+  fileParam:
+    name: file
+    in: formData
+    description: The file to be uploaded.
+    required: true
+    type: file
+  preserveClaimsParam:
+    name: preserveClaims
+    in: query
+    description: Specify whether to merge and preserve the claims or completely replace the existing claims set.
+    required: false
+    type: boolean
+    default: false
 
 #-----------------------------------------------------
 # Definitions
@@ -623,59 +751,61 @@ definitions:
   # The Local Claim Response object
   #-----------------------------------------------------
   LocalClaimRes:
-    type: object
     description: Local claim response.
-    properties:
-      id:
-        type: string
-        description: claim ID.
-        example: "394b8adcce24c64a8a09a8d80abf8c337bd253de"
-      claimURI:
-        type: string
-        description: A unique URI specific to the claim.
-        example: "http://wso2.org/claims/username"
-      dialectURI:
-        type: string
-        description: URI of the claim dialect.
-        example: "http://wso2.org/claims"
-      description:
-        type: string
-        description: Description of the claim.
-        example: "Some description about the claim."
-      displayOrder:
-        type: integer
-        description: The order in which the claim is displayed among other claims under the same dialect.
-        example: 10
-      displayName:
-        type: string
-        description: Name of the claim to be displayed in the UI.
-        example: "Username"
-      readOnly:
-        type: boolean
-        description: Specifies if the claim is read-only.
-        example: true
-      regEx:
-        type: string
-        description: Regular expression used to validate inputs.
-        example: "^([a-zA-Z)$"
-      required:
-        type: boolean
-        description: Specifies if the claim is required for user registration.
-        example: true
-      supportedByDefault:
-        type: boolean
-        description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
-        example: true
-      attributeMapping:
-        type: array
-        description: Userstore attribute mappings.
-        items:
-          $ref: '#/definitions/AttributeMapping'
-      properties:
-        type: array
-        description: Define any additional properties if required.
-        items:
-          $ref: '#/definitions/Property'
+    allOf:
+      - $ref: '#/definitions/ClaimRes'
+      - type: object
+        properties:
+          id:
+            type: string
+            description: claim ID.
+            example: "394b8adcce24c64a8a09a8d80abf8c337bd253de"
+          claimURI:
+            type: string
+            description: A unique URI specific to the claim.
+            example: "http://wso2.org/claims/username"
+          dialectURI:
+            type: string
+            description: URI of the claim dialect.
+            example: "http://wso2.org/claims"
+          description:
+            type: string
+            description: Description of the claim.
+            example: "Some description about the claim."
+          displayOrder:
+            type: integer
+            description: The order in which the claim is displayed among other claims under the same dialect.
+            example: 10
+          displayName:
+            type: string
+            description: Name of the claim to be displayed in the UI.
+            example: "Username"
+          readOnly:
+            type: boolean
+            description: Specifies if the claim is read-only.
+            example: true
+          regEx:
+            type: string
+            description: Regular expression used to validate inputs.
+            example: "^([a-zA-Z)$"
+          required:
+            type: boolean
+            description: Specifies if the claim is required for user registration.
+            example: true
+          supportedByDefault:
+            type: boolean
+            description: Specifies if the claim will be prompted during user registration and displayed on the user profile.
+            example: true
+          attributeMapping:
+            type: array
+            description: Userstore attribute mappings.
+            items:
+              $ref: '#/definitions/AttributeMapping'
+          properties:
+            type: array
+            description: Define any additional properties if required.
+            items:
+              $ref: '#/definitions/Property'
 
   #-----------------------------------------------------
   # The Additional Attribute Mapping object
@@ -748,28 +878,38 @@ definitions:
         example: "http://wso2.org/claims/username"
 
   #-----------------------------------------------------
+  # The Abstract Claim object
+  #-----------------------------------------------------
+  ClaimRes:
+    type: object
+    description: Claim response.
+    x-wso2-json-ignore-unknown: true
+
+  #-----------------------------------------------------
   # The External Claim Response object
   #-----------------------------------------------------
   ExternalClaimRes:
-    type: object
     description: External claim response.
-    properties:
-      id:
-        type: string
-        description: External claim ID.
-        example: "394b8adcce24c64a8a09a0d80abf8c337dd255de"
-      claimURI:
-        type: string
-        description: Claim URI of the external claim.
-        example: "  urn:ietf:params:scim:schemas:core:2.0:User:userName"
-      claimDialectURI:
-        type: string
-        description: Dialect URI of the external claim.
-        example: "urn:ietf:params:scim:schemas:core:2.0:User"
-      mappedLocalClaimURI:
-        type: string
-        description: The local claim URI to map with the external claim.
-        example: "http://wso2.org/claims/username"
+    allOf:
+      - $ref: '#/definitions/ClaimRes'
+      - type: object
+        properties:
+          id:
+            type: string
+            description: External claim ID.
+            example: "394b8adcce24c64a8a09a0d80abf8c337dd255de"
+          claimURI:
+            type: string
+            description: Claim URI of the external claim.
+            example: "  urn:ietf:params:scim:schemas:core:2.0:User:userName"
+          claimDialectURI:
+            type: string
+            description: Dialect URI of the external claim.
+            example: "urn:ietf:params:scim:schemas:core:2.0:User"
+          mappedLocalClaimURI:
+            type: string
+            description: The local claim URI to map with the external claim.
+            example: "http://wso2.org/claims/username"
 
   #-----------------------------------------------------
   # Property Object
