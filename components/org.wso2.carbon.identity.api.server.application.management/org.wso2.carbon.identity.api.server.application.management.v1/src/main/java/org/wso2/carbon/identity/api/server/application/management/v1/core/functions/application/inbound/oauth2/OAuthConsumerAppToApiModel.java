@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.OIDCLogoutC
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RefreshTokenConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
+import org.wso2.carbon.identity.oauth2.internal.OAuth2ServiceComponentHolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,15 +82,20 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
 
     private AccessTokenConfiguration buildTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
 
-        return new AccessTokenConfiguration()
+        AccessTokenConfiguration accessTokenConfiguration = new AccessTokenConfiguration()
                 .type(oAuthConsumerAppDTO.getTokenType())
                 .userAccessTokenExpiryInSeconds(oAuthConsumerAppDTO.getUserAccessTokenExpiryTime())
                 .applicationAccessTokenExpiryInSeconds(oAuthConsumerAppDTO.getApplicationAccessTokenExpiryTime())
                 .bindingType(oAuthConsumerAppDTO.getTokenBindingType())
                 .revokeTokensWhenIDPSessionTerminated(oAuthConsumerAppDTO
                         .isTokenRevocationWithIDPSessionTerminationEnabled())
-                .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled())
-                .audience(getAccessTokenAudiences(oAuthConsumerAppDTO.getAccessTokenAudiences()));
+                .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled());
+
+        if (!OAuth2ServiceComponentHolder.isLegacyAudienceEnabled()) {
+            accessTokenConfiguration.audience(getAccessTokenAudiences(oAuthConsumerAppDTO.getAccessTokenAudiences()));
+        }
+
+        return accessTokenConfiguration;
     }
 
     private RefreshTokenConfiguration buildRefreshTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
