@@ -126,6 +126,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.governance</groupId>
+                <artifactId>org.wso2.carbon.identity.idle.account.identification</artifactId>
+                <version>${identity.governance.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.event.handler.notification</groupId>
                 <artifactId>org.wso2.carbon.email.mgt</artifactId>
                 <version>${identity.event.handler.version}</version>
@@ -141,6 +147,12 @@
                 <groupId>org.wso2.carbon.identity.workflow.impl.bps</groupId>
                 <artifactId>org.wso2.carbon.identity.workflow.impl</artifactId>
                 <version>${identity.workflow.impl.bps.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.mgt</artifactId>
+                <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -516,6 +528,35 @@
                 <artifactId>org.wso2.carbon.identity.api.server.idv.provider.common</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.idle.account.identification.common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
+                <version>${apache.felix.scr.ds.annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jacoco</groupId>
+                <artifactId>org.jacoco.agent</artifactId>
+                <classifier>runtime</classifier>
+                <version>${jacoco.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>${testng.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2database.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -598,7 +639,7 @@
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
-        <identity.governance.version>1.8.23</identity.governance.version>
+        <identity.governance.version>1.8.49</identity.governance.version>
         <carbon.identity.framework.version>5.25.198</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
@@ -614,6 +655,7 @@
         <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.4.21</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
         <org.wso2.carbon.event.publisher.version>5.2.15</org.wso2.carbon.event.publisher.version>
         <identity.branding.preference.management.version>1.0.4</identity.branding.preference.management.version>
+        <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
@@ -624,6 +666,11 @@
         </org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
+
+        <!-- Unit test versions -->
+        <testng.version>6.9.10</testng.version>
+        <jacoco.version>0.8.2</jacoco.version>
+        <h2database.version>2.1.210</h2database.version>
     </properties>
 
     <modules>
