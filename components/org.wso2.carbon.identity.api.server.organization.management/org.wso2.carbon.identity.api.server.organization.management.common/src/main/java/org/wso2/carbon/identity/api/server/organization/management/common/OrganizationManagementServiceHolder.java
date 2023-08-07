@@ -43,7 +43,7 @@ public class OrganizationManagementServiceHolder {
     /**
      * Get OrgApplicationManager OSGi service.
      *
-     * @return OrgApplicationManager
+     * @return OrgApplicationManager.
      */
     public OrgApplicationManager getOrgApplicationManager() {
 
@@ -63,7 +63,7 @@ public class OrganizationManagementServiceHolder {
     /**
      * Get OrganizationManager OSGi service.
      *
-     * @return OrganizationManager
+     * @return OrganizationManager.
      */
     public OrganizationManager getOrganizationManager() {
 
@@ -73,7 +73,7 @@ public class OrganizationManagementServiceHolder {
     /**
      * Set OrganizationManager OSGi service.
      *
-     * @param organizationManager IdentityProviderManager.
+     * @param organizationManager OrganizationManager.
      */
     public void setOrganizationManager(OrganizationManager organizationManager) {
 

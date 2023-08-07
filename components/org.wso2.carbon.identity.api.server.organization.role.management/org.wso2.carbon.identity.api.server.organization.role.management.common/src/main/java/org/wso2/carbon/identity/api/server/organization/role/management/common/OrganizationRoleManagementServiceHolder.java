@@ -44,7 +44,7 @@ public class OrganizationRoleManagementServiceHolder {
     /**
      * Get RoleManager OSGi service.
      *
-     * @return RoleManager
+     * @return RoleManager.
      */
     public RoleManager getRoleManager() {
 
@@ -62,7 +62,7 @@ public class OrganizationRoleManagementServiceHolder {
     }
 
     /**
-     * Method to get the organization user resident resolver osgi service.
+     * Method to get the organization user resident resolver OSGi service.
      *
      * @return OrganizationUserResidentResolverService.
      */
@@ -72,7 +72,7 @@ public class OrganizationRoleManagementServiceHolder {
     }
 
     /**
-     * Set OrganizationUserResidentResolverService osgi service.
+     * Set OrganizationUserResidentResolverService OSGi service.
      *
      * @param organizationUserResidentResolverService OrganizationUserResidentResolverService.
      */
