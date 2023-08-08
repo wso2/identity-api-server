@@ -1,12 +1,12 @@
 openapi: 3.0.0
 info:
   version: 'v1'
-  title: 'Private CIAM Cloud - Organizational Role Management'
-  description: 'This is the RESTful API for managing organizational roles in CIAM Cloud. 
+  title: 'WSO2 Identity Server - Organizational Role Management'
+  description: 'This is the RESTful API for managing organizational roles in WSO2 Identity Server. 
   This API allows users to create, update, retrieve and delete organization roles.'
   contact:
     name: WSO2
-    url: 'https://wso2.com/ciam-suite/private-ciam-cloud/b2b-ciam'
+    url: 'http://wso2.com/products/identity-server/'
     email: iam-dev@wso2.org
   license:
     name: Apache 2.0
