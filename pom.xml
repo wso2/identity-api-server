@@ -699,6 +699,7 @@
         <module>components/org.wso2.carbon.identity.api.server.extension.management</module>
         <module>components/org.wso2.carbon.identity.api.server.admin.advisory.management</module>
         <module>components/org.wso2.carbon.identity.api.server.idv.provider</module>
+        <module>components/org.wso2.carbon.identity.api.idle.account.identification</module>
     </modules>
 
 </project>

@@ -24,7 +24,6 @@ package org.wso2.carbon.identity.api.idle.account.identification.common.util;
 public class IdleAccountIdentificationConstants {
 
     public static final String INACTIVE_USER_MANAGEMENT_SERVICE_ERROR_PREFIX = "IDLE_ACC-";
-    public static final String CORRELATION_ID = "Correlation-ID";
 
     public static final String DATE_INACTIVE_AFTER = "inactiveAfter";
     public static final String DATE_EXCLUDE_BEFORE = "excludeBefore";

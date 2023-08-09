@@ -44,14 +44,13 @@ import static org.wso2.carbon.identity.api.idle.account.identification.common.ut
 import static org.wso2.carbon.identity.api.idle.account.identification.common.util.IdleAccountIdentificationConstants.DATE_FORMAT_REGEX;
 import static org.wso2.carbon.identity.api.idle.account.identification.common.util.IdleAccountIdentificationConstants.DATE_INACTIVE_AFTER;
 import static org.wso2.carbon.identity.api.idle.account.identification.common.util.IdleAccountIdentificationConstants.ErrorMessage;
-import static org.wso2.carbon.identity.api.idle.account.identification.common.util.Utils.getCorrelation;
 
 /**
  * Calls internal osgi services to perform idle account identification management related operations.
  */
 public class InactiveUsersManagementApiService {
 
-    private static final Log LOGGER = LogFactory.getLog(InactiveUsersManagementApiService.class);
+    private static final Log LOG = LogFactory.getLog(InactiveUsersManagementApiService.class);
 
     /**
      * Get inactive users.
@@ -91,7 +90,7 @@ public class InactiveUsersManagementApiService {
     private void validateDates(String inactiveAfter, String excludeBefore) throws
             IdleAccountIdentificationClientException {
 
-        // Check if the required parameter ''inactiveAfter' is present.
+        // Check if the required parameter 'inactiveAfter' is present.
         if (StringUtils.isEmpty(inactiveAfter)) {
             ErrorMessage error = ErrorMessage.ERROR_REQUIRED_PARAMETER_MISSING;
             throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
@@ -180,12 +179,11 @@ public class InactiveUsersManagementApiService {
         ErrorResponse errorResponse;
         Response.Status status;
         if (exception instanceof IdleAccountIdentificationClientException) {
-            errorResponse = getErrorBuilder(errorEnum, data).build(LOGGER, exception.getMessage());
+            errorResponse = getErrorBuilder(errorEnum, data).build(LOG, exception.getMessage());
             if (exception.getErrorCode() != null) {
                 errorResponse.setCode(exception.getErrorCode());
             }
             errorResponse.setDescription(exception.getMessage());
-            errorResponse.setRef(getCorrelation());
             if (StringUtils.isNotEmpty(exception.getDescription())) {
                 errorResponse.setMessage(exception.getMessage());
                 errorResponse.setDescription(exception.getDescription());
@@ -196,16 +194,14 @@ public class InactiveUsersManagementApiService {
                 status = Response.Status.BAD_REQUEST;
             }
         } else if (exception instanceof IdleAccountIdentificationServerException) {
-            errorResponse = getErrorBuilder(errorEnum, data).build(LOGGER, exception, errorEnum.getDescription());
+            errorResponse = getErrorBuilder(errorEnum, data).build(LOG, exception, errorEnum.getDescription());
             if (exception.getErrorCode() != null) {
                 errorResponse.setCode(exception.getErrorCode());
             }
             errorResponse.setDescription(exception.getMessage());
-            errorResponse.setRef(getCorrelation());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
-            errorResponse = getErrorBuilder(errorEnum, data).build(LOGGER, exception, errorEnum.getDescription());
-            errorResponse.setRef(getCorrelation());
+            errorResponse = getErrorBuilder(errorEnum, data).build(LOG, exception, errorEnum.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
 

@@ -29,7 +29,7 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
  */
 public class ContextLoader {
 
-    private static final Log log = LogFactory.getLog(ContextLoader.class);
+    private static final Log LOG = LogFactory.getLog(ContextLoader.class);
 
     /**
      * Retrieves loaded tenant domain from carbon context.
