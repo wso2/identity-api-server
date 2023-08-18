@@ -81,5 +81,10 @@
             <artifactId>org.wso2.carbon.identity.auth.attribute.handler</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.application.role.mgt</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

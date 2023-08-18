@@ -42,9 +42,13 @@ import java.io.File;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.PaginatedAppRoleResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
+import org.wso2.carbon.identity.api.server.application.management.v1.Role;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleCreationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RolePatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
@@ -90,6 +94,30 @@ public class ApplicationsApi  {
     public Response changeApplicationOwner(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "" ) @Valid ApplicationOwner applicationOwner) {
 
         return delegate.changeApplicationOwner(applicationId,  applicationOwner );
+    }
+
+    @Valid
+    @POST
+    @Path("/{applicationId}/roles")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Create an application role with collected permissions ", notes = "Create a new application role with or without permissions <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br> <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = Role.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Roles", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Successfully created.", response = Role.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response createAppRole(@ApiParam(value = "Application ID",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Role name and Permissions to add to the role" ) @Valid RoleCreationModel roleCreationModel) {
+
+        return delegate.createAppRole(applicationId,  roleCreationModel );
     }
 
     @Valid
@@ -140,6 +168,29 @@ public class ApplicationsApi  {
     public Response createApplicationTemplate(@ApiParam(value = "This represents the application template to be created." ,required=true) @Valid ApplicationTemplateModel applicationTemplateModel) {
 
         return delegate.createApplicationTemplate(applicationTemplateModel );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/{applicationId}/roles/{roleId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete an application role ", notes = "Delete a role <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br> <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Roles", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Delete Success", response = Void.class),
+        @ApiResponse(code = 400, message = "", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteAppRole(@ApiParam(value = "Application ID",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Role ID",required=true) @PathParam("roleId") String roleId) {
+
+        return delegate.deleteAppRole(applicationId,  roleId );
     }
 
     @Valid
@@ -383,6 +434,29 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/{applicationId}/roles")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get all roles of the application ", notes = "Get all roles of the application <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/view <br> <b>Scope required:</b> <br>     * internal_application_mgt_view ", response = PaginatedAppRoleResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Roles", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = PaginatedAppRoleResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getAllAppRoles(@ApiParam(value = "Application ID",required=true) @PathParam("applicationId") String applicationId,     @Valid@ApiParam(value = "Previous Cursor")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Next Cursor")  @QueryParam("after") String after) {
+
+        return delegate.getAllAppRoles(applicationId,  before,  after );
+    }
+
+    @Valid
+    @GET
     @Path("/templates")
     
     @Produces({ "application/json" })
@@ -432,6 +506,30 @@ public class ApplicationsApi  {
     public Response getAllApplications(    @Valid @Min(1)@ApiParam(value = "Maximum number of records to return. ", defaultValue="30") @DefaultValue("30")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ", defaultValue="0") @DefaultValue("0")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew', and 'eq' operations with 'and', 'or' logical operators. Please note that 'and' and 'or' operators in filters follow the general precedence of logical operators ex: A and B or C and D = (A and B) or (C and D)). Currently supports only filtering based on the 'name', the 'clientId', and the 'issuer' attributes.  /applications?filter=name+eq+user_portal <br> /applications?filter=name+co+prod+or+clientId+co+123 ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Define the order in which the retrieved records should be sorted. _This parameter is not supported yet._ ", allowableValues="ASC, DESC")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. _This parameter is not supported yet._ ")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Specifies the required parameters in the response. Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', and 'issuer' attributes.  /applications?attributes=advancedConfigurations,templateId,clientId ")  @QueryParam("attributes") String attributes) {
 
         return delegate.getAllApplications(limit,  offset,  filter,  sortOrder,  sortBy,  attributes );
+    }
+
+    @Valid
+    @GET
+    @Path("/{applicationId}/roles/{roleId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get role and associated permissions ", notes = "Get a role of the application and its associated permissions<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br> <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = Role.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Roles", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = Role.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getAppRole(@ApiParam(value = "Application ID",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Role ID",required=true) @PathParam("roleId") String roleId) {
+
+        return delegate.getAppRole(applicationId,  roleId );
     }
 
     @Valid
@@ -836,6 +934,29 @@ public class ApplicationsApi  {
     public Response importApplicationForUpdate(@Multipart(value = "file", required = false) InputStream fileInputStream,@Multipart(value = "file" , required = false) Attachment fileDetail) {
 
         return delegate.importApplicationForUpdate(fileInputStream, fileDetail );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/{applicationId}/roles/{roleId}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update an application role ", notes = "Update role name and permissions <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br> <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = Role.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Roles", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = Role.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchAppRole(@ApiParam(value = "Application ID",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Role ID",required=true) @PathParam("roleId") String roleId, @ApiParam(value = "" ) @Valid RolePatchModel rolePatchModel) {
+
+        return delegate.patchAppRole(applicationId,  roleId,  rolePatchModel );
     }
 
     @Valid

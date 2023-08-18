@@ -20,6 +20,7 @@
 
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService"/>
+    <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ApplicationRoleManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.impl.ApplicationsApiServiceImpl"/>
 
     <bean id="applicationManagementServiceHolderBean"
@@ -50,6 +51,10 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
         <property name="realmService" ref="realmServiceFactoryBean"/>
     </bean>
+    <bean id="applicationRoleMgtServiceHolderBean"
+          class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
+        <property name="applicationRoleManagerService" ref="applicationRoleManagementServiceFactoryBean"/>
+    </bean>
 
     <bean id="applicationManagementServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.ApplicationManagementOSGiServiceFactory"/>
@@ -65,5 +70,8 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.CORSMgtOGSiServiceFactory"/>
     <bean id="realmServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.RealmServiceOSGIServiceFactory">
+    </bean>
+    <bean id="applicationRoleManagementServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.application.management.common.factory.ApplicationRoleMgtOSGiServiceFactory">
     </bean>
 </beans>

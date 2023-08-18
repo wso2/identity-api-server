@@ -1955,7 +1955,261 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
+  '/applications/{applicationId}/roles':
+    post:
+      tags:
+        - Application Roles
+      summary: |
+        Create an application role with collected permissions
+      description: >
+        Create a new application role with or without permissions <br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/applicationmgt/update <br>
+        <b>Scope required:</b> <br>
+            * internal_application_mgt_update
+      operationId: createAppRole
+      parameters:
+        - name: applicationId
+          in: path
+          description: Application ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleCreationModel'
+        description: Role name and Permissions to add to the role
+      responses:
+        201:
+          description: Successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags:
+        - Application Roles
+      summary: |
+        Get all roles of the application
+      description: >
+        Get all roles of the application <br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/applicationmgt/view <br>
+        <b>Scope required:</b> <br>
+            * internal_application_mgt_view
+      operationId: getAllAppRoles
+      parameters:
+        - name: applicationId
+          in: path
+          description: Application ID
+          required: true
+          schema:
+            type: string
+        - name: before
+          in: query
+          description: Previous Cursor
+          schema:
+            type: string
+        - name: after
+          in: query
+          description: Next Cursor
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAppRoleResponse'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/applications/{applicationId}/roles/{roleId}':
+    get:
+      tags:
+        - Application Roles
+      summary: |
+        Get role and associated permissions
+      description: >
+        Get a role of the application and its associated permissions<br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/applicationmgt/update <br>
+        <b>Scope required:</b> <br>
+            * internal_application_mgt_update
+      operationId: getAppRole
+      parameters:
+        - name: applicationId
+          in: path
+          description: Application ID
+          required: true
+          schema:
+            type: string
+        - name: roleId
+          in: path
+          description: Role ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Application Roles
+      summary: |
+        Update an application role
+      description: >
+        Update role name and permissions <br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/applicationmgt/update <br>
+        <b>Scope required:</b> <br>
+            * internal_application_mgt_update
+      operationId: patchAppRole
+      parameters:
+        - name: applicationId
+          in: path
+          description: Application ID
+          required: true
+          schema:
+            type: string
+        - name: roleId
+          in: path
+          description: Role ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolePatchModel'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Application Roles
+      summary: |
+        Delete an application role
+      description: >
+        Delete a role <br>
+        <b>Permission required:</b> <br>
+            * /permission/admin/manage/identity/applicationmgt/update <br>
+        <b>Scope required:</b> <br>
+            * internal_application_mgt_update
+      operationId: deleteAppRole
+      parameters:
+        - name: applicationId
+          in: path
+          description: Application ID
+          required: true
+          schema:
+            type: string
+        - name: roleId
+          in: path
+          description: Role ID
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Delete Success
+        400:
+          $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /applications/templates:
     get:
       tags:
@@ -3507,7 +3761,82 @@ components:
           example: "85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
       required:
         - id
-
+    RoleCreationModel:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: administrator
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+    Role:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "85e3f4b8-0d22-4181-b1e3-1651f71b88bd"
+        name:
+          type: string
+          example: administrator
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+    Permission:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: 'deploy_component'
+        displayName:
+          type: string
+          example: "Deploy Component"
+    PaginatedAppRoleResponse:
+      type: object
+      required:
+        - links
+      properties:
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaginationLink'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+    PaginationLink:
+      type: object
+      properties:
+        rel:
+          type: string
+          example: before
+        href:
+          type: string
+          example: /t/{tenant-name}/applications/{application-id}/roles?after=NDoy
+    RolePatchModel:
+      type: object
+      required:
+        - name
+        - addedPermissions
+        - removedPermissions
+      properties:
+        name:
+          type: string
+          example: uuid
+        addedPermissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+        removedPermissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
     Error:
       type: object
       properties:
