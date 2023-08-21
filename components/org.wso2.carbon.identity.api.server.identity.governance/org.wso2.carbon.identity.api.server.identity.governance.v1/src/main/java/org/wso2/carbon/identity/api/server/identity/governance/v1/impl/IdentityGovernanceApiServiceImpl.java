@@ -69,10 +69,11 @@ public class IdentityGovernanceApiServiceImpl implements IdentityGovernanceApiSe
     }
 
     @Override
-    public Response patchConnectorsOfCategory(String categoryId, MultipleConnectorsPatchReq multipleConnectorsPatchReq) {
+    public Response patchConnectorsOfCategory(String categoryId,
+                                              MultipleConnectorsPatchReq multipleConnectorsPatchReq) {
 
-        // TODO: do some magic!
-        return Response.ok().entity("magic!").build();
+        identityGovernanceService.updateGovernanceConnectorProperties(categoryId, multipleConnectorsPatchReq);
+        return Response.ok().build();
     }
 
     @Override
