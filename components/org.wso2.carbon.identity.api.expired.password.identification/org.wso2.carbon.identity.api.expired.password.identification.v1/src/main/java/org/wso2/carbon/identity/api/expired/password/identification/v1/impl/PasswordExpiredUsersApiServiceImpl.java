@@ -26,7 +26,7 @@ import org.wso2.carbon.identity.api.expired.password.identification.v1.core.Pass
 import javax.ws.rs.core.Response;
 
 /**
- * iuhiuhu
+ * Implementation of the password expired User retrieval API Service.
  */
 public class PasswordExpiredUsersApiServiceImpl implements PasswordExpiredUsersApiService {
 
@@ -34,11 +34,11 @@ public class PasswordExpiredUsersApiServiceImpl implements PasswordExpiredUsersA
     private PasswordExpiredUsersManagementApiService passwordExpiredUsersManagementApiService;
 
     @Override
-    public Response getPasswordExpiredUsers(String inactiveAfter, String excludeBefore) {
+    public Response getPasswordExpiredUsers(String expiredAfter, String excludeAfter) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         return Response.ok().entity(passwordExpiredUsersManagementApiService.getPasswordExpiredUsers(
-                inactiveAfter, excludeBefore, tenantDomain)).build();
+                expiredAfter, excludeAfter, tenantDomain)).build();
     }
 }
 

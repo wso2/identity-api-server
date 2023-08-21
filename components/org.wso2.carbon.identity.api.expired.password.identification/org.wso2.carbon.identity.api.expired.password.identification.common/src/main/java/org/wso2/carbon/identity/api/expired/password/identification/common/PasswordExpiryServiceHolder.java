@@ -19,8 +19,9 @@
 package org.wso2.carbon.identity.api.expired.password.identification.common;
 
 import org.wso2.carbon.identity.password.expiry.services.ExpiredPasswordIdentificationService;
+
 /**
- * Service holder class for idle account identification.
+ * Service holder class for password expired users identification.
  */
 public class PasswordExpiryServiceHolder {
 
@@ -39,11 +40,11 @@ public class PasswordExpiryServiceHolder {
     /**
      * Set ExpiredPasswordIdentificationService OSGi service.
      *
-     * @param idleAccountIdentificationService ExpiredPassword identification Service.
+     * @param expiredPasswordIdentificationService ExpiredPassword identification Service.
      */
     public static void setExpiredPasswordIdentificationService(
-            ExpiredPasswordIdentificationService idleAccountIdentificationService) {
+            ExpiredPasswordIdentificationService expiredPasswordIdentificationService) {
 
-        PasswordExpiryServiceHolder.expiredPasswordIdentificationService = idleAccountIdentificationService;
+        PasswordExpiryServiceHolder.expiredPasswordIdentificationService = expiredPasswordIdentificationService;
     }
 }

@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.67</version>
+    <version>1.2.69-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -138,6 +138,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.governance</groupId>
+                <artifactId>org.wso2.carbon.identity.idle.account.identification</artifactId>
+                <version>${identity.governance.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.event.handler.notification</groupId>
                 <artifactId>org.wso2.carbon.email.mgt</artifactId>
                 <version>${identity.event.handler.version}</version>
@@ -153,6 +159,12 @@
                 <groupId>org.wso2.carbon.identity.workflow.impl.bps</groupId>
                 <artifactId>org.wso2.carbon.identity.workflow.impl</artifactId>
                 <version>${identity.workflow.impl.bps.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.mgt</artifactId>
+                <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -557,6 +569,35 @@
                 <artifactId>org.wso2.carbon.identity.api.expired.password.identification.common</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.idle.account.identification.common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
+                <version>${apache.felix.scr.ds.annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jacoco</groupId>
+                <artifactId>org.jacoco.agent</artifactId>
+                <classifier>runtime</classifier>
+                <version>${jacoco.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>${testng.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2database.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -667,7 +708,7 @@
         </org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
-
+      
         <!-- Organization management service Version -->
         <org.wso2.carbon.identity.organization.management.version>1.3.50
         </org.wso2.carbon.identity.organization.management.version>
@@ -706,6 +747,7 @@
         <module>components/org.wso2.carbon.identity.api.server.idv.provider</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.management</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.role.management</module>
+        <module>components/org.wso2.carbon.identity.api.idle.account.identification</module>
         <module>components/org.wso2.carbon.identity.api.expired.password.identification</module>
     </modules>
 

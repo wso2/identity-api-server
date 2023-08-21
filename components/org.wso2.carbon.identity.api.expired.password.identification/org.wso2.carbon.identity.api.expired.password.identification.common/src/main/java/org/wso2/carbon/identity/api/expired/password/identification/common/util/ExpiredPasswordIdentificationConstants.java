@@ -19,14 +19,13 @@
 package org.wso2.carbon.identity.api.expired.password.identification.common.util;
 
 /**
- * Inactive users management related constant class.
+ * Password expired users identification related constant class.
  */
 public class ExpiredPasswordIdentificationConstants {
 
     public static final String EXPIRED_PASSWORD_IDENTIFICATION_MANAGEMENT_SERVICE_ERROR_PREFIX = "PASS-EXP_ACC-";
-
     public static final String DATE_EXPIRED_AFTER = "expiredAfter";
-    public static final String DATE_EXCLUDE_BEFORE = "excludeBefore";
+    public static final String DATE_EXCLUDE_AFTER = "excludeAfter";
     public static final String DATE_FORMAT_REGEX = "^\\d{4}-\\d{2}-\\d{2}$";
 
     /**
@@ -48,9 +47,9 @@ public class ExpiredPasswordIdentificationConstants {
                    "The date provided for %s parameter is invalid"),
 
         // Server errors 650xx.
-        ERROR_RETRIEVING_INACTIVE_USERS("65001",
-                "Error while retrieving inactive users.",
-                "Error while retrieving inactive users for organization: %s.");
+        ERROR_RETRIEVING_PASSWORD_EXPIRED_USERS("65001",
+                "Error while retrieving password expired users.",
+                "Error while retrieving password expired users for organization: %s.");
 
         private final String code;
         private final String message;

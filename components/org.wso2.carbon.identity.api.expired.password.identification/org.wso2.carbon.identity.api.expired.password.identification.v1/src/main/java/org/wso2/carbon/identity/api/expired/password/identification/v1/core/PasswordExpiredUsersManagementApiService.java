@@ -40,68 +40,68 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.expired.password.identification.common.util.ExpiredPasswordIdentificationConstants.DATE_EXCLUDE_BEFORE;
+import static org.wso2.carbon.identity.api.expired.password.identification.common.util.ExpiredPasswordIdentificationConstants.DATE_EXCLUDE_AFTER;
 import static org.wso2.carbon.identity.api.expired.password.identification.common.util.ExpiredPasswordIdentificationConstants.DATE_EXPIRED_AFTER;
 import static org.wso2.carbon.identity.api.expired.password.identification.common.util.ExpiredPasswordIdentificationConstants.DATE_FORMAT_REGEX;
 
 /**
- * Calls internal osgi services to perform idle account identification management related operations.
+ * Calls internal osgi services to perform password expired user identification management related operations.
  */
 public class PasswordExpiredUsersManagementApiService {
 
     private static final Log LOG = LogFactory.getLog(PasswordExpiredUsersManagementApiService.class);
 
     /**
-     * Get inactive users.
+     * Get password expired users.
      *
-     * @param inactiveAfter Latest active date of login.
-     * @param excludeBefore Date to exclude the oldest inactive users.
+     * @param expiredAfter The date after which passwords will expire.
+     * @param excludeAfter The date after which should be excluded.
      * @param tenantDomain  Tenant domain.
-     * @return  List of inactive users.
+     * @return  List of password expired users.
      */
     public List<PasswordExpiredUser> getPasswordExpiredUsers(
-            String inactiveAfter, String excludeBefore, String tenantDomain) {
+            String expiredAfter, String excludeAfter, String tenantDomain) {
 
-        List<PasswordExpiredUserModel> inactiveUsers = null;
+        List<PasswordExpiredUserModel> passwordExpiredUsers = null;
         try {
-            validateDates(inactiveAfter, excludeBefore);
-            LocalDateTime inactiveAfterDate = convertToDateObject(inactiveAfter, DATE_EXPIRED_AFTER);
-            LocalDateTime excludeBeforeDate = convertToDateObject(excludeBefore, DATE_EXCLUDE_BEFORE);
-            if (excludeBeforeDate == null) {
-                inactiveUsers = PasswordExpiryServiceHolder.getExpiredPasswordIdentificationService().
-                        getPasswordExpiredUsersFromSpecificDate(inactiveAfterDate, tenantDomain);
+            validateDates(expiredAfter, excludeAfter);
+            LocalDateTime expiredAfterDate = convertToDateObject(expiredAfter, DATE_EXPIRED_AFTER);
+            LocalDateTime excludeAfterDate = convertToDateObject(excludeAfter, DATE_EXCLUDE_AFTER);
+            if (excludeAfterDate == null) {
+                passwordExpiredUsers = PasswordExpiryServiceHolder.getExpiredPasswordIdentificationService().
+                        getPasswordExpiredUsersFromSpecificDate(expiredAfterDate, tenantDomain);
             } else {
-                inactiveUsers = PasswordExpiryServiceHolder.getExpiredPasswordIdentificationService().
-                        getPasswordExpiredUsersBetweenSpecificDates(inactiveAfterDate, excludeBeforeDate, tenantDomain);
+                passwordExpiredUsers = PasswordExpiryServiceHolder.getExpiredPasswordIdentificationService().
+                        getPasswordExpiredUsersBetweenSpecificDates(expiredAfterDate, excludeAfterDate, tenantDomain);
             }
-            return buildResponse(inactiveUsers);
+            return buildResponse(passwordExpiredUsers);
         } catch (ExpiredPasswordIdentificationException e) {
-            throw handleIdleAccIdentificationException(e,
-                    ErrorMessage.ERROR_RETRIEVING_INACTIVE_USERS, tenantDomain);
+            throw handleExpiredPasswordIdentificationException(e,
+                    ErrorMessage.ERROR_RETRIEVING_PASSWORD_EXPIRED_USERS, tenantDomain);
         }
     }
 
     /**
      * Validate the dates.
      *
-     * @param inactiveAfter InactiveAfter date.
-     * @param excludeBefore ExcludeBefore date.
-     * @throws ExpiredPasswordIdentificationClientException IdleAccIdentificationClientException.
+     * @param expiredAfter ExpiredAfter date.
+     * @param excludeAfter ExcludeAfter date.
+     * @throws ExpiredPasswordIdentificationClientException ExpiredPasswordIdentificationClientException.
      */
-    private void validateDates(String inactiveAfter, String excludeBefore) throws
+    private void validateDates(String expiredAfter, String excludeAfter) throws
             ExpiredPasswordIdentificationClientException {
 
-        // Check if the required parameter 'inactiveAfter' is present.
-        if (StringUtils.isEmpty(inactiveAfter)) {
+        // Check if the required parameter 'expiredAfter' is present.
+        if (StringUtils.isEmpty(expiredAfter)) {
             ErrorMessage error = ErrorMessage.ERROR_REQUIRED_PARAMETER_MISSING;
             throw new ExpiredPasswordIdentificationClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription(), DATE_EXPIRED_AFTER));
         }
 
         // Validate the date format.
-        validateDateFormat(inactiveAfter, DATE_EXPIRED_AFTER);
-        if (StringUtils.isNotEmpty(excludeBefore)) {
-            validateDateFormat(excludeBefore, DATE_EXCLUDE_BEFORE);
+        validateDateFormat(expiredAfter, DATE_EXPIRED_AFTER);
+        if (StringUtils.isNotEmpty(excludeAfter)) {
+            validateDateFormat(excludeAfter, DATE_EXCLUDE_AFTER);
         }
     }
 
@@ -110,7 +110,7 @@ public class PasswordExpiredUsersManagementApiService {
      *
      * @param dateString Date as a string.
      * @param dateType   Date type.
-     * @throws ExpiredPasswordIdentificationClientException IdleAccIdentificationClientException.
+     * @throws ExpiredPasswordIdentificationClientException ExpiredPasswordIdentificationClientException.
      */
     private void validateDateFormat(String dateString, String dateType) throws
             ExpiredPasswordIdentificationClientException {
@@ -128,8 +128,8 @@ public class PasswordExpiredUsersManagementApiService {
      *
      * @param dateString Date as a string.
      * @param dateType   Date type.
-     * @throws ExpiredPasswordIdentificationClientException IdleAccIdentificationClientException.
-     * @return List of inactive users.
+     * @throws ExpiredPasswordIdentificationClientException ExpiredPasswordIdentificationClientException.
+     * @return LocalDateTime of the date.
      */
     private LocalDateTime convertToDateObject(String dateString, String dateType)
             throws ExpiredPasswordIdentificationClientException {
@@ -147,35 +147,35 @@ public class PasswordExpiredUsersManagementApiService {
     }
 
     /**
-     * Build the InactiveUser list.
+     * Build the password expired users list.
      *
-     * @param inactiveUserModels List of inactive users.
-     * @return List of inactive users.
+     * @param passwordExpiredUserModels List of password expired users.
+     * @return List of password expired users.
      */
-    private List<PasswordExpiredUser> buildResponse(List<PasswordExpiredUserModel> inactiveUserModels) {
+    private List<PasswordExpiredUser> buildResponse(List<PasswordExpiredUserModel> passwordExpiredUserModels) {
 
-        List<PasswordExpiredUser> inactiveUserList = new ArrayList<>();
-        for (PasswordExpiredUserModel inactiveUserModel : inactiveUserModels) {
-            PasswordExpiredUser inactiveUser = new PasswordExpiredUser();
-            inactiveUser.setUsername(inactiveUserModel.getUsername());
-            inactiveUser.setUserStoreDomain(inactiveUserModel.getUserStoreDomain());
-            inactiveUser.setUserId(inactiveUserModel.getUserId());
-            inactiveUserList.add(inactiveUser);
+        List<PasswordExpiredUser> passwordExpiredUsers = new ArrayList<>();
+        for (PasswordExpiredUserModel passwordExpiredUserModel : passwordExpiredUserModels) {
+            PasswordExpiredUser passwordExpiredUser = new PasswordExpiredUser();
+            passwordExpiredUser.setUsername(passwordExpiredUserModel.getUsername());
+            passwordExpiredUser.setUserStoreDomain(passwordExpiredUserModel.getUserStoreDomain());
+            passwordExpiredUser.setUserId(passwordExpiredUserModel.getUserId());
+            passwordExpiredUsers.add(passwordExpiredUser);
         }
-        return inactiveUserList;
+        return passwordExpiredUsers;
     }
 
     /**
-     * Handle IdleAccIdentificationException.
+     * Handle ExpiredPasswordIdentificationException.
      *
-     * @param exception IdleAccIdentificationException.
+     * @param exception ExpiredPasswordIdentificationException.
      * @param errorEnum Error message.
      * @param data      Context data.
      * @return APIError.
      */
-    private APIError handleIdleAccIdentificationException(ExpiredPasswordIdentificationException exception,
-                                                          ErrorMessage errorEnum,
-                                                          String data) {
+    private APIError handleExpiredPasswordIdentificationException(ExpiredPasswordIdentificationException exception,
+                                                                  ErrorMessage errorEnum,
+                                                                  String data) {
 
         ErrorResponse errorResponse;
         Response.Status status;

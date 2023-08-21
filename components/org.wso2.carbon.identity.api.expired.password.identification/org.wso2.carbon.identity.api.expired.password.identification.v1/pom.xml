@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.expired.password.identification</artifactId>
-        <version>1.2.67</version>
+        <version>1.2.69-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -153,6 +153,7 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.expired.password.identification.common</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-lang.wso2</groupId>
@@ -168,6 +169,7 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.governance</groupId>
             <artifactId>org.wso2.carbon.identity.password.expiry</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>

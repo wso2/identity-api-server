@@ -32,5 +32,5 @@ import javax.ws.rs.core.Response;
 
 public interface PasswordExpiredUsersApiService {
 
-      public Response getPasswordExpiredUsers(String expiredAfter, String excludeBefore);
+      public Response getPasswordExpiredUsers(String expiredAfter, String excludeAfter);
 }
