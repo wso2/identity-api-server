@@ -163,7 +163,8 @@ public class ServerIdentityGovernanceService {
                     .withoutPadding()
                     .encodeToString(connectorConfig.getCategory().getBytes(StandardCharsets.UTF_8));
             if (!categoryId.equals(categoryIdFound)) {
-                throw handleNotFoundError(connectorId, GovernanceConstants.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
+                throw handleMismatchError(connectorId, categoryId,
+                        GovernanceConstants.ErrorMessage.ERROR_CODE_CONNECTOR_CATEGORY_MISMATCH);
             }
 
             return buildConnectorResDTO(connectorConfig);
@@ -320,7 +321,7 @@ public class ServerIdentityGovernanceService {
             IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
-            // Check whether the category ID is accurate.
+            // Check whether the category ID exists.
             CategoryRes category = getGovernanceConnectorCategory(categoryId);
             if (category == null) {
                 throw handleNotFoundError(categoryId, GovernanceConstants.ErrorMessage.ERROR_CODE_CATEGORY_NOT_FOUND);
@@ -332,7 +333,7 @@ public class ServerIdentityGovernanceService {
             for (ConnectorReq connectorReq : multipleConnectorsPatchReq.getConnectors()) {
                 String connectorId = connectorReq.getId();
 
-                // Check whether the connector ID is accurate.
+                // Check whether the connector ID exists.
                 ConnectorRes connector = getGovernanceConnector(categoryId, connectorId);
                 if (connector == null) {
                     throw handleNotFoundError(connectorId,
@@ -505,6 +506,16 @@ public class ServerIdentityGovernanceService {
         Response.Status status = Response.Status.NOT_FOUND;
         ErrorResponse errorResponse =
                 getErrorBuilder(errorMessage, resourceId).build(LOG, errorMessage.getDescription());
+
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleMismatchError(String connectorId, String categoryId,
+                                         GovernanceConstants.ErrorMessage errorMessage) {
+
+        Response.Status status = Response.Status.NOT_FOUND;
+        ErrorResponse errorResponse =
+                getErrorBuilder(errorMessage, connectorId, categoryId).build(LOG, errorMessage.getDescription());
 
         return new APIError(status, errorResponse);
     }
