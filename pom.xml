@@ -193,6 +193,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
+                <artifactId>org.wso2.carbon.identity.api.resource.mgt</artifactId>
+                <version>${carbon.identity.framework.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.application.mgt</artifactId>
                 <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
@@ -391,6 +397,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.tenant.management.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.api.resource.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -775,6 +787,7 @@
         <module>components/org.wso2.carbon.identity.api.idle.account.identification</module>
         <module>components/org.wso2.carbon.identity.api.expired.password.identification</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.user.invitation.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.api.resource</module>
     </modules>
 
 </project>
