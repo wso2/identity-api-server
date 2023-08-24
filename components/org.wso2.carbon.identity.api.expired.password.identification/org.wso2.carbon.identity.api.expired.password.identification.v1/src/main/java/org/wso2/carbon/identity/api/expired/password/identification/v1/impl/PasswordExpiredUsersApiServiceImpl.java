@@ -41,4 +41,3 @@ public class PasswordExpiredUsersApiServiceImpl implements PasswordExpiredUsersA
                 expiredAfter, excludeAfter, tenantDomain)).build();
     }
 }
-
