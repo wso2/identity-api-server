@@ -67,9 +67,7 @@ public class GovernanceConstants {
         ERROR_CODE_INCORRECT_CONNECTOR_NAME("50011", "Invalid connector name",
                 "Unable to find a connector with the name %s."),
         ERROR_CODE_UNSUPPORTED_PROPERTY_NAME("50012", "Unsupported property is requested.",
-                "The property %s is not supported by this API."),
-        ERROR_CODE_CONNECTOR_CATEGORY_MISMATCH("50013", "Connector category mismatch.",
-                "The connector %s is not found in the category %s.");
+                "The property %s is not supported by this API.");
 
         private final String code;
         private final String message;

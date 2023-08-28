@@ -163,8 +163,7 @@ public class ServerIdentityGovernanceService {
                     .withoutPadding()
                     .encodeToString(connectorConfig.getCategory().getBytes(StandardCharsets.UTF_8));
             if (!categoryId.equals(categoryIdFound)) {
-                throw handleMismatchError(connectorId, categoryId,
-                        GovernanceConstants.ErrorMessage.ERROR_CODE_CONNECTOR_CATEGORY_MISMATCH);
+                throw handleNotFoundError(connectorId, GovernanceConstants.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
             }
 
             return buildConnectorResDTO(connectorConfig);
@@ -506,16 +505,6 @@ public class ServerIdentityGovernanceService {
         Response.Status status = Response.Status.NOT_FOUND;
         ErrorResponse errorResponse =
                 getErrorBuilder(errorMessage, resourceId).build(LOG, errorMessage.getDescription());
-
-        return new APIError(status, errorResponse);
-    }
-
-    private APIError handleMismatchError(String connectorId, String categoryId,
-                                         GovernanceConstants.ErrorMessage errorMessage) {
-
-        Response.Status status = Response.Status.NOT_FOUND;
-        ErrorResponse errorResponse =
-                getErrorBuilder(errorMessage, connectorId, categoryId).build(LOG, errorMessage.getDescription());
 
         return new APIError(status, errorResponse);
     }
