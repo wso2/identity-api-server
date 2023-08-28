@@ -40,11 +40,14 @@ public class ExpiredPasswordIdentificationConstants {
 
         ERROR_DATE_REGEX_MISMATCH("60002",
                   "Invalid date format provided.",
-                  "The value provided for %s parameter is invalid. Date format should be yyyy-mm-dd"),
+                  "The value provided for %s parameter is invalid. Date format should be yyyy-mm-dd."),
 
         ERROR_INVALID_DATE("60003",
                    "Invalid date provided.",
-                   "The date provided for %s parameter is invalid"),
+                   "The date provided for %s parameter is invalid."),
+        PASSWORD_EXPIRY_FEATURE_NOT_ENABLED("60004",
+                "The password expiry feature is not enabled.",
+                "The password expiry feature needs to be enabled to retrieve the password expired users."),
 
         // Server errors 650xx.
         ERROR_RETRIEVING_PASSWORD_EXPIRED_USERS("65001",

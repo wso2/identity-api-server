@@ -57,7 +57,7 @@ public class PasswordExpiredUsersApi  {
         @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getPasswordExpiredUsers(    @Valid@ApiParam(value = "The date after which passwords will expire.")  @QueryParam("expiredAfter") String expiredAfter,     @Valid@ApiParam(value = "The date after which should be excluded.")  @QueryParam("excludeAfter") String excludeAfter) {
+    public Response getPasswordExpiredUsers(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "The date after which passwords will expire.",required=true)  @QueryParam("expiredAfter") String expiredAfter,     @Valid@ApiParam(value = "The date after which should be excluded.")  @QueryParam("excludeAfter") String excludeAfter) {
 
         return delegate.getPasswordExpiredUsers(expiredAfter,  excludeAfter );
     }

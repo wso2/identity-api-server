@@ -26,10 +26,12 @@ import org.wso2.carbon.identity.api.expired.password.identification.common.util.
 import org.wso2.carbon.identity.api.expired.password.identification.v1.model.PasswordExpiredUser;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.application.authentication.framework.exception.PostAuthenticationFailedException;
 import org.wso2.carbon.identity.password.expiry.exceptions.ExpiredPasswordIdentificationClientException;
 import org.wso2.carbon.identity.password.expiry.exceptions.ExpiredPasswordIdentificationException;
 import org.wso2.carbon.identity.password.expiry.exceptions.ExpiredPasswordIdentificationServerException;
 import org.wso2.carbon.identity.password.expiry.models.PasswordExpiredUserModel;
+import org.wso2.carbon.identity.password.expiry.util.PasswordPolicyUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -65,6 +67,7 @@ public class PasswordExpiredUsersManagementApiService {
         List<PasswordExpiredUserModel> passwordExpiredUsers = null;
         try {
             validateDates(expiredAfter, excludeAfter);
+            validatePasswordExpiryFeatureEnabled(tenantDomain);
             LocalDateTime expiredAfterDate = convertToDateObject(expiredAfter, DATE_EXPIRED_AFTER);
             LocalDateTime excludeAfterDate = convertToDateObject(excludeAfter, DATE_EXCLUDE_AFTER);
             if (excludeAfterDate == null) {
@@ -90,13 +93,6 @@ public class PasswordExpiredUsersManagementApiService {
      */
     private void validateDates(String expiredAfter, String excludeAfter) throws
             ExpiredPasswordIdentificationClientException {
-
-        // Check if the required parameter 'expiredAfter' is present.
-        if (StringUtils.isEmpty(expiredAfter)) {
-            ErrorMessage error = ErrorMessage.ERROR_REQUIRED_PARAMETER_MISSING;
-            throw new ExpiredPasswordIdentificationClientException(error.getCode(), error.getMessage(),
-                    String.format(error.getDescription(), DATE_EXPIRED_AFTER));
-        }
 
         // Validate the date format.
         validateDateFormat(expiredAfter, DATE_EXPIRED_AFTER);
@@ -191,6 +187,8 @@ public class PasswordExpiredUsersManagementApiService {
             }
             if (ErrorMessage.ERROR_REQUIRED_PARAMETER_MISSING.getCode().equals(exception.getErrorCode())) {
                 status = Response.Status.NOT_FOUND;
+            } else if (ErrorMessage.PASSWORD_EXPIRY_FEATURE_NOT_ENABLED.getCode().equals(exception.getErrorCode())) {
+                status = Response.Status.METHOD_NOT_ALLOWED;
             } else {
                 status = Response.Status.BAD_REQUEST;
             }
@@ -234,6 +232,26 @@ public class PasswordExpiredUsersManagementApiService {
             return String.format(error.getDescription(), data);
         } else {
             return error.getDescription();
+        }
+    }
+
+    /**
+     * Validate whether password expiry feature is enabled.
+     *
+     * @param tenantDomain  Tenant Domain.
+     * @throws ExpiredPasswordIdentificationException if password expiry feature is not enabled.
+     */
+    private void validatePasswordExpiryFeatureEnabled (String tenantDomain)
+            throws ExpiredPasswordIdentificationException {
+
+        try {
+            if (!PasswordPolicyUtils.isPasswordExpiryEnabled(tenantDomain)) {
+                ErrorMessage error = ErrorMessage.PASSWORD_EXPIRY_FEATURE_NOT_ENABLED;
+                throw new ExpiredPasswordIdentificationClientException(error.getCode(), error.getMessage(),
+                        error.getDescription());
+            }
+        } catch (PostAuthenticationFailedException e) {
+            throw new ExpiredPasswordIdentificationServerException(e);
         }
     }
 }
