@@ -39,15 +39,22 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import java.io.File;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupAssignedRoleResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.PaginatedAppRoleResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
+import org.wso2.carbon.identity.api.server.application.management.v1.Role;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleCreationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RolePatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
+import org.wso2.carbon.identity.api.server.application.management.v1.UserAssignedRoleResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import javax.ws.rs.core.Response;
@@ -57,9 +64,13 @@ public interface ApplicationsApiService {
 
       public Response changeApplicationOwner(String applicationId, ApplicationOwner applicationOwner);
 
+      public Response createAppRole(String applicationId, RoleCreationModel roleCreationModel);
+
       public Response createApplication(ApplicationModel applicationModel, String template);
 
       public Response createApplicationTemplate(ApplicationTemplateModel applicationTemplateModel);
+
+      public Response deleteAppRole(String applicationId, String roleId);
 
       public Response deleteApplication(String applicationId);
 
@@ -83,7 +94,15 @@ public interface ApplicationsApiService {
 
       public Response getAllApplicationTemplates(Integer limit, Integer offset, SearchContext searchContext);
 
+      public Response getAllAppRoles(String applicationId, String before, String after);
+
       public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String attributes);
+
+      public Response getAppRole(String applicationId, String roleId);
+
+      public Response getAppRoleGroups(String applicationId, String roleId, String idpId);
+
+      public Response getAppRoleUsers(String applicationId, String roleId);
 
       public Response getApplication(String applicationId);
 
@@ -118,6 +137,12 @@ public interface ApplicationsApiService {
       public Response importApplication(InputStream fileInputStream, Attachment fileDetail);
 
       public Response importApplicationForUpdate(InputStream fileInputStream, Attachment fileDetail);
+
+      public Response patchAppRole(String applicationId, String roleId, RolePatchModel rolePatchModel);
+
+      public Response patchAppRoleAssignedGroups(String applicationId, String roleId, String idpId, RoleAssignPatchModel roleAssignPatchModel);
+
+      public Response patchAppRoleAssignedUsers(String applicationId, String roleId, RoleAssignPatchModel roleAssignPatchModel);
 
       public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel);
 

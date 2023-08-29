@@ -42,6 +42,7 @@ public class ApplicationManagementConstants {
     public static final String INBOUND_PROTOCOL_SAML_PATH_COMPONENT = "/saml";
     public static final String INBOUND_PROTOCOL_PASSIVE_STS_PATH_COMPONENT = "/passive-sts";
     public static final String INBOUND_PROTOCOL_WS_TRUST_PATH_COMPONENT = "/ws-trust";
+    public static final String ROLES_PATH_COMPONENT = "/roles";
 
     private static final Map<String, String> OAUTH_GRANT_TYPE_NAMES = new LinkedHashMap<>();
     public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
@@ -51,6 +52,15 @@ public class ApplicationManagementConstants {
     public static final String NAME = "name";
     public static final String CLIENT_ID = "clientId";
     public static final String ISSUER = "issuer";
+
+    public static final String URL_SEPERATOR = "/";
+    public static final String TENANT_URL_SEPERATOR = "/t/";
+    public static final String SCIM2_ENDPOINT = "/scim2";
+
+    public static final String USERS = "/Users";
+    public static final String GROUPS = "/Groups";
+
+    public static final String LOCAL_IDP = "LOCAL";
 
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 

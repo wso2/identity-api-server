@@ -34,17 +34,27 @@ import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConne
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
+import org.wso2.carbon.identity.api.server.application.management.v1.Role;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleCreationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RolePatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.ApplicationRoleManagementService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.TransferResource;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
@@ -60,6 +70,9 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Autowired
     private ServerApplicationMetadataService applicationMetadataService;
 
+    @Autowired
+    private ApplicationRoleManagementService applicationRoleManagementService;
+
     @Override
     public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
                                        String requiredAttributes) {
@@ -67,6 +80,26 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
         ApplicationListResponse listResponse = applicationManagementService
                 .getAllApplications(limit, offset, filter, sortOrder, sortBy, requiredAttributes);
         return Response.ok().entity(listResponse).build();
+    }
+
+    @Override
+    public Response getAppRole(String applicationId, String roleId) {
+
+        return Response.ok().entity(applicationRoleManagementService.getApplicationRole(applicationId, roleId)).build();
+    }
+
+    @Override
+    public Response getAppRoleGroups(String applicationId, String roleId, String idpId) {
+
+        return Response.ok().entity(applicationRoleManagementService
+                .getApplicationRoleAssignedGroups(applicationId, roleId, idpId)).build();
+    }
+
+    @Override
+    public Response getAppRoleUsers(String applicationId, String roleId) {
+
+        return Response.ok().entity(applicationRoleManagementService
+                .getApplicationRoleAssignedUsers(applicationId, roleId)).build();
     }
 
     @Override
@@ -96,6 +129,24 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response createAppRole(String applicationId, RoleCreationModel roleCreationModel) {
+
+        Role role = applicationRoleManagementService.addApplicationRole(applicationId, roleCreationModel);
+        URI location;
+        try {
+            location = ContextLoader.buildURIForHeader(Constants.V1_API_PATH_COMPONENT +
+                    ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT + "/" + applicationId + "/" +
+                    ApplicationManagementConstants.ROLES_PATH_COMPONENT + "/" +
+                    URLEncoder.encode(role.getId(), StandardCharsets.UTF_8.name()));
+        } catch (UnsupportedEncodingException e) {
+            ErrorResponse errorResponse =
+                    new ErrorResponse.Builder().withMessage("Error due to unsupported encoding.").build();
+            throw new APIError(Response.Status.METHOD_NOT_ALLOWED, errorResponse);
+        }
+        return Response.created(location).entity(role).build();
+    }
+
+    @Override
     public Response createApplication(ApplicationModel applicationModel, String template) {
 
         String resourceId = applicationManagementService.createApplication(applicationModel, template);
@@ -107,6 +158,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
         String templateId = applicationManagementService.createApplicationTemplate(applicationTemplateModel);
         return Response.created(getTemplateResourceLocation(templateId)).build();
+    }
+
+    @Override
+    public Response deleteAppRole(String applicationId, String roleId) {
+
+        applicationRoleManagementService.deleteApplicationRole(applicationId, roleId);
+        return Response.noContent().build();
     }
 
     @Override
@@ -243,6 +301,29 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response patchAppRole(String applicationId, String roleId, RolePatchModel rolePatchModel) {
+
+        applicationRoleManagementService.updateApplicationRole(applicationId, roleId, rolePatchModel);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response patchAppRoleAssignedGroups(String applicationId, String roleId, String idpId,
+                                               RoleAssignPatchModel roleAssignPatchModel) {
+
+        return Response.ok().entity(applicationRoleManagementService.updateApplicationRoleAssignedGroups(applicationId,
+                roleId, idpId, roleAssignPatchModel)).build();
+    }
+
+    @Override
+    public Response patchAppRoleAssignedUsers(String applicationId, String roleId,
+                                              RoleAssignPatchModel roleAssignPatchModel) {
+
+        return Response.ok().entity(applicationRoleManagementService.updateApplicationRoleAssignedUsers(applicationId,
+                roleId, roleAssignPatchModel)).build();
+    }
+
+    @Override
     public Response getInboundAuthenticationConfigurations(String applicationId) {
 
         List<InboundProtocolListItem> inbounds = applicationManagementService.getInboundProtocols(applicationId);
@@ -366,6 +447,13 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
         return Response.ok().entity(applicationManagementService.listApplicationTemplates(limit, offset,
                 searchContext)).build();
+    }
+
+    @Override
+    public Response getAllAppRoles(String applicationId, String before, String after) {
+
+        return Response.ok().entity(applicationRoleManagementService.getApplicationRoles(applicationId, before,
+                after, null, null, null)).build();
     }
 
     private URI getResourceLocation(String resourceId) {
