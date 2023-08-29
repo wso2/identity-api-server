@@ -20,6 +20,7 @@
 
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService"/>
+    <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ApplicationRoleManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.impl.ApplicationsApiServiceImpl"/>
 
     <bean id="applicationManagementServiceHolderBean"
