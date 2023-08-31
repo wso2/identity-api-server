@@ -303,8 +303,8 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Override
     public Response patchAppRole(String applicationId, String roleId, RolePatchModel rolePatchModel) {
 
-        applicationRoleManagementService.updateApplicationRole(applicationId, roleId, rolePatchModel);
-        return Response.ok().build();
+        return Response.ok().entity(applicationRoleManagementService.updateApplicationRole(applicationId, roleId,
+                rolePatchModel)).build();
     }
 
     @Override

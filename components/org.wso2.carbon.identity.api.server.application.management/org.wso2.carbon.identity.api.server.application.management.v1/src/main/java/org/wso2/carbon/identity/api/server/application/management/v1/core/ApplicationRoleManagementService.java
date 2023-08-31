@@ -171,7 +171,7 @@ public class ApplicationRoleManagementService {
      * @param roleId        Role ID.
      * @param roleUpdate    Role update.
      */
-    public void updateApplicationRole(String applicationId, String roleId, RolePatchModel roleUpdate) {
+    public ApplicationRole updateApplicationRole(String applicationId, String roleId, RolePatchModel roleUpdate) {
 
         List<String> addedPermission = null;
         List<String> removedPermission = null;
@@ -184,7 +184,7 @@ public class ApplicationRoleManagementService {
                     .map(permission -> permission.getName()).collect(Collectors.toList());
         }
         try {
-            getApplicationRoleManager().updateApplicationRole(applicationId, roleId, roleUpdate.getName(),
+            return getApplicationRoleManager().updateApplicationRole(applicationId, roleId, roleUpdate.getName(),
                     addedPermission, removedPermission);
         } catch (ApplicationRoleManagementException e) {
             throw ApplicationRoleMgtEndpointUtil.handleApplicationRoleMgtException(e);
