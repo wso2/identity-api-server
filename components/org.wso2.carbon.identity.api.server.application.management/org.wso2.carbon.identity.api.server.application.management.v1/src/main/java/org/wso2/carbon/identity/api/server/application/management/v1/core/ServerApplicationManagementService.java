@@ -119,6 +119,8 @@ import org.wso2.carbon.identity.template.mgt.exception.TemplateManagementExcepti
 import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -551,8 +553,8 @@ public class ServerApplicationManagementService {
 
     private String parseYamlFromServiceProvider(ServiceProvider serviceProvider) {
 
-        Constructor constructor = new Constructor();
-        CustomRepresenter representer = new CustomRepresenter();
+        Constructor constructor = new Constructor(new LoaderOptions());
+        CustomRepresenter representer = new CustomRepresenter(new DumperOptions());
 
         for (Class<?> protocol : INBOUND_CONFIG_PROTOCOLS) {
             TypeDescription description = new TypeDescription(InboundConfigurationProtocol.class);
@@ -684,7 +686,7 @@ public class ServerApplicationManagementService {
             throws IdentityApplicationManagementException {
 
         try {
-            Yaml yaml = new Yaml(new Constructor(ServiceProvider.class));
+            Yaml yaml = new Yaml(new Constructor(ServiceProvider.class, new LoaderOptions()));
             return yaml.loadAs(spFileContent.getContent(), ServiceProvider.class);
         } catch (YAMLException e) {
             throw new IdentityApplicationManagementException(String.format("Error in reading YAML Service Provider " +

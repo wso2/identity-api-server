@@ -58,6 +58,7 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.model.ClaimE
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserStoreManager;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -1154,7 +1155,7 @@ public class ServerClaimManagementService {
     private ClaimDialectConfiguration parseClaimDialectFromYaml(FileContent fileContent) throws ClaimMetadataException {
 
         try {
-            Yaml yaml = new Yaml(new Constructor(ClaimDialectConfiguration.class));
+            Yaml yaml = new Yaml(new Constructor(ClaimDialectConfiguration.class, new LoaderOptions()));
             return yaml.loadAs(fileContent.getContent(), ClaimDialectConfiguration.class);
         } catch (YAMLException e) {
             throw new ClaimMetadataException(String.format(
