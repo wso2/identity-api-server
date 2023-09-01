@@ -287,9 +287,9 @@
                 <version>${identity.inbound.oauth2.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.security.mgt</groupId>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.security.mgt</artifactId>
-                <version>${carbon.security.mgt.version}</version>
+                <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -700,7 +700,6 @@
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
         <carbon.kernel.version>4.9.4</carbon.kernel.version>
         <carbon.multitenancy.version>4.9.10</carbon.multitenancy.version>
-        <carbon.security.mgt.version>1.0.0</carbon.security.mgt.version>
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
         <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.4.21</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
         <org.wso2.carbon.event.publisher.version>5.2.15</org.wso2.carbon.event.publisher.version>
