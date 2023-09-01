@@ -76,6 +76,7 @@ import org.wso2.carbon.user.core.UserStoreConfigConstants;
 import org.wso2.carbon.user.core.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -1660,7 +1661,7 @@ public class ServerUserStoreService {
     private UserStoreConfigurations parseUserStoreFromYaml(FileContent fileContent) throws UserStoreException {
 
         try {
-            Yaml yaml = new Yaml(new Constructor(UserStoreConfigurations.class));
+            Yaml yaml = new Yaml(new Constructor(UserStoreConfigurations.class, new LoaderOptions()));
             return yaml.loadAs(fileContent.getContent(), UserStoreConfigurations.class);
         } catch (YAMLException e) {
             throw new UserStoreException(String.format("Error in reading YAML file " +
