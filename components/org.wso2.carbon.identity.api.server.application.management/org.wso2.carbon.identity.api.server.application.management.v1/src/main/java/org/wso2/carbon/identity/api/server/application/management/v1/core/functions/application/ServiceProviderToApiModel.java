@@ -83,6 +83,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private static final Set<String> systemApplications = ApplicationManagementServiceHolder
             .getApplicationManagementService().getSystemApplications();
     private static final String IS_FRAGMENT_APP = "isFragmentApp";
+    private static final String useUserIdForDefaultSubject = "useUserIdForDefaultSubject";
 
     @Override
     public ApplicationResponseModel apply(ServiceProvider application) {
@@ -283,15 +284,34 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             subjectConfig.includeUserDomain(localAndOutboundAuthConfig.isUseUserstoreDomainInLocalSubjectIdentifier());
 
             if (StringUtils.isBlank(localAndOutboundAuthConfig.getSubjectClaimUri())) {
-                if (isLocalClaimDialectUsedBySp(application)) {
-                    subjectConfig.claim(buildClaimModel(FrameworkConstants.USERNAME_CLAIM));
-                }
+                assignClaimForSubjectValue(application, subjectConfig);
             } else {
                 subjectConfig.claim(buildClaimModel(localAndOutboundAuthConfig.getSubjectClaimUri()));
             }
         }
 
         return subjectConfig;
+    }
+
+    private void assignClaimForSubjectValue(ServiceProvider application, SubjectConfig subjectConfig) {
+        
+        if (isLocalClaimDialectUsedBySp(application)) {
+            if (isUserIdUsedAsDefaultSubject(application.getSpProperties())) {
+                subjectConfig.claim(buildClaimModel(FrameworkConstants.USER_ID_CLAIM));
+            } else {
+                subjectConfig.claim(buildClaimModel(FrameworkConstants.USERNAME_CLAIM));
+            }
+        }
+    }
+
+    private boolean isUserIdUsedAsDefaultSubject (ServiceProviderProperty[] spProperties) {
+
+        for (ServiceProviderProperty spProperty : spProperties) {
+            if (useUserIdForDefaultSubject.equals(spProperty.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private ClaimConfiguration.DialectEnum getDialect(ServiceProvider application) {
