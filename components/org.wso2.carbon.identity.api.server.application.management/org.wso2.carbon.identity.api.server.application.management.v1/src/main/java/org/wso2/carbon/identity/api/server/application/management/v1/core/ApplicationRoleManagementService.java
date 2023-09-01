@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -83,15 +84,17 @@ public class ApplicationRoleManagementService {
         }
         String roleId = UUID.randomUUID().toString();
         try {
-            getApplicationRoleManager().addApplicationRole(
+            ApplicationRole appRole = getApplicationRoleManager().addApplicationRole(
                     new ApplicationRole(roleId, role.getName(), permissions != null ?
                             permissions.toArray(new String[0]) : new String[0],
                             applicationId));
 
             Role createdRole = new Role();
-            createdRole.setId(roleId);
-            createdRole.setName(role.getName());
-            createdRole.setPermissions(role.getPermissions());
+            createdRole.setId(appRole.getRoleId());
+            createdRole.setName(appRole.getRoleName());
+            if (appRole.getPermissions() != null) {
+                createdRole.setPermissions(Arrays.asList(appRole.getPermissions()));
+            }
             return createdRole;
         } catch (ApplicationRoleManagementException e) {
             throw ApplicationRoleMgtEndpointUtil.handleApplicationRoleMgtException(e);
