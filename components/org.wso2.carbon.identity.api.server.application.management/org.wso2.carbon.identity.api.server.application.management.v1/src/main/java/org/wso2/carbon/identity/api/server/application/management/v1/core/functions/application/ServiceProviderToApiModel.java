@@ -294,6 +294,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     }
 
     private void assignClaimForSubjectValue(ServiceProvider application, SubjectConfig subjectConfig) {
+        
         if (isLocalClaimDialectUsedBySp(application)) {
             if (isUserIdUsedAsDefaultSubject(application.getSpProperties())) {
                 subjectConfig.claim(buildClaimModel(FrameworkConstants.USER_ID_CLAIM));
