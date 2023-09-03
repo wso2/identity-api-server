@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.admin.advisory.management.v1.core;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.admin.advisory.mgt.dto.AdminAdvisoryBannerDTO;
@@ -61,6 +62,29 @@ public class ServerAdminAdvisoryManagementService {
         }
     }
 
+    /**
+     * Update admin advisory configuration.
+     *
+     * @param adminAdvisoryConfig Admin advisory configuration.
+     */
+    public void saveAdminAdvisoryConfig(AdminAdvisoryConfig adminAdvisoryConfig) {
+
+        try {
+            AdminAdvisoryManagementService adminAdvisoryManagementService = AdminAdvisoryManagementServiceHolder
+                    .getAdminAdvisoryManagementService();
+            AdminAdvisoryBannerDTO modifiedAdminAdvisoryBannerDTO = createModifiedAdminAdvisoryBannerDTO(
+                    adminAdvisoryManagementService.getAdminAdvisoryConfig(), adminAdvisoryConfig);
+
+            adminAdvisoryManagementService.saveAdminAdvisoryConfig(modifiedAdminAdvisoryBannerDTO);
+
+        } catch (AdminAdvisoryMgtException e) {
+            AdminAdvisoryConstants.ErrorMessage errorEnum =
+                    AdminAdvisoryConstants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_BANNER_CONFIG;
+            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            throw handleException(e, errorEnum, status);
+        }
+    }
+
     private AdminAdvisoryConfig buildAdminAdvisoryConfigResponse(AdminAdvisoryBannerDTO adminAdvisoryBannerDTO) {
 
         AdminAdvisoryConfig adminAdvisoryConfig = new AdminAdvisoryConfig();
@@ -89,5 +113,36 @@ public class ServerAdminAdvisoryManagementService {
             return String.format(errorEnum.getDescription(), data);
         }
         return errorEnum.getDescription();
+    }
+
+    /**
+     * Create AdminAdvisoryBannerDTO for given admin advisory configurations.
+     *
+     * @param adminAdvisoryConfig   Admin advisory configurations.
+     * @return AdminAdvisoryBannerDTO.
+     */
+    private AdminAdvisoryBannerDTO createModifiedAdminAdvisoryBannerDTO(AdminAdvisoryBannerDTO
+            currentAdminAdvisoryBannerDTO, AdminAdvisoryConfig adminAdvisoryConfig) throws AdminAdvisoryMgtException {
+
+        AdminAdvisoryBannerDTO modifiedAdminAdvisoryBannerDTO = new AdminAdvisoryBannerDTO();
+        boolean isEnableBanner;
+        String bannerContent;
+
+        if (adminAdvisoryConfig.getEnableBanner() == null) {
+            isEnableBanner = currentAdminAdvisoryBannerDTO.getEnableBanner();
+        } else {
+            isEnableBanner = adminAdvisoryConfig.getEnableBanner();
+        }
+
+        if (StringUtils.isBlank(adminAdvisoryConfig.getBannerContent())) {
+            bannerContent = currentAdminAdvisoryBannerDTO.getBannerContent();
+        } else {
+            bannerContent = adminAdvisoryConfig.getBannerContent();
+        }
+
+        modifiedAdminAdvisoryBannerDTO.setEnableBanner(isEnableBanner);
+        modifiedAdminAdvisoryBannerDTO.setBannerContent(bannerContent);
+
+        return modifiedAdminAdvisoryBannerDTO;
     }
 }

@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.admin.advisory.management.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.AdminAdvisoryManagementApiService;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.core.ServerAdminAdvisoryManagementService;
+import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.model.AdminAdvisoryConfig;
 
 import javax.ws.rs.core.Response;
 
@@ -41,5 +42,19 @@ public class AdminAdvisoryManagementApiServiceImpl implements AdminAdvisoryManag
     public Response getAdminAdvisoryConfig() {
 
         return Response.ok().entity(adminAdvisoryManagementService.getAdminAdvisoryConfig()).build();
+    }
+
+    /**
+     * Endpoint to update the admin advisory banner configuration.
+     *
+     * @param adminAdvisoryConfig   Admin advisory configuration.
+     *
+     * @return Response instance.
+     */
+    @Override
+    public Response updateAdminAdvisoryConfig(AdminAdvisoryConfig adminAdvisoryConfig) {
+
+        adminAdvisoryManagementService.saveAdminAdvisoryConfig(adminAdvisoryConfig);
+        return Response.ok().build();
     }
 }

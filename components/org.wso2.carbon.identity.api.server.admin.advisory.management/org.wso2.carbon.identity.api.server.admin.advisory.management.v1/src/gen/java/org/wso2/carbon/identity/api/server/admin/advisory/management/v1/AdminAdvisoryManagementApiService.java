@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.admin.advisory.management.v1;
 
+import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.model.AdminAdvisoryConfig;
+
 import javax.ws.rs.core.Response;
 
 /**
@@ -26,4 +28,6 @@ import javax.ws.rs.core.Response;
 public interface AdminAdvisoryManagementApiService {
 
       public Response getAdminAdvisoryConfig();
+
+      public Response updateAdminAdvisoryConfig(AdminAdvisoryConfig adminAdvisoryConfig);
 }
