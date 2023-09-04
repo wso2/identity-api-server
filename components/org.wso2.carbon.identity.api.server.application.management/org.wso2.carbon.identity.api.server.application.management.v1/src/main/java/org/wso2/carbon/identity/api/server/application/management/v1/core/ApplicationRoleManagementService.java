@@ -110,9 +110,8 @@ public class ApplicationRoleManagementService {
      */
     public Role getApplicationRole(String applicationId, String roleId) {
 
-        ApplicationRole applicationRole = null;
         try {
-            applicationRole = getApplicationRoleManager().getApplicationRoleById(roleId);
+            ApplicationRole applicationRole = getApplicationRoleManager().getApplicationRoleById(roleId);
             Role role = new Role();
             role.setId(roleId);
             role.setName(applicationRole.getRoleName());
