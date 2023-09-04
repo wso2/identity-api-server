@@ -18,7 +18,7 @@ package org.wso2.carbon.identity.api.server.keystore.management.common.factory;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.security.keystore.KeyStoreManagementService;
+import org.wso2.carbon.core.keystore.KeyStoreManagementService;
 
 /**
  * Factory Beans serve as a factory for creating other beans within the IOC container. This factory bean is used to

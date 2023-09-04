@@ -19,13 +19,13 @@ package org.wso2.carbon.identity.api.server.keystore.management.v1.core;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.core.keystore.KeyStoreManagementException;
+import org.wso2.carbon.core.keystore.KeyStoreManagementServerException;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants;
 import org.wso2.carbon.identity.api.server.keystore.management.v1.model.CertificateResponse;
-import org.wso2.carbon.security.keystore.KeyStoreManagementException;
-import org.wso2.carbon.security.keystore.KeyStoreManagementServerException;
 
 import java.io.File;
 import java.io.FileOutputStream;
