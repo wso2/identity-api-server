@@ -34,6 +34,9 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
@@ -67,6 +70,30 @@ public class ApplicationsApi  {
 
     @Autowired
     private ApplicationsApiService delegate;
+
+    @Valid
+    @POST
+    @Path("/{applicationId}/authorized-apis")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Authorized an API to the application ", notes = "This API provides the capability to authorized an API to the application.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/create <br>   <b>Scope required:</b> <br>       * internal_application_mgt_create ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Authorized APIs", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Created", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response addAuthorizedAPI(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "" ) @Valid AuthorizedAPICreationModel authorizedAPICreationModel) {
+
+        return delegate.addAuthorizedAPI(applicationId,  authorizedAPICreationModel );
+    }
 
     @Valid
     @PUT
@@ -188,6 +215,28 @@ public class ApplicationsApi  {
     public Response deleteApplicationTemplate(@ApiParam(value = "Application template ID. This should be a valid locale. ",required=true) @PathParam("template-id") String templateId) {
 
         return delegate.deleteApplicationTemplate(templateId );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/{applicationId}/authorized-apis/{apiId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Remove API authorization from the application ", notes = "This API provides the capability to delete an authorized API of the application.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/delete <br>   <b>Scope required:</b> <br>       * internal_application_mgt_delete ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Authorized APIs", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "No Content", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteAuthorizedAPI(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "ID of the API resource.",required=true) @PathParam("apiId") String apiId) {
+
+        return delegate.deleteAuthorizedAPI(applicationId,  apiId );
     }
 
     @Valid
@@ -480,6 +529,29 @@ public class ApplicationsApi  {
     public Response getApplicationTemplate(@ApiParam(value = "Application template ID. This should be a valid locale. ",required=true) @PathParam("template-id") String templateId) {
 
         return delegate.getApplicationTemplate(templateId );
+    }
+
+    @Valid
+    @GET
+    @Path("/{applicationId}/authorized-apis")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get authorized APIs of the application. ", notes = "This API provides the capability to retrieve all the authorized APIs of the application.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = AuthorizedAPIResponse.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Authorized APIs", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = AuthorizedAPIResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getAuthorizedAPIs(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.getAuthorizedAPIs(applicationId );
     }
 
     @Valid
@@ -860,6 +932,30 @@ public class ApplicationsApi  {
     public Response patchApplication(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "This represents the application details to be updated." ,required=true) @Valid ApplicationPatchModel applicationPatchModel) {
 
         return delegate.patchApplication(applicationId,  applicationPatchModel );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/{applicationId}/authorized-apis/{apiId}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update authorized API scopes ", notes = "This API provides the capability to update an authorized API of the application.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>       * internal_application_mgt_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Authorized APIs", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchAuthorizedAPI(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "ID of the API resource.",required=true) @PathParam("apiId") String apiId, @ApiParam(value = "" ) @Valid AuthorizedAPIPatchModel authorizedAPIPatchModel) {
+
+        return delegate.patchAuthorizedAPI(applicationId,  apiId,  authorizedAPIPatchModel );
     }
 
     @Valid

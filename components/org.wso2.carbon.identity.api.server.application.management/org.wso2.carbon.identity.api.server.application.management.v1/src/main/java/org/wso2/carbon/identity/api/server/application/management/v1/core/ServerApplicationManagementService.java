@@ -32,7 +32,9 @@ import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
@@ -46,6 +48,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedScope;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticator;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
@@ -81,8 +87,10 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
+import org.wso2.carbon.identity.application.common.model.APIResource;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
+import org.wso2.carbon.identity.application.common.model.AuthorizedAPI;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.ImportResponse;
@@ -90,11 +98,13 @@ import org.wso2.carbon.identity.application.common.model.InboundAuthenticationCo
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.InboundConfigurationProtocol;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
+import org.wso2.carbon.identity.application.common.model.Scope;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.common.model.User;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceSearchBean;
 import org.wso2.carbon.identity.configuration.mgt.core.search.ComplexCondition;
@@ -1297,6 +1307,192 @@ public class ServerApplicationManagementService {
         updateServiceProvider(applicationId, appToUpdate);
     }
 
+    /**
+     * Authorize an API resource to the application.
+     *
+     * @param applicationId              Application ID.
+     * @param authorizedAPICreationModel API Authorization creation model.
+     */
+    public void addAuthorizedAPI(String applicationId, AuthorizedAPICreationModel authorizedAPICreationModel) {
+
+        try {
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            String authorizedAPIId = authorizedAPICreationModel.getId();
+            AuthorizedAPI authorizedAPI = getAuthorizedAPIManagementService().getAuthorizedAPI(applicationId,
+                    authorizedAPIId, tenantDomain);
+            if (authorizedAPI != null) {
+                throw handleAuthorizedAPIConflictError(applicationId, authorizedAPIId);
+            }
+
+            // Validate authorized API creation model.
+            APIResource apiResource = ApplicationManagementServiceHolder.getApiResourceManager()
+                    .getAPIResourceById(authorizedAPIId, tenantDomain);
+            if (apiResource == null) {
+                throw buildClientError(ErrorMessage.API_RESOURCE_NOT_FOUND, authorizedAPIId, tenantDomain);
+            }
+            validateAPIResourceScopes(apiResource, authorizedAPICreationModel.getScopes());
+
+            // Validate policy identifier.
+            String policyIdentifier = validatePolicy(authorizedAPICreationModel.getPolicyIdentifier());
+
+            // If API resource has requiresAuthorization set to true, policy identifier should be RBAC.
+            if (apiResource.isRequiresAuthorization() &&
+                    !policyIdentifier.equals(ApplicationManagementConstants.RBAC)) {
+                throw buildClientError(ErrorMessage.INVALID_POLICY_TYPE_FOR_API_RESOURCE, authorizedAPIId,
+                        policyIdentifier);
+            }
+
+            getAuthorizedAPIManagementService().addAuthorizedAPI(applicationId,
+                    new AuthorizedAPI.AuthorizedAPIBuilder()
+                            .appId(applicationId)
+                            .apiId(authorizedAPIId)
+                            .policyId(policyIdentifier)
+                            .scopes(authorizedAPICreationModel.getScopes().stream().map(
+                                    scope -> new Scope.ScopeBuilder().name(scope).build()).collect(Collectors.toList()))
+                            .build(), tenantDomain);
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error adding authorized API with id: " + authorizedAPICreationModel.getId() +
+                    " to application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
+        } catch (APIResourceMgtException e) {
+            String msg = "Error while fetching API resource with id: " + authorizedAPICreationModel.getId();
+            throw Utils.buildServerError(msg, e);
+        }
+    }
+
+    /**
+     * Delete an API authorization from the application.
+     *
+     * @param applicationId Application ID.
+     * @param apiId         API resource ID.
+     */
+    public void deleteAuthorizedAPI(String applicationId, String apiId) {
+
+        try {
+            getAuthorizedAPIManagementService().deleteAuthorizedAPI(applicationId, apiId,
+                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error while deleting authorized API with id: " + apiId + " from the application with  id: "
+                    + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+
+    /**
+     * Update the API authorization of the application for an API resource.
+     *
+     * @param applicationId           Application ID.
+     * @param apiId                   API resource ID.
+     * @param authorizedAPIPatchModel API resource patch model.
+     */
+    public void updateAuthorizedAPI(String applicationId, String apiId,
+                                    AuthorizedAPIPatchModel authorizedAPIPatchModel) {
+
+        try {
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
+            // Validate added scopes and removed scopes sent in the authorized API patch model.
+            List<String> addedScopes = authorizedAPIPatchModel.getAddedScopes();
+            List<String> removedScopes = authorizedAPIPatchModel.getRemovedScopes();
+            addedScopes.removeAll(removedScopes);
+
+            // Validate authorized API patch model.
+            APIResource apiResource = ApplicationManagementServiceHolder.getApiResourceManager()
+                    .getAPIResourceById(apiId, tenantDomain);
+            if (apiResource == null) {
+                throw buildClientError(ErrorMessage.API_RESOURCE_NOT_FOUND, apiId, tenantDomain);
+            }
+            validateAPIResourceScopes(apiResource, addedScopes);
+
+            // Remove already authorized scopes from the added scopes list.
+            AuthorizedAPI currentAuthorizedAPI = getAuthorizedAPIManagementService().getAuthorizedAPI(applicationId,
+                    apiId, tenantDomain);
+            if (currentAuthorizedAPI == null) {
+                throw buildClientError(ErrorMessage.AUTHORIZED_API_NOT_FOUND, apiId, applicationId);
+            }
+            addedScopes.removeIf(scopeName -> currentAuthorizedAPI.getScopes().stream().anyMatch(scope ->
+                    scope.getName().equals(scopeName)));
+
+            getAuthorizedAPIManagementService().patchAuthorizedAPI(applicationId, apiId, addedScopes, removedScopes,
+                    tenantDomain);
+        } catch (APIResourceMgtException e) {
+            String msg = "Error while fetching API resource with id: " + apiId;
+            throw Utils.buildServerError(msg, e);
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error while updating authorized API with id: " + apiId + " for the application with  id: "
+                    + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+
+    /**
+     * Get Authorized API list.
+     *
+     * @param applicationId Application ID.
+     * @return List of authorized APIs of the application.
+     */
+    public List<AuthorizedAPIResponse> getAuthorizedAPIs(String applicationId) {
+
+        try {
+            List<AuthorizedAPIResponse> authorizedAPIResponses = new ArrayList<>();
+            List<AuthorizedAPI> authorizedAPIs = getAuthorizedAPIManagementService().getAuthorizedAPIs(applicationId,
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            if (authorizedAPIs == null) {
+                return new ArrayList<>();
+            }
+            for (AuthorizedAPI authorizedAPI : authorizedAPIs) {
+                authorizedAPIResponses.add(new AuthorizedAPIResponse()
+                        .id(authorizedAPI.getAPIId())
+                        .identifier(authorizedAPI.getAPIIdentifier())
+                        .displayName(authorizedAPI.getAPIName())
+                        .policyId(authorizedAPI.getPolicyId())
+                        .authorizedScopes(createAuthorizedScope(authorizedAPI.getScopes())));
+            }
+            return authorizedAPIResponses;
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error retrieving authorized APIs of application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+
+    private String validatePolicy(String policyId) {
+
+        if (StringUtils.isBlank(policyId)) {
+            // No input provided, use the default policy identifier.
+            return ApplicationManagementConstants.RBAC;
+        }
+        if (StringUtils.equalsIgnoreCase(ApplicationManagementConstants.RBAC, policyId)
+                || StringUtils.equalsIgnoreCase(ApplicationManagementConstants.NO_POLICY, policyId)) {
+            return StringUtils.upperCase(policyId);
+        } else {
+            throw buildClientError(ErrorMessage.INVALID_POLICY_VALUE);
+        }
+    }
+
+    private void validateAPIResourceScopes(APIResource apiResource, List<String> scopes)
+            throws APIResourceMgtException {
+
+        List<Scope> apiResourceScopes = apiResource.getScopes();
+        if (scopes == null) {
+            return;
+        }
+        for (String scopeName : scopes) {
+            if (apiResourceScopes.stream().noneMatch(scope -> scope.getName().equals(scopeName))) {
+                throw buildClientError(ErrorMessage.SCOPES_NOT_FOUND, apiResource.getId(),
+                        CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            }
+        }
+    }
+
+    private List<AuthorizedScope> createAuthorizedScope(List<Scope> scope) {
+
+        return scope.stream().map(s -> new AuthorizedScope()
+                        .name(s.getName())
+                        .displayName(s.getDisplayName())
+                        .id(s.getId()))
+                .collect(Collectors.toList());
+    }
+
     private <T> T getInbound(String applicationId,
                              String inboundType,
                              Function<InboundAuthenticationRequestConfig, T> getInboundApiModelFunction) {
@@ -1526,6 +1722,11 @@ public class ServerApplicationManagementService {
         return ApplicationManagementServiceHolder.getApplicationManagementService();
     }
 
+    private AuthorizedAPIManagementService getAuthorizedAPIManagementService() {
+
+        return ApplicationManagementServiceHolder.getAuthorizedAPIManagementService();
+    }
+
     private TemplateManager getTemplateManager() {
 
         return ApplicationManagementServiceHolder.getTemplateManager();
@@ -1684,5 +1885,12 @@ public class ServerApplicationManagementService {
                     ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getMessage(),
                     ErrorMessage.ERROR_RETRIEVING_USERSTORE_MANAGER.getDescription());
         }
+    }
+
+    private APIError handleAuthorizedAPIConflictError(String appId, String apiId) {
+
+        return Utils.buildConflictError(ErrorMessage.API_RESOURCE_ALREADY_AUTHORIZED.getCode(),
+                ErrorMessage.API_RESOURCE_ALREADY_AUTHORIZED.getMessage(),
+                String.format(ErrorMessage.API_RESOURCE_ALREADY_AUTHORIZED.getDescription(), apiId, appId));
     }
 }

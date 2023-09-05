@@ -129,6 +129,11 @@
             <artifactId>org.wso2.carbon.identity.core</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.api.resource.mgt</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>

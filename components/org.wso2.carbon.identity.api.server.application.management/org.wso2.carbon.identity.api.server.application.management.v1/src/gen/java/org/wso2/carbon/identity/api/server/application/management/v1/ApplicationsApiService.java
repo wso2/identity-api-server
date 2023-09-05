@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+
 import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
@@ -55,6 +56,8 @@ import javax.ws.rs.core.Response;
 
 public interface ApplicationsApiService {
 
+      public Response addAuthorizedAPI(String applicationId, AuthorizedAPICreationModel authorizedAPICreationModel);
+
       public Response changeApplicationOwner(String applicationId, ApplicationOwner applicationOwner);
 
       public Response createApplication(ApplicationModel applicationModel, String template);
@@ -64,6 +67,8 @@ public interface ApplicationsApiService {
       public Response deleteApplication(String applicationId);
 
       public Response deleteApplicationTemplate(String templateId);
+
+      public Response deleteAuthorizedAPI(String applicationId, String apiId);
 
       public Response deleteCustomInboundConfiguration(String applicationId, String inboundProtocolId);
 
@@ -88,6 +93,8 @@ public interface ApplicationsApiService {
       public Response getApplication(String applicationId);
 
       public Response getApplicationTemplate(String templateId);
+
+      public Response getAuthorizedAPIs(String applicationId);
 
       public Response getConfiguredAuthenticators(String applicationId);
 
@@ -120,6 +127,8 @@ public interface ApplicationsApiService {
       public Response importApplicationForUpdate(InputStream fileInputStream, Attachment fileDetail);
 
       public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel);
+
+      public Response patchAuthorizedAPI(String applicationId, String apiId, AuthorizedAPIPatchModel authorizedAPIPatchModel);
 
       public Response regenerateOAuthClientSecret(String applicationId);
 
