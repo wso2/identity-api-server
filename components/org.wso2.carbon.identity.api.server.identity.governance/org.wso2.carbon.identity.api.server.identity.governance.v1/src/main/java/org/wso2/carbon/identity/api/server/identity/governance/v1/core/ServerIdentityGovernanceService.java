@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2019 , WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.api.server.identity.governance.v1.core;
@@ -27,9 +29,11 @@ import org.wso2.carbon.identity.api.server.identity.governance.common.Governance
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoriesRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryConnectorsRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryRes;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorReq;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorsPatchReq;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.MetaRes;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.model.MultipleConnectorsPatchReq;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceResp;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceSearchAttribute;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PropertyReq;
@@ -292,6 +296,55 @@ public class ServerIdentityGovernanceService {
             for (PropertyReq propertyReqDTO : governanceConnector.getProperties()) {
                 configurationDetails.put(propertyReqDTO.getName(), propertyReqDTO.getValue());
             }
+            identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
+
+        } catch (IdentityGovernanceException e) {
+            GovernanceConstants.ErrorMessage errorEnum =
+                    GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONNECTOR_PROPERTY;
+            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            throw handleException(e, errorEnum, status);
+        }
+    }
+
+    /**
+     *
+     * Update multiple governance connector properties.
+     *
+     * @param categoryId                 Governance connector category id.
+     * @param multipleConnectorsPatchReq Governance connectors and properties to update.
+     */
+    public void updateGovernanceConnectorProperties(String categoryId,
+                                                    MultipleConnectorsPatchReq multipleConnectorsPatchReq) {
+
+        try {
+            IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
+            // Check whether the category ID exists.
+            CategoryRes category = getGovernanceConnectorCategory(categoryId);
+            if (category == null) {
+                throw handleNotFoundError(categoryId, GovernanceConstants.ErrorMessage.ERROR_CODE_CATEGORY_NOT_FOUND);
+            }
+
+            Map<String, String> configurationDetails = new HashMap<>();
+
+            // Loop through each connector in the request and add the properties to be updated to a hashmap.
+            for (ConnectorReq connectorReq : multipleConnectorsPatchReq.getConnectors()) {
+                String connectorId = connectorReq.getId();
+
+                // Check whether the connector ID exists.
+                ConnectorRes connector = getGovernanceConnector(categoryId, connectorId);
+                if (connector == null) {
+                    throw handleNotFoundError(connectorId,
+                            GovernanceConstants.ErrorMessage.ERROR_CODE_CONNECTOR_NOT_FOUND);
+                }
+
+                // Add properties of the connector to be updated to the configurationDetails hashmap.
+                for (PropertyReq propertyReqDTO : connectorReq.getProperties()) {
+                    configurationDetails.put(propertyReqDTO.getName(), propertyReqDTO.getValue());
+                }
+            }
+
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
 
         } catch (IdentityGovernanceException e) {

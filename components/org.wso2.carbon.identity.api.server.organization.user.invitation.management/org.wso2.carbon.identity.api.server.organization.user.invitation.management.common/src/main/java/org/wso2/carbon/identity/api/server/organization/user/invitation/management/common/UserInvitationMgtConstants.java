@@ -64,6 +64,18 @@ public class UserInvitationMgtConstants {
         ERROR_CODE_INVALID_FILTER("60009",
                 "Invalid filter.",
                 "Provided filter %s is not valid."),
+        ERROR_CODE_INVALID_APPLICATION("60009",
+                "Invalid application provided.",
+                "One of the provided applications with roles are not valid."),
+        ERROR_CODE_INVALID_CONFIRMATION_CODE_FOR_ACCEPTANCE("60010",
+                "Invalid confirmation code.",
+                "Could not accept the invitation since the confirmation code %s is not valid."),
+        ERROR_CODE_INVALID_USER("60011",
+                "Invalid user provided.",
+                "Invalid user is provided."),
+        ERROR_CODE_EXISTING_USER("60012",
+                "Authenticated user exist.",
+                "The authenticated user is already available in the organization."),
 
         // Server errors.
         ERROR_CODE_CREATE_INVITATION("65001",
@@ -78,6 +90,9 @@ public class UserInvitationMgtConstants {
         ERROR_CODE_DELETE_INVITATION("65004",
                 "Unable to delete the invitation.",
                 "Could not delete the invitation with the id %s."),
+        ERROR_CODE_ACCEPT_INVITATION("65005",
+                "Unable to accept the invitation.",
+                "Could not accept the invitation with the confirmation code %s."),
         ERROR_CODE_NOT_IMPLEMENTED("65100",
                 "Not Implemented.",
                 "Method is not implemented.");

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.representer.Representer;
 
@@ -32,6 +33,10 @@ public class CustomRepresenter extends Representer {
 
     private static final String[] PROPERTIES_TO_REMOVE = {"inboundConfiguration", "applicationID", "owner",
             "tenantDomain", "id", "idpProperties", "resourceId", "spProperties", "applicationResourceId"};
+
+    public CustomRepresenter(DumperOptions options) {
+        super(options);
+    }
 
     @Override
     protected Set<Property> getProperties(Class<?> type) {

@@ -44,13 +44,15 @@ import static org.wso2.carbon.identity.organization.user.invitation.management.c
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_CONFIRMATION_CODE;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_FILTER;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_INVITATION_ID;
+import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_USER;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER;
+import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_STORE_ROLES_APP_ID_INVALID;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE_VALUE;
+import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_USER_ALREADY_EXISTS;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_USER_NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static javax.ws.rs.core.Response.Status.NOT_IMPLEMENTED;
 
 /**
  * Service class for the User Invitation Management APIs.
@@ -109,6 +111,9 @@ public class GuestApiServiceCore {
             } else if (ERROR_CODE_ACTIVE_INVITATION_EXISTS.getCode().equals(e.getErrorCode())) {
                 throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
                         .ERROR_CODE_ACTIVE_INVITATION_AVAILABLE, invitation.getUsername());
+            } else if (ERROR_CODE_STORE_ROLES_APP_ID_INVALID.getCode().equals(e.getErrorCode())) {
+                throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
+                        .ERROR_CODE_INVALID_APPLICATION, StringUtils.EMPTY);
             }
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_CREATE_INVITATION,
@@ -199,8 +204,24 @@ public class GuestApiServiceCore {
      */
     public void acceptInvitation(AcceptanceRequestBody acceptanceRequestBody) {
 
-        throw handleException(NOT_IMPLEMENTED, UserInvitationMgtConstants
-                .ErrorMessage.ERROR_CODE_NOT_IMPLEMENTED, null);
+        InvitationCoreServiceImpl invitationCoreService = new InvitationCoreServiceImpl();
+        try {
+            invitationCoreService.acceptInvitation(acceptanceRequestBody.getConfirmationCode());
+        } catch (UserInvitationMgtException e) {
+            if (ERROR_CODE_INVALID_CONFIRMATION_CODE.getCode().equals(e.getErrorCode())) {
+                throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
+                        .ERROR_CODE_INVALID_CONFIRMATION_CODE_FOR_ACCEPTANCE, acceptanceRequestBody
+                        .getConfirmationCode());
+            } else if (ERROR_CODE_INVALID_USER.getCode().equals(e.getErrorCode())) {
+                throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
+                        .ERROR_CODE_INVALID_USER, StringUtils.EMPTY);
+            } else if (ERROR_CODE_USER_ALREADY_EXISTS.getCode().equals(e.getErrorCode())) {
+                throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
+                        .ERROR_CODE_EXISTING_USER, StringUtils.EMPTY);
+            }
+            throw handleException(INTERNAL_SERVER_ERROR, UserInvitationMgtConstants.ErrorMessage
+                            .ERROR_CODE_ACCEPT_INVITATION, acceptanceRequestBody.getConfirmationCode());
+        }
     }
 
     private APIError handleException(Response.Status status, UserInvitationMgtConstants.ErrorMessage error,
