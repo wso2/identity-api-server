@@ -23,17 +23,20 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
-import org.wso2.carbon.identity.api.server.application.management.v1.GroupAssignedRoleResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupsAssignedRoleResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.Permission;
 import org.wso2.carbon.identity.api.server.application.management.v1.Role;
-import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedGroup;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedGroupsPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedGroupsPatchOp;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedGroupsPatchOpValue;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedUser;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedUsersPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedUsersPatchOp;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedUsersPatchOpValue;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleCreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.RolePatchModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.RolePatchOp;
-import org.wso2.carbon.identity.api.server.application.management.v1.RolePatchOpValue;
-import org.wso2.carbon.identity.api.server.application.management.v1.UserAssignedRoleResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.UsersAssignedRoleResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.util.ApplicationRoleMgtEndpointUtil;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.application.role.mgt.ApplicationRoleManager;
@@ -222,26 +225,27 @@ public class ApplicationRoleManagementService {
      *
      * @param applicationId Application ID.
      * @param roleId        Role ID.
-     * @param roleAssignUpdateModel    Role assign update.
+     * @param roleAssignedUsersPatchModel    Role assign update.
      */
-    public UserAssignedRoleResponse updateApplicationRoleAssignedUsers(String applicationId, String roleId,
-                                                   RoleAssignPatchModel roleAssignUpdateModel) {
+    public UsersAssignedRoleResponse updateApplicationRoleAssignedUsers(String applicationId, String roleId,
+                                                                        RoleAssignedUsersPatchModel
+                                                                               roleAssignedUsersPatchModel) {
 
         try {
-            List<RolePatchOp> patchOperationList = roleAssignUpdateModel.getOperations();
+            List<RoleAssignedUsersPatchOp> patchOperationList = roleAssignedUsersPatchModel.getOperations();
             List<String> addUsers = new ArrayList<>();
             List<String> removedUsers = new ArrayList<>();
 
-            for (RolePatchOp rolePatchOp : patchOperationList) {
-                List<RolePatchOpValue> values = rolePatchOp.getValue();
+            for (RoleAssignedUsersPatchOp rolePatchOp : patchOperationList) {
+                List<RoleAssignedUsersPatchOpValue> values = rolePatchOp.getValue();
                 String patchOp = rolePatchOp.getOp();
                 if ((CollectionUtils.isNotEmpty(values) && StringUtils.equalsIgnoreCase(patchOp, PATCH_OP_ADD))) {
-                    for (RolePatchOpValue value : values) {
+                    for (RoleAssignedUsersPatchOpValue value : values) {
                         addUsers.add(value.getValue());
                     }
                 } else if ((CollectionUtils.isNotEmpty(values) &&
                         StringUtils.equalsIgnoreCase(patchOp, PATCH_OP_REMOVE))) {
-                    for (RolePatchOpValue value : values) {
+                    for (RoleAssignedUsersPatchOpValue value : values) {
                         removedUsers.add(value.getValue());
                     }
                 } else {
@@ -254,7 +258,7 @@ public class ApplicationRoleManagementService {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             ApplicationRole applicationRole = getApplicationRoleManager().updateApplicationRoleAssignedUsers(roleId,
                     addUsers, removedUsers);
-            UserAssignedRoleResponse response = new UserAssignedRoleResponse();
+            UsersAssignedRoleResponse response = new UsersAssignedRoleResponse();
             List<RoleAssignedUser> users = getUsersForResponseObject(applicationRole.getAssignedUsers(),
                     tenantDomain);
             response.setAssignedUsers(users);
@@ -270,13 +274,13 @@ public class ApplicationRoleManagementService {
      * @param applicationId Application ID.
      * @param roleId        Role ID.
      */
-    public UserAssignedRoleResponse getApplicationRoleAssignedUsers(String applicationId, String roleId) {
+    public UsersAssignedRoleResponse getApplicationRoleAssignedUsers(String applicationId, String roleId) {
 
         ApplicationRole applicationRole = null;
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             applicationRole = getApplicationRoleManager().getApplicationRoleAssignedUsers(roleId);
-            UserAssignedRoleResponse response = new UserAssignedRoleResponse();
+            UsersAssignedRoleResponse response = new UsersAssignedRoleResponse();
             List<RoleAssignedUser> users = getUsersForResponseObject(applicationRole.getAssignedUsers(),
                     tenantDomain);
             response.setAssignedUsers(users);
@@ -291,28 +295,28 @@ public class ApplicationRoleManagementService {
      *
      * @param applicationId Application ID.
      * @param roleId        Role ID.
-     * @param roleAssignUpdateModel    Role assign update.
+     * @param roleAssignedGroupsPatchModel    Role assign update.
      */
-    public GroupAssignedRoleResponse updateApplicationRoleAssignedGroups(String applicationId, String roleId,
-                                                                         String idpId,
-                                                                         RoleAssignPatchModel roleAssignUpdateModel) {
+    public GroupsAssignedRoleResponse updateApplicationRoleAssignedGroups(String applicationId, String roleId,
+                                                                         RoleAssignedGroupsPatchModel
+                                                                                 roleAssignedGroupsPatchModel) {
 
         try {
-            List<RolePatchOp> patchOperationList = roleAssignUpdateModel.getOperations();
-            List<String> addGroups = new ArrayList<>();
+            List<RoleAssignedGroupsPatchOp> patchOperationList = roleAssignedGroupsPatchModel.getOperations();
+            List<Group> addGroups = new ArrayList<>();
             List<String> removedGroups = new ArrayList<>();
 
-            for (RolePatchOp rolePatchOp : patchOperationList) {
-                List<RolePatchOpValue> values = rolePatchOp.getValue();
-                String patchOp = rolePatchOp.getOp().toString();
+            for (RoleAssignedGroupsPatchOp roleAssignedGroupsPatchOp : patchOperationList) {
+                List<RoleAssignedGroupsPatchOpValue> values = roleAssignedGroupsPatchOp.getValue();
+                String patchOp = roleAssignedGroupsPatchOp.getOp();
                 if ((CollectionUtils.isNotEmpty(values) && StringUtils.equalsIgnoreCase(patchOp, PATCH_OP_ADD))) {
-                    for (RolePatchOpValue value : values) {
-                        addGroups.add(value.getValue());
+                    for (RoleAssignedGroupsPatchOpValue value : values) {
+                        addGroups.add(new Group(value.getGroupId(), value.getIdpId()));
                     }
                 } else if ((CollectionUtils.isNotEmpty(values) &&
                         StringUtils.equalsIgnoreCase(patchOp, PATCH_OP_REMOVE))) {
-                    for (RolePatchOpValue value : values) {
-                        removedGroups.add(value.getValue());
+                    for (RoleAssignedGroupsPatchOpValue value : values) {
+                        removedGroups.add(value.getGroupId());
                     }
                 } else {
                     // Invalid patch operations cannot be sent due to swagger validation.
@@ -322,9 +326,9 @@ public class ApplicationRoleManagementService {
                 }
             }
             ApplicationRole applicationRole = getApplicationRoleManager().updateApplicationRoleAssignedGroups(roleId,
-                    idpId, addGroups, removedGroups);
+                    addGroups, removedGroups);
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            GroupAssignedRoleResponse response = new GroupAssignedRoleResponse();
+            GroupsAssignedRoleResponse response = new GroupsAssignedRoleResponse();
             List<RoleAssignedGroup> groups = getGroupsForResponseObject(applicationRole.getAssignedGroups(),
                     tenantDomain);
             response.setAssignedGroups(groups);
@@ -340,13 +344,14 @@ public class ApplicationRoleManagementService {
      * @param applicationId Application ID.
      * @param roleId        Role ID.
      */
-    public GroupAssignedRoleResponse getApplicationRoleAssignedGroups(String applicationId, String roleId, String idp) {
+    public GroupsAssignedRoleResponse getApplicationRoleAssignedGroups(String applicationId, String roleId,
+                                                                       String idp) {
 
         ApplicationRole applicationRole = null;
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             applicationRole = getApplicationRoleManager().getApplicationRoleAssignedGroups(roleId, idp);
-            GroupAssignedRoleResponse response = new GroupAssignedRoleResponse();
+            GroupsAssignedRoleResponse response = new GroupsAssignedRoleResponse();
             List<RoleAssignedGroup> groups = getGroupsForResponseObject(applicationRole.getAssignedGroups(),
                     tenantDomain);
             response.setAssignedGroups(groups);

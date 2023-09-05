@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedGroupsPatchOpValue;
 import javax.validation.constraints.*;
 
 
@@ -30,86 +33,58 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class RoleAssignedGroup  {
+public class RoleAssignedGroupsPatchOp  {
   
-    private String $ref;
-    private String display;
-    private String value;
-    private String idp;
+    private String op;
+    private List<RoleAssignedGroupsPatchOpValue> value = new ArrayList<>();
+
 
     /**
     **/
-    public RoleAssignedGroup $ref(String $ref) {
+    public RoleAssignedGroupsPatchOp op(String op) {
 
-        this.$ref = $ref;
+        this.op = op;
         return this;
     }
     
-    @ApiModelProperty(example = "https://localhost:9443/scim2/Groups/3a12bae9-4386-44be-befd-caf349297f45", value = "")
-    @JsonProperty("$ref")
+    @ApiModelProperty(example = "add", required = true, value = "")
+    @JsonProperty("op")
     @Valid
-    public String get$Ref() {
-        return $ref;
+    @NotNull(message = "Property op cannot be null.")
+
+    public String getOp() {
+        return op;
     }
-    public void set$Ref(String $ref) {
-        this.$ref = $ref;
+    public void setOp(String op) {
+        this.op = op;
     }
 
     /**
     **/
-    public RoleAssignedGroup display(String display) {
-
-        this.display = display;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "display", value = "")
-    @JsonProperty("display")
-    @Valid
-    public String getDisplay() {
-        return display;
-    }
-    public void setDisplay(String display) {
-        this.display = display;
-    }
-
-    /**
-    **/
-    public RoleAssignedGroup value(String value) {
+    public RoleAssignedGroupsPatchOp value(List<RoleAssignedGroupsPatchOpValue> value) {
 
         this.value = value;
         return this;
     }
     
-    @ApiModelProperty(example = "e44dbc52-dcc3-443d-96f5-fe9dc208e9d8", value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("value")
     @Valid
-    public String getValue() {
+    @NotNull(message = "Property value cannot be null.")
+
+    public List<RoleAssignedGroupsPatchOpValue> getValue() {
         return value;
     }
-    public void setValue(String value) {
+    public void setValue(List<RoleAssignedGroupsPatchOpValue> value) {
         this.value = value;
     }
 
-    /**
-    **/
-    public RoleAssignedGroup idp(String idp) {
-
-        this.idp = idp;
+    public RoleAssignedGroupsPatchOp addValueItem(RoleAssignedGroupsPatchOpValue valueItem) {
+        this.value.add(valueItem);
         return this;
     }
+
     
-    @ApiModelProperty(example = "e44dbc52-dcc3-443d-96f5-fe9dc208e9d8", value = "")
-    @JsonProperty("idp")
-    @Valid
-    public String getIdp() {
-        return idp;
-    }
-    public void setIdp(String idp) {
-        this.idp = idp;
-    }
-
-
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -120,28 +95,24 @@ public class RoleAssignedGroup  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RoleAssignedGroup roleAssignedGroup = (RoleAssignedGroup) o;
-        return Objects.equals(this.$ref, roleAssignedGroup.$ref) &&
-            Objects.equals(this.display, roleAssignedGroup.display) &&
-            Objects.equals(this.value, roleAssignedGroup.value) &&
-            Objects.equals(this.idp, roleAssignedGroup.idp);
+        RoleAssignedGroupsPatchOp roleAssignedGroupsPatchOp = (RoleAssignedGroupsPatchOp) o;
+        return Objects.equals(this.op, roleAssignedGroupsPatchOp.op) &&
+            Objects.equals(this.value, roleAssignedGroupsPatchOp.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash($ref, display, value, idp);
+        return Objects.hash(op, value);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class RoleAssignedGroup {\n");
+        sb.append("class RoleAssignedGroupsPatchOp {\n");
         
-        sb.append("    $ref: ").append(toIndentedString($ref)).append("\n");
-        sb.append("    display: ").append(toIndentedString(display)).append("\n");
+        sb.append("    op: ").append(toIndentedString(op)).append("\n");
         sb.append("    value: ").append(toIndentedString(value)).append("\n");
-        sb.append("    idp: ").append(toIndentedString(idp)).append("\n");
         sb.append("}");
         return sb.toString();
     }

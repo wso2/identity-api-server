@@ -39,7 +39,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import java.io.File;
-import org.wso2.carbon.identity.api.server.application.management.v1.GroupAssignedRoleResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupsAssignedRoleResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
@@ -48,13 +48,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsC
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.Role;
-import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedGroupsPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedUsersPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleCreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.RolePatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.UserAssignedRoleResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.UsersAssignedRoleResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
@@ -537,24 +538,24 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
-    @Path("/{applicationId}/roles/{roleId}/identity-providers/{idpId}/assigned-groups")
+    @Path("/{applicationId}/roles/{roleId}/assigned-groups")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get role and assigned groups ", notes = "Get a role of the application and its assigned groups<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/rolemgt/view <br> <b>Scope required:</b> <br>     * internal_role_mgt_view ", response = GroupAssignedRoleResponse.class, authorizations = {
+    @ApiOperation(value = "Get role and assigned groups ", notes = "Get a role of the application and its assigned groups<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/rolemgt/view <br> <b>Scope required:</b> <br>     * internal_role_mgt_view ", response = GroupsAssignedRoleResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Application Roles", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = GroupAssignedRoleResponse.class),
+        @ApiResponse(code = 200, message = "OK", response = GroupsAssignedRoleResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getAppRoleGroups(@ApiParam(value = "Application ID",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Role ID",required=true) @PathParam("roleId") String roleId, @ApiParam(value = "IDP ID",required=true) @PathParam("idpId") String idpId) {
+    public Response getAppRoleGroups(@ApiParam(value = "Application ID",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Role ID",required=true) @PathParam("roleId") String roleId,     @Valid@ApiParam(value = "Idp ID")  @QueryParam("idpId") String idpId) {
 
         return delegate.getAppRoleGroups(applicationId,  roleId,  idpId );
     }
@@ -564,14 +565,14 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/roles/{roleId}/assigned-users")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get role and assigned users ", notes = "Get a role of the application and its assigned users<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/usermgt/view <br> <b>Scope required:</b> <br>     * internal_user_mgt_view ", response = UserAssignedRoleResponse.class, authorizations = {
+    @ApiOperation(value = "Get role and assigned users ", notes = "Get a role of the application and its assigned users<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/usermgt/view <br> <b>Scope required:</b> <br>     * internal_user_mgt_view ", response = UsersAssignedRoleResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Application Roles", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = UserAssignedRoleResponse.class),
+        @ApiResponse(code = 200, message = "OK", response = UsersAssignedRoleResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -1012,25 +1013,25 @@ public class ApplicationsApi  {
 
     @Valid
     @PATCH
-    @Path("/{applicationId}/roles/{roleId}/identity-providers/{idpId}/assigned-groups")
+    @Path("/{applicationId}/roles/{roleId}/assigned-groups")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Assign groups to an application role ", notes = "Assign groups to an application role <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/rolemgt/update <br> <b>Scope required:</b> <br>     * internal_role_mgt_update ", response = GroupAssignedRoleResponse.class, authorizations = {
+    @ApiOperation(value = "Assign groups to an application role ", notes = "Assign groups to an application role <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/rolemgt/update <br> <b>Scope required:</b> <br>     * internal_role_mgt_update ", response = GroupsAssignedRoleResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Application Roles", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = GroupAssignedRoleResponse.class),
+        @ApiResponse(code = 200, message = "OK", response = GroupsAssignedRoleResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response patchAppRoleAssignedGroups(@ApiParam(value = "Application ID",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Role ID",required=true) @PathParam("roleId") String roleId, @ApiParam(value = "IDP ID",required=true) @PathParam("idpId") String idpId, @ApiParam(value = "" ) @Valid RoleAssignPatchModel roleAssignPatchModel) {
+    public Response patchAppRoleAssignedGroups(@ApiParam(value = "Application ID",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Role ID",required=true) @PathParam("roleId") String roleId, @ApiParam(value = "" ) @Valid RoleAssignedGroupsPatchModel roleAssignedGroupsPatchModel) {
 
-        return delegate.patchAppRoleAssignedGroups(applicationId,  roleId,  idpId,  roleAssignPatchModel );
+        return delegate.patchAppRoleAssignedGroups(applicationId,  roleId,  roleAssignedGroupsPatchModel );
     }
 
     @Valid
@@ -1038,22 +1039,22 @@ public class ApplicationsApi  {
     @Path("/{applicationId}/roles/{roleId}/assigned-users")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Assign users to an application role ", notes = "Assign users to an application role <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/usermgt/update <br> <b>Scope required:</b> <br>     * internal_user_mgt_update ", response = UserAssignedRoleResponse.class, authorizations = {
+    @ApiOperation(value = "Assign users to an application role ", notes = "Assign users to an application role <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/usermgt/update <br> <b>Scope required:</b> <br>     * internal_user_mgt_update ", response = UsersAssignedRoleResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Application Roles", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = UserAssignedRoleResponse.class),
+        @ApiResponse(code = 200, message = "OK", response = UsersAssignedRoleResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response patchAppRoleAssignedUsers(@ApiParam(value = "Application ID",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Role ID",required=true) @PathParam("roleId") String roleId, @ApiParam(value = "" ) @Valid RoleAssignPatchModel roleAssignPatchModel) {
+    public Response patchAppRoleAssignedUsers(@ApiParam(value = "Application ID",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "Role ID",required=true) @PathParam("roleId") String roleId, @ApiParam(value = "" ) @Valid RoleAssignedUsersPatchModel roleAssignedUsersPatchModel) {
 
-        return delegate.patchAppRoleAssignedUsers(applicationId,  roleId,  roleAssignPatchModel );
+        return delegate.patchAppRoleAssignedUsers(applicationId,  roleId,  roleAssignedUsersPatchModel );
     }
 
     @Valid

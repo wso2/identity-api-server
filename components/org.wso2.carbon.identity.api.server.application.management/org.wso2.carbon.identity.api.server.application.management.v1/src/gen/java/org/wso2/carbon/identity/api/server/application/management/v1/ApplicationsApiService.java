@@ -39,7 +39,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import java.io.File;
-import org.wso2.carbon.identity.api.server.application.management.v1.GroupAssignedRoleResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.GroupsAssignedRoleResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
@@ -48,13 +48,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsC
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.Role;
-import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedGroupsPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedUsersPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleCreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.RolePatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.UserAssignedRoleResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.UsersAssignedRoleResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import javax.ws.rs.core.Response;
@@ -140,9 +141,9 @@ public interface ApplicationsApiService {
 
       public Response patchAppRole(String applicationId, String roleId, RolePatchModel rolePatchModel);
 
-      public Response patchAppRoleAssignedGroups(String applicationId, String roleId, String idpId, RoleAssignPatchModel roleAssignPatchModel);
+      public Response patchAppRoleAssignedGroups(String applicationId, String roleId, RoleAssignedGroupsPatchModel roleAssignedGroupsPatchModel);
 
-      public Response patchAppRoleAssignedUsers(String applicationId, String roleId, RoleAssignPatchModel roleAssignPatchModel);
+      public Response patchAppRoleAssignedUsers(String applicationId, String roleId, RoleAssignedUsersPatchModel roleAssignedUsersPatchModel);
 
       public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel);
 

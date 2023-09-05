@@ -22,9 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedGroup;
 import javax.validation.constraints.*;
 
 
@@ -33,38 +30,29 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class GroupAssignedRoleResponse  {
+public class RoleAssignedUsersPatchOpValue  {
   
-    private List<RoleAssignedGroup> assignedGroups = null;
-
+    private String value;
 
     /**
     **/
-    public GroupAssignedRoleResponse assignedGroups(List<RoleAssignedGroup> assignedGroups) {
+    public RoleAssignedUsersPatchOpValue value(String value) {
 
-        this.assignedGroups = assignedGroups;
+        this.value = value;
         return this;
     }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("assignedGroups")
+    @ApiModelProperty(example = "e44dbc52-dcc3-443d-96f5-fe9dc208e9d8", value = "")
+    @JsonProperty("value")
     @Valid
-    public List<RoleAssignedGroup> getAssignedGroups() {
-        return assignedGroups;
+    public String getValue() {
+        return value;
     }
-    public void setAssignedGroups(List<RoleAssignedGroup> assignedGroups) {
-        this.assignedGroups = assignedGroups;
-    }
-
-    public GroupAssignedRoleResponse addAssignedGroupsItem(RoleAssignedGroup assignedGroupsItem) {
-        if (this.assignedGroups == null) {
-            this.assignedGroups = new ArrayList<>();
-        }
-        this.assignedGroups.add(assignedGroupsItem);
-        return this;
+    public void setValue(String value) {
+        this.value = value;
     }
 
-    
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -75,22 +63,22 @@ public class GroupAssignedRoleResponse  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        GroupAssignedRoleResponse groupAssignedRoleResponse = (GroupAssignedRoleResponse) o;
-        return Objects.equals(this.assignedGroups, groupAssignedRoleResponse.assignedGroups);
+        RoleAssignedUsersPatchOpValue roleAssignedUsersPatchOpValue = (RoleAssignedUsersPatchOpValue) o;
+        return Objects.equals(this.value, roleAssignedUsersPatchOpValue.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(assignedGroups);
+        return Objects.hash(value);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class GroupAssignedRoleResponse {\n");
+        sb.append("class RoleAssignedUsersPatchOpValue {\n");
         
-        sb.append("    assignedGroups: ").append(toIndentedString(assignedGroups)).append("\n");
+        sb.append("    value: ").append(toIndentedString(value)).append("\n");
         sb.append("}");
         return sb.toString();
     }

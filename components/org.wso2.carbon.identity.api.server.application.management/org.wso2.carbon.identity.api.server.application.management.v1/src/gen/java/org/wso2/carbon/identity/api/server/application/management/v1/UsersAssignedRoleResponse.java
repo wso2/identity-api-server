@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.RolePatchOp;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedUser;
 import javax.validation.constraints.*;
 
 
@@ -33,33 +33,34 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class RoleAssignPatchModel  {
+public class UsersAssignedRoleResponse  {
   
-    private List<RolePatchOp> operations = new ArrayList<>();
+    private List<RoleAssignedUser> assignedUsers = null;
 
 
     /**
     **/
-    public RoleAssignPatchModel operations(List<RolePatchOp> operations) {
+    public UsersAssignedRoleResponse assignedUsers(List<RoleAssignedUser> assignedUsers) {
 
-        this.operations = operations;
+        this.assignedUsers = assignedUsers;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("operations")
+    @ApiModelProperty(value = "")
+    @JsonProperty("assignedUsers")
     @Valid
-    @NotNull(message = "Property operations cannot be null.")
-
-    public List<RolePatchOp> getOperations() {
-        return operations;
+    public List<RoleAssignedUser> getAssignedUsers() {
+        return assignedUsers;
     }
-    public void setOperations(List<RolePatchOp> operations) {
-        this.operations = operations;
+    public void setAssignedUsers(List<RoleAssignedUser> assignedUsers) {
+        this.assignedUsers = assignedUsers;
     }
 
-    public RoleAssignPatchModel addOperationsItem(RolePatchOp operationsItem) {
-        this.operations.add(operationsItem);
+    public UsersAssignedRoleResponse addAssignedUsersItem(RoleAssignedUser assignedUsersItem) {
+        if (this.assignedUsers == null) {
+            this.assignedUsers = new ArrayList<>();
+        }
+        this.assignedUsers.add(assignedUsersItem);
         return this;
     }
 
@@ -74,22 +75,22 @@ public class RoleAssignPatchModel  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RoleAssignPatchModel roleAssignPatchModel = (RoleAssignPatchModel) o;
-        return Objects.equals(this.operations, roleAssignPatchModel.operations);
+        UsersAssignedRoleResponse usersAssignedRoleResponse = (UsersAssignedRoleResponse) o;
+        return Objects.equals(this.assignedUsers, usersAssignedRoleResponse.assignedUsers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(operations);
+        return Objects.hash(assignedUsers);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class RoleAssignPatchModel {\n");
+        sb.append("class UsersAssignedRoleResponse {\n");
         
-        sb.append("    operations: ").append(toIndentedString(operations)).append("\n");
+        sb.append("    assignedUsers: ").append(toIndentedString(assignedUsers)).append("\n");
         sb.append("}");
         return sb.toString();
     }

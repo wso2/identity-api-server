@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedGroupsPatchOp;
 import javax.validation.constraints.*;
 
 
@@ -30,29 +33,37 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class RolePatchOpValue  {
+public class RoleAssignedGroupsPatchModel  {
   
-    private String value;
+    private List<RoleAssignedGroupsPatchOp> operations = new ArrayList<>();
+
 
     /**
     **/
-    public RolePatchOpValue value(String value) {
+    public RoleAssignedGroupsPatchModel operations(List<RoleAssignedGroupsPatchOp> operations) {
 
-        this.value = value;
+        this.operations = operations;
         return this;
     }
     
-    @ApiModelProperty(example = "e44dbc52-dcc3-443d-96f5-fe9dc208e9d8", value = "")
-    @JsonProperty("value")
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("operations")
     @Valid
-    public String getValue() {
-        return value;
+    @NotNull(message = "Property operations cannot be null.")
+
+    public List<RoleAssignedGroupsPatchOp> getOperations() {
+        return operations;
     }
-    public void setValue(String value) {
-        this.value = value;
+    public void setOperations(List<RoleAssignedGroupsPatchOp> operations) {
+        this.operations = operations;
     }
 
+    public RoleAssignedGroupsPatchModel addOperationsItem(RoleAssignedGroupsPatchOp operationsItem) {
+        this.operations.add(operationsItem);
+        return this;
+    }
 
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -63,22 +74,22 @@ public class RolePatchOpValue  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RolePatchOpValue rolePatchOpValue = (RolePatchOpValue) o;
-        return Objects.equals(this.value, rolePatchOpValue.value);
+        RoleAssignedGroupsPatchModel roleAssignedGroupsPatchModel = (RoleAssignedGroupsPatchModel) o;
+        return Objects.equals(this.operations, roleAssignedGroupsPatchModel.operations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value);
+        return Objects.hash(operations);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class RolePatchOpValue {\n");
+        sb.append("class RoleAssignedGroupsPatchModel {\n");
         
-        sb.append("    value: ").append(toIndentedString(value)).append("\n");
+        sb.append("    operations: ").append(toIndentedString(operations)).append("\n");
         sb.append("}");
         return sb.toString();
     }

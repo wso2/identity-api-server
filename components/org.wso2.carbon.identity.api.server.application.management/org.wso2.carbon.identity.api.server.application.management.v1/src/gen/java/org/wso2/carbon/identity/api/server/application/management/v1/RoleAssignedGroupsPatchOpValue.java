@@ -22,9 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.application.management.v1.RolePatchOpValue;
 import javax.validation.constraints.*;
 
 
@@ -33,58 +30,48 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class RolePatchOp  {
+public class RoleAssignedGroupsPatchOpValue  {
   
-    private String op;
-    private List<RolePatchOpValue> value = new ArrayList<>();
-
+    private String idpId;
+    private String groupId;
 
     /**
     **/
-    public RolePatchOp op(String op) {
+    public RoleAssignedGroupsPatchOpValue idpId(String idpId) {
 
-        this.op = op;
+        this.idpId = idpId;
         return this;
     }
     
-    @ApiModelProperty(example = "add", required = true, value = "")
-    @JsonProperty("op")
+    @ApiModelProperty(example = "e44dbc52-dcc3-443d-96f5-fe9dc208e9d8", value = "")
+    @JsonProperty("idpId")
     @Valid
-    @NotNull(message = "Property op cannot be null.")
-
-    public String getOp() {
-        return op;
+    public String getIdpId() {
+        return idpId;
     }
-    public void setOp(String op) {
-        this.op = op;
+    public void setIdpId(String idpId) {
+        this.idpId = idpId;
     }
 
     /**
     **/
-    public RolePatchOp value(List<RolePatchOpValue> value) {
+    public RoleAssignedGroupsPatchOpValue groupId(String groupId) {
 
-        this.value = value;
+        this.groupId = groupId;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("value")
+    @ApiModelProperty(example = "e44dbc52-dcc3-443d-96f5-fe9dc208e9d8", value = "")
+    @JsonProperty("groupId")
     @Valid
-    @NotNull(message = "Property value cannot be null.")
-
-    public List<RolePatchOpValue> getValue() {
-        return value;
+    public String getGroupId() {
+        return groupId;
     }
-    public void setValue(List<RolePatchOpValue> value) {
-        this.value = value;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
-    public RolePatchOp addValueItem(RolePatchOpValue valueItem) {
-        this.value.add(valueItem);
-        return this;
-    }
 
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -95,24 +82,24 @@ public class RolePatchOp  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        RolePatchOp rolePatchOp = (RolePatchOp) o;
-        return Objects.equals(this.op, rolePatchOp.op) &&
-            Objects.equals(this.value, rolePatchOp.value);
+        RoleAssignedGroupsPatchOpValue roleAssignedGroupsPatchOpValue = (RoleAssignedGroupsPatchOpValue) o;
+        return Objects.equals(this.idpId, roleAssignedGroupsPatchOpValue.idpId) &&
+            Objects.equals(this.groupId, roleAssignedGroupsPatchOpValue.groupId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(op, value);
+        return Objects.hash(idpId, groupId);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class RolePatchOp {\n");
+        sb.append("class RoleAssignedGroupsPatchOpValue {\n");
         
-        sb.append("    op: ").append(toIndentedString(op)).append("\n");
-        sb.append("    value: ").append(toIndentedString(value)).append("\n");
+        sb.append("    idpId: ").append(toIndentedString(idpId)).append("\n");
+        sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -35,7 +35,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsC
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.Role;
-import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedGroupsPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.RoleAssignedUsersPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleCreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.RolePatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
@@ -308,16 +309,16 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response patchAppRoleAssignedGroups(String applicationId, String roleId, String idpId,
-                                               RoleAssignPatchModel roleAssignPatchModel) {
+    public Response patchAppRoleAssignedGroups(String applicationId, String roleId,
+                                               RoleAssignedGroupsPatchModel roleAssignPatchModel) {
 
         return Response.ok().entity(applicationRoleManagementService.updateApplicationRoleAssignedGroups(applicationId,
-                roleId, idpId, roleAssignPatchModel)).build();
+                roleId, roleAssignPatchModel)).build();
     }
 
     @Override
     public Response patchAppRoleAssignedUsers(String applicationId, String roleId,
-                                              RoleAssignPatchModel roleAssignPatchModel) {
+                                              RoleAssignedUsersPatchModel roleAssignPatchModel) {
 
         return Response.ok().entity(applicationRoleManagementService.updateApplicationRoleAssignedUsers(applicationId,
                 roleId, roleAssignPatchModel)).build();

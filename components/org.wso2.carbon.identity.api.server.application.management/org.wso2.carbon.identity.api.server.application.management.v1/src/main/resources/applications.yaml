@@ -2481,7 +2481,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserAssignedRoleResponse'
+                $ref: '#/components/schemas/UsersAssignedRoleResponse'
         400:
           description: Bad Request
           content:
@@ -2533,14 +2533,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RoleAssignPatchModel'
+              $ref: '#/components/schemas/RoleAssignedUsersPatchModel'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserAssignedRoleResponse'
+                $ref: '#/components/schemas/UsersAssignedRoleResponse'
         400:
           description: Bad Request
           content:
@@ -2557,7 +2557,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  '/applications/{applicationId}/roles/{roleId}/identity-providers/{idpId}/assigned-groups':
+  '/applications/{applicationId}/roles/{roleId}/assigned-groups':
     get:
       tags:
         - Application Roles
@@ -2584,9 +2584,8 @@ paths:
           schema:
             type: string
         - name: idpId
-          in: path
-          description: IDP ID
-          required: true
+          in: query
+          description: Idp ID
           schema:
             type: string
       responses:
@@ -2595,7 +2594,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupAssignedRoleResponse'
+                $ref: '#/components/schemas/GroupsAssignedRoleResponse'
         400:
           description: Bad Request
           content:
@@ -2643,24 +2642,18 @@ paths:
           required: true
           schema:
             type: string
-        - name: idpId
-          in: path
-          description: IDP ID
-          required: true
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RoleAssignPatchModel'
+              $ref: '#/components/schemas/RoleAssignedGroupsPatchModel'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GroupAssignedRoleResponse'
+                $ref: '#/components/schemas/GroupsAssignedRoleResponse'
         400:
           description: Bad Request
           content:
@@ -4067,7 +4060,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Permission'
-    RoleAssignPatchModel:
+    RoleAssignedGroupsPatchModel:
       type: object
       required:
         - operations
@@ -4075,8 +4068,17 @@ components:
         operations:
           type: array
           items:
-            $ref: '#/components/schemas/RolePatchOp'
-    RolePatchOp:
+            $ref: '#/components/schemas/RoleAssignedGroupsPatchOp'
+    RoleAssignedUsersPatchModel:
+      type: object
+      required:
+        - operations
+      properties:
+        operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleAssignedUsersPatchOp'
+    RoleAssignedUsersPatchOp:
       type: object
       required:
         - op
@@ -4088,21 +4090,43 @@ components:
         value:
           type: array
           items:
-            $ref: '#/components/schemas/RolePatchOpValue'
-    RolePatchOpValue:
+            $ref: '#/components/schemas/RoleAssignedUsersPatchOpValue'
+    RoleAssignedGroupsPatchOp:
+      type: object
+      required:
+        - op
+        - value
+      properties:
+        op:
+          type: string
+          example: 'add'
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleAssignedGroupsPatchOpValue'
+    RoleAssignedUsersPatchOpValue:
       type: object
       properties:
         value:
           type: string
           example: 'e44dbc52-dcc3-443d-96f5-fe9dc208e9d8'
-    UserAssignedRoleResponse:
+    RoleAssignedGroupsPatchOpValue:
+      type: object
+      properties:
+        idpId:
+          type: string
+          example: 'e44dbc52-dcc3-443d-96f5-fe9dc208e9d8'
+        groupId:
+          type: string
+          example: 'e44dbc52-dcc3-443d-96f5-fe9dc208e9d8'
+    UsersAssignedRoleResponse:
       type: object
       properties:
         assignedUsers:
           type: array
           items:
             $ref: '#/components/schemas/RoleAssignedUser'
-    GroupAssignedRoleResponse:
+    GroupsAssignedRoleResponse:
       type: object
       properties:
         assignedGroups:
@@ -4131,6 +4155,9 @@ components:
           type: string
           example: 'display'
         value:
+          type: string
+          example: 'e44dbc52-dcc3-443d-96f5-fe9dc208e9d8'
+        idp:
           type: string
           example: 'e44dbc52-dcc3-443d-96f5-fe9dc208e9d8'
     Error:
