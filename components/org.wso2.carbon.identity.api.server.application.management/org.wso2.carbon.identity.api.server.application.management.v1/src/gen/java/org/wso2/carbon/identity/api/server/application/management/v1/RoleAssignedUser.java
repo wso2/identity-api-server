@@ -33,8 +33,8 @@ import javax.xml.bind.annotation.*;
 public class RoleAssignedUser  {
   
     private String $ref;
-    private String display;
-    private String value;
+    private String name;
+    private String id;
 
     /**
     **/
@@ -56,38 +56,38 @@ public class RoleAssignedUser  {
 
     /**
     **/
-    public RoleAssignedUser display(String display) {
+    public RoleAssignedUser name(String name) {
 
-        this.display = display;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "display", value = "")
-    @JsonProperty("display")
+    @ApiModelProperty(example = "username", value = "")
+    @JsonProperty("name")
     @Valid
-    public String getDisplay() {
-        return display;
+    public String getName() {
+        return name;
     }
-    public void setDisplay(String display) {
-        this.display = display;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
     **/
-    public RoleAssignedUser value(String value) {
+    public RoleAssignedUser id(String id) {
 
-        this.value = value;
+        this.id = id;
         return this;
     }
     
     @ApiModelProperty(example = "e44dbc52-dcc3-443d-96f5-fe9dc208e9d8", value = "")
-    @JsonProperty("value")
+    @JsonProperty("id")
     @Valid
-    public String getValue() {
-        return value;
+    public String getId() {
+        return id;
     }
-    public void setValue(String value) {
-        this.value = value;
+    public void setId(String id) {
+        this.id = id;
     }
 
 
@@ -103,13 +103,13 @@ public class RoleAssignedUser  {
         }
         RoleAssignedUser roleAssignedUser = (RoleAssignedUser) o;
         return Objects.equals(this.$ref, roleAssignedUser.$ref) &&
-            Objects.equals(this.display, roleAssignedUser.display) &&
-            Objects.equals(this.value, roleAssignedUser.value);
+            Objects.equals(this.name, roleAssignedUser.name) &&
+            Objects.equals(this.id, roleAssignedUser.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash($ref, display, value);
+        return Objects.hash($ref, name, id);
     }
 
     @Override
@@ -119,8 +119,8 @@ public class RoleAssignedUser  {
         sb.append("class RoleAssignedUser {\n");
         
         sb.append("    $ref: ").append(toIndentedString($ref)).append("\n");
-        sb.append("    display: ").append(toIndentedString(display)).append("\n");
-        sb.append("    value: ").append(toIndentedString(value)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("}");
         return sb.toString();
     }

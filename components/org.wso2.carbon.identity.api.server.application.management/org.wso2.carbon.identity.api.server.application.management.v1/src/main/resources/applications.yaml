@@ -4107,7 +4107,7 @@ components:
     RoleAssignedUsersPatchOpValue:
       type: object
       properties:
-        value:
+        userId:
           type: string
           example: 'e44dbc52-dcc3-443d-96f5-fe9dc208e9d8'
     RoleAssignedGroupsPatchOpValue:
@@ -4139,10 +4139,10 @@ components:
         $ref:
           type: string
           example: 'https://localhost:9443/scim2/Users/3a12bae9-4386-44be-befd-caf349297f45'
-        display:
+        name:
           type: string
-          example: 'display'
-        value:
+          example: 'username'
+        id:
           type: string
           example: 'e44dbc52-dcc3-443d-96f5-fe9dc208e9d8'
     RoleAssignedGroup:
@@ -4151,15 +4151,18 @@ components:
         $ref:
           type: string
           example: 'https://localhost:9443/scim2/Groups/3a12bae9-4386-44be-befd-caf349297f45'
-        display:
+        name:
           type: string
-          example: 'display'
-        value:
-          type: string
-          example: 'e44dbc52-dcc3-443d-96f5-fe9dc208e9d8'
-        idp:
+          example: 'group name'
+        id:
           type: string
           example: 'e44dbc52-dcc3-443d-96f5-fe9dc208e9d8'
+        idpId:
+          type: string
+          example: 'e44dbc52-dcc3-443d-96f5-fe9dc208e9d8'
+        idpName:
+          type: string
+          example: 'idp name'
     Error:
       type: object
       properties:

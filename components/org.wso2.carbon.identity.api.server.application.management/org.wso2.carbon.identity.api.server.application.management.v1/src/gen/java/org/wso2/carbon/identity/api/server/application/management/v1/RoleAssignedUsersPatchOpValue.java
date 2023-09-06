@@ -32,24 +32,24 @@ import javax.xml.bind.annotation.*;
 
 public class RoleAssignedUsersPatchOpValue  {
   
-    private String value;
+    private String userId;
 
     /**
     **/
-    public RoleAssignedUsersPatchOpValue value(String value) {
+    public RoleAssignedUsersPatchOpValue userId(String userId) {
 
-        this.value = value;
+        this.userId = userId;
         return this;
     }
     
     @ApiModelProperty(example = "e44dbc52-dcc3-443d-96f5-fe9dc208e9d8", value = "")
-    @JsonProperty("value")
+    @JsonProperty("userId")
     @Valid
-    public String getValue() {
-        return value;
+    public String getUserId() {
+        return userId;
     }
-    public void setValue(String value) {
-        this.value = value;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
 
@@ -64,12 +64,12 @@ public class RoleAssignedUsersPatchOpValue  {
             return false;
         }
         RoleAssignedUsersPatchOpValue roleAssignedUsersPatchOpValue = (RoleAssignedUsersPatchOpValue) o;
-        return Objects.equals(this.value, roleAssignedUsersPatchOpValue.value);
+        return Objects.equals(this.userId, roleAssignedUsersPatchOpValue.userId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(value);
+        return Objects.hash(userId);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class RoleAssignedUsersPatchOpValue  {
         StringBuilder sb = new StringBuilder();
         sb.append("class RoleAssignedUsersPatchOpValue {\n");
         
-        sb.append("    value: ").append(toIndentedString(value)).append("\n");
+        sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
         sb.append("}");
         return sb.toString();
     }

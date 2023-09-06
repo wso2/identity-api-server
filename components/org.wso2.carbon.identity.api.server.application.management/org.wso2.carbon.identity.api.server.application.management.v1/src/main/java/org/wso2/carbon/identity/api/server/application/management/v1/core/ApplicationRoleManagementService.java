@@ -241,12 +241,12 @@ public class ApplicationRoleManagementService {
                 String patchOp = rolePatchOp.getOp();
                 if ((CollectionUtils.isNotEmpty(values) && StringUtils.equalsIgnoreCase(patchOp, PATCH_OP_ADD))) {
                     for (RoleAssignedUsersPatchOpValue value : values) {
-                        addUsers.add(value.getValue());
+                        addUsers.add(value.getUserId());
                     }
                 } else if ((CollectionUtils.isNotEmpty(values) &&
                         StringUtils.equalsIgnoreCase(patchOp, PATCH_OP_REMOVE))) {
                     for (RoleAssignedUsersPatchOpValue value : values) {
-                        removedUsers.add(value.getValue());
+                        removedUsers.add(value.getUserId());
                     }
                 } else {
                     // Invalid patch operations cannot be sent due to swagger validation.
@@ -381,8 +381,8 @@ public class ApplicationRoleManagementService {
             String uri = getSCIMUserURL(basicUser.getId(), tenantDomain);
 
             RoleAssignedUser user = new RoleAssignedUser();
-            user.value(basicUser.getId());
-            user.display(basicUser.getUserName());
+            user.id(basicUser.getId());
+            user.name(basicUser.getUserName());
             user.$ref(uri);
             users.add(user);
         }
@@ -404,8 +404,10 @@ public class ApplicationRoleManagementService {
             String uri = getSCIMGroupURL(group.getGroupId(), tenantDomain);
 
             RoleAssignedGroup assignedGroup = new RoleAssignedGroup();
-            assignedGroup.value(group.getGroupId());
-            assignedGroup.display(group.getGroupName());
+            assignedGroup.id(group.getGroupId());
+            assignedGroup.name(group.getGroupName());
+            assignedGroup.idpId(group.getIdpId());
+            assignedGroup.idpName(group.getIdpName());
             if (LOCAL_IDP.equals(group.getIdpName())) {
                 assignedGroup.$ref(uri);
             }

@@ -33,9 +33,10 @@ import javax.xml.bind.annotation.*;
 public class RoleAssignedGroup  {
   
     private String $ref;
-    private String display;
-    private String value;
-    private String idp;
+    private String name;
+    private String id;
+    private String idpId;
+    private String idpName;
 
     /**
     **/
@@ -57,56 +58,74 @@ public class RoleAssignedGroup  {
 
     /**
     **/
-    public RoleAssignedGroup display(String display) {
+    public RoleAssignedGroup name(String name) {
 
-        this.display = display;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "display", value = "")
-    @JsonProperty("display")
+    @ApiModelProperty(example = "group name", value = "")
+    @JsonProperty("name")
     @Valid
-    public String getDisplay() {
-        return display;
+    public String getName() {
+        return name;
     }
-    public void setDisplay(String display) {
-        this.display = display;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
     **/
-    public RoleAssignedGroup value(String value) {
+    public RoleAssignedGroup id(String id) {
 
-        this.value = value;
+        this.id = id;
         return this;
     }
     
     @ApiModelProperty(example = "e44dbc52-dcc3-443d-96f5-fe9dc208e9d8", value = "")
-    @JsonProperty("value")
+    @JsonProperty("id")
     @Valid
-    public String getValue() {
-        return value;
+    public String getId() {
+        return id;
     }
-    public void setValue(String value) {
-        this.value = value;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
     **/
-    public RoleAssignedGroup idp(String idp) {
+    public RoleAssignedGroup idpId(String idpId) {
 
-        this.idp = idp;
+        this.idpId = idpId;
         return this;
     }
     
     @ApiModelProperty(example = "e44dbc52-dcc3-443d-96f5-fe9dc208e9d8", value = "")
-    @JsonProperty("idp")
+    @JsonProperty("idpId")
     @Valid
-    public String getIdp() {
-        return idp;
+    public String getIdpId() {
+        return idpId;
     }
-    public void setIdp(String idp) {
-        this.idp = idp;
+    public void setIdpId(String idpId) {
+        this.idpId = idpId;
+    }
+
+    /**
+    **/
+    public RoleAssignedGroup idpName(String idpName) {
+
+        this.idpName = idpName;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "idp name", value = "")
+    @JsonProperty("idpName")
+    @Valid
+    public String getIdpName() {
+        return idpName;
+    }
+    public void setIdpName(String idpName) {
+        this.idpName = idpName;
     }
 
 
@@ -122,14 +141,15 @@ public class RoleAssignedGroup  {
         }
         RoleAssignedGroup roleAssignedGroup = (RoleAssignedGroup) o;
         return Objects.equals(this.$ref, roleAssignedGroup.$ref) &&
-            Objects.equals(this.display, roleAssignedGroup.display) &&
-            Objects.equals(this.value, roleAssignedGroup.value) &&
-            Objects.equals(this.idp, roleAssignedGroup.idp);
+            Objects.equals(this.name, roleAssignedGroup.name) &&
+            Objects.equals(this.id, roleAssignedGroup.id) &&
+            Objects.equals(this.idpId, roleAssignedGroup.idpId) &&
+            Objects.equals(this.idpName, roleAssignedGroup.idpName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash($ref, display, value, idp);
+        return Objects.hash($ref, name, id, idpId, idpName);
     }
 
     @Override
@@ -139,9 +159,10 @@ public class RoleAssignedGroup  {
         sb.append("class RoleAssignedGroup {\n");
         
         sb.append("    $ref: ").append(toIndentedString($ref)).append("\n");
-        sb.append("    display: ").append(toIndentedString(display)).append("\n");
-        sb.append("    value: ").append(toIndentedString(value)).append("\n");
-        sb.append("    idp: ").append(toIndentedString(idp)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    idpId: ").append(toIndentedString(idpId)).append("\n");
+        sb.append("    idpName: ").append(toIndentedString(idpName)).append("\n");
         sb.append("}");
         return sb.toString();
     }
