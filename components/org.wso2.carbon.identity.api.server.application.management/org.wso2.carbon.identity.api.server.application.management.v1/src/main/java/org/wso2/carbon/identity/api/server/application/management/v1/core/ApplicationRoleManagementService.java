@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -94,11 +93,17 @@ public class ApplicationRoleManagementService {
                             applicationId));
 
             Role createdRole = new Role();
-            createdRole.setId(appRole.getRoleId());
-            createdRole.setName(appRole.getRoleName());
+            createdRole.id(appRole.getRoleId())
+                    .name(appRole.getRoleName());
+            List<Permission> addedPermissions = new ArrayList<>();
             if (appRole.getPermissions() != null) {
-                createdRole.setPermissions(Arrays.asList(appRole.getPermissions()));
+                for (String name : appRole.getPermissions()) {
+                    Permission permission = new Permission();
+                    permission.setName(name);
+                    addedPermissions.add(permission);
+                }
             }
+            createdRole.setPermissions(addedPermissions);
             return createdRole;
         } catch (ApplicationRoleManagementException e) {
             throw ApplicationRoleMgtEndpointUtil.handleApplicationRoleMgtException(e);
@@ -116,16 +121,18 @@ public class ApplicationRoleManagementService {
 
         try {
             ApplicationRole applicationRole = getApplicationRoleManager().getApplicationRoleById(roleId);
-            Role role = new Role();
-            role.setId(roleId);
-            role.setName(applicationRole.getRoleName());
             List<Permission> permissions = new ArrayList<>();
-            for (String scope : applicationRole.getPermissions()) {
-                Permission permission = new Permission();
-                permission.setName(scope);
-                permissions.add(permission);
+            if (applicationRole.getPermissions() != null) {
+                for (String name : applicationRole.getPermissions()) {
+                    Permission permission = new Permission();
+                    permission.setName(name);
+                    permissions.add(permission);
+                }
             }
-            role.setPermissions(permissions);
+            Role role = new Role();
+            role.id(roleId)
+                    .name(applicationRole.getRoleName())
+                    .setPermissions(permissions);
             return role;
         } catch (ApplicationRoleManagementException e) {
             throw ApplicationRoleMgtEndpointUtil.handleApplicationRoleMgtException(e);
@@ -146,20 +153,21 @@ public class ApplicationRoleManagementService {
     public List<Role> getApplicationRoles(String applicationId, String before, String after, Integer limit,
                                           String filter, String sort) {
 
-        List<ApplicationRole> applicationRoles = null;
         try {
-            applicationRoles = getApplicationRoleManager().getApplicationRoles(applicationId);
+            List<ApplicationRole> applicationRoles = getApplicationRoleManager().getApplicationRoles(applicationId);
             return applicationRoles.stream().map(applicationRole -> {
-                Role role = new Role();
-                role.setId(applicationRole.getRoleId());
-                role.setName(applicationRole.getRoleName());
                 List<Permission> permissions = new ArrayList<>();
-                for (String scope : applicationRole.getPermissions()) {
-                    Permission permission = new Permission();
-                    permission.setName(scope);
-                    permissions.add(permission);
+                if (applicationRole.getPermissions() != null) {
+                    for (String name : applicationRole.getPermissions()) {
+                        Permission permission = new Permission();
+                        permission.setName(name);
+                        permissions.add(permission);
+                    }
                 }
-                role.setPermissions(permissions);
+                Role role = new Role();
+                role.id(applicationRole.getRoleId())
+                        .name(applicationRole.getRoleName())
+                        .setPermissions(permissions);
                 return role;
             }).collect(Collectors.toList());
         } catch (ApplicationRoleManagementException e) {
@@ -195,25 +203,27 @@ public class ApplicationRoleManagementService {
         List<String> removedPermission = null;
         if (roleUpdate.getAddedPermissions() !=  null) {
             addedPermission = roleUpdate.getAddedPermissions().stream()
-                    .map(permission -> permission.getName()).collect(Collectors.toList());
+                    .map(Permission::getName).collect(Collectors.toList());
         }
         if (roleUpdate.getRemovedPermissions() !=  null) {
             removedPermission = roleUpdate.getRemovedPermissions().stream()
-                    .map(permission -> permission.getName()).collect(Collectors.toList());
+                    .map(Permission::getName).collect(Collectors.toList());
         }
         try {
             ApplicationRole applicationRole =  getApplicationRoleManager().updateApplicationRole(applicationId,
                     roleId, roleUpdate.getName(), addedPermission, removedPermission);
-            Role role = new Role();
-            role.setId(roleId);
-            role.setName(applicationRole.getRoleName());
             List<Permission> permissions = new ArrayList<>();
-            for (String scope : applicationRole.getPermissions()) {
-                Permission permission = new Permission();
-                permission.setName(scope);
-                permissions.add(permission);
+            if (applicationRole.getPermissions() != null) {
+                for (String name : applicationRole.getPermissions()) {
+                    Permission permission = new Permission();
+                    permission.setName(name);
+                    permissions.add(permission);
+                }
             }
-            role.setPermissions(permissions);
+            Role role = new Role();
+            role.id(roleId)
+                    .name(applicationRole.getRoleName())
+                    .setPermissions(permissions);
             return role;
         } catch (ApplicationRoleManagementException e) {
             throw ApplicationRoleMgtEndpointUtil.handleApplicationRoleMgtException(e);
@@ -381,9 +391,9 @@ public class ApplicationRoleManagementService {
             String uri = getSCIMUserURL(basicUser.getId(), tenantDomain);
 
             RoleAssignedUser user = new RoleAssignedUser();
-            user.id(basicUser.getId());
-            user.name(basicUser.getUserName());
-            user.$ref(uri);
+            user.id(basicUser.getId())
+                    .name(basicUser.getUserName())
+                    .$ref(uri);
             users.add(user);
         }
         return users;
@@ -404,10 +414,10 @@ public class ApplicationRoleManagementService {
             String uri = getSCIMGroupURL(group.getGroupId(), tenantDomain);
 
             RoleAssignedGroup assignedGroup = new RoleAssignedGroup();
-            assignedGroup.id(group.getGroupId());
-            assignedGroup.name(group.getGroupName());
-            assignedGroup.idpId(group.getIdpId());
-            assignedGroup.idpName(group.getIdpName());
+            assignedGroup.id(group.getGroupId())
+                    .name(group.getGroupName())
+                    .idpId(group.getIdpId())
+                    .idpName(group.getIdpName());
             if (LOCAL_IDP.equals(group.getIdpName())) {
                 assignedGroup.$ref(uri);
             }
