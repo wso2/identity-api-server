@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.extension.management.v1.model.ExtensionListItemAdditionalProperties;
 import javax.validation.constraints.*;
 
 
@@ -41,6 +42,7 @@ public class ExtensionListItem  {
     private Integer displayOrder;
     private List<String> tags = null;
 
+    private ExtensionListItemAdditionalProperties additionalProperties;
     private String category;
     private String type;
     private String self;
@@ -163,6 +165,24 @@ public class ExtensionListItem  {
 
         /**
     **/
+    public ExtensionListItem additionalProperties(ExtensionListItemAdditionalProperties additionalProperties) {
+
+        this.additionalProperties = additionalProperties;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("additionalProperties")
+    @Valid
+    public ExtensionListItemAdditionalProperties getAdditionalProperties() {
+        return additionalProperties;
+    }
+    public void setAdditionalProperties(ExtensionListItemAdditionalProperties additionalProperties) {
+        this.additionalProperties = additionalProperties;
+    }
+
+    /**
+    **/
     public ExtensionListItem category(String category) {
 
         this.category = category;
@@ -233,6 +253,7 @@ public class ExtensionListItem  {
             Objects.equals(this.image, extensionListItem.image) &&
             Objects.equals(this.displayOrder, extensionListItem.displayOrder) &&
             Objects.equals(this.tags, extensionListItem.tags) &&
+            Objects.equals(this.additionalProperties, extensionListItem.additionalProperties) &&
             Objects.equals(this.category, extensionListItem.category) &&
             Objects.equals(this.type, extensionListItem.type) &&
             Objects.equals(this.self, extensionListItem.self);
@@ -240,7 +261,7 @@ public class ExtensionListItem  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, displayOrder, tags, category, type, self);
+        return Objects.hash(id, name, description, image, displayOrder, tags, additionalProperties, category, type, self);
     }
 
     @Override
@@ -255,6 +276,7 @@ public class ExtensionListItem  {
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    displayOrder: ").append(toIndentedString(displayOrder)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+        sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
         sb.append("    category: ").append(toIndentedString(category)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
