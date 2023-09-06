@@ -24,6 +24,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagemen
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 
 import java.util.List;
@@ -82,10 +84,36 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response getRemoteLoggingConfig(String logType) {
+
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    @Override
+    public Response getRemoteLoggingConfigs() {
+
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+    }
+
+    @Override
     public Response patchPrivatKeyJWTValidationConfiguration(List<JWTKeyValidatorPatch> jwTKeyValidatorPatch) {
 
         configManagementService.patchPrivateKeyJWTValidatorSConfig(jwTKeyValidatorPatch);
         return Response.ok().build();
+    }
+
+    @Override
+    public Response restoreServerRemoteLoggingConfiguration(String logType) {
+
+        configManagementService.resetRemoteServerConfig(logType);
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response restoreServerRemoteLoggingConfigurations() {
+
+        configManagementService.resetRemoteServerConfig();
+        return Response.noContent().build();
     }
 
     @Override
@@ -119,5 +147,19 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
         configManagementService.updateInboundScimConfigs(scimConfig);
         return Response.ok().build();
+    }
+
+    @Override
+    public Response updateRemoteLoggingConfig(String logType, RemoteLoggingConfig remoteLoggingConfig) {
+
+        configManagementService.updateRemoteLoggingConfig(logType, remoteLoggingConfig);
+        return Response.accepted().build();
+    }
+
+    @Override
+    public Response updateRemoteLoggingConfigs(List<RemoteLoggingConfigListItem> remoteLoggingConfigListItem) {
+
+        configManagementService.updateRemoteLoggingConfigs(remoteLoggingConfigListItem);
+        return Response.accepted().build();
     }
 }

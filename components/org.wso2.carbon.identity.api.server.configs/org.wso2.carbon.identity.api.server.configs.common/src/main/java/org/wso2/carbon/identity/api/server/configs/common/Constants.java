@@ -48,6 +48,9 @@ public class Constants {
     public static final String CORS_CONFIG_SUPPORTS_CREDENTIALS_PATH_REGEX = "^/supportsCredentials$";
     public static final String CORS_CONFIG_MAX_AGE_PATH_REGEX = "^/maxAge$";
 
+    public static final String AUDIT = "AUDIT";
+    public static final String CARBON = "CARBON";
+
     /**
      * PATCH operation path for Private Key JWT Validation configuration.
      */
@@ -105,7 +108,27 @@ public class Constants {
                                                       "Private Key JWT Validation configuration."),
         ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND("60505",
                 "Private Key JWT Authenticator is not supported.",
-                "Private Key JWT Authenticator service is unavailable at the moment.");
+                "Private Key JWT Authenticator service is unavailable at the moment."),
+
+        //Remote logging server configuration error.
+        ERROR_CODE_ERROR_RESETTING_REMOTE_LOGGING_CONFIGS("65008",
+                "Unable to reset remote logging  configs.",
+                "Server encountered an " +
+                        "error while resetting the remote logging configs."),
+
+        ERROR_CODE_ERROR_UPDATING_REMOTE_LOGGING_CONFIGS("65009",
+                "Unable to update remote logging  configs.",
+                "Server encountered an " +
+                        "error while updating the remote logging configs."),
+
+        ERROR_CODE_INVALID_TENANT_DOMAIN_FOR_REMOTE_LOGGING_CONFIG("60506",
+                "Invalid tenant domain for accessing remote logging config service",
+                "Remote logging configuration service is only supported for super tenant."),
+
+        ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG("60507",
+                "Invalid log type provided remote logging config service",
+                "Remote logging configuration service only supports AUDIT or CARBON.");
+
 
         private final String code;
         private final String message;
