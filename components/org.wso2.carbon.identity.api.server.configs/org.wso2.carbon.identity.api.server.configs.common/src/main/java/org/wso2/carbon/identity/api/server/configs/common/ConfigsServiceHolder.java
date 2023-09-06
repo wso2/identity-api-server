@@ -116,6 +116,6 @@ public class ConfigsServiceHolder {
      */
     public void setRemoteLoggingConfigService(RemoteLoggingConfigService remoteLoggingConfigService) {
 
-        ConfigsServiceHolder.getInstance().remoteLoggingConfigService = remoteLoggingConfigService;
+        this.remoteLoggingConfigService = remoteLoggingConfigService;
     }
 }
