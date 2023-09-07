@@ -62,6 +62,11 @@
             <artifactId>org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.commons</groupId>
+            <artifactId>org.wso2.carbon.logging.service</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     
 </project>

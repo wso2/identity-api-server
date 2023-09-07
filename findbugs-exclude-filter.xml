@@ -121,4 +121,16 @@
             <Bug pattern="URF_UNREAD_FIELD"/>
         </Match>
     </FindBugsFilter>
+
+    <!--
+        The following exclusions added because the find bug issue is false positive.
+        while using "toUpperCase", ENGLISH locale is already specified to avoid  non-ASCII characters.
+    -->
+    <FindBugsFilter>
+        <Match>
+            <Class name="org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService" />
+            <Method name="resetRemoteServerConfig" />
+            <Bug pattern="IMPROPER_UNICODE" />
+        </Match>
+    </FindBugsFilter>
 </FindBugsFilter>

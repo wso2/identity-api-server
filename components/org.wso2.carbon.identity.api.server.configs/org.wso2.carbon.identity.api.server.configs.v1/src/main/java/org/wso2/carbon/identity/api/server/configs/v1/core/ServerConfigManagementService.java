@@ -22,10 +22,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -48,6 +50,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ProvisioningConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RealmConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
 import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
@@ -73,15 +77,18 @@ import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
+import org.wso2.carbon.logging.service.data.RemoteServerLoggerData;
 import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -449,6 +456,150 @@ public class ServerConfigManagementService {
         schema.setName(schemaName);
         schema.setAttributes(schemaMap.get(schemaName));
         return schema;
+    }
+
+    /**
+     * Reset Remote Server configuration to default values.
+     */
+    public void resetRemoteServerConfig() {
+
+        resetRemoteServerConfig(Constants.AUDIT);
+        resetRemoteServerConfig(Constants.CARBON);
+    }
+
+    /**
+     * Reset Remote Server configuration to default values.
+     *
+     * @param logType Log Type (ex: CARBON or AUDIT).
+     */
+    public void resetRemoteServerConfig(String logType) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (!StringUtils.equalsIgnoreCase(tenantDomain, MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Resetting remote server configuration service is not available for %s",
+                        tenantDomain));
+            }
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                    .ERROR_CODE_INVALID_TENANT_DOMAIN_FOR_REMOTE_LOGGING_CONFIG, null);
+        }
+
+        RemoteServerLoggerData remoteServerLoggerData = new RemoteServerLoggerData();
+
+        switch (logType.toUpperCase(Locale.ENGLISH)) {
+            case Constants.AUDIT:
+                remoteServerLoggerData.setAuditLogType(true);
+                break;
+            case Constants.CARBON:
+                remoteServerLoggerData.setCarbonLogType(true);
+                break;
+            default:
+                throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                        .ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG, null);
+        }
+
+        try {
+            ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService()
+                    .resetRemoteServerConfig(remoteServerLoggerData);
+        } catch (ConfigurationException | IOException e) {
+            log.error("Error while resetting remote server configuration.", e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_RESETTING_REMOTE_LOGGING_CONFIGS, null);
+        }
+    }
+
+    /**
+     * Update remote server logging configurations. Each list item should correspond to specific log type.
+     *
+     * @param remoteLoggingConfigListItem Remote Logging Config List Item.
+     */
+    public void updateRemoteLoggingConfigs(List<RemoteLoggingConfigListItem> remoteLoggingConfigListItem) {
+
+        for (RemoteLoggingConfigListItem loggingConfigListItem: remoteLoggingConfigListItem) {
+
+            switch (loggingConfigListItem.getLogType()) {
+                case AUDIT:
+                    updateRemoteLoggingConfig(Constants.AUDIT, getRemoteLoggingConfig(loggingConfigListItem));
+                    break;
+                case CARBON:
+                    updateRemoteLoggingConfig(Constants.CARBON, getRemoteLoggingConfig(loggingConfigListItem));
+                    break;
+                default:
+                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                            .ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG, null);
+            }
+        }
+    }
+
+    private RemoteLoggingConfig getRemoteLoggingConfig(RemoteLoggingConfigListItem loggingConfigListItem) {
+
+        RemoteLoggingConfig remoteLoggingConfig = new RemoteLoggingConfig();
+        remoteLoggingConfig.setRemoteUrl(loggingConfigListItem.getRemoteUrl());
+        remoteLoggingConfig.setConnectTimeoutMillis(loggingConfigListItem.getConnectTimeoutMillis());
+        remoteLoggingConfig.setVerifyHostname(loggingConfigListItem.getVerifyHostname());
+        remoteLoggingConfig.setUsername(loggingConfigListItem.getUsername());
+        remoteLoggingConfig.setPassword(loggingConfigListItem.getPassword());
+        remoteLoggingConfig.setKeystoreLocation(loggingConfigListItem.getKeystoreLocation());
+        remoteLoggingConfig.setKeystorePassword(loggingConfigListItem.getKeystorePassword());
+        remoteLoggingConfig.setTruststoreLocation(loggingConfigListItem.getTruststoreLocation());
+        remoteLoggingConfig.setTruststorePassword(loggingConfigListItem.getTruststorePassword());
+        return remoteLoggingConfig;
+    }
+
+    /**
+     * Update remote server logging configurations for given log type.
+     *
+     * @param logType               Log type (ex: AUDIT or CARBON).
+     * @param remoteLoggingConfig   Remote server logging configurations.
+     */
+    public void updateRemoteLoggingConfig(String logType, RemoteLoggingConfig remoteLoggingConfig) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        if (!StringUtils.equalsIgnoreCase(tenantDomain, MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Resetting remote server configuration service is not available for %s",
+                        tenantDomain));
+            }
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                    .ERROR_CODE_INVALID_TENANT_DOMAIN_FOR_REMOTE_LOGGING_CONFIG, null);
+        }
+
+        RemoteServerLoggerData remoteServerLoggerData = getRemoteServerLoggerData(remoteLoggingConfig);
+        switch (logType) {
+            case Constants.AUDIT:
+                remoteServerLoggerData.setAuditLogType(true);
+                break;
+            case Constants.CARBON:
+                remoteServerLoggerData.setCarbonLogType(true);
+                break;
+            default:
+                throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                        .ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG, null);
+        }
+
+        try {
+            ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService()
+                    .addRemoteServerConfig(remoteServerLoggerData);
+        } catch (ConfigurationException | IOException e) {
+            log.error("Error while updating remote server configuration.", e);
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
+                    .ERROR_CODE_ERROR_UPDATING_REMOTE_LOGGING_CONFIGS, null);
+        }
+    }
+
+    private RemoteServerLoggerData getRemoteServerLoggerData(RemoteLoggingConfig remoteLoggingConfig) {
+
+        RemoteServerLoggerData remoteServerLoggerData = new RemoteServerLoggerData();
+        remoteServerLoggerData.setUrl(remoteLoggingConfig.getRemoteUrl());
+        remoteServerLoggerData.setConnectTimeoutMillis(remoteLoggingConfig.getConnectTimeoutMillis());
+        remoteServerLoggerData.setVerifyHostname(remoteLoggingConfig.getVerifyHostname());
+        remoteServerLoggerData.setUsername(remoteLoggingConfig.getUsername());
+        remoteServerLoggerData.setPassword(remoteLoggingConfig.getPassword());
+        remoteServerLoggerData.setKeystoreLocation(remoteLoggingConfig.getKeystoreLocation());
+        remoteServerLoggerData.setKeystorePassword(remoteLoggingConfig.getKeystorePassword());
+        remoteServerLoggerData.setTruststoreLocation(remoteLoggingConfig.getTruststoreLocation());
+        remoteServerLoggerData.setTruststorePassword(remoteLoggingConfig.getTruststorePassword());
+        return remoteServerLoggerData;
     }
 
     private List<AuthenticatorListItem> buildAuthenticatorListResponse(

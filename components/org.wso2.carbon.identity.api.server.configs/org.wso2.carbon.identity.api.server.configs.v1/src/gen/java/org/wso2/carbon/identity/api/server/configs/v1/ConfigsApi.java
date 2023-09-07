@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.configs.v1;
 
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
+import java.util.List;
 
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
@@ -30,6 +33,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Schema;
 import org.wso2.carbon.identity.api.server.configs.v1.model.SchemaListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
@@ -197,6 +202,54 @@ public class ConfigsApi  {
 
     @Valid
     @GET
+    @Path("/remote-logging/{log-type}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve Remote Logging Configuration", notes = "Retrieve Remote Logging Configurations ", response = RemoteLoggingConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Server Remote Logging Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = RemoteLoggingConfig.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getRemoteLoggingConfig(@ApiParam(value = "Log Type",required=true) @PathParam("log-type") String logType) {
+
+        return delegate.getRemoteLoggingConfig(logType );
+    }
+
+    @Valid
+    @GET
+    @Path("/remote-logging")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve Remote Logging Configuration", notes = "Retrieve Remote Logging Configurations ", response = RemoteLoggingConfigListItem.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Server Remote Logging Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = RemoteLoggingConfigListItem.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getRemoteLoggingConfigs() {
+
+        return delegate.getRemoteLoggingConfigs();
+    }
+
+    @Valid
+    @GET
     @Path("/schemas/{schema-id}")
     
     @Produces({ "application/json" })
@@ -341,6 +394,54 @@ public class ConfigsApi  {
     }
 
     @Valid
+    @DELETE
+    @Path("/remote-logging/{log-type}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Restore Server Remote Logging Configuration to Default setting ", notes = "Restore Remote Logging Configuration to Default Configuration ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Server Remote Logging Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Delete successful", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response restoreServerRemoteLoggingConfiguration(@ApiParam(value = "Log Type",required=true) @PathParam("log-type") String logType) {
+
+        return delegate.restoreServerRemoteLoggingConfiguration(logType );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/remote-logging")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Restore Server Remote Logging Configuration to Default setting ", notes = "Restore Remote Logging Configuration to Default Configuration ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Server Remote Logging Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Delete successful", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response restoreServerRemoteLoggingConfigurations() {
+
+        return delegate.restoreServerRemoteLoggingConfigurations();
+    }
+
+    @Valid
     @PUT
     @Path("/provisioning/inbound/scim")
     @Consumes({ "application/json" })
@@ -350,7 +451,7 @@ public class ConfigsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Server Inbound SCIM" })
+    }, tags={ "Server Inbound SCIM", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -362,6 +463,54 @@ public class ConfigsApi  {
     public Response updateInboundScimConfigs(@ApiParam(value = "" ,required=true) @Valid ScimConfig scimConfig) {
 
         return delegate.updateInboundScimConfigs(scimConfig );
+    }
+
+    @Valid
+    @PUT
+    @Path("/remote-logging/{log-type}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update Remote Logging Configuration", notes = "Update Remote Logging Configuration ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Server Remote Logging Configuration", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Accepted", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateRemoteLoggingConfig(@ApiParam(value = "Log Type",required=true) @PathParam("log-type") String logType, @ApiParam(value = "" ,required=true) @Valid RemoteLoggingConfig remoteLoggingConfig) {
+
+        return delegate.updateRemoteLoggingConfig(logType,  remoteLoggingConfig );
+    }
+
+    @Valid
+    @PUT
+    @Path("/remote-logging")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update Remote Logging Configuration", notes = "Update Remote Logging Configuration ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Server Remote Logging Configuration" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Accepted", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateRemoteLoggingConfigs(@ApiParam(value = "" ,required=true) @Valid List<RemoteLoggingConfigListItem> remoteLoggingConfigListItem) {
+
+        return delegate.updateRemoteLoggingConfigs(remoteLoggingConfigListItem );
     }
 
 }
