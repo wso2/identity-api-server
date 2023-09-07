@@ -107,7 +107,7 @@ public class ConfigsServiceHolder {
      */
     public RemoteLoggingConfigService getRemoteLoggingConfigService() {
 
-        return this.remoteLoggingConfigService;
+        return ConfigsServiceHolder.getInstance().remoteLoggingConfigService;
     }
     /**
      * Set RemoteLoggingConfigService osgi service.
@@ -116,6 +116,6 @@ public class ConfigsServiceHolder {
      */
     public void setRemoteLoggingConfigService(RemoteLoggingConfigService remoteLoggingConfigService) {
 
-        this.remoteLoggingConfigService = remoteLoggingConfigService;
+        ConfigsServiceHolder.getInstance().remoteLoggingConfigService = remoteLoggingConfigService;
     }
 }
