@@ -72,6 +72,8 @@ public class ApplicationRoleMgtEndpointConstants {
                 "IDP with id: %s doesn't exist."),
         ERROR_CODE_INVALID_PATCH_OPERATION("60008", "Invalid patch operation.",
                 "Invalid patch operation"),
+        ERROR_CODE_SCOPE_ALREADY_ASSIGNED("60009", "Unable to assign scope to app role.",
+                "Scope already assign for the roleId: %s."),
         ;
 
         private final String code;

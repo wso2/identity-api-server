@@ -36,9 +36,9 @@ import javax.xml.bind.annotation.*;
 public class RolePatchModel  {
   
     private String name;
-    private List<Permission> addedPermissions = new ArrayList<>();
+    private List<Permission> addedPermissions = null;
 
-    private List<Permission> removedPermissions = new ArrayList<>();
+    private List<Permission> removedPermissions = null;
 
 
     /**
@@ -49,11 +49,9 @@ public class RolePatchModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "uuid", required = true, value = "")
+    @ApiModelProperty(example = "uuid", value = "")
     @JsonProperty("name")
     @Valid
-    @NotNull(message = "Property name cannot be null.")
-
     public String getName() {
         return name;
     }
@@ -69,11 +67,9 @@ public class RolePatchModel  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("addedPermissions")
     @Valid
-    @NotNull(message = "Property addedPermissions cannot be null.")
-
     public List<Permission> getAddedPermissions() {
         return addedPermissions;
     }
@@ -82,6 +78,9 @@ public class RolePatchModel  {
     }
 
     public RolePatchModel addAddedPermissionsItem(Permission addedPermissionsItem) {
+        if (this.addedPermissions == null) {
+            this.addedPermissions = new ArrayList<>();
+        }
         this.addedPermissions.add(addedPermissionsItem);
         return this;
     }
@@ -94,11 +93,9 @@ public class RolePatchModel  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("removedPermissions")
     @Valid
-    @NotNull(message = "Property removedPermissions cannot be null.")
-
     public List<Permission> getRemovedPermissions() {
         return removedPermissions;
     }
@@ -107,6 +104,9 @@ public class RolePatchModel  {
     }
 
     public RolePatchModel addRemovedPermissionsItem(Permission removedPermissionsItem) {
+        if (this.removedPermissions == null) {
+            this.removedPermissions = new ArrayList<>();
+        }
         this.removedPermissions.add(removedPermissionsItem);
         return this;
     }

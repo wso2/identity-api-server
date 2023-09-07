@@ -31,6 +31,7 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationRoleMgtEndpointConstants.ErrorMessage.ERROR_CODE_GROUP_ALREADY_ASSIGNED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationRoleMgtEndpointConstants.ErrorMessage.ERROR_CODE_GROUP_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationRoleMgtEndpointConstants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND;
+import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationRoleMgtEndpointConstants.ErrorMessage.ERROR_CODE_SCOPE_ALREADY_ASSIGNED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationRoleMgtEndpointConstants.ErrorMessage.ERROR_CODE_USER_ALREADY_ASSIGNED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.constants.ApplicationRoleMgtEndpointConstants.ErrorMessage.ERROR_CODE_USER_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
@@ -74,7 +75,9 @@ public class ApplicationRoleMgtEndpointUtil {
             ) {
                 status = Response.Status.NOT_FOUND;
             } else if (e.getErrorCode().equals(ERROR_CODE_USER_ALREADY_ASSIGNED.getCode()) ||
-                    e.getErrorCode().equals(ERROR_CODE_GROUP_ALREADY_ASSIGNED.getCode())) {
+                    e.getErrorCode().equals(ERROR_CODE_GROUP_ALREADY_ASSIGNED.getCode()) ||
+                    e.getErrorCode().equals(ERROR_CODE_SCOPE_ALREADY_ASSIGNED.getCode())
+            ) {
                 status = Response.Status.CONFLICT;
             } else {
                 status = Response.Status.BAD_REQUEST;

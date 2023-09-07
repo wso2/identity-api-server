@@ -4044,10 +4044,6 @@ components:
           example: /t/{tenant-name}/applications/{application-id}/roles?after=NDoy
     RolePatchModel:
       type: object
-      required:
-        - name
-        - addedPermissions
-        - removedPermissions
       properties:
         name:
           type: string
