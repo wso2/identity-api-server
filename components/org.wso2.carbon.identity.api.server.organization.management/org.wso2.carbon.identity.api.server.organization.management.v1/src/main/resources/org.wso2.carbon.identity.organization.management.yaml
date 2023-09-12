@@ -14,7 +14,7 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
-  - url: 'https://localhost:9443/o/{organization-domain}/api/server/v1/organizations'
+  - url: 'https://localhost:9443/o/{organization-domain}/api/server/v1'
     variables:
       organization-domain:
         default: 10084a8d-113f-4211-a0d5-efe36b082211
