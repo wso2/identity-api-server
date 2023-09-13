@@ -36,9 +36,9 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.ErrorMessage;
-import org.wso2.carbon.identity.api.server.api.resource.v1.exception.APIResourceMgtEndpointException;
 import org.wso2.carbon.identity.api.server.api.resource.v1.util.APIResourceMgtEndpointUtil;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.common.model.APIResource;
 import org.wso2.carbon.identity.application.common.model.Scope;
 
@@ -105,9 +105,9 @@ public class ServerAPIResourceManagementService {
     /**
      * Get API Resources.
      *
-     * @param before - before parameter for cursor based pagination.
-     * @param after  - after parameter for cursor based pagination.
-     * @param filter - filter parameter.
+     * @param before before parameter for cursor based pagination.
+     * @param after  after parameter for cursor based pagination.
+     * @param filter filter parameter.
      * @return Response with API Resources list.
      */
     public APIResourceListResponse getAPIResources(String before, String after, String filter, Integer limit) {
@@ -132,7 +132,7 @@ public class ServerAPIResourceManagementService {
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             List<APIResource> apiResources = apiResourceSearchResult.getAPIResources();
 
-            if (limit != 0 && CollectionUtils.isNotEmpty(apiResources)) {
+            if (CollectionUtils.isNotEmpty(apiResources)) {
                 boolean hasMoreItems = apiResources.size() > limit;
                 boolean needsReverse = StringUtils.isNotBlank(before);
                 boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
@@ -454,9 +454,9 @@ public class ServerAPIResourceManagementService {
      *
      * @param limit Limit parameter.
      * @return Validated limit.
-     * @throws APIResourceMgtEndpointException if the limit is invalid.
+     * @throws APIError if the limit is invalid.
      */
-    private static Integer validatedLimit(Integer limit) throws APIResourceMgtEndpointException {
+    private static Integer validatedLimit(Integer limit) throws APIError {
 
         limit = limit == null ? DEFAULT_LIMIT : limit;
         if (limit == 0 || limit < 0) {

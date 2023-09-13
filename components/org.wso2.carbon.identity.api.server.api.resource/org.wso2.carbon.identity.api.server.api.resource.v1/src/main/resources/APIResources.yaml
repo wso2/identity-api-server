@@ -163,12 +163,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/apiResourceId'
       responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIResourceResponse'
+        204:
+          description: Not Content
         400:
           description: Bad Request
           content:

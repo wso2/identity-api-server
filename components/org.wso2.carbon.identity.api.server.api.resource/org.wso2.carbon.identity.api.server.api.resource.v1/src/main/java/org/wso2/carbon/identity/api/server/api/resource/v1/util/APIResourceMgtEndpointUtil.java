@@ -25,11 +25,11 @@ import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtClientException;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
 import org.wso2.carbon.identity.api.server.api.resource.common.APIResourceManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationModel;
-import org.wso2.carbon.identity.api.server.api.resource.v1.Error;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
-import org.wso2.carbon.identity.api.server.api.resource.v1.exception.APIResourceMgtEndpointException;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
 
@@ -55,7 +55,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DE
  */
 public class APIResourceMgtEndpointUtil {
 
-    private static final Log log = LogFactory.getLog(APIResourceMgtEndpointUtil.class);
+    private static final Log LOG = LogFactory.getLog(APIResourceMgtEndpointUtil.class);
 
     public static void validateAPIResource(APIResourceCreationModel apiResource) {
 
@@ -69,7 +69,7 @@ public class APIResourceMgtEndpointUtil {
 
     public static void validateScopes(List<ScopeCreationModel> scopes) {
 
-        if (scopes == null || scopes.isEmpty()) {
+        if (scopes == null) {
             return;
         }
         for (ScopeCreationModel scope : scopes) {
@@ -90,8 +90,10 @@ public class APIResourceMgtEndpointUtil {
             try {
                 List<String> registeredOIDCScopes = APIResourceManagementServiceHolder.getOAuthAdminServiceImpl()
                         .getRegisteredOIDCScope(ContextLoader.getTenantDomainFromContext());
-                if (registeredOIDCScopes.contains(scope.getName())) {
-                    throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_RESTRICTED_OIDC_SCOPES);
+                if (registeredOIDCScopes != null) {
+                    if (registeredOIDCScopes.contains(scope.getName())) {
+                        throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_RESTRICTED_OIDC_SCOPES);
+                    }
                 }
             } catch (IdentityOAuthAdminException e) {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR, ERROR_CODE_VALIDATE_SCOPES);
@@ -109,7 +111,7 @@ public class APIResourceMgtEndpointUtil {
 
         List<String> validatedAttributes = new ArrayList<>();
 
-        if (attributes == null || attributes.isEmpty()) {
+        if (attributes == null) {
             return validatedAttributes;
         }
 
@@ -123,32 +125,32 @@ public class APIResourceMgtEndpointUtil {
         return validatedAttributes;
     }
 
-    public static APIResourceMgtEndpointException handleException(Response.Status status,
-                                                                  APIResourceMgtEndpointConstants.ErrorMessage error) {
+    public static APIError handleException(Response.Status status,
+                                           APIResourceMgtEndpointConstants.ErrorMessage error) {
 
-        return new APIResourceMgtEndpointException(status, getError(error.getCode(), error.getMessage(),
+        return new APIError(status, getError(error.getCode(), error.getMessage(),
                 error.getDescription()));
     }
 
-    public static APIResourceMgtEndpointException handleException(Response.Status status,
-                                                                  APIResourceMgtEndpointConstants.ErrorMessage error,
-                                                                  String data) {
+    public static APIError handleException(Response.Status status,
+                                           APIResourceMgtEndpointConstants.ErrorMessage error,
+                                           String data) {
 
-        return new APIResourceMgtEndpointException(status, getError(error.getCode(), error.getMessage(),
+        return new APIError(status, getError(error.getCode(), error.getMessage(),
                 String.format(error.getDescription(), data)));
     }
 
-    public static APIResourceMgtEndpointException handleException(Response.Status status, String errorCode,
-                                                                  String message, String description) {
+    public static APIError handleException(Response.Status status, String errorCode,
+                                           String message, String description) {
 
-        return new APIResourceMgtEndpointException(status, getError(errorCode, message, description));
+        return new APIError(status, getError(errorCode, message, description));
     }
 
-    public static APIResourceMgtEndpointException handleAPIResourceMgtException(APIResourceMgtException e) {
+    public static APIError handleAPIResourceMgtException(APIResourceMgtException e) {
 
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
         if (e instanceof APIResourceMgtClientException) {
-            log.debug(e.getMessage(), e);
+            LOG.debug(e.getMessage(), e);
             if (ERROR_CODE_API_RESOURCE_ALREADY_EXISTS.getCode().equals(e.getErrorCode()) ||
                     ERROR_CODE_SCOPE_ALREADY_EXISTS.getCode().equals(e.getErrorCode())) {
                 status = Response.Status.CONFLICT;
@@ -156,7 +158,7 @@ public class APIResourceMgtEndpointUtil {
                 status = Response.Status.BAD_REQUEST;
             }
         } else {
-            log.error(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
         }
         String errorCode = e.getErrorCode();
         errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
@@ -172,9 +174,9 @@ public class APIResourceMgtEndpointUtil {
      * @param errorDescription Error description.
      * @return A generic error with the specified details.
      */
-    public static Error getError(String errorCode, String errorMessage, String errorDescription) {
+    public static ErrorDTO getError(String errorCode, String errorMessage, String errorDescription) {
 
-        Error error = new Error();
+        ErrorDTO error = new ErrorDTO();
         error.setCode(errorCode);
         error.setMessage(errorMessage);
         error.setDescription(errorDescription);

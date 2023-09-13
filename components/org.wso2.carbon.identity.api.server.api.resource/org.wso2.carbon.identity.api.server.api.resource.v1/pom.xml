@@ -22,14 +22,13 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.api.resource</artifactId>
-        <version>1.2.79-SNAPSHOT</version>
+        <version>1.2.81-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <name>WSO2 Identity Server - Applications Rest API</name>
+    <name>WSO2 Identity Server - API Resource Rest API</name>
     <description>WSO2 Identity Server - API Resource Rest API</description>
     <artifactId>org.wso2.carbon.identity.api.server.api.resource.v1</artifactId>
-    <version>1.2.79-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -114,6 +113,7 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.application.common</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
