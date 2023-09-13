@@ -419,6 +419,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.base</artifactId>
+                <version>${carbon.kernel.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.multitenancy</groupId>
                 <artifactId>org.wso2.carbon.tenant.mgt</artifactId>
                 <version>${carbon.multitenancy.version}</version>
@@ -599,6 +605,12 @@
                 <version>${apache.felix.scr.ds.annotations.version}</version>
             </dependency>
             <dependency>
+                <groupId>commons-lang.wso2</groupId>
+                <artifactId>commons-lang</artifactId>
+                <scope>compile</scope>
+                <version>${commons.lang.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jacoco</groupId>
                 <artifactId>org.jacoco.agent</artifactId>
                 <classifier>runtime</classifier>
@@ -718,6 +730,7 @@
         <identity.branding.preference.management.version>1.0.4</identity.branding.preference.management.version>
         <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
+        <commons.lang.version>2.6.0.wso2v1</commons.lang.version>
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
         <identity.verification.version>1.0.3</identity.verification.version>
