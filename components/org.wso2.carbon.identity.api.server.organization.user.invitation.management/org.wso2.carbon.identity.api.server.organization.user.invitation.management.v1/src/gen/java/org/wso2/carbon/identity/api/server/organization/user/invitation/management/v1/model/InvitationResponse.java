@@ -36,14 +36,12 @@ import javax.xml.bind.annotation.*;
 public class InvitationResponse  {
   
     private String id;
-    private String confirmationCode;
     private String username;
     private String email;
     private List<RoleAssignmentResponse> roleAssignments = null;
 
     private String status;
     private String expiredAt;
-    private String userRedirectUrl;
 
     /**
     **/
@@ -63,26 +61,6 @@ public class InvitationResponse  {
     }
     public void setId(String id) {
         this.id = id;
-    }
-
-    /**
-    **/
-    public InvitationResponse confirmationCode(String confirmationCode) {
-
-        this.confirmationCode = confirmationCode;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "2663329b-c8c5-4c71-9500-9ea8c4e77d94", required = true, value = "")
-    @JsonProperty("confirmationCode")
-    @Valid
-    @NotNull(message = "Property confirmationCode cannot be null.")
-
-    public String getConfirmationCode() {
-        return confirmationCode;
-    }
-    public void setConfirmationCode(String confirmationCode) {
-        this.confirmationCode = confirmationCode;
     }
 
     /**
@@ -189,26 +167,6 @@ public class InvitationResponse  {
         this.expiredAt = expiredAt;
     }
 
-    /**
-    **/
-    public InvitationResponse userRedirectUrl(String userRedirectUrl) {
-
-        this.userRedirectUrl = userRedirectUrl;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "https://localhost:8080/travel-manager/login", required = true, value = "")
-    @JsonProperty("userRedirectUrl")
-    @Valid
-    @NotNull(message = "Property userRedirectUrl cannot be null.")
-
-    public String getUserRedirectUrl() {
-        return userRedirectUrl;
-    }
-    public void setUserRedirectUrl(String userRedirectUrl) {
-        this.userRedirectUrl = userRedirectUrl;
-    }
-
 
 
     @Override
@@ -222,18 +180,16 @@ public class InvitationResponse  {
         }
         InvitationResponse invitationResponse = (InvitationResponse) o;
         return Objects.equals(this.id, invitationResponse.id) &&
-            Objects.equals(this.confirmationCode, invitationResponse.confirmationCode) &&
             Objects.equals(this.username, invitationResponse.username) &&
             Objects.equals(this.email, invitationResponse.email) &&
             Objects.equals(this.roleAssignments, invitationResponse.roleAssignments) &&
             Objects.equals(this.status, invitationResponse.status) &&
-            Objects.equals(this.expiredAt, invitationResponse.expiredAt) &&
-            Objects.equals(this.userRedirectUrl, invitationResponse.userRedirectUrl);
+            Objects.equals(this.expiredAt, invitationResponse.expiredAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, confirmationCode, username, email, roleAssignments, status, expiredAt, userRedirectUrl);
+        return Objects.hash(id, username, email, roleAssignments, status, expiredAt);
     }
 
     @Override
@@ -243,13 +199,11 @@ public class InvitationResponse  {
         sb.append("class InvitationResponse {\n");
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
-        sb.append("    confirmationCode: ").append(toIndentedString(confirmationCode)).append("\n");
         sb.append("    username: ").append(toIndentedString(username)).append("\n");
         sb.append("    email: ").append(toIndentedString(email)).append("\n");
         sb.append("    roleAssignments: ").append(toIndentedString(roleAssignments)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    expiredAt: ").append(toIndentedString(expiredAt)).append("\n");
-        sb.append("    userRedirectUrl: ").append(toIndentedString(userRedirectUrl)).append("\n");
         sb.append("}");
         return sb.toString();
     }

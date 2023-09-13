@@ -104,10 +104,9 @@ paths:
         - Parent Organization User Invitation
       summary: Accepts an invitation from a user in the parent organization
       description: |
-        After user clicks on the link provided, the application should invoke this API.
-        In order to invoke this API a user should be logged in to the application.
-        Then this API can be initiated with the access token issued for that user.
-        This logged in user should be the same user which the invitation was initiated to.
+        After user clicks on the link provided, the redirected application should invoke this API.
+        This API is a public API and this should be invoked with the confirmation code which is 
+        appended to the notification.
         
         <b>Scope required:</b> <br/> 
         - none
@@ -119,18 +118,6 @@ paths:
           description: Successful Response
         '400':
           description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden
           content:
             application/json:
               schema:
@@ -310,8 +297,6 @@ components:
       type: object
       required:
         - username
-        - applicationId
-        - roles
       properties:
         username:
           type: string
@@ -327,26 +312,13 @@ components:
           description: Role assignments which the user will be assigned to.
           items:
             $ref: '#/components/schemas/RoleAssignmentRequestBody'
-        userRedirectUrl:
-          type: string
-          description: URL to which the user should be redirected for authenticate and a place where accepting API
-            can be invoked. This should be able to invoke switch grant and get the token from the organization where
-            the user is existing.
-          example: https://localhost:8080/travel-manager/invitations/accept
     InvitationSuccessResponse:
       type: object
       required:
-        - confirmationCode
         - username
         - email
         - roleAssignments
-        - userRedirectUrl
       properties:
-        confirmationCode:
-          type: string
-          description: Confirmation code of the invitation which needs to be passed back from the confirmation API
-            to accept the invitation.
-          example: 2663329b-c8c5-4c71-9500-9ea8c4e77d94
         username:
           type: string
           description: Username of the user who will be invited to the organization. This can be an
@@ -361,11 +333,6 @@ components:
           description: Role assignments which the user will be assigned to.
           items:
             $ref: '#/components/schemas/RoleAssignmentResponse'
-        userRedirectUrl:
-          type: string
-          description: URL to which the user should be redirected for authenticate before accepting API
-            is invoked.
-          example: https://localhost:8080/travel-manager/login
     IntrospectRequestBody:
       type: object
       required:
@@ -423,18 +390,13 @@ components:
       type: object
       required:
         - id
-        - confirmationCode
         - username
         - email
         - status
-        - userRedirectUrl
       properties:
         id:
           type: string
           example: f7594498-5b52-4201-abd5-d7cf72565c73
-        confirmationCode:
-          type: string
-          example: 2663329b-c8c5-4c71-9500-9ea8c4e77d94
         username:
           type: string
           example: alex@gmail.com/alex
@@ -451,9 +413,6 @@ components:
         expiredAt:
           type: string
           example: 2021-08-10T10:15:30.00Z
-        userRedirectUrl:
-          type: string
-          example: https://localhost:8080/travel-manager/login
     RoleAssignmentResponse:
       type: object
       required:

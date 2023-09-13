@@ -53,12 +53,10 @@ public class GuestsApi  {
     @Path("/invitation/accept")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Accepts an invitation from a user in the parent organization", notes = "After user clicks on the link provided, the application should invoke this API. In order to invoke this API a user should be logged in to the application. Then this API can be initiated with the access token issued for that user. This logged in user should be the same user which the invitation was initiated to.  <b>Scope required:</b> <br/>  - none ", response = Void.class, tags={ "Parent Organization User Invitation", })
+    @ApiOperation(value = "Accepts an invitation from a user in the parent organization", notes = "After user clicks on the link provided, the redirected application should invoke this API. This API is a public API and this should be invoked with the confirmation code which is  appended to the notification.  <b>Scope required:</b> <br/>  - none ", response = Void.class, tags={ "Parent Organization User Invitation", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
     public Response invitationAcceptPost(@ApiParam(value = "Details that need to confirm an invitation" ,required=true) @Valid AcceptanceRequestBody acceptanceRequestBody) {
