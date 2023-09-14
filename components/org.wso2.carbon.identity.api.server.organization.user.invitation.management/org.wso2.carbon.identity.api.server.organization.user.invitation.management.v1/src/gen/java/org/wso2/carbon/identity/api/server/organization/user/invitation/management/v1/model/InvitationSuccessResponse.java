@@ -35,33 +35,10 @@ import javax.xml.bind.annotation.*;
 
 public class InvitationSuccessResponse  {
   
-    private String confirmationCode;
     private String username;
     private String email;
     private List<RoleAssignmentResponse> roleAssignments = new ArrayList<>();
 
-    private String userRedirectUrl;
-
-    /**
-    * Confirmation code of the invitation which needs to be passed back from the confirmation API to accept the invitation.
-    **/
-    public InvitationSuccessResponse confirmationCode(String confirmationCode) {
-
-        this.confirmationCode = confirmationCode;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "2663329b-c8c5-4c71-9500-9ea8c4e77d94", required = true, value = "Confirmation code of the invitation which needs to be passed back from the confirmation API to accept the invitation.")
-    @JsonProperty("confirmationCode")
-    @Valid
-    @NotNull(message = "Property confirmationCode cannot be null.")
-
-    public String getConfirmationCode() {
-        return confirmationCode;
-    }
-    public void setConfirmationCode(String confirmationCode) {
-        this.confirmationCode = confirmationCode;
-    }
 
     /**
     * Username of the user who will be invited to the organization. This can be an email or an alphanumeric username.
@@ -131,28 +108,7 @@ public class InvitationSuccessResponse  {
         return this;
     }
 
-        /**
-    * URL to which the user should be redirected for authenticate before accepting API is invoked.
-    **/
-    public InvitationSuccessResponse userRedirectUrl(String userRedirectUrl) {
-
-        this.userRedirectUrl = userRedirectUrl;
-        return this;
-    }
     
-    @ApiModelProperty(example = "https://localhost:8080/travel-manager/login", required = true, value = "URL to which the user should be redirected for authenticate before accepting API is invoked.")
-    @JsonProperty("userRedirectUrl")
-    @Valid
-    @NotNull(message = "Property userRedirectUrl cannot be null.")
-
-    public String getUserRedirectUrl() {
-        return userRedirectUrl;
-    }
-    public void setUserRedirectUrl(String userRedirectUrl) {
-        this.userRedirectUrl = userRedirectUrl;
-    }
-
-
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -164,16 +120,14 @@ public class InvitationSuccessResponse  {
             return false;
         }
         InvitationSuccessResponse invitationSuccessResponse = (InvitationSuccessResponse) o;
-        return Objects.equals(this.confirmationCode, invitationSuccessResponse.confirmationCode) &&
-            Objects.equals(this.username, invitationSuccessResponse.username) &&
+        return Objects.equals(this.username, invitationSuccessResponse.username) &&
             Objects.equals(this.email, invitationSuccessResponse.email) &&
-            Objects.equals(this.roleAssignments, invitationSuccessResponse.roleAssignments) &&
-            Objects.equals(this.userRedirectUrl, invitationSuccessResponse.userRedirectUrl);
+            Objects.equals(this.roleAssignments, invitationSuccessResponse.roleAssignments);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(confirmationCode, username, email, roleAssignments, userRedirectUrl);
+        return Objects.hash(username, email, roleAssignments);
     }
 
     @Override
@@ -182,11 +136,9 @@ public class InvitationSuccessResponse  {
         StringBuilder sb = new StringBuilder();
         sb.append("class InvitationSuccessResponse {\n");
         
-        sb.append("    confirmationCode: ").append(toIndentedString(confirmationCode)).append("\n");
         sb.append("    username: ").append(toIndentedString(username)).append("\n");
         sb.append("    email: ").append(toIndentedString(email)).append("\n");
         sb.append("    roleAssignments: ").append(toIndentedString(roleAssignments)).append("\n");
-        sb.append("    userRedirectUrl: ").append(toIndentedString(userRedirectUrl)).append("\n");
         sb.append("}");
         return sb.toString();
     }

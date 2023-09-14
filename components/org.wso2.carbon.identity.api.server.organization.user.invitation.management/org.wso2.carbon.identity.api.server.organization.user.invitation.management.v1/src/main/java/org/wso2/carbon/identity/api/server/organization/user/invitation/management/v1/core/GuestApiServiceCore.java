@@ -85,7 +85,6 @@ public class GuestApiServiceCore {
         Invitation invitation = new Invitation();
         invitation.setUsername(invitationRequestBody.getUsername());
         invitation.setUserDomain(invitationRequestBody.getUserDomain());
-        invitation.setUserRedirectUrl(invitationRequestBody.getUserRedirectUrl());
         if (invitationRequestBody.getRoleAssignments() != null) {
             List<RoleAssignments> roleAssignments = new ArrayList<>();
             for (RoleAssignmentRequestBody roleAssignmentRequestBody : invitationRequestBody.getRoleAssignments()) {
@@ -249,10 +248,8 @@ public class GuestApiServiceCore {
     private InvitationSuccessResponse createInvitationSuccessResponse(Invitation invitation) {
 
         InvitationSuccessResponse invitationSuccessResponse = new InvitationSuccessResponse();
-        invitationSuccessResponse.setConfirmationCode(invitation.getConfirmationCode());
         invitationSuccessResponse.setUsername(invitation.getUsername());
         invitationSuccessResponse.setEmail(invitation.getEmail());
-        invitationSuccessResponse.setUserRedirectUrl(invitation.getUserRedirectUrl());
         if (invitation.getRoleAssignments().length > 0) {
             List<RoleAssignmentResponse> roleAssignmentResponses = buildRoleAssignmentResponse(invitation);
             invitationSuccessResponse.setRoleAssignments(roleAssignmentResponses);
@@ -266,12 +263,10 @@ public class GuestApiServiceCore {
         for (Invitation invitationRecord : invitationList) {
             InvitationResponse invitationResponse = new InvitationResponse();
             invitationResponse.setId(invitationRecord.getInvitationId());
-            invitationResponse.setConfirmationCode(invitationRecord.getConfirmationCode());
             invitationResponse.setUsername(invitationRecord.getUsername());
             invitationResponse.setEmail(invitationRecord.getEmail());
             invitationResponse.setStatus(invitationRecord.getStatus());
             invitationResponse.setExpiredAt(invitationRecord.getExpiredAt().toString());
-            invitationResponse.setUserRedirectUrl(invitationRecord.getUserRedirectUrl());
             if (invitationRecord.getRoleAssignments().length > 0) {
                 List<RoleAssignmentResponse> roleAssignments = buildRoleAssignmentResponse(invitationRecord);
                 invitationResponse.setRoleAssignments(roleAssignments);

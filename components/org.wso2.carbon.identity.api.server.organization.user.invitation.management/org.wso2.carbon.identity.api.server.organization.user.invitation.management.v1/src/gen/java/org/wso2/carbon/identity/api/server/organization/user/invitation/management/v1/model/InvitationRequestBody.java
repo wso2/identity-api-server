@@ -39,7 +39,6 @@ public class InvitationRequestBody  {
     private String userDomain;
     private List<RoleAssignmentRequestBody> roleAssignments = null;
 
-    private String userRedirectUrl;
 
     /**
     * Username of the user who will be invited to the organization. This can be an email or an alphanumeric username.
@@ -108,26 +107,7 @@ public class InvitationRequestBody  {
         return this;
     }
 
-        /**
-    * URL to which the user should be redirected for authenticate and a place where accepting API can be invoked. This should be able to invoke switch grant and get the token from the organization where the user is existing.
-    **/
-    public InvitationRequestBody userRedirectUrl(String userRedirectUrl) {
-
-        this.userRedirectUrl = userRedirectUrl;
-        return this;
-    }
     
-    @ApiModelProperty(example = "https://localhost:8080/travel-manager/invitations/accept", value = "URL to which the user should be redirected for authenticate and a place where accepting API can be invoked. This should be able to invoke switch grant and get the token from the organization where the user is existing.")
-    @JsonProperty("userRedirectUrl")
-    @Valid
-    public String getUserRedirectUrl() {
-        return userRedirectUrl;
-    }
-    public void setUserRedirectUrl(String userRedirectUrl) {
-        this.userRedirectUrl = userRedirectUrl;
-    }
-
-
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -141,13 +121,12 @@ public class InvitationRequestBody  {
         InvitationRequestBody invitationRequestBody = (InvitationRequestBody) o;
         return Objects.equals(this.username, invitationRequestBody.username) &&
             Objects.equals(this.userDomain, invitationRequestBody.userDomain) &&
-            Objects.equals(this.roleAssignments, invitationRequestBody.roleAssignments) &&
-            Objects.equals(this.userRedirectUrl, invitationRequestBody.userRedirectUrl);
+            Objects.equals(this.roleAssignments, invitationRequestBody.roleAssignments);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, userDomain, roleAssignments, userRedirectUrl);
+        return Objects.hash(username, userDomain, roleAssignments);
     }
 
     @Override
@@ -159,7 +138,6 @@ public class InvitationRequestBody  {
         sb.append("    username: ").append(toIndentedString(username)).append("\n");
         sb.append("    userDomain: ").append(toIndentedString(userDomain)).append("\n");
         sb.append("    roleAssignments: ").append(toIndentedString(roleAssignments)).append("\n");
-        sb.append("    userRedirectUrl: ").append(toIndentedString(userRedirectUrl)).append("\n");
         sb.append("}");
         return sb.toString();
     }
