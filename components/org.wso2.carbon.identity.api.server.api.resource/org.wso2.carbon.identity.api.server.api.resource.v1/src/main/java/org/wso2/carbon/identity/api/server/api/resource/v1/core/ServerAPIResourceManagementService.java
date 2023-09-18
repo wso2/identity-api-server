@@ -448,7 +448,7 @@ public class ServerAPIResourceManagementService {
     private static Integer validatedLimit(Integer limit) throws APIError {
 
         limit = limit == null ? DEFAULT_LIMIT : limit;
-        if (limit == 0 || limit < 0) {
+        if (limit <= 0) {
             throw APIResourceMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
                     ErrorMessage.ERROR_CODE_INVALID_LIMIT);
         }
