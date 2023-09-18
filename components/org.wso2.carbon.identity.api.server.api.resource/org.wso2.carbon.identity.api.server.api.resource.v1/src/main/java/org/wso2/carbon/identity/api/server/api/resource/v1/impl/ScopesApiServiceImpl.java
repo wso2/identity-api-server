@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopesApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceManagementService;
 
@@ -28,8 +29,8 @@ import javax.ws.rs.core.Response;
  */
 public class ScopesApiServiceImpl implements ScopesApiService {
 
-    ServerAPIResourceManagementService serverAPIResourceManagementService =
-            ServerAPIResourceManagementService.getInstance();
+    @Autowired
+    ServerAPIResourceManagementService serverAPIResourceManagementService;
 
     @Override
     public Response scopesGet(String filter) {

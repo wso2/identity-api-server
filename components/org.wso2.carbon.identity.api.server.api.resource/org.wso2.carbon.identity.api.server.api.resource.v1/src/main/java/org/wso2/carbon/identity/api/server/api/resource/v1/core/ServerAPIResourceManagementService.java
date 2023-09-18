@@ -63,18 +63,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  */
 public class ServerAPIResourceManagementService {
 
-    private static final ServerAPIResourceManagementService instance = new ServerAPIResourceManagementService();
-
     private static final Log LOG = LogFactory.getLog(ServerAPIResourceManagementService.class);
-
-    private ServerAPIResourceManagementService() {
-
-    }
-
-    public static ServerAPIResourceManagementService getInstance() {
-
-        return instance;
-    }
 
     /**
      * Add API resource.
