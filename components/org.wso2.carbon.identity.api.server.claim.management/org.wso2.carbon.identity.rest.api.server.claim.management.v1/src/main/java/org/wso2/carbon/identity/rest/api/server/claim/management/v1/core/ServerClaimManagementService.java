@@ -62,6 +62,8 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.inspector.TagInspector;
+import org.yaml.snakeyaml.inspector.TrustedPrefixesTagInspector;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -1155,7 +1157,16 @@ public class ServerClaimManagementService {
     private ClaimDialectConfiguration parseClaimDialectFromYaml(FileContent fileContent) throws ClaimMetadataException {
 
         try {
-            Yaml yaml = new Yaml(new Constructor(ClaimDialectConfiguration.class, new LoaderOptions()));
+            // Add trusted tags included in the Claims YAML files.
+            List<String> trustedTagList = new ArrayList<>();
+            trustedTagList.add(ClaimDialectConfiguration.class.getName());
+            trustedTagList.add(ExternalClaimResDTO.class.getName());
+            trustedTagList.add(LocalClaimResDTO.class.getName());
+
+            LoaderOptions loaderOptions = new LoaderOptions();
+            TagInspector tagInspector = new TrustedPrefixesTagInspector(trustedTagList);
+            loaderOptions.setTagInspector(tagInspector);
+            Yaml yaml = new Yaml(new Constructor(ClaimDialectConfiguration.class, loaderOptions));
             return yaml.loadAs(fileContent.getContent(), ClaimDialectConfiguration.class);
         } catch (YAMLException e) {
             throw new ClaimMetadataException(String.format(

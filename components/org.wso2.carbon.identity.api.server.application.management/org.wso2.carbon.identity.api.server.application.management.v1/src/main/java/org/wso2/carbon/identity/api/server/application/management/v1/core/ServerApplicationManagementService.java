@@ -125,6 +125,8 @@ import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.inspector.TagInspector;
+import org.yaml.snakeyaml.inspector.TrustedPrefixesTagInspector;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -686,7 +688,16 @@ public class ServerApplicationManagementService {
             throws IdentityApplicationManagementException {
 
         try {
-            Yaml yaml = new Yaml(new Constructor(ServiceProvider.class, new LoaderOptions()));
+            // Add trusted tags included in the SP YAML file.
+            List<String> trustedTagList = new ArrayList<>();
+            trustedTagList.add(ServiceProvider.class.getName());
+            trustedTagList.add(OAuthAppDO.class.getName());
+            trustedTagList.add(SAMLSSOServiceProviderDTO.class.getName());
+
+            LoaderOptions loaderOptions = new LoaderOptions();
+            TagInspector tagInspector = new TrustedPrefixesTagInspector(trustedTagList);
+            loaderOptions.setTagInspector(tagInspector);
+            Yaml yaml = new Yaml(new Constructor(ServiceProvider.class, loaderOptions));
             return yaml.loadAs(spFileContent.getContent(), ServiceProvider.class);
         } catch (YAMLException e) {
             throw new IdentityApplicationManagementException(String.format("Error in reading YAML Service Provider " +
