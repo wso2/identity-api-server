@@ -118,6 +118,8 @@ import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.inspector.TagInspector;
+import org.yaml.snakeyaml.inspector.TrustedPrefixesTagInspector;
 import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.IOException;
@@ -3696,7 +3698,14 @@ public class ServerIdpManagementService {
             throws IdentityProviderManagementClientException {
 
         try {
-            Yaml yaml = new Yaml(new Constructor(IdentityProvider.class, new LoaderOptions()));
+            // Add trusted tags included in the IDP YAML files.
+            List<String> trustedTagList = new ArrayList<>();
+            trustedTagList.add(IdentityProvider.class.getName());
+
+            LoaderOptions loaderOptions = new LoaderOptions();
+            TagInspector tagInspector = new TrustedPrefixesTagInspector(trustedTagList);
+            loaderOptions.setTagInspector(tagInspector);
+            Yaml yaml = new Yaml(new Constructor(IdentityProvider.class, loaderOptions));
             return yaml.loadAs(fileContent.getContent(), IdentityProvider.class);
         } catch (YAMLException e) {
             throw new IdentityProviderManagementClientException(String.format("Error in reading YAML file " +

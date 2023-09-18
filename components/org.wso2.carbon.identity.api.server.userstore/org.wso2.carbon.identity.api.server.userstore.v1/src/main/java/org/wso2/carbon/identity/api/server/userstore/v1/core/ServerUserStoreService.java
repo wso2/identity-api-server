@@ -80,6 +80,8 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.inspector.TagInspector;
+import org.yaml.snakeyaml.inspector.TrustedPrefixesTagInspector;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -1661,7 +1663,14 @@ public class ServerUserStoreService {
     private UserStoreConfigurations parseUserStoreFromYaml(FileContent fileContent) throws UserStoreException {
 
         try {
-            Yaml yaml = new Yaml(new Constructor(UserStoreConfigurations.class, new LoaderOptions()));
+            // Add trusted tags included in the Userstore YAML files.
+            List<String> trustedTagList = new ArrayList<>();
+            trustedTagList.add(UserStoreConfigurations.class.getName());
+
+            LoaderOptions loaderOptions = new LoaderOptions();
+            TagInspector tagInspector = new TrustedPrefixesTagInspector(trustedTagList);
+            loaderOptions.setTagInspector(tagInspector);
+            Yaml yaml = new Yaml(new Constructor(UserStoreConfigurations.class, loaderOptions));
             return yaml.loadAs(fileContent.getContent(), UserStoreConfigurations.class);
         } catch (YAMLException e) {
             throw new UserStoreException(String.format("Error in reading YAML file " +
