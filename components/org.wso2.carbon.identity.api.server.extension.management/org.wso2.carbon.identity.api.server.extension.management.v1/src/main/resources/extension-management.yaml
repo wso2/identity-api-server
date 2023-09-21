@@ -362,6 +362,11 @@ components:
           items:
             type: string
             example: 'OIDC'
+        customAttributes:
+          type: array
+          items:
+            type: object
+            additionalProperties: { }
         category:
           type: string
           example: 'DEFAULT'
