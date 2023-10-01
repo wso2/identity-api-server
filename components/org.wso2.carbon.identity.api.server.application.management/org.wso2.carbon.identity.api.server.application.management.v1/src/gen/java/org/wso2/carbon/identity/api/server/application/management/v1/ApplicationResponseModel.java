@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Authenticat
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.TagItem;
 import javax.validation.constraints.*;
 
 
@@ -89,6 +90,7 @@ public enum AccessEnum {
 }
 
     private AccessEnum access = AccessEnum.READ;
+    private List<TagItem> tags = null;
 
     /**
     **/
@@ -388,6 +390,32 @@ public enum AccessEnum {
         this.access = access;
     }
 
+    /**
+     **/
+    public ApplicationResponseModel tags(List<TagItem> tags) {
+
+        this.tags = tags;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("tags")
+    @Valid
+    public List<TagItem> getTags() {
+        return tags;
+    }
+    public void setTags(List<TagItem> tags) {
+        this.tags = tags;
+    }
+
+    public ApplicationResponseModel addTagsItem(TagItem tagsItem) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.add(tagsItem);
+        return this;
+    }
+
 
 
     @Override
@@ -415,12 +443,13 @@ public enum AccessEnum {
             Objects.equals(this.authenticationSequence, applicationResponseModel.authenticationSequence) &&
             Objects.equals(this.advancedConfigurations, applicationResponseModel.advancedConfigurations) &&
             Objects.equals(this.provisioningConfigurations, applicationResponseModel.provisioningConfigurations) &&
-            Objects.equals(this.access, applicationResponseModel.access);
+            Objects.equals(this.access, applicationResponseModel.access) &&
+            Objects.equals(this.tags, applicationResponseModel.tags);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, isB2BSelfServiceApp, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, isB2BSelfServiceApp, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access, tags);
     }
 
     @Override
@@ -445,6 +474,7 @@ public enum AccessEnum {
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
         sb.append("    provisioningConfigurations: ").append(toIndentedString(provisioningConfigurations)).append("\n");
         sb.append("    access: ").append(toIndentedString(access)).append("\n");
+        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("}");
         return sb.toString();
     }

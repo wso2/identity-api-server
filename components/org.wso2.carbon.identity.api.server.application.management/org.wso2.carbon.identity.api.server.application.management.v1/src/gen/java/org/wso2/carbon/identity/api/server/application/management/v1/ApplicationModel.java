@@ -27,10 +27,13 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Authenticat
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ListValue;
 import javax.validation.constraints.*;
 
 
 import io.swagger.annotations.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
@@ -50,6 +53,7 @@ public class ApplicationModel  {
     private AuthenticationSequence authenticationSequence;
     private AdvancedApplicationConfiguration advancedConfigurations;
     private ProvisioningConfiguration provisioningConfigurations;
+    private List<ListValue> tags = null;
 
     /**
     **/
@@ -287,6 +291,32 @@ public class ApplicationModel  {
         this.provisioningConfigurations = provisioningConfigurations;
     }
 
+    /**
+     **/
+    public ApplicationModel tags(List<ListValue> tags) {
+
+        this.tags = tags;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("tags")
+    @Valid
+    public List<ListValue> getTags() {
+        return tags;
+    }
+    public void setTags(List<ListValue> tags) {
+        this.tags = tags;
+    }
+
+    public ApplicationModel addTagsItem(ListValue tagsItem) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.add(tagsItem);
+        return this;
+    }
+
 
 
     @Override
@@ -311,12 +341,13 @@ public class ApplicationModel  {
             Objects.equals(this.inboundProtocolConfiguration, applicationModel.inboundProtocolConfiguration) &&
             Objects.equals(this.authenticationSequence, applicationModel.authenticationSequence) &&
             Objects.equals(this.advancedConfigurations, applicationModel.advancedConfigurations) &&
-            Objects.equals(this.provisioningConfigurations, applicationModel.provisioningConfigurations);
+            Objects.equals(this.provisioningConfigurations, applicationModel.provisioningConfigurations) &&
+            Objects.equals(this.tags, applicationModel.tags);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, isManagementApp, isB2BSelfServiceApp, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, isManagementApp, isB2BSelfServiceApp, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations, tags);
     }
 
     @Override
@@ -338,6 +369,7 @@ public class ApplicationModel  {
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
         sb.append("    provisioningConfigurations: ").append(toIndentedString(provisioningConfigurations)).append("\n");
+        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("}");
         return sb.toString();
     }

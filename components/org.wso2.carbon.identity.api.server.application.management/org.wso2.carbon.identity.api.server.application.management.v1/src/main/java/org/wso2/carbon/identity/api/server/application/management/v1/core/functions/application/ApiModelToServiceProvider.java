@@ -20,11 +20,16 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
+import org.wso2.carbon.identity.api.server.application.management.v1.ListValue;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.UpdateInboundProtocols;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
+import org.wso2.carbon.identity.application.common.model.ApplicationTagsItem;
+import org.wso2.carbon.identity.application.common.model.ApplicationTagsItem.ApplicationTagsItemBuilder;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
@@ -53,6 +58,7 @@ public class ApiModelToServiceProvider implements Function<ApplicationModel, Ser
         addAuthenticationSequence(application, applicationModel.getAuthenticationSequence());
         addProvisioningConfiguration(application, applicationModel.getProvisioningConfigurations());
         addInboundAuthenticationProtocolsToApplication(application, applicationModel.getInboundProtocolConfiguration());
+        addApplicationTagsToApplication(application, applicationModel.getTags());
 
         return application;
     }
@@ -92,6 +98,17 @@ public class ApiModelToServiceProvider implements Function<ApplicationModel, Ser
 
         if (advancedApplicationConfig != null) {
             new UpdateAdvancedConfigurations().apply(application, advancedApplicationConfig);
+        }
+    }
+
+    private void addApplicationTagsToApplication(ServiceProvider application, List<ListValue> tags) {
+
+        if (tags != null) {
+            List<ApplicationTagsItem> tagsList = new ArrayList<>();
+            for (ListValue tag: tags) {
+                tagsList.add(new ApplicationTagsItemBuilder().id(tag.getValue()).build());
+            }
+            setIfNotNull(tagsList, application::setTags);
         }
     }
 }

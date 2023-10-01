@@ -23,10 +23,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.TagItem;
 import javax.validation.constraints.*;
 
 
 import io.swagger.annotations.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
@@ -77,6 +80,7 @@ public enum AccessEnum {
     private String self;
     private AdvancedApplicationConfiguration advancedConfigurations;
     private String templateId;
+    private List<TagItem> tags = null;
 
     /**
     **/
@@ -276,6 +280,32 @@ public enum AccessEnum {
         this.templateId = templateId;
     }
 
+    /**
+     **/
+    public ApplicationListItem tags(List<TagItem> tags) {
+
+        this.tags = tags;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("tags")
+    @Valid
+    public List<TagItem> getTags() {
+        return tags;
+    }
+    public void setTags(List<TagItem> tags) {
+        this.tags = tags;
+    }
+
+    public ApplicationListItem addTagsItem(TagItem tagsItem) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.add(tagsItem);
+        return this;
+    }
+
 
 
     @Override
@@ -298,12 +328,13 @@ public enum AccessEnum {
             Objects.equals(this.access, applicationListItem.access) &&
             Objects.equals(this.self, applicationListItem.self) &&
             Objects.equals(this.advancedConfigurations, applicationListItem.advancedConfigurations) &&
-            Objects.equals(this.templateId, applicationListItem.templateId);
+            Objects.equals(this.templateId, applicationListItem.templateId) &&
+            Objects.equals(this.tags, applicationListItem.tags);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, access, self, advancedConfigurations, templateId);
+        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, access, self, advancedConfigurations, templateId, tags);
     }
 
     @Override
@@ -323,6 +354,7 @@ public enum AccessEnum {
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
+        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("}");
         return sb.toString();
     }
