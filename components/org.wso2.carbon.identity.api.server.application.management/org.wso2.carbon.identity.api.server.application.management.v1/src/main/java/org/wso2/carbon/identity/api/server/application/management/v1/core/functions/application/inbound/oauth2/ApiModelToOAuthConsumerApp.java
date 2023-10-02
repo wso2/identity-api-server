@@ -57,6 +57,23 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         consumerAppDTO.setBypassClientCredentials(oidcModel.getPublicClient());
         consumerAppDTO.setRequestObjectSignatureValidationEnabled(oidcModel.getValidateRequestObjectSignature());
 
+        consumerAppDTO.setTokenEndpointAuthMethod(oidcModel.getTokenEndpointAuthMethod());
+        consumerAppDTO.setTokenEndpointAuthSignatureAlgorithm(oidcModel.getTokenEndpointAuthSignatureAlgorithm());
+        consumerAppDTO.setSectorIdentifierURI(oidcModel.getSectorIdentifierURI());
+        consumerAppDTO.setIdTokenSignatureAlgorithm(oidcModel.getIdTokenSignatureAlgorithm());
+        consumerAppDTO.setAuthorizationResponseEncryptionAlgorithm(oidcModel
+                .getAuthorizationResponseEncryptionAlgorithm());
+        consumerAppDTO.setAuthorizationResponseSignatureAlgorithm(oidcModel
+                .getAuthorizationResponseSignatureAlgorithm());
+        consumerAppDTO.setAuthorizationResponseEncryptionMethod(oidcModel.getAuthorizationResponseEncryptionMethod());
+        consumerAppDTO.setRequestObjectSignatureAlgorithm(oidcModel.getRequestObjectSignatureAlgorithm());
+        consumerAppDTO.setRequestObjectEncryptionAlgorithm(oidcModel.getRequestObjectEncryptionAlgorithm());
+        consumerAppDTO.setRequestObjectEncryptionMethod(oidcModel.getRequestObjectEncryptionMethod());
+        consumerAppDTO.setTlsClientAuthSubjectDN(oidcModel.getTlsClientAuthSubjectDN());
+        consumerAppDTO.setTlsClientCertificateBoundAccessTokens(oidcModel.getTlsClientCertificateBoundAccessTokens());
+        consumerAppDTO.setRequirePushedAuthorizationRequests(oidcModel.getRequirePushedAuthorizationRequests());
+        consumerAppDTO.setSubjectType(oidcModel.getSubjectType());
+
         updateAllowedOrigins(consumerAppDTO, oidcModel.getAllowedOrigins());
         updatePkceConfigurations(consumerAppDTO, oidcModel.getPkce());
         updateAccessTokenConfiguration(consumerAppDTO, oidcModel.getAccessToken());

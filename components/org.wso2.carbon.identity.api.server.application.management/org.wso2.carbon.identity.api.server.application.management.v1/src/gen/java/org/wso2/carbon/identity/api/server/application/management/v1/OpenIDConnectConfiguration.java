@@ -89,6 +89,20 @@ public enum StateEnum {
     private OIDCLogoutConfiguration logout;
     private Boolean validateRequestObjectSignature = false;
     private List<String> scopeValidators = null;
+    private String tokenEndpointAuthMethod;
+    private String tokenEndpointAuthSignatureAlgorithm;
+    private String sectorIdentifierURI;
+    private String idTokenSignatureAlgorithm;
+    private String authorizationResponseEncryptionAlgorithm;
+    private String authorizationResponseSignatureAlgorithm;
+    private String authorizationResponseEncryptionMethod;
+    private String requestObjectSignatureAlgorithm;
+    private String requestObjectEncryptionAlgorithm;
+    private String requestObjectEncryptionMethod;
+    private String tlsClientAuthSubjectDN;
+    private boolean tlsClientCertificateBoundAccessTokens;
+    private boolean requirePushedAuthorizationRequests;
+    private String subjectType;
 
 
     /**
@@ -377,7 +391,231 @@ public enum StateEnum {
         return this;
     }
 
-    
+    public OpenIDConnectConfiguration tokenEndpointAuthMethod(String tokenEndpointAuthMethod) {
+
+        this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("tokenEndpointAuthMethod")
+    @Valid
+    public String getTokenEndpointAuthMethod() {
+        return tokenEndpointAuthMethod;
+    }
+    public void setTokenEndpointAuthMethod(String tokenEndpointAuthMethod) {
+        this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
+    }
+
+    public OpenIDConnectConfiguration tokenEndpointAuthSignatureAlgorithm(String tokenEndpointAuthSignatureAlgorithm) {
+
+        this.tokenEndpointAuthSignatureAlgorithm = tokenEndpointAuthSignatureAlgorithm;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("tokenEndpointAuthSignatureAlgorithm")
+    @Valid
+    public String getTokenEndpointAuthSignatureAlgorithm() {
+        return tokenEndpointAuthSignatureAlgorithm;
+    }
+    public void setTokenEndpointAuthSignatureAlgorithm(String tokenEndpointAuthSignatureAlgorithm) {
+        this.tokenEndpointAuthSignatureAlgorithm = tokenEndpointAuthSignatureAlgorithm;
+    }
+
+    public OpenIDConnectConfiguration sectorIdentifierURI(String sectorIdentifierURI) {
+
+        this.sectorIdentifierURI = sectorIdentifierURI;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("sectorIdentifierURI")
+    @Valid
+    public String getSectorIdentifierURI() {
+        return sectorIdentifierURI;
+    }
+    public void setSectorIdentifierURI(String sectorIdentifierURI) {
+        this.sectorIdentifierURI = sectorIdentifierURI;
+    }
+
+    public OpenIDConnectConfiguration idTokenSignatureAlgorithm(String idTokenSignatureAlgorithm) {
+
+        this.idTokenSignatureAlgorithm = idTokenSignatureAlgorithm;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("idTokenSignatureAlgorithm")
+    @Valid
+    public String getIdTokenSignatureAlgorithm() {
+        return idTokenSignatureAlgorithm;
+    }
+    public void setIdTokenSignatureAlgorithm(String idTokenSignatureAlgorithm) {
+        this.idTokenSignatureAlgorithm = idTokenSignatureAlgorithm;
+    }
+
+    public OpenIDConnectConfiguration authorizationResponseEncryptionAlgorithm(
+            String authorizationResponseEncryptionAlgorithm) {
+
+        this.authorizationResponseEncryptionAlgorithm = authorizationResponseEncryptionAlgorithm;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("authorizationResponseEncryptionAlgorithm")
+    @Valid
+    public String getAuthorizationResponseEncryptionAlgorithm() {
+        return authorizationResponseEncryptionAlgorithm;
+    }
+    public void setAuthorizationResponseEncryptionAlgorithm(String authorizationResponseEncryptionAlgorithm) {
+        this.authorizationResponseEncryptionAlgorithm = authorizationResponseEncryptionAlgorithm;
+    }
+
+    public OpenIDConnectConfiguration authorizationResponseSignatureAlgorithm(
+            String authorizationResponseSignatureAlgorithm) {
+
+        this.authorizationResponseSignatureAlgorithm = authorizationResponseSignatureAlgorithm;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("authorizationResponseSignatureAlgorithm")
+    @Valid
+    public String getAuthorizationResponseSignatureAlgorithm() {
+        return authorizationResponseSignatureAlgorithm;
+    }
+    public void setAuthorizationResponseSignatureAlgorithm(String authorizationResponseSignatureAlgorithm) {
+        this.authorizationResponseSignatureAlgorithm = authorizationResponseSignatureAlgorithm;
+    }
+
+    public OpenIDConnectConfiguration authorizationResponseEncryptionMethod(String authorizationResponseEncryptionMethod) {
+
+        this.authorizationResponseEncryptionMethod = authorizationResponseEncryptionMethod;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("authorizationResponseEncryptionMethod")
+    @Valid
+    public String getAuthorizationResponseEncryptionMethod() {
+        return authorizationResponseEncryptionMethod;
+    }
+    public void setAuthorizationResponseEncryptionMethod(String authorizationResponseEncryptionMethod) {
+        this.authorizationResponseEncryptionMethod = authorizationResponseEncryptionMethod;
+    }
+
+    public OpenIDConnectConfiguration requestObjectSignatureAlgorithm(String requestObjectSignatureAlgorithm) {
+
+        this.requestObjectSignatureAlgorithm = requestObjectSignatureAlgorithm;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("requestObjectSignatureAlgorithm")
+    @Valid
+    public String getRequestObjectSignatureAlgorithm() {
+        return requestObjectSignatureAlgorithm;
+    }
+    public void setRequestObjectSignatureAlgorithm(String requestObjectSignatureAlgorithm) {
+        this.requestObjectSignatureAlgorithm = requestObjectSignatureAlgorithm;
+    }
+
+    public OpenIDConnectConfiguration requestObjectEncryptionAlgorithm(String requestObjectEncryptionAlgorithm) {
+
+        this.requestObjectEncryptionAlgorithm = requestObjectEncryptionAlgorithm;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("requestObjectEncryptionAlgorithm")
+    @Valid
+    public String getRequestObjectEncryptionAlgorithm() {
+        return requestObjectEncryptionAlgorithm;
+    }
+    public void setRequestObjectEncryptionAlgorithm(String requestObjectEncryptionAlgorithm) {
+        this.requestObjectEncryptionAlgorithm = requestObjectEncryptionAlgorithm;
+    }
+
+    public OpenIDConnectConfiguration requestObjectEncryptionMethod(String requestObjectEncryptionMethod) {
+
+        this.requestObjectEncryptionMethod = requestObjectEncryptionMethod;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("requestObjectEncryptionMethod")
+    @Valid
+    public String getRequestObjectEncryptionMethod() {
+        return requestObjectEncryptionMethod;
+    }
+    public void setRequestObjectEncryptionMethod(String requestObjectEncryptionMethod) {
+        this.requestObjectEncryptionMethod = requestObjectEncryptionMethod;
+    }
+
+    public OpenIDConnectConfiguration tlsClientAuthSubjectDN(String tlsClientAuthSubjectDN) {
+
+        this.tlsClientAuthSubjectDN = tlsClientAuthSubjectDN;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("tlsClientAuthSubjectDN")
+    @Valid
+    public String getTlsClientAuthSubjectDN() {
+        return tlsClientAuthSubjectDN;
+    }
+    public void setTlsClientAuthSubjectDN(String tlsClientAuthSubjectDN) {
+        this.tlsClientAuthSubjectDN = tlsClientAuthSubjectDN;
+    }
+
+    public OpenIDConnectConfiguration tlsClientCertificateBoundAccessTokens(boolean tlsClientCertificateBoundAccessTokens) {
+
+        this.tlsClientCertificateBoundAccessTokens = tlsClientCertificateBoundAccessTokens;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("tlsClientCertificateBoundAccessTokens")
+    @Valid
+    public boolean getTlsClientCertificateBoundAccessTokens() {
+        return tlsClientCertificateBoundAccessTokens;
+    }
+    public void setTlsClientCertificateBoundAccessTokens(boolean tlsClientCertificateBoundAccessTokens) {
+        this.tlsClientCertificateBoundAccessTokens = tlsClientCertificateBoundAccessTokens;
+    }
+
+    public OpenIDConnectConfiguration requirePushedAuthorizationRequests(boolean requirePushedAuthorizationRequests) {
+
+        this.requirePushedAuthorizationRequests = requirePushedAuthorizationRequests;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("requirePushedAuthorizationRequests")
+    @Valid
+    public boolean getRequirePushedAuthorizationRequests() {
+        return requirePushedAuthorizationRequests;
+    }
+    public void setRequirePushedAuthorizationRequests(boolean requirePushedAuthorizationRequests) {
+        this.requirePushedAuthorizationRequests = requirePushedAuthorizationRequests;
+    }
+
+    public OpenIDConnectConfiguration subjectType(String subjectType) {
+
+        this.subjectType = subjectType;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("subjectType")
+    @Valid
+    public String getSubjectType() {
+        return subjectType;
+    }
+    public void setSubjectType(String subjectType) {
+        this.subjectType = subjectType;
+    }
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -402,12 +640,27 @@ public enum StateEnum {
             Objects.equals(this.idToken, openIDConnectConfiguration.idToken) &&
             Objects.equals(this.logout, openIDConnectConfiguration.logout) &&
             Objects.equals(this.validateRequestObjectSignature, openIDConnectConfiguration.validateRequestObjectSignature) &&
-            Objects.equals(this.scopeValidators, openIDConnectConfiguration.scopeValidators);
+            Objects.equals(this.scopeValidators, openIDConnectConfiguration.scopeValidators) &&
+            Objects.equals(this.tokenEndpointAuthMethod, openIDConnectConfiguration.tokenEndpointAuthMethod) &&
+            Objects.equals(this.tokenEndpointAuthSignatureAlgorithm, openIDConnectConfiguration.tokenEndpointAuthSignatureAlgorithm) &&
+            Objects.equals(this.sectorIdentifierURI, openIDConnectConfiguration.sectorIdentifierURI) &&
+            Objects.equals(this.idTokenSignatureAlgorithm, openIDConnectConfiguration.idTokenSignatureAlgorithm) &&
+            Objects.equals(this.authorizationResponseEncryptionAlgorithm, openIDConnectConfiguration.authorizationResponseEncryptionAlgorithm) &&
+            Objects.equals(this.authorizationResponseSignatureAlgorithm, openIDConnectConfiguration.authorizationResponseSignatureAlgorithm) &&
+            Objects.equals(this.authorizationResponseEncryptionMethod, openIDConnectConfiguration.authorizationResponseEncryptionMethod) &&
+            Objects.equals(this.requestObjectSignatureAlgorithm, openIDConnectConfiguration.requestObjectSignatureAlgorithm) &&
+            Objects.equals(this.requestObjectEncryptionAlgorithm, openIDConnectConfiguration.requestObjectEncryptionAlgorithm) &&
+            Objects.equals(this.requestObjectEncryptionMethod, openIDConnectConfiguration.requestObjectEncryptionMethod) &&
+            Objects.equals(this.tlsClientAuthSubjectDN, openIDConnectConfiguration.tlsClientAuthSubjectDN) &&
+            Objects.equals(this.tlsClientCertificateBoundAccessTokens, openIDConnectConfiguration.tlsClientCertificateBoundAccessTokens) &&
+            Objects.equals(this.requirePushedAuthorizationRequests, openIDConnectConfiguration.requirePushedAuthorizationRequests) &&
+            Objects.equals(this.subjectType, openIDConnectConfiguration.subjectType);
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clientId, clientSecret, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, refreshToken, idToken, logout, validateRequestObjectSignature, scopeValidators);
+        return Objects.hash(clientId, clientSecret, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, refreshToken, idToken, logout, validateRequestObjectSignature, scopeValidators, tokenEndpointAuthMethod, tokenEndpointAuthSignatureAlgorithm, sectorIdentifierURI, idTokenSignatureAlgorithm, authorizationResponseEncryptionAlgorithm, authorizationResponseSignatureAlgorithm, authorizationResponseEncryptionMethod, requestObjectSignatureAlgorithm, requestObjectEncryptionAlgorithm, requestObjectEncryptionMethod, tlsClientAuthSubjectDN, tlsClientCertificateBoundAccessTokens, requirePushedAuthorizationRequests, subjectType);
     }
 
     @Override
@@ -430,6 +683,20 @@ public enum StateEnum {
         sb.append("    logout: ").append(toIndentedString(logout)).append("\n");
         sb.append("    validateRequestObjectSignature: ").append(toIndentedString(validateRequestObjectSignature)).append("\n");
         sb.append("    scopeValidators: ").append(toIndentedString(scopeValidators)).append("\n");
+        sb.append("    tokenEndpointAuthMethod: ").append(toIndentedString(tokenEndpointAuthMethod)).append("\n");
+        sb.append("    tokenEndpointAuthSignatureAlgorithm: ").append(toIndentedString(tokenEndpointAuthSignatureAlgorithm)).append("\n");
+        sb.append("    sectorIdentifierURI: ").append(toIndentedString(sectorIdentifierURI)).append("\n");
+        sb.append("    idTokenSignatureAlgorithm: ").append(toIndentedString(idTokenSignatureAlgorithm)).append("\n");
+        sb.append("    authorizationResponseEncryptionAlgorithm: ").append(toIndentedString(authorizationResponseEncryptionAlgorithm)).append("\n");
+        sb.append("    authorizationResponseSignatureAlgorithm: ").append(toIndentedString(authorizationResponseSignatureAlgorithm)).append("\n");
+        sb.append("    authorizationResponseEncryptionMethod: ").append(toIndentedString(authorizationResponseEncryptionMethod)).append("\n");
+        sb.append("    requestObjectSignatureAlgorithm: ").append(toIndentedString(requestObjectSignatureAlgorithm)).append("\n");
+        sb.append("    requestObjectEncryptionAlgorithm: ").append(toIndentedString(requestObjectEncryptionAlgorithm)).append("\n");
+        sb.append("    requestObjectEncryptionMethod: ").append(toIndentedString(requestObjectEncryptionMethod)).append("\n");
+        sb.append("    tlsClientAuthSubjectDN: ").append(toIndentedString(tlsClientAuthSubjectDN)).append("\n");
+        sb.append("    tlsClientCertificateBoundAccessTokens: ").append(toIndentedString(tlsClientCertificateBoundAccessTokens)).append("\n");
+        sb.append("    requirePushedAuthorizationRequests: ").append(toIndentedString(requirePushedAuthorizationRequests)).append("\n");
+        sb.append("    subjectType: ").append(toIndentedString(subjectType)).append("\n");
         sb.append("}");
         return sb.toString();
     }

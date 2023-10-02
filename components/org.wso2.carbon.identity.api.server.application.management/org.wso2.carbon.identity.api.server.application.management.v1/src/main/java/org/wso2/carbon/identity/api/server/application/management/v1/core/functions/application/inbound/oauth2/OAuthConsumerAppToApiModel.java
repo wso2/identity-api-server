@@ -53,7 +53,21 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .idToken(buildIdTokenConfiguration(oauthAppDTO))
                 .logout(buildLogoutConfiguration(oauthAppDTO))
                 .scopeValidators(getScopeValidators(oauthAppDTO))
-                .validateRequestObjectSignature(oauthAppDTO.isRequestObjectSignatureValidationEnabled());
+                .validateRequestObjectSignature(oauthAppDTO.isRequestObjectSignatureValidationEnabled())
+                .tokenEndpointAuthMethod(oauthAppDTO.getTokenEndpointAuthMethod())
+                .tokenEndpointAuthSignatureAlgorithm(oauthAppDTO.getTokenEndpointAuthSignatureAlgorithm())
+                .sectorIdentifierURI(oauthAppDTO.getSectorIdentifierURI())
+                .idTokenSignatureAlgorithm(oauthAppDTO.getIdTokenSignatureAlgorithm())
+                .authorizationResponseEncryptionAlgorithm(oauthAppDTO.getAuthorizationResponseEncryptionAlgorithm())
+                .authorizationResponseSignatureAlgorithm(oauthAppDTO.getAuthorizationResponseSignatureAlgorithm())
+                .authorizationResponseEncryptionMethod(oauthAppDTO.getAuthorizationResponseEncryptionMethod())
+                .requestObjectSignatureAlgorithm(oauthAppDTO.getRequestObjectSignatureAlgorithm())
+                .requestObjectEncryptionAlgorithm(oauthAppDTO.getRequestObjectEncryptionAlgorithm())
+                .requestObjectEncryptionMethod(oauthAppDTO.getRequestObjectEncryptionMethod())
+                .tlsClientAuthSubjectDN(oauthAppDTO.getTlsClientAuthSubjectDN())
+                .tlsClientCertificateBoundAccessTokens(oauthAppDTO.getTlsClientCertificateBoundAccessTokens())
+                .requirePushedAuthorizationRequests(oauthAppDTO.getRequirePushedAuthorizationRequests())
+                .subjectType(oauthAppDTO.getSubjectType());
     }
 
     private List<String> getScopeValidators(OAuthConsumerAppDTO oauthAppDTO) {
