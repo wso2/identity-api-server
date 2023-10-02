@@ -27,12 +27,14 @@ import org.wso2.carbon.identity.api.server.branding.preference.management.common
 import org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceServiceHolder;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.utils.BrandingPreferenceUtils;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtClientException;
 import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtException;
 import org.wso2.carbon.identity.branding.preference.management.core.exception.BrandingPreferenceMgtServerException;
 import org.wso2.carbon.identity.branding.preference.management.core.model.BrandingPreference;
+import org.wso2.carbon.identity.branding.preference.management.core.model.CustomText;
 
 import javax.ws.rs.core.Response;
 
@@ -41,14 +43,23 @@ import static org.wso2.carbon.identity.api.server.branding.preference.management
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_MGT_ERROR_CODE_DELIMITER;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_NOT_ALLOWED_ERROR_CODE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.CUSTOM_TEXT_PREFERENCE_ALREADY_EXISTS_ERROR_CODE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.DEFAULT_LOCALE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_BRANDING_PREFERENCE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_CUSTOM_TEXT_PREFERENCE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_BRANDING_PREFERENCE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_ADDING_CUSTOM_TEXT_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_BRANDING_PREFERENCE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_DELETING_CUSTOM_TEXT_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_CUSTOM_TEXT_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_BRANDING_PREFERENCE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CUSTOM_TEXT_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_INVALID_BRANDING_PREFERENCE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_INVALID_CUSTOM_TEXT_PREFERENCE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ErrorMessage.ERROR_CODE_NOT_ALLOWED_BRANDING_PREFERENCE_CONFIGURATIONS;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ORGANIZATION_TYPE;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
@@ -238,6 +249,173 @@ public class BrandingPreferenceManagementService {
     }
 
     /**
+     * Create a custom text preference resource with a resource file.
+     *
+     * @param customTextModal Custom Text preference post request.
+     * @return created custom text preference model.
+     */
+    public CustomTextModel addCustomTextPreference(CustomTextModel customTextModal) {
+
+        String tenantDomain = getTenantDomainFromContext();
+        String preferencesJSON = generatePreferencesJSONFromRequest(customTextModal.getPreference());
+        if (!BrandingPreferenceUtils.isValidJSONString(preferencesJSON)) {
+            throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_BRANDING_PREFERENCE, null);
+        }
+
+        CustomText responseDTO;
+        try {
+            CustomText requestDTO = buildRequestDTOFromCustomTextRequest(customTextModal);
+            responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
+                    addCustomText(requestDTO);
+        } catch (BrandingPreferenceMgtException e) {
+            if (CUSTOM_TEXT_PREFERENCE_ALREADY_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Custom Text preferences are already exists for tenant: " + tenantDomain, e);
+                }
+                throw handleException(Response.Status.CONFLICT, ERROR_CODE_CONFLICT_CUSTOM_TEXT_PREFERENCE,
+                        tenantDomain);
+            }
+            throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_ADDING_CUSTOM_TEXT_PREFERENCE, tenantDomain);
+        }
+        return buildCustomTextResponseFromResponseDTO(responseDTO);
+    }
+
+    /**
+     * Delete custom text preference resource.
+     *
+     * @param type   Resource type.
+     * @param name   Name.
+     * @param screen Screen Name.
+     * @param locale Language preference.
+     */
+    public void deleteCustomTextPreference(String type, String name, String screen, String locale) {
+
+        String tenantDomain = getTenantDomainFromContext();
+        if (ORGANIZATION_TYPE.equals(type)) {
+            name = tenantDomain;
+        }
+
+        try {
+            BrandingPreferenceServiceHolder.getBrandingPreferenceManager().deleteCustomText(type, name, screen, locale);
+        } catch (BrandingPreferenceMgtException e) {
+            if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find a custom text preferences to delete for tenant: " + tenantDomain, e);
+                }
+                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS,
+                        tenantDomain);
+            }
+            throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_DELETING_CUSTOM_TEXT_PREFERENCE,
+                    tenantDomain);
+        }
+    }
+
+    /**
+     * Retrieve the requested branding preferences.
+     *
+     * @param type   Resource Type.
+     * @param name   Name.
+     * @param screen Screen Name.
+     * @param locale Language preference.
+     * @return The requested custom text preference resource.
+     */
+    public CustomTextModel getCustomTextPreference(String type, String name, String screen, String locale) {
+
+        String tenantDomain = getTenantDomainFromContext();
+        if (ORGANIZATION_TYPE.equals(type)) {
+            name = tenantDomain;
+        }
+        if (StringUtils.isBlank(locale)) {
+            locale = DEFAULT_LOCALE;
+        }
+        try {
+            CustomText responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
+                    getCustomText(type, name, screen, locale);
+
+            return buildCustomTextResponseFromResponseDTO(responseDTO);
+        } catch (BrandingPreferenceMgtException e) {
+            if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find a custom text preference configurations for tenant: " + tenantDomain, e);
+                }
+                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS,
+                        tenantDomain);
+            }
+            throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_GETTING_CUSTOM_TEXT_PREFERENCE,
+                    tenantDomain);
+        }
+    }
+
+    /**
+     * Retrieve the resolved branding preferences.
+     *
+     * @param type   Resource Type.
+     * @param name   Name.
+     * @param locale Language preference.
+     * @return The resolved custom text preference resource. If not exists return the default preferences.
+     */
+    public CustomTextModel resolveCustomTextPreference(String type, String name, String screen, String locale) {
+
+        String tenantDomain = getTenantDomainFromContext();
+        if (ORGANIZATION_TYPE.equals(type)) {
+            name = tenantDomain;
+        }
+        if (StringUtils.isBlank(locale)) {
+            locale = DEFAULT_LOCALE;
+        }
+        try {
+            CustomText responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
+                    resolveCustomText(type, name, screen, locale);
+
+            return buildCustomTextResponseFromResponseDTO(responseDTO);
+        } catch (BrandingPreferenceMgtException e) {
+            if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find a custom text preference configurations for tenant: " + tenantDomain, e);
+                }
+                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS,
+                        tenantDomain);
+            }
+            throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_GETTING_CUSTOM_TEXT_PREFERENCE,
+                    tenantDomain);
+        }
+    }
+
+    /**
+     * Update custom text preferences.
+     *
+     * @param customTextModel Custom Text Preference Model with new preferences.
+     * @return Updated custom text preference model.
+     */
+    public CustomTextModel updateCustomTextPreference(CustomTextModel customTextModel) {
+
+        String tenantDomain = getTenantDomainFromContext();
+
+        String preferencesJSON = generatePreferencesJSONFromRequest(customTextModel.getPreference());
+        if (!BrandingPreferenceUtils.isValidJSONString(preferencesJSON)) {
+            throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_CUSTOM_TEXT_PREFERENCE, null);
+        }
+
+        CustomText responseDTO;
+        try {
+            CustomText requestDTO = buildRequestDTOFromCustomTextRequest(customTextModel);
+            responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
+                    replaceCustomText(requestDTO);
+        } catch (BrandingPreferenceMgtException e) {
+            if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find a custom text preferences to update for tenant: " + tenantDomain, e);
+                }
+                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS,
+                        tenantDomain);
+            }
+            throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_UPDATING_CUSTOM_TEXT_PREFERENCE,
+                    tenantDomain);
+        }
+        return buildCustomTextResponseFromResponseDTO(responseDTO);
+    }
+
+    /**
      * Build branding preference requestDTO from request body.
      *
      * @param brandingModel Branding preference request body.
@@ -262,6 +440,31 @@ public class BrandingPreferenceManagementService {
     }
 
     /**
+     * Build custom text preference requestDTO from request body.
+     *
+     * @param customTextModel Custom Text preference request body.
+     * @return Custom Text preference requestDTO object.
+     */
+    private CustomText buildRequestDTOFromCustomTextRequest(CustomTextModel customTextModel) {
+
+        CustomText customTextRequestDTO = new CustomText();
+        customTextRequestDTO.setType(customTextModel.getType().toString());
+        if (ORGANIZATION_TYPE.equals(customTextModel.getType().toString())) {
+            customTextRequestDTO.setName(getTenantDomainFromContext());
+        } else {
+            customTextRequestDTO.setName(customTextModel.getName());
+        }
+        if (StringUtils.isBlank(customTextModel.getLocale())) {
+            customTextRequestDTO.setLocale(DEFAULT_LOCALE);
+        } else {
+            customTextRequestDTO.setLocale(customTextModel.getLocale());
+        }
+        customTextRequestDTO.setScreen(customTextModel.getScreen());
+        customTextRequestDTO.setPreference(customTextModel.getPreference());
+        return customTextRequestDTO;
+    }
+
+    /**
      * Build branding preference response object from the responseDTO.
      *
      * @param responseDTO Branding preference responseDTO object.
@@ -275,6 +478,23 @@ public class BrandingPreferenceManagementService {
         brandingPreferenceResponse.setLocale(responseDTO.getLocale());
         brandingPreferenceResponse.setPreference(responseDTO.getPreference());
         return brandingPreferenceResponse;
+    }
+
+    /**
+     * Build custom text preference response object from the responseDTO.
+     *
+     * @param responseDTO Custom Text preference responseDTO object.
+     * @return Custom Text preference response object{@link CustomTextModel}.
+     */
+    private CustomTextModel buildCustomTextResponseFromResponseDTO(CustomText responseDTO) {
+
+        CustomTextModel customTextModel = new CustomTextModel();
+        customTextModel.setType(CustomTextModel.TypeEnum.valueOf(responseDTO.getType()));
+        customTextModel.setName(responseDTO.getName());
+        customTextModel.setLocale(responseDTO.getLocale());
+        customTextModel.setScreen(responseDTO.getScreen());
+        customTextModel.setPreference(responseDTO.getPreference());
+        return customTextModel;
     }
 
     /**
@@ -320,9 +540,11 @@ public class BrandingPreferenceManagementService {
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(exception.getMessage());
-            if (BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE.equals(exception.getErrorCode())) {
+            if (BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE.equals(exception.getErrorCode()) ||
+                    CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(exception.getErrorCode())) {
                 status = Response.Status.CONFLICT;
-            } else if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(exception.getErrorCode())) {
+            } else if (BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(exception.getErrorCode()) ||
+                    CUSTOM_TEXT_PREFERENCE_ALREADY_EXISTS_ERROR_CODE.equals(exception.getErrorCode())) {
                 status = Response.Status.NOT_FOUND;
             } else {
                 status = Response.Status.BAD_REQUEST;

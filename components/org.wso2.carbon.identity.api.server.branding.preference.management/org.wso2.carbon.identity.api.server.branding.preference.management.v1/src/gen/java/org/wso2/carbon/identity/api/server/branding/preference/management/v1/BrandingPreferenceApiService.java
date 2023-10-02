@@ -25,6 +25,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.Error;
 import javax.ws.rs.core.Response;
 
@@ -33,11 +34,21 @@ public interface BrandingPreferenceApiService {
 
       public Response addBrandingPreference(BrandingPreferenceModel brandingPreferenceModel);
 
+      public Response addCustomText(CustomTextModel customTextModel);
+
       public Response deleteBrandingPreference(String type, String name, String locale);
+
+      public Response deleteCustomText(String type, String name, String locale, String screen);
 
       public Response getBrandingPreference(String type, String name, String locale);
 
+      public Response getCustomText(String type, String name, String locale, String screen);
+
       public Response resolveBrandingPreference(String type, String name, String locale);
 
+      public Response resolveCustomText(String type, String name, String locale, String screen);
+
       public Response updateBrandingPreference(BrandingPreferenceModel brandingPreferenceModel);
+
+      public Response updateCustomText(CustomTextModel customTextModel);
 }

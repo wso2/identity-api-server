@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingPreferenceManagementService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
@@ -37,6 +38,7 @@ import static org.wso2.carbon.identity.api.server.branding.preference.management
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.BRANDING_PREFERENCE_CONTEXT_PATH;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.CUSTOM_TYPE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.DEFAULT_LOCALE;
+import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.GET_CUSTOM_TEXT_COMPONENT_WITH_QUERY_PARAM;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.GET_PREFERENCE_COMPONENT_WITH_QUERY_PARAM;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.ORGANIZATION_TYPE;
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.QUERY_PARAM_INDICATOR;
@@ -83,6 +85,39 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     }
 
     @Override
+    public Response addCustomText(CustomTextModel customTextModel) {
+
+        if (StringUtils.isBlank(customTextModel.getType().toString())
+                || StringUtils.isBlank(customTextModel.getScreen())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (!ORGANIZATION_TYPE.equals(customTextModel.getType().toString())) {
+            return Response.status(Response.Status.NOT_IMPLEMENTED).entity("Not Implemented.").build();
+        }
+
+        String locale = customTextModel.getLocale();
+        if (StringUtils.isBlank(customTextModel.getLocale())) {
+            locale = DEFAULT_LOCALE;
+        }
+
+        CustomTextModel createdCustomTextModel =
+                brandingPreferenceManagementService.addCustomTextPreference(customTextModel);
+        URI location;
+        try {
+            location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT + BRANDING_PREFERENCE_CONTEXT_PATH
+                    + QUERY_PARAM_INDICATOR +
+                    URLEncoder.encode(String.format(GET_CUSTOM_TEXT_COMPONENT_WITH_QUERY_PARAM, ORGANIZATION_TYPE,
+                                    getTenantDomainFromContext(), customTextModel.getScreen(), locale),
+                            StandardCharsets.UTF_8.name()));
+        } catch (UnsupportedEncodingException e) {
+            ErrorResponse errorResponse =
+                    new ErrorResponse.Builder().withMessage("Error due to unsupported encoding.").build();
+            throw new APIError(Response.Status.METHOD_NOT_ALLOWED, errorResponse);
+        }
+        return Response.created(location).entity(createdCustomTextModel).build();
+    }
+
+    @Override
     public Response deleteBrandingPreference(String type, String name, String locale) {
 
         if (type != null) {
@@ -108,6 +143,31 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     }
 
     @Override
+    public Response deleteCustomText(String type, String name, String locale, String screen) {
+
+        if (type != null) {
+            if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            if (!ORGANIZATION_TYPE.equals(type)) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+        } else {
+            type = ORGANIZATION_TYPE;
+        }
+
+        if (screen == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (locale == null) {
+            locale = DEFAULT_LOCALE;
+        }
+
+        brandingPreferenceManagementService.deleteCustomTextPreference(type, name, screen, locale);
+        return Response.noContent().build();
+    }
+
+    @Override
     public Response getBrandingPreference(String type, String name, String locale) {
 
         if (type != null) {
@@ -120,6 +180,27 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     }
 
     @Override
+    public Response getCustomText(String type, String name, String locale, String screen) {
+
+        if (type != null) {
+            if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            if (!(ORGANIZATION_TYPE.equals(type))) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+        } else {
+            type = ORGANIZATION_TYPE;
+        }
+
+        if (screen == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.ok().entity(brandingPreferenceManagementService.
+                getCustomTextPreference(type, name, screen, locale)).build();
+    }
+
+    @Override
     public Response resolveBrandingPreference(String type, String name, String locale) {
 
         if (type != null) {
@@ -129,6 +210,24 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         }
         return Response.ok()
                 .entity(brandingPreferenceManagementService.resolveBrandingPreference(type, name, locale)).build();
+    }
+
+    @Override
+    public Response resolveCustomText(String type, String name, String locale, String screen) {
+
+        if (type != null) {
+            if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+        } else {
+            type = ORGANIZATION_TYPE;
+        }
+
+        if (screen == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.ok().entity(brandingPreferenceManagementService.
+                resolveCustomTextPreference(type, name, screen, locale)).build();
     }
 
     @Override
@@ -148,5 +247,23 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         BrandingPreferenceModel updatedBrandingPreferenceModel =
                 brandingPreferenceManagementService.updateBrandingPreference(brandingPreferenceModel);
         return Response.ok().entity(updatedBrandingPreferenceModel).build();
+    }
+
+    @Override
+    public Response updateCustomText(CustomTextModel customTextModel) {
+
+        if (StringUtils.isBlank(customTextModel.getType().toString())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (!ORGANIZATION_TYPE.equals(customTextModel.getType().toString())) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (StringUtils.isBlank(customTextModel.getScreen())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        CustomTextModel updatedCustomTextModel =
+                brandingPreferenceManagementService.updateCustomTextPreference(customTextModel);
+        return Response.ok().entity(updatedCustomTextModel).build();
     }
 }
