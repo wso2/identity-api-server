@@ -101,6 +101,8 @@ import static org.wso2.carbon.identity.organization.management.service.util.Util
 public class OrganizationManagementService {
 
     private static final Log LOG = LogFactory.getLog(OrganizationManagementService.class);
+    private static final OrganizationDiscoveryManager organizationDiscoveryManager =
+            OrganizationManagementServiceHolder.getInstance().getOrganizationDiscoveryManager();
 
     /**
      * Retrieve organization IDs.
@@ -399,7 +401,7 @@ public class OrganizationManagementService {
                                                                organizationDiscoveryPostRequest) {
 
         try {
-            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = getOrganizationDiscoveryManager()
+            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = organizationDiscoveryManager
                     .addOrganizationDiscoveryAttributes(organizationDiscoveryPostRequest.getOrganizationId(),
                             getOrgDiscoveryAttributesFromPostRequest(organizationDiscoveryPostRequest), true);
             String organizationId = organizationDiscoveryPostRequest.getOrganizationId();
@@ -421,7 +423,7 @@ public class OrganizationManagementService {
     public Response getOrganizationDiscoveryAttributes(String organizationId) {
 
         try {
-            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = getOrganizationDiscoveryManager()
+            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = organizationDiscoveryManager
                     .getOrganizationDiscoveryAttributes(organizationId, true);
             return Response.ok().entity(getOrganizationDiscoveryAttributesResponse(orgDiscoveryAttributeList)).build();
         } catch (OrganizationManagementClientException e) {
@@ -443,7 +445,7 @@ public class OrganizationManagementService {
             organizationDiscoveryAttributes) {
 
         try {
-            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = getOrganizationDiscoveryManager()
+            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = organizationDiscoveryManager
                     .updateOrganizationDiscoveryAttributes(organizationId,
                             getOrgDiscoveryAttributesFromPutRequest(organizationDiscoveryAttributes), true);
             return Response.ok().entity(getOrganizationDiscoveryAttributesResponse(orgDiscoveryAttributeList)).build();
@@ -463,7 +465,7 @@ public class OrganizationManagementService {
     public Response deleteOrganizationDiscoveryAttributes(String organizationId) {
 
         try {
-            getOrganizationDiscoveryManager().deleteOrganizationDiscoveryAttributes(organizationId, true);
+            organizationDiscoveryManager.deleteOrganizationDiscoveryAttributes(organizationId, true);
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -485,7 +487,7 @@ public class OrganizationManagementService {
         handleNotImplementedCapabilities(filter, offset, limit);
         try {
             Map<String, List<OrgDiscoveryAttribute>> organizationsDiscoveryAttributes =
-                    getOrganizationDiscoveryManager().getOrganizationsDiscoveryAttributes();
+                    organizationDiscoveryManager.getOrganizationsDiscoveryAttributes();
             OrganizationsDiscoveryResponse response = new OrganizationsDiscoveryResponse();
             organizationsDiscoveryAttributes.forEach((key, value) -> {
                 OrganizationDiscoveryResponse organizationDiscoveryResponse = new OrganizationDiscoveryResponse();
@@ -517,7 +519,7 @@ public class OrganizationManagementService {
                                                           organizationDiscoveryCheckPOSTRequest) {
 
         try {
-            boolean discoveryAttributeValueAvailable = getOrganizationDiscoveryManager()
+            boolean discoveryAttributeValueAvailable = organizationDiscoveryManager
                     .isDiscoveryAttributeValueAvailable(organizationDiscoveryCheckPOSTRequest.getType(),
                             organizationDiscoveryCheckPOSTRequest.getValue());
             OrganizationDiscoveryCheckPOSTResponse organizationDiscoveryCheckPOSTResponse =
@@ -540,7 +542,7 @@ public class OrganizationManagementService {
 
         try {
             Organization organization = getOrganizationManager().getOrganization(getOrganizationId(), false, true);
-            List<OrgDiscoveryAttribute> organizationDiscoveryAttributes = getOrganizationDiscoveryManager()
+            List<OrgDiscoveryAttribute> organizationDiscoveryAttributes = organizationDiscoveryManager
                     .getOrganizationDiscoveryAttributes(getOrganizationId(), false);
             return Response.ok().entity(getOrganizationMetadataResponse(organization, organizationDiscoveryAttributes))
                     .build();
@@ -945,10 +947,5 @@ public class OrganizationManagementService {
     private OrgApplicationManager getOrgApplicationManager() {
 
         return OrganizationManagementServiceHolder.getInstance().getOrgApplicationManager();
-    }
-
-    private OrganizationDiscoveryManager getOrganizationDiscoveryManager() {
-
-        return OrganizationManagementServiceHolder.getInstance().getOrganizationDiscoveryManager();
     }
 }
