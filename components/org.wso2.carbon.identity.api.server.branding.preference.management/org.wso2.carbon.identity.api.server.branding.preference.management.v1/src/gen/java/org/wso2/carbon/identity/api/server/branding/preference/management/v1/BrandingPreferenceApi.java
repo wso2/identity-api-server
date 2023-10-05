@@ -134,7 +134,6 @@ public class BrandingPreferenceApi  {
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
         @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
         @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
     public Response deleteCustomText(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM", defaultValue="ORG") @DefaultValue("ORG")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.", defaultValue="en-US") @DefaultValue("en-US")  @QueryParam("locale") String locale,     @Valid@ApiParam(value = "Screen to filter the retrieval of customizations.")  @QueryParam("screen") String screen) {
@@ -180,8 +179,6 @@ public class BrandingPreferenceApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = CustomTextModel.class),
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
-        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
         @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
@@ -228,8 +225,6 @@ public class BrandingPreferenceApi  {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = CustomTextModel.class),
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
-        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
         @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })

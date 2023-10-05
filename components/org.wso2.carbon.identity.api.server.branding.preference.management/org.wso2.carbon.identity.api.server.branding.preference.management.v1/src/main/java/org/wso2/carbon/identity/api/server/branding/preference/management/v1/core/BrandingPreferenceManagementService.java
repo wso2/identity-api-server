@@ -302,8 +302,7 @@ public class BrandingPreferenceManagementService {
                 if (log.isDebugEnabled()) {
                     log.debug("Can not find a custom text preferences to delete for tenant: " + tenantDomain, e);
                 }
-                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS,
-                        tenantDomain);
+                return;
             }
             throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_DELETING_CUSTOM_TEXT_PREFERENCE,
                     tenantDomain);
