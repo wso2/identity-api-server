@@ -145,21 +145,18 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     @Override
     public Response deleteCustomText(String type, String name, String locale, String screen) {
 
-        if (type != null) {
-            if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            }
-            if (!ORGANIZATION_TYPE.equals(type)) {
-                return Response.status(Response.Status.NOT_FOUND).build();
-            }
-        } else {
+        if (StringUtils.isBlank(type)) {
             type = ORGANIZATION_TYPE;
+        } else if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } else if (!ORGANIZATION_TYPE.equals(type)) {
+                return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        if (screen == null) {
+        if (StringUtils.isBlank(screen)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (locale == null) {
+        if (StringUtils.isBlank(locale)) {
             locale = DEFAULT_LOCALE;
         }
 
@@ -182,18 +179,15 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     @Override
     public Response getCustomText(String type, String name, String locale, String screen) {
 
-        if (type != null) {
-            if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            }
-            if (!(ORGANIZATION_TYPE.equals(type))) {
-                return Response.status(Response.Status.NOT_FOUND).build();
-            }
-        } else {
+        if (StringUtils.isBlank(type)) {
             type = ORGANIZATION_TYPE;
+        } else if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } else if (!ORGANIZATION_TYPE.equals(type)) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        if (screen == null) {
+        if (StringUtils.isBlank(screen)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         return Response.ok().entity(brandingPreferenceManagementService.
@@ -215,15 +209,13 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     @Override
     public Response resolveCustomText(String type, String name, String locale, String screen) {
 
-        if (type != null) {
-            if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            }
-        } else {
+        if (StringUtils.isBlank(type)) {
             type = ORGANIZATION_TYPE;
+        } else if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        if (screen == null) {
+        if (StringUtils.isBlank(screen)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         return Response.ok().entity(brandingPreferenceManagementService.

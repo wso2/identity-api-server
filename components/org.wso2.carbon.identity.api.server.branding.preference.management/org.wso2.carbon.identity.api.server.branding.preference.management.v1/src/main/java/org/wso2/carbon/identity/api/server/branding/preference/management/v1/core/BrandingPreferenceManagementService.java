@@ -259,7 +259,7 @@ public class BrandingPreferenceManagementService {
         String tenantDomain = getTenantDomainFromContext();
         String preferencesJSON = generatePreferencesJSONFromRequest(customTextModal.getPreference());
         if (!BrandingPreferenceUtils.isValidJSONString(preferencesJSON)) {
-            throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_BRANDING_PREFERENCE, null);
+            throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_CUSTOM_TEXT_PREFERENCE, null);
         }
 
         CustomText responseDTO;
@@ -331,7 +331,6 @@ public class BrandingPreferenceManagementService {
         try {
             CustomText responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
                     getCustomText(type, name, screen, locale);
-
             return buildCustomTextResponseFromResponseDTO(responseDTO);
         } catch (BrandingPreferenceMgtException e) {
             if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
@@ -366,7 +365,6 @@ public class BrandingPreferenceManagementService {
         try {
             CustomText responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
                     resolveCustomText(type, name, screen, locale);
-
             return buildCustomTextResponseFromResponseDTO(responseDTO);
         } catch (BrandingPreferenceMgtException e) {
             if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {

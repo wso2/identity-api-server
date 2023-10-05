@@ -38,7 +38,7 @@ public class BrandingPreferenceManagementConstants {
     public static final String BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE = "BRANDINGM_00002";
     public static final String BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE = "BRANDINGM_00003";
     public static final String BRANDING_PREFERENCE_NOT_ALLOWED_ERROR_CODE = "BRANDINGM_00011";
-    public static final String CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE = "BRANDINGM_000023";
+    public static final String CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE = "BRANDINGM_00023";
     public static final String CUSTOM_TEXT_PREFERENCE_ALREADY_EXISTS_ERROR_CODE = "BRANDINGM_00024";
 
     /**
@@ -59,11 +59,11 @@ public class BrandingPreferenceManagementConstants {
                 "Not allowed branding preference configurations.",
                 "Requested branding preference configuration: %s is not allowed for the organization."),
         ERROR_CODE_INVALID_CUSTOM_TEXT_PREFERENCE("60005",
-                "Invalid Custom Text Preference configurations.",
-                "Invalid Custom Text Preference configurations in request"),
+                "Invalid custom text preference configurations.",
+                "Invalid custom text preference configurations in request"),
         ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS("60006",
-                "Custom Text preferences are not configured.",
-                "Custom Text preferences are not configured for organization: %s."),
+                "Custom text preferences are not configured.",
+                "Custom text preferences are not configured for organization: %s."),
         ERROR_CODE_CONFLICT_CUSTOM_TEXT_PREFERENCE("60007", "Custom Text preference already exists.",
                 "There exists a custom text preference configurations in the organization: %s."),
 
