@@ -31,6 +31,7 @@ import java.net.URI;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DISCOVERY_PATH;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ERROR_BUILDING_RESPONSE_HEADER_URL;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_APPLICATION;
@@ -147,6 +148,18 @@ public class OrganizationManagementEndpointUtil {
 
         return buildURIForHeader(V1_API_PATH_COMPONENT + PATH_SEPARATOR + ORGANIZATION_PATH + PATH_SEPARATOR
                 + organizationId);
+    }
+
+    /**
+     * Get location of the created organization discovery attributes.
+     *
+     * @param organizationId The unique identifier of the organization.
+     * @return URI
+     */
+    public static URI getDiscoveryResourceLocation(String organizationId) {
+
+        return buildURIForHeader(V1_API_PATH_COMPONENT + PATH_SEPARATOR + ORGANIZATION_PATH + PATH_SEPARATOR
+                + organizationId + PATH_SEPARATOR + DISCOVERY_PATH);
     }
 
     private static URI buildURIForHeader(String endpoint) {

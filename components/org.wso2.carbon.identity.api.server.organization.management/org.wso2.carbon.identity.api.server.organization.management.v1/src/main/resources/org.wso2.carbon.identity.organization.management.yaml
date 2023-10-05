@@ -522,6 +522,251 @@ paths:
       tags:
         - Organization Application Management
 
+  /organizations/discovery:
+    post:
+      tags:
+        - Organization Discovery
+      description:
+        This API serves the purpose of adding discovery attributes to an organization, with the current restriction that only the primary organization has the capability to perform this action.<br>
+        <b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/organizationmgt/update <br>
+        <b>Scope required:</b> <br>
+        * internal_organization_update
+      summary:
+        Map discovery attributes to the organization.
+      operationId: organizationDiscoveryPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDiscoveryPostRequest'
+        description: This represents the organization discovery attributes to be added.
+        required: true
+      responses:
+        '201':
+          description: Successful response
+          headers:
+            Location:
+              description: Location URL to fetch the discovery attributes of the organization.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDiscoveryAttributes'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    get:
+      tags:
+        - Organization Discovery
+      description:
+        This API facilitates the retrieval of discovery attributes of organizations in the hierarchy, allowing filtering by discovery attribute type and value. It currently provides the capability to retrieve these attributes from only the primary organization.<br>
+        <b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/organizationmgt/view <br>
+        <b>Scope required:</b> <br>
+        * internal_organization_view
+      summary:
+        Get discovery attributes of organizations.
+      operationId: organizationsDiscoveryGet
+      parameters:
+        - $ref: '#/components/parameters/filterQueryParam'
+        - $ref: '#/components/parameters/offsetQueryParam'
+        - $ref: '#/components/parameters/limitQueryParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationsDiscoveryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+  /organizations/{organization-id}/discovery:
+    get:
+      tags:
+        - Organization Discovery
+      description:
+        This API facilitates the retrieval of discovery attributes for an organization. It currently provides the capability to retrieve these attributes only from the primary organization.<br>
+        <b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/organizationmgt/view <br>
+        <b>Scope required:</b> <br>
+        * internal_organization_view
+      summary:
+        Get discovery attributes of the organization.
+      operationId: organizationDiscoveryGet
+      parameters:
+        - name: organization-id
+          in: path
+          description: ID of the organization whose discovery attributes are to be fetched.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDiscoveryAttributes'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+        '501':
+          $ref: '#/components/responses/NotImplemented'
+    delete:
+      tags:
+        - Organization Discovery
+      description:
+        This API serves the purpose of deleting discovery attributes of an organization, with the current restriction that only the primary organization has the capability to perform this action.<br>
+        <b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/organizationmgt/update <br>
+        <b>Scope required:</b> <br>
+        * internal_organization_update
+      summary:
+        Delete discovery attributes of an organization.
+      parameters:
+        - name: organization-id
+          in: path
+          description: ID of the organization whose discovery attributes are to be deleted.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags:
+        - Organization Discovery
+      description:
+        This API serves the purpose of updating discovery attributes of an organization, with the current restriction that only the primary organization has the capability to perform this action.<br>
+        <b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/organizationmgt/update <br>
+        <b>Scope required:</b> <br>
+        * internal_organization_update
+      summary:
+        Update discovery attributes of an organization.
+      parameters:
+        - name: organization-id
+          in: path
+          description: ID of the organization whose discovery attributes are to be updated.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDiscoveryAttributes'
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDiscoveryAttributes'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /organizations/check-discovery:
+    post:
+      tags:
+        - Organization Discovery
+      summary: Check whether given discovery attribute exists among the organization hierarchy.
+      description: This API is used to verify whether a specific discovery attribute has already been associated with an organization within the hierarchy. It is available for use within any organization in the hierarchy.<br>
+        <b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/organizationmgt/view <br>
+        <b>Scope required:</b> <br>
+        * internal_organization_view
+      operationId: organizationCheckDiscovery
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationDiscoveryCheckPOSTRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationDiscoveryCheckPOSTResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /organizations/metadata:
+    get:
+      tags:
+        - Organization Metadata
+      description:
+        This API facilitates the retrieval of metadata including discovery attributes of the logged in organization.<br>
+        <b>Permission required:</b> <br>
+        * /permission/admin/manage/identity/organizationmgt/view <br>
+        <b>Scope required:</b> <br>
+        * internal_organization_view
+      summary:
+        Get metadata of the logged in organization.
+      operationId: organizationMetadataGet
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationMetadata'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   parameters:
     filterQueryParam:
@@ -538,6 +783,15 @@ components:
       required: false
       description:
         Maximum number of records to be returned. (Should be greater than 0)
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+    offsetQueryParam:
+      in: query
+      name: offset
+      required: false
+      description: Number of records to skip for pagination.
       schema:
         type: integer
         format: int32
@@ -906,6 +1160,159 @@ components:
           type: string
           description: Shared application residing organization id.
           example: '682edf68-4835-4bb8-961f-0a16bc6cc866'
+
+    OrganizationDiscoveryPostRequest:
+      type: object
+      required:
+        - organizationId
+        - attributes
+      properties:
+        organizationId:
+          type: string
+          description: The ID of the organization whose discovery attributes are to be added.
+          example: '06c1f4e2-3339-44e4-a825-96585e3653b1'
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscoveryAttribute'
+    OrganizationDiscoveryAttributes:
+      type: object
+      required:
+        - attributes
+      properties:
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscoveryAttribute'
+    DiscoveryAttribute:
+      type: object
+      required:
+        - type
+        - value
+      properties:
+        type:
+          type: string
+          example: 'emailDomain'
+        values:
+          type: array
+          items:
+            type: string
+            example: 'abc.com'
+    OrganizationsDiscoveryResponse:
+      type: object
+      properties:
+        totalResults:
+          type: integer
+          example: 10
+        startIndex:
+          type: integer
+          example: 1
+        count:
+          type: integer
+          example: 10
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+          example:
+            [
+              {
+                "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=50",
+                "rel": "next",
+              },  {
+              "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30",
+              "rel": "previous",
+            }
+            ]
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationDiscoveryResponse'
+    OrganizationDiscoveryResponse:
+      type: object
+      required:
+        - organizationId
+        - attributes
+      properties:
+        organizationId:
+          type: string
+          description: The ID of the organization.
+          example: '06c1f4e2-3339-44e4-a825-96585e3653b1'
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscoveryAttribute'
+    OrganizationDiscoveryCheckPOSTRequest:
+      required:
+        - type
+        - value
+      type: object
+      properties:
+        type:
+          type: string
+          example: 'emailDomain'
+        value:
+          type: string
+          example: 'abc.com'
+    OrganizationDiscoveryCheckPOSTResponse:
+      type: object
+      required:
+        - available
+      properties:
+        available:
+          type: boolean
+          example: true
+
+    OrganizationMetadata:
+      type: object
+      required:
+        - id
+        - name
+        - status
+        - created
+        - lastModified
+        - type
+      properties:
+        id:
+          type: string
+          example: '06c1f4e2-3339-44e4-a825-96585e3653b1'
+        name:
+          type: string
+          example: 'ABC Builders'
+        description:
+          type: string
+          example: 'Building constructions'
+        status:
+          type: string
+          enum: [ACTIVE, DISABLED]
+          example: ACTIVE
+        created:
+          type: string
+          example: '2021-10-25T12:31:53.406Z'
+        lastModified:
+          type: string
+          example: '2021-10-25T12:31:53.406Z'
+        type:
+          type: string
+          example: "TENANT"
+          enum:
+            - TENANT
+            - STRUCTURAL
+        parent:
+          $ref: '#/components/schemas/ParentOrganization'
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attribute'
+        permissions:
+          type: array
+          items:
+            type: string
+        discoveryAttributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscoveryAttribute'
+
   #--------------------------------------------------------
   # Descriptions of Organization Management API responses.
   #--------------------------------------------------------

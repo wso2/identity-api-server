@@ -28,12 +28,18 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Appl
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryAttributes;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTRequest;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTResponse;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryPostRequest;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationMetadata;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationNameCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationNameCheckPOSTResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPUTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPatchRequestItem;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationResponse;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationsDiscoveryResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationsResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.SharedApplicationsResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.SharedOrganizationsResponse;
@@ -53,6 +59,100 @@ public class OrganizationsApi  {
 
     @Autowired
     private OrganizationsApiService delegate;
+
+    @Valid
+    @POST
+    @Path("/check-discovery")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Check whether given discovery attribute exists among the organization hierarchy.", notes = "This API is used to verify whether a specific discovery attribute has already been associated with an organization within the hierarchy. It is available for use within any organization in the hierarchy.<br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/organizationmgt/view <br> <b>Scope required:</b> <br> * internal_organization_view", response = OrganizationDiscoveryCheckPOSTResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Discovery", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = OrganizationDiscoveryCheckPOSTResponse.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response organizationCheckDiscovery(@ApiParam(value = "" ,required=true) @Valid OrganizationDiscoveryCheckPOSTRequest organizationDiscoveryCheckPOSTRequest) {
+
+        return delegate.organizationCheckDiscovery(organizationDiscoveryCheckPOSTRequest );
+    }
+
+    @Valid
+    @GET
+    @Path("/{organization-id}/discovery")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get discovery attributes of the organization.", notes = "This API facilitates the retrieval of discovery attributes for an organization. It currently provides the capability to retrieve these attributes only from the primary organization.<br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/organizationmgt/view <br> <b>Scope required:</b> <br> * internal_organization_view", response = OrganizationDiscoveryAttributes.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Discovery", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = OrganizationDiscoveryAttributes.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
+    })
+    public Response organizationDiscoveryGet(@ApiParam(value = "ID of the organization whose discovery attributes are to be fetched.",required=true) @PathParam("organization-id") String organizationId) {
+
+        return delegate.organizationDiscoveryGet(organizationId );
+    }
+
+    @Valid
+    @POST
+    @Path("/discovery")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Map discovery attributes to the organization.", notes = "This API serves the purpose of adding discovery attributes to an organization, with the current restriction that only the primary organization has the capability to perform this action.<br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/organizationmgt/update <br> <b>Scope required:</b> <br> * internal_organization_update", response = OrganizationDiscoveryAttributes.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Discovery", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Successful response", response = OrganizationDiscoveryAttributes.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response organizationDiscoveryPost(@ApiParam(value = "This represents the organization discovery attributes to be added." ,required=true) @Valid OrganizationDiscoveryPostRequest organizationDiscoveryPostRequest) {
+
+        return delegate.organizationDiscoveryPost(organizationDiscoveryPostRequest );
+    }
+
+    @Valid
+    @GET
+    @Path("/metadata")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get metadata of the logged in organization.", notes = "This API facilitates the retrieval of metadata including discovery attributes of the logged in organization.<br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/organizationmgt/view <br> <b>Scope required:</b> <br> * internal_organization_view", response = OrganizationMetadata.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Metadata", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = OrganizationMetadata.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response organizationMetadataGet() {
+
+        return delegate.organizationMetadataGet();
+    }
 
     @Valid
     @POST
@@ -99,6 +199,30 @@ public class OrganizationsApi  {
     public Response organizationsCheckNamePost(@ApiParam(value = "OrganizationNameCheckPOSTRequest object containing the organization name." ,required=true) @Valid OrganizationNameCheckPOSTRequest organizationNameCheckPOSTRequest) {
 
         return delegate.organizationsCheckNamePost(organizationNameCheckPOSTRequest );
+    }
+
+    @Valid
+    @GET
+    @Path("/discovery")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get discovery attributes of organizations.", notes = "This API facilitates the retrieval of discovery attributes of organizations in the hierarchy, allowing filtering by discovery attribute type and value. It currently provides the capability to retrieve these attributes from only the primary organization.<br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/organizationmgt/view <br> <b>Scope required:</b> <br> * internal_organization_view", response = OrganizationsDiscoveryResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Discovery", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = OrganizationsDiscoveryResponse.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
+    })
+    public Response organizationsDiscoveryGet(    @Valid@ApiParam(value = "Condition to filter the retrieval of records.")  @QueryParam("filter") String filter,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination.")  @QueryParam("offset") Integer offset,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to be returned. (Should be greater than 0)")  @QueryParam("limit") Integer limit) {
+
+        return delegate.organizationsDiscoveryGet(filter,  offset,  limit );
     }
 
     @Valid
@@ -171,6 +295,54 @@ public class OrganizationsApi  {
     public Response organizationsOrganizationIdDelete(@ApiParam(value = "ID of the organization to be deleted.",required=true) @PathParam("organization-id") String organizationId) {
 
         return delegate.organizationsOrganizationIdDelete(organizationId );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/{organization-id}/discovery")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete discovery attributes of an organization.", notes = "This API serves the purpose of deleting discovery attributes of an organization, with the current restriction that only the primary organization has the capability to perform this action.<br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/organizationmgt/update <br> <b>Scope required:</b> <br> * internal_organization_update", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Discovery", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Successfully deleted", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response organizationsOrganizationIdDiscoveryDelete(@ApiParam(value = "ID of the organization whose discovery attributes are to be deleted.",required=true) @PathParam("organization-id") String organizationId) {
+
+        return delegate.organizationsOrganizationIdDiscoveryDelete(organizationId );
+    }
+
+    @Valid
+    @PUT
+    @Path("/{organization-id}/discovery")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update discovery attributes of an organization.", notes = "This API serves the purpose of updating discovery attributes of an organization, with the current restriction that only the primary organization has the capability to perform this action.<br> <b>Permission required:</b> <br> * /permission/admin/manage/identity/organizationmgt/update <br> <b>Scope required:</b> <br> * internal_organization_update", response = OrganizationDiscoveryAttributes.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Discovery", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = OrganizationDiscoveryAttributes.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response organizationsOrganizationIdDiscoveryPut(@ApiParam(value = "ID of the organization whose discovery attributes are to be updated.",required=true) @PathParam("organization-id") String organizationId, @ApiParam(value = "" ,required=true) @Valid OrganizationDiscoveryAttributes organizationDiscoveryAttributes) {
+
+        return delegate.organizationsOrganizationIdDiscoveryPut(organizationId,  organizationDiscoveryAttributes );
     }
 
     @Valid

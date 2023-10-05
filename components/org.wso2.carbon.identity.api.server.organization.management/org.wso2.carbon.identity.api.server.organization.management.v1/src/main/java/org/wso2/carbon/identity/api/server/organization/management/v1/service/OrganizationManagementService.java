@@ -28,14 +28,22 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.exceptions
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ApplicationSharePOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Attribute;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.BasicOrganizationResponse;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.DiscoveryAttribute;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Link;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryAttributes;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTRequest;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTResponse;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryPostRequest;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryResponse;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationMetadata;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationNameCheckPOSTResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPUTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPatchRequestItem;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationResponse;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationsDiscoveryResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationsResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ParentOrganization;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.SharedApplicationResponse;
@@ -43,6 +51,8 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Shar
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.SharedOrganizationsResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.util.OrganizationManagementEndpointUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.organization.discovery.service.OrganizationDiscoveryManager;
+import org.wso2.carbon.identity.organization.discovery.service.model.OrgDiscoveryAttribute;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
 import org.wso2.carbon.identity.organization.management.application.model.SharedApplication;
 import org.wso2.carbon.identity.organization.management.service.OrganizationManager;
@@ -65,6 +75,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
@@ -72,12 +84,15 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.ASC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DESC_SORT_ORDER;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL;
+import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_FILTERING_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_EMPTY_REQUEST_BODY;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY;
+import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.SUPER;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.buildURIForBody;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.generateUniqueID;
+import static org.wso2.carbon.identity.organization.management.service.util.Utils.getOrganizationId;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.handleClientException;
 
 /**
@@ -374,6 +389,168 @@ public class OrganizationManagementService {
         }
     }
 
+    /**
+     * Add discovery attributes for the given organization.
+     *
+     * @param organizationDiscoveryPostRequest Add organization discovery attributes request.
+     * @return The newly created discovery attributes of the organization.
+     */
+    public Response addOrganizationDiscoveryAttributes(OrganizationDiscoveryPostRequest
+                                                               organizationDiscoveryPostRequest) {
+
+        try {
+            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = getOrganizationDiscoveryManager()
+                    .addOrganizationDiscoveryAttributes(organizationDiscoveryPostRequest.getOrganizationId(),
+                            getOrgDiscoveryAttributesFromPostRequest(organizationDiscoveryPostRequest), true);
+            String organizationId = organizationDiscoveryPostRequest.getOrganizationId();
+            return Response.created(OrganizationManagementEndpointUtil.getDiscoveryResourceLocation(organizationId))
+                    .entity(getOrganizationDiscoveryAttributesResponse(orgDiscoveryAttributeList)).build();
+        } catch (OrganizationManagementClientException e) {
+            return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
+    }
+
+    /**
+     * Fetch the discovery attributes of the given organization.
+     *
+     * @param organizationId The ID of the organization whose organization discovery attributes are to be fetched.
+     * @return The discovery attributes of the given organization.
+     */
+    public Response getOrganizationDiscoveryAttributes(String organizationId) {
+
+        try {
+            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = getOrganizationDiscoveryManager()
+                    .getOrganizationDiscoveryAttributes(organizationId, true);
+            return Response.ok().entity(getOrganizationDiscoveryAttributesResponse(orgDiscoveryAttributeList)).build();
+        } catch (OrganizationManagementClientException e) {
+            return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
+    }
+
+    /**
+     * Update the discovery attributes of the given organization.
+     *
+     * @param organizationId                  The ID of the organization whose organization discovery attributes are to
+     *                                        be updated.
+     * @param organizationDiscoveryAttributes The organization discovery attributes.
+     * @return Organization discovery attribute update response.
+     */
+    public Response updateOrganizationDiscoveryAttributes(String organizationId, OrganizationDiscoveryAttributes
+            organizationDiscoveryAttributes) {
+
+        try {
+            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = getOrganizationDiscoveryManager()
+                    .updateOrganizationDiscoveryAttributes(organizationId,
+                            getOrgDiscoveryAttributesFromPutRequest(organizationDiscoveryAttributes), true);
+            return Response.ok().entity(getOrganizationDiscoveryAttributesResponse(orgDiscoveryAttributeList)).build();
+        } catch (OrganizationManagementClientException e) {
+            return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
+    }
+
+    /**
+     * Delete the discovery attributes of the given organization.
+     *
+     * @param organizationId The ID of the organization whose organization discovery attributes are to be deleted.
+     * @return Organization discovery attribute deletion response.
+     */
+    public Response deleteOrganizationDiscoveryAttributes(String organizationId) {
+
+        try {
+            getOrganizationDiscoveryManager().deleteOrganizationDiscoveryAttributes(organizationId, true);
+            return Response.noContent().build();
+        } catch (OrganizationManagementClientException e) {
+            return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
+    }
+
+    /**
+     * Returns the discovery attributes of the organizations.
+     *
+     * @param filter The filter string. **Not supported at the moment.**
+     * @param offset The offset to be used with the limit parameter. **Not supported at the moment.**
+     * @param limit  The items per page. **Not supported at the moment.**
+     * @return The discovery attributes of the organizations in the hierarchy under the root organization.
+     */
+    public Response getOrganizationsDiscoveryAttributes(String filter, Integer offset, Integer limit) {
+
+        handleNotImplementedCapabilities(filter, offset, limit);
+        try {
+            Map<String, List<OrgDiscoveryAttribute>> organizationsDiscoveryAttributes =
+                    getOrganizationDiscoveryManager().getOrganizationsDiscoveryAttributes();
+            OrganizationsDiscoveryResponse response = new OrganizationsDiscoveryResponse();
+            organizationsDiscoveryAttributes.forEach((key, value) -> {
+                OrganizationDiscoveryResponse organizationDiscoveryResponse = new OrganizationDiscoveryResponse();
+                organizationDiscoveryResponse.setOrganizationId(key);
+                value.forEach(orgDiscoveryAttribute -> {
+                    DiscoveryAttribute organizationDiscoveryAttributeResponse = new DiscoveryAttribute();
+                    organizationDiscoveryAttributeResponse.setType(orgDiscoveryAttribute.getType());
+                    organizationDiscoveryAttributeResponse.setValues(orgDiscoveryAttribute.getValues());
+                    organizationDiscoveryResponse.addAttributesItem(organizationDiscoveryAttributeResponse);
+
+                });
+                response.addOrganizationsItem(organizationDiscoveryResponse);
+            });
+            return Response.ok(response).build();
+        } catch (OrganizationManagementClientException e) {
+            return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
+    }
+
+    /**
+     * Check if the given organization discovery attribute is already taken by another organization in the hierarchy.
+     *
+     * @param organizationDiscoveryCheckPOSTRequest Organization discovery attribute check request.
+     * @return Organization discovery attribute check response.
+     */
+    public Response isDiscoveryAttributeAvailable(OrganizationDiscoveryCheckPOSTRequest
+                                                          organizationDiscoveryCheckPOSTRequest) {
+
+        try {
+            boolean discoveryAttributeValueAvailable = getOrganizationDiscoveryManager()
+                    .isDiscoveryAttributeValueAvailable(organizationDiscoveryCheckPOSTRequest.getType(),
+                            organizationDiscoveryCheckPOSTRequest.getValue());
+            OrganizationDiscoveryCheckPOSTResponse organizationDiscoveryCheckPOSTResponse =
+                    new OrganizationDiscoveryCheckPOSTResponse();
+            organizationDiscoveryCheckPOSTResponse.setAvailable(discoveryAttributeValueAvailable);
+            return Response.ok().entity(organizationDiscoveryCheckPOSTResponse).build();
+        } catch (OrganizationManagementClientException e) {
+            return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
+    }
+
+    /**
+     * Fetch organization metadata.
+     *
+     * @return Requested organization metadata.
+     */
+    public Response getOrganizationMetadata() {
+
+        try {
+            Organization organization = getOrganizationManager().getOrganization(getOrganizationId(), false, true);
+            List<OrgDiscoveryAttribute> organizationDiscoveryAttributes = getOrganizationDiscoveryManager()
+                    .getOrganizationDiscoveryAttributes(getOrganizationId(), false);
+            return Response.ok().entity(getOrganizationMetadataResponse(organization, organizationDiscoveryAttributes))
+                    .build();
+        } catch (OrganizationManagementClientException e) {
+            return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
+    }
+
     private Organization getOrganizationFromPostRequest(OrganizationPOSTRequest organizationPOSTRequest) {
 
         String organizationId = generateUniqueID();
@@ -653,6 +830,113 @@ public class OrganizationManagementService {
         return response;
     }
 
+    private OrganizationDiscoveryAttributes getOrganizationDiscoveryAttributesResponse
+            (List<OrgDiscoveryAttribute> orgDiscoveryAttributeList) {
+
+        OrganizationDiscoveryAttributes discoveryAttributes = new OrganizationDiscoveryAttributes();
+        List<DiscoveryAttribute> attributes = orgDiscoveryAttributeList.stream()
+                .map(discoveryAttribute -> {
+                    DiscoveryAttribute attribute = new DiscoveryAttribute();
+                    attribute.setType(discoveryAttribute.getType());
+                    attribute.setValues(discoveryAttribute.getValues());
+                    return attribute;
+                }).collect(Collectors.toList());
+        discoveryAttributes.setAttributes(attributes);
+        return discoveryAttributes;
+    }
+
+    private List<OrgDiscoveryAttribute> getOrgDiscoveryAttributesFromPostRequest(OrganizationDiscoveryPostRequest
+                                                                                         discoveryPostRequest) {
+
+        return Optional.ofNullable(discoveryPostRequest.getAttributes()).orElse(Collections.emptyList())
+                .stream()
+                .map(attribute -> {
+                    OrgDiscoveryAttribute orgDiscoveryAttribute = new OrgDiscoveryAttribute();
+                    orgDiscoveryAttribute.setType(attribute.getType());
+                    orgDiscoveryAttribute.setValues(attribute.getValues());
+                    return orgDiscoveryAttribute;
+                }).collect(Collectors.toList());
+    }
+
+    private List<OrgDiscoveryAttribute> getOrgDiscoveryAttributesFromPutRequest(OrganizationDiscoveryAttributes
+                                                                                        discoveryAttributes) {
+
+        return Optional.ofNullable(discoveryAttributes.getAttributes()).orElse(Collections.emptyList())
+                .stream()
+                .map(attribute -> {
+                    OrgDiscoveryAttribute orgDiscoveryAttribute = new OrgDiscoveryAttribute();
+                    orgDiscoveryAttribute.setType(attribute.getType());
+                    orgDiscoveryAttribute.setValues(attribute.getValues());
+                    return orgDiscoveryAttribute;
+                }).collect(Collectors.toList());
+    }
+
+    private void handleNotImplementedCapabilities(String filter, Integer offset, Integer limit) {
+
+        if (limit != null || offset != null) {
+            Error error = OrganizationManagementEndpointUtil.getError(
+                    ERROR_CODE_PAGINATION_NOT_IMPLEMENTED.getCode(),
+                    ERROR_CODE_PAGINATION_NOT_IMPLEMENTED.getMessage(),
+                    ERROR_CODE_PAGINATION_NOT_IMPLEMENTED.getDescription());
+            throw new OrganizationManagementEndpointException(Response.Status.NOT_IMPLEMENTED, error);
+        }
+        if (filter != null) {
+            Error error = OrganizationManagementEndpointUtil.getError(
+                    ERROR_CODE_FILTERING_NOT_IMPLEMENTED.getCode(),
+                    ERROR_CODE_FILTERING_NOT_IMPLEMENTED.getMessage(),
+                    ERROR_CODE_FILTERING_NOT_IMPLEMENTED.getDescription());
+            throw new OrganizationManagementEndpointException(Response.Status.NOT_IMPLEMENTED, error);
+        }
+    }
+
+    private OrganizationMetadata getOrganizationMetadataResponse(Organization organization, List<OrgDiscoveryAttribute>
+            organizationDiscoveryAttributes) {
+
+        OrganizationMetadata organizationMetadata = new OrganizationMetadata();
+        organizationMetadata.setId(organization.getId());
+        organizationMetadata.setName(organization.getName());
+        organizationMetadata.setDescription(organization.getDescription());
+        organizationMetadata.setCreated(organization.getCreated().toString());
+        organizationMetadata.setLastModified(organization.getLastModified().toString());
+        organizationMetadata.setPermissions(organization.getPermissions());
+
+        OrganizationMetadata.StatusEnum status;
+        try {
+            status = OrganizationMetadata.StatusEnum.valueOf(organization.getStatus());
+        } catch (IllegalArgumentException e) {
+            status = OrganizationMetadata.StatusEnum.DISABLED;
+        }
+        organizationMetadata.setStatus(status);
+
+        String type = organization.getType();
+        if (StringUtils.equals(type, GetOrganizationResponse.TypeEnum.TENANT.toString())) {
+            organizationMetadata.setType(OrganizationMetadata.TypeEnum.TENANT);
+        } else {
+            organizationMetadata.setType(OrganizationMetadata.TypeEnum.STRUCTURAL);
+        }
+
+        ParentOrganizationDO parentOrganizationDO = organization.getParent();
+        if (parentOrganizationDO != null) {
+            organizationMetadata.setParent(getParentOrganization(parentOrganizationDO));
+        }
+
+        List<Attribute> attributeList = getOrganizationAttributes(organization);
+        if (!attributeList.isEmpty()) {
+            organizationMetadata.setAttributes(attributeList);
+        }
+
+        List<DiscoveryAttribute> attributes = organizationDiscoveryAttributes.stream()
+                .map(discoveryAttribute -> {
+                    DiscoveryAttribute attribute = new DiscoveryAttribute();
+                    attribute.setType(discoveryAttribute.getType());
+                    attribute.setValues(discoveryAttribute.getValues());
+                    return attribute;
+                }).collect(Collectors.toList());
+        organizationMetadata.setDiscoveryAttributes(attributes);
+
+        return organizationMetadata;
+    }
+
     private OrganizationManager getOrganizationManager() {
 
         return OrganizationManagementServiceHolder.getInstance().getOrganizationManager();
@@ -661,5 +945,10 @@ public class OrganizationManagementService {
     private OrgApplicationManager getOrgApplicationManager() {
 
         return OrganizationManagementServiceHolder.getInstance().getOrgApplicationManager();
+    }
+
+    private OrganizationDiscoveryManager getOrganizationDiscoveryManager() {
+
+        return OrganizationManagementServiceHolder.getInstance().getOrganizationDiscoveryManager();
     }
 }
