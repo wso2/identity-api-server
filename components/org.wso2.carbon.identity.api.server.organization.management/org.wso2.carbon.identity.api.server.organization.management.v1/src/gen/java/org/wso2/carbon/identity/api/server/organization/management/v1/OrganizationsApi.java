@@ -313,7 +313,6 @@ public class OrganizationsApi  {
         @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
         @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
         @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
     public Response organizationsOrganizationIdDiscoveryDelete(@ApiParam(value = "ID of the organization whose discovery attributes are to be deleted.",required=true) @PathParam("organization-id") String organizationId) {

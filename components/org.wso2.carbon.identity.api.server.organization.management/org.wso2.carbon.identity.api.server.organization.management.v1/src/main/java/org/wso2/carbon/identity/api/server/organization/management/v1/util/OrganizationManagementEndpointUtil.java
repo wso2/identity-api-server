@@ -154,7 +154,7 @@ public class OrganizationManagementEndpointUtil {
      * Get location of the created organization discovery attributes.
      *
      * @param organizationId The unique identifier of the organization.
-     * @return URI
+     * @return URI.
      */
     public static URI getDiscoveryResourceLocation(String organizationId) {
 
