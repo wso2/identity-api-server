@@ -29,6 +29,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListIte
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
 import java.util.List;
@@ -178,6 +180,30 @@ public class ConfigsApi  {
 
     @Valid
     @GET
+    @Path("/authentication/inbound/passivests")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve WS Federation (Passive STS) inbound authentication configurations.", notes = "Retrieve WS Federation (Passive STS) inbound authentication configurations. ", response = InboundAuthPassiveSTSConfig.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Authentication Configurations", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = InboundAuthPassiveSTSConfig.class),
+        @ApiResponse(code = 400, message = "Bad request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getPassiveSTSInboundAuthConfig() {
+
+        return delegate.getPassiveSTSInboundAuthConfig();
+    }
+
+    @Valid
+    @GET
     @Path("/jwt-key-validator")
     
     @Produces({ "application/json" })
@@ -246,6 +272,30 @@ public class ConfigsApi  {
     public Response getRemoteLoggingConfigs() {
 
         return delegate.getRemoteLoggingConfigs();
+    }
+
+    @Valid
+    @GET
+    @Path("/authentication/inbound/saml2")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve SAML2 inbound authentication configurations.", notes = "Retrieve server SAML2 inbound authentication configurations. ", response = InboundAuthSAML2Config.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Authentication Configurations", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = InboundAuthSAML2Config.class),
+        @ApiResponse(code = 400, message = "Bad request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getSAMLInboundAuthConfig() {
+
+        return delegate.getSAMLInboundAuthConfig();
     }
 
     @Valid
@@ -466,6 +516,30 @@ public class ConfigsApi  {
     }
 
     @Valid
+    @PATCH
+    @Path("/authentication/inbound/passivests")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update WS Federation (Passive STS) inbound authentication configurations.", notes = "Patch WS Federation (Passive STS) inbound authentication configurations. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Authentication Configurations", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updatePassiveSTSInboundAuthConfig(@ApiParam(value = "" ) @Valid InboundAuthPassiveSTSConfig inboundAuthPassiveSTSConfig) {
+
+        return delegate.updatePassiveSTSInboundAuthConfig(inboundAuthPassiveSTSConfig );
+    }
+
+    @Valid
     @PUT
     @Path("/remote-logging/{log-type}")
     @Consumes({ "application/json" })
@@ -513,4 +587,27 @@ public class ConfigsApi  {
         return delegate.updateRemoteLoggingConfigs(remoteLoggingConfigListItem );
     }
 
+    @Valid
+    @PATCH
+    @Path("/authentication/inbound/saml2")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update SAML2 inbound authentication configurations.", notes = "Patch server SAML2 inbound authentication configurations. ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Inbound Authentication Configurations" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateSAMLInboundAuthConfig(@ApiParam(value = "" ) @Valid InboundAuthSAML2Config inboundAuthSAML2Config) {
+
+        return delegate.updateSAMLInboundAuthConfig(inboundAuthSAML2Config );
+    }
 }

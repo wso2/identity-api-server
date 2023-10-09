@@ -760,6 +760,154 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /configs/authentication/inbound/saml2:
+    get:
+      tags:
+        - Inbound Authentication Configurations
+      summary: Retrieve SAML2 inbound authentication configurations.
+      description: |
+        Retrieve server SAML2 inbound authentication configurations.
+      operationId: getSAMLInboundAuthConfig
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundAuthSAML2Config'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Inbound Authentication Configurations
+      summary: Update SAML2 inbound authentication configurations.
+      description: |
+        Patch server SAML2 inbound authentication configurations.
+      operationId: updateSAMLInboundAuthConfig
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InboundAuthSAML2Config'
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /configs/authentication/inbound/passivests:
+    get:
+      tags:
+        - Inbound Authentication Configurations
+      summary: Retrieve WS Federation (Passive STS) inbound authentication configurations.
+      description: |
+        Retrieve WS Federation (Passive STS) inbound authentication configurations.
+      operationId: getPassiveSTSInboundAuthConfig
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundAuthPassiveSTSConfig'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Inbound Authentication Configurations
+      summary: Update WS Federation (Passive STS) inbound authentication configurations.
+      description: |
+        Patch WS Federation (Passive STS) inbound authentication configurations.
+      operationId: updatePassiveSTSInboundAuthConfig
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InboundAuthPassiveSTSConfig'
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 servers:
   - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
     variables:
@@ -1194,3 +1342,37 @@ components:
         truststorePassword:
           type: string
           description: " The password of the truststore"
+    InboundAuthSAML2Config:
+      type: object
+      properties:
+        destinationURLs:
+          type: array
+          description: "List of destination URLs"
+          items:
+            type: string
+          example: ["https://localhost:9443/samlsso"]
+        metadataValidityPeriod:
+          type: number
+          description: "SAML metadata validity period in minutes"
+          example: 60
+        enableMetadataSigning:
+          type: boolean
+          description: "Enable SAML metadata signing"
+          example: false
+        metadataEndpoint:
+          type: string
+          description: "SAML metadata endpoint"
+          readOnly: true
+          example: "https://localhost:9443/identity/metadata/saml2"
+    InboundAuthPassiveSTSConfig:
+      type: object
+      properties:
+        enableRequestSigning:
+          type: boolean
+          description: "Enable authentication requests signing"
+          example: false
+        passiveSTSUrl:
+          type: string
+          description: "Passive STS URL"
+          readOnly: true
+          example: "https://localhost:9443/passivests"
