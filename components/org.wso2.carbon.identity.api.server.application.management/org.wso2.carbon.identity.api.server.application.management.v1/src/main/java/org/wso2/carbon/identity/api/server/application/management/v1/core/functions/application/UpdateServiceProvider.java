@@ -15,14 +15,22 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.springframework.util.CollectionUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ListValue;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.TagsPatchRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
+import org.wso2.carbon.identity.application.common.model.ApplicationTagsItem;
+import org.wso2.carbon.identity.application.common.model.ApplicationTagsItem.ApplicationTagsItemBuilder;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
@@ -44,6 +52,7 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
         patchAuthenticationSequence(applicationPatchModel.getAuthenticationSequence(), serviceProvider);
         patchAdvancedConfiguration(serviceProvider, applicationPatchModel.getAdvancedConfigurations());
         patchProvisioningConfiguration(applicationPatchModel.getProvisioningConfigurations(), serviceProvider);
+        patchApplicationTags(applicationPatchModel.getTags(), serviceProvider);
     }
 
     private void patchClaimConfiguration(ServiceProvider serviceProvider, ClaimConfiguration claimConfiguration) {
@@ -74,6 +83,30 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
 
         if (provisioningConfigurations != null) {
             new UpdateProvisioningConfiguration().apply(serviceProvider, provisioningConfigurations);
+        }
+    }
+
+    private void patchApplicationTags(List<TagsPatchRequest> tags, ServiceProvider serviceProvider) {
+
+        if (!CollectionUtils.isEmpty(tags)) {
+            List<String> tagIdList = serviceProvider.getTags().stream().map(ApplicationTagsItem::getId)
+                    .collect(Collectors.toList());
+            for (TagsPatchRequest patchReq: tags) {
+
+                if (patchReq.getOperation().toString().equals("ADD")) {
+                    List<String> addingTagIdList = patchReq.getTags().stream().map(ListValue::getValue)
+                            .collect(Collectors.toList());
+                    tagIdList.addAll(addingTagIdList);
+                    continue;
+                }
+                if (patchReq.getOperation().toString().equals("REMOVE")) {
+                    List<String> removingTagIdList = patchReq.getTags().stream().map(ListValue::getValue)
+                            .collect(Collectors.toList());
+                    tagIdList.removeAll(removingTagIdList);
+                }
+            }
+            serviceProvider.setTags(tagIdList.stream().map(id -> new ApplicationTagsItemBuilder().id(id).build())
+                    .collect(Collectors.toList()));
         }
     }
 }

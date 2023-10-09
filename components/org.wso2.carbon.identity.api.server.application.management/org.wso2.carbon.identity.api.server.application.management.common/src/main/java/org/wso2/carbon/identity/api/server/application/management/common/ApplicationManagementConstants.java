@@ -51,6 +51,7 @@ public class ApplicationManagementConstants {
     public static final String NAME = "name";
     public static final String CLIENT_ID = "clientId";
     public static final String ISSUER = "issuer";
+    public static final String TAGS = "tags";
 
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 

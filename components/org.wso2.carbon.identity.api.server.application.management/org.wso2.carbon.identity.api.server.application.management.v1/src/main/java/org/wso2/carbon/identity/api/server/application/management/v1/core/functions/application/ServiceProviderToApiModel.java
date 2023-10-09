@@ -34,12 +34,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Provisionin
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfig;
+import org.wso2.carbon.identity.api.server.application.management.v1.TagItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
+import org.wso2.carbon.identity.application.common.model.ApplicationTagsItem;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
@@ -111,7 +113,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .advancedConfigurations(buildAdvancedAppConfiguration(application))
                     .provisioningConfigurations(buildProvisioningConfiguration(application))
                     .authenticationSequence(buildAuthenticationSequence(application))
-                    .access(getAccess(application.getApplicationName()));
+                    .access(getAccess(application.getApplicationName()))
+                    .tags(buildTags(application.getTags()));
         }
     }
 
@@ -480,5 +483,18 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         }
 
         return StringUtils.EMPTY;
+    }
+
+    private List<TagItem> buildTags(List<ApplicationTagsItem> tagsList) {
+
+        if (tagsList != null) {
+            return tagsList.stream()
+                    .map(element -> new TagItem()
+                            .id(element.getId())
+                            .name(element.getName())
+                            .colour(element.getColour()))
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 }

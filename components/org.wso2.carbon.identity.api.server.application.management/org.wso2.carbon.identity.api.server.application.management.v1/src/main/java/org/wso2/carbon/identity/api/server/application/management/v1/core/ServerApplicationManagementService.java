@@ -82,6 +82,7 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
+import org.wso2.carbon.identity.application.common.model.ApplicationTagsItem;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
@@ -140,8 +141,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -163,6 +166,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TAGS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
@@ -212,11 +216,13 @@ public class ServerApplicationManagementService {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
         SUPPORTED_FILTER_ATTRIBUTES.add(CLIENT_ID);
         SUPPORTED_FILTER_ATTRIBUTES.add(ISSUER);
+        SUPPORTED_FILTER_ATTRIBUTES.add(TAGS);
 
         SUPPORTED_REQUIRED_ATTRIBUTES.add(ADVANCED_CONFIGURATIONS);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(CLIENT_ID);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(TEMPLATE_ID);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(ISSUER);
+        SUPPORTED_REQUIRED_ATTRIBUTES.add(TAGS);
     }
 
     @Autowired
@@ -268,10 +274,14 @@ public class ServerApplicationManagementService {
             if (!requestedAttributeList.contains(ISSUER) && submittedFilterAttributes.contains(ISSUER)) {
                 requestedAttributeList.add(ISSUER);
             }
+            // Add issuer as a required attribute when there's tags as a filter param.
+            if (!requestedAttributeList.contains(TAGS) && submittedFilterAttributes.contains(TAGS)) {
+                requestedAttributeList.add(TAGS);
+            }
 
             if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
                 List<ServiceProvider> serviceProviderList = getSpWithRequiredAttributes(filteredAppList,
-                        requestedAttributeList);
+                        requestedAttributeList, tenantDomain);
 
                 return new ApplicationListResponse()
                         .totalResults(totalResults)
@@ -343,14 +353,28 @@ public class ServerApplicationManagementService {
     }
 
     private List<ServiceProvider> getSpWithRequiredAttributes(ApplicationBasicInfo[] filteredAppList,
-                                                              List<String> requestedAttributeList)
+                                                              List<String> requestedAttributeList, String tenantDomain)
             throws IdentityApplicationManagementException {
+
+        Map<Integer, List<ApplicationTagsItem>> associatedTags = new HashMap<>();
+        if (requestedAttributeList.contains(TAGS)) {
+            List<Integer> applicationIdList = Arrays.stream(filteredAppList)
+                    .map(ApplicationBasicInfo::getApplicationId)
+                    .collect(Collectors.toList());
+
+            associatedTags = getApplicationManagementService()
+                    .getAssociatedTagsOfApplications(applicationIdList, tenantDomain);
+        }
 
         List<ServiceProvider> serviceProviderList = new ArrayList<>();
         for (ApplicationBasicInfo applicationBasicInfo : filteredAppList) {
+            Integer applicationId = applicationBasicInfo.getApplicationId();
             ServiceProvider serviceProvider = getApplicationManagementService().
-                    getApplicationWithRequiredAttributes(applicationBasicInfo.getApplicationId(),
-                            requestedAttributeList);
+                    getApplicationWithRequiredAttributes(applicationId, requestedAttributeList);
+
+            if (requestedAttributeList.contains(TAGS) && associatedTags.containsKey(applicationId)) {
+                serviceProvider.setTags(associatedTags.get(applicationId));
+            }
             serviceProviderList.add(serviceProvider);
         }
         return serviceProviderList;
@@ -1431,6 +1455,9 @@ public class ServerApplicationManagementService {
             }
             if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(ISSUER))) {
                 applicationResponseModel.issuer(null);
+            }
+            if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(TAGS))) {
+                applicationResponseModel.tags(null);
             }
             applicationListItems.add(new ApplicationInfoWithRequiredPropsToApiModel().apply(applicationResponseModel));
         }

@@ -30,6 +30,8 @@ import javax.validation.constraints.*;
 
 
 import io.swagger.annotations.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
@@ -45,6 +47,7 @@ public class ApplicationPatchModel  {
     private AuthenticationSequence authenticationSequence;
     private AdvancedApplicationConfiguration advancedConfigurations;
     private ProvisioningConfiguration provisioningConfigurations;
+    private List<TagsPatchRequest> tags = null;
 
     /**
     **/
@@ -208,6 +211,32 @@ public class ApplicationPatchModel  {
         this.provisioningConfigurations = provisioningConfigurations;
     }
 
+    /**
+     **/
+    public ApplicationPatchModel tags(List<TagsPatchRequest> tags) {
+
+        this.tags = tags;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("tags")
+    @Valid
+    public List<TagsPatchRequest> getTags() {
+        return tags;
+    }
+    public void setTags(List<TagsPatchRequest> tags) {
+        this.tags = tags;
+    }
+
+    public ApplicationPatchModel addTagsItem(TagsPatchRequest tagsItem) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.add(tagsItem);
+        return this;
+    }
+
 
 
     @Override
@@ -228,12 +257,13 @@ public class ApplicationPatchModel  {
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
             Objects.equals(this.authenticationSequence, applicationPatchModel.authenticationSequence) &&
             Objects.equals(this.advancedConfigurations, applicationPatchModel.advancedConfigurations) &&
-            Objects.equals(this.provisioningConfigurations, applicationPatchModel.provisioningConfigurations);
+            Objects.equals(this.provisioningConfigurations, applicationPatchModel.provisioningConfigurations) &&
+            Objects.equals(this.tags, applicationPatchModel.tags);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, imageUrl, accessUrl, templateId, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, imageUrl, accessUrl, templateId, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations, tags);
     }
 
     @Override
@@ -251,6 +281,7 @@ public class ApplicationPatchModel  {
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
         sb.append("    provisioningConfigurations: ").append(toIndentedString(provisioningConfigurations)).append("\n");
+        sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("}");
         return sb.toString();
     }
