@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) (2019-2023), WSO2 LLC. (http://www.wso2.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.wso2.carbon.identity.api.server.claim.management.common;
 
 import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementService;
+import org.wso2.carbon.identity.organization.management.service.OrganizationManager;
 
 /**
  * Service holder class for identity governance.
@@ -24,6 +25,7 @@ import org.wso2.carbon.identity.claim.metadata.mgt.ClaimMetadataManagementServic
 public class ClaimManagementDataHolder {
 
     private static ClaimMetadataManagementService claimMetadataManagementService;
+    private static OrganizationManager organizationManager;
 
     public static ClaimMetadataManagementService getClaimMetadataManagementService() {
 
@@ -34,5 +36,25 @@ public class ClaimManagementDataHolder {
             ClaimMetadataManagementService claimMetadataManagementService) {
 
         ClaimManagementDataHolder.claimMetadataManagementService = claimMetadataManagementService;
+    }
+
+    /**
+     * Get organizationManager OSGi service.
+     *
+     * @return organization Manager.
+     */
+    public static OrganizationManager getOrganizationManager() {
+
+        return organizationManager;
+    }
+
+    /**
+     * Set organizationManager OSGi service.
+     *
+     * @param organizationManager Organization Manager.
+     */
+    public static void setOrganizationManager(OrganizationManager organizationManager) {
+
+        ClaimManagementDataHolder.organizationManager = organizationManager;
     }
 }

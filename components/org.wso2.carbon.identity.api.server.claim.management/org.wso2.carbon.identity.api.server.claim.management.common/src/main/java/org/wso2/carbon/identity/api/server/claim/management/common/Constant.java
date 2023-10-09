@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) (2019-2023), WSO2 LLC. (http://www.wso2.org).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,7 +201,12 @@ public class Constant {
         ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS("CMT-60005", "Userstore not specified",
                 "Mapped userstore cannot be empty"),
         ERROR_CODE_EMPTY_ATTRIBUTE_MAPPINGS("CMT-60006", "Attribute mapping not specified",
-                "Attribute mapping cannot be empty");
+                "Attribute mapping cannot be empty"),
+        ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_MANAGEMENT("CMT-60007", "Claim modification is not " +
+                "allowed for this organization.", "Unable to execute the requested organization claim " +
+                "management task."),
+        ERROR_CODE_ERROR_RESOLVING_ORGANIZATION("CMT-60008", "Error resolving organization",
+                "Unable to resolve organization.");
 
         private final String code;
         private final String message;
