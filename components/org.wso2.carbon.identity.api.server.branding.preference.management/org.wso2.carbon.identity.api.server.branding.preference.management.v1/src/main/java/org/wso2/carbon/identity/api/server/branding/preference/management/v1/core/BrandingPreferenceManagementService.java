@@ -321,7 +321,7 @@ public class BrandingPreferenceManagementService {
     public CustomTextModel getCustomTextPreference(String type, String name, String screen, String locale) {
 
         String tenantDomain = getTenantDomainFromContext();
-        if (ORGANIZATION_TYPE.equals(type)) {
+        if (ORGANIZATION_TYPE.equals(type) || StringUtils.isBlank(name)) {
             name = tenantDomain;
         }
         if (StringUtils.isBlank(locale)) {
@@ -355,7 +355,7 @@ public class BrandingPreferenceManagementService {
     public CustomTextModel resolveCustomTextPreference(String type, String name, String screen, String locale) {
 
         String tenantDomain = getTenantDomainFromContext();
-        if (ORGANIZATION_TYPE.equals(type)) {
+        if (ORGANIZATION_TYPE.equals(type) || StringUtils.isBlank(name)) {
             name = tenantDomain;
         }
         if (StringUtils.isBlank(locale)) {
