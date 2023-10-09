@@ -57,7 +57,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Provisionin
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
-import org.wso2.carbon.identity.api.server.application.management.v1.TagsPatchRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ApiModelToServiceProvider;
@@ -84,8 +83,6 @@ import org.wso2.carbon.identity.application.common.IdentityApplicationManagement
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
 import org.wso2.carbon.identity.application.common.model.ApplicationTagsItem;
-import org.wso2.carbon.identity.application.common.model.ApplicationTagsPatch;
-import org.wso2.carbon.identity.application.common.model.ApplicationTagsPatch.ApplicationTagsPatchBuilder.OperationEnum;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
@@ -93,8 +90,6 @@ import org.wso2.carbon.identity.application.common.model.ImportResponse;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.InboundConfigurationProtocol;
-import org.wso2.carbon.identity.application.common.model.ListValue;
-import org.wso2.carbon.identity.application.common.model.ListValue.ListValueBuilder;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
@@ -862,8 +857,6 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
-        //Setting an empty array to avoid updating same tags again.
-        appToUpdate.setTags(new ArrayList<>());
         if (applicationPatchModel != null) {
             new UpdateServiceProvider().apply(appToUpdate, applicationPatchModel);
         }
@@ -873,42 +866,10 @@ public class ServerApplicationManagementService {
             String username = ContextLoader.getUsernameFromContext();
             getApplicationManagementService()
                     .updateApplicationByResourceId(applicationId, appToUpdate, tenantDomain, username);
-            if (applicationPatchModel.getTags() != null) {
-                getApplicationManagementService().updateApplicationTags(appToUpdate.getApplicationID(),
-                        getApplicationTagsPatchModel(applicationPatchModel.getTags()), tenantDomain);
-            }
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error patching application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
         }
-    }
-
-    private List<ApplicationTagsPatch> getApplicationTagsPatchModel(List<TagsPatchRequest> tagsPatchModel) {
-
-        List<ApplicationTagsPatch> applicationTagsPatch = new ArrayList<>();
-
-        for (TagsPatchRequest tagsPatch: tagsPatchModel) {
-            OperationEnum operation;
-            switch (tagsPatch.getOperation().toString()) {
-                case "ADD":
-                    operation = OperationEnum.ADD;
-                    break;
-                case "REMOVE":
-                    operation = OperationEnum.REMOVE;
-                    break;
-                default:
-                    operation = null;
-            }
-
-            List<ListValue> patchTags = tagsPatch.getTags().stream()
-                    .map(tag -> new ListValueBuilder().value(tag.getValue()).build())
-                    .collect(Collectors.toList());
-
-            applicationTagsPatch.add(new ApplicationTagsPatch.ApplicationTagsPatchBuilder()
-                    .operation(operation)
-                    .tags(patchTags).build());
-        }
-        return applicationTagsPatch;
     }
 
     public void deleteApplication(String applicationId) {

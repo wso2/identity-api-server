@@ -160,7 +160,8 @@ public class ServerApplicationTagManagementService {
     public ApplicationTagResponse getApplicationTagById(String tagId) {
 
         try {
-            ApplicationTagsItem applicationTag = ApplicationTagManagementServiceHolder.getApplicationTagManager()
+            org.wso2.carbon.identity.application.common.model.ApplicationTagsListItem applicationTag =
+                    ApplicationTagManagementServiceHolder.getApplicationTagManager()
                     .getApplicationTagById(tagId, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             if (applicationTag == null) {
                 throw ApplicationTagMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
@@ -215,18 +216,19 @@ public class ServerApplicationTagManagementService {
     }
 
     /**
-     * Build ApplicationTagsListItem from the ApplicationTagsItem.
+     * Build ApplicationTagResponse from the ApplicationTagsListItem.
      *
      * @param applicationTag Application Tag Item.
      * @return ApplicationTagsListItem.
      */
-    private ApplicationTagResponse buildApplicationTagResponse(ApplicationTagsItem applicationTag) {
+    private ApplicationTagResponse buildApplicationTagResponse(
+            org.wso2.carbon.identity.application.common.model.ApplicationTagsListItem applicationTag) {
 
        return new ApplicationTagResponse()
                     .id(applicationTag.getId())
                     .name(applicationTag.getName())
                     .colour(applicationTag.getColour())
-                    .associatedAppsCount(0);
+                    .associatedAppsCount(applicationTag.getAssociatedAppsCount());
     }
 
     /**

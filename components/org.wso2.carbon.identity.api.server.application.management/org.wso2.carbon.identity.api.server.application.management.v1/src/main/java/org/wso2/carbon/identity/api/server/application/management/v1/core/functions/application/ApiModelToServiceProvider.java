@@ -28,9 +28,9 @@ import org.wso2.carbon.identity.application.common.model.ApplicationTagsItem;
 import org.wso2.carbon.identity.application.common.model.ApplicationTagsItem.ApplicationTagsItemBuilder;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
@@ -104,10 +104,9 @@ public class ApiModelToServiceProvider implements Function<ApplicationModel, Ser
     private void addApplicationTagsToApplication(ServiceProvider application, List<ListValue> tags) {
 
         if (tags != null) {
-            List<ApplicationTagsItem> tagsList = new ArrayList<>();
-            for (ListValue tag: tags) {
-                tagsList.add(new ApplicationTagsItemBuilder().id(tag.getValue()).build());
-            }
+            List<ApplicationTagsItem> tagsList = tags.stream()
+                    .map(tag -> new ApplicationTagsItemBuilder().id(tag.getValue()).build())
+                    .collect(Collectors.toList());
             setIfNotNull(tagsList, application::setTags);
         }
     }

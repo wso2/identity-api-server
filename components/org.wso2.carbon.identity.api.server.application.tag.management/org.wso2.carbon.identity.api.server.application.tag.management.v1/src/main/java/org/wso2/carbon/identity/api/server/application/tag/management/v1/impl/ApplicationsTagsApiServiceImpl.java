@@ -57,7 +57,7 @@ public class ApplicationsTagsApiServiceImpl implements ApplicationsTagsApiServic
     }
 
     @Override
-    public Response getAllApplicationTags(Integer offset, Integer limit, String filter) {
+    public Response getAllApplicationTags(Integer limit, Integer offset, String filter) {
 
         return Response.ok().entity(serverApplicationTagManagementService.getAllApplicationTags(offset, limit,
                 filter)).build();
