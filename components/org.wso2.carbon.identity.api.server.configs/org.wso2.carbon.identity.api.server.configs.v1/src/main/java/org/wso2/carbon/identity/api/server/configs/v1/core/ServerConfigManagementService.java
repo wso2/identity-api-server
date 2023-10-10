@@ -44,6 +44,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListIte
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorProperty;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
@@ -70,6 +72,8 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationManagementUtil;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
+import org.wso2.carbon.identity.core.ServiceURLBuilder;
+import org.wso2.carbon.identity.core.URLBuilderException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
@@ -109,6 +113,12 @@ import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_
 public class ServerConfigManagementService {
 
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
+
+    private static final List<String> FEDERATED_AUTHENTICATORS_TO_UPDATE = new ArrayList<>(Arrays.asList(
+            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME,
+            IdentityApplicationConstants.Authenticator.PassiveSTS.NAME,
+            IdentityApplicationConstants.Authenticator.OIDC.NAME)
+    );
 
     /**
      * Get list of local authenticators supported by the server.
@@ -1180,5 +1190,288 @@ public class ServerConfigManagementService {
 
         Response.Status status = Response.Status.NOT_FOUND;
         return new APIError(status, errorResponse);
+    }
+
+    /**
+     * Get the SAML inbound authentication configuration for the tenant.
+     */
+    public InboundAuthSAML2Config getSAMLInboundAuthConfig() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        InboundAuthSAML2Config inboundAuthConfig = new InboundAuthSAML2Config();
+        try {
+            IdentityProvider residentIdp = ConfigsServiceHolder.getInstance().getIdentityProviderManager()
+                    .getResidentIdP(tenantDomain);
+            if (residentIdp != null) {
+                FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
+                        .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
+                                IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+                if (federatedAuthConfig == null) {
+                    throw handleException(Response.Status.NOT_FOUND,
+                            Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
+                            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+                }
+
+                Property[] idpProperties = federatedAuthConfig.getProperties();
+                if (idpProperties == null || idpProperties.length == 0) {
+                    throw handleException(Response.Status.NOT_FOUND,
+                            Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
+                            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+                }
+
+                inboundAuthConfig.setDestinationURLs(IdentityApplicationManagementUtil
+                        .getPropertyValuesForNameStartsWith(idpProperties,
+                                IdentityApplicationConstants.Authenticator.SAML2SSO.DESTINATION_URL_PREFIX));
+
+                String metadataValidityPeriod = IdentityApplicationManagementUtil.getPropertyValue(idpProperties,
+                        IdentityApplicationConstants.Authenticator.SAML2SSO.SAML_METADATA_VALIDITY_PERIOD);
+                if (StringUtils.isNotEmpty(metadataValidityPeriod)) {
+                    inboundAuthConfig.setMetadataValidityPeriod(Integer.parseInt(metadataValidityPeriod));
+                }
+
+                inboundAuthConfig.setEnableMetadataSigning(Boolean.parseBoolean(
+                        IdentityApplicationManagementUtil.getPropertyValue(idpProperties,
+                                IdentityApplicationConstants.Authenticator.SAML2SSO.SAML_METADATA_SIGNING_ENABLED)));
+
+                // Construct and set the SAML metadata download endpoint.
+                String samlMetadataEndpoint;
+                if (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                    samlMetadataEndpoint = ServiceURLBuilder.create().addPath(
+                            Constants.SAML2_METADATA_ENDPOINT_URI_PATH).build().getAbsolutePublicURL();
+                } else {
+                    samlMetadataEndpoint = ServiceURLBuilder.create().addPath("/t/" + tenantDomain +
+                            Constants.SAML2_METADATA_ENDPOINT_URI_PATH).build().getAbsolutePublicURL();
+                }
+                inboundAuthConfig.setMetadataEndpoint(samlMetadataEndpoint);
+            } else {
+                throw handleException(Response.Status.NOT_FOUND,
+                        Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
+            }
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_RETRIEVE, null);
+        } catch (URLBuilderException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_RETRIEVE, null);
+        }
+
+        return inboundAuthConfig;
+    }
+
+    /**
+     * Update the SAML inbound authentication configuration for the tenant.
+     *
+     * @param authConfigToUpdate SAML inbound authentication configs to update.
+     */
+    public void updateSAMLInboundAuthConfig(InboundAuthSAML2Config authConfigToUpdate) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        validateSAMLAuthConfigUpdate(authConfigToUpdate);
+
+        try {
+            IdentityProvider residentIdp = ConfigsServiceHolder.getInstance().getIdentityProviderManager()
+                    .getResidentIdP(tenantDomain);
+            if (residentIdp != null) {
+                FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
+                        .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
+                                IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+                if (federatedAuthConfig == null) {
+                    throw handleException(Response.Status.NOT_FOUND,
+                            Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
+                            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+                }
+
+                Property[] idpProperties = federatedAuthConfig.getProperties();
+                if (idpProperties == null) {
+                    throw handleException(Response.Status.NOT_FOUND,
+                            Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
+                            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+                }
+                Property[] updatedIdpProperties = getUpdatedSAMLFederatedAuthConfigProperties(idpProperties,
+                        authConfigToUpdate);
+                federatedAuthConfig.setProperties(updatedIdpProperties);
+
+                cleanResidentIDPForUpdateRequest(residentIdp);
+                ConfigsServiceHolder.getInstance().getIdentityProviderManager().updateResidentIdP(
+                        residentIdp, tenantDomain);
+            } else {
+                throw handleException(Response.Status.NOT_FOUND,
+                        Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
+            }
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_UPDATE, null);
+        }
+    }
+
+    private Property[] getUpdatedSAMLFederatedAuthConfigProperties(Property[] properties,
+                                                                   InboundAuthSAML2Config authConfigToUpdate) {
+
+        List<Property> updatedPropertyList = new ArrayList<>();
+
+        for (Property property : properties) {
+            if (property.getName().equals(
+                    IdentityApplicationConstants.Authenticator.SAML2SSO.SAML_METADATA_VALIDITY_PERIOD)) {
+                if (authConfigToUpdate.getMetadataValidityPeriod() != null) {
+                    property.setValue(Integer.toString(authConfigToUpdate.getMetadataValidityPeriod()));
+                }
+                updatedPropertyList.add(property);
+            } else if (property.getName().equals(
+                    IdentityApplicationConstants.Authenticator.SAML2SSO.SAML_METADATA_SIGNING_ENABLED)) {
+                if (authConfigToUpdate.getEnableMetadataSigning() != null) {
+                    property.setValue(Boolean.toString(authConfigToUpdate.getEnableMetadataSigning()));
+                }
+                updatedPropertyList.add(property);
+            } else if (!property.getName().startsWith(
+                    IdentityApplicationConstants.Authenticator.SAML2SSO.DESTINATION_URL_PREFIX)) {
+                updatedPropertyList.add(property);
+            } else if (authConfigToUpdate.getDestinationURLs() == null) {
+                updatedPropertyList.add(property);
+            }
+        }
+
+        // Update destination URLs.
+        if (authConfigToUpdate.getDestinationURLs() != null) {
+            int destUriIndex = 1;
+            for (String destinationURL : authConfigToUpdate.getDestinationURLs()) {
+                Property property = new Property();
+                property.setName(IdentityApplicationConstants.Authenticator.SAML2SSO.DESTINATION_URL_PREFIX +
+                        "." + destUriIndex);
+                property.setValue(destinationURL);
+                updatedPropertyList.add(property);
+                destUriIndex += 1;
+            }
+        }
+
+        return updatedPropertyList.toArray(new Property[0]);
+    }
+
+    private void validateSAMLAuthConfigUpdate(InboundAuthSAML2Config authConfigToUpdate) {
+
+        if (authConfigToUpdate.getDestinationURLs() != null && authConfigToUpdate.getDestinationURLs().isEmpty()) {
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                    "Should contain at least one destination URL");
+        }
+    }
+
+    /**
+     * Get the Passive STS inbound authentication configuration for the tenant.
+     */
+    public InboundAuthPassiveSTSConfig getPassiveSTSInboundAuthConfig() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        InboundAuthPassiveSTSConfig inboundAuthConfig = new InboundAuthPassiveSTSConfig();
+        try {
+            IdentityProvider residentIdp = ConfigsServiceHolder.getInstance().getIdentityProviderManager()
+                    .getResidentIdP(tenantDomain);
+            if (residentIdp != null) {
+                FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
+                        .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
+                                IdentityApplicationConstants.Authenticator.PassiveSTS.NAME);
+                if (federatedAuthConfig == null) {
+                    throw handleException(Response.Status.NOT_FOUND,
+                            Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
+                            IdentityApplicationConstants.Authenticator.PassiveSTS.NAME);
+                }
+
+                Property[] idpProperties = federatedAuthConfig.getProperties();
+                if (idpProperties == null || idpProperties.length == 0) {
+                    throw handleException(Response.Status.NOT_FOUND,
+                            Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
+                            IdentityApplicationConstants.Authenticator.PassiveSTS.NAME);
+                }
+
+                inboundAuthConfig.setPassiveSTSUrl(IdentityApplicationManagementUtil.getPropertyValue(idpProperties,
+                        IdentityApplicationConstants.Authenticator.PassiveSTS.IDENTITY_PROVIDER_URL));
+
+                /*
+                 Note: SAML 'samlAuthnRequestsSigningEnabled' property is used as the authentication request
+                 signing property of passive STS in the management console. Hence, the same property is used
+                 in the API.
+                */
+                FederatedAuthenticatorConfig samlFederatedAuthConfig = IdentityApplicationManagementUtil
+                        .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
+                                IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+                if (samlFederatedAuthConfig != null) {
+                    inboundAuthConfig.setEnableRequestSigning(Boolean.parseBoolean(IdentityApplicationManagementUtil
+                            .getPropertyValue(samlFederatedAuthConfig.getProperties(), IdentityApplicationConstants
+                                    .Authenticator.SAML2SSO.SAML_METADATA_AUTHN_REQUESTS_SIGNING_ENABLED)));
+                }
+            } else {
+                throw handleException(Response.Status.NOT_FOUND,
+                        Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
+            }
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_RETRIEVE, null);
+        }
+
+        return inboundAuthConfig;
+    }
+
+    /**
+     * Update the Passive STS inbound authentication configuration for the tenant.
+     *
+     * @param authConfigToUpdate Passive STS inbound authentication configs to update.
+     */
+    public void updatePassiveSTSInboundAuthConfig(InboundAuthPassiveSTSConfig authConfigToUpdate) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        try {
+            IdentityProvider residentIdp = ConfigsServiceHolder.getInstance().getIdentityProviderManager()
+                    .getResidentIdP(tenantDomain);
+            if (residentIdp != null) {
+                /*
+                 Note: SAML 'samlAuthnRequestsSigningEnabled' property is used as the authentication request
+                 signing property of passive STS in the management console. Hence, the same property is used
+                 in the API.
+                */
+                FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
+                        .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
+                                IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+                if (federatedAuthConfig == null) {
+                    throw handleException(Response.Status.NOT_FOUND,
+                            Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
+                            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+                }
+
+                Property[] idpProperties = federatedAuthConfig.getProperties();
+                if (idpProperties == null) {
+                    throw handleException(Response.Status.NOT_FOUND,
+                            Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
+                            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
+                }
+
+                for (Property property : idpProperties) {
+                    if (property.getName().equals(IdentityApplicationConstants.Authenticator
+                            .SAML2SSO.SAML_METADATA_AUTHN_REQUESTS_SIGNING_ENABLED)
+                            && authConfigToUpdate.getEnableRequestSigning() != null) {
+                        property.setValue(Boolean.toString(authConfigToUpdate.getEnableRequestSigning()));
+                    }
+                }
+                cleanResidentIDPForUpdateRequest(residentIdp);
+                ConfigsServiceHolder.getInstance().getIdentityProviderManager().updateResidentIdP(
+                        residentIdp, tenantDomain);
+            } else {
+                throw handleException(Response.Status.NOT_FOUND,
+                        Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
+            }
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_UPDATE, null);
+        }
+    }
+
+    private void cleanResidentIDPForUpdateRequest(IdentityProvider updatedResidentIdp) {
+
+        List<FederatedAuthenticatorConfig> updatedFederatedAuthConfigs = new ArrayList<>();
+        for (FederatedAuthenticatorConfig federatedAuthenticatorConfig :
+                updatedResidentIdp.getFederatedAuthenticatorConfigs()) {
+            if (FEDERATED_AUTHENTICATORS_TO_UPDATE.contains(federatedAuthenticatorConfig.getName())) {
+                updatedFederatedAuthConfigs.add(federatedAuthenticatorConfig);
+            }
+        }
+        updatedResidentIdp.setFederatedAuthenticatorConfigs(
+                updatedFederatedAuthConfigs.toArray(new FederatedAuthenticatorConfig[0]));
     }
 }

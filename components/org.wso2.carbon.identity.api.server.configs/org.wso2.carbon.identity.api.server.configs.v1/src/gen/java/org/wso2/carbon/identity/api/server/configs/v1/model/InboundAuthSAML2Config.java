@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.*;
@@ -37,7 +36,7 @@ public class InboundAuthSAML2Config  {
   
     private List<String> destinationURLs = null;
 
-    private BigDecimal metadataValidityPeriod;
+    private Integer metadataValidityPeriod;
     private Boolean enableMetadataSigning;
     private String metadataEndpoint;
 
@@ -71,7 +70,7 @@ public class InboundAuthSAML2Config  {
         /**
     * SAML metadata validity period in minutes
     **/
-    public InboundAuthSAML2Config metadataValidityPeriod(BigDecimal metadataValidityPeriod) {
+    public InboundAuthSAML2Config metadataValidityPeriod(Integer metadataValidityPeriod) {
 
         this.metadataValidityPeriod = metadataValidityPeriod;
         return this;
@@ -80,10 +79,10 @@ public class InboundAuthSAML2Config  {
     @ApiModelProperty(example = "60", value = "SAML metadata validity period in minutes")
     @JsonProperty("metadataValidityPeriod")
     @Valid
-    public BigDecimal getMetadataValidityPeriod() {
+    public Integer getMetadataValidityPeriod() {
         return metadataValidityPeriod;
     }
-    public void setMetadataValidityPeriod(BigDecimal metadataValidityPeriod) {
+    public void setMetadataValidityPeriod(Integer metadataValidityPeriod) {
         this.metadataValidityPeriod = metadataValidityPeriod;
     }
 

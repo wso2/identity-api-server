@@ -168,28 +168,26 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     @Override
     public Response getSAMLInboundAuthConfig() {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(configManagementService.getSAMLInboundAuthConfig()).build();
     }
 
     @Override
     public Response updateSAMLInboundAuthConfig(InboundAuthSAML2Config inboundAuthSAML2Config) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        configManagementService.updateSAMLInboundAuthConfig(inboundAuthSAML2Config);
+        return Response.ok().build();
     }
 
     @Override
     public Response getPassiveSTSInboundAuthConfig() {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(configManagementService.getPassiveSTSInboundAuthConfig()).build();
     }
 
     @Override
     public Response updatePassiveSTSInboundAuthConfig(InboundAuthPassiveSTSConfig inboundAuthPassiveSTSConfig) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        configManagementService.updatePassiveSTSInboundAuthConfig(inboundAuthPassiveSTSConfig);
+        return Response.ok().build();
     }
 }
