@@ -341,7 +341,7 @@ public class ServerAPIResourceManagementService {
                 .description(apiResource.getDescription())
                 .scopes(apiResource.getScopes().stream().map(this::buildScopeGetResponse)
                         .collect(Collectors.toList()))
-                .requiresAuthorization(apiResource.isRequiresAuthorization());
+                .requiresAuthorization(apiResource.isAuthorizationRequired());
     }
 
     /**
@@ -418,7 +418,7 @@ public class ServerAPIResourceManagementService {
                 .name(apiResource.getName())
                 .identifier(apiResource.getIdentifier())
                 .type(apiResource.getType())
-                .requiresAuthorization(apiResource.isRequiresAuthorization())
+                .requiresAuthorization(apiResource.isAuthorizationRequired())
                 .self(V1_API_PATH_COMPONENT + APIResourceMgtEndpointConstants.API_RESOURCE_PATH_COMPONENT + "/"
                         + apiResource.getId());
     }

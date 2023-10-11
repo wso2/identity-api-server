@@ -1336,7 +1336,7 @@ public class ServerApplicationManagementService {
             String policyIdentifier = validatePolicy(authorizedAPICreationModel.getPolicyIdentifier());
 
             // If API resource has requiresAuthorization set to true, policy identifier should be RBAC.
-            if (apiResource.isRequiresAuthorization() &&
+            if (apiResource.isAuthorizationRequired() &&
                     !policyIdentifier.equals(ApplicationManagementConstants.RBAC)) {
                 throw buildClientError(ErrorMessage.INVALID_POLICY_TYPE_FOR_API_RESOURCE, authorizedAPIId,
                         policyIdentifier);
