@@ -114,12 +114,6 @@ public class ServerConfigManagementService {
 
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
 
-    private static final List<String> FEDERATED_AUTHENTICATORS_TO_UPDATE = new ArrayList<>(Arrays.asList(
-            IdentityApplicationConstants.Authenticator.SAML2SSO.NAME,
-            IdentityApplicationConstants.Authenticator.PassiveSTS.NAME,
-            IdentityApplicationConstants.Authenticator.OIDC.NAME)
-    );
-
     /**
      * Get list of local authenticators supported by the server.
      *
@@ -1207,14 +1201,14 @@ public class ServerConfigManagementService {
                         .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
                                 IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
                 if (federatedAuthConfig == null) {
-                    throw handleException(Response.Status.NOT_FOUND,
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                             Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
                             IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
                 }
 
                 Property[] idpProperties = federatedAuthConfig.getProperties();
                 if (idpProperties == null || idpProperties.length == 0) {
-                    throw handleException(Response.Status.NOT_FOUND,
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                             Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
                             IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
                 }
@@ -1244,7 +1238,7 @@ public class ServerConfigManagementService {
                 }
                 inboundAuthConfig.setMetadataEndpoint(samlMetadataEndpoint);
             } else {
-                throw handleException(Response.Status.NOT_FOUND,
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
             }
         } catch (IdentityProviderManagementException e) {
@@ -1276,26 +1270,25 @@ public class ServerConfigManagementService {
                         .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
                                 IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
                 if (federatedAuthConfig == null) {
-                    throw handleException(Response.Status.NOT_FOUND,
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                             Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
                             IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
                 }
 
                 Property[] idpProperties = federatedAuthConfig.getProperties();
                 if (idpProperties == null) {
-                    throw handleException(Response.Status.NOT_FOUND,
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                             Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
                             IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
                 }
                 Property[] updatedIdpProperties = getUpdatedSAMLFederatedAuthConfigProperties(idpProperties,
                         authConfigToUpdate);
                 federatedAuthConfig.setProperties(updatedIdpProperties);
-
-                cleanResidentIDPForUpdateRequest(residentIdp);
+                residentIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
                 ConfigsServiceHolder.getInstance().getIdentityProviderManager().updateResidentIdP(
                         residentIdp, tenantDomain);
             } else {
-                throw handleException(Response.Status.NOT_FOUND,
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
             }
         } catch (IdentityProviderManagementException e) {
@@ -1369,14 +1362,14 @@ public class ServerConfigManagementService {
                         .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
                                 IdentityApplicationConstants.Authenticator.PassiveSTS.NAME);
                 if (federatedAuthConfig == null) {
-                    throw handleException(Response.Status.NOT_FOUND,
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                             Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
                             IdentityApplicationConstants.Authenticator.PassiveSTS.NAME);
                 }
 
                 Property[] idpProperties = federatedAuthConfig.getProperties();
                 if (idpProperties == null || idpProperties.length == 0) {
-                    throw handleException(Response.Status.NOT_FOUND,
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                             Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
                             IdentityApplicationConstants.Authenticator.PassiveSTS.NAME);
                 }
@@ -1398,7 +1391,7 @@ public class ServerConfigManagementService {
                                     .Authenticator.SAML2SSO.SAML_METADATA_AUTHN_REQUESTS_SIGNING_ENABLED)));
                 }
             } else {
-                throw handleException(Response.Status.NOT_FOUND,
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
             }
         } catch (IdentityProviderManagementException e) {
@@ -1430,14 +1423,14 @@ public class ServerConfigManagementService {
                         .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
                                 IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
                 if (federatedAuthConfig == null) {
-                    throw handleException(Response.Status.NOT_FOUND,
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                             Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND,
                             IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
                 }
 
                 Property[] idpProperties = federatedAuthConfig.getProperties();
                 if (idpProperties == null) {
-                    throw handleException(Response.Status.NOT_FOUND,
+                    throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                             Constants.ErrorMessage.ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND,
                             IdentityApplicationConstants.Authenticator.SAML2SSO.NAME);
                 }
@@ -1449,29 +1442,16 @@ public class ServerConfigManagementService {
                         property.setValue(Boolean.toString(authConfigToUpdate.getEnableRequestSigning()));
                     }
                 }
-                cleanResidentIDPForUpdateRequest(residentIdp);
+                residentIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
                 ConfigsServiceHolder.getInstance().getIdentityProviderManager().updateResidentIdP(
                         residentIdp, tenantDomain);
             } else {
-                throw handleException(Response.Status.NOT_FOUND,
+                throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
             }
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_UPDATE, null);
         }
-    }
-
-    private void cleanResidentIDPForUpdateRequest(IdentityProvider updatedResidentIdp) {
-
-        List<FederatedAuthenticatorConfig> updatedFederatedAuthConfigs = new ArrayList<>();
-        for (FederatedAuthenticatorConfig federatedAuthenticatorConfig :
-                updatedResidentIdp.getFederatedAuthenticatorConfigs()) {
-            if (FEDERATED_AUTHENTICATORS_TO_UPDATE.contains(federatedAuthenticatorConfig.getName())) {
-                updatedFederatedAuthConfigs.add(federatedAuthenticatorConfig);
-            }
-        }
-        updatedResidentIdp.setFederatedAuthenticatorConfigs(
-                updatedFederatedAuthConfigs.toArray(new FederatedAuthenticatorConfig[0]));
     }
 }
