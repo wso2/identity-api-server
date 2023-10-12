@@ -279,7 +279,7 @@ public class ServerApplicationManagementService {
                         .count(resultsInCurrentPage)
                         .applications(getApplicationListItems(serviceProviderList, requestedAttributeList))
                         .links(Util.buildPaginationLinks(limit, offset, totalResults,
-                                        APPLICATION_MANAGEMENT_PATH_COMPONENT)
+                                        APPLICATION_MANAGEMENT_PATH_COMPONENT, requiredAttributes, filter)
                                 .entrySet()
                                 .stream()
                                 .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
@@ -291,7 +291,7 @@ public class ServerApplicationManagementService {
                         .count(resultsInCurrentPage)
                         .applications(getApplicationListItems(filteredAppList))
                         .links(Util.buildPaginationLinks(limit, offset, totalResults,
-                                        APPLICATION_MANAGEMENT_PATH_COMPONENT)
+                                        APPLICATION_MANAGEMENT_PATH_COMPONENT, requiredAttributes, filter)
                                 .entrySet()
                                 .stream()
                                 .map(link -> new Link().rel(link.getKey()).href(link.getValue()))
