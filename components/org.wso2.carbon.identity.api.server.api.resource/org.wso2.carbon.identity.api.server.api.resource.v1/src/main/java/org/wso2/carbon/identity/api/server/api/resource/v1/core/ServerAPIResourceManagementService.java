@@ -171,12 +171,17 @@ public class ServerAPIResourceManagementService {
     }
 
     /**
-     * Get API Resource by ID.
+     * Get API Resource Response by ID.
      *
-     * @param apiResourceID API Resource ID.
+     * @param apiResourceId API Resource ID.
      * @return API Resource.
      */
-    public APIResource getAPIResourceById(String apiResourceID) {
+    public APIResourceResponse getAPIResourceResponseById(String apiResourceId) {
+
+        return buildAPIResourceResponse(getAPIResourceById(apiResourceId));
+    }
+
+    private APIResource getAPIResourceById(String apiResourceID) {
 
         try {
             APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
