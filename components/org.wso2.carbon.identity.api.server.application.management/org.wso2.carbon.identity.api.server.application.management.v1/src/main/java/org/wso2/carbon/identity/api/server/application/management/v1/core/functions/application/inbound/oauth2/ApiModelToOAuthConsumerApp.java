@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -88,7 +89,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
 
         if (idToken != null) {
             setIfNotNull(idToken.getExpiryInSeconds(), consumerAppDTO::setIdTokenExpiryTime);
-            consumerAppDTO.setAudiences(Optional.ofNullable(idToken.getAudience())
+            consumerAppDTO.setIdTokenAudiences(Optional.ofNullable(idToken.getAudience())
                     .map(audiences -> audiences.toArray(new String[0]))
                     .orElse(new String[0])
             );
@@ -131,6 +132,10 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         if (accessToken != null) {
             consumerAppDTO.setTokenType(accessToken.getType());
             consumerAppDTO.setUserAccessTokenExpiryTime(accessToken.getUserAccessTokenExpiryInSeconds());
+            consumerAppDTO.setAccessTokenAudiences(Optional.ofNullable(accessToken.getAudience())
+                    .map(audiences -> audiences.toArray(new String[0]))
+                    .orElse(new String[0])
+            );
             consumerAppDTO.setApplicationAccessTokenExpiryTime(accessToken.getApplicationAccessTokenExpiryInSeconds());
             consumerAppDTO.setTokenBindingType(accessToken.getBindingType());
             if (accessToken.getRevokeTokensWhenIDPSessionTerminated() != null) {

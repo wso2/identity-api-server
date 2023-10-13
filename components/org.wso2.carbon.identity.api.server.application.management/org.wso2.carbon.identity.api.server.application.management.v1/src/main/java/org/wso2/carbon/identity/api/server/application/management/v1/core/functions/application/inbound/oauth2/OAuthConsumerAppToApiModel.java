@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2;
 
 import org.apache.commons.lang.StringUtils;
@@ -24,6 +27,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.OIDCLogoutC
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RefreshTokenConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
+import org.wso2.carbon.identity.oauth2.internal.OAuth2ServiceComponentHolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,7 +82,7 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
 
     private AccessTokenConfiguration buildTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
 
-        return new AccessTokenConfiguration()
+        AccessTokenConfiguration accessTokenConfiguration = new AccessTokenConfiguration()
                 .type(oAuthConsumerAppDTO.getTokenType())
                 .userAccessTokenExpiryInSeconds(oAuthConsumerAppDTO.getUserAccessTokenExpiryTime())
                 .applicationAccessTokenExpiryInSeconds(oAuthConsumerAppDTO.getApplicationAccessTokenExpiryTime())
@@ -86,6 +90,12 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .revokeTokensWhenIDPSessionTerminated(oAuthConsumerAppDTO
                         .isTokenRevocationWithIDPSessionTerminationEnabled())
                 .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled());
+
+        if (!OAuth2ServiceComponentHolder.isLegacyAudienceEnabled()) {
+            accessTokenConfiguration.audience(getAccessTokenAudiences(oAuthConsumerAppDTO.getAccessTokenAudiences()));
+        }
+
+        return accessTokenConfiguration;
     }
 
     private RefreshTokenConfiguration buildRefreshTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
@@ -99,17 +109,18 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
 
         return new IdTokenConfiguration()
                 .expiryInSeconds(oAuthConsumerAppDTO.getIdTokenExpiryTime())
-                .audience(getAudiences(oAuthConsumerAppDTO))
+                .audience(getIdTokenAudiences(oAuthConsumerAppDTO.getIdTokenAudiences()))
                 .encryption(buildIdTokenEncryptionConfiguration(oAuthConsumerAppDTO));
     }
 
-    private List<String> getAudiences(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+    private List<String> getIdTokenAudiences(String[] audiences) {
 
-        if (oAuthConsumerAppDTO.getAudiences() == null) {
-            return Collections.emptyList();
-        } else {
-            return Arrays.asList(oAuthConsumerAppDTO.getAudiences());
-        }
+        return (audiences == null) ? Collections.emptyList() : Arrays.asList(audiences);
+    }
+
+    private List<String> getAccessTokenAudiences(String[] audiences) {
+
+        return (audiences == null) ? Collections.emptyList() : Arrays.asList(audiences);
     }
 
     private IdTokenEncryptionConfiguration buildIdTokenEncryptionConfiguration(OAuthConsumerAppDTO appDTO) {

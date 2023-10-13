@@ -3261,6 +3261,12 @@ components:
         type:
           type: string
           example: JWT
+        audience:
+          type: array
+          example:
+            - 'http://idp.xyz.com'
+          items:
+            type: string
         userAccessTokenExpiryInSeconds:
           type: integer
           format: int64

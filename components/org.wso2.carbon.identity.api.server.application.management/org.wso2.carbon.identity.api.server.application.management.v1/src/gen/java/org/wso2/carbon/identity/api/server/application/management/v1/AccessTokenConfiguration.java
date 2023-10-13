@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 
 
@@ -33,6 +35,8 @@ import javax.xml.bind.annotation.*;
 public class AccessTokenConfiguration  {
   
     private String type;
+    private List<String> audience = null;
+
     private Long userAccessTokenExpiryInSeconds;
     private Long applicationAccessTokenExpiryInSeconds;
     private String bindingType = "None";
@@ -58,6 +62,32 @@ public class AccessTokenConfiguration  {
     }
 
     /**
+    **/
+    public AccessTokenConfiguration audience(List<String> audience) {
+
+        this.audience = audience;
+        return this;
+    }
+
+    @ApiModelProperty(example = "[\"http://idp.xyz.com\"]", value = "")
+    @JsonProperty("audience")
+    @Valid
+    public List<String> getAudience() {
+        return audience;
+    }
+    public void setAudience(List<String> audience) {
+        this.audience = audience;
+    }
+
+    public AccessTokenConfiguration addAudienceItem(String audienceItem) {
+        if (this.audience == null) {
+            this.audience = new ArrayList<>();
+        }
+        this.audience.add(audienceItem);
+        return this;
+    }
+
+        /**
     **/
     public AccessTokenConfiguration userAccessTokenExpiryInSeconds(Long userAccessTokenExpiryInSeconds) {
 
@@ -163,6 +193,7 @@ public class AccessTokenConfiguration  {
         }
         AccessTokenConfiguration accessTokenConfiguration = (AccessTokenConfiguration) o;
         return Objects.equals(this.type, accessTokenConfiguration.type) &&
+            Objects.equals(this.audience, accessTokenConfiguration.audience) &&
             Objects.equals(this.userAccessTokenExpiryInSeconds, accessTokenConfiguration.userAccessTokenExpiryInSeconds) &&
             Objects.equals(this.applicationAccessTokenExpiryInSeconds, accessTokenConfiguration.applicationAccessTokenExpiryInSeconds) &&
             Objects.equals(this.bindingType, accessTokenConfiguration.bindingType) &&
@@ -172,7 +203,7 @@ public class AccessTokenConfiguration  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding);
+        return Objects.hash(type, audience, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding);
     }
 
     @Override
@@ -182,6 +213,7 @@ public class AccessTokenConfiguration  {
         sb.append("class AccessTokenConfiguration {\n");
         
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    audience: ").append(toIndentedString(audience)).append("\n");
         sb.append("    userAccessTokenExpiryInSeconds: ").append(toIndentedString(userAccessTokenExpiryInSeconds)).append("\n");
         sb.append("    applicationAccessTokenExpiryInSeconds: ").append(toIndentedString(applicationAccessTokenExpiryInSeconds)).append("\n");
         sb.append("    bindingType: ").append(toIndentedString(bindingType)).append("\n");
