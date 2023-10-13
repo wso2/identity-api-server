@@ -395,7 +395,7 @@ public class ServerAPIResourceManagementService {
                 .scopes(createScopes(apIResourceCreationModel.getScopes()))
                 .requiresAuthorization(apIResourceCreationModel.getRequiresAuthorization() != null ?
                         apIResourceCreationModel.getRequiresAuthorization() : true)
-                .type(APIResourceMgtEndpointConstants.API_RESOURCE_TYPE);
+                .type(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE);
         return apiResourceBuilder.build();
     }
 
@@ -479,9 +479,9 @@ public class ServerAPIResourceManagementService {
      *
      * @param apiResource API resource to be handled.
      */
-    private static void handleSystemAPI(APIResource apiResource) {
+    private void handleSystemAPI(APIResource apiResource) {
 
-        if (StringUtils.equals(apiResource.getType(), APIResourceMgtEndpointConstants.SYSTEM_API_RESOURCE_TYPE)) {
+        if (APIResourceMgtEndpointConstants.SYSTEM_API_RESOURCE_TYPE.equals(apiResource.getType())) {
             throw APIResourceMgtEndpointUtil.handleException(Response.Status.FORBIDDEN,
                     ErrorMessage.ERROR_CODE_SYSTEM_API_RESOURCE_NOT_MODIFIABLE);
         }
