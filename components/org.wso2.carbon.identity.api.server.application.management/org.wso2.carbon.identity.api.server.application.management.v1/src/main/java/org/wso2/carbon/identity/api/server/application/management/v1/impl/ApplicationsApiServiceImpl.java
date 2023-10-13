@@ -28,6 +28,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
@@ -89,6 +91,19 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response getAuthorizedAPIs(String applicationId) {
+
+        return Response.ok().entity(applicationManagementService.getAuthorizedAPIs(applicationId)).build();
+    }
+
+    @Override
+    public Response addAuthorizedAPI(String applicationId, AuthorizedAPICreationModel authorizedAPICreationModel) {
+
+        applicationManagementService.addAuthorizedAPI(applicationId, authorizedAPICreationModel);
+        return Response.ok().build();
+    }
+
+    @Override
     public Response changeApplicationOwner(String applicationId, ApplicationOwner applicationOwner) {
 
         applicationManagementService.changeApplicationOwner(applicationId, applicationOwner);
@@ -124,9 +139,24 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response deleteAuthorizedAPI(String applicationId, String authorizationId) {
+
+        applicationManagementService.deleteAuthorizedAPI(applicationId, authorizationId);
+        return Response.noContent().build();
+    }
+
+    @Override
     public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         applicationManagementService.patchApplication(applicationId, applicationPatchModel);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response patchAuthorizedAPI(String applicationId, String authorizationId,
+                                       AuthorizedAPIPatchModel authorizedAPIPatchModel) {
+
+        applicationManagementService.updateAuthorizedAPI(applicationId, authorizationId, authorizedAPIPatchModel);
         return Response.ok().build();
     }
 

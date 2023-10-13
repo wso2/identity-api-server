@@ -171,12 +171,17 @@ public class ServerAPIResourceManagementService {
     }
 
     /**
-     * Get API Resource by ID.
+     * Get API Resource Response by ID.
      *
-     * @param apiResourceID API Resource ID.
+     * @param apiResourceId API Resource ID.
      * @return API Resource.
      */
-    public APIResource getAPIResourceById(String apiResourceID) {
+    public APIResourceResponse getAPIResourceResponseById(String apiResourceId) {
+
+        return buildAPIResourceResponse(getAPIResourceById(apiResourceId));
+    }
+
+    private APIResource getAPIResourceById(String apiResourceID) {
 
         try {
             APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
@@ -341,7 +346,7 @@ public class ServerAPIResourceManagementService {
                 .description(apiResource.getDescription())
                 .scopes(apiResource.getScopes().stream().map(this::buildScopeGetResponse)
                         .collect(Collectors.toList()))
-                .requiresAuthorization(apiResource.isRequiresAuthorization());
+                .requiresAuthorization(apiResource.isAuthorizationRequired());
     }
 
     /**
@@ -418,7 +423,7 @@ public class ServerAPIResourceManagementService {
                 .name(apiResource.getName())
                 .identifier(apiResource.getIdentifier())
                 .type(apiResource.getType())
-                .requiresAuthorization(apiResource.isRequiresAuthorization())
+                .requiresAuthorization(apiResource.isAuthorizationRequired())
                 .self(V1_API_PATH_COMPONENT + APIResourceMgtEndpointConstants.API_RESOURCE_PATH_COMPONENT + "/"
                         + apiResource.getId());
     }
