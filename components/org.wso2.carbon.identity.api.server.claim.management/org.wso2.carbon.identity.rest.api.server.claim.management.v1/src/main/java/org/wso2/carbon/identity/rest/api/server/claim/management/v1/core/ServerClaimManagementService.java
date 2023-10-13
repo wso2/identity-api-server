@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.claim.management.common.Constant;
@@ -1466,7 +1467,7 @@ public class ServerClaimManagementService {
         try {
             String organizationId = getOrganizationManager().resolveOrganizationId(tenantDomain);
             boolean isPrimaryOrg = getOrganizationManager().isPrimaryOrganization(organizationId);
-            if (!isPrimaryOrg) {
+            if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && !isPrimaryOrg) {
                 throw handleClaimManagementClientError(ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_MANAGEMENT, FORBIDDEN,
                         organizationId);
             }
