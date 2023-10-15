@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
@@ -49,6 +50,7 @@ public class ApplicationResponseModel  {
     private String templateId;
     private Boolean isManagementApp;
     private Boolean isB2BSelfServiceApp;
+    private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
     private List<InboundProtocolListItem> inboundProtocols = null;
 
@@ -271,6 +273,27 @@ public enum AccessEnum {
 
         return isB2BSelfServiceApp;
     }
+    public void setIsB2BSelfServiceApp(Boolean isB2BSelfServiceApp) {
+        this.isB2BSelfServiceApp = isB2BSelfServiceApp;
+    }
+
+    /**
+    **/
+    public ApplicationResponseModel associatedRoles(AssociatedRolesConfig associatedRoles) {
+
+        this.associatedRoles = associatedRoles;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("associatedRoles")
+    @Valid
+    public AssociatedRolesConfig getAssociatedRoles() {
+        return associatedRoles;
+    }
+    public void setAssociatedRoles(AssociatedRolesConfig associatedRoles) {
+        this.associatedRoles = associatedRoles;
+    }
 
     /**
     **/
@@ -410,6 +433,7 @@ public enum AccessEnum {
             Objects.equals(this.templateId, applicationResponseModel.templateId) &&
             Objects.equals(this.isManagementApp, applicationResponseModel.isManagementApp) &&
             Objects.equals(this.isB2BSelfServiceApp, applicationResponseModel.isB2BSelfServiceApp) &&
+            Objects.equals(this.associatedRoles, applicationResponseModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationResponseModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocols, applicationResponseModel.inboundProtocols) &&
             Objects.equals(this.authenticationSequence, applicationResponseModel.authenticationSequence) &&
@@ -420,7 +444,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, isB2BSelfServiceApp, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, isB2BSelfServiceApp, associatedRoles, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
     }
 
     @Override
@@ -439,6 +463,7 @@ public enum AccessEnum {
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
+        sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocols: ").append(toIndentedString(inboundProtocols)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
