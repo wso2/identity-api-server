@@ -29,8 +29,10 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
+import org.wso2.carbon.logging.service.data.RemoteServerLoggerData;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
@@ -88,13 +90,23 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     @Override
     public Response getRemoteLoggingConfig(String logType) {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        RemoteServerLoggerData remoteServerLoggerResponseData =
+                configManagementService.getRemoteServerConfig(logType);
+        if (remoteServerLoggerResponseData != null) {
+            return Response.ok().entity(createRemoteLoggingConfig(remoteServerLoggerResponseData)).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 
     @Override
     public Response getRemoteLoggingConfigs() {
 
-        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+        List<RemoteServerLoggerData> remoteServerLoggerResponseData =
+                configManagementService.getRemoteServerConfigs();
+        return Response.ok()
+                .entity(remoteServerLoggerResponseData.stream().map(this::createRemoteLoggingConfigListItem)
+                        .collect(Collectors.toList())).build();
     }
 
     @Override
@@ -189,5 +201,39 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
         configManagementService.updatePassiveSTSInboundAuthConfig(inboundAuthPassiveSTSConfig);
         return Response.ok().build();
+    }
+    
+    private RemoteLoggingConfigListItem createRemoteLoggingConfigListItem(
+            RemoteServerLoggerData remoteServerLoggerData) {
+
+        RemoteLoggingConfigListItem remoteLoggingConfigListItem = new RemoteLoggingConfigListItem();
+        remoteLoggingConfigListItem.setRemoteUrl(remoteServerLoggerData.getUrl());
+        remoteLoggingConfigListItem.setConnectTimeoutMillis(remoteServerLoggerData.getConnectTimeoutMillis());
+        remoteLoggingConfigListItem.setVerifyHostname(remoteServerLoggerData.isVerifyHostname());
+        remoteLoggingConfigListItem.setUsername(remoteServerLoggerData.getUsername());
+        remoteLoggingConfigListItem.setPassword(remoteServerLoggerData.getPassword());
+        remoteLoggingConfigListItem.setKeystoreLocation(remoteServerLoggerData.getKeystoreLocation());
+        remoteLoggingConfigListItem.setKeystorePassword(remoteServerLoggerData.getKeystorePassword());
+        remoteLoggingConfigListItem.setTruststoreLocation(remoteServerLoggerData.getTruststoreLocation());
+        remoteLoggingConfigListItem.setTruststorePassword(remoteServerLoggerData.getTruststorePassword());
+        remoteLoggingConfigListItem.setLogType(
+                RemoteLoggingConfigListItem.LogTypeEnum.valueOf(remoteServerLoggerData.getLogType()));
+        return remoteLoggingConfigListItem;
+    }
+
+    private RemoteLoggingConfig createRemoteLoggingConfig(
+            RemoteServerLoggerData remoteServerLoggerData) {
+
+        RemoteLoggingConfig remoteLoggingConfig = new RemoteLoggingConfig();
+        remoteLoggingConfig.setRemoteUrl(remoteServerLoggerData.getUrl());
+        remoteLoggingConfig.setConnectTimeoutMillis(remoteServerLoggerData.getConnectTimeoutMillis());
+        remoteLoggingConfig.setVerifyHostname(remoteServerLoggerData.isVerifyHostname());
+        remoteLoggingConfig.setUsername(remoteServerLoggerData.getUsername());
+        remoteLoggingConfig.setPassword(remoteServerLoggerData.getPassword());
+        remoteLoggingConfig.setKeystoreLocation(remoteServerLoggerData.getKeystoreLocation());
+        remoteLoggingConfig.setKeystorePassword(remoteServerLoggerData.getKeystorePassword());
+        remoteLoggingConfig.setTruststoreLocation(remoteServerLoggerData.getTruststoreLocation());
+        remoteLoggingConfig.setTruststorePassword(remoteServerLoggerData.getTruststorePassword());
+        return remoteLoggingConfig;
     }
 }

@@ -92,7 +92,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -479,28 +478,12 @@ public class ServerConfigManagementService {
     public void resetRemoteServerConfig(String logType) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        if (!StringUtils.equalsIgnoreCase(tenantDomain, MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            if (log.isDebugEnabled()) {
-                log.debug(String.format("Resetting remote server configuration service is not available for %s",
-                        tenantDomain));
-            }
-            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                    .ERROR_CODE_INVALID_TENANT_DOMAIN_FOR_REMOTE_LOGGING_CONFIG, null);
-        }
+        validateTenantDomain(tenantDomain, "Resetting remote server configuration service is not available for %s");
 
         RemoteServerLoggerData remoteServerLoggerData = new RemoteServerLoggerData();
 
-        switch (logType.toUpperCase(Locale.ENGLISH)) {
-            case Constants.AUDIT:
-                remoteServerLoggerData.setAuditLogType(true);
-                break;
-            case Constants.CARBON:
-                remoteServerLoggerData.setCarbonLogType(true);
-                break;
-            default:
-                throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                        .ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG, null);
-        }
+        validateLogType(logType);
+        remoteServerLoggerData.setLogType(logType);
 
         try {
             ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService()
@@ -509,6 +492,26 @@ public class ServerConfigManagementService {
             log.error("Error while resetting remote server configuration.", e);
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
                     .ERROR_CODE_ERROR_RESETTING_REMOTE_LOGGING_CONFIGS, null);
+        }
+    }
+
+    private void validateTenantDomain(String tenantDomain, String message) {
+
+        if (!StringUtils.equalsIgnoreCase(tenantDomain, MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            if (log.isDebugEnabled()) {
+                log.debug(String.format(message,
+                        tenantDomain));
+            }
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                    .ERROR_CODE_INVALID_TENANT_DOMAIN_FOR_REMOTE_LOGGING_CONFIG, null);
+        }
+    }
+
+    private void validateLogType(String logType) {
+
+        if (!Constants.AUDIT.equals(logType) && !Constants.CARBON.equals(logType)) {
+            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                    .ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG, null);
         }
     }
 
@@ -559,27 +562,11 @@ public class ServerConfigManagementService {
     public void updateRemoteLoggingConfig(String logType, RemoteLoggingConfig remoteLoggingConfig) {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
-        if (!StringUtils.equalsIgnoreCase(tenantDomain, MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            if (log.isDebugEnabled()) {
-                log.debug(String.format("Resetting remote server configuration service is not available for %s",
-                        tenantDomain));
-            }
-            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                    .ERROR_CODE_INVALID_TENANT_DOMAIN_FOR_REMOTE_LOGGING_CONFIG, null);
-        }
+        validateTenantDomain(tenantDomain, "Resetting remote server configuration service is not available for %s");
 
         RemoteServerLoggerData remoteServerLoggerData = getRemoteServerLoggerData(remoteLoggingConfig);
-        switch (logType) {
-            case Constants.AUDIT:
-                remoteServerLoggerData.setAuditLogType(true);
-                break;
-            case Constants.CARBON:
-                remoteServerLoggerData.setCarbonLogType(true);
-                break;
-            default:
-                throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                        .ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG, null);
-        }
+        validateLogType(logType);
+        remoteServerLoggerData.setLogType(logType);
 
         try {
             ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService()
@@ -1184,6 +1171,30 @@ public class ServerConfigManagementService {
 
         Response.Status status = Response.Status.NOT_FOUND;
         return new APIError(status, errorResponse);
+    }
+
+    public RemoteServerLoggerData getRemoteServerConfig(String logType) {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        validateTenantDomain(tenantDomain, "Getting remote server configuration service is not available for %s");
+        try {
+            return ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService().getRemoteServerConfig(logType);
+        } catch (ConfigurationException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS, null);
+        }
+    }
+
+    public List<RemoteServerLoggerData> getRemoteServerConfigs() {
+
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        validateTenantDomain(tenantDomain, "Listing remote server configuration service is not available for %s");
+        try {
+            return ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService().getRemoteServerConfigs();
+        } catch (ConfigurationException e) {
+            throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
+                    Constants.ErrorMessage.ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS, null);
+        }
     }
 
     /**

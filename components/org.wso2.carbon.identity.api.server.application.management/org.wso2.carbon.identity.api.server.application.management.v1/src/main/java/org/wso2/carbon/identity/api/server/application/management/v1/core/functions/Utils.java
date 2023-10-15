@@ -206,6 +206,18 @@ public class Utils {
         return new APIError(status, errorResponse);
     }
 
+    public static APIError buildConflictError(String errorCode, String message, String description) {
+
+        ErrorResponse errorResponse = new ErrorResponse.Builder()
+                .withCode(errorCode)
+                .withMessage(message)
+                .withDescription(description)
+                .build(log, description);
+
+        Response.Status status = Response.Status.CONFLICT;
+        return new APIError(status, errorResponse);
+    }
+
     private static final Set<String> systemApplications =
             ApplicationManagementServiceHolder.getApplicationManagementService().getSystemApplications();
 

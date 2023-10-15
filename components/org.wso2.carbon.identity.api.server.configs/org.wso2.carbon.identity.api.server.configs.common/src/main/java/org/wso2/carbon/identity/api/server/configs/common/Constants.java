@@ -125,6 +125,11 @@ public class Constants {
                 "Unable to update remote logging  configs.",
                 "Server encountered an " +
                         "error while updating the remote logging configs."),
+        ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS("65008",
+                "Unable to get remote logging  configs.",
+                "Server encountered an " +
+                        "error while getting the remote logging configs."),
+
 
         ERROR_CODE_INVALID_TENANT_DOMAIN_FOR_REMOTE_LOGGING_CONFIG("60506",
                 "Invalid tenant domain for accessing remote logging config service",
@@ -133,6 +138,9 @@ public class Constants {
         ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG("60507",
                 "Invalid log type provided remote logging config service",
                 "Remote logging configuration service only supports AUDIT or CARBON."),
+        ERROR_CODE_REMOTE_LOGGING_CONFIG_NOT_FOUND("60508",
+                "Resource not found.",
+                "Unable to find a resource matching the provided log type %s."),
 
         /**
          * Inbound auth config error messages.

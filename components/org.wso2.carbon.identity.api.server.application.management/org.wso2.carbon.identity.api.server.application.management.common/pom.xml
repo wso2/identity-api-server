@@ -22,12 +22,12 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.application.management</artifactId>
-        <version>1.2.88-SNAPSHOT</version>
+        <version>1.2.92-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>org.wso2.carbon.identity.api.server.application.management.common</artifactId>
-    <version>1.2.88-SNAPSHOT</version>
+    <version>1.2.92-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -79,6 +79,11 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.governance</groupId>
             <artifactId>org.wso2.carbon.identity.auth.attribute.handler</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.api.resource.mgt</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

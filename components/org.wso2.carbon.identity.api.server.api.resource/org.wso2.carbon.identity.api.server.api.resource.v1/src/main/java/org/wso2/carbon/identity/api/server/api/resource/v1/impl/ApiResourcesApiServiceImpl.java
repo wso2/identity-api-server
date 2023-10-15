@@ -63,7 +63,8 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     @Override
     public Response apiResourcesApiResourceIdGet(String apiResourceId) {
 
-        return Response.ok().entity(serverAPIResourceManagementService.getAPIResourceById(apiResourceId)).build();
+        return Response.ok().entity(
+                serverAPIResourceManagementService.getAPIResourceResponseById(apiResourceId)).build();
     }
 
     @Override

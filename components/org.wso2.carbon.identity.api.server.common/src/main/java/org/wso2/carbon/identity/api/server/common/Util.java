@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.common;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.MDC;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.recovery.ChallengeQuestionManager;
@@ -105,7 +106,10 @@ public class Util {
      * @param totalResultsFromSearch Value of the 'totalResultsFromSearch' parameter.
      * @param servicePathComponent API service path. E.g: applications/
      * @return A map containing pagination link key-value pairs.
+     * @deprecated because this can not build pagination links when filter and attributes params are used in the api.
+     * Use {@link #buildPaginationLinks(int, int, int, String, String, String)} instead.
      */
+    @Deprecated
     public static Map<String, String> buildPaginationLinks(int limit, int currentOffset, int totalResultsFromSearch,
                                                            String servicePathComponent) {
 
@@ -131,6 +135,57 @@ public class Util {
             } else { // A previous page exists but it's size is less than the specified limit.
                 links.put(PAGE_LINK_REL_PREVIOUS, ContextLoader.buildURIForBody
                         (String.format(PAGINATION_LINK_FORMAT, servicePathComponent, 0, currentOffset)).toString());
+            }
+        }
+
+        return links;
+    }
+
+    /**
+     * Build 'next' and 'previous' pagination links.
+     *
+     * @param limit                  Value of the 'limit' parameter.
+     * @param currentOffset          Value of the 'currentOffset' parameter.
+     * @param totalResultsFromSearch Value of the 'totalResultsFromSearch' parameter.
+     * @param servicePathComponent   API service path. E.g: applications/
+     * @param requiredAttributes     Value of the 'attributes' parameter.
+     * @param filter                 Value of the 'filter' parameter.
+     * @return A map containing pagination link key-value pairs.
+     */
+    public static Map<String, String> buildPaginationLinks(int limit, int currentOffset, int totalResultsFromSearch,
+                                                           String servicePathComponent, String requiredAttributes,
+                                                           String filter) {
+
+        Map<String, String> links = new HashMap<>();
+
+        StringBuilder otherParams = new StringBuilder();
+        if (!StringUtils.isEmpty(requiredAttributes)) {
+            otherParams.append("&attributes=").append(requiredAttributes);
+        }
+        if (!StringUtils.isEmpty(filter)) {
+            otherParams.append("&filter=").append(filter.replace(" ", "+"));
+        }
+
+        // Next link.
+        if ((currentOffset + limit) < totalResultsFromSearch) {
+            links.put(PAGE_LINK_REL_NEXT, ContextLoader.buildURIForBody(String.format(PAGINATION_LINK_FORMAT,
+                    servicePathComponent, (currentOffset + limit), limit) + otherParams).toString());
+        }
+
+        /*
+        Previous link.
+        Previous link matters only if offset is greater than 0.
+        */
+        if (currentOffset > 0) {
+            if ((currentOffset - limit) >= 0) { // A previous page of size 'limit' exists.
+                links.put(PAGE_LINK_REL_PREVIOUS, ContextLoader.buildURIForBody
+                        (String.format(PAGINATION_LINK_FORMAT, servicePathComponent,
+                                calculateOffsetForPreviousLink(currentOffset, limit, totalResultsFromSearch), limit) +
+                                otherParams).toString());
+            } else { // A previous page exists but it's size is less than the specified limit.
+                links.put(PAGE_LINK_REL_PREVIOUS, ContextLoader.buildURIForBody
+                        (String.format(PAGINATION_LINK_FORMAT, servicePathComponent, 0, currentOffset) +
+                                otherParams).toString());
             }
         }
 
