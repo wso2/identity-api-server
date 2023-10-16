@@ -57,6 +57,11 @@ public class Constants {
     public static final String PRIVATE_KEY_JWT_VALIDATION_CONFIG_TOKEN_REUSE = "/enableTokenReuse";
 
     /**
+     * SAML2 metadata endpoint uri path.
+     */
+    public static final String SAML2_METADATA_ENDPOINT_URI_PATH = "/identity/metadata/saml2";
+
+    /**
      * Enum for error messages.
      */
     public enum ErrorMessage {
@@ -135,8 +140,31 @@ public class Constants {
                 "Remote logging configuration service only supports AUDIT or CARBON."),
         ERROR_CODE_REMOTE_LOGGING_CONFIG_NOT_FOUND("60508",
                 "Resource not found.",
-                "Unable to find a resource matching the provided log type %s.");
+                "Unable to find a resource matching the provided log type %s."),
 
+        /**
+         * Inbound auth config error messages.
+         */
+        ERROR_CODE_RESIDENT_IDP_NOT_FOUND("65010", "Resident IDP not found.",
+                "Unable to find the resident IDP for the tenant domain %s."),
+        ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND("65011",
+                "Federated authenticator config not found.",
+                "Unable to find the federated authenticator config for %s in the resident IDP."),
+        ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND("65012",
+                "Federated authenticator properties not found.",
+                "Unable to find the authenticator properties for the federated authenticator %s."),
+        ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_RETRIEVE("65013",
+                "Unable to retrieve SAML inbound auth configs.",
+                "Server encountered an error while retrieving the SAML inbound auth configs."),
+        ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_UPDATE("65014",
+                "Unable to update SAML inbound auth configs.",
+                "Server encountered an error while updating the SAML inbound auth configs."),
+        ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_RETRIEVE("65015",
+                "Unable to retrieve Passive STS inbound auth configs.",
+                "Server encountered an error while retrieving the Passive STS inbound auth configs."),
+        ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_UPDATE("65016",
+                "Unable to update Passive STS inbound auth configs.",
+                "Server encountered an error while updating the Passive STS inbound auth configs.");
 
         private final String code;
         private final String message;
