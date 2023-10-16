@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) (2019-2023), WSO2 LLC. (http://www.wso2.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.claim.management.common.Constant;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.FileContent;
@@ -43,6 +45,7 @@ import org.wso2.carbon.identity.claim.metadata.mgt.model.ExternalClaim;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
 import org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeMappingDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectResDTO;
@@ -85,6 +88,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import static org.wso2.carbon.identity.api.server.claim.management.common.ClaimManagementDataHolder.getClaimMetadataManagementService;
+import static org.wso2.carbon.identity.api.server.claim.management.common.ClaimManagementDataHolder.getOrganizationManager;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.CMT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_ATTRIBUTE_FILTERING_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_CLAIMS_NOT_FOUND_FOR_DIALECT;
@@ -115,6 +119,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_LOCAL_CLAIM_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_MANAGEMENT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.ErrorMessage.ERROR_CODE_USERSTORE_NOT_SPECIFIED_IN_MAPPINGS;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
@@ -133,6 +138,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 import static org.wso2.carbon.identity.api.server.common.Constants.XML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForBody;
+import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ORGANIZATION_NOT_FOUND_FOR_TENANT;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.CONFLICT;
@@ -162,6 +168,7 @@ public class ServerClaimManagementService {
     public String addClaimDialect(ClaimDialectReqDTO claimDialectReqDTO) {
 
         try {
+            validateClaimModificationEligibility();
             getClaimMetadataManagementService().addClaimDialect(
                     createClaimDialect(claimDialectReqDTO),
                     ContextLoader.getTenantDomainFromContext());
@@ -182,6 +189,7 @@ public class ServerClaimManagementService {
     public String addClaimDialect(String dialectURI) {
 
         try {
+            validateClaimModificationEligibility();
             getClaimMetadataManagementService().addClaimDialect(
                     createClaimDialect(dialectURI),
                     ContextLoader.getTenantDomainFromContext());
@@ -201,6 +209,7 @@ public class ServerClaimManagementService {
 
         String claimDialectURI;
         try {
+            validateClaimModificationEligibility();
             claimDialectURI = base64DecodeId(dialectId);
         } catch (Exception ignored) {
             // Ignoring the delete operation and return 204 response code, since the resource does not exist.
@@ -281,6 +290,7 @@ public class ServerClaimManagementService {
     public String updateClaimDialect(String dialectId, ClaimDialectReqDTO claimDialectReqDTO) {
 
         try {
+            validateClaimModificationEligibility();
             // If the old and new dialect uri is the same we don't need to do a db update.
             if (!StringUtils.equals(base64DecodeId(dialectId), claimDialectReqDTO.getDialectURI())) {
                 getClaimMetadataManagementService().renameClaimDialect(
@@ -320,6 +330,7 @@ public class ServerClaimManagementService {
         }
 
         try {
+            validateClaimModificationEligibility();
             validateAttributeMappings(localClaimReqDTO.getAttributeMapping());
             getClaimMetadataManagementService().addLocalClaim(createLocalClaim(localClaimReqDTO),
                     ContextLoader.getTenantDomainFromContext());
@@ -343,6 +354,7 @@ public class ServerClaimManagementService {
 
         String claimURI;
         try {
+            validateClaimModificationEligibility();
             claimURI = base64DecodeId(claimId);
         } catch (Exception ignored) {
             // Ignoring the delete operation and return 204 response code, since the resource does not exist.
@@ -425,6 +437,7 @@ public class ServerClaimManagementService {
     public void updateLocalClaim(String claimId, LocalClaimReqDTO localClaimReqDTO) {
 
         try {
+            validateClaimModificationEligibility();
             if (!StringUtils.equals(base64DecodeId(claimId), localClaimReqDTO.getClaimURI())) {
                 throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_CONFLICT, CONFLICT,
                         base64DecodeId(claimId));
@@ -699,6 +712,7 @@ public class ServerClaimManagementService {
     public String addExternalClaim(String dialectId, ExternalClaimReqDTO externalClaimReqDTO) {
 
         try {
+            validateClaimModificationEligibility();
             if (!isDialectExists(dialectId)) {
                 throw handleClaimManagementClientError(ERROR_CODE_INVALID_DIALECT_ID, NOT_FOUND, dialectId);
             }
@@ -725,6 +739,7 @@ public class ServerClaimManagementService {
         String externalClaimURI;
         String externalClaimDialectURI;
         try {
+            validateClaimModificationEligibility();
             externalClaimURI = base64DecodeId(claimId);
             externalClaimDialectURI = base64DecodeId(dialectId);
         } catch (Exception ignored) {
@@ -820,6 +835,7 @@ public class ServerClaimManagementService {
     public void updateExternalClaim(String dialectId, String claimId, ExternalClaimReqDTO externalClaimReqDTO) {
 
         try {
+            validateClaimModificationEligibility();
             if (!StringUtils.equals(base64DecodeId(claimId), externalClaimReqDTO.getClaimURI())) {
                 throw handleClaimManagementClientError(ERROR_CODE_EXTERNAL_CLAIM_CONFLICT, CONFLICT,
                         base64DecodeId(claimId), dialectId);
@@ -1443,5 +1459,29 @@ public class ServerClaimManagementService {
                         attributeMappingDTO.getUserstore());
             }
         }
+    }
+
+    private void validateClaimModificationEligibility() throws ClaimMetadataClientException {
+
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        try {
+            String organizationId = getOrganizationManager().resolveOrganizationId(tenantDomain);
+            boolean isPrimaryOrg = getOrganizationManager().isPrimaryOrganization(organizationId);
+            if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && !isPrimaryOrg) {
+                throw handleClaimManagementClientError(ERROR_CODE_UNAUTHORIZED_ORG_FOR_CLAIM_MANAGEMENT, FORBIDDEN,
+                        organizationId);
+            }
+        } catch (OrganizationManagementException e) {
+            // This is to handle the scenario where the tenant is not modeled as an organization.
+            if (ERROR_CODE_ORGANIZATION_NOT_FOUND_FOR_TENANT.getCode().equals(e.getErrorCode())) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Organization not found for the tenant: " + tenantDomain);
+                }
+                return;
+            }
+            throw new ClaimMetadataClientException(Constant.ErrorMessage.ERROR_CODE_ERROR_RESOLVING_ORGANIZATION.
+                    getCode(), Constant.ErrorMessage.ERROR_CODE_ERROR_RESOLVING_ORGANIZATION.getDescription());
+        }
+
     }
 }

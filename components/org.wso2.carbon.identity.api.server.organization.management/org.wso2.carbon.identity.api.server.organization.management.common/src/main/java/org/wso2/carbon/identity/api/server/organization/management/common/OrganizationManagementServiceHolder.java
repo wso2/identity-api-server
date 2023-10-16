@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.organization.management.common;
 
+import org.wso2.carbon.identity.organization.discovery.service.OrganizationDiscoveryManager;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
 import org.wso2.carbon.identity.organization.management.service.OrganizationManager;
 
@@ -30,6 +31,7 @@ public class OrganizationManagementServiceHolder {
 
     private OrgApplicationManager orgApplicationManager;
     private OrganizationManager organizationManager;
+    private OrganizationDiscoveryManager organizationDiscoveryManager;
 
     private OrganizationManagementServiceHolder() {
 
@@ -78,5 +80,25 @@ public class OrganizationManagementServiceHolder {
     public void setOrganizationManager(OrganizationManager organizationManager) {
 
         OrganizationManagementServiceHolder.getInstance().organizationManager = organizationManager;
+    }
+
+    /**
+     * Get OrganizationDiscoveryManager OSGi service.
+     *
+     * @return OrganizationDiscoveryManager.
+     */
+    public OrganizationDiscoveryManager getOrganizationDiscoveryManager() {
+
+        return OrganizationManagementServiceHolder.getInstance().organizationDiscoveryManager;
+    }
+
+    /**
+     * Set OrganizationDiscoveryManager OSGi service.
+     *
+     * @param organizationDiscoveryManager OrganizationDiscoveryManager.
+     */
+    public void setOrganizationDiscoveryManager(OrganizationDiscoveryManager organizationDiscoveryManager) {
+
+        OrganizationManagementServiceHolder.getInstance().organizationDiscoveryManager = organizationDiscoveryManager;
     }
 }

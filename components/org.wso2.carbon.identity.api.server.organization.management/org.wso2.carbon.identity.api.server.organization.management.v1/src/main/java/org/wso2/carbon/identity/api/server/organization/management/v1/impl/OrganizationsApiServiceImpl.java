@@ -21,6 +21,9 @@ package org.wso2.carbon.identity.api.server.organization.management.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.organization.management.v1.OrganizationsApiService;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ApplicationSharePOSTRequest;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryAttributes;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTRequest;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryPostRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationNameCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPUTRequest;
@@ -52,6 +55,20 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     }
 
     @Override
+    public Response organizationsOrganizationIdDiscoveryDelete(String organizationId) {
+
+        return organizationManagementService.deleteOrganizationDiscoveryAttributes(organizationId);
+    }
+
+    @Override
+    public Response organizationsOrganizationIdDiscoveryPut(String organizationId, OrganizationDiscoveryAttributes
+            organizationDiscoveryAttributes) {
+
+        return organizationManagementService.updateOrganizationDiscoveryAttributes(organizationId,
+                organizationDiscoveryAttributes);
+    }
+
+    @Override
     public Response organizationsOrganizationIdGet(String organizationId, Boolean includePermissions) {
 
         return organizationManagementService.getOrganization(organizationId, includePermissions);
@@ -69,6 +86,31 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
             organizationPUTRequest) {
 
         return organizationManagementService.updateOrganization(organizationId, organizationPUTRequest);
+    }
+
+    @Override
+    public Response organizationCheckDiscovery(
+            OrganizationDiscoveryCheckPOSTRequest organizationDiscoveryCheckPOSTRequest) {
+
+        return organizationManagementService.isDiscoveryAttributeAvailable(organizationDiscoveryCheckPOSTRequest);
+    }
+
+    @Override
+    public Response organizationDiscoveryGet(String organizationId) {
+
+        return organizationManagementService.getOrganizationDiscoveryAttributes(organizationId);
+    }
+
+    @Override
+    public Response organizationDiscoveryPost(OrganizationDiscoveryPostRequest organizationDiscoveryPostRequest) {
+
+        return organizationManagementService.addOrganizationDiscoveryAttributes(organizationDiscoveryPostRequest);
+    }
+
+    @Override
+    public Response organizationMetadataGet() {
+
+        return organizationManagementService.getOrganizationMetadata();
     }
 
     @Override
@@ -122,6 +164,12 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     public Response organizationsCheckNamePost(OrganizationNameCheckPOSTRequest organizationNameCheckPOSTRequest) {
 
         return organizationManagementService.checkOrganizationName(organizationNameCheckPOSTRequest.getName());
+    }
+
+    @Override
+    public Response organizationsDiscoveryGet(String filter, Integer offset, Integer limit) {
+
+        return organizationManagementService.getOrganizationsDiscoveryAttributes(filter, offset, limit);
     }
 
     @Override

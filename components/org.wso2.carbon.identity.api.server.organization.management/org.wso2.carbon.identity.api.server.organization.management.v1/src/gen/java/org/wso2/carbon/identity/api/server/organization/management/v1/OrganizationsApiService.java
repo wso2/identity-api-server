@@ -28,12 +28,18 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Appl
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryAttributes;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTRequest;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTResponse;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryPostRequest;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationMetadata;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationNameCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationNameCheckPOSTResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPUTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationPatchRequestItem;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationResponse;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationsDiscoveryResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationsResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.SharedApplicationsResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.SharedOrganizationsResponse;
@@ -42,15 +48,29 @@ import javax.ws.rs.core.Response;
 
 public interface OrganizationsApiService {
 
+      public Response organizationCheckDiscovery(OrganizationDiscoveryCheckPOSTRequest organizationDiscoveryCheckPOSTRequest);
+
+      public Response organizationDiscoveryGet(String organizationId);
+
+      public Response organizationDiscoveryPost(OrganizationDiscoveryPostRequest organizationDiscoveryPostRequest);
+
+      public Response organizationMetadataGet();
+
       public Response organizationPost(OrganizationPOSTRequest organizationPOSTRequest);
 
       public Response organizationsCheckNamePost(OrganizationNameCheckPOSTRequest organizationNameCheckPOSTRequest);
+
+      public Response organizationsDiscoveryGet(String filter, Integer offset, Integer limit);
 
       public Response organizationsGet(String filter, Integer limit, String after, String before, Boolean recursive);
 
       public Response organizationsGetMe(String filter, Integer limit, String after, String before, Boolean recursive);
 
       public Response organizationsOrganizationIdDelete(String organizationId);
+
+      public Response organizationsOrganizationIdDiscoveryDelete(String organizationId);
+
+      public Response organizationsOrganizationIdDiscoveryPut(String organizationId, OrganizationDiscoveryAttributes organizationDiscoveryAttributes);
 
       public Response organizationsOrganizationIdGet(String organizationId, Boolean includePermissions);
 
