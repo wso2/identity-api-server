@@ -15,10 +15,12 @@ info:
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 
 servers:
-  - url: 'https://{host-name}/api/server/v1'
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
       server-url:
         default: "localhost:9443"
+      tenant-domain:
+        default: carbon.super
 paths:
   /validation-rules:
     get:
