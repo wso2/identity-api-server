@@ -1,0 +1,22 @@
+{
+  "name": "b2b-self-service-app",
+  "templateId": "custom-application-oidc",
+  "isManagementApp": true,
+  "isB2BSelfServiceApp": true,
+  "inboundProtocolConfiguration": {
+    "oidc": {
+      "grantTypes": [
+        "client_credentials",
+        "organization_switch"
+      ],
+      "accessToken": {
+        "applicationAccessTokenExpiryInSeconds": 7200,
+        "bindingType": "None",
+        "revokeTokensWhenIDPSessionTerminated": false,
+        "type": "Default",
+        "userAccessTokenExpiryInSeconds": 7200,
+        "validateTokenBinding": false
+      }
+    }
+  }
+}
