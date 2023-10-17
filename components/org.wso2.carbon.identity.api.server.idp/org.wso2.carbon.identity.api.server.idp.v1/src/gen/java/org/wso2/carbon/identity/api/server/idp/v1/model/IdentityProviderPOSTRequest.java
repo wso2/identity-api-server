@@ -57,7 +57,7 @@ public class IdentityProviderPOSTRequest  {
 
     private FederatedAuthenticatorRequest federatedAuthenticators;
     private ProvisioningRequest provisioning;
-    private AssociationRequest association;
+    private AssociationRequest implicitAssociation;
 
     /**
     **/
@@ -342,20 +342,20 @@ public class IdentityProviderPOSTRequest  {
 
     /**
     **/
-    public IdentityProviderPOSTRequest association(AssociationRequest association) {
+    public IdentityProviderPOSTRequest implicitAssociation(AssociationRequest implicitAssociation) {
 
-        this.association = association;
+        this.implicitAssociation = implicitAssociation;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("association")
+    @JsonProperty("implicitAssociation")
     @Valid
-    public AssociationRequest getAssociation() {
-        return association;
+    public AssociationRequest getImplicitAssociation() {
+        return implicitAssociation;
     }
-    public void setAssociation(AssociationRequest association) {
-        this.association = association;
+    public void setImplicitAssociation(AssociationRequest implicitAssociation) {
+        this.implicitAssociation = implicitAssociation;
     }
 
 
@@ -385,12 +385,12 @@ public class IdentityProviderPOSTRequest  {
             Objects.equals(this.groups, identityProviderPOSTRequest.groups) &&
             Objects.equals(this.federatedAuthenticators, identityProviderPOSTRequest.federatedAuthenticators) &&
             Objects.equals(this.provisioning, identityProviderPOSTRequest.provisioning) &&
-            Objects.equals(this.association, identityProviderPOSTRequest.association);
+            Objects.equals(this.implicitAssociation, identityProviderPOSTRequest.implicitAssociation);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, image, templateId, isPrimary, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning, association);
+        return Objects.hash(name, description, image, templateId, isPrimary, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning, implicitAssociation);
     }
 
     @Override
@@ -414,7 +414,7 @@ public class IdentityProviderPOSTRequest  {
         sb.append("    groups: ").append(toIndentedString(groups)).append("\n");
         sb.append("    federatedAuthenticators: ").append(toIndentedString(federatedAuthenticators)).append("\n");
         sb.append("    provisioning: ").append(toIndentedString(provisioning)).append("\n");
-        sb.append("    association: ").append(toIndentedString(association)).append("\n");
+        sb.append("    implicitAssociation: ").append(toIndentedString(implicitAssociation)).append("\n");
         sb.append("}");
         return sb.toString();
     }

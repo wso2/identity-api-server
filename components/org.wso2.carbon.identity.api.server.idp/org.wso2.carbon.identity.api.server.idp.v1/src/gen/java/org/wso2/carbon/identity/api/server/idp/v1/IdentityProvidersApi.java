@@ -241,7 +241,7 @@ public class IdentityProvidersApi  {
 
     @Valid
     @GET
-    @Path("/{identity-provider-id}/association")
+    @Path("/{identity-provider-id}/implicit-association")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Federated association config of an identity provider ", notes = "This API provides the federated association config of an identity provider. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = AssociationResponse.class, authorizations = {
@@ -724,7 +724,7 @@ public class IdentityProvidersApi  {
 
     @Valid
     @PUT
-    @Path("/{identity-provider-id}/association")
+    @Path("/{identity-provider-id}/implicit-association")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Update the federated association config of an identity provider ", notes = "This API provides the capability to update the federated association config of an identity provider by specifying the identity provider ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = AssociationResponse.class, authorizations = {

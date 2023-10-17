@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 
 
@@ -33,8 +35,8 @@ import javax.xml.bind.annotation.*;
 public class AssociationResponse  {
   
     private Boolean isEnabled;
-    private String federatedAttribute;
-    private String mappedLocalAttribute;
+    private List<String> lookupAttribute = null;
+
 
     /**
     **/
@@ -56,41 +58,31 @@ public class AssociationResponse  {
 
     /**
     **/
-    public AssociationResponse federatedAttribute(String federatedAttribute) {
+    public AssociationResponse lookupAttribute(List<String> lookupAttribute) {
 
-        this.federatedAttribute = federatedAttribute;
+        this.lookupAttribute = lookupAttribute;
         return this;
     }
     
-    @ApiModelProperty(example = "sub", value = "")
-    @JsonProperty("federatedAttribute")
+    @ApiModelProperty(example = "[\"email\"]", value = "")
+    @JsonProperty("lookupAttribute")
     @Valid
-    public String getFederatedAttribute() {
-        return federatedAttribute;
+    public List<String> getLookupAttribute() {
+        return lookupAttribute;
     }
-    public void setFederatedAttribute(String federatedAttribute) {
-        this.federatedAttribute = federatedAttribute;
+    public void setLookupAttribute(List<String> lookupAttribute) {
+        this.lookupAttribute = lookupAttribute;
     }
 
-    /**
-    **/
-    public AssociationResponse mappedLocalAttribute(String mappedLocalAttribute) {
-
-        this.mappedLocalAttribute = mappedLocalAttribute;
+    public AssociationResponse addLookupAttributeItem(String lookupAttributeItem) {
+        if (this.lookupAttribute == null) {
+            this.lookupAttribute = new ArrayList<>();
+        }
+        this.lookupAttribute.add(lookupAttributeItem);
         return this;
     }
+
     
-    @ApiModelProperty(example = "http://wso2.org/claims/username", value = "")
-    @JsonProperty("mappedLocalAttribute")
-    @Valid
-    public String getMappedLocalAttribute() {
-        return mappedLocalAttribute;
-    }
-    public void setMappedLocalAttribute(String mappedLocalAttribute) {
-        this.mappedLocalAttribute = mappedLocalAttribute;
-    }
-
-
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -103,13 +95,12 @@ public class AssociationResponse  {
         }
         AssociationResponse associationResponse = (AssociationResponse) o;
         return Objects.equals(this.isEnabled, associationResponse.isEnabled) &&
-            Objects.equals(this.federatedAttribute, associationResponse.federatedAttribute) &&
-            Objects.equals(this.mappedLocalAttribute, associationResponse.mappedLocalAttribute);
+            Objects.equals(this.lookupAttribute, associationResponse.lookupAttribute);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isEnabled, federatedAttribute, mappedLocalAttribute);
+        return Objects.hash(isEnabled, lookupAttribute);
     }
 
     @Override
@@ -119,8 +110,7 @@ public class AssociationResponse  {
         sb.append("class AssociationResponse {\n");
         
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
-        sb.append("    federatedAttribute: ").append(toIndentedString(federatedAttribute)).append("\n");
-        sb.append("    mappedLocalAttribute: ").append(toIndentedString(mappedLocalAttribute)).append("\n");
+        sb.append("    lookupAttribute: ").append(toIndentedString(lookupAttribute)).append("\n");
         sb.append("}");
         return sb.toString();
     }
