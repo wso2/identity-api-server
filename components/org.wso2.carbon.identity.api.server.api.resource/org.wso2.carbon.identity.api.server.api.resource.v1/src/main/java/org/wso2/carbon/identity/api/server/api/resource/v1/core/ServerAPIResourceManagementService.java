@@ -206,7 +206,7 @@ public class ServerAPIResourceManagementService {
 
         try {
             APIResource currentAPIResource = getAPIResourceById(apiResourceID);
-
+            handleSystemAPI(currentAPIResource);
             if (apiResourcePatchModel.getRemovedScopes() != null) {
                 LOG.debug("Removed scopes field is not supported in patch operation.");
                 throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_IMPLEMENTED,
@@ -244,8 +244,15 @@ public class ServerAPIResourceManagementService {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Deleting API Resource with ID: " + apiResourceID);
             }
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
+                    .getAPIResourceById(apiResourceID, tenantDomain);
+            if (apiResource == null) {
+                return;
+            }
+            handleSystemAPI(apiResource);
             APIResourceManagementServiceHolder.getApiResourceManager().deleteAPIResourceById(apiResourceID,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+                    tenantDomain);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
@@ -287,6 +294,7 @@ public class ServerAPIResourceManagementService {
                 throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
                         APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_API_RESOURCE_NOT_FOUND, apiResourceId);
             }
+            handleSystemAPI(apiResource);
             List<Scope> scopes = createScopes(scopeCreationModels);
             APIResourceManagementServiceHolder.getApiResourceManager().putScopes(apiResourceId, apiResource.getScopes(),
                     scopes, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
@@ -307,9 +315,15 @@ public class ServerAPIResourceManagementService {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Deleting scope with ID: " + scopeName + " of API Resource ID: " + apiResourceId);
             }
-            APIResourceManagementServiceHolder.getApiResourceManager()
-                    .deleteAPIScopeByScopeName(apiResourceId, scopeName,
-                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
+                    .getAPIResourceById(apiResourceId, tenantDomain);
+            if (apiResource == null) {
+                return;
+            }
+            handleSystemAPI(apiResource);
+            APIResourceManagementServiceHolder.getApiResourceManager().deleteAPIScopeByScopeName(apiResourceId,
+                    scopeName, tenantDomain);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }
@@ -381,7 +395,7 @@ public class ServerAPIResourceManagementService {
                 .scopes(createScopes(apIResourceCreationModel.getScopes()))
                 .requiresAuthorization(apIResourceCreationModel.getRequiresAuthorization() != null ?
                         apIResourceCreationModel.getRequiresAuthorization() : true)
-                .type(APIResourceMgtEndpointConstants.API_RESOURCE_TYPE);
+                .type(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE);
         return apiResourceBuilder.build();
     }
 
@@ -458,5 +472,18 @@ public class ServerAPIResourceManagementService {
                     ErrorMessage.ERROR_CODE_INVALID_LIMIT);
         }
         return limit;
+    }
+
+    /**
+     * Validate whether the given API resource is a system API resource and throw an error if it is.
+     *
+     * @param apiResource API resource to be handled.
+     */
+    private void handleSystemAPI(APIResource apiResource) {
+
+        if (APIResourceMgtEndpointConstants.SYSTEM_API_RESOURCE_TYPE.equals(apiResource.getType())) {
+            throw APIResourceMgtEndpointUtil.handleException(Response.Status.FORBIDDEN,
+                    ErrorMessage.ERROR_CODE_SYSTEM_API_RESOURCE_NOT_MODIFIABLE);
+        }
     }
 }
