@@ -1908,8 +1908,7 @@ public class ServerIdpManagementService {
         if (associationRequest != null) {
 
             if (associationRequest.getIsEnabled() == null ||
-                    StringUtils.isBlank(associationRequest.getFederatedAttribute()) ||
-                    StringUtils.isBlank(associationRequest.getMappedLocalAttribute())) {
+                    associationRequest.getLookupAttribute().isEmpty()) {
                 throw handleException(Response.Status.BAD_REQUEST,
                         Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
                         "Provided request body content is not in the expected format.");
@@ -1917,8 +1916,7 @@ public class ServerIdpManagementService {
 
             FederatedAssociationConfig associationConfig = new FederatedAssociationConfig();
             associationConfig.setEnabled(associationRequest.getIsEnabled());
-            associationConfig.setFederatedAttribute(associationRequest.getFederatedAttribute());
-            associationConfig.setMappedLocalAttribute(associationRequest.getMappedLocalAttribute());
+            associationConfig.setLookupAttributes(associationRequest.getLookupAttribute().toArray(new String[0]));
             identityProvider.setFederatedAssociationConfig(associationConfig);
         }
     }
@@ -2110,8 +2108,8 @@ public class ServerIdpManagementService {
             updateJIT(idp, identityProviderPOSTRequest.getProvisioning().getJit());
         }
 
-        if (identityProviderPOSTRequest.getAssociation() != null) {
-            updateFederatedAssociation(idp, identityProviderPOSTRequest.getAssociation());
+        if (identityProviderPOSTRequest.getImplicitAssociation() != null) {
+            updateFederatedAssociation(idp, identityProviderPOSTRequest.getImplicitAssociation());
         }
         updateClaims(idp, identityProviderPOSTRequest.getClaims());
         updateRoles(idp, identityProviderPOSTRequest.getRoles());
@@ -2279,7 +2277,7 @@ public class ServerIdpManagementService {
         idpResponse.setGroups(createGroupResponse(identityProvider));
         idpResponse.setFederatedAuthenticators(createFederatedAuthenticatorResponse(identityProvider));
         idpResponse.setProvisioning(createProvisioningResponse(identityProvider));
-        idpResponse.setAssociation(createAssociationResponse(identityProvider));
+        idpResponse.setImplicitAssociation(createAssociationResponse(identityProvider));
         return idpResponse;
     }
 
@@ -2485,8 +2483,8 @@ public class ServerIdpManagementService {
 
         AssociationResponse associationResponse = new AssociationResponse();
         associationResponse.setIsEnabled(idp.getFederatedAssociationConfig().isEnabled());
-        associationResponse.setFederatedAttribute(idp.getFederatedAssociationConfig().getFederatedAttribute());
-        associationResponse.setMappedLocalAttribute(idp.getFederatedAssociationConfig().getMappedLocalAttribute());
+        associationResponse.setLookupAttribute(
+                Arrays.asList(idp.getFederatedAssociationConfig().getLookupAttributes()));;
         return associationResponse;
     }
 
