@@ -41,6 +41,8 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.idp.common.Constants;
 import org.wso2.carbon.identity.api.server.idp.common.IdentityProviderServiceHolder;
+import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claim;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
@@ -80,6 +82,7 @@ import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorServi
 import org.wso2.carbon.identity.application.common.model.CertificateInfo;
 import org.wso2.carbon.identity.application.common.model.ClaimConfig;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
+import org.wso2.carbon.identity.application.common.model.FederatedAssociationConfig;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.IdentityProviderProperty;
@@ -1075,6 +1078,47 @@ public class ServerIdpManagementService {
         }
     }
 
+    public AssociationResponse getFederatedAssociationConfig(String idpId) {
+
+        try {
+            IdentityProvider identityProvider =
+                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
+                            .getTenantDomainFromContext(), true);
+            if (identityProvider == null) {
+                throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
+                        idpId);
+            }
+
+            return createAssociationResponse(identityProvider);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_ASSOCIATION, idpId);
+        }
+    }
+
+    public AssociationResponse updateFederatedAssociationConfig(String idpId, AssociationRequest associationRequest) {
+
+        try {
+            IdentityProvider idP =
+                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
+                            .getTenantDomainFromContext(), true);
+
+            if (idP == null) {
+                throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
+                        idpId);
+            }
+
+            updateFederatedAssociation(idP, associationRequest);
+
+            IdentityProvider updatedIdP =
+                    IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(idpId,
+                            idP, ContextLoader.getTenantDomainFromContext());
+
+            return createAssociationResponse(updatedIdP);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_ASSOCIATION, idpId);
+        }
+    }
+
     /**
      * Get Just-In-Time Provisioning configuration.
      *
@@ -1859,6 +1903,26 @@ public class ServerIdpManagementService {
         }
     }
 
+    private void updateFederatedAssociation(IdentityProvider identityProvider, AssociationRequest associationRequest) {
+
+        if (associationRequest != null) {
+
+            if (associationRequest.getIsEnabled() == null ||
+                    StringUtils.isBlank(associationRequest.getFederatedAttribute()) ||
+                    StringUtils.isBlank(associationRequest.getMappedLocalAttribute())) {
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                        "Provided request body content is not in the expected format.");
+            }
+
+            FederatedAssociationConfig associationConfig = new FederatedAssociationConfig();
+            associationConfig.setEnabled(associationRequest.getIsEnabled());
+            associationConfig.setFederatedAttribute(associationRequest.getFederatedAttribute());
+            associationConfig.setMappedLocalAttribute(associationRequest.getMappedLocalAttribute());
+            identityProvider.setFederatedAssociationConfig(associationConfig);
+        }
+    }
+
     private void updateClaims(IdentityProvider idp, Claims claims) {
 
         if (claims != null) {
@@ -2045,6 +2109,10 @@ public class ServerIdpManagementService {
             updateOutboundConnectorConfig(idp, identityProviderPOSTRequest.getProvisioning().getOutboundConnectors());
             updateJIT(idp, identityProviderPOSTRequest.getProvisioning().getJit());
         }
+
+        if (identityProviderPOSTRequest.getAssociation() != null) {
+            updateFederatedAssociation(idp, identityProviderPOSTRequest.getAssociation());
+        }
         updateClaims(idp, identityProviderPOSTRequest.getClaims());
         updateRoles(idp, identityProviderPOSTRequest.getRoles());
         updateGroups(idp, identityProviderPOSTRequest.getGroups());
@@ -2211,6 +2279,7 @@ public class ServerIdpManagementService {
         idpResponse.setGroups(createGroupResponse(identityProvider));
         idpResponse.setFederatedAuthenticators(createFederatedAuthenticatorResponse(identityProvider));
         idpResponse.setProvisioning(createProvisioningResponse(identityProvider));
+        idpResponse.setAssociation(createAssociationResponse(identityProvider));
         return idpResponse;
     }
 
@@ -2410,6 +2479,15 @@ public class ServerIdpManagementService {
         provisioningResponse.setJit(createJITResponse(idp));
         provisioningResponse.setOutboundConnectors(createOutboundProvisioningResponse(idp));
         return provisioningResponse;
+    }
+
+    private AssociationResponse createAssociationResponse(IdentityProvider idp) {
+
+        AssociationResponse associationResponse = new AssociationResponse();
+        associationResponse.setIsEnabled(idp.getFederatedAssociationConfig().isEnabled());
+        associationResponse.setFederatedAttribute(idp.getFederatedAssociationConfig().getFederatedAttribute());
+        associationResponse.setMappedLocalAttribute(idp.getFederatedAssociationConfig().getMappedLocalAttribute());
+        return associationResponse;
     }
 
     private OutboundConnectorListResponse createOutboundProvisioningResponse(IdentityProvider idp) {
