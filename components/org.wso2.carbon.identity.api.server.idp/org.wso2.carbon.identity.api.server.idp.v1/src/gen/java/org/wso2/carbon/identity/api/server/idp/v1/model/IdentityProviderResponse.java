@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
@@ -58,6 +59,7 @@ public class IdentityProviderResponse  {
 
     private FederatedAuthenticatorListResponse federatedAuthenticators;
     private ProvisioningResponse provisioning;
+    private AssociationResponse association;
 
     /**
     **/
@@ -374,6 +376,24 @@ public class IdentityProviderResponse  {
         this.provisioning = provisioning;
     }
 
+    /**
+    **/
+    public IdentityProviderResponse association(AssociationResponse association) {
+
+        this.association = association;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("association")
+    @Valid
+    public AssociationResponse getAssociation() {
+        return association;
+    }
+    public void setAssociation(AssociationResponse association) {
+        this.association = association;
+    }
+
 
 
     @Override
@@ -402,12 +422,13 @@ public class IdentityProviderResponse  {
             Objects.equals(this.roles, identityProviderResponse.roles) &&
             Objects.equals(this.groups, identityProviderResponse.groups) &&
             Objects.equals(this.federatedAuthenticators, identityProviderResponse.federatedAuthenticators) &&
-            Objects.equals(this.provisioning, identityProviderResponse.provisioning);
+            Objects.equals(this.provisioning, identityProviderResponse.provisioning) &&
+            Objects.equals(this.association, identityProviderResponse.association);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, templateId, isEnabled, isPrimary, image, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning);
+        return Objects.hash(id, name, description, templateId, isEnabled, isPrimary, image, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning, association);
     }
 
     @Override
@@ -433,6 +454,7 @@ public class IdentityProviderResponse  {
         sb.append("    groups: ").append(toIndentedString(groups)).append("\n");
         sb.append("    federatedAuthenticators: ").append(toIndentedString(federatedAuthenticators)).append("\n");
         sb.append("    provisioning: ").append(toIndentedString(provisioning)).append("\n");
+        sb.append("    association: ").append(toIndentedString(association)).append("\n");
         sb.append("}");
         return sb.toString();
     }
