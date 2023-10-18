@@ -100,7 +100,7 @@ paths:
         - $ref: '#/components/parameters/after'
         - $ref: '#/components/parameters/filter'
         - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/requiredAttributes'
+        - $ref: '#/components/parameters/attributes'
       responses:
         200:
           description: OK
@@ -481,8 +481,8 @@ components:
         type: integer
       example: 10
 
-    requiredAttributes:
-      name: requiredAttributes
+    attributes:
+      name: attributes
       in: query
       required: false
       description: Specifies the required parameters in the response. This parameter is not supported yet
@@ -529,6 +529,10 @@ components:
         requiresAuthorization:
           type: boolean
           example: true
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/Property'
         self:
           type: string
           example: /t/carbon.super/api/server/v1/api-resources/eDUwOUNlcnRpZmljYXRlQXV0aGVudGljYXRvcg
@@ -567,6 +571,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SubscribedApplicationGetModel'
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/Property'
         self:
           type: string
           example: /t/carbon.super/api/server/v1/api-resources/eDUwOUNlcnRpZmljYXRlQXV0aGVudGljYXRvcg
@@ -684,6 +692,19 @@ components:
         id:
           type: string
           example: 23fd-23gd-54vv-sdhf
+
+    Property:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+          example: "label"
+        value:
+          type: string
+          example: "Internal"
 
   responses:
     BadRequest:
