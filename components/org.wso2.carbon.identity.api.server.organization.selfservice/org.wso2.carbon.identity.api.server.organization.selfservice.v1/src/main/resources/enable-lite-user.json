@@ -1,0 +1,16 @@
+{
+  "properties": [
+    {
+      "name": "LiteRegistration.Enable",
+      "value": true
+    },
+    {
+      "name": "LiteRegistration.LockOnCreation",
+      "value": true
+    },
+    {
+      "name": "LiteRegistration.ResendVerificationOnUserExistence",
+      "value": true
+    }
+  ]
+}

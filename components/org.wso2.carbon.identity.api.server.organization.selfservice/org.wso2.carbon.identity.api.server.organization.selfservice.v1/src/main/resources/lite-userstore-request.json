@@ -1,0 +1,91 @@
+{
+  "description": "This database is LiteUser",
+  "name": "LiteUser",
+  "properties": [
+    {
+      "name": "commitOnReturn",
+      "value": "false"
+    },
+    {
+      "name": "rollbackOnReturn",
+      "value": "false"
+    },
+    {
+      "name": "ClaimOperationsSupported",
+      "value": "true"
+    },
+    {
+      "name": "url",
+      "value": ""
+    },
+    {
+      "name": "userName",
+      "value": ""
+    },
+    {
+      "name": "password",
+      "value": ""
+    },
+    {
+      "name": "driverName",
+      "value": ""
+    },
+    {
+      "name": "Disabled",
+      "value": "false"
+    },
+    {
+      "name": "ReadOnly",
+      "value": "false"
+    },
+    {
+      "name": "DisplayNameAttribute",
+      "value": "LiteUsers"
+    },
+    {
+      "name": "ReadGroups",
+      "value": "true"
+    },
+    {
+      "name": "WriteGroups",
+      "value": "true"
+    },
+    {
+      "name": "UsernameJavaScriptRegEx",
+      "value":""
+    },
+    {
+      "name": "UniqueID",
+      "value": "67fc2f31-52c5-43f9-ab1a-33aae952ca5b"
+    },
+    {
+      "name": "PasswordJavaScriptRegEx",
+      "value": "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])).{8,100}$"
+    },
+    {
+      "name": "RolenameJavaRegEx",
+      "value": "^[a-zA-Z0-9-_]{3,30}$"
+    },
+    {
+      "name": "PasswordJavaRegEx",
+      "value": "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])).{8,100}$"
+    },
+    {
+      "name": "UsernameJavaRegEx",
+      "value":""
+    },
+    {
+      "name": "RolenameJavaScriptRegEx",
+      "value": "^[a-zA-Z0-9-_]{3,30}$"
+    },
+    {
+      "name": "UsernameJavaRegExViolationErrorMsg",
+      "value": "Username pattern policy violated."
+    },
+    {
+      "name": "CaseInsensitiveUsername",
+      "value": "false"
+    }
+  ],
+  "typeId": "VW5pcXVlSURKREJDVXNlclN0b3JlTWFuYWdlcg"
+}
