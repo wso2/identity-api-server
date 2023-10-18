@@ -30,7 +30,8 @@ public class APIResourceMgtEndpointConstants {
     private APIResourceMgtEndpointConstants() {
     }
 
-    public static final String API_RESOURCE_TYPE = "BUSINESS";
+    public static final String BUSINESS_API_RESOURCE_TYPE = "BUSINESS";
+    public static final String SYSTEM_API_RESOURCE_TYPE = "SYSTEM";
     public static final String API_RESOURCE_MANAGEMENT_PREFIX = "API-RESOURCE-";
     public static final String API_RESOURCE_PATH_COMPONENT = "/api-resources";
 
@@ -87,9 +88,11 @@ public class APIResourceMgtEndpointConstants {
                 "Limit should be a positive integer."),
         ERROR_CODE_BOTH_BEFORE_AFTER_PROVIDED("60011", "Invalid before/after provided.",
                 "Both before and after parameters cannot be provided at the same time."),
+        ERROR_CODE_SYSTEM_API_RESOURCE_NOT_MODIFIABLE("60012", "Cannot modify or delete System APIs.",
+                "Cannot modify or delete the read-only System APIs."),
         ERROR_CODE_INVALID_REQ_ATTRIBUTES("60012", "Invalid attribute name.",
                 "Invalid attribute name provided as required attribute."),
-
+      
         // Server errors.
         ERROR_CODE_ADD_API_RESOURCE("65001", "Error while adding api resource.", "Server encountered an error while " +
                 "adding the api resource."),

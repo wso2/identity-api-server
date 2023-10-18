@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
@@ -175,6 +177,32 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
         return Response.accepted().build();
     }
 
+    @Override
+    public Response getSAMLInboundAuthConfig() {
+
+        return Response.ok().entity(configManagementService.getSAMLInboundAuthConfig()).build();
+    }
+
+    @Override
+    public Response updateSAMLInboundAuthConfig(InboundAuthSAML2Config inboundAuthSAML2Config) {
+
+        configManagementService.updateSAMLInboundAuthConfig(inboundAuthSAML2Config);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response getPassiveSTSInboundAuthConfig() {
+
+        return Response.ok().entity(configManagementService.getPassiveSTSInboundAuthConfig()).build();
+    }
+
+    @Override
+    public Response updatePassiveSTSInboundAuthConfig(InboundAuthPassiveSTSConfig inboundAuthPassiveSTSConfig) {
+
+        configManagementService.updatePassiveSTSInboundAuthConfig(inboundAuthPassiveSTSConfig);
+        return Response.ok().build();
+    }
+    
     private RemoteLoggingConfigListItem createRemoteLoggingConfigListItem(
             RemoteServerLoggerData remoteServerLoggerData) {
 

@@ -29,6 +29,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListIte
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
 import java.util.List;
@@ -54,11 +56,15 @@ public interface ConfigsApiService {
 
       public Response getInboundScimConfigs();
 
+      public Response getPassiveSTSInboundAuthConfig();
+
       public Response getPrivatKeyJWTValidationConfiguration();
 
       public Response getRemoteLoggingConfig(String logType);
 
       public Response getRemoteLoggingConfigs();
+
+      public Response getSAMLInboundAuthConfig();
 
       public Response getSchema(String schemaId);
 
@@ -78,7 +84,11 @@ public interface ConfigsApiService {
 
       public Response updateInboundScimConfigs(ScimConfig scimConfig);
 
+      public Response updatePassiveSTSInboundAuthConfig(InboundAuthPassiveSTSConfig inboundAuthPassiveSTSConfig);
+
       public Response updateRemoteLoggingConfig(String logType, RemoteLoggingConfig remoteLoggingConfig);
 
       public Response updateRemoteLoggingConfigs(List<RemoteLoggingConfigListItem> remoteLoggingConfigListItem);
+
+      public Response updateSAMLInboundAuthConfig(InboundAuthSAML2Config inboundAuthSAML2Config);
 }

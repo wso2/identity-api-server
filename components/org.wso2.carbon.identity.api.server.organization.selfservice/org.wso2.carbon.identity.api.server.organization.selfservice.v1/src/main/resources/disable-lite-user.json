@@ -1,0 +1,9 @@
+{
+  "operation": "UPDATE",
+  "properties": [
+    {
+      "name": "LiteRegistration.Enable",
+      "value": false
+    }
+  ]
+}
