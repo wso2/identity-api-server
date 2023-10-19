@@ -18,12 +18,17 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OAuth2PKCEConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCLogoutConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.PushAuthorizationRequestConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RefreshTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
+import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
@@ -57,29 +62,16 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         consumerAppDTO.setBypassClientCredentials(oidcModel.getPublicClient());
         consumerAppDTO.setRequestObjectSignatureValidationEnabled(oidcModel.getValidateRequestObjectSignature());
 
-        consumerAppDTO.setTokenEndpointAuthMethod(oidcModel.getTokenEndpointAuthMethod());
-        consumerAppDTO.setTokenEndpointAuthSignatureAlgorithm(oidcModel.getTokenEndpointAuthSignatureAlgorithm());
-        consumerAppDTO.setSectorIdentifierURI(oidcModel.getSectorIdentifierURI());
-        consumerAppDTO.setIdTokenSignatureAlgorithm(oidcModel.getIdTokenSignatureAlgorithm());
-        consumerAppDTO.setAuthorizationResponseEncryptionAlgorithm(oidcModel
-                .getAuthorizationResponseEncryptionAlgorithm());
-        consumerAppDTO.setAuthorizationResponseSignatureAlgorithm(oidcModel
-                .getAuthorizationResponseSignatureAlgorithm());
-        consumerAppDTO.setAuthorizationResponseEncryptionMethod(oidcModel.getAuthorizationResponseEncryptionMethod());
-        consumerAppDTO.setRequestObjectSignatureAlgorithm(oidcModel.getRequestObjectSignatureAlgorithm());
-        consumerAppDTO.setRequestObjectEncryptionAlgorithm(oidcModel.getRequestObjectEncryptionAlgorithm());
-        consumerAppDTO.setRequestObjectEncryptionMethod(oidcModel.getRequestObjectEncryptionMethod());
-        consumerAppDTO.setTlsClientAuthSubjectDN(oidcModel.getTlsClientAuthSubjectDN());
-        consumerAppDTO.setTlsClientCertificateBoundAccessTokens(oidcModel.getTlsClientCertificateBoundAccessTokens());
-        consumerAppDTO.setRequirePushedAuthorizationRequests(oidcModel.getRequirePushedAuthorizationRequests());
-        consumerAppDTO.setSubjectType(oidcModel.getSubjectType());
-
         updateAllowedOrigins(consumerAppDTO, oidcModel.getAllowedOrigins());
         updatePkceConfigurations(consumerAppDTO, oidcModel.getPkce());
         updateAccessTokenConfiguration(consumerAppDTO, oidcModel.getAccessToken());
         updateRefreshTokenConfiguration(consumerAppDTO, oidcModel.getRefreshToken());
         updateIdTokenConfiguration(consumerAppDTO, oidcModel.getIdToken());
         updateOidcLogoutConfiguration(consumerAppDTO, oidcModel.getLogout());
+        updateClientAuthenticationConfigurations(consumerAppDTO, oidcModel.getClientAuthentication());
+        updateRequestObjectConfiguration(consumerAppDTO, oidcModel.getRequestObject());
+        updatePARConfigurations(consumerAppDTO, oidcModel.getPushAuthorizationRequest());
+        updateSubjectConfigurations(consumerAppDTO, oidcModel.getSubject());
 
         return consumerAppDTO;
     }
@@ -109,6 +101,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
                     .map(audiences -> audiences.toArray(new String[0]))
                     .orElse(new String[0])
             );
+            consumerAppDTO.setIdTokenSignatureAlgorithm(idToken.getIdTokenSignedResponseAlg());
 
             if (idToken.getEncryption() != null) {
                 boolean idTokenEncryptionEnabled = isIdTokenEncryptionEnabled(idToken);
@@ -118,6 +111,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
                     consumerAppDTO.setIdTokenEncryptionMethod(idToken.getEncryption().getMethod());
                 }
             }
+
         }
     }
 
@@ -149,6 +143,12 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             consumerAppDTO.setTokenType(accessToken.getType());
             consumerAppDTO.setUserAccessTokenExpiryTime(accessToken.getUserAccessTokenExpiryInSeconds());
             consumerAppDTO.setApplicationAccessTokenExpiryTime(accessToken.getApplicationAccessTokenExpiryInSeconds());
+            if (Constants.TLS_CLIENT_CERTIFICATE_BINDING_TYPE.equals(accessToken.getBindingType())) {
+                consumerAppDTO.setTlsClientCertificateBoundAccessTokens(true);
+                accessToken.setBindingType("None");
+            } else {
+                consumerAppDTO.setTlsClientCertificateBoundAccessTokens(false);
+            }
             consumerAppDTO.setTokenBindingType(accessToken.getBindingType());
             if (accessToken.getRevokeTokensWhenIDPSessionTerminated() != null) {
                 consumerAppDTO.setTokenRevocationWithIDPSessionTerminationEnabled(accessToken
@@ -193,6 +193,43 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             }
         } else {
             return null;
+        }
+    }
+
+    private void updateClientAuthenticationConfigurations(OAuthConsumerAppDTO appDTO,
+                                                          ClientAuthenticationConfiguration clientAuthentication) {
+
+        if (clientAuthentication != null) {
+            appDTO.setTokenEndpointAuthMethod(clientAuthentication.getTokenEndpointAuthMethod());
+            appDTO.setTokenEndpointAuthSignatureAlgorithm(clientAuthentication.getTokenEndpointAuthSigningAlg());
+            appDTO.setTlsClientAuthSubjectDN(clientAuthentication.getTlsClientAuthSubjectDn());
+        }
+    }
+
+    private void updatePARConfigurations(OAuthConsumerAppDTO appDTO, PushAuthorizationRequestConfiguration par) {
+
+        if (par != null) {
+            appDTO.setRequirePushedAuthorizationRequests(par.getRequirePushAuthorizationRequest());
+        }
+    }
+
+    private void updateRequestObjectConfiguration(OAuthConsumerAppDTO consumerAppDTO,
+                                                  RequestObjectConfiguration requestObject) {
+
+        if (requestObject != null) {
+
+            consumerAppDTO.setRequestObjectEncryptionAlgorithm(requestObject.getEncryption().getAlgorithm());
+            consumerAppDTO.setRequestObjectEncryptionMethod(requestObject.getEncryption().getMethod());
+            consumerAppDTO.setRequestObjectSignatureValidationEnabled(requestObject.getRequireSignedRequestObject());
+            consumerAppDTO.setRequestObjectSignatureAlgorithm(requestObject.getRequestObjectSigningAlg());
+        }
+    }
+
+    private void updateSubjectConfigurations(OAuthConsumerAppDTO consumerAppDTO, SubjectConfiguration subject) {
+
+        if (subject != null) {
+            consumerAppDTO.setSubjectType(subject.getSubjectType());
+            consumerAppDTO.setSectorIdentifierURI(subject.getSectorIdentifierUri());
         }
     }
 }

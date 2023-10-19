@@ -17,12 +17,18 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenEncryptionConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OAuth2PKCEConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCLogoutConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.PushAuthorizationRequestConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RefreshTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectEncryptionConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
+import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.util.ArrayList;
@@ -54,20 +60,10 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .logout(buildLogoutConfiguration(oauthAppDTO))
                 .scopeValidators(getScopeValidators(oauthAppDTO))
                 .validateRequestObjectSignature(oauthAppDTO.isRequestObjectSignatureValidationEnabled())
-                .tokenEndpointAuthMethod(oauthAppDTO.getTokenEndpointAuthMethod())
-                .tokenEndpointAuthSignatureAlgorithm(oauthAppDTO.getTokenEndpointAuthSignatureAlgorithm())
-                .sectorIdentifierURI(oauthAppDTO.getSectorIdentifierURI())
-                .idTokenSignatureAlgorithm(oauthAppDTO.getIdTokenSignatureAlgorithm())
-                .authorizationResponseEncryptionAlgorithm(oauthAppDTO.getAuthorizationResponseEncryptionAlgorithm())
-                .authorizationResponseSignatureAlgorithm(oauthAppDTO.getAuthorizationResponseSignatureAlgorithm())
-                .authorizationResponseEncryptionMethod(oauthAppDTO.getAuthorizationResponseEncryptionMethod())
-                .requestObjectSignatureAlgorithm(oauthAppDTO.getRequestObjectSignatureAlgorithm())
-                .requestObjectEncryptionAlgorithm(oauthAppDTO.getRequestObjectEncryptionAlgorithm())
-                .requestObjectEncryptionMethod(oauthAppDTO.getRequestObjectEncryptionMethod())
-                .tlsClientAuthSubjectDN(oauthAppDTO.getTlsClientAuthSubjectDN())
-                .tlsClientCertificateBoundAccessTokens(oauthAppDTO.getTlsClientCertificateBoundAccessTokens())
-                .requirePushedAuthorizationRequests(oauthAppDTO.getRequirePushedAuthorizationRequests())
-                .subjectType(oauthAppDTO.getSubjectType());
+                .clientAuthentication(buildClientAuthenticationConfiguration(oauthAppDTO))
+                .requestObject(buildRequestObjectConfiguration(oauthAppDTO))
+                .pushAuthorizationRequest(buildPARAuthenticationConfiguration(oauthAppDTO))
+                .subject(buildSubjectConfiguration(oauthAppDTO));
     }
 
     private List<String> getScopeValidators(OAuthConsumerAppDTO oauthAppDTO) {
@@ -92,6 +88,9 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
 
     private AccessTokenConfiguration buildTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
 
+        if (oAuthConsumerAppDTO.getTlsClientCertificateBoundAccessTokens()) {
+            oAuthConsumerAppDTO.setTokenBindingType(Constants.TLS_CLIENT_CERTIFICATE_BINDING_TYPE);
+        }
         return new AccessTokenConfiguration()
                 .type(oAuthConsumerAppDTO.getTokenType())
                 .userAccessTokenExpiryInSeconds(oAuthConsumerAppDTO.getUserAccessTokenExpiryTime())
@@ -114,6 +113,7 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         return new IdTokenConfiguration()
                 .expiryInSeconds(oAuthConsumerAppDTO.getIdTokenExpiryTime())
                 .audience(getAudiences(oAuthConsumerAppDTO))
+                .idTokenSignedResponseAlg(oAuthConsumerAppDTO.getIdTokenSignatureAlgorithm())
                 .encryption(buildIdTokenEncryptionConfiguration(oAuthConsumerAppDTO));
     }
 
@@ -159,5 +159,45 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
             callbackUris.add(oauthApp.getCallbackUrl());
         }
         return callbackUris;
+    }
+
+    private ClientAuthenticationConfiguration buildClientAuthenticationConfiguration(OAuthConsumerAppDTO appDTO) {
+
+        return new ClientAuthenticationConfiguration()
+                .tokenEndpointAuthMethod(appDTO.getTokenEndpointAuthMethod())
+                .tokenEndpointAuthSigningAlg(appDTO.getTokenEndpointAuthSignatureAlgorithm())
+                .tlsClientAuthSubjectDn(appDTO.getTlsClientAuthSubjectDN());
+    }
+
+    private RequestObjectConfiguration buildRequestObjectConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+
+        return new RequestObjectConfiguration()
+                .requestObjectSigningAlg(oAuthConsumerAppDTO.getRequestObjectSignatureAlgorithm())
+                .requireSignedRequestObject(oAuthConsumerAppDTO.isRequestObjectSignatureValidationEnabled())
+                .encryption(buildRequestObjectEncryptionConfiguration(oAuthConsumerAppDTO));
+    }
+
+    private RequestObjectEncryptionConfiguration buildRequestObjectEncryptionConfiguration(OAuthConsumerAppDTO appDTO) {
+
+        String algorithm = appDTO.getRequestObjectEncryptionAlgorithm();
+        String method = appDTO.getRequestObjectEncryptionMethod();
+        return new RequestObjectEncryptionConfiguration()
+                .algorithm(StringUtils.equals(algorithm, "null") ||
+                        StringUtils.isBlank(algorithm) ? "" : appDTO.getRequestObjectEncryptionAlgorithm())
+                .method(StringUtils.equals(method, "null") ||
+                        StringUtils.isBlank(method) ? "" : appDTO.getRequestObjectEncryptionMethod());
+    }
+
+    private PushAuthorizationRequestConfiguration buildPARAuthenticationConfiguration(OAuthConsumerAppDTO appDTO) {
+
+        return new PushAuthorizationRequestConfiguration()
+                .requirePushAuthorizationRequest(appDTO.getRequirePushedAuthorizationRequests());
+    }
+
+    private SubjectConfiguration buildSubjectConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+
+        return new SubjectConfiguration()
+                .subjectType(oAuthConsumerAppDTO.getSubjectType())
+                .sectorIdentifierUri(oAuthConsumerAppDTO.getSectorIdentifierURI());
     }
 }

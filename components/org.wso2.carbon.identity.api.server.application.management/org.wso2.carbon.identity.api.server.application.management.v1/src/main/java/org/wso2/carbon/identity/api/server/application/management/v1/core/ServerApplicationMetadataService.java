@@ -34,6 +34,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaDat
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
+import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.mgt.AbstractInboundAuthenticatorConfig;
@@ -151,6 +152,14 @@ public class ServerApplicationMetadataService {
         OIDCMetaData oidcMetaData = new OIDCMetaData();
         OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
 
+        List<String> authMethods = oAuthAdminService.getSupportedClientAuthenticationMethods();
+        oidcMetaData.setTokenEndpointAuthMethod(new MetadataProperty()
+                .defaultValue("Any")
+                .options(authMethods));
+        List<String> authAlgorithms = oAuthAdminService.getSupportedTokenEndpointSignatureAlgorithms();
+        oidcMetaData.setTokenEndpointSignatureAlgorithm(new MetadataProperty()
+                .defaultValue("PS256")
+                .options(authAlgorithms));
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
         List<GrantType> supportedGrantTypeNames = new ArrayList<>();
         // Iterate through the standard grant type names and add matching elements.
@@ -201,6 +210,7 @@ public class ServerApplicationMetadataService {
         List<TokenBindingMetaDataDTO> supportedTokenBindings = oAuthAdminService.getSupportedTokenBindingsMetaData();
         List<String> supportedTokenBindingTypes = new ArrayList<>();
         supportedTokenBindingTypes.add("None");
+        supportedTokenBindingTypes.add(Constants.TLS_CLIENT_CERTIFICATE_BINDING_TYPE);
         for (TokenBindingMetaDataDTO tokenBindingDTO : supportedTokenBindings) {
             supportedTokenBindingTypes.add(tokenBindingDTO.getTokenBindingType());
         }

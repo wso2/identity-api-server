@@ -46,6 +46,7 @@ public class Constants {
     static final String[] VALID_MEDIA_TYPES_JSON = {MEDIA_TYPE_JSON, "text/json"};
     static final String[] VALID_MEDIA_TYPES_XML = {MEDIA_TYPE_XML, "text/xml"};
     static final String[] VALID_MEDIA_TYPES_YAML = {MEDIA_TYPE_YAML, "text/yaml", "application/x-yaml"};
+    public static final String TLS_CLIENT_CERTIFICATE_BINDING_TYPE = "TLS Client Certificate";
 
     /**
      * Enum for server error prefixes.
