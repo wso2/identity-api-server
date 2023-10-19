@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.94-SNAPSHOT</version>
+    <version>1.2.96-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -598,6 +598,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.organization.selfservice.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.extension.identity.verification</groupId>
                 <artifactId>org.wso2.carbon.extension.identity.verification.provider</artifactId>
                 <version>${identity.verification.version}</version>
@@ -651,6 +657,24 @@
                 <artifactId>h2</artifactId>
                 <version>${h2database.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito-core.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.application.management.v1</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.userstore.v1</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -770,6 +794,7 @@
 
         <!-- Unit test versions -->
         <testng.version>6.9.10</testng.version>
+        <mockito-core.version>4.6.1</mockito-core.version>
         <jacoco.version>0.8.2</jacoco.version>
         <h2database.version>2.1.210</h2database.version>
     </properties>
@@ -807,6 +832,7 @@
         <module>components/org.wso2.carbon.identity.api.server.organization.user.invitation.management</module>
         <module>components/org.wso2.carbon.identity.api.server.api.resource</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.configs</module>
+        <module>components/org.wso2.carbon.identity.api.server.organization.selfservice</module>
     </modules>
 
 </project>
