@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.FileContent;
 import org.wso2.carbon.identity.api.server.idp.v1.IdentityProvidersApiService;
 import org.wso2.carbon.identity.api.server.idp.v1.core.ServerIdpManagementService;
+import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
@@ -141,6 +142,12 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     public Response getGroupConfig(String identityProviderId) {
 
         return Response.ok().entity(idpManagementService.getGroupConfig(identityProviderId)).build();
+    }
+
+    @Override
+    public Response getFederatedAssociationConfig(String identityProviderId) {
+
+        return Response.ok().entity(idpManagementService.getFederatedAssociationConfig(identityProviderId)).build();
     }
 
     @Override
@@ -276,6 +283,13 @@ public class IdentityProvidersApiServiceImpl implements IdentityProvidersApiServ
     public Response updateGroupConfig(String identityProviderId, List<IdPGroup> idPGroup) {
 
         return Response.ok().entity(idpManagementService.updateGroupConfig(identityProviderId, idPGroup)).build();
+    }
+
+    @Override
+    public Response updateFederatedAssociationConfig(String identityProviderId, AssociationRequest associationRequest) {
+
+        return Response.ok().entity(idpManagementService.updateFederatedAssociationConfig(identityProviderId,
+                associationRequest)).build();
     }
 
     @Override

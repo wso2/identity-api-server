@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
@@ -56,6 +57,7 @@ public class IdentityProviderPOSTRequest  {
 
     private FederatedAuthenticatorRequest federatedAuthenticators;
     private ProvisioningRequest provisioning;
+    private AssociationRequest implicitAssociation;
 
     /**
     **/
@@ -338,6 +340,24 @@ public class IdentityProviderPOSTRequest  {
         this.provisioning = provisioning;
     }
 
+    /**
+    **/
+    public IdentityProviderPOSTRequest implicitAssociation(AssociationRequest implicitAssociation) {
+
+        this.implicitAssociation = implicitAssociation;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("implicitAssociation")
+    @Valid
+    public AssociationRequest getImplicitAssociation() {
+        return implicitAssociation;
+    }
+    public void setImplicitAssociation(AssociationRequest implicitAssociation) {
+        this.implicitAssociation = implicitAssociation;
+    }
+
 
 
     @Override
@@ -364,12 +384,13 @@ public class IdentityProviderPOSTRequest  {
             Objects.equals(this.roles, identityProviderPOSTRequest.roles) &&
             Objects.equals(this.groups, identityProviderPOSTRequest.groups) &&
             Objects.equals(this.federatedAuthenticators, identityProviderPOSTRequest.federatedAuthenticators) &&
-            Objects.equals(this.provisioning, identityProviderPOSTRequest.provisioning);
+            Objects.equals(this.provisioning, identityProviderPOSTRequest.provisioning) &&
+            Objects.equals(this.implicitAssociation, identityProviderPOSTRequest.implicitAssociation);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, image, templateId, isPrimary, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning);
+        return Objects.hash(name, description, image, templateId, isPrimary, isFederationHub, homeRealmIdentifier, certificate, alias, idpIssuerName, claims, roles, groups, federatedAuthenticators, provisioning, implicitAssociation);
     }
 
     @Override
@@ -393,6 +414,7 @@ public class IdentityProviderPOSTRequest  {
         sb.append("    groups: ").append(toIndentedString(groups)).append("\n");
         sb.append("    federatedAuthenticators: ").append(toIndentedString(federatedAuthenticators)).append("\n");
         sb.append("    provisioning: ").append(toIndentedString(provisioning)).append("\n");
+        sb.append("    implicitAssociation: ").append(toIndentedString(implicitAssociation)).append("\n");
         sb.append("}");
         return sb.toString();
     }
