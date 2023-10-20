@@ -71,7 +71,7 @@ public enum TypeEnum {
 }
 
     private TypeEnum type = TypeEnum.TENANT;
-    private String parentId = "10084a8d-113f-4211-a0d5-efe36b082211";
+    private String parentId;
     private List<Attribute> attributes = null;
 
 
