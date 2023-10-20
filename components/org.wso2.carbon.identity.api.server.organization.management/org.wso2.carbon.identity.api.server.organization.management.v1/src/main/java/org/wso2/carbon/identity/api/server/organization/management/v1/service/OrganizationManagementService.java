@@ -23,7 +23,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.organization.management.common.OrganizationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.management.v1.exceptions.OrganizationManagementEndpointException;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ApplicationSharePOSTRequest;
@@ -570,9 +569,6 @@ public class OrganizationManagementService {
         String parentId = organizationPOSTRequest.getParentId();
         if (StringUtils.isNotBlank(parentId)) {
             organization.getParent().setId(parentId);
-        } else {
-            String accessingOrganization = PrivilegedCarbonContext.getThreadLocalCarbonContext().getOrganizationId();
-            organization.getParent().setId(accessingOrganization);
         }
         List<Attribute> organizationAttributes = organizationPOSTRequest.getAttributes();
         if (CollectionUtils.isNotEmpty(organizationAttributes)) {
