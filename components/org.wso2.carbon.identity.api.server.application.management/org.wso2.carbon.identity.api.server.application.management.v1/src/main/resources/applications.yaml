@@ -3253,7 +3253,7 @@ components:
         pushAuthorizationRequest:
           $ref: '#/components/schemas/PushAuthorizationRequestConfiguration'
         subject:
-            $ref: '#/components/schemas/SubjectConfiguration'
+          $ref: '#/components/schemas/SubjectConfiguration'
     OAuth2PKCEConfiguration:
       type: object
       properties:
