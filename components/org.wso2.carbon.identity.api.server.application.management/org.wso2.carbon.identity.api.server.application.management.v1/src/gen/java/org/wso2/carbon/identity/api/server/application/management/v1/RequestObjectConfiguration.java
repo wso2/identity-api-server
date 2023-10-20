@@ -78,7 +78,7 @@ public class RequestObjectConfiguration {
         }
         RequestObjectConfiguration requestObjectConfiguration = (RequestObjectConfiguration) o;
         return Objects.equals(this.requestObjectSigningAlg, requestObjectConfiguration.requestObjectSigningAlg) &&
-            Objects.equals(this.requireSignedRequestObject, requestObjectConfiguration.requestObjectSigningAlg) &&
+            Objects.equals(this.requireSignedRequestObject, requestObjectConfiguration.requireSignedRequestObject) &&
             Objects.equals(this.encryption, requestObjectConfiguration.encryption);
     }
 
