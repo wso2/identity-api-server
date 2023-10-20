@@ -39,9 +39,11 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.mgt.AbstractInboundAuthenticatorConfig;
 import org.wso2.carbon.identity.base.IdentityException;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
 import org.wso2.carbon.identity.oauth.dto.TokenBindingMetaDataDTO;
+import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.security.SecurityConfigException;
 
@@ -65,6 +67,8 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 public class ServerApplicationMetadataService {
 
     private static final Log LOG = LogFactory.getLog(ServerApplicationMetadataService.class);
+    private static final String TOKEN_EP_SIGNATURE_ALGS_SUPPORTED = "OAuth.OpenIDConnect." +
+            "SupportedTokenEndpointSigningAlgorithms.SupportedTokenEndpointSigningAlgorithm";
 
     /**
      * Return a list of all available inbound protocols. If the customOnly parameter set to True, will return only the
@@ -152,11 +156,11 @@ public class ServerApplicationMetadataService {
         OIDCMetaData oidcMetaData = new OIDCMetaData();
         OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
 
-        List<String> authMethods = oAuthAdminService.getSupportedClientAuthenticationMethods();
+        List<String> authMethods = OAuth2Util.getSupportedClientAuthenticationMethods();
         oidcMetaData.setTokenEndpointAuthMethod(new MetadataProperty()
                 .defaultValue("Any")
                 .options(authMethods));
-        List<String> authAlgorithms = oAuthAdminService.getSupportedTokenEndpointSignatureAlgorithms();
+        List<String> authAlgorithms = IdentityUtil.getPropertyAsList(TOKEN_EP_SIGNATURE_ALGS_SUPPORTED);
         oidcMetaData.setTokenEndpointSignatureAlgorithm(new MetadataProperty()
                 .defaultValue("PS256")
                 .options(authAlgorithms));
