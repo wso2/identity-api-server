@@ -485,7 +485,7 @@ components:
       name: attributes
       in: query
       required: false
-      description: Specifies the required parameters in the response. This parameter is not supported yet
+      description: Specifies the required attributes in the response. Only 'properties' attribute is currently supported.
       schema:
         type: string
 

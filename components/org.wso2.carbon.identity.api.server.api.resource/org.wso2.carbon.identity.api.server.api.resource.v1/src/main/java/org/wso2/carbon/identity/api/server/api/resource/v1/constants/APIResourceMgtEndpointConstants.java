@@ -90,7 +90,7 @@ public class APIResourceMgtEndpointConstants {
                 "Both before and after parameters cannot be provided at the same time."),
         ERROR_CODE_SYSTEM_API_RESOURCE_NOT_MODIFIABLE("60012", "Cannot modify or delete System APIs.",
                 "Cannot modify or delete the read-only System APIs."),
-        ERROR_CODE_INVALID_REQ_ATTRIBUTES("60012", "Invalid attribute name.",
+        ERROR_CODE_INVALID_REQ_ATTRIBUTES("60013", "Invalid attribute name.",
                 "Invalid attribute name provided as required attribute."),
       
         // Server errors.
