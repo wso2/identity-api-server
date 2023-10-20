@@ -312,6 +312,7 @@ paths:
       summary: Deletes custom text.
       description: |
         This API provides the capability to delete the custom texts for the specified screen & locale of a tenant.<br>
+        If no query parameter was specified in the delete request, all the custom texts configured in the tenant will be deleted.<br>
           <b>Permission required:</b> <br>
             * /permission/admin/manage/identity/applicationmgt/update <br>
           <b>Scope required:</b> <br>
@@ -378,7 +379,6 @@ components:
           - ORG
           - APP
           - CUSTOM
-        default: "ORG"
       example: "ORG"
     nameQueryParam:
       in: query
@@ -395,7 +395,6 @@ components:
       description: Locale to filter the retrieval of customizations.
       schema:
         type: string
-        default: "en-US"
       example: "en-US"
     screenQueryParam:
       in: query

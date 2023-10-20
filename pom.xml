@@ -751,7 +751,7 @@
         <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.4.21</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
         <org.wso2.carbon.logging.service.version>4.10.7</org.wso2.carbon.logging.service.version>
         <org.wso2.carbon.event.publisher.version>5.2.15</org.wso2.carbon.event.publisher.version>
-        <identity.branding.preference.management.version>1.0.7</identity.branding.preference.management.version>
+        <identity.branding.preference.management.version>1.0.9-SNAPSHOT</identity.branding.preference.management.version>
         <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 

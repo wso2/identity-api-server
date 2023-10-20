@@ -310,6 +310,26 @@ public class BrandingPreferenceManagementService {
     }
 
     /**
+     * Delete all the custom text preference resources of the current tenant.
+     */
+    public void deleteAllCustomTextPreferences() {
+
+        String tenantDomain = getTenantDomainFromContext();
+        try {
+            BrandingPreferenceServiceHolder.getBrandingPreferenceManager().deleteAllCustomText();
+        } catch (BrandingPreferenceMgtException e) {
+            if (CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE.equals(e.getErrorCode())) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Can not find a custom text preferences to delete for tenant: " + tenantDomain, e);
+                }
+                return;
+            }
+            throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_DELETING_CUSTOM_TEXT_PREFERENCE,
+                    tenantDomain);
+        }
+    }
+
+    /**
      * Retrieve the requested branding preferences.
      *
      * @param type   Resource Type.
