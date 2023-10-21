@@ -202,6 +202,9 @@ public class Constants {
                 "Server encountered an error while retrieving the identity provider JIT config for identifier %s."),
         ERROR_CODE_ERROR_RETRIEVING_IDP_GROUPS("65033", "Unable to retrieve identity provider group config.",
                 "Server encountered an error while retrieving the identity provider group config for identifier %s."),
+        ERROR_CODE_ERROR_RETRIEVING_IDP_ASSOCIATION("65034", "Unable to retrieve identity provider federated " +
+                "association config.", "Server encountered an error while retrieving the identity provider " +
+                "federated association config for identifier %s."),
         ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS("65042",
                 "Unable to retrieve identity provider connected applications.",
                 "Server encountered an error while retrieving the identity provider connected applications %s."),
@@ -244,6 +247,9 @@ public class Constants {
                 "Unable to update identity provider groups.",
                 "Server encountered an error while updating the identity provider " +
                         "group config for identifier %s."),
+        ERROR_CODE_ERROR_UPDATING_IDP_ASSOCIATION("65037", "Unable to update identity provider federated " +
+                "association config.", "Server encountered an error while updating the identity provider " +
+                "federated association config for identifier %s."),
         ERROR_CODE_ERROR_LISTING_IDP_TEMPLATES("65050", "Unable to list existing identity provider " +
                 "templates.", "Error occured while listing identity provider templates."),
         ERROR_CODE_ERROR_ADDING_IDP_TEMPLATE("65051", "Unable to add IDP template.",

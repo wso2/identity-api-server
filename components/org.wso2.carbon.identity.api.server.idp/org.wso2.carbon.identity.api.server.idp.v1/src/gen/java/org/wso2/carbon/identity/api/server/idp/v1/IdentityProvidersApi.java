@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.idp.v1;
 
@@ -23,6 +25,8 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Error;
@@ -233,6 +237,30 @@ public class IdentityProvidersApi  {
     public Response getConnectedApps(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId,     @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset) {
 
         return delegate.getConnectedApps(identityProviderId,  limit,  offset );
+    }
+
+    @Valid
+    @GET
+    @Path("/{identity-provider-id}/implicit-association")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Federated association config of an identity provider ", notes = "This API provides the federated association config of an identity provider. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/view <br> <b>Scope required:</b> <br>     * internal_idp_view ", response = AssociationResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Association", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = AssociationResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getFederatedAssociationConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId) {
+
+        return delegate.getFederatedAssociationConfig(identityProviderId );
     }
 
     @Valid
@@ -692,6 +720,30 @@ public class IdentityProvidersApi  {
     public Response updateClaimConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the claim config to be updated" ,required=true) @Valid Claims claims) {
 
         return delegate.updateClaimConfig(identityProviderId,  claims );
+    }
+
+    @Valid
+    @PUT
+    @Path("/{identity-provider-id}/implicit-association")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update the federated association config of an identity provider ", notes = "This API provides the capability to update the federated association config of an identity provider by specifying the identity provider ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idpmgt/update <br> <b>Scope required:</b> <br>     * internal_idp_update ", response = AssociationResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Association", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = AssociationResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateFederatedAssociationConfig(@ApiParam(value = "ID of the identity provider.",required=true) @PathParam("identity-provider-id") String identityProviderId, @ApiParam(value = "This represents the federated association config to be updated." ,required=true) @Valid AssociationRequest associationRequest) {
+
+        return delegate.updateFederatedAssociationConfig(identityProviderId,  associationRequest );
     }
 
     @Valid
