@@ -1229,12 +1229,17 @@ components:
       type: object
       required:
         - organizationId
+        - organizationName
         - attributes
       properties:
         organizationId:
           type: string
           description: The ID of the organization.
           example: '06c1f4e2-3339-44e4-a825-96585e3653b1'
+        organizationName:
+          type: string
+          description: The name of the organization.
+          example: 'ABC Builders'
         attributes:
           type: array
           items:

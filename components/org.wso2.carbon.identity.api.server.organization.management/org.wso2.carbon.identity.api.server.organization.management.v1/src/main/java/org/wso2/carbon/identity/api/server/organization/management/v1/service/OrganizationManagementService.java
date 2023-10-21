@@ -53,6 +53,7 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.util.Organ
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.organization.discovery.service.OrganizationDiscoveryManager;
 import org.wso2.carbon.identity.organization.discovery.service.model.OrgDiscoveryAttribute;
+import org.wso2.carbon.identity.organization.discovery.service.model.OrganizationDiscovery;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
 import org.wso2.carbon.identity.organization.management.application.model.SharedApplication;
 import org.wso2.carbon.identity.organization.management.service.OrganizationManager;
@@ -75,7 +76,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -483,21 +483,21 @@ public class OrganizationManagementService {
 
         handleNotImplementedCapabilities(filter, offset, limit);
         try {
-            Map<String, List<OrgDiscoveryAttribute>> organizationsDiscoveryAttributes =
+            List<OrganizationDiscovery> organizationsDiscoveryAttributes =
                     getOrganizationDiscoveryManager().getOrganizationsDiscoveryAttributes();
             OrganizationsDiscoveryResponse response = new OrganizationsDiscoveryResponse();
-            organizationsDiscoveryAttributes.forEach((key, value) -> {
+            for (OrganizationDiscovery organizationDiscovery : organizationsDiscoveryAttributes) {
                 OrganizationDiscoveryResponse organizationDiscoveryResponse = new OrganizationDiscoveryResponse();
-                organizationDiscoveryResponse.setOrganizationId(key);
-                value.forEach(orgDiscoveryAttribute -> {
+                organizationDiscoveryResponse.setOrganizationId(organizationDiscovery.getOrganizationId());
+                organizationDiscoveryResponse.setOrganizationName(organizationDiscovery.getOrganizationName());
+                organizationDiscovery.getDiscoveryAttributes().forEach(orgDiscoveryAttribute -> {
                     DiscoveryAttribute organizationDiscoveryAttributeResponse = new DiscoveryAttribute();
                     organizationDiscoveryAttributeResponse.setType(orgDiscoveryAttribute.getType());
                     organizationDiscoveryAttributeResponse.setValues(orgDiscoveryAttribute.getValues());
                     organizationDiscoveryResponse.addAttributesItem(organizationDiscoveryAttributeResponse);
-
                 });
                 response.addOrganizationsItem(organizationDiscoveryResponse);
-            });
+            }
             return Response.ok(response).build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);

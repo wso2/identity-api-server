@@ -36,6 +36,7 @@ import javax.xml.bind.annotation.*;
 public class OrganizationDiscoveryResponse  {
   
     private String organizationId;
+    private String organizationName;
     private List<DiscoveryAttribute> attributes = new ArrayList<>();
 
 
@@ -58,6 +59,27 @@ public class OrganizationDiscoveryResponse  {
     }
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    /**
+    * The name of the organization.
+    **/
+    public OrganizationDiscoveryResponse organizationName(String organizationName) {
+
+        this.organizationName = organizationName;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "ABC Builders", required = true, value = "The name of the organization.")
+    @JsonProperty("organizationName")
+    @Valid
+    @NotNull(message = "Property organizationName cannot be null.")
+
+    public String getOrganizationName() {
+        return organizationName;
+    }
+    public void setOrganizationName(String organizationName) {
+        this.organizationName = organizationName;
     }
 
     /**
@@ -98,12 +120,13 @@ public class OrganizationDiscoveryResponse  {
         }
         OrganizationDiscoveryResponse organizationDiscoveryResponse = (OrganizationDiscoveryResponse) o;
         return Objects.equals(this.organizationId, organizationDiscoveryResponse.organizationId) &&
+            Objects.equals(this.organizationName, organizationDiscoveryResponse.organizationName) &&
             Objects.equals(this.attributes, organizationDiscoveryResponse.attributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(organizationId, attributes);
+        return Objects.hash(organizationId, organizationName, attributes);
     }
 
     @Override
@@ -113,6 +136,7 @@ public class OrganizationDiscoveryResponse  {
         sb.append("class OrganizationDiscoveryResponse {\n");
         
         sb.append("    organizationId: ").append(toIndentedString(organizationId)).append("\n");
+        sb.append("    organizationName: ").append(toIndentedString(organizationName)).append("\n");
         sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("}");
         return sb.toString();
