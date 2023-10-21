@@ -19,13 +19,27 @@
 package org.wso2.carbon.identity.api.server.api.resource.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
 import java.util.List;
+
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceListResponse;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
+import org.wso2.carbon.identity.api.server.api.resource.v1.Error;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourcesApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+
+import javax.validation.constraints.*;
 
 @Path("/api-resources")
 @Api(description = "The api-resources API")
@@ -40,7 +54,7 @@ public class ApiResourcesApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json", "application/xml",  })
-    @ApiOperation(value = "Add a new API resource", notes = "Add a new API resource", response = APIResourceResponse.class, authorizations = {
+    @ApiOperation(value = "Add a new API resource", notes = "Add a new API resource <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/create <br> <b>Scope required:</b> <br>   * internal_api_resource_create ", response = APIResourceResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -65,7 +79,7 @@ public class ApiResourcesApi  {
     @Path("/{apiResourceId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete API resource specified by the id", notes = "Delete API resource specified by the id", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete API resource specified by the id", notes = "Delete API resource specified by the id <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/delete <br> <b>Scope required:</b> <br>   * internal_api_resource_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -87,7 +101,7 @@ public class ApiResourcesApi  {
     @Path("/{apiResourceId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get API resource specified by the id", notes = "Get API resource specified by the id", response = APIResourceResponse.class, authorizations = {
+    @ApiOperation(value = "Get API resource specified by the id", notes = "Get API resource specified by the id <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/view <br> <b>Scope required:</b> <br>   * internal_api_resource_view ", response = APIResourceResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -109,14 +123,14 @@ public class ApiResourcesApi  {
     @Path("/{apiResourceId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json", "application/xml",  })
-    @ApiOperation(value = "Patch API resource specified by the id", notes = "Patch API resource specified by the id. Patch operation only supports \"name\", \"description\" updating and \"addedScopes\" fields at the moment.", response = APIResourceResponse.class, authorizations = {
+    @ApiOperation(value = "Patch API resource specified by the id", notes = "Patch API resource specified by the id. Patch operation only supports \"name\", \"description\" updating and \"addedScopes\" fields at the moment. <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/update <br> <b>Scope required:</b> <br>   * internal_api_resource_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "API Resources", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = APIResourceResponse.class),
+        @ApiResponse(code = 204, message = "Not Content", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -135,7 +149,7 @@ public class ApiResourcesApi  {
     @Path("/{apiResourceId}/scopes")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get API resource scopes", notes = "Get API resource scopes specified by the id", response = ScopeGetModel.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Get API resource scopes", notes = "Get API resource scopes specified by the id <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/view <br> <b>Scope required:</b> <br>   * internal_api_resource_view ", response = ScopeGetModel.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -158,7 +172,7 @@ public class ApiResourcesApi  {
     @Path("/{apiResourceId}/scopes")
     @Consumes({ "application/json" })
     @Produces({ "application/json", "application/xml",  })
-    @ApiOperation(value = "Add scopes to API resource", notes = "Put scopes API resource specified by the id", response = Void.class, authorizations = {
+    @ApiOperation(value = "Add scopes to API resource", notes = "Put scopes API resource specified by the id <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/update <br> <b>Scope required:</b> <br>   * internal_api_resource_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -180,10 +194,10 @@ public class ApiResourcesApi  {
 
     @Valid
     @DELETE
-    @Path("/{apiResourceId}/scopes/{scopeId}")
+    @Path("/{apiResourceId}/scopes/{scopeName}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete API resource specified by the id", notes = "Delete API resource specified by the id", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete API scope specified by the name", notes = "Delete API scope specified by the name <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/delete <br> <b>Scope required:</b> <br>   * internal_api_resource_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -194,9 +208,9 @@ public class ApiResourcesApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response apiResourcesApiResourceIdScopesScopeIdDelete(@ApiParam(value = "ID of the API Resource.",required=true) @PathParam("apiResourceId") String apiResourceId, @ApiParam(value = "ID of the Scope.",required=true) @PathParam("scopeId") String scopeId) {
+    public Response apiResourcesApiResourceIdScopesScopeNameDelete(@ApiParam(value = "ID of the API Resource.",required=true) @PathParam("apiResourceId") String apiResourceId, @ApiParam(value = "Name of the Scope.",required=true) @PathParam("scopeName") String scopeName) {
 
-        return delegate.apiResourcesApiResourceIdScopesScopeNameDelete(apiResourceId,  scopeId );
+        return delegate.apiResourcesApiResourceIdScopesScopeNameDelete(apiResourceId,  scopeName );
     }
 
     @Valid
@@ -204,21 +218,21 @@ public class ApiResourcesApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List all API resources in the server", notes = "List all API resources in the server", response = APIResourceListResponse.class, authorizations = {
+    @ApiOperation(value = "List all API resources in the server", notes = "List all API resources in the server <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/view <br> <b>Scope required:</b> <br>   * internal_api_resource_view ", response = APIResourceListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "API Resources", })
+    }, tags={ "API Resources" })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = APIResourceListResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getAPIResources(    @Valid@ApiParam(value = "Base64 encoded cursor value for backward pagination. ")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Base64 encoded cursor value for forward pagination. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Specifies the required parameters in the response. This parameter is not supported yet")  @QueryParam("requiredAttributes") String requiredAttributes) {
+    public Response getAPIResources(    @Valid@ApiParam(value = "Base64 encoded cursor value for backward pagination. ")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Base64 encoded cursor value for forward pagination. ")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Specifies the required attributes in the response. Only 'properties' attribute is currently supported.")  @QueryParam("attributes") String attributes) {
 
-        return delegate.getAPIResources(before,  after,  filter,  limit,  requiredAttributes );
+        return delegate.getAPIResources(before,  after,  filter,  limit,  attributes );
     }
 
 }

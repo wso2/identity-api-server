@@ -48,7 +48,7 @@ public class ScopesApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Get all scopes in the tenant", notes = "Get all scopes in the tenant", response = ScopeGetModel.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Get all scopes in the tenant", notes = "Get all scopes in the tenant <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/view <br> <b>Scope required:</b> <br>   * internal_api_resource_view ", response = ScopeGetModel.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

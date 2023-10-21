@@ -34,8 +34,14 @@ public class APIResourceMgtEndpointConstants {
     public static final String SYSTEM_API_RESOURCE_TYPE = "SYSTEM";
     public static final String API_RESOURCE_MANAGEMENT_PREFIX = "API-RESOURCE-";
     public static final String API_RESOURCE_PATH_COMPONENT = "/api-resources";
+
     private static final List<String> allowedAttributeList = new ArrayList<>();
     public static final List<String> ALLOWED_SEARCH_ATTRIBUTES = Collections.unmodifiableList(allowedAttributeList);
+
+    private static final List<String> supportedRequiredAttributeList = new ArrayList<>();
+    public static final List<String> SUPPORTED_REQUIRED_ATTRIBUTES = Collections
+            .unmodifiableList(supportedRequiredAttributeList);
+
     public static final String RESTRICTED_OAUTH2_SCOPES = "OAuth.RestrictedScopes.RestrictedScope";
     public static final Integer DEFAULT_LIMIT = 10;
     public static final String ASC_SORT_ORDER = "ASC";
@@ -46,6 +52,8 @@ public class APIResourceMgtEndpointConstants {
         allowedAttributeList.add("type");
         allowedAttributeList.add("requires_authorization");
         allowedAttributeList.add("scopes");
+
+        supportedRequiredAttributeList.add("properties");
     }
 
     /**
@@ -82,7 +90,9 @@ public class APIResourceMgtEndpointConstants {
                 "Both before and after parameters cannot be provided at the same time."),
         ERROR_CODE_SYSTEM_API_RESOURCE_NOT_MODIFIABLE("60012", "Cannot modify or delete System APIs.",
                 "Cannot modify or delete the read-only System APIs."),
-
+        ERROR_CODE_INVALID_REQ_ATTRIBUTES("60013", "Invalid attribute name.",
+                "Invalid attribute name provided as required attribute."),
+      
         // Server errors.
         ERROR_CODE_ADD_API_RESOURCE("65001", "Error while adding api resource.", "Server encountered an error while " +
                 "adding the api resource."),

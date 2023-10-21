@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.api.resource.v1.Property;
 import javax.validation.constraints.*;
 
 
@@ -37,6 +40,8 @@ public class APIResourceListItem  {
     private String identifier;
     private String type;
     private Boolean requiresAuthorization;
+    private List<Property> properties = null;
+
     private String self;
 
     /**
@@ -137,6 +142,32 @@ public class APIResourceListItem  {
 
     /**
     **/
+    public APIResourceListItem properties(List<Property> properties) {
+
+        this.properties = properties;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("properties")
+    @Valid
+    public List<Property> getProperties() {
+        return properties;
+    }
+    public void setProperties(List<Property> properties) {
+        this.properties = properties;
+    }
+
+    public APIResourceListItem addPropertiesItem(Property propertiesItem) {
+        if (this.properties == null) {
+            this.properties = new ArrayList<Property>();
+        }
+        this.properties.add(propertiesItem);
+        return this;
+    }
+
+        /**
+    **/
     public APIResourceListItem self(String self) {
 
         this.self = self;
@@ -172,12 +203,13 @@ public class APIResourceListItem  {
             Objects.equals(this.identifier, apIResourceListItem.identifier) &&
             Objects.equals(this.type, apIResourceListItem.type) &&
             Objects.equals(this.requiresAuthorization, apIResourceListItem.requiresAuthorization) &&
+            Objects.equals(this.properties, apIResourceListItem.properties) &&
             Objects.equals(this.self, apIResourceListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, identifier, type, requiresAuthorization, self);
+        return Objects.hash(id, name, identifier, type, requiresAuthorization, properties, self);
     }
 
     @Override
@@ -191,6 +223,7 @@ public class APIResourceListItem  {
         sb.append("    identifier: ").append(toIndentedString(identifier)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    requiresAuthorization: ").append(toIndentedString(requiresAuthorization)).append("\n");
+        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
