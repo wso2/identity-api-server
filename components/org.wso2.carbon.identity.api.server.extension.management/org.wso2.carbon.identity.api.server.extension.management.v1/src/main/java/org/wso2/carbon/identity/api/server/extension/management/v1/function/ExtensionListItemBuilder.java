@@ -20,13 +20,10 @@ package org.wso2.carbon.identity.api.server.extension.management.v1.function;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.api.server.extension.management.common.utils.ExtensionMgtConstants;
 import org.wso2.carbon.identity.api.server.extension.management.common.utils.ExtensionMgtUtils;
 import org.wso2.carbon.identity.api.server.extension.management.v1.model.ExtensionListItem;
 import org.wso2.carbon.identity.extension.mgt.model.ExtensionInfo;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -51,14 +48,7 @@ public class ExtensionListItemBuilder implements Function<ExtensionInfo, Extensi
         extensionListItem.setSelf(ExtensionMgtUtils.getExtensionInfoLocation(extensionInfo.getType(),
                 extensionInfo.getId()));
         if (extensionInfo.getCustomAttributes() != null) {
-            for (Map<String, Object> customAttributeMap : extensionInfo.getCustomAttributes()) {
-                Map<String, Object> customAttribute = new HashMap<>();
-                customAttribute.put(ExtensionMgtConstants.KEY,
-                        customAttributeMap.get(ExtensionMgtConstants.KEY));
-                customAttribute.put(ExtensionMgtConstants.VALUE,
-                        customAttributeMap.get(ExtensionMgtConstants.VALUE).toString());
-                extensionListItem.addCustomAttributesItem(customAttribute);
-            }
+            extensionListItem.setCustomAttributes(extensionInfo.getCustomAttributes());
         }
         return extensionListItem;
     }
