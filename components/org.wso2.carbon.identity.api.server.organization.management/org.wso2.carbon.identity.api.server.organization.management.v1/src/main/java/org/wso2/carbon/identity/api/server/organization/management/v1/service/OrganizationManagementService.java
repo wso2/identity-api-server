@@ -84,7 +84,6 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.ASC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DESC_SORT_ORDER;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL;
-import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_FILTERING_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_EMPTY_REQUEST_BODY;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY;
@@ -474,17 +473,17 @@ public class OrganizationManagementService {
     /**
      * Returns the discovery attributes of the organizations.
      *
-     * @param filter The filter string. **Not supported at the moment.**
+     * @param filter The filter string.
      * @param offset The offset to be used with the limit parameter. **Not supported at the moment.**
      * @param limit  The items per page. **Not supported at the moment.**
      * @return The discovery attributes of the organizations in the hierarchy under the root organization.
      */
     public Response getOrganizationsDiscoveryAttributes(String filter, Integer offset, Integer limit) {
 
-        handleNotImplementedCapabilities(filter, offset, limit);
+        handleNotImplementedCapabilities(offset, limit);
         try {
             List<OrganizationDiscovery> organizationsDiscoveryAttributes =
-                    getOrganizationDiscoveryManager().getOrganizationsDiscoveryAttributes();
+                    getOrganizationDiscoveryManager().getOrganizationsDiscoveryAttributes(filter);
             OrganizationsDiscoveryResponse response = new OrganizationsDiscoveryResponse();
             for (OrganizationDiscovery organizationDiscovery : organizationsDiscoveryAttributes) {
                 OrganizationDiscoveryResponse organizationDiscoveryResponse = new OrganizationDiscoveryResponse();
@@ -868,20 +867,13 @@ public class OrganizationManagementService {
                 }).collect(Collectors.toList());
     }
 
-    private void handleNotImplementedCapabilities(String filter, Integer offset, Integer limit) {
+    private void handleNotImplementedCapabilities(Integer offset, Integer limit) {
 
         if (limit != null || offset != null) {
             Error error = OrganizationManagementEndpointUtil.getError(
                     ERROR_CODE_PAGINATION_NOT_IMPLEMENTED.getCode(),
                     ERROR_CODE_PAGINATION_NOT_IMPLEMENTED.getMessage(),
                     ERROR_CODE_PAGINATION_NOT_IMPLEMENTED.getDescription());
-            throw new OrganizationManagementEndpointException(Response.Status.NOT_IMPLEMENTED, error);
-        }
-        if (filter != null) {
-            Error error = OrganizationManagementEndpointUtil.getError(
-                    ERROR_CODE_FILTERING_NOT_IMPLEMENTED.getCode(),
-                    ERROR_CODE_FILTERING_NOT_IMPLEMENTED.getMessage(),
-                    ERROR_CODE_FILTERING_NOT_IMPLEMENTED.getDescription());
             throw new OrganizationManagementEndpointException(Response.Status.NOT_IMPLEMENTED, error);
         }
     }
