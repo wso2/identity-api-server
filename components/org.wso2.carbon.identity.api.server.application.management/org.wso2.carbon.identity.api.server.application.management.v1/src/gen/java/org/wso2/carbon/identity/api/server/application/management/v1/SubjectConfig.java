@@ -37,8 +37,6 @@ public class SubjectConfig  {
     private Boolean includeUserDomain;
     private Boolean includeTenantDomain;
     private Boolean useMappedLocalSubject;
-    private String subjectType;
-    private String sectorIdentifierUri;
 
     /**
     **/
@@ -112,42 +110,6 @@ public class SubjectConfig  {
         this.useMappedLocalSubject = useMappedLocalSubject;
     }
 
-    /**
-     **/
-    public SubjectConfig subjectType(String subjectType) {
-
-        this.subjectType = subjectType;
-        return this;
-    }
-
-    @ApiModelProperty(example = "false", value = "")
-    @JsonProperty("subjectType")
-    @Valid
-    public String getSubjectType() {
-        return subjectType;
-    }
-    public void setSubjectType(String subjectType) {
-        this.subjectType = subjectType;
-    }
-
-    /**
-     **/
-    public SubjectConfig sectorIdentifierUri(String sectorIdentifierUri) {
-
-        this.sectorIdentifierUri = sectorIdentifierUri;
-        return this;
-    }
-
-    @ApiModelProperty(example = "false", value = "")
-    @JsonProperty("sectorIdentifierUri")
-    @Valid
-    public String getSectorIdentifierUri() {
-        return sectorIdentifierUri;
-    }
-    public void setSectorIdentifierUri(String sectorIdentifierUri) {
-        this.sectorIdentifierUri = sectorIdentifierUri;
-    }
-
 
 
     @Override
@@ -163,14 +125,12 @@ public class SubjectConfig  {
         return Objects.equals(this.claim, subjectConfig.claim) &&
             Objects.equals(this.includeUserDomain, subjectConfig.includeUserDomain) &&
             Objects.equals(this.includeTenantDomain, subjectConfig.includeTenantDomain) &&
-            Objects.equals(this.useMappedLocalSubject, subjectConfig.useMappedLocalSubject) &&
-            Objects.equals(this.subjectType, subjectConfig.subjectType) &&
-            Objects.equals(this.sectorIdentifierUri, subjectConfig.sectorIdentifierUri);
+            Objects.equals(this.useMappedLocalSubject, subjectConfig.useMappedLocalSubject);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(claim, includeUserDomain, includeTenantDomain, useMappedLocalSubject, subjectType, sectorIdentifierUri);
+        return Objects.hash(claim, includeUserDomain, includeTenantDomain, useMappedLocalSubject);
     }
 
     @Override
@@ -183,8 +143,6 @@ public class SubjectConfig  {
         sb.append("    includeUserDomain: ").append(toIndentedString(includeUserDomain)).append("\n");
         sb.append("    includeTenantDomain: ").append(toIndentedString(includeTenantDomain)).append("\n");
         sb.append("    useMappedLocalSubject: ").append(toIndentedString(useMappedLocalSubject)).append("\n");
-        sb.append("    subjectType: ").append(toIndentedString(subjectType)).append("\n");
-        sb.append("    sectorIdentifierUri: ").append(toIndentedString(sectorIdentifierUri)).append("\n");
         sb.append("}");
         return sb.toString();
     }
