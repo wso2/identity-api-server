@@ -48,13 +48,13 @@ public class SMSSenderUpdateRequest  {
 
         private String value;
 
-        ContentTypeEnum(String v) {
-            value = v;
-        }
+    ContentTypeEnum(String v) {
+        value = v;
+    }
 
-        public String value() {
-            return value;
-        }
+    public String value() {
+        return value;
+    }
 
         @Override
         public String toString() {
@@ -103,11 +103,9 @@ public class SMSSenderUpdateRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "https://rest.nexmo.com/sms/json", required = true, value = "")
+    @ApiModelProperty(example = "https://rest.nexmo.com/sms/json", value = "")
     @JsonProperty("providerURL")
     @Valid
-    @NotNull(message = "Property providerURL cannot be null.")
-
     public String getProviderURL() {
         return providerURL;
     }

@@ -122,11 +122,9 @@ public class SMSSenderAdd  {
         return this;
     }
     
-    @ApiModelProperty(example = "https://rest.nexmo.com/sms/json", required = true, value = "")
+    @ApiModelProperty(example = "https://rest.nexmo.com/sms/json", value = "")
     @JsonProperty("providerURL")
     @Valid
-    @NotNull(message = "Property providerURL cannot be null.")
-
     public String getProviderURL() {
         return providerURL;
     }
