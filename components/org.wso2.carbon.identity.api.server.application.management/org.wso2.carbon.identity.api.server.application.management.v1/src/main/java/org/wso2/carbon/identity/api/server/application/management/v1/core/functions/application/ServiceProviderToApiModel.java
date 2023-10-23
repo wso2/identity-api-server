@@ -51,6 +51,7 @@ import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthent
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
+import org.wso2.carbon.identity.application.common.model.RoleV2;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
@@ -139,7 +140,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 break;
         }
         associatedRolesConfig.setAllowedAudience(allowedAudienceEnum);
-        application.getAssociatedRolesConfig().getRoles().forEach(role -> associatedRolesConfig.addRolesItem(
+        RoleV2[] roles = application.getAssociatedRolesConfig().getRoles();
+        Arrays.asList(roles).forEach(role -> associatedRolesConfig.addRolesItem(
                 new Role().id(role.getId()).name(role.getName())));
         return associatedRolesConfig;
     }

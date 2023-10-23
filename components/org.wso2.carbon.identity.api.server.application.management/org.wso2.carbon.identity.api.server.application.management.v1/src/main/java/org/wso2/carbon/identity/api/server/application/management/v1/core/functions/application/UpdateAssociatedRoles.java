@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
+import org.wso2.carbon.identity.application.common.model.RoleV2;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
 import java.util.List;
@@ -41,7 +42,7 @@ public class UpdateAssociatedRoles implements UpdateFunction<ServiceProvider, As
                     associatedRolesConfig.getRoles().stream()
                             .map(role -> new org.wso2.carbon.identity.application.common.model.RoleV2(role.getId()))
                             .collect(Collectors.toList());
-            rolesConfig.setRoles(listOfRoles);
+            rolesConfig.setRoles(listOfRoles.toArray(new RoleV2[0]));
         }
         serviceProvider.setAssociatedRolesConfig(rolesConfig);
     }

@@ -50,7 +50,8 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
         patchProvisioningConfiguration(applicationPatchModel.getProvisioningConfigurations(), serviceProvider);
     }
 
-    private void patchAssociatedRolesConfigurations(ServiceProvider serviceProvider, AssociatedRolesConfig associatedRoles) {
+    private void patchAssociatedRolesConfigurations(ServiceProvider serviceProvider,
+                                                    AssociatedRolesConfig associatedRoles) {
 
         if (associatedRoles != null) {
             new UpdateAssociatedRoles().apply(serviceProvider, associatedRoles);
