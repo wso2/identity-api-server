@@ -2963,11 +2963,11 @@ components:
       properties:
         allowedAudience:
           type: string
-          example: "organization"
+          example: "ORGANIZATION"
           enum:
-            - organization
-            - application
-          default: organization
+            - ORGANIZATION
+            - APPLICATION
+          default: ORGANIZATION
         roles:
           type: array
           items:

@@ -39,7 +39,8 @@ public class AssociatedRolesConfig  {
 @XmlType(name="AllowedAudienceEnum")
 @XmlEnum(String.class)
 public enum AllowedAudienceEnum {
-    @XmlEnumValue("organization") ORGANIZATION(String.valueOf("organization")), @XmlEnumValue("application") APPLICATION(String.valueOf("application"));
+
+    @XmlEnumValue("ORGANIZATION") ORGANIZATION(String.valueOf("ORGANIZATION")), @XmlEnumValue("APPLICATION") APPLICATION(String.valueOf("APPLICATION"));
 
 
     private String value;
@@ -79,7 +80,7 @@ public enum AllowedAudienceEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "organization", required = true, value = "")
+    @ApiModelProperty(example = "ORGANIZATION", required = true, value = "")
     @JsonProperty("allowedAudience")
     @Valid
     @NotNull(message = "Property allowedAudience cannot be null.")
