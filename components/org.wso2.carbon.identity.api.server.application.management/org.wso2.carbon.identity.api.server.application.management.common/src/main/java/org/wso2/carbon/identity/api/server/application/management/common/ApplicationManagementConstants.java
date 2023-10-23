@@ -51,6 +51,7 @@ public class ApplicationManagementConstants {
     public static final String NAME = "name";
     public static final String CLIENT_ID = "clientId";
     public static final String ISSUER = "issuer";
+    public static final String ROLE_ASSOCIATION_ALLOWED_AUDIENCE = "associatedRoles.allowedAudience";
     public static final String RBAC = "RBAC";
     public static final String NO_POLICY = "NO POLICY";
 

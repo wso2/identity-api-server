@@ -173,6 +173,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ROLE_ASSOCIATION_ALLOWED_AUDIENCE;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
@@ -227,6 +228,7 @@ public class ServerApplicationManagementService {
         SUPPORTED_REQUIRED_ATTRIBUTES.add(CLIENT_ID);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(TEMPLATE_ID);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(ISSUER);
+        SUPPORTED_REQUIRED_ATTRIBUTES.add(ROLE_ASSOCIATION_ALLOWED_AUDIENCE);
     }
 
     @Autowired
@@ -1627,6 +1629,10 @@ public class ServerApplicationManagementService {
             }
             if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(ISSUER))) {
                 applicationResponseModel.issuer(null);
+            }
+            if (requiredAttributes.stream()
+                    .noneMatch(attribute -> attribute.equals(ROLE_ASSOCIATION_ALLOWED_AUDIENCE))) {
+                applicationResponseModel.associatedRoles(null);
             }
             applicationListItems.add(new ApplicationInfoWithRequiredPropsToApiModel().apply(applicationResponseModel));
         }
