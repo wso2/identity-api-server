@@ -31,6 +31,10 @@ public class ExtensionMgtConstants {
 
     public static final String EXTENSION_MANAGEMENT_PREFIX = "EXT-";
 
+    public static final String KEY = "key";
+
+    public static final String VALUE = "value";
+
     /**
      * Enum for error messages.
      */

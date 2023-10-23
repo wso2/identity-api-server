@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.validation.constraints.*;
 
 
@@ -40,6 +41,8 @@ public class ExtensionListItem  {
     private String image;
     private Integer displayOrder;
     private List<String> tags = null;
+
+    private List<Map<String, Object>> customAttributes = null;
 
     private String category;
     private String type;
@@ -163,6 +166,32 @@ public class ExtensionListItem  {
 
         /**
     **/
+    public ExtensionListItem customAttributes(List<Map<String, Object>> customAttributes) {
+
+        this.customAttributes = customAttributes;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("customAttributes")
+    @Valid
+    public List<Map<String, Object>> getCustomAttributes() {
+        return customAttributes;
+    }
+    public void setCustomAttributes(List<Map<String, Object>> customAttributes) {
+        this.customAttributes = customAttributes;
+    }
+
+    public ExtensionListItem addCustomAttributesItem(Map<String, Object> customAttributesItem) {
+        if (this.customAttributes == null) {
+            this.customAttributes = new ArrayList<>();
+        }
+        this.customAttributes.add(customAttributesItem);
+        return this;
+    }
+
+        /**
+    **/
     public ExtensionListItem category(String category) {
 
         this.category = category;
@@ -233,6 +262,7 @@ public class ExtensionListItem  {
             Objects.equals(this.image, extensionListItem.image) &&
             Objects.equals(this.displayOrder, extensionListItem.displayOrder) &&
             Objects.equals(this.tags, extensionListItem.tags) &&
+            Objects.equals(this.customAttributes, extensionListItem.customAttributes) &&
             Objects.equals(this.category, extensionListItem.category) &&
             Objects.equals(this.type, extensionListItem.type) &&
             Objects.equals(this.self, extensionListItem.self);
@@ -240,7 +270,7 @@ public class ExtensionListItem  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, displayOrder, tags, category, type, self);
+        return Objects.hash(id, name, description, image, displayOrder, tags, customAttributes, category, type, self);
     }
 
     @Override
@@ -255,6 +285,7 @@ public class ExtensionListItem  {
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    displayOrder: ").append(toIndentedString(displayOrder)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
+        sb.append("    customAttributes: ").append(toIndentedString(customAttributes)).append("\n");
         sb.append("    category: ").append(toIndentedString(category)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
