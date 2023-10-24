@@ -2622,6 +2622,8 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to for B2B self service
+        associatedRoles:
+          $ref: '#/components/schemas/AssociatedRolesConfig'
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocolConfiguration:
@@ -2632,7 +2634,6 @@ components:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
           $ref: '#/components/schemas/ProvisioningConfiguration'
-
     ApplicationResponseModel:
       type: object
       required:
@@ -2671,6 +2672,8 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to for B2B self service
+        associatedRoles:
+          $ref: '#/components/schemas/AssociatedRolesConfig'
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocols:
@@ -2706,6 +2709,8 @@ components:
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
+        associatedRoles:
+          $ref: '#/components/schemas/AssociatedRolesConfig'
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         authenticationSequence:
@@ -2951,6 +2956,33 @@ components:
         applicationRole:
           type: string
           example: Administrator
+    AssociatedRolesConfig:
+      type: object
+      required:
+        - allowedAudience
+      properties:
+        allowedAudience:
+          type: string
+          example: "ORGANIZATION"
+          enum:
+            - ORGANIZATION
+            - APPLICATION
+          default: ORGANIZATION
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+    Role:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          example: "bf5abd05-3667-4a2a-a6c2-2fb9f4d26e47"
+        name:
+          type: string
+          example: "RoleA"
     RequestedClaimConfiguration:
       type: object
       required:
