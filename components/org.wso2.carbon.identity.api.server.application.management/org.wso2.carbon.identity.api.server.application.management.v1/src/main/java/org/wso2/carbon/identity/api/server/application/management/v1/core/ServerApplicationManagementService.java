@@ -121,6 +121,7 @@ import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceCli
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
 import org.wso2.carbon.identity.oauth.dao.OAuthAppDO;
+import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
 import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
@@ -175,6 +176,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildForbiddenError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthKey;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthenticationRequestConfig;
@@ -843,12 +845,16 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         if (applicationPatchModel != null) {
+            if (applicationPatchModel.getName() != null && !applicationPatchModel.getName().equals(appToUpdate
+                    .getApplicationName())) {
+                validateApplicationNameUpdateEligibility(tenantDomain);
+            }
             new UpdateServiceProvider().apply(appToUpdate, applicationPatchModel);
         }
 
         try {
-            String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String username = ContextLoader.getUsernameFromContext();
             getApplicationManagementService()
                     .updateApplicationByResourceId(applicationId, appToUpdate, tenantDomain, username);
@@ -1689,7 +1695,6 @@ public class ServerApplicationManagementService {
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String username = ContextLoader.getUsernameFromContext();
-
             getApplicationManagementService().updateApplicationByResourceId(
                     applicationId, updatedApplication, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
@@ -1761,7 +1766,7 @@ public class ServerApplicationManagementService {
         String code = ERROR_APPLICATION_LIMIT_REACHED.getCode();
         String message = ERROR_APPLICATION_LIMIT_REACHED.getMessage();
         String description = ERROR_APPLICATION_LIMIT_REACHED.getDescription();
-        return Utils.buildForbiddenError(code, message, description);
+        return buildForbiddenError(code, message, description);
     }
 
     private String getErrorCode(IdentityApplicationManagementException e, String defaultErrorCode) {
@@ -1892,5 +1897,25 @@ public class ServerApplicationManagementService {
         return Utils.buildConflictError(ErrorMessage.API_RESOURCE_ALREADY_AUTHORIZED.getCode(),
                 ErrorMessage.API_RESOURCE_ALREADY_AUTHORIZED.getMessage(),
                 String.format(ErrorMessage.API_RESOURCE_ALREADY_AUTHORIZED.getDescription(), apiId, appId));
+    }
+
+    private void validateApplicationNameUpdateEligibility(String tenantDomain) {
+
+        try {
+            boolean isSubOrganization =
+                    org.wso2.carbon.identity.organization.management.service.util.OrganizationManagementUtil.
+                            isOrganization(tenantDomain);
+            if (isSubOrganization) {
+                throw buildForbiddenError(
+                        ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_APPLICATION_NAME_UPDATE.getCode(),
+                        ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_APPLICATION_NAME_UPDATE.getMessage(),
+                        ErrorMessage.ERROR_CODE_UNAUTHORIZED_ORG_FOR_APPLICATION_NAME_UPDATE.getDescription());
+            }
+        } catch (OrganizationManagementException e) {
+            throw Utils.buildServerError(ErrorMessage.ERROR_CODE_ERROR_RESOLVING_ORGANIZATION.getCode(),
+                    ErrorMessage.ERROR_CODE_ERROR_RESOLVING_ORGANIZATION.getMessage(),
+                    ErrorMessage.ERROR_CODE_ERROR_RESOLVING_ORGANIZATION.getDescription());
+
+        }
     }
 }

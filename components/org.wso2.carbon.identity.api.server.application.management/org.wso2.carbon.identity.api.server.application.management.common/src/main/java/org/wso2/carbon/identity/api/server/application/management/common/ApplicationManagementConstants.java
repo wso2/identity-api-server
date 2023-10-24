@@ -151,7 +151,12 @@ public class ApplicationManagementConstants {
         ERROR_RETRIEVING_USER_BY_ID("65503", "Error occurred while retrieving user",
                 "Error occurred while retrieving user by userid: %s."),
         ERROR_RETRIEVING_USERSTORE_MANAGER("65504", "Error retrieving userstore manager.",
-                "Error occurred while retrieving userstore manager.");
+                "Error occurred while retrieving userstore manager."),
+        ERROR_CODE_UNAUTHORIZED_ORG_FOR_APPLICATION_NAME_UPDATE("65505", "Application name modification is not " +
+                "allowed for this organization.", "Unable to execute the requested organization application " +
+                "name update."),
+        ERROR_CODE_ERROR_RESOLVING_ORGANIZATION("65506", "Error resolving organization",
+                "Unable to resolve organization.");
 
         private final String code;
         private final String message;
