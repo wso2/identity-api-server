@@ -28,7 +28,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RefreshToke
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectEncryptionConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
-import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.util.ArrayList;
@@ -88,9 +87,6 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
 
     private AccessTokenConfiguration buildTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
 
-        if (oAuthConsumerAppDTO.getTlsClientCertificateBoundAccessTokens()) {
-            oAuthConsumerAppDTO.setTokenBindingType(Constants.TLS_CLIENT_CERTIFICATE_BINDING_TYPE);
-        }
         return new AccessTokenConfiguration()
                 .type(oAuthConsumerAppDTO.getTokenType())
                 .userAccessTokenExpiryInSeconds(oAuthConsumerAppDTO.getUserAccessTokenExpiryTime())

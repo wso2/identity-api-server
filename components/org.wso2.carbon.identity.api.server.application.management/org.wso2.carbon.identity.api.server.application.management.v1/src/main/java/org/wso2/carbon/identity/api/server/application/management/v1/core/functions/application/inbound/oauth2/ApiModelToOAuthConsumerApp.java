@@ -28,7 +28,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RefreshToke
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
-import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
@@ -143,12 +142,6 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             consumerAppDTO.setTokenType(accessToken.getType());
             consumerAppDTO.setUserAccessTokenExpiryTime(accessToken.getUserAccessTokenExpiryInSeconds());
             consumerAppDTO.setApplicationAccessTokenExpiryTime(accessToken.getApplicationAccessTokenExpiryInSeconds());
-            if (Constants.TLS_CLIENT_CERTIFICATE_BINDING_TYPE.equals(accessToken.getBindingType())) {
-                consumerAppDTO.setTlsClientCertificateBoundAccessTokens(true);
-                accessToken.setBindingType("None");
-            } else {
-                consumerAppDTO.setTlsClientCertificateBoundAccessTokens(false);
-            }
             consumerAppDTO.setTokenBindingType(accessToken.getBindingType());
             if (accessToken.getRevokeTokensWhenIDPSessionTerminated() != null) {
                 consumerAppDTO.setTokenRevocationWithIDPSessionTerminationEnabled(accessToken
