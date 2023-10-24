@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
@@ -23,6 +24,11 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Provisionin
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
@@ -44,6 +50,7 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
         patchAuthenticationSequence(applicationPatchModel.getAuthenticationSequence(), serviceProvider);
         patchAdvancedConfiguration(serviceProvider, applicationPatchModel.getAdvancedConfigurations());
         patchProvisioningConfiguration(applicationPatchModel.getProvisioningConfigurations(), serviceProvider);
+        patchFapiStatusToApplication(applicationPatchModel.getIsFapiApplication(), serviceProvider);
     }
 
     private void patchClaimConfiguration(ServiceProvider serviceProvider, ClaimConfiguration claimConfiguration) {
@@ -75,5 +82,21 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
         if (provisioningConfigurations != null) {
             new UpdateProvisioningConfiguration().apply(serviceProvider, provisioningConfigurations);
         }
+    }
+
+    private void patchFapiStatusToApplication(boolean isFapiApplication, ServiceProvider application) {
+
+        List<ServiceProviderProperty> spProperties = new ArrayList<>(Arrays.asList(application.getSpProperties()));
+        for (ServiceProviderProperty spProperty: spProperties) {
+            if (spProperty.getName().equals(ApplicationManagementConstants.IS_FAPI_CONFORMANT)) {
+                spProperty.setValue(String.valueOf(isFapiApplication));
+                return;
+            }
+        }
+        ServiceProviderProperty serviceProviderProperty = new ServiceProviderProperty();
+        serviceProviderProperty.setName(ApplicationManagementConstants.IS_FAPI_CONFORMANT);
+        serviceProviderProperty.setValue(String.valueOf(isFapiApplication));
+        spProperties.add(serviceProviderProperty);
+        application.setSpProperties(spProperties.toArray(new ServiceProviderProperty[0]));
     }
 }

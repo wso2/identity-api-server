@@ -2622,6 +2622,10 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to for B2B self service
+        isFapiApplication:
+          type: boolean
+          example: false
+          description: Whether the application should support FAPI conformance
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocolConfiguration:
@@ -2671,6 +2675,10 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to for B2B self service
+        isFapiApplication:
+          type: boolean
+          example: false
+          description: Whether the application should support FAPI conformance
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocols:
@@ -2706,6 +2714,10 @@ components:
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
+        isFapiApplication:
+          type: boolean
+          example: false
+          description: Whether the application should support FAPI conformance
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         authenticationSequence:
