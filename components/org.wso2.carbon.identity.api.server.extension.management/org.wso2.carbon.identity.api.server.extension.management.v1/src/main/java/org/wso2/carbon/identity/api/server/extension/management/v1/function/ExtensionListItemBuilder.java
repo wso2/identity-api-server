@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.extension.management.v1.function;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.extension.management.common.utils.ExtensionMgtUtils;
 import org.wso2.carbon.identity.api.server.extension.management.v1.model.ExtensionListItem;
 import org.wso2.carbon.identity.extension.mgt.model.ExtensionInfo;
@@ -28,6 +30,8 @@ import java.util.function.Function;
  * Converts a {@link ExtensionInfo} to a {@link ExtensionListItem}.
  */
 public class ExtensionListItemBuilder implements Function<ExtensionInfo, ExtensionListItem> {
+
+    private static final Log log = LogFactory.getLog(ExtensionListItemBuilder.class);
 
     @Override
     public ExtensionListItem apply(ExtensionInfo extensionInfo) {
@@ -43,6 +47,9 @@ public class ExtensionListItemBuilder implements Function<ExtensionInfo, Extensi
         extensionListItem.setType(extensionInfo.getType());
         extensionListItem.setSelf(ExtensionMgtUtils.getExtensionInfoLocation(extensionInfo.getType(),
                 extensionInfo.getId()));
+        if (extensionInfo.getCustomAttributes() != null) {
+            extensionListItem.setCustomAttributes(extensionInfo.getCustomAttributes());
+        }
         return extensionListItem;
     }
 }

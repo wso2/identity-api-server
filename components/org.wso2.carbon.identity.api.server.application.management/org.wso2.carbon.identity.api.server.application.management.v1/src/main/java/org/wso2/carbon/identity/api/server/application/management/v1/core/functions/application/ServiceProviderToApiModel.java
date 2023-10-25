@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2023, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
@@ -23,6 +25,7 @@ import org.wso2.carbon.identity.api.server.application.management.common.Applica
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationStepModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.Authenticator;
@@ -33,6 +36,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappin
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.Role;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
@@ -48,6 +52,7 @@ import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthent
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
+import org.wso2.carbon.identity.application.common.model.RoleV2;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
@@ -107,6 +112,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .issuer(getInboundKey(application, "samlsso"))
                     .templateId(application.getTemplateId())
                     .isManagementApp(application.isManagementApp())
+                    .associatedRoles(buildAssociatedRoles(application))
                     .claimConfiguration(buildClaimConfiguration(application))
                     .inboundProtocols(buildInboundProtocols(application))
                     .advancedConfigurations(buildAdvancedAppConfiguration(application))
@@ -115,6 +121,31 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .access(getAccess(application.getApplicationName()))
                     .isFapiApplication(getIsFapiApplication(application));
         }
+    }
+
+    private AssociatedRolesConfig buildAssociatedRoles(ServiceProvider application) {
+
+        AssociatedRolesConfig associatedRolesConfig = new AssociatedRolesConfig();
+        if (application.getAssociatedRolesConfig() == null) {
+            associatedRolesConfig.setAllowedAudience(AssociatedRolesConfig.AllowedAudienceEnum.ORGANIZATION);
+            return associatedRolesConfig;
+        }
+
+        String allowedAudience = application.getAssociatedRolesConfig().getAllowedAudience();
+        AssociatedRolesConfig.AllowedAudienceEnum allowedAudienceEnum;
+        switch (allowedAudience) {
+            case "application":
+                allowedAudienceEnum = AssociatedRolesConfig.AllowedAudienceEnum.APPLICATION;
+                break;
+            default:
+                allowedAudienceEnum = AssociatedRolesConfig.AllowedAudienceEnum.ORGANIZATION;
+                break;
+        }
+        associatedRolesConfig.setAllowedAudience(allowedAudienceEnum);
+        RoleV2[] roles = application.getAssociatedRolesConfig().getRoles();
+        Arrays.asList(roles).forEach(role -> associatedRolesConfig.addRolesItem(
+                new Role().id(role.getId()).name(role.getName())));
+        return associatedRolesConfig;
     }
 
     private List<InboundProtocolListItem> buildInboundProtocols(ServiceProvider application) {

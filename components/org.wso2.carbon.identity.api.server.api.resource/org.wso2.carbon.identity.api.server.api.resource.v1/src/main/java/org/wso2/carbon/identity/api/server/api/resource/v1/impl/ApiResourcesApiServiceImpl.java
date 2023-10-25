@@ -96,9 +96,9 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     }
 
     @Override
-    public Response getAPIResources(String before, String after, String filter, Integer limit, String sortOrder) {
+    public Response getAPIResources(String before, String after, String filter, Integer limit, String attributes) {
 
-        return Response.ok().entity(serverAPIResourceManagementService.getAPIResources(before, after, filter, limit))
-                .build();
+        return Response.ok().entity(serverAPIResourceManagementService.getAPIResources(before, after, filter, limit,
+                attributes)).build();
     }
 }

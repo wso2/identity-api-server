@@ -32,6 +32,7 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceListRespon
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
 import org.wso2.carbon.identity.api.server.api.resource.v1.PaginationLink;
+import org.wso2.carbon.identity.api.server.api.resource.v1.Property;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
@@ -40,12 +41,14 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.util.APIResourceMgtEn
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.common.model.APIResource;
+import org.wso2.carbon.identity.application.common.model.APIResourceProperty;
 import org.wso2.carbon.identity.application.common.model.Scope;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -99,7 +102,8 @@ public class ServerAPIResourceManagementService {
      * @param filter filter parameter.
      * @return Response with API Resources list.
      */
-    public APIResourceListResponse getAPIResources(String before, String after, String filter, Integer limit) {
+    public APIResourceListResponse getAPIResources(String before, String after, String filter, Integer limit,
+                                                   String requiredAttributes) {
 
         APIResourceListResponse apiResourceListResponse = new APIResourceListResponse();
 
@@ -116,9 +120,23 @@ public class ServerAPIResourceManagementService {
             // Set the pagination sort order.
             String paginationSortOrder = StringUtils.isNotBlank(before) ? DESC_SORT_ORDER : ASC_SORT_ORDER;
 
-            APIResourceSearchResult apiResourceSearchResult = APIResourceManagementServiceHolder.getApiResourceManager()
-                    .getAPIResources(before, after, limit + 1, filter, paginationSortOrder,
-                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            // Validate the required attributes.
+            List<String> requestedAttributeList = new ArrayList<>();
+            if (StringUtils.isNotEmpty(requiredAttributes)) {
+                requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
+                validateRequiredAttributes(requestedAttributeList);
+            }
+
+            APIResourceSearchResult apiResourceSearchResult;
+            if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
+                apiResourceSearchResult = APIResourceManagementServiceHolder.getApiResourceManager()
+                        .getAPIResourcesWithRequiredAttributes(before, after, limit + 1, filter, paginationSortOrder,
+                                CarbonContext.getThreadLocalCarbonContext().getTenantDomain(), requestedAttributeList);
+            } else {
+                apiResourceSearchResult = APIResourceManagementServiceHolder.getApiResourceManager()
+                        .getAPIResources(before, after, limit + 1, filter, paginationSortOrder,
+                                CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            }
             List<APIResource> apiResources = apiResourceSearchResult.getAPIResources();
 
             if (CollectionUtils.isNotEmpty(apiResources)) {
@@ -360,7 +378,22 @@ public class ServerAPIResourceManagementService {
                 .description(apiResource.getDescription())
                 .scopes(apiResource.getScopes().stream().map(this::buildScopeGetResponse)
                         .collect(Collectors.toList()))
-                .requiresAuthorization(apiResource.isAuthorizationRequired());
+                .requiresAuthorization(apiResource.isAuthorizationRequired())
+                .properties(apiResource.getProperties().stream().map(this::buildAPIResourceProperty)
+                           .collect(Collectors.toList()));
+    }
+
+    /**
+     * Build Property from APIResourceProperty.
+     *
+     * @param apiResourceProperty APIResourceProperty object.
+     * @return Property object.
+     */
+    private Property buildAPIResourceProperty(APIResourceProperty apiResourceProperty) {
+
+        return new Property()
+                .name(apiResourceProperty.getName())
+                .value(apiResourceProperty.getValue());
     }
 
     /**
@@ -432,12 +465,17 @@ public class ServerAPIResourceManagementService {
      */
     private APIResourceListItem buildAPIResourceListItem(APIResource apiResource) {
 
+        List<Property> properties = apiResource.getProperties() != null ?
+                apiResource.getProperties().stream().map(this::buildAPIResourceProperty).collect(Collectors.toList()) :
+                null;
+
         return new APIResourceListItem()
                 .id(apiResource.getId())
                 .name(apiResource.getName())
                 .identifier(apiResource.getIdentifier())
                 .type(apiResource.getType())
                 .requiresAuthorization(apiResource.isAuthorizationRequired())
+                .properties(properties)
                 .self(V1_API_PATH_COMPONENT + APIResourceMgtEndpointConstants.API_RESOURCE_PATH_COMPONENT + "/"
                         + apiResource.getId());
     }
@@ -472,6 +510,22 @@ public class ServerAPIResourceManagementService {
                     ErrorMessage.ERROR_CODE_INVALID_LIMIT);
         }
         return limit;
+    }
+
+    /**
+     * Validate required attributes.
+     *
+     * @param requiredAttributeList Requested attribute list.
+     * @throws APIError if the requested attributes are invalid.
+     */
+    private void validateRequiredAttributes(List<String> requiredAttributeList) throws APIError {
+
+        for (String attribute : requiredAttributeList) {
+            if (!(APIResourceMgtEndpointConstants.SUPPORTED_REQUIRED_ATTRIBUTES.contains(attribute))) {
+                throw APIResourceMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                        ErrorMessage.ERROR_CODE_INVALID_REQ_ATTRIBUTES);
+            }
+        }
     }
 
     /**

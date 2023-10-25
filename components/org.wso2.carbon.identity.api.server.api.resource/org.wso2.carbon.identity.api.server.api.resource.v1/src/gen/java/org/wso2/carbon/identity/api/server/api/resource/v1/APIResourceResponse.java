@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.api.resource.v1.Property;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.SubscribedApplicationGetModel;
 import javax.validation.constraints.*;
@@ -45,6 +46,8 @@ public class APIResourceResponse  {
     private List<ScopeGetModel> scopes = null;
 
     private List<SubscribedApplicationGetModel> subscribedApplications = null;
+
+    private List<Property> properties = null;
 
     private String self;
 
@@ -216,6 +219,32 @@ public class APIResourceResponse  {
 
         /**
     **/
+    public APIResourceResponse properties(List<Property> properties) {
+
+        this.properties = properties;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("properties")
+    @Valid
+    public List<Property> getProperties() {
+        return properties;
+    }
+    public void setProperties(List<Property> properties) {
+        this.properties = properties;
+    }
+
+    public APIResourceResponse addPropertiesItem(Property propertiesItem) {
+        if (this.properties == null) {
+            this.properties = new ArrayList<Property>();
+        }
+        this.properties.add(propertiesItem);
+        return this;
+    }
+
+        /**
+    **/
     public APIResourceResponse self(String self) {
 
         this.self = self;
@@ -254,12 +283,13 @@ public class APIResourceResponse  {
             Objects.equals(this.requiresAuthorization, apIResourceResponse.requiresAuthorization) &&
             Objects.equals(this.scopes, apIResourceResponse.scopes) &&
             Objects.equals(this.subscribedApplications, apIResourceResponse.subscribedApplications) &&
+            Objects.equals(this.properties, apIResourceResponse.properties) &&
             Objects.equals(this.self, apIResourceResponse.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, identifier, type, requiresAuthorization, scopes, subscribedApplications, self);
+        return Objects.hash(id, name, description, identifier, type, requiresAuthorization, scopes, subscribedApplications, properties, self);
     }
 
     @Override
@@ -276,6 +306,7 @@ public class APIResourceResponse  {
         sb.append("    requiresAuthorization: ").append(toIndentedString(requiresAuthorization)).append("\n");
         sb.append("    scopes: ").append(toIndentedString(scopes)).append("\n");
         sb.append("    subscribedApplications: ").append(toIndentedString(subscribedApplications)).append("\n");
+        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();

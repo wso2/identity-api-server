@@ -53,6 +53,7 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.util.Organ
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.organization.discovery.service.OrganizationDiscoveryManager;
 import org.wso2.carbon.identity.organization.discovery.service.model.OrgDiscoveryAttribute;
+import org.wso2.carbon.identity.organization.discovery.service.model.OrganizationDiscovery;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
 import org.wso2.carbon.identity.organization.management.application.model.SharedApplication;
 import org.wso2.carbon.identity.organization.management.service.OrganizationManager;
@@ -75,7 +76,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -84,12 +84,10 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.ASC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DESC_SORT_ORDER;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL;
-import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_FILTERING_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_EMPTY_REQUEST_BODY;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
-import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.SUPER;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.buildURIForBody;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.generateUniqueID;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.getOrganizationId;
@@ -475,30 +473,30 @@ public class OrganizationManagementService {
     /**
      * Returns the discovery attributes of the organizations.
      *
-     * @param filter The filter string. **Not supported at the moment.**
+     * @param filter The filter string.
      * @param offset The offset to be used with the limit parameter. **Not supported at the moment.**
      * @param limit  The items per page. **Not supported at the moment.**
      * @return The discovery attributes of the organizations in the hierarchy under the root organization.
      */
     public Response getOrganizationsDiscoveryAttributes(String filter, Integer offset, Integer limit) {
 
-        handleNotImplementedCapabilities(filter, offset, limit);
+        handleNotImplementedCapabilities(offset, limit);
         try {
-            Map<String, List<OrgDiscoveryAttribute>> organizationsDiscoveryAttributes =
-                    getOrganizationDiscoveryManager().getOrganizationsDiscoveryAttributes();
+            List<OrganizationDiscovery> organizationsDiscoveryAttributes =
+                    getOrganizationDiscoveryManager().getOrganizationsDiscoveryAttributes(filter);
             OrganizationsDiscoveryResponse response = new OrganizationsDiscoveryResponse();
-            organizationsDiscoveryAttributes.forEach((key, value) -> {
+            for (OrganizationDiscovery organizationDiscovery : organizationsDiscoveryAttributes) {
                 OrganizationDiscoveryResponse organizationDiscoveryResponse = new OrganizationDiscoveryResponse();
-                organizationDiscoveryResponse.setOrganizationId(key);
-                value.forEach(orgDiscoveryAttribute -> {
+                organizationDiscoveryResponse.setOrganizationId(organizationDiscovery.getOrganizationId());
+                organizationDiscoveryResponse.setOrganizationName(organizationDiscovery.getOrganizationName());
+                organizationDiscovery.getDiscoveryAttributes().forEach(orgDiscoveryAttribute -> {
                     DiscoveryAttribute organizationDiscoveryAttributeResponse = new DiscoveryAttribute();
                     organizationDiscoveryAttributeResponse.setType(orgDiscoveryAttribute.getType());
                     organizationDiscoveryAttributeResponse.setValues(orgDiscoveryAttribute.getValues());
                     organizationDiscoveryResponse.addAttributesItem(organizationDiscoveryAttributeResponse);
-
                 });
                 response.addOrganizationsItem(organizationDiscoveryResponse);
-            });
+            }
             return Response.ok(response).build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -570,8 +568,6 @@ public class OrganizationManagementService {
         String parentId = organizationPOSTRequest.getParentId();
         if (StringUtils.isNotBlank(parentId)) {
             organization.getParent().setId(parentId);
-        } else {
-            organization.getParent().setId(SUPER);
         }
         List<Attribute> organizationAttributes = organizationPOSTRequest.getAttributes();
         if (CollectionUtils.isNotEmpty(organizationAttributes)) {
@@ -871,20 +867,13 @@ public class OrganizationManagementService {
                 }).collect(Collectors.toList());
     }
 
-    private void handleNotImplementedCapabilities(String filter, Integer offset, Integer limit) {
+    private void handleNotImplementedCapabilities(Integer offset, Integer limit) {
 
         if (limit != null || offset != null) {
             Error error = OrganizationManagementEndpointUtil.getError(
                     ERROR_CODE_PAGINATION_NOT_IMPLEMENTED.getCode(),
                     ERROR_CODE_PAGINATION_NOT_IMPLEMENTED.getMessage(),
                     ERROR_CODE_PAGINATION_NOT_IMPLEMENTED.getDescription());
-            throw new OrganizationManagementEndpointException(Response.Status.NOT_IMPLEMENTED, error);
-        }
-        if (filter != null) {
-            Error error = OrganizationManagementEndpointUtil.getError(
-                    ERROR_CODE_FILTERING_NOT_IMPLEMENTED.getCode(),
-                    ERROR_CODE_FILTERING_NOT_IMPLEMENTED.getMessage(),
-                    ERROR_CODE_FILTERING_NOT_IMPLEMENTED.getDescription());
             throw new OrganizationManagementEndpointException(Response.Status.NOT_IMPLEMENTED, error);
         }
     }

@@ -884,7 +884,6 @@ components:
           type: string
           example: "b4526d91-a8bf-43d2-8b14-c548cf73065b"
           description: "If the parentId is not present, Super will be taken as the parent organization."
-          default: "10084a8d-113f-4211-a0d5-efe36b082211"
         attributes:
           type: array
           items:
@@ -1230,12 +1229,17 @@ components:
       type: object
       required:
         - organizationId
+        - organizationName
         - attributes
       properties:
         organizationId:
           type: string
           description: The ID of the organization.
           example: '06c1f4e2-3339-44e4-a825-96585e3653b1'
+        organizationName:
+          type: string
+          description: The name of the organization.
+          example: 'ABC Builders'
         attributes:
           type: array
           items:
