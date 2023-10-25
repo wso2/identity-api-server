@@ -213,7 +213,6 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
 
             consumerAppDTO.setRequestObjectEncryptionAlgorithm(requestObject.getEncryption().getAlgorithm());
             consumerAppDTO.setRequestObjectEncryptionMethod(requestObject.getEncryption().getMethod());
-            consumerAppDTO.setRequestObjectSignatureValidationEnabled(requestObject.getRequireSignedRequestObject());
             consumerAppDTO.setRequestObjectSignatureAlgorithm(requestObject.getRequestObjectSigningAlg());
         }
     }

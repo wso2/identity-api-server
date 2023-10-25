@@ -3381,9 +3381,6 @@ components:
     RequestObjectConfiguration:
       type: object
       properties:
-        requireSignedRequestObject:
-          type: boolean
-          example: false
         requestObjectSigningAlg:
           type: string
           example: 'PS256'

@@ -169,7 +169,6 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
 
         return new RequestObjectConfiguration()
                 .requestObjectSigningAlg(oAuthConsumerAppDTO.getRequestObjectSignatureAlgorithm())
-                .requireSignedRequestObject(oAuthConsumerAppDTO.isRequestObjectSignatureValidationEnabled())
                 .encryption(buildRequestObjectEncryptionConfiguration(oAuthConsumerAppDTO));
     }
 

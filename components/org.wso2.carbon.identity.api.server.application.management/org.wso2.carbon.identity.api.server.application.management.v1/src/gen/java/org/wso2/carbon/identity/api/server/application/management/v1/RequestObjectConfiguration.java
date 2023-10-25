@@ -9,7 +9,6 @@ import java.util.Objects;
 public class RequestObjectConfiguration {
 
     private String requestObjectSigningAlg;
-    private Boolean requireSignedRequestObject;
 
     private RequestObjectEncryptionConfiguration encryption;
 
@@ -29,24 +28,6 @@ public class RequestObjectConfiguration {
     }
     public void setRequestObjectSigningAlg(String requestObjectSigningAlg) {
         this.requestObjectSigningAlg = requestObjectSigningAlg;
-    }
-
-    /**
-     **/
-    public RequestObjectConfiguration requireSignedRequestObject(Boolean requireSignedRequestObject) {
-
-        this.requireSignedRequestObject = requireSignedRequestObject;
-        return this;
-    }
-
-    @ApiModelProperty(example = "false", value = "")
-    @JsonProperty("requireSignedRequestObject")
-    @Valid
-    public Boolean getRequireSignedRequestObject() {
-        return requireSignedRequestObject;
-    }
-    public void setRequireSignedRequestObject(Boolean requireSignedRequestObject) {
-        this.requireSignedRequestObject = requireSignedRequestObject;
     }
 
     /**
@@ -78,13 +59,12 @@ public class RequestObjectConfiguration {
         }
         RequestObjectConfiguration requestObjectConfiguration = (RequestObjectConfiguration) o;
         return Objects.equals(this.requestObjectSigningAlg, requestObjectConfiguration.requestObjectSigningAlg) &&
-            Objects.equals(this.requireSignedRequestObject, requestObjectConfiguration.requireSignedRequestObject) &&
             Objects.equals(this.encryption, requestObjectConfiguration.encryption);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestObjectSigningAlg, requireSignedRequestObject, encryption);
+        return Objects.hash(requestObjectSigningAlg, encryption);
     }
 
     @Override
@@ -94,7 +74,6 @@ public class RequestObjectConfiguration {
         sb.append("class RequestObjectConfiguration {\n");
 
         sb.append("    requestObjectSigningAlg: ").append(toIndentedString(requestObjectSigningAlg)).append("\n");
-        sb.append("    requireSignedRequestObject: ").append(toIndentedString(requireSignedRequestObject)).append("\n");
         sb.append("    encryption: ").append(toIndentedString(encryption)).append("\n");
         sb.append("}");
         return sb.toString();
