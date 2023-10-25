@@ -145,6 +145,13 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     @Override
     public Response deleteCustomText(String type, String name, String locale, String screen) {
 
+        if (StringUtils.isBlank(type) && StringUtils.isBlank(screen) && StringUtils.isBlank(name) &&
+                StringUtils.isBlank(locale)) {
+            // Delete all custom text preferences if no query parameter was specified.
+            brandingPreferenceManagementService.deleteAllCustomTextPreferences();
+            return Response.noContent().build();
+        }
+
         if (StringUtils.isBlank(type)) {
             type = ORGANIZATION_TYPE;
         } else if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
