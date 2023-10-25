@@ -20,7 +20,6 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
@@ -118,8 +117,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .advancedConfigurations(buildAdvancedAppConfiguration(application))
                     .provisioningConfigurations(buildProvisioningConfiguration(application))
                     .authenticationSequence(buildAuthenticationSequence(application))
-                    .access(getAccess(application.getApplicationName()))
-                    .isFapiApplication(getIsFapiApplication(application));
+                    .access(getAccess(application.getApplicationName()));
         }
     }
 
@@ -513,17 +511,5 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         }
 
         return StringUtils.EMPTY;
-    }
-
-    private boolean getIsFapiApplication(ServiceProvider application) {
-
-        boolean isFapiApplication = false;
-        List<ServiceProviderProperty> spProperties = Arrays.asList(application.getSpProperties());
-        for (ServiceProviderProperty spProperty : spProperties) {
-            if (spProperty.getName().equals(ApplicationManagementConstants.IS_FAPI_CONFORMANT)) {
-                isFapiApplication = Boolean.parseBoolean(spProperty.getValue());
-            }
-        }
-        return isFapiApplication;
     }
 }

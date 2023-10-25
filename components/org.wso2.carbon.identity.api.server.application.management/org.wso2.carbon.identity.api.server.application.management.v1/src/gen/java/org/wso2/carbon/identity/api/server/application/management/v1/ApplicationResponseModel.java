@@ -50,7 +50,6 @@ public class ApplicationResponseModel  {
     private String templateId;
     private Boolean isManagementApp;
     private Boolean isB2BSelfServiceApp;
-    private Boolean isFapiApplication;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
     private List<InboundProtocolListItem> inboundProtocols = null;
@@ -412,24 +411,6 @@ public enum AccessEnum {
         this.access = access;
     }
 
-    /**
-     **/
-    public ApplicationResponseModel isFapiApplication(Boolean isFapiApplication) {
-
-        this.isFapiApplication = isFapiApplication;
-        return this;
-    }
-
-    @ApiModelProperty(value = "")
-    @JsonProperty("isFapiApplication")
-    @Valid
-    public Boolean getIsFapiApplication() {
-        return isFapiApplication;
-    }
-    public void setIsFapiApplication(Boolean isFapiApplication) {
-        this.isFapiApplication = isFapiApplication;
-    }
-
 
 
     @Override
@@ -452,7 +433,6 @@ public enum AccessEnum {
             Objects.equals(this.templateId, applicationResponseModel.templateId) &&
             Objects.equals(this.isManagementApp, applicationResponseModel.isManagementApp) &&
             Objects.equals(this.isB2BSelfServiceApp, applicationResponseModel.isB2BSelfServiceApp) &&
-            Objects.equals(this.isFapiApplication, applicationResponseModel.isFapiApplication) &&
             Objects.equals(this.associatedRoles, applicationResponseModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationResponseModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocols, applicationResponseModel.inboundProtocols) &&
@@ -464,7 +444,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, isB2BSelfServiceApp, isFapiApplication, associatedRoles, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, isB2BSelfServiceApp, associatedRoles, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
     }
 
     @Override
@@ -483,7 +463,6 @@ public enum AccessEnum {
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
-        sb.append("    isFapiApplication: ").append(toIndentedString(isFapiApplication)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocols: ").append(toIndentedString(inboundProtocols)).append("\n");

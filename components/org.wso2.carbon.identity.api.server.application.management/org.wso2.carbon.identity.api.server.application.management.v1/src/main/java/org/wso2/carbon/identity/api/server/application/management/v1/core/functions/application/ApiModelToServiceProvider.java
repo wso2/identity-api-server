@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
-import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
@@ -28,11 +27,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Provisionin
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.UpdateInboundProtocols;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
-import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
@@ -62,8 +57,6 @@ public class ApiModelToServiceProvider implements Function<ApplicationModel, Ser
         addProvisioningConfiguration(application, applicationModel.getProvisioningConfigurations());
         addInboundAuthenticationProtocolsToApplication(application, applicationModel.getInboundProtocolConfiguration());
         addAssociatedRolesConfigurations(application, applicationModel.getAssociatedRoles());
-        addFapiStatusToApplication(application, applicationModel.getIsFapiApplication());
-
         return application;
     }
 
@@ -110,21 +103,5 @@ public class ApiModelToServiceProvider implements Function<ApplicationModel, Ser
         if (advancedApplicationConfig != null) {
             new UpdateAdvancedConfigurations().apply(application, advancedApplicationConfig);
         }
-    }
-
-    private void addFapiStatusToApplication(ServiceProvider application, boolean isFapiApplication) {
-
-        List<ServiceProviderProperty> spProperties = new ArrayList<>(Arrays.asList(application.getSpProperties()));
-        for (ServiceProviderProperty spProperty: spProperties) {
-            if (spProperty.getName().equals(ApplicationManagementConstants.IS_FAPI_CONFORMANT)) {
-                spProperty.setValue(String.valueOf(isFapiApplication));
-                return;
-            }
-        }
-        ServiceProviderProperty serviceProviderProperty = new ServiceProviderProperty();
-        serviceProviderProperty.setName(ApplicationManagementConstants.IS_FAPI_CONFORMANT);
-        serviceProviderProperty.setValue(String.valueOf(isFapiApplication));
-        spProperties.add(serviceProviderProperty);
-        application.setSpProperties(spProperties.toArray(new ServiceProviderProperty[0]));
     }
 }

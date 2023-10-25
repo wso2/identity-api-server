@@ -53,7 +53,6 @@ public class ApplicationManagementConstants {
     public static final String ISSUER = "issuer";
     public static final String RBAC = "RBAC";
     public static final String NO_POLICY = "NO POLICY";
-    public static final String IS_FAPI_CONFORMANT = "isFAPIConformant";
 
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 

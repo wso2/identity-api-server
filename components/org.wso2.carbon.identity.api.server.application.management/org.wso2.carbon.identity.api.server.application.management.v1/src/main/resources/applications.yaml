@@ -2622,10 +2622,6 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to for B2B self service
-        isFapiApplication:
-          type: boolean
-          example: false
-          description: Whether the application should support FAPI conformance
         associatedRoles:
           $ref: '#/components/schemas/AssociatedRolesConfig'
         claimConfiguration:
@@ -2676,10 +2672,6 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to for B2B self service
-        isFapiApplication:
-          type: boolean
-          example: false
-          description: Whether the application should support FAPI conformance
         associatedRoles:
           $ref: '#/components/schemas/AssociatedRolesConfig'
         claimConfiguration:
@@ -2717,10 +2709,6 @@ components:
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
-        isFapiApplication:
-          type: boolean
-          example: false
-          description: Whether the application should support FAPI conformance
         associatedRoles:
           $ref: '#/components/schemas/AssociatedRolesConfig'
         claimConfiguration:
