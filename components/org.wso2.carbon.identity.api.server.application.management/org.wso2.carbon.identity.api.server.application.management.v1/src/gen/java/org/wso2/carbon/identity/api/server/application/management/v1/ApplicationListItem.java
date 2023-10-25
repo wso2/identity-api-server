@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import javax.validation.constraints.*;
 
 
@@ -77,6 +78,7 @@ public enum AccessEnum {
     private String self;
     private AdvancedApplicationConfiguration advancedConfigurations;
     private String templateId;
+    private AssociatedRolesConfig associatedRoles;
 
     /**
     **/
@@ -276,6 +278,24 @@ public enum AccessEnum {
         this.templateId = templateId;
     }
 
+    /**
+    **/
+    public ApplicationListItem associatedRoles(AssociatedRolesConfig associatedRoles) {
+
+        this.associatedRoles = associatedRoles;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("associatedRoles")
+    @Valid
+    public AssociatedRolesConfig getAssociatedRoles() {
+        return associatedRoles;
+    }
+    public void setAssociatedRoles(AssociatedRolesConfig associatedRoles) {
+        this.associatedRoles = associatedRoles;
+    }
+
 
 
     @Override
@@ -298,12 +318,13 @@ public enum AccessEnum {
             Objects.equals(this.access, applicationListItem.access) &&
             Objects.equals(this.self, applicationListItem.self) &&
             Objects.equals(this.advancedConfigurations, applicationListItem.advancedConfigurations) &&
-            Objects.equals(this.templateId, applicationListItem.templateId);
+            Objects.equals(this.templateId, applicationListItem.templateId) &&
+            Objects.equals(this.associatedRoles, applicationListItem.associatedRoles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, access, self, advancedConfigurations, templateId);
+        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, access, self, advancedConfigurations, templateId, associatedRoles);
     }
 
     @Override
@@ -323,6 +344,7 @@ public enum AccessEnum {
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
+        sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("}");
         return sb.toString();
     }
