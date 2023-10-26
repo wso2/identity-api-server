@@ -3628,7 +3628,7 @@ components:
         accessTokenBindingType:
           $ref: '#/components/schemas/MetadataProperty'
         tokenEndpointAuthMethod:
-          $ref: '#/components/schemas/MetadataProperty'
+          $ref: '#/components/schemas/ClientAuthenticationMethodMetadata'
         tokenEndpointSignatureAlgorithm:
           $ref: '#/components/schemas/MetadataProperty'
         idTokenSignatureAlgorithm:
