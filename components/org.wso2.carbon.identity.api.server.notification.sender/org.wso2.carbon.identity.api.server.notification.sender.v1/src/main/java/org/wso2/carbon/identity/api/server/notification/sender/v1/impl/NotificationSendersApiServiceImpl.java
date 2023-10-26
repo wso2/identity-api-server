@@ -81,9 +81,6 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response createSMSSender(SMSSenderAdd smSSenderAdd) {
 
-        if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
-        }
         SMSSender smsSender = notificationSenderManagementService.addSMSSender(smSSenderAdd);
         URI location = null;
         try {
@@ -112,9 +109,6 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response deleteSMSSender(String senderName) {
 
-        if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
-        }
         notificationSenderManagementService.deleteNotificationSender(senderName);
         return Response.noContent().build();
     }
@@ -140,18 +134,12 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response getSMSSender(String senderName) {
 
-        if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
-        }
         return Response.ok().entity(notificationSenderManagementService.getSMSSender(senderName)).build();
     }
 
     @Override
     public Response getSMSSenders() {
 
-        if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
-        }
         return Response.ok().entity(notificationSenderManagementService.getSMSSenders()).build();
     }
 
@@ -169,9 +157,6 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response updateSMSSender(String senderName, SMSSenderUpdateRequest smSSenderUpdateRequest) {
 
-        if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
-        }
         return Response.ok()
                 .entity(notificationSenderManagementService.updateSMSSender(senderName, smSSenderUpdateRequest))
                 .build();
