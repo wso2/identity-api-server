@@ -176,11 +176,16 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
 
         String algorithm = appDTO.getRequestObjectEncryptionAlgorithm();
         String method = appDTO.getRequestObjectEncryptionMethod();
+
+        if (StringUtils.equals(algorithm, "null") || StringUtils.isBlank(algorithm)) {
+            algorithm = "";
+        }
+        if (StringUtils.equals(method, "null") || StringUtils.isBlank(method)) {
+            method = "";
+        }
         return new RequestObjectEncryptionConfiguration()
-                .algorithm(StringUtils.equals(algorithm, "null") ||
-                        StringUtils.isBlank(algorithm) ? "" : appDTO.getRequestObjectEncryptionAlgorithm())
-                .method(StringUtils.equals(method, "null") ||
-                        StringUtils.isBlank(method) ? "" : appDTO.getRequestObjectEncryptionMethod());
+                .algorithm(algorithm)
+                .method(method);
     }
 
     private PushAuthorizationRequestConfiguration buildPARAuthenticationConfiguration(OAuthConsumerAppDTO appDTO) {

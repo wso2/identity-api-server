@@ -21,10 +21,13 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationMethod;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationMethodMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.GrantType;
@@ -66,18 +69,6 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 public class ServerApplicationMetadataService {
 
     private static final Log LOG = LogFactory.getLog(ServerApplicationMetadataService.class);
-    private static final String TOKEN_EP_SIGNATURE_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
-            "SupportedTokenEndpointSigningAlgorithms.SupportedTokenEndpointSigningAlgorithm";
-    private static final String ID_TOKEN_SIGNATURE_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
-            "SupportedIDTokenSigningAlgorithms.SupportedIDTokenSigningAlgorithm";
-    private static final String REQUEST_OBJECT_SIGNATURE_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
-            "SupportedRequestObjectSigningAlgorithms.SupportedRequestObjectSigningAlgorithm";
-    private static final String REQUEST_OBJECT_ENCRYPTION_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
-            "SupportedRequestObjectEncryptionAlgorithms.SupportedRequestObjectEncryptionAlgorithm";
-    private static final String REQUEST_OBJECT_ENCRYPTION_METHODS_SUPPORTED = "OAuth.OpenIDConnect." +
-            "SupportedRequestObjectEncryptionMethods.SupportedRequestObjectEncryptionMethod";
-    private static final String DEFAULT_SIGNATURE_ALGORITHM = "PS256";
-
 
     /**
      * Return a list of all available inbound protocols. If the customOnly parameter set to True, will return only the
@@ -166,26 +157,57 @@ public class ServerApplicationMetadataService {
         OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
 
         List<String> tokenEpAuthMethods = OAuth2Util.getSupportedClientAuthenticationMethods();
-        oidcMetaData.setTokenEndpointAuthMethod(new MetadataProperty()
-                .options(tokenEpAuthMethods));
-        List<String> tokenEpSigningAlgorithms = IdentityUtil.getPropertyAsList(TOKEN_EP_SIGNATURE_ALGORITHMS_SUPPORTED);
+        List<ClientAuthenticationMethod> supportedClientAuthenticationMethods = new ArrayList<>();
+        for (String tokenEpAuthMethod : tokenEpAuthMethods) {
+            ClientAuthenticationMethod clientAuthenticationMethod = new ClientAuthenticationMethod();
+            clientAuthenticationMethod.setName(tokenEpAuthMethod);
+            if (tokenEpAuthMethod.equals("client_secret_basic")) {
+                clientAuthenticationMethod.setDisplayName("Client Secret Post");
+            } else if (tokenEpAuthMethod.equals("client_secret_post")) {
+                clientAuthenticationMethod.setDisplayName("Client Secret Post");
+            } else if (tokenEpAuthMethod.equals("private_key_jwt")) {
+                clientAuthenticationMethod.setDisplayName("Private Key JWT");
+            } else if (tokenEpAuthMethod.equals("tls_client_auth")) {
+                clientAuthenticationMethod.setDisplayName("Mutual TLS");
+            } else {
+                clientAuthenticationMethod.setDisplayName(tokenEpAuthMethod);
+            }
+            supportedClientAuthenticationMethods.add(clientAuthenticationMethod);
+        }
+        oidcMetaData.setTokenEndpointAuthMethod(
+                new ClientAuthenticationMethodMetadata().options(supportedClientAuthenticationMethods));
+        List<String> tokenEpSigningAlgorithms = IdentityUtil
+                .getPropertyAsList(ApplicationManagementConstants.TOKEN_EP_SIGNATURE_ALGORITHMS_SUPPORTED);
         oidcMetaData.setTokenEndpointSignatureAlgorithm(new MetadataProperty()
                 .options(tokenEpSigningAlgorithms));
-        List<String> idTokenSigningAlgorithms = IdentityUtil.getPropertyAsList(ID_TOKEN_SIGNATURE_ALGORITHMS_SUPPORTED);
+        List<String> idTokenSigningAlgorithms = new ArrayList<>();
+        idTokenSigningAlgorithms.add("None");
+        idTokenSigningAlgorithms.addAll(IdentityUtil.
+                getPropertyAsList(ApplicationManagementConstants.ID_TOKEN_SIGNATURE_ALGORITHMS_SUPPORTED));
         oidcMetaData.setIdTokenSignatureAlgorithm(new MetadataProperty()
                 .options(idTokenSigningAlgorithms));
-        List<String> requestObjectSigningAlgorithms = IdentityUtil
-                .getPropertyAsList(REQUEST_OBJECT_SIGNATURE_ALGORITHMS_SUPPORTED);
+        List<String> requestObjectSigningAlgorithms = new ArrayList<>();
+        requestObjectSigningAlgorithms.add("None");
+        requestObjectSigningAlgorithms.addAll(IdentityUtil
+                .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_SIGNATURE_ALGORITHMS_SUPPORTED));
         oidcMetaData.setRequestObjectSignatureAlgorithm(new MetadataProperty()
                 .options(requestObjectSigningAlgorithms));
-        List<String> requestObjectEncryptionAlgorithms = IdentityUtil
-                .getPropertyAsList(REQUEST_OBJECT_ENCRYPTION_ALGORITHMS_SUPPORTED);
+        List<String> requestObjectEncryptionAlgorithms = new ArrayList<>();
+        requestObjectEncryptionAlgorithms.add("None");
+        requestObjectEncryptionAlgorithms.addAll(IdentityUtil
+                .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_ENCRYPTION_ALGORITHMS_SUPPORTED));
         oidcMetaData.setRequestObjectSignatureAlgorithm(new MetadataProperty()
                 .options(requestObjectEncryptionAlgorithms));
-        List<String> requestObjectEncryptionMethods = IdentityUtil
-                .getPropertyAsList(REQUEST_OBJECT_ENCRYPTION_METHODS_SUPPORTED);
+        List<String> requestObjectEncryptionMethods = new ArrayList<>();
+        requestObjectEncryptionMethods.add("None");
+        requestObjectEncryptionMethods.addAll(IdentityUtil
+                .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_ENCRYPTION_METHODS_SUPPORTED));
         oidcMetaData.setRequestObjectEncryptionMethod(new MetadataProperty()
                 .options(requestObjectEncryptionMethods));
+        List<String> subjectTypes = Arrays.asList("public", "pairwise");
+        oidcMetaData.setSubjectType(new MetadataProperty()
+                .defaultValue("public")
+                .options(subjectTypes));
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
         List<GrantType> supportedGrantTypeNames = new ArrayList<>();
         // Iterate through the standard grant type names and add matching elements.

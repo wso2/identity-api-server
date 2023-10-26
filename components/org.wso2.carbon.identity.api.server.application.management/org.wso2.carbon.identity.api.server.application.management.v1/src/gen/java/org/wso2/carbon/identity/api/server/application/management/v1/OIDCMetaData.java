@@ -44,12 +44,13 @@ public class OIDCMetaData  {
     private MetadataProperty scopeValidators;
     private MetadataProperty accessTokenType;
     private MetadataProperty accessTokenBindingType;
-    private MetadataProperty tokenEndpointAuthMethod;
+    private ClientAuthenticationMethodMetadata tokenEndpointAuthMethod;
     private MetadataProperty tokenEndpointSignatureAlgorithm;
     private MetadataProperty idTokenSignatureAlgorithm;
     private MetadataProperty requestObjectSignatureAlgorithm;
     private MetadataProperty requestObjectEncryptionAlgorithm;
     private MetadataProperty requestObjectEncryptionMethod;
+    private MetadataProperty subjectType;
 
     /**
     **/
@@ -233,7 +234,7 @@ public class OIDCMetaData  {
 
     /**
      **/
-    public OIDCMetaData tokenEndpointAuthMethod(MetadataProperty tokenEndpointAuthMethod) {
+    public OIDCMetaData tokenEndpointAuthMethod(ClientAuthenticationMethodMetadata tokenEndpointAuthMethod) {
 
         this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
         return this;
@@ -242,10 +243,10 @@ public class OIDCMetaData  {
     @ApiModelProperty(value = "")
     @JsonProperty("tokenEndpointAuthMethod")
     @Valid
-    public MetadataProperty getTokenEndpointAuthMethod() {
+    public ClientAuthenticationMethodMetadata getTokenEndpointAuthMethod() {
         return tokenEndpointAuthMethod;
     }
-    public void setTokenEndpointAuthMethod(MetadataProperty tokenEndpointAuthMethod) {
+    public void setTokenEndpointAuthMethod(ClientAuthenticationMethodMetadata tokenEndpointAuthMethod) {
         this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
     }
 
@@ -339,6 +340,24 @@ public class OIDCMetaData  {
         this.requestObjectEncryptionMethod = requestObjectEncryptionMethod;
     }
 
+    /**
+     **/
+    public OIDCMetaData subjectType(MetadataProperty subjectType) {
+
+        this.subjectType = subjectType;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("subjectType")
+    @Valid
+    public MetadataProperty getSubjectType() {
+        return subjectType;
+    }
+    public void setSubjectType(MetadataProperty subjectType) {
+        this.subjectType = subjectType;
+    }
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -365,12 +384,13 @@ public class OIDCMetaData  {
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.idTokenSignatureAlgorithm) &&
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.requestObjectSignatureAlgorithm) &&
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.requestObjectEncryptionAlgorithm) &&
-            Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.requestObjectEncryptionMethod);
+            Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.requestObjectEncryptionMethod) &&
+            Objects.equals(this.subjectType, oiDCMetaData.subjectType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(allowedGrantTypes, defaultUserAccessTokenExpiryTime, defaultApplicationAccessTokenExpiryTime, defaultRefreshTokenExpiryTime, defaultIdTokenExpiryTime, idTokenEncryptionAlgorithm, idTokenEncryptionMethod, scopeValidators, accessTokenType, accessTokenBindingType, tokenEndpointAuthMethod, tokenEndpointSignatureAlgorithm, idTokenSignatureAlgorithm, requestObjectSignatureAlgorithm, requestObjectEncryptionAlgorithm, requestObjectEncryptionMethod);
+        return Objects.hash(allowedGrantTypes, defaultUserAccessTokenExpiryTime, defaultApplicationAccessTokenExpiryTime, defaultRefreshTokenExpiryTime, defaultIdTokenExpiryTime, idTokenEncryptionAlgorithm, idTokenEncryptionMethod, scopeValidators, accessTokenType, accessTokenBindingType, tokenEndpointAuthMethod, tokenEndpointSignatureAlgorithm, idTokenSignatureAlgorithm, requestObjectSignatureAlgorithm, requestObjectEncryptionAlgorithm, requestObjectEncryptionMethod, subjectType);
     }
 
     @Override
@@ -395,6 +415,7 @@ public class OIDCMetaData  {
         sb.append("    requestObjectSignatureAlgorithm: ").append(toIndentedString(requestObjectSignatureAlgorithm)).append("\n");
         sb.append("    requestObjectEncryptionAlgorithm: ").append(toIndentedString(requestObjectEncryptionAlgorithm)).append("\n");
         sb.append("    requestObjectEncryptionMethod: ").append(toIndentedString(requestObjectEncryptionMethod)).append("\n");
+        sb.append("    subjectType: ").append(toIndentedString(subjectType)).append("\n");
         sb.append("}");
         return sb.toString();
     }
