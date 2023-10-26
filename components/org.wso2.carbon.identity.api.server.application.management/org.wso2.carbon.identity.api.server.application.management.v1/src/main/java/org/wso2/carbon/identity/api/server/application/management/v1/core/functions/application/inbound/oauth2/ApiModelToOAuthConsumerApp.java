@@ -211,10 +211,10 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
 
         if (requestObject != null) {
 
-            if (requestObject.getEncryption().getAlgorithm() != null) {
+            if (requestObject.getEncryption() != null && requestObject.getEncryption().getAlgorithm() != null) {
                 consumerAppDTO.setRequestObjectEncryptionAlgorithm(requestObject.getEncryption().getAlgorithm());
             }
-            if (requestObject.getEncryption().getMethod() != null) {
+            if (requestObject.getEncryption() != null && requestObject.getEncryption().getMethod() != null) {
                 consumerAppDTO.setRequestObjectEncryptionMethod(requestObject.getEncryption().getMethod());
             }
             if (requestObject.getRequestObjectSigningAlg() != null) {

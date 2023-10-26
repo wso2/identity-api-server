@@ -53,6 +53,7 @@ public class ApplicationManagementConstants {
     public static final String ISSUER = "issuer";
     public static final String RBAC = "RBAC";
     public static final String NO_POLICY = "NO POLICY";
+    public static final String NONE = "None";
     public static final String TOKEN_EP_SIGNATURE_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
             "SupportedTokenEndpointSigningAlgorithms.SupportedTokenEndpointSigningAlgorithm";
     public static final String ID_TOKEN_SIGNATURE_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
@@ -63,6 +64,7 @@ public class ApplicationManagementConstants {
             "SupportedRequestObjectEncryptionAlgorithms.SupportedRequestObjectEncryptionAlgorithm";
     public static final String REQUEST_OBJECT_ENCRYPTION_METHODS_SUPPORTED = "OAuth.OpenIDConnect." +
             "SupportedRequestObjectEncryptionMethods.SupportedRequestObjectEncryptionMethod";
+    public static final String DEFAULT_SUBJECT_TYPE = "OAuth.OpenIDConnect.DefaultSubjectType";
 
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 

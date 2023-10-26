@@ -43,6 +43,7 @@ import org.wso2.carbon.identity.application.mgt.AbstractInboundAuthenticatorConf
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
+import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
 import org.wso2.carbon.identity.oauth.dto.TokenBindingMetaDataDTO;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
@@ -181,32 +182,33 @@ public class ServerApplicationMetadataService {
         oidcMetaData.setTokenEndpointSignatureAlgorithm(new MetadataProperty()
                 .options(tokenEpSigningAlgorithms));
         List<String> idTokenSigningAlgorithms = new ArrayList<>();
-        idTokenSigningAlgorithms.add("None");
+        idTokenSigningAlgorithms.add(ApplicationManagementConstants.NONE);
         idTokenSigningAlgorithms.addAll(IdentityUtil.
                 getPropertyAsList(ApplicationManagementConstants.ID_TOKEN_SIGNATURE_ALGORITHMS_SUPPORTED));
         oidcMetaData.setIdTokenSignatureAlgorithm(new MetadataProperty()
                 .options(idTokenSigningAlgorithms));
         List<String> requestObjectSigningAlgorithms = new ArrayList<>();
-        requestObjectSigningAlgorithms.add("None");
+        requestObjectSigningAlgorithms.add(ApplicationManagementConstants.NONE);
         requestObjectSigningAlgorithms.addAll(IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_SIGNATURE_ALGORITHMS_SUPPORTED));
         oidcMetaData.setRequestObjectSignatureAlgorithm(new MetadataProperty()
                 .options(requestObjectSigningAlgorithms));
         List<String> requestObjectEncryptionAlgorithms = new ArrayList<>();
-        requestObjectEncryptionAlgorithms.add("None");
+        requestObjectEncryptionAlgorithms.add(ApplicationManagementConstants.NONE);
         requestObjectEncryptionAlgorithms.addAll(IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_ENCRYPTION_ALGORITHMS_SUPPORTED));
         oidcMetaData.setRequestObjectEncryptionAlgorithm(new MetadataProperty()
                 .options(requestObjectEncryptionAlgorithms));
         List<String> requestObjectEncryptionMethods = new ArrayList<>();
-        requestObjectEncryptionMethods.add("None");
+        requestObjectEncryptionMethods.add(ApplicationManagementConstants.NONE);
         requestObjectEncryptionMethods.addAll(IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_ENCRYPTION_METHODS_SUPPORTED));
         oidcMetaData.setRequestObjectEncryptionMethod(new MetadataProperty()
                 .options(requestObjectEncryptionMethods));
-        List<String> subjectTypes = Arrays.asList("public", "pairwise");
+        List<String> subjectTypes = Arrays.asList(OAuthConstants.SubjectType.PUBLIC.getValue(),
+                OAuthConstants.SubjectType.PAIRWISE.getValue());
         oidcMetaData.setSubjectType(new MetadataProperty()
-                .defaultValue("public")
+                .defaultValue(IdentityUtil.getProperty(ApplicationManagementConstants.DEFAULT_SUBJECT_TYPE))
                 .options(subjectTypes));
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
         List<GrantType> supportedGrantTypeNames = new ArrayList<>();
