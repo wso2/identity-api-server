@@ -171,10 +171,4 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
 
         return organizationManagementService.getOrganizationsDiscoveryAttributes(filter, offset, limit);
     }
-
-    @Override
-    public Response organizationsGetMe(String filter, Integer limit, String after, String before, Boolean recursive) {
-
-        return organizationManagementService.getAuthorizedOrganizations(filter, limit, after, before, recursive);
-    }
 }

@@ -112,36 +112,11 @@ public class OrganizationManagementService {
      */
     public Response getOrganizations(String filter, Integer limit, String after, String before, Boolean recursive) {
 
-        return getOrganizationList(false, filter, limit, after, before, recursive);
-    }
-
-    /**
-     * Retrieve organization IDs for authorized user.
-     *
-     * @param filter    The filter string.
-     * @param limit     The maximum number of records to be returned.
-     * @param after     The pointer to next page.
-     * @param before    The pointer to previous page.
-     * @param recursive Determines whether recursive search is required.
-     * @return The list of organization IDs.
-     */
-    public Response getAuthorizedOrganizations(String filter, Integer limit, String after, String before,
-                                               Boolean recursive) {
-
-        return getOrganizationList(true, filter, limit, after, before, recursive);
-    }
-
-    private Response getOrganizationList(boolean authorizedSubOrgsOnly, String filter, Integer limit, String after,
-                                         String before, Boolean recursive) {
-
         try {
             limit = validateLimit(limit);
             String sortOrder = StringUtils.isNotBlank(before) ? ASC_SORT_ORDER : DESC_SORT_ORDER;
-            List<BasicOrganization> organizations = authorizedSubOrgsOnly ?
-                    getOrganizationManager().getUserAuthorizedOrganizations(
-                            limit + 1, after, before, sortOrder, filter, Boolean.TRUE.equals(recursive))
-                    : getOrganizationManager().getOrganizations(
-                    limit + 1, after, before, sortOrder, filter, Boolean.TRUE.equals(recursive));
+            List<BasicOrganization> organizations = getOrganizationManager().getOrganizations(limit + 1, after,
+                    before, sortOrder, filter, Boolean.TRUE.equals(recursive));
             return Response.ok().entity(getOrganizationsResponse(limit, after, before, filter, organizations,
                     Boolean.TRUE.equals(recursive))).build();
         } catch (OrganizationManagementClientException e) {

@@ -90,38 +90,6 @@ paths:
           $ref: '#/components/responses/NotImplemented'
       tags:
         - Organization
-  /organizations/me:
-    get:
-      description:
-        Retrieve authorized sub organizations which matches the defined search criteria, if any.
-      summary:
-        This API is used to search and retrieve child organizations which are authorized for the user.
-      operationId: organizationsGetMe
-      parameters:
-        - $ref: '#/components/parameters/filterQueryParam'
-        - $ref: '#/components/parameters/limitQueryParam'
-        - $ref: '#/components/parameters/afterQueryParam'
-        - $ref: '#/components/parameters/beforeQueryParam'
-        - $ref: '#/components/parameters/recursiveQueryParam'
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrganizationsResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/ServerError'
-        '501':
-          $ref: '#/components/responses/NotImplemented'
-      tags:
-        - Organization
   /organizations/check-name:
     post:
       summary: Check organization with given name exist among the organizations hierarchy.
