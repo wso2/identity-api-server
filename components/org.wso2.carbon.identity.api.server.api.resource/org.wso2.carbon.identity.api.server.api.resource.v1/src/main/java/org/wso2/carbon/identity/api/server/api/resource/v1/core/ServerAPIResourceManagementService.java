@@ -535,7 +535,8 @@ public class ServerAPIResourceManagementService {
      */
     private void handleSystemAPI(APIResource apiResource) {
 
-        if (APIResourceMgtEndpointConstants.SYSTEM_API_RESOURCE_TYPE.equals(apiResource.getType())) {
+        if (apiResource.getType() != null &&
+                apiResource.getType().startsWith(APIResourceMgtEndpointConstants.SYSTEM_API_RESOURCE_TYPE)) {
             throw APIResourceMgtEndpointUtil.handleException(Response.Status.FORBIDDEN,
                     ErrorMessage.ERROR_CODE_SYSTEM_API_RESOURCE_NOT_MODIFIABLE);
         }
