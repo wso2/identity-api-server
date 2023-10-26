@@ -3552,6 +3552,22 @@ components:
         defaultValue:
           type: string
           example: 'Option 1'
+    ClientAuthenticationMethodMetadata:
+      type: object
+      properties:
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientAuthenticationMethod'
+    ClientAuthenticationMethod:
+      type: object
+      properties:
+        name:
+          type: string
+          example: private_key_jwt
+        displayName:
+          type: string
+          example: Private Key JWT
     GrantTypeMetaData:
       type: object
       properties:
@@ -3622,6 +3638,8 @@ components:
         requestObjectEncryptionAlgorithm:
           $ref: '#/components/schemas/MetadataProperty'
         requestObjectEncryptionMethod:
+          $ref: '#/components/schemas/MetadataProperty'
+        subjectType:
           $ref: '#/components/schemas/MetadataProperty'
     WSTrustMetaData:
       type: object
