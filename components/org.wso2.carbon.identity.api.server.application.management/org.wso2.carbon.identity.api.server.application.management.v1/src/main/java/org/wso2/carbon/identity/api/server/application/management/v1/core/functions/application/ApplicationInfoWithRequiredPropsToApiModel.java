@@ -19,6 +19,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalS
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
@@ -54,7 +55,18 @@ public class ApplicationInfoWithRequiredPropsToApiModel implements Function<Appl
                 .issuer(applicationResponseModel.getIssuer())
                 .advancedConfigurations(getAdvancedConfigurations(applicationResponseModel))
                 .templateId(applicationResponseModel.getTemplateId())
-                .self(getApplicationLocation(applicationResponseModel.getId()));
+                .self(getApplicationLocation(applicationResponseModel.getId()))
+                .associatedRoles(excludeAssociatedRoles(applicationResponseModel.getAssociatedRoles()));
+    }
+
+    private AssociatedRolesConfig excludeAssociatedRoles(AssociatedRolesConfig associatedRolesConfig) {
+
+        AssociatedRolesConfig configExcludingRoles = new AssociatedRolesConfig();
+        if (associatedRolesConfig == null) {
+            return configExcludingRoles;
+        }
+        configExcludingRoles.setAllowedAudience(associatedRolesConfig.getAllowedAudience());
+        return configExcludingRoles;
     }
 
     private AdvancedApplicationConfiguration getAdvancedConfigurations(

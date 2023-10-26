@@ -656,7 +656,6 @@ components:
             $ref: '#/components/schemas/Properties'
     SMSSenderAdd:
       required:
-        - providerURL
         - provider
         - contentType
       type: object
@@ -793,7 +792,6 @@ components:
             $ref: '#/components/schemas/Properties'
     SMSSenderUpdateRequest:
       required:
-        - providerURL
         - provider
         - contentType
       type: object

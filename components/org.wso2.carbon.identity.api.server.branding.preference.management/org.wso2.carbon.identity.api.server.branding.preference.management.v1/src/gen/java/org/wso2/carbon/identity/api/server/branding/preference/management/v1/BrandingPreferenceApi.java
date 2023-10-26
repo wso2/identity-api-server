@@ -113,7 +113,7 @@ public class BrandingPreferenceApi  {
         @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
-    public Response deleteBrandingPreference(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM", defaultValue="ORG") @DefaultValue("ORG")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.", defaultValue="en-US") @DefaultValue("en-US")  @QueryParam("locale") String locale) {
+    public Response deleteBrandingPreference(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.")  @QueryParam("locale") String locale) {
 
         return delegate.deleteBrandingPreference(type,  name,  locale );
     }
@@ -123,7 +123,7 @@ public class BrandingPreferenceApi  {
     @Path("/text")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Deletes custom text.", notes = "This API provides the capability to delete the custom texts for the specified screen & locale of a tenant.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Deletes custom text.", notes = "This API provides the capability to delete the custom texts for the specified screen & locale of a tenant.<br> If no query parameter was specified in the delete request, all the custom texts configured in the tenant will be deleted.<br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>     * internal_application_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -136,7 +136,7 @@ public class BrandingPreferenceApi  {
         @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
-    public Response deleteCustomText(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM", defaultValue="ORG") @DefaultValue("ORG")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.", defaultValue="en-US") @DefaultValue("en-US")  @QueryParam("locale") String locale,     @Valid@ApiParam(value = "Screen to filter the retrieval of customizations.")  @QueryParam("screen") String screen) {
+    public Response deleteCustomText(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.")  @QueryParam("locale") String locale,     @Valid@ApiParam(value = "Screen to filter the retrieval of customizations.")  @QueryParam("screen") String screen) {
 
         return delegate.deleteCustomText(type,  name,  locale,  screen );
     }
@@ -160,7 +160,7 @@ public class BrandingPreferenceApi  {
         @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
-    public Response getBrandingPreference(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM", defaultValue="ORG") @DefaultValue("ORG")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.", defaultValue="en-US") @DefaultValue("en-US")  @QueryParam("locale") String locale) {
+    public Response getBrandingPreference(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.")  @QueryParam("locale") String locale) {
 
         return delegate.getBrandingPreference(type,  name,  locale );
     }
@@ -182,7 +182,7 @@ public class BrandingPreferenceApi  {
         @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
-    public Response getCustomText(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM", defaultValue="ORG") @DefaultValue("ORG")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.", defaultValue="en-US") @DefaultValue("en-US")  @QueryParam("locale") String locale,     @Valid@ApiParam(value = "Screen to filter the retrieval of customizations.")  @QueryParam("screen") String screen) {
+    public Response getCustomText(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.")  @QueryParam("locale") String locale,     @Valid@ApiParam(value = "Screen to filter the retrieval of customizations.")  @QueryParam("screen") String screen) {
 
         return delegate.getCustomText(type,  name,  locale,  screen );
     }
@@ -206,7 +206,7 @@ public class BrandingPreferenceApi  {
         @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
-    public Response resolveBrandingPreference(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM", defaultValue="ORG") @DefaultValue("ORG")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.", defaultValue="en-US") @DefaultValue("en-US")  @QueryParam("locale") String locale) {
+    public Response resolveBrandingPreference(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.")  @QueryParam("locale") String locale) {
 
         return delegate.resolveBrandingPreference(type,  name,  locale );
     }
@@ -228,7 +228,7 @@ public class BrandingPreferenceApi  {
         @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
-    public Response resolveCustomText(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM", defaultValue="ORG") @DefaultValue("ORG")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.", defaultValue="en-US") @DefaultValue("en-US")  @QueryParam("locale") String locale,     @Valid@ApiParam(value = "Screen to filter the retrieval of customizations.")  @QueryParam("screen") String screen) {
+    public Response resolveCustomText(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.")  @QueryParam("locale") String locale,     @Valid@ApiParam(value = "Screen to filter the retrieval of customizations.")  @QueryParam("screen") String screen) {
 
         return delegate.resolveCustomText(type,  name,  locale,  screen );
     }
