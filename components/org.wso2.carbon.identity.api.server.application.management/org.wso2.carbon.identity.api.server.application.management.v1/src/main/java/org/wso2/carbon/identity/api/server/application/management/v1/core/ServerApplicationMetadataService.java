@@ -156,13 +156,13 @@ public class ServerApplicationMetadataService {
         OIDCMetaData oidcMetaData = new OIDCMetaData();
         OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
 
-        List<String> tokenEpAuthMethods = OAuth2Util.getSupportedClientAuthenticationMethods();
+        List<String> tokenEpAuthMethods = Arrays.asList(OAuth2Util.getSupportedClientAuthMethods());
         List<ClientAuthenticationMethod> supportedClientAuthenticationMethods = new ArrayList<>();
         for (String tokenEpAuthMethod : tokenEpAuthMethods) {
             ClientAuthenticationMethod clientAuthenticationMethod = new ClientAuthenticationMethod();
             clientAuthenticationMethod.setName(tokenEpAuthMethod);
             if (tokenEpAuthMethod.equals("client_secret_basic")) {
-                clientAuthenticationMethod.setDisplayName("Client Secret Post");
+                clientAuthenticationMethod.setDisplayName("Client Secret Basic");
             } else if (tokenEpAuthMethod.equals("client_secret_post")) {
                 clientAuthenticationMethod.setDisplayName("Client Secret Post");
             } else if (tokenEpAuthMethod.equals("private_key_jwt")) {
@@ -196,7 +196,7 @@ public class ServerApplicationMetadataService {
         requestObjectEncryptionAlgorithms.add("None");
         requestObjectEncryptionAlgorithms.addAll(IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_ENCRYPTION_ALGORITHMS_SUPPORTED));
-        oidcMetaData.setRequestObjectSignatureAlgorithm(new MetadataProperty()
+        oidcMetaData.setRequestObjectEncryptionAlgorithm(new MetadataProperty()
                 .options(requestObjectEncryptionAlgorithms));
         List<String> requestObjectEncryptionMethods = new ArrayList<>();
         requestObjectEncryptionMethods.add("None");
