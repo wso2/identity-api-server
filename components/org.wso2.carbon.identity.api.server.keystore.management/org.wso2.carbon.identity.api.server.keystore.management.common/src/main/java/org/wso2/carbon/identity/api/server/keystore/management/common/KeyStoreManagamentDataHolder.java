@@ -15,7 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.keystore.management.common;
 
-import org.wso2.carbon.security.keystore.KeyStoreManagementService;
+import org.wso2.carbon.core.keystore.KeyStoreManagementService;
 
 /**
  * Service holder class for keystore management.
