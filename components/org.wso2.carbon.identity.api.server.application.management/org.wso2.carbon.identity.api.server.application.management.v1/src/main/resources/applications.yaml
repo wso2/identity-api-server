@@ -3280,6 +3280,14 @@ components:
             - XACML Scope Validator
           items:
             type: string
+        clientAuthentication:
+          $ref: '#/components/schemas/ClientAuthenticationConfiguration'
+        requestObject:
+          $ref: '#/components/schemas/RequestObjectConfiguration'
+        pushAuthorizationRequest:
+          $ref: '#/components/schemas/PushAuthorizationRequestConfiguration'
+        subject:
+          $ref: '#/components/schemas/SubjectConfiguration'
     OAuth2PKCEConfiguration:
       type: object
       properties:
@@ -3342,6 +3350,9 @@ components:
             - 'http://idp.abc.com'
           items:
             type: string
+        idTokenSignedResponseAlg:
+          type: string
+          example: 'PS256'
         encryption:
           $ref: '#/components/schemas/IdTokenEncryptionConfiguration'
     IdTokenEncryptionConfiguration:
@@ -3357,6 +3368,50 @@ components:
         method:
           type: string
           example: A128CBC+HS256
+    ClientAuthenticationConfiguration:
+      type: object
+      properties:
+        tokenEndpointAuthMethod:
+          type: string
+          example: 'client_secret_basic'
+        tokenEndpointAuthSigningAlg:
+          type: string
+          example: 'PS256'
+        tlsClientAuthSubjectDnUpdated:
+          type: string
+          example: 'CN=John Doe,OU=OrgUnit,O=Organization,L=Colombo,ST=Western,C=LK'
+    RequestObjectConfiguration:
+      type: object
+      properties:
+        requestObjectSigningAlg:
+          type: string
+          example: 'PS256'
+        encryption:
+          $ref: '#/components/schemas/RequestObjectEncryptionConfiguration'
+    RequestObjectEncryptionConfiguration:
+      type: object
+      properties:
+        algorithm:
+          type: string
+          example: RSA-OAEP
+        method:
+          type: string
+          example: A128CBC+HS256
+    PushAuthorizationRequestConfiguration:
+      type: object
+      properties:
+        requirePushAuthorizationRequest:
+          type: boolean
+          example: false
+    SubjectConfiguration:
+      type: object
+      properties:
+        subjectType:
+          type: string
+          example: 'public'
+        sectorIdentifierUri:
+          type: string
+          example: 'https://app.example.com'
     OIDCLogoutConfiguration:
       type: object
       properties:
@@ -3497,6 +3552,22 @@ components:
         defaultValue:
           type: string
           example: 'Option 1'
+    ClientAuthenticationMethodMetadata:
+      type: object
+      properties:
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientAuthenticationMethod'
+    ClientAuthenticationMethod:
+      type: object
+      properties:
+        name:
+          type: string
+          example: private_key_jwt
+        displayName:
+          type: string
+          example: Private Key JWT
     GrantTypeMetaData:
       type: object
       properties:
@@ -3555,6 +3626,20 @@ components:
         accessTokenType:
           $ref: '#/components/schemas/MetadataProperty'
         accessTokenBindingType:
+          $ref: '#/components/schemas/MetadataProperty'
+        tokenEndpointAuthMethod:
+          $ref: '#/components/schemas/ClientAuthenticationMethodMetadata'
+        tokenEndpointSignatureAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        idTokenSignatureAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        requestObjectSignatureAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        requestObjectEncryptionAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        requestObjectEncryptionMethod:
+          $ref: '#/components/schemas/MetadataProperty'
+        subjectType:
           $ref: '#/components/schemas/MetadataProperty'
     WSTrustMetaData:
       type: object

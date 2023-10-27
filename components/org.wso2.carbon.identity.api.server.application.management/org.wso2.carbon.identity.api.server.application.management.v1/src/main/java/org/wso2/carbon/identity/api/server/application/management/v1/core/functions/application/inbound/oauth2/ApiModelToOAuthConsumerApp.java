@@ -18,11 +18,15 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OAuth2PKCEConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCLogoutConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.PushAuthorizationRequestConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RefreshTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
@@ -63,6 +67,10 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         updateRefreshTokenConfiguration(consumerAppDTO, oidcModel.getRefreshToken());
         updateIdTokenConfiguration(consumerAppDTO, oidcModel.getIdToken());
         updateOidcLogoutConfiguration(consumerAppDTO, oidcModel.getLogout());
+        updateClientAuthenticationConfigurations(consumerAppDTO, oidcModel.getClientAuthentication());
+        updateRequestObjectConfiguration(consumerAppDTO, oidcModel.getRequestObject());
+        updatePARConfigurations(consumerAppDTO, oidcModel.getPushAuthorizationRequest());
+        updateSubjectConfigurations(consumerAppDTO, oidcModel.getSubject());
 
         return consumerAppDTO;
     }
@@ -92,6 +100,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
                     .map(audiences -> audiences.toArray(new String[0]))
                     .orElse(new String[0])
             );
+            consumerAppDTO.setIdTokenSignatureAlgorithm(idToken.getIdTokenSignedResponseAlg());
 
             if (idToken.getEncryption() != null) {
                 boolean idTokenEncryptionEnabled = isIdTokenEncryptionEnabled(idToken);
@@ -101,6 +110,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
                     consumerAppDTO.setIdTokenEncryptionMethod(idToken.getEncryption().getMethod());
                 }
             }
+
         }
     }
 
@@ -176,6 +186,48 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             }
         } else {
             return null;
+        }
+    }
+
+    private void updateClientAuthenticationConfigurations(OAuthConsumerAppDTO appDTO,
+                                                          ClientAuthenticationConfiguration clientAuthentication) {
+
+        if (clientAuthentication != null) {
+            appDTO.setTokenEndpointAuthMethod(clientAuthentication.getTokenEndpointAuthMethod());
+            appDTO.setTokenEndpointAuthSignatureAlgorithm(clientAuthentication.getTokenEndpointAuthSigningAlg());
+            appDTO.setTlsClientAuthSubjectDN(clientAuthentication.getTlsClientAuthSubjectDn());
+        }
+    }
+
+    private void updatePARConfigurations(OAuthConsumerAppDTO appDTO, PushAuthorizationRequestConfiguration par) {
+
+        if (par != null) {
+            appDTO.setRequirePushedAuthorizationRequests(par.getRequirePushAuthorizationRequest());
+        }
+    }
+
+    private void updateRequestObjectConfiguration(OAuthConsumerAppDTO consumerAppDTO,
+                                                  RequestObjectConfiguration requestObject) {
+
+        if (requestObject != null) {
+
+            if (requestObject.getEncryption() != null && requestObject.getEncryption().getAlgorithm() != null) {
+                consumerAppDTO.setRequestObjectEncryptionAlgorithm(requestObject.getEncryption().getAlgorithm());
+            }
+            if (requestObject.getEncryption() != null && requestObject.getEncryption().getMethod() != null) {
+                consumerAppDTO.setRequestObjectEncryptionMethod(requestObject.getEncryption().getMethod());
+            }
+            if (requestObject.getRequestObjectSigningAlg() != null) {
+                consumerAppDTO.setRequestObjectSignatureAlgorithm(requestObject.getRequestObjectSigningAlg());
+            }
+        }
+    }
+
+    private void updateSubjectConfigurations(OAuthConsumerAppDTO consumerAppDTO, SubjectConfiguration subject) {
+
+        if (subject != null) {
+            consumerAppDTO.setSubjectType(subject.getSubjectType());
+            consumerAppDTO.setSectorIdentifierURI(subject.getSectorIdentifierUri());
         }
     }
 }
