@@ -376,6 +376,7 @@ public class ServerAPIResourceManagementService {
                 .name(apiResource.getName())
                 .identifier(apiResource.getIdentifier())
                 .description(apiResource.getDescription())
+                .type(apiResource.getType())
                 .scopes(apiResource.getScopes().stream().map(this::buildScopeGetResponse)
                         .collect(Collectors.toList()))
                 .requiresAuthorization(apiResource.isAuthorizationRequired())
