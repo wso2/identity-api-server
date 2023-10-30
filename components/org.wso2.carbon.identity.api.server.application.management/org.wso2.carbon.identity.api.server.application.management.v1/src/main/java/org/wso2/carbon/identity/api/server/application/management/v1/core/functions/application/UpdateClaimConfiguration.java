@@ -133,10 +133,8 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
 
         if (subjectApiModel != null) {
 
-            if (subjectApiModel.getMappedLocalSubjectMandatory() != null &&
-                    subjectApiModel.getMappedLocalSubjectMandatory() &&
-                    subjectApiModel.getUseMappedLocalSubject() != null &&
-                    !subjectApiModel.getUseMappedLocalSubject()) {
+            if (Boolean.TRUE.equals(subjectApiModel.getMappedLocalSubjectMandatory()) &&
+                    Boolean.FALSE.equals(subjectApiModel.getUseMappedLocalSubject())) {
                 throw buildBadRequestError(ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED.getCode(),
                         ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED.getDescription());
             }

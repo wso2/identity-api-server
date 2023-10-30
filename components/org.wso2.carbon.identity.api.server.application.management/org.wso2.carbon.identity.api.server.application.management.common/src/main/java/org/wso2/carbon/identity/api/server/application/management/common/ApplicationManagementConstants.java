@@ -134,7 +134,7 @@ public class ApplicationManagementConstants {
 
         ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED("60513",
                 "Invalid configuration.",
-                "useMappedLocalSubject cannot be disabled when mappedLocalSubjectMandatory is enabled."),
+                "'useMappedLocalSubject' cannot be disabled when 'mappedLocalSubjectMandatory' is enabled."),
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
                 "Error occurred while retrieving SAML Metadata.",
