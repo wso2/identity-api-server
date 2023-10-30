@@ -306,6 +306,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         if (application.getClaimConfig() != null) {
             subjectConfig.useMappedLocalSubject(application.getClaimConfig().isAlwaysSendMappedLocalSubjectId());
+            subjectConfig.mappedLocalSubjectMandatory(application.getClaimConfig().isMappedLocalSubjectMandatory());
         }
 
         LocalAndOutboundAuthenticationConfig localAndOutboundAuthConfig =

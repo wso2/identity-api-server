@@ -2934,6 +2934,9 @@ components:
         useMappedLocalSubject:
           type: boolean
           example: false
+        mappedLocalSubjectMandatory:
+          type: boolean
+          example: false
     RoleConfig:
       type: object
       properties:
