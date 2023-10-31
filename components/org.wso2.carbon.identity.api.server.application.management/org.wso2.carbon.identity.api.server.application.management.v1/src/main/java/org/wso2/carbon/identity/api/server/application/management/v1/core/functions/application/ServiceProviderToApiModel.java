@@ -130,7 +130,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         String allowedAudience = application.getAssociatedRolesConfig().getAllowedAudience();
         AssociatedRolesConfig.AllowedAudienceEnum allowedAudienceEnum = null;
-        switch (allowedAudience.toLowerCase()) {
+        switch (allowedAudience) {
             case "application":
                 allowedAudienceEnum = AssociatedRolesConfig.AllowedAudienceEnum.APPLICATION;
                 break;
