@@ -15,11 +15,13 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import com.google.gson.Gson;
 import org.apache.commons.collections.CollectionUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
+import org.wso2.carbon.identity.application.common.model.ClientAttestationMetaData;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 
@@ -53,10 +55,41 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                     config::setAlwaysSendBackAuthenticatedListOfIdPs);
             setIfNotNull(advancedConfigurations.getEnableAuthorization(), config::setEnableAuthorization);
             setIfNotNull(advancedConfigurations.getUseExternalConsentPage(), config::setUseExternalConsentPage);
-
+            setIfNotNull(advancedConfigurations.getEnableAPIBasedAuthentication(),
+                    serviceProvider::setAPIBasedAuthenticationEnabled);
+            if (advancedConfigurations.getAttestationMetaData() != null) {
+                ClientAttestationMetaData clientAttestationMetaData = new ClientAttestationMetaData();
+                setIfNotNull(advancedConfigurations.getAttestationMetaData().getEnableClientAttestation(),
+                        clientAttestationMetaData::setAttestationEnabled);
+                setIfNotNull(advancedConfigurations.getAttestationMetaData().getAndroidPackageName(),
+                        clientAttestationMetaData::setAndroidPackageName);
+                if (advancedConfigurations.getAttestationMetaData()
+                        .getAndroidAttestationServiceCredentials() != null) {
+                    String androidAttestationServiceCredentials
+                            = parseAndroidAttestationServiceCredentials(advancedConfigurations
+                            .getAttestationMetaData()
+                            .getAndroidAttestationServiceCredentials());
+                    setIfNotNull(androidAttestationServiceCredentials,
+                            clientAttestationMetaData::setAndroidAttestationServiceCredentials);
+                }
+                serviceProvider.setClientAttestationMetaData(clientAttestationMetaData);
+            }
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
         }
     }
+
+    /**
+     * Parses the Android attestation service credentials and converts them into a JSON string.
+     *
+     * @param androidAttestationServiceCredentials The Android attestation service credentials to be parsed.
+     * @return A JSON string representation of the parsed credentials.
+     */
+    private String parseAndroidAttestationServiceCredentials(Object androidAttestationServiceCredentials) {
+
+        Gson gson = new Gson();
+        return gson.toJson(androidAttestationServiceCredentials);
+    }
+
 
     private LocalAndOutboundAuthenticationConfig getLocalAndOutboundConfig(ServiceProvider application) {
 
