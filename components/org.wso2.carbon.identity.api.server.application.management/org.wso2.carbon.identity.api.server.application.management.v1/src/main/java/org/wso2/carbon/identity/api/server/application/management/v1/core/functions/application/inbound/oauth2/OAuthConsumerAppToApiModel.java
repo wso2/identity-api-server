@@ -62,7 +62,8 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .clientAuthentication(buildClientAuthenticationConfiguration(oauthAppDTO))
                 .requestObject(buildRequestObjectConfiguration(oauthAppDTO))
                 .pushAuthorizationRequest(buildPARAuthenticationConfiguration(oauthAppDTO))
-                .subject(buildSubjectConfiguration(oauthAppDTO));
+                .subject(buildSubjectConfiguration(oauthAppDTO))
+                .isFAPIApplication(oauthAppDTO.isFapiConformanceEnabled());
     }
 
     private List<String> getScopeValidators(OAuthConsumerAppDTO oauthAppDTO) {
