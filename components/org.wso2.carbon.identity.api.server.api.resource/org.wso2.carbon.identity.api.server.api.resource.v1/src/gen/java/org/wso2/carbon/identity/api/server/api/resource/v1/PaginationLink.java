@@ -61,7 +61,7 @@ public class PaginationLink  {
         return this;
     }
     
-    @ApiModelProperty(example = "/o/orgName/api-resources?after=NDoy", value = "")
+    @ApiModelProperty(example = "/t/carbon.super/api/server/v1/api-resources?after=NDoy", value = "")
     @JsonProperty("href")
     @Valid
     public String getHref() {

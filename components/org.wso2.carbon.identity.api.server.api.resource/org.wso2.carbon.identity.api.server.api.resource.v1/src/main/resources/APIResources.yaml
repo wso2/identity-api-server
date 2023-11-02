@@ -33,7 +33,7 @@ paths:
         - API Resources
       operationId: addAPIResource
       summary: Add a new API resource
-      description: > 
+      description: >
         Add a new API resource
         <b>Permission required:</b> <br>
           * /permission/admin/manage/identity/apiresourcemgt/create <br>
@@ -88,7 +88,7 @@ paths:
       tags:
         - API Resources
       summary: List all API resources in the server
-      description: > 
+      description: >
         List all API resources in the server
         <b>Permission required:</b> <br>
           * /permission/admin/manage/identity/apiresourcemgt/view <br>
@@ -124,7 +124,7 @@ paths:
       tags:
         - API Resources
       summary: Get API resource specified by the id
-      description: > 
+      description: >
         Get API resource specified by the id
         <b>Permission required:</b> <br>
           * /permission/admin/manage/identity/apiresourcemgt/view <br>
@@ -154,7 +154,7 @@ paths:
       tags:
         - API Resources
       summary: Patch API resource specified by the id
-      description: > 
+      description: >
         Patch API resource specified by the id. Patch operation only supports "name", "description" updating and "addedScopes" fields at the moment.
         <b>Permission required:</b> <br>
           * /permission/admin/manage/identity/apiresourcemgt/update <br>
@@ -214,7 +214,7 @@ paths:
       tags:
         - API Resources
       summary: Delete API resource specified by the id
-      description: > 
+      description: >
         Delete API resource specified by the id
         <b>Permission required:</b> <br>
           * /permission/admin/manage/identity/apiresourcemgt/delete <br>
@@ -241,7 +241,7 @@ paths:
       tags:
         - API Resource Scopes
       summary: Get API resource scopes
-      description: > 
+      description: >
         Get API resource scopes specified by the id
         <b>Permission required:</b> <br>
           * /permission/admin/manage/identity/apiresourcemgt/view <br>
@@ -279,7 +279,7 @@ paths:
       tags:
         - API Resource Scopes
       summary: Add scopes to API resource
-      description: > 
+      description: >
         Put scopes API resource specified by the id
         <b>Permission required:</b> <br>
           * /permission/admin/manage/identity/apiresourcemgt/update <br>
@@ -337,7 +337,7 @@ paths:
       tags:
         - API Resource Scopes
       summary: Delete API scope specified by the name
-      description: > 
+      description: >
         Delete API scope specified by the name
         <b>Permission required:</b> <br>
           * /permission/admin/manage/identity/apiresourcemgt/delete <br>
@@ -363,7 +363,7 @@ paths:
       tags:
         - API Resource Scopes
       summary: Get all scopes in the tenant
-      description: > 
+      description: >
         Get all scopes in the tenant
         <b>Permission required:</b> <br>
           * /permission/admin/manage/identity/apiresourcemgt/view <br>
@@ -397,6 +397,69 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /api-resource-collections:
+    get:
+      tags:
+        - API Resource Collections
+      summary: List all API resource collections in the server
+      description: >
+        List all API resource collections in the server
+        <b>Permission required:</b> <br>
+          * /permission/admin/manage/identity/apiresourcemgt/view <br>
+        <b>Scope required:</b> <br>
+          * internal_api_resource_view
+      operationId: getAPIResourceCollections
+      parameters:
+        - $ref: '#/components/parameters/filter'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResourceCollectionListResponse'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api-resource-collections/{collectionId}:
+    get:
+      tags:
+        - API Resource Collections
+      summary: Get API resource collection specified by the id
+      description: >
+        Get API resource collection specified by the id
+        <b>Permission required:</b> <br>
+          * /permission/admin/manage/identity/apiresourcemgt/view <br>
+        <b>Scope required:</b> <br>
+          * internal_api_resource_view
+      parameters:
+        - $ref: '#/components/parameters/collectionId'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResourceCollectionResponse'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   parameters:
     organizationId:
@@ -412,6 +475,15 @@ components:
       name: apiResourceId
       in: path
       description: ID of the API Resource.
+      required: true
+      schema:
+        type: string
+        example: er34-gf23-bv54-vb90
+
+    collectionId:
+      name: collectionId
+      in: path
+      description: ID of the API Resource Collection.
       required: true
       schema:
         type: string
@@ -629,7 +701,7 @@ components:
           example: before
         href:
           type: string
-          example: /o/orgName/api-resources?after=NDoy
+          example: /t/carbon.super/api/server/v1/api-resources?after=NDoy
 
     APIResourceListResponse:
       type: object
@@ -647,6 +719,68 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/APIResourceListItem'
+
+    APIResourceCollectionListItem:
+      type: object
+      required:
+        - id
+        - name
+        - displayName
+        - self
+      properties:
+        id:
+          type: string
+          example: gh43-jk34-vb34-df67
+        name:
+          type: string
+          example: bulkUserImport
+        displayName:
+          type: string
+          example: Bulk User Import
+        type:
+          type: string
+          example: SYSTEM
+        self:
+          type: string
+          example: /t/carbon.super/api/server/v1/api-resource-collections/eDUwOUNlcnRpZmljYXRlQXV0aGVudGljYXRvcg
+
+    APIResourceCollectionListResponse:
+      type: object
+      required:
+        - links
+      properties:
+        totalResults:
+          type: integer
+          example: 1
+        APIResourceCollections:
+          type: array
+          items:
+            $ref: '#/components/schemas/APIResourceCollectionListItem'
+
+    APIResourceCollectionResponse:
+      type: object
+      required:
+        - id
+        - name
+        - displayName
+        - self
+      properties:
+        id:
+          type: string
+          example: gh43-jk34-vb34-df67
+        name:
+          type: string
+          example: bulkUserImport
+        displayName:
+          type: string
+          example: Bulk User Import
+        type:
+          type: string
+          example: SYSTEM
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScopeGetModel'
 
     ScopeGetModel:
       type: object
