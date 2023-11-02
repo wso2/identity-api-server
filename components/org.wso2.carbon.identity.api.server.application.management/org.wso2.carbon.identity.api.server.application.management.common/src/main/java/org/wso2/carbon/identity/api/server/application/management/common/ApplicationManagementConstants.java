@@ -65,6 +65,11 @@ public class ApplicationManagementConstants {
     public static final String REQUEST_OBJECT_ENCRYPTION_METHODS_SUPPORTED = "OAuth.OpenIDConnect." +
             "SupportedRequestObjectEncryptionMethods.SupportedRequestObjectEncryptionMethod";
     public static final String DEFAULT_SUBJECT_TYPE = "OAuth.OpenIDConnect.DefaultSubjectType";
+    public static final String FAPI_ALLOWED_SIGNATURE_ALGORITHMS = "OAuth.OpenIDConnect.FAPI." +
+            "AllowedSignatureAlgorithms.AllowedSignatureAlgorithm";
+    public static final String FAPI_ALLOWED_CLIENT_AUTHENTICATION_METHODS = "OAuth.OpenIDConnect.FAPI." +
+            "AllowedClientAuthenticationMethods.AllowedClientAuthenticationMethod";
+    public static final String RSA1_5 = "RSA1_5";
 
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 

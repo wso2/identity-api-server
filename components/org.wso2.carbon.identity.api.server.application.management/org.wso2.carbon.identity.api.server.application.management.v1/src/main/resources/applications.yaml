@@ -2588,8 +2588,8 @@ components:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
         associatedRoles:
-           type: object
-           $ref: '#/components/schemas/AssociatedRolesConfig'
+          type: object
+          $ref: '#/components/schemas/AssociatedRolesConfig'
     ApplicationModel:
       type: object
       required:
@@ -3288,6 +3288,11 @@ components:
           $ref: '#/components/schemas/PushAuthorizationRequestConfiguration'
         subject:
           $ref: '#/components/schemas/SubjectConfiguration'
+        isFAPIApplication:
+          type: boolean
+          default: false
+          description: Enabling this option will make the application FAPI conformant.
+          example: false
     OAuth2PKCEConfiguration:
       type: object
       properties:
@@ -3377,7 +3382,7 @@ components:
         tokenEndpointAuthSigningAlg:
           type: string
           example: 'PS256'
-        tlsClientAuthSubjectDnUpdated:
+        tlsClientAuthSubjectDn:
           type: string
           example: 'CN=John Doe,OU=OrgUnit,O=Organization,L=Colombo,ST=Western,C=LK'
     RequestObjectConfiguration:
@@ -3559,6 +3564,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ClientAuthenticationMethod'
+    FapiMetadata:
+      type: object
+      properties:
+        allowedSignatureAlgorithms:
+          type: array
+          items:
+            type: string
+          example:
+            - 'PS256'
+            - 'ES256'
+        allowedEncryptionAlgorithms:
+          type: array
+          items:
+            type: string
+          example:
+            - 'RSA-OAEP'
+            - 'RSA1_5'
+        tokenEndpointAuthMethod:
+          type: string
+          example: 'private_key_jwt'
     ClientAuthenticationMethod:
       type: object
       properties:
@@ -3641,6 +3666,8 @@ components:
           $ref: '#/components/schemas/MetadataProperty'
         subjectType:
           $ref: '#/components/schemas/MetadataProperty'
+        fapiMetadata:
+          $ref: '#/components/schemas/FapiMetadata'
     WSTrustMetaData:
       type: object
       properties:
