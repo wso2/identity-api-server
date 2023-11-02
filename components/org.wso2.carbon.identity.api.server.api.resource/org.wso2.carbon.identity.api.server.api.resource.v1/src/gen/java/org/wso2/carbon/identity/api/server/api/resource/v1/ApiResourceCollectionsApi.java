@@ -61,9 +61,9 @@ public class ApiResourceCollectionsApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response apiResourceCollectionsCollectionIdGet(@ApiParam(value = "ID of the API Resource Collection.",required=true) @PathParam("collectionId") String collectionId) {
+    public Response getAPIResourceCollectionByCollectionId(@ApiParam(value = "ID of the API Resource Collection.",required=true) @PathParam("collectionId") String collectionId) {
 
-        return delegate.apiResourceCollectionsCollectionIdGet(collectionId );
+        return delegate.getAPIResourceCollectionByCollectionId(collectionId );
     }
 
     @Valid

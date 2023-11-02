@@ -23,12 +23,12 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourceCollection
 import javax.ws.rs.core.Response;
 
 /**
- * Implementation of the Api resource collection REST Api.
+ * Implementation of the API resource collections REST API.
  */
 public class ApiResourceCollectionsApiServiceImpl implements ApiResourceCollectionsApiService {
 
     @Override
-    public Response apiResourceCollectionsCollectionIdGet(String collectionId) {
+    public Response getAPIResourceCollectionByCollectionId(String collectionId) {
 
         // do some magic!
         return Response.ok().entity("magic!").build();

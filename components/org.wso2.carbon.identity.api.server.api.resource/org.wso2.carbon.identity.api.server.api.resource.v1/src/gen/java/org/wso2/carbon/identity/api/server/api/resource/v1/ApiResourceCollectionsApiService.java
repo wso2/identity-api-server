@@ -32,7 +32,7 @@ import javax.ws.rs.core.Response;
 
 public interface ApiResourceCollectionsApiService {
 
-      public Response apiResourceCollectionsCollectionIdGet(String collectionId);
+      public Response getAPIResourceCollectionByCollectionId(String collectionId);
 
       public Response getAPIResourceCollections(String filter);
 }

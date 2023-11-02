@@ -440,6 +440,7 @@ paths:
           * /permission/admin/manage/identity/apiresourcemgt/view <br>
         <b>Scope required:</b> <br>
           * internal_api_resource_view
+      operationId: getAPIResourceCollectionByCollectionId
       parameters:
         - $ref: '#/components/parameters/collectionId'
       responses:
