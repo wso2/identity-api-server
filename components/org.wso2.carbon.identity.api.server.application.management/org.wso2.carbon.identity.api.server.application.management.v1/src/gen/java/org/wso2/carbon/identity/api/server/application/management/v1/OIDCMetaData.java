@@ -235,13 +235,13 @@ public class OIDCMetaData  {
     }
 
     /**
-    **/
+     **/
     public OIDCMetaData tokenEndpointAuthMethod(ClientAuthenticationMethodMetadata tokenEndpointAuthMethod) {
 
         this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("tokenEndpointAuthMethod")
     @Valid
@@ -253,13 +253,13 @@ public class OIDCMetaData  {
     }
 
     /**
-    **/
+     **/
     public OIDCMetaData tokenEndpointSignatureAlgorithm(MetadataProperty tokenEndpointSignatureAlgorithm) {
 
         this.tokenEndpointSignatureAlgorithm = tokenEndpointSignatureAlgorithm;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("tokenEndpointSignatureAlgorithm")
     @Valid
@@ -271,13 +271,13 @@ public class OIDCMetaData  {
     }
 
     /**
-    **/
+     **/
     public OIDCMetaData idTokenSignatureAlgorithm(MetadataProperty idTokenSignatureAlgorithm) {
 
         this.idTokenSignatureAlgorithm = idTokenSignatureAlgorithm;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("idTokenSignatureAlgorithm")
     @Valid
@@ -289,13 +289,13 @@ public class OIDCMetaData  {
     }
 
     /**
-    **/
+     **/
     public OIDCMetaData requestObjectSignatureAlgorithm(MetadataProperty requestObjectSignatureAlgorithm) {
 
         this.requestObjectSignatureAlgorithm = requestObjectSignatureAlgorithm;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("requestObjectSignatureAlgorithm")
     @Valid
@@ -307,13 +307,13 @@ public class OIDCMetaData  {
     }
 
     /**
-    **/
+     **/
     public OIDCMetaData requestObjectEncryptionAlgorithm(MetadataProperty requestObjectEncryptionAlgorithm) {
 
         this.requestObjectEncryptionAlgorithm = requestObjectEncryptionAlgorithm;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("requestObjectEncryptionAlgorithm")
     @Valid
@@ -325,13 +325,13 @@ public class OIDCMetaData  {
     }
 
     /**
-    **/
+     **/
     public OIDCMetaData requestObjectEncryptionMethod(MetadataProperty requestObjectEncryptionMethod) {
 
         this.requestObjectEncryptionMethod = requestObjectEncryptionMethod;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("requestObjectEncryptionMethod")
     @Valid
@@ -343,13 +343,13 @@ public class OIDCMetaData  {
     }
 
     /**
-    **/
+     **/
     public OIDCMetaData subjectType(MetadataProperty subjectType) {
 
         this.subjectType = subjectType;
         return this;
     }
-    
+
     @ApiModelProperty(value = "")
     @JsonProperty("subjectType")
     @Valid
