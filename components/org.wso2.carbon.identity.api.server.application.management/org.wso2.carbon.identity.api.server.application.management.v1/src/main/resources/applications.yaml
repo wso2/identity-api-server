@@ -3568,22 +3568,11 @@ components:
       type: object
       properties:
         allowedSignatureAlgorithms:
-          type: array
-          items:
-            type: string
-          example:
-            - 'PS256'
-            - 'ES256'
+          $ref: '#/components/schemas/MetadataProperty'
         allowedEncryptionAlgorithms:
-          type: array
-          items:
-            type: string
-          example:
-            - 'RSA-OAEP'
-            - 'RSA1_5'
+          $ref: '#/components/schemas/MetadataProperty'
         tokenEndpointAuthMethod:
-          type: string
-          example: 'private_key_jwt'
+          $ref: '#/components/schemas/ClientAuthenticationMethodMetadata'
     ClientAuthenticationMethod:
       type: object
       properties:

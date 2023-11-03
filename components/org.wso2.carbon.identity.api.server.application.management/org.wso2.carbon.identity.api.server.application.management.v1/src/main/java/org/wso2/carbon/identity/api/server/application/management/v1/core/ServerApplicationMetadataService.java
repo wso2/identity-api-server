@@ -160,8 +160,11 @@ public class ServerApplicationMetadataService {
         OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
 
         List<String> tokenEpAuthMethods = Arrays.asList(OAuth2Util.getSupportedClientAuthMethods());
-        List<ClientAuthenticationMethod> supportedClientAuthenticationMethods =
-                getClientAuthMethods(tokenEpAuthMethods);
+        List<ClientAuthenticationMethod> supportedClientAuthenticationMethods = new ArrayList<>();
+        supportedClientAuthenticationMethods.add(new ClientAuthenticationMethod()
+                .name(ApplicationManagementConstants.NONE)
+                .displayName(ApplicationManagementConstants.NONE));
+        supportedClientAuthenticationMethods.addAll(getClientAuthMethods(tokenEpAuthMethods));
         oidcMetaData.setTokenEndpointAuthMethod(
                 new ClientAuthenticationMethodMetadata().options(supportedClientAuthenticationMethods));
         List<String> tokenEpSigningAlgorithms = IdentityUtil
@@ -201,8 +204,7 @@ public class ServerApplicationMetadataService {
         fapiAllowedSignatureAlgorithms.addAll(IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.FAPI_ALLOWED_SIGNATURE_ALGORITHMS));
         List<String> fapiAllowedEncryptionAlgorithms = new ArrayList<>();
-        fapiAllowedEncryptionAlgorithms.addAll(IdentityUtil
-                .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_ENCRYPTION_ALGORITHMS_SUPPORTED));
+        fapiAllowedEncryptionAlgorithms.addAll(requestObjectEncryptionAlgorithms);
         fapiAllowedEncryptionAlgorithms.removeIf(n -> (n.equals(ApplicationManagementConstants.RSA1_5)));
         List<String> fapiAllowedAuthMethods = new ArrayList<>();
         fapiAllowedAuthMethods.addAll(IdentityUtil
@@ -212,8 +214,8 @@ public class ServerApplicationMetadataService {
         List<ClientAuthenticationMethod> supportedFapiClientAuthenticationMethods =
                 getClientAuthMethods(serverSupportedFapiAuthMethods);
         FapiMetadata fapiMetadata = new FapiMetadata();
-        fapiMetadata.allowedSignatureAlgorithms(fapiAllowedSignatureAlgorithms);
-        fapiMetadata.allowedEncryptionAlgorithms(fapiAllowedEncryptionAlgorithms);
+        fapiMetadata.allowedSignatureAlgorithms(new MetadataProperty().options(fapiAllowedSignatureAlgorithms));
+        fapiMetadata.allowedEncryptionAlgorithms(new MetadataProperty().options(fapiAllowedEncryptionAlgorithms));
         fapiMetadata.setTokenEndpointAuthMethod(new ClientAuthenticationMethodMetadata()
                 .options(supportedFapiClientAuthenticationMethods));
         oidcMetaData.setFapiMetadata(fapiMetadata);

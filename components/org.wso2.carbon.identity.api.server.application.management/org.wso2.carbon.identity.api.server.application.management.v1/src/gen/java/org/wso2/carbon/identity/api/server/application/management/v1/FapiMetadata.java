@@ -22,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationMethodMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.MetadataProperty;
 import javax.validation.constraints.*;
 
 
@@ -34,74 +34,55 @@ import javax.xml.bind.annotation.*;
 
 public class FapiMetadata  {
   
-    private List<String> allowedSignatureAlgorithms = null;
-
-    private List<String> allowedEncryptionAlgorithms = null;
-
+    private MetadataProperty allowedSignatureAlgorithms;
+    private MetadataProperty allowedEncryptionAlgorithms;
     private ClientAuthenticationMethodMetadata tokenEndpointAuthMethod;
 
-
     /**
     **/
-    public FapiMetadata allowedSignatureAlgorithms(List<String> allowedSignatureAlgorithms) {
+    public FapiMetadata allowedSignatureAlgorithms(MetadataProperty allowedSignatureAlgorithms) {
 
         this.allowedSignatureAlgorithms = allowedSignatureAlgorithms;
         return this;
     }
     
-    @ApiModelProperty(example = "[\"PS256\",\"ES256\"]", value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("allowedSignatureAlgorithms")
     @Valid
-    public List<String> getAllowedSignatureAlgorithms() {
+    public MetadataProperty getAllowedSignatureAlgorithms() {
         return allowedSignatureAlgorithms;
     }
-    public void setAllowedSignatureAlgorithms(List<String> allowedSignatureAlgorithms) {
+    public void setAllowedSignatureAlgorithms(MetadataProperty allowedSignatureAlgorithms) {
         this.allowedSignatureAlgorithms = allowedSignatureAlgorithms;
     }
 
-    public FapiMetadata addAllowedSignatureAlgorithmsItem(String allowedSignatureAlgorithmsItem) {
-        if (this.allowedSignatureAlgorithms == null) {
-            this.allowedSignatureAlgorithms = new ArrayList<>();
-        }
-        this.allowedSignatureAlgorithms.add(allowedSignatureAlgorithmsItem);
-        return this;
-    }
-
-        /**
+    /**
     **/
-    public FapiMetadata allowedEncryptionAlgorithms(List<String> allowedEncryptionAlgorithms) {
+    public FapiMetadata allowedEncryptionAlgorithms(MetadataProperty allowedEncryptionAlgorithms) {
 
         this.allowedEncryptionAlgorithms = allowedEncryptionAlgorithms;
         return this;
     }
     
-    @ApiModelProperty(example = "[\"RSA-OAEP\",\"RSA1_5\"]", value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("allowedEncryptionAlgorithms")
     @Valid
-    public List<String> getAllowedEncryptionAlgorithms() {
+    public MetadataProperty getAllowedEncryptionAlgorithms() {
         return allowedEncryptionAlgorithms;
     }
-    public void setAllowedEncryptionAlgorithms(List<String> allowedEncryptionAlgorithms) {
+    public void setAllowedEncryptionAlgorithms(MetadataProperty allowedEncryptionAlgorithms) {
         this.allowedEncryptionAlgorithms = allowedEncryptionAlgorithms;
     }
 
-    public FapiMetadata addAllowedEncryptionAlgorithmsItem(String allowedEncryptionAlgorithmsItem) {
-        if (this.allowedEncryptionAlgorithms == null) {
-            this.allowedEncryptionAlgorithms = new ArrayList<>();
-        }
-        this.allowedEncryptionAlgorithms.add(allowedEncryptionAlgorithmsItem);
-        return this;
-    }
-
     /**
-     **/
+    **/
     public FapiMetadata tokenEndpointAuthMethod(ClientAuthenticationMethodMetadata tokenEndpointAuthMethod) {
 
         this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
         return this;
     }
-
-    @ApiModelProperty(example = "true", value = "")
+    
+    @ApiModelProperty(value = "")
     @JsonProperty("tokenEndpointAuthMethod")
     @Valid
     public ClientAuthenticationMethodMetadata getTokenEndpointAuthMethod() {
@@ -110,7 +91,8 @@ public class FapiMetadata  {
     public void setTokenEndpointAuthMethod(ClientAuthenticationMethodMetadata tokenEndpointAuthMethod) {
         this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
     }
-    
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
