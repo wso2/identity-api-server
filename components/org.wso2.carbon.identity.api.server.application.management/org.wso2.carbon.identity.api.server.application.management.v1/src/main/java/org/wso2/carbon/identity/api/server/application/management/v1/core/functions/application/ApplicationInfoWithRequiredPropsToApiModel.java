@@ -61,10 +61,10 @@ public class ApplicationInfoWithRequiredPropsToApiModel implements Function<Appl
 
     private AssociatedRolesConfig excludeAssociatedRoles(AssociatedRolesConfig associatedRolesConfig) {
 
-        AssociatedRolesConfig configExcludingRoles = new AssociatedRolesConfig();
         if (associatedRolesConfig == null) {
-            return configExcludingRoles;
+            return null;
         }
+        AssociatedRolesConfig configExcludingRoles = new AssociatedRolesConfig();
         configExcludingRoles.setAllowedAudience(associatedRolesConfig.getAllowedAudience());
         return configExcludingRoles;
     }
