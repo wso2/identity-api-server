@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.common;
 
+import org.wso2.carbon.identity.api.resource.collection.mgt.APIResourceCollectionManager;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 
@@ -27,6 +28,7 @@ import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 public class APIResourceManagementServiceHolder {
 
     private static APIResourceManager apiResourceManager;
+    private static APIResourceCollectionManager apiResourceCollectionManager;
     private static OAuthAdminServiceImpl oAuthAdminServiceImpl;
 
     /**
@@ -47,6 +49,26 @@ public class APIResourceManagementServiceHolder {
     public static void setApiResourceManager(APIResourceManager apiResourceManager) {
 
         APIResourceManagementServiceHolder.apiResourceManager = apiResourceManager;
+    }
+
+    /**
+     * Get APIResourceCollectionManager osgi service.
+     *
+     * @return APIResourceCollectionManager.
+     */
+    public static APIResourceCollectionManager getApiResourceCollectionManager() {
+
+        return apiResourceCollectionManager;
+    }
+
+    /**
+     * Set APIResourceCollectionManager osgi service.
+     *
+     * @param apiResourceCollectionManager APIResourceCollectionManager.
+     */
+    public static void setApiResourceCollectionManager(APIResourceCollectionManager apiResourceCollectionManager) {
+
+        APIResourceManagementServiceHolder.apiResourceCollectionManager = apiResourceCollectionManager;
     }
 
     /**

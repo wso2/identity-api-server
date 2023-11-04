@@ -753,10 +753,41 @@ components:
         totalResults:
           type: integer
           example: 1
-        APIResourceCollections:
+        apiResourceCollections:
           type: array
           items:
             $ref: '#/components/schemas/APIResourceCollectionListItem'
+
+    APIResourceCollectionItem:
+      type: object
+      required:
+        - id
+        - name
+        - displayName
+        - self
+      properties:
+        id:
+          type: string
+          example: gh43-jk34-vb34-df67
+        name:
+          type: string
+          example: Greetings API
+        description:
+          type: string
+          example: Greeting API representation
+        identifier:
+          type: string
+          example: greetings_api
+        type:
+          type: string
+          example: SYSTEM
+        scopes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScopeGetModel'
+        self:
+          type: string
+          example: /t/carbon.super/api/server/v1/api-resources/eDUwOUNlcnRpZmljYXRlQXV0aGVudGljYXRvcg
 
     APIResourceCollectionResponse:
       type: object
@@ -778,10 +809,10 @@ components:
         type:
           type: string
           example: SYSTEM
-        scopes:
+        apiResources:
           type: array
           items:
-            $ref: '#/components/schemas/ScopeGetModel'
+            $ref: '#/components/schemas/APIResourceCollectionItem'
 
     ScopeGetModel:
       type: object

@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourceCollectionsApiService;
+import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceCollectionManagementService;
 
 import javax.ws.rs.core.Response;
 
@@ -27,17 +29,19 @@ import javax.ws.rs.core.Response;
  */
 public class ApiResourceCollectionsApiServiceImpl implements ApiResourceCollectionsApiService {
 
+    @Autowired
+    ServerAPIResourceCollectionManagementService serverAPIResourceManagementService;
+
     @Override
     public Response getAPIResourceCollectionByCollectionId(String collectionId) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(
+                serverAPIResourceManagementService.getAPIResourceCollectionByCollectionId(collectionId)).build();
     }
 
     @Override
     public Response getAPIResourceCollections(String filter) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(serverAPIResourceManagementService.getAPIResourceCollections(filter)).build();
     }
 }

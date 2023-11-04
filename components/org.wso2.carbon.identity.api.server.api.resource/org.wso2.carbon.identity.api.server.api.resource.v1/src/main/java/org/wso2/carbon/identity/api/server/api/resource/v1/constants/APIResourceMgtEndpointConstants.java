@@ -34,6 +34,7 @@ public class APIResourceMgtEndpointConstants {
     public static final String SYSTEM_API_RESOURCE_TYPE = "SYSTEM";
     public static final String API_RESOURCE_MANAGEMENT_PREFIX = "API-RESOURCE-";
     public static final String API_RESOURCE_PATH_COMPONENT = "/api-resources";
+    public static final String API_RESOURCE_COLLECTION_PATH_COMPONENT = "/api-resource-collections";
 
     private static final List<String> allowedAttributeList = new ArrayList<>();
     public static final List<String> ALLOWED_SEARCH_ATTRIBUTES = Collections.unmodifiableList(allowedAttributeList);
@@ -99,7 +100,10 @@ public class APIResourceMgtEndpointConstants {
 
         ERROR_CODE_VALIDATE_SCOPES("65002", "Error while validating scopes.", "Server encountered an error while " +
                 "validating the scopes."),
-        ;
+        ERROR_CODE_API_RESOURCE_COLLECTION_NOT_FOUND("600014",
+                "Unable to find the API resource collection.",
+                "Unable to find the API resource collection with the id: %s in the tenant domain."),
+        ; // TODO: Change code.
         private final String code;
         private final String message;
         private final String description;

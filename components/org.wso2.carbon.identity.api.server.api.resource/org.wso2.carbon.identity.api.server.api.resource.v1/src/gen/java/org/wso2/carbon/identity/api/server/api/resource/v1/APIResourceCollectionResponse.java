@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionItem;
 import javax.validation.constraints.*;
 
 
@@ -39,7 +39,7 @@ public class APIResourceCollectionResponse  {
     private String name;
     private String displayName;
     private String type;
-    private List<ScopeGetModel> scopes = null;
+    private List<APIResourceCollectionItem> apiResources = null;
 
 
     /**
@@ -122,27 +122,27 @@ public class APIResourceCollectionResponse  {
 
     /**
     **/
-    public APIResourceCollectionResponse scopes(List<ScopeGetModel> scopes) {
+    public APIResourceCollectionResponse apiResources(List<APIResourceCollectionItem> apiResources) {
 
-        this.scopes = scopes;
+        this.apiResources = apiResources;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("scopes")
+    @JsonProperty("apiResources")
     @Valid
-    public List<ScopeGetModel> getScopes() {
-        return scopes;
+    public List<APIResourceCollectionItem> getApiResources() {
+        return apiResources;
     }
-    public void setScopes(List<ScopeGetModel> scopes) {
-        this.scopes = scopes;
+    public void setApiResources(List<APIResourceCollectionItem> apiResources) {
+        this.apiResources = apiResources;
     }
 
-    public APIResourceCollectionResponse addScopesItem(ScopeGetModel scopesItem) {
-        if (this.scopes == null) {
-            this.scopes = new ArrayList<ScopeGetModel>();
+    public APIResourceCollectionResponse addApiResourcesItem(APIResourceCollectionItem apiResourcesItem) {
+        if (this.apiResources == null) {
+            this.apiResources = new ArrayList<APIResourceCollectionItem>();
         }
-        this.scopes.add(scopesItem);
+        this.apiResources.add(apiResourcesItem);
         return this;
     }
 
@@ -162,12 +162,12 @@ public class APIResourceCollectionResponse  {
             Objects.equals(this.name, apIResourceCollectionResponse.name) &&
             Objects.equals(this.displayName, apIResourceCollectionResponse.displayName) &&
             Objects.equals(this.type, apIResourceCollectionResponse.type) &&
-            Objects.equals(this.scopes, apIResourceCollectionResponse.scopes);
+            Objects.equals(this.apiResources, apIResourceCollectionResponse.apiResources);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, type, scopes);
+        return Objects.hash(id, name, displayName, type, apiResources);
     }
 
     @Override
@@ -180,7 +180,7 @@ public class APIResourceCollectionResponse  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
-        sb.append("    scopes: ").append(toIndentedString(scopes)).append("\n");
+        sb.append("    apiResources: ").append(toIndentedString(apiResources)).append("\n");
         sb.append("}");
         return sb.toString();
     }

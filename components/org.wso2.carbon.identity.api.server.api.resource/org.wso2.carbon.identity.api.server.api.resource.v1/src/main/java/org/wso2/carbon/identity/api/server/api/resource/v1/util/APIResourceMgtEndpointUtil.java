@@ -21,6 +21,8 @@ package org.wso2.carbon.identity.api.server.api.resource.v1.util;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.resource.collection.mgt.exception.APIResourceCollectionMgtClientException;
+import org.wso2.carbon.identity.api.resource.collection.mgt.exception.APIResourceCollectionMgtException;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtClientException;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
 import org.wso2.carbon.identity.api.server.api.resource.common.APIResourceManagementServiceHolder;
@@ -161,6 +163,21 @@ public class APIResourceMgtEndpointUtil {
             LOG.error(e.getMessage(), e);
         }
         String errorCode = e.getErrorCode();
+        errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
+                APIResourceMgtEndpointConstants.API_RESOURCE_MANAGEMENT_PREFIX + errorCode;
+        return handleException(status, errorCode, e.getMessage(), e.getDescription());
+    }
+
+    public static APIError handleAPIResourceCollectionMgtException(APIResourceCollectionMgtException e) {
+
+        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+        if (e instanceof APIResourceCollectionMgtClientException) {
+            LOG.debug(e.getMessage(), e);
+            status = Response.Status.BAD_REQUEST;
+        } else {
+            LOG.error(e.getMessage(), e);
+        }
+        String errorCode = e.getErrorCode(); //TODO: Update this
         errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
                 APIResourceMgtEndpointConstants.API_RESOURCE_MANAGEMENT_PREFIX + errorCode;
         return handleException(status, errorCode, e.getMessage(), e.getDescription());

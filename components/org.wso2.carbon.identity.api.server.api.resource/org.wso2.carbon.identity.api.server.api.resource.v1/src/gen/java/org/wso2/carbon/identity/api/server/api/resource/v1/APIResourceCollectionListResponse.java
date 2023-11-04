@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.*;
 public class APIResourceCollectionListResponse  {
   
     private Integer totalResults;
-    private List<APIResourceCollectionListItem> apIResourceCollections = null;
+    private List<APIResourceCollectionListItem> apiResourceCollections = null;
 
 
     /**
@@ -59,27 +59,27 @@ public class APIResourceCollectionListResponse  {
 
     /**
     **/
-    public APIResourceCollectionListResponse apIResourceCollections(List<APIResourceCollectionListItem> apIResourceCollections) {
+    public APIResourceCollectionListResponse apiResourceCollections(List<APIResourceCollectionListItem> apiResourceCollections) {
 
-        this.apIResourceCollections = apIResourceCollections;
+        this.apiResourceCollections = apiResourceCollections;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("APIResourceCollections")
+    @JsonProperty("apiResourceCollections")
     @Valid
-    public List<APIResourceCollectionListItem> getApIResourceCollections() {
-        return apIResourceCollections;
+    public List<APIResourceCollectionListItem> getApiResourceCollections() {
+        return apiResourceCollections;
     }
-    public void setApIResourceCollections(List<APIResourceCollectionListItem> apIResourceCollections) {
-        this.apIResourceCollections = apIResourceCollections;
+    public void setApiResourceCollections(List<APIResourceCollectionListItem> apiResourceCollections) {
+        this.apiResourceCollections = apiResourceCollections;
     }
 
-    public APIResourceCollectionListResponse addApIResourceCollectionsItem(APIResourceCollectionListItem apIResourceCollectionsItem) {
-        if (this.apIResourceCollections == null) {
-            this.apIResourceCollections = new ArrayList<APIResourceCollectionListItem>();
+    public APIResourceCollectionListResponse addApiResourceCollectionsItem(APIResourceCollectionListItem apiResourceCollectionsItem) {
+        if (this.apiResourceCollections == null) {
+            this.apiResourceCollections = new ArrayList<APIResourceCollectionListItem>();
         }
-        this.apIResourceCollections.add(apIResourceCollectionsItem);
+        this.apiResourceCollections.add(apiResourceCollectionsItem);
         return this;
     }
 
@@ -96,12 +96,12 @@ public class APIResourceCollectionListResponse  {
         }
         APIResourceCollectionListResponse apIResourceCollectionListResponse = (APIResourceCollectionListResponse) o;
         return Objects.equals(this.totalResults, apIResourceCollectionListResponse.totalResults) &&
-            Objects.equals(this.apIResourceCollections, apIResourceCollectionListResponse.apIResourceCollections);
+            Objects.equals(this.apiResourceCollections, apIResourceCollectionListResponse.apiResourceCollections);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(totalResults, apIResourceCollections);
+        return Objects.hash(totalResults, apiResourceCollections);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class APIResourceCollectionListResponse  {
         sb.append("class APIResourceCollectionListResponse {\n");
         
         sb.append("    totalResults: ").append(toIndentedString(totalResults)).append("\n");
-        sb.append("    apIResourceCollections: ").append(toIndentedString(apIResourceCollections)).append("\n");
+        sb.append("    apiResourceCollections: ").append(toIndentedString(apiResourceCollections)).append("\n");
         sb.append("}");
         return sb.toString();
     }
