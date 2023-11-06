@@ -64,8 +64,6 @@ public interface OrganizationsApiService {
 
       public Response organizationsGet(String filter, Integer limit, String after, String before, Boolean recursive);
 
-      public Response organizationsGetMe(String filter, Integer limit, String after, String before, Boolean recursive);
-
       public Response organizationsOrganizationIdDelete(String organizationId);
 
       public Response organizationsOrganizationIdDiscoveryDelete(String organizationId);

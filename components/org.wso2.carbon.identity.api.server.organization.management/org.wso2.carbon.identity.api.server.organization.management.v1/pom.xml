@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.organization.management</artifactId>
-        <version>1.2.106-SNAPSHOT</version>
+        <version>1.2.113-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -90,6 +90,10 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.wso2.carbon.identity.server.api</groupId>
+            <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.server.organization.management.common</artifactId>

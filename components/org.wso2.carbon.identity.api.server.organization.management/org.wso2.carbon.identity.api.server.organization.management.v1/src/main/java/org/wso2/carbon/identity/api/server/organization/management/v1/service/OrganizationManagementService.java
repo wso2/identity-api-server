@@ -23,6 +23,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.organization.management.common.OrganizationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.management.v1.exceptions.OrganizationManagementEndpointException;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ApplicationSharePOSTRequest;
@@ -52,6 +53,7 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Shar
 import org.wso2.carbon.identity.api.server.organization.management.v1.util.OrganizationManagementEndpointUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.organization.discovery.service.OrganizationDiscoveryManager;
+import org.wso2.carbon.identity.organization.discovery.service.model.DiscoveryOrganizationsResult;
 import org.wso2.carbon.identity.organization.discovery.service.model.OrgDiscoveryAttribute;
 import org.wso2.carbon.identity.organization.discovery.service.model.OrganizationDiscovery;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
@@ -83,11 +85,13 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.ASC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DESC_SORT_ORDER;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DISCOVERY_PATH;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_EMPTY_REQUEST_BODY;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY;
-import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ORGANIZATION_PATH;
+import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.buildURIForBody;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.generateUniqueID;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.getOrganizationId;
@@ -112,36 +116,11 @@ public class OrganizationManagementService {
      */
     public Response getOrganizations(String filter, Integer limit, String after, String before, Boolean recursive) {
 
-        return getOrganizationList(false, filter, limit, after, before, recursive);
-    }
-
-    /**
-     * Retrieve organization IDs for authorized user.
-     *
-     * @param filter    The filter string.
-     * @param limit     The maximum number of records to be returned.
-     * @param after     The pointer to next page.
-     * @param before    The pointer to previous page.
-     * @param recursive Determines whether recursive search is required.
-     * @return The list of organization IDs.
-     */
-    public Response getAuthorizedOrganizations(String filter, Integer limit, String after, String before,
-                                               Boolean recursive) {
-
-        return getOrganizationList(true, filter, limit, after, before, recursive);
-    }
-
-    private Response getOrganizationList(boolean authorizedSubOrgsOnly, String filter, Integer limit, String after,
-                                         String before, Boolean recursive) {
-
         try {
             limit = validateLimit(limit);
             String sortOrder = StringUtils.isNotBlank(before) ? ASC_SORT_ORDER : DESC_SORT_ORDER;
-            List<BasicOrganization> organizations = authorizedSubOrgsOnly ?
-                    getOrganizationManager().getUserAuthorizedOrganizations(
-                            limit + 1, after, before, sortOrder, filter, Boolean.TRUE.equals(recursive))
-                    : getOrganizationManager().getOrganizations(
-                    limit + 1, after, before, sortOrder, filter, Boolean.TRUE.equals(recursive));
+            List<BasicOrganization> organizations = getOrganizationManager().getOrganizations(limit + 1, after,
+                    before, sortOrder, filter, Boolean.TRUE.equals(recursive));
             return Response.ok().entity(getOrganizationsResponse(limit, after, before, filter, organizations,
                     Boolean.TRUE.equals(recursive))).build();
         } catch (OrganizationManagementClientException e) {
@@ -480,11 +459,25 @@ public class OrganizationManagementService {
      */
     public Response getOrganizationsDiscoveryAttributes(String filter, Integer offset, Integer limit) {
 
-        handleNotImplementedCapabilities(offset, limit);
         try {
-            List<OrganizationDiscovery> organizationsDiscoveryAttributes =
-                    getOrganizationDiscoveryManager().getOrganizationsDiscoveryAttributes(filter);
+            DiscoveryOrganizationsResult discoveryOrganizationsResult = getOrganizationDiscoveryManager()
+                    .getOrganizationsDiscoveryAttributes(limit, offset, filter);
             OrganizationsDiscoveryResponse response = new OrganizationsDiscoveryResponse();
+            List<OrganizationDiscovery> organizationsDiscoveryAttributes = discoveryOrganizationsResult
+                    .getOrganizations();
+            response.setTotalResults(discoveryOrganizationsResult.getTotalResults());
+            response.setStartIndex(discoveryOrganizationsResult.getOffset() + 1);
+            List<Link> paginationLinks = Util.buildPaginationLinks(discoveryOrganizationsResult.getLimit(),
+                            discoveryOrganizationsResult.getOffset(),
+                            discoveryOrganizationsResult.getTotalResults(),
+                            PATH_SEPARATOR + ORGANIZATION_PATH + PATH_SEPARATOR + DISCOVERY_PATH,
+                            null, filter)
+                    .entrySet()
+                    .stream()
+                    .map(entry -> new Link().rel(entry.getKey()).href(URI.create(entry.getValue())))
+                    .collect(Collectors.toList());
+            response.setLinks(paginationLinks);
+            response.setCount(organizationsDiscoveryAttributes.size());
             for (OrganizationDiscovery organizationDiscovery : organizationsDiscoveryAttributes) {
                 OrganizationDiscoveryResponse organizationDiscoveryResponse = new OrganizationDiscoveryResponse();
                 organizationDiscoveryResponse.setOrganizationId(organizationDiscovery.getOrganizationId());
@@ -865,17 +858,6 @@ public class OrganizationManagementService {
                     orgDiscoveryAttribute.setValues(attribute.getValues());
                     return orgDiscoveryAttribute;
                 }).collect(Collectors.toList());
-    }
-
-    private void handleNotImplementedCapabilities(Integer offset, Integer limit) {
-
-        if (limit != null || offset != null) {
-            Error error = OrganizationManagementEndpointUtil.getError(
-                    ERROR_CODE_PAGINATION_NOT_IMPLEMENTED.getCode(),
-                    ERROR_CODE_PAGINATION_NOT_IMPLEMENTED.getMessage(),
-                    ERROR_CODE_PAGINATION_NOT_IMPLEMENTED.getDescription());
-            throw new OrganizationManagementEndpointException(Response.Status.NOT_IMPLEMENTED, error);
-        }
     }
 
     private OrganizationMetadata getOrganizationMetadataResponse(Organization organization, List<OrgDiscoveryAttribute>

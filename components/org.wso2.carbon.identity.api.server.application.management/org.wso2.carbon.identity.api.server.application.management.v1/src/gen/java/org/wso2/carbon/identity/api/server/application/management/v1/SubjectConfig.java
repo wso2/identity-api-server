@@ -37,6 +37,7 @@ public class SubjectConfig  {
     private Boolean includeUserDomain;
     private Boolean includeTenantDomain;
     private Boolean useMappedLocalSubject;
+    private Boolean mappedLocalSubjectMandatory;
 
     /**
     **/
@@ -110,6 +111,24 @@ public class SubjectConfig  {
         this.useMappedLocalSubject = useMappedLocalSubject;
     }
 
+    /**
+    **/
+    public SubjectConfig mappedLocalSubjectMandatory(Boolean mappedLocalSubjectMandatory) {
+
+        this.mappedLocalSubjectMandatory = mappedLocalSubjectMandatory;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("mappedLocalSubjectMandatory")
+    @Valid
+    public Boolean getMappedLocalSubjectMandatory() {
+        return mappedLocalSubjectMandatory;
+    }
+    public void setMappedLocalSubjectMandatory(Boolean mappedLocalSubjectMandatory) {
+        this.mappedLocalSubjectMandatory = mappedLocalSubjectMandatory;
+    }
+
 
 
     @Override
@@ -125,12 +144,13 @@ public class SubjectConfig  {
         return Objects.equals(this.claim, subjectConfig.claim) &&
             Objects.equals(this.includeUserDomain, subjectConfig.includeUserDomain) &&
             Objects.equals(this.includeTenantDomain, subjectConfig.includeTenantDomain) &&
-            Objects.equals(this.useMappedLocalSubject, subjectConfig.useMappedLocalSubject);
+            Objects.equals(this.useMappedLocalSubject, subjectConfig.useMappedLocalSubject) &&
+            Objects.equals(this.mappedLocalSubjectMandatory, subjectConfig.mappedLocalSubjectMandatory);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(claim, includeUserDomain, includeTenantDomain, useMappedLocalSubject);
+        return Objects.hash(claim, includeUserDomain, includeTenantDomain, useMappedLocalSubject, mappedLocalSubjectMandatory);
     }
 
     @Override
@@ -143,6 +163,7 @@ public class SubjectConfig  {
         sb.append("    includeUserDomain: ").append(toIndentedString(includeUserDomain)).append("\n");
         sb.append("    includeTenantDomain: ").append(toIndentedString(includeTenantDomain)).append("\n");
         sb.append("    useMappedLocalSubject: ").append(toIndentedString(useMappedLocalSubject)).append("\n");
+        sb.append("    mappedLocalSubjectMandatory: ").append(toIndentedString(mappedLocalSubjectMandatory)).append("\n");
         sb.append("}");
         return sb.toString();
     }

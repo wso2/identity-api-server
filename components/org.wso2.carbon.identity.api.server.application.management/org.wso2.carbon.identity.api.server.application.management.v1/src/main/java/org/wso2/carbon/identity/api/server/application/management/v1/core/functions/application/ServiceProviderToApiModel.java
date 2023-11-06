@@ -125,18 +125,19 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         AssociatedRolesConfig associatedRolesConfig = new AssociatedRolesConfig();
         if (application.getAssociatedRolesConfig() == null) {
-            associatedRolesConfig.setAllowedAudience(AssociatedRolesConfig.AllowedAudienceEnum.ORGANIZATION);
-            return associatedRolesConfig;
+            return null;
         }
 
         String allowedAudience = application.getAssociatedRolesConfig().getAllowedAudience();
-        AssociatedRolesConfig.AllowedAudienceEnum allowedAudienceEnum;
+        AssociatedRolesConfig.AllowedAudienceEnum allowedAudienceEnum = null;
         switch (allowedAudience) {
             case "application":
                 allowedAudienceEnum = AssociatedRolesConfig.AllowedAudienceEnum.APPLICATION;
                 break;
-            default:
+            case "organization":
                 allowedAudienceEnum = AssociatedRolesConfig.AllowedAudienceEnum.ORGANIZATION;
+                break;
+            default:
                 break;
         }
         associatedRolesConfig.setAllowedAudience(allowedAudienceEnum);
@@ -306,6 +307,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         if (application.getClaimConfig() != null) {
             subjectConfig.useMappedLocalSubject(application.getClaimConfig().isAlwaysSendMappedLocalSubjectId());
+            subjectConfig.mappedLocalSubjectMandatory(application.getClaimConfig().isMappedLocalSubjectMandatory());
         }
 
         LocalAndOutboundAuthenticationConfig localAndOutboundAuthConfig =
