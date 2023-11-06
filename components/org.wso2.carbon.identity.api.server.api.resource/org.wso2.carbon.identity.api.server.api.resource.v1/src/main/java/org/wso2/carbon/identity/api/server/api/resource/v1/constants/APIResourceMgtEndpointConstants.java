@@ -93,6 +93,9 @@ public class APIResourceMgtEndpointConstants {
                 "Cannot modify or delete the read-only System APIs."),
         ERROR_CODE_INVALID_REQ_ATTRIBUTES("60013", "Invalid attribute name.",
                 "Invalid attribute name provided as required attribute."),
+        ERROR_CODE_API_RESOURCE_COLLECTION_NOT_FOUND("60014",
+                "Unable to find the API resource collection.",
+                "Unable to find the API resource collection with the id: %s in the tenant domain."),
       
         // Server errors.
         ERROR_CODE_ADD_API_RESOURCE("65001", "Error while adding api resource.", "Server encountered an error while " +
@@ -100,10 +103,7 @@ public class APIResourceMgtEndpointConstants {
 
         ERROR_CODE_VALIDATE_SCOPES("65002", "Error while validating scopes.", "Server encountered an error while " +
                 "validating the scopes."),
-        ERROR_CODE_API_RESOURCE_COLLECTION_NOT_FOUND("600014",
-                "Unable to find the API resource collection.",
-                "Unable to find the API resource collection with the id: %s in the tenant domain."),
-        ; // TODO: Change code.
+        ;
         private final String code;
         private final String message;
         private final String description;
