@@ -3429,10 +3429,13 @@ components:
       required:
         - realm
         - replyTo
+        - replyToLogout
       properties:
         realm:
           type: string
         replyTo:
+          type: string
+        replyToLogout:
           type: string
     WSTrustConfiguration:
       type: object

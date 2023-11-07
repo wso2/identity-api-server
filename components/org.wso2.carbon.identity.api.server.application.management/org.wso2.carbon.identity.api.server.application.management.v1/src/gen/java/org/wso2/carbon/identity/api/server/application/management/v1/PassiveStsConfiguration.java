@@ -34,6 +34,7 @@ public class PassiveStsConfiguration  {
   
     private String realm;
     private String replyTo;
+    private String replyToLogout;
 
     /**
     **/
@@ -75,6 +76,26 @@ public class PassiveStsConfiguration  {
         this.replyTo = replyTo;
     }
 
+    /**
+    **/
+    public PassiveStsConfiguration replyToLogout(String replyToLogout) {
+
+        this.replyToLogout = replyToLogout;
+        return this;
+    }
+    
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("replyToLogout")
+    @Valid
+    @NotNull(message = "Property replyToLogout cannot be null.")
+
+    public String getReplyToLogout() {
+        return replyToLogout;
+    }
+    public void setReplyToLogout(String replyToLogout) {
+        this.replyToLogout = replyToLogout;
+    }
+
 
 
     @Override
@@ -88,12 +109,13 @@ public class PassiveStsConfiguration  {
         }
         PassiveStsConfiguration passiveStsConfiguration = (PassiveStsConfiguration) o;
         return Objects.equals(this.realm, passiveStsConfiguration.realm) &&
-            Objects.equals(this.replyTo, passiveStsConfiguration.replyTo);
+            Objects.equals(this.replyTo, passiveStsConfiguration.replyTo) &&
+            Objects.equals(this.replyToLogout, passiveStsConfiguration.replyToLogout);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(realm, replyTo);
+        return Objects.hash(realm, replyTo, replyToLogout);
     }
 
     @Override
@@ -104,6 +126,7 @@ public class PassiveStsConfiguration  {
         
         sb.append("    realm: ").append(toIndentedString(realm)).append("\n");
         sb.append("    replyTo: ").append(toIndentedString(replyTo)).append("\n");
+        sb.append("    replyToLogout: ").append(toIndentedString(replyToLogout)).append("\n");
         sb.append("}");
         return sb.toString();
     }

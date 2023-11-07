@@ -26,6 +26,7 @@ import org.wso2.carbon.identity.application.common.util.IdentityApplicationConst
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.arrayToStream;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.PassiveSTS.PASSIVE_STS_REPLY_URL;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.PassiveSTS.PASSIVE_STS_REPLY_URL_LOGOUT;
 
 /**
  * Helper functions for Passive STS inbound management.
@@ -63,7 +64,11 @@ public class PassiveSTSInboundFunctions {
         passiveStsReplyUrl.setName(IdentityApplicationConstants.PassiveSTS.PASSIVE_STS_REPLY_URL);
         passiveStsReplyUrl.setValue(config.getReplyTo());
 
-        passiveStsInbound.setProperties(new Property[]{passiveStsReplyUrl});
+        Property passiveStsReplyUrlLogout = new Property();
+        passiveStsReplyUrlLogout.setName(PASSIVE_STS_REPLY_URL_LOGOUT);
+        passiveStsReplyUrlLogout.setValue(config.getReplyToLogout());
+
+        passiveStsInbound.setProperties(new Property[]{passiveStsReplyUrl, passiveStsReplyUrlLogout});
         return passiveStsInbound;
     }
 
@@ -74,6 +79,12 @@ public class PassiveSTSInboundFunctions {
                 .findAny()
                 .map(Property::getValue).orElse(null);
 
-        return new PassiveStsConfiguration().realm(inboundAuth.getInboundAuthKey()).replyTo(replyTo);
+        String replyToLogout = arrayToStream(inboundAuth.getProperties())
+                .filter(property -> StringUtils.equals(property.getName(), PASSIVE_STS_REPLY_URL_LOGOUT))
+                .findAny()
+                .map(Property::getValue).orElse(null);
+
+        return new PassiveStsConfiguration().realm(inboundAuth.getInboundAuthKey()).replyTo(replyTo)
+                .replyToLogout(replyToLogout);
     }
 }
