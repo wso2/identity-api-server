@@ -84,11 +84,9 @@ public class PassiveStsConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("replyToLogout")
     @Valid
-    @NotNull(message = "Property replyToLogout cannot be null.")
-
     public String getReplyToLogout() {
         return replyToLogout;
     }

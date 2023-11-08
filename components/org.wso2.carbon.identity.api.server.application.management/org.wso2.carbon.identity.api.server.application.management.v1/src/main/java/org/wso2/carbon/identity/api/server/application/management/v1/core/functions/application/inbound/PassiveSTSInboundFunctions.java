@@ -64,11 +64,15 @@ public class PassiveSTSInboundFunctions {
         passiveStsReplyUrl.setName(IdentityApplicationConstants.PassiveSTS.PASSIVE_STS_REPLY_URL);
         passiveStsReplyUrl.setValue(config.getReplyTo());
 
-        Property passiveStsReplyUrlLogout = new Property();
-        passiveStsReplyUrlLogout.setName(PASSIVE_STS_REPLY_URL_LOGOUT);
-        passiveStsReplyUrlLogout.setValue(config.getReplyToLogout());
+        if (StringUtils.isNotBlank(config.getReplyToLogout())) {
+            Property passiveStsReplyUrlLogout = new Property();
+            passiveStsReplyUrlLogout.setName(PASSIVE_STS_REPLY_URL_LOGOUT);
+            passiveStsReplyUrlLogout.setValue(config.getReplyToLogout());
+            passiveStsInbound.setProperties(new Property[]{passiveStsReplyUrl, passiveStsReplyUrlLogout});
+        } else {
+            passiveStsInbound.setProperties(new Property[]{passiveStsReplyUrl});
+        }
 
-        passiveStsInbound.setProperties(new Property[]{passiveStsReplyUrl, passiveStsReplyUrlLogout});
         return passiveStsInbound;
     }
 

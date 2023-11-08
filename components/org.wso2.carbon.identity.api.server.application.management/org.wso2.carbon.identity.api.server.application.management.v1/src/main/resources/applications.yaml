@@ -3429,7 +3429,6 @@ components:
       required:
         - realm
         - replyTo
-        - replyToLogout
       properties:
         realm:
           type: string
