@@ -3380,7 +3380,7 @@ components:
         tokenEndpointAuthSigningAlg:
           type: string
           example: 'PS256'
-        tlsClientAuthSubjectDnUpdated:
+        tlsClientAuthSubjectDn:
           type: string
           example: 'CN=John Doe,OU=OrgUnit,O=Organization,L=Colombo,ST=Western,C=LK'
     RequestObjectConfiguration:

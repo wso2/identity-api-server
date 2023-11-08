@@ -46,6 +46,7 @@ import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
 import org.wso2.carbon.identity.oauth.dto.TokenBindingMetaDataDTO;
+import org.wso2.carbon.identity.oauth2.model.ClientAuthenticationMethodModel;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.security.SecurityConfigException;
@@ -53,6 +54,7 @@ import org.wso2.carbon.security.SecurityConfigException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -157,26 +159,9 @@ public class ServerApplicationMetadataService {
         OIDCMetaData oidcMetaData = new OIDCMetaData();
         OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
 
-        List<String> tokenEpAuthMethods = Arrays.asList(OAuth2Util.getSupportedClientAuthMethods());
-        List<ClientAuthenticationMethod> supportedClientAuthenticationMethods = new ArrayList<>();
-        for (String tokenEpAuthMethod : tokenEpAuthMethods) {
-            ClientAuthenticationMethod clientAuthenticationMethod = new ClientAuthenticationMethod();
-            clientAuthenticationMethod.setName(tokenEpAuthMethod);
-            if (tokenEpAuthMethod.equals("client_secret_basic")) {
-                clientAuthenticationMethod.setDisplayName("Client Secret Basic");
-            } else if (tokenEpAuthMethod.equals("client_secret_post")) {
-                clientAuthenticationMethod.setDisplayName("Client Secret Post");
-            } else if (tokenEpAuthMethod.equals("private_key_jwt")) {
-                clientAuthenticationMethod.setDisplayName("Private Key JWT");
-            } else if (tokenEpAuthMethod.equals("tls_client_auth")) {
-                clientAuthenticationMethod.setDisplayName("Mutual TLS");
-            } else {
-                clientAuthenticationMethod.setDisplayName(tokenEpAuthMethod);
-            }
-            supportedClientAuthenticationMethods.add(clientAuthenticationMethod);
-        }
+        List<ClientAuthenticationMethod> supportedClientAuthMethods = getClientAuthenticationMethods();
         oidcMetaData.setTokenEndpointAuthMethod(
-                new ClientAuthenticationMethodMetadata().options(supportedClientAuthenticationMethods));
+                new ClientAuthenticationMethodMetadata().options(supportedClientAuthMethods));
         List<String> tokenEpSigningAlgorithms = IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.TOKEN_EP_SIGNATURE_ALGORITHMS_SUPPORTED);
         oidcMetaData.setTokenEndpointSignatureAlgorithm(new MetadataProperty()
@@ -417,5 +402,18 @@ public class ServerApplicationMetadataService {
         String errorDescription = String.format(ErrorMessage.INVALID_INBOUND_PROTOCOL.getDescription(), inboundName);
 
         return Utils.buildClientError(errorCode, errorMessage, errorDescription);
+    }
+
+    private List<ClientAuthenticationMethod> getClientAuthenticationMethods() {
+
+        HashSet<ClientAuthenticationMethodModel> tokenEpAuthMethods = OAuth2Util.getSupportedAuthenticationMethods();
+        List<ClientAuthenticationMethod> supportedClientAuthMethods = new ArrayList<>();
+        for (ClientAuthenticationMethodModel authMethod : tokenEpAuthMethods) {
+            ClientAuthenticationMethod clientAuthenticationMethod = new ClientAuthenticationMethod();
+            clientAuthenticationMethod.setName(authMethod.getName());
+            clientAuthenticationMethod.setDisplayName(authMethod.getDisplayName());
+            supportedClientAuthMethods.add(clientAuthenticationMethod);
+        }
+        return supportedClientAuthMethods;
     }
 }
