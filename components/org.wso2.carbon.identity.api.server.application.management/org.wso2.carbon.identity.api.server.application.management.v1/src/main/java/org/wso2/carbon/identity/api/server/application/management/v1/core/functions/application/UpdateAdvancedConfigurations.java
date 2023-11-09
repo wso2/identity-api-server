@@ -63,6 +63,8 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                         clientAttestationMetaData::setAttestationEnabled);
                 setIfNotNull(advancedConfigurations.getAttestationMetaData().getAndroidPackageName(),
                         clientAttestationMetaData::setAndroidPackageName);
+                setIfNotNull(advancedConfigurations.getAttestationMetaData().getAppleAppId(),
+                        clientAttestationMetaData::setAppleAppId);
                 if (advancedConfigurations.getAttestationMetaData()
                         .getAndroidAttestationServiceCredentials() != null) {
                     String androidAttestationServiceCredentials

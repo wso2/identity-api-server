@@ -38,6 +38,7 @@ public class AdvancedApplicationConfigurationAttestationMetaData  {
     private Boolean enableClientAttestation;
     private String androidPackageName;
     private Object androidAttestationServiceCredentials;
+    private String appleAppId;
 
     /**
     * Decides whether client attestation enabled for this application.
@@ -67,7 +68,7 @@ public class AdvancedApplicationConfigurationAttestationMetaData  {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Decides the android package name of the application.")
+    @ApiModelProperty(example = "com.wso2.mobile.sample", value = "Decides the android package name of the application.")
     @JsonProperty("androidPackageName")
     @Valid
     public String getAndroidPackageName() {
@@ -86,7 +87,7 @@ public class AdvancedApplicationConfigurationAttestationMetaData  {
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "Decides the credentials for the service account to access Google Play Integrity Service.")
+    @ApiModelProperty(value = "Decides the credentials for the service account to access Google Play Integrity Service.")
     @JsonProperty("androidAttestationServiceCredentials")
     @Valid
     public Object getAndroidAttestationServiceCredentials() {
@@ -94,6 +95,25 @@ public class AdvancedApplicationConfigurationAttestationMetaData  {
     }
     public void setAndroidAttestationServiceCredentials(Object androidAttestationServiceCredentials) {
         this.androidAttestationServiceCredentials = androidAttestationServiceCredentials;
+    }
+
+    /**
+    * Decides the apple app id which denotes {apple-teamId}.{bundleId}.
+    **/
+    public AdvancedApplicationConfigurationAttestationMetaData appleAppId(String appleAppId) {
+
+        this.appleAppId = appleAppId;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "APPLETEAMID.com.wso2.mobile.sample", value = "Decides the apple app id which denotes {apple-teamId}.{bundleId}.")
+    @JsonProperty("appleAppId")
+    @Valid
+    public String getAppleAppId() {
+        return appleAppId;
+    }
+    public void setAppleAppId(String appleAppId) {
+        this.appleAppId = appleAppId;
     }
 
 
@@ -110,12 +130,13 @@ public class AdvancedApplicationConfigurationAttestationMetaData  {
         AdvancedApplicationConfigurationAttestationMetaData advancedApplicationConfigurationAttestationMetaData = (AdvancedApplicationConfigurationAttestationMetaData) o;
         return Objects.equals(this.enableClientAttestation, advancedApplicationConfigurationAttestationMetaData.enableClientAttestation) &&
             Objects.equals(this.androidPackageName, advancedApplicationConfigurationAttestationMetaData.androidPackageName) &&
-            Objects.equals(this.androidAttestationServiceCredentials, advancedApplicationConfigurationAttestationMetaData.androidAttestationServiceCredentials);
+            Objects.equals(this.androidAttestationServiceCredentials, advancedApplicationConfigurationAttestationMetaData.androidAttestationServiceCredentials) &&
+            Objects.equals(this.appleAppId, advancedApplicationConfigurationAttestationMetaData.appleAppId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enableClientAttestation, androidPackageName, androidAttestationServiceCredentials);
+        return Objects.hash(enableClientAttestation, androidPackageName, androidAttestationServiceCredentials, appleAppId);
     }
 
     @Override
@@ -127,6 +148,7 @@ public class AdvancedApplicationConfigurationAttestationMetaData  {
         sb.append("    enableClientAttestation: ").append(toIndentedString(enableClientAttestation)).append("\n");
         sb.append("    androidPackageName: ").append(toIndentedString(androidPackageName)).append("\n");
         sb.append("    androidAttestationServiceCredentials: ").append(toIndentedString(androidAttestationServiceCredentials)).append("\n");
+        sb.append("    appleAppId: ").append(toIndentedString(appleAppId)).append("\n");
         sb.append("}");
         return sb.toString();
     }

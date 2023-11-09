@@ -73,6 +73,7 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_JWKS;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_PEM;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.ANDROID_PACKAGE_NAME_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.APPLE_APP_ID_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_API_BASED_AUTHENTICATION_ENABLED_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_ATTESTATION_ENABLED_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.ALLOWED_ROLE_AUDIENCE_PROPERTY_NAME;
@@ -451,6 +452,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return new AdvancedApplicationConfigurationAttestationMetaData()
                 .enableClientAttestation(clientAttestationMetaData.isAttestationEnabled())
                 .androidPackageName(clientAttestationMetaData.getAndroidPackageName())
+                .appleAppId(clientAttestationMetaData.getAppleAppId())
                 .androidAttestationServiceCredentials(clientAttestationMetaData
                         .getAndroidAttestationServiceCredentials());
     }
@@ -495,6 +497,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     ANDROID_PACKAGE_NAME_PROPERTY_NAME.equals(property.getName()));
             spPropertyList.removeIf(property ->
                     ANDROID_PACKAGE_NAME_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property ->
+                    APPLE_APP_ID_PROPERTY_NAME.equals(property.getName()));
             spPropertyList.removeIf(property -> ALLOWED_ROLE_AUDIENCE_PROPERTY_NAME.equals(property.getName()));
             return spPropertyList.toArray(new ServiceProviderProperty[0]);
     }
