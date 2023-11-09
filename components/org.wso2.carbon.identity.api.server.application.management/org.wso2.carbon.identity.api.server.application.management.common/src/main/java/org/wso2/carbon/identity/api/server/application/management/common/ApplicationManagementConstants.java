@@ -137,6 +137,9 @@ public class ApplicationManagementConstants {
         INVALID_POLICY_TYPE_FOR_API_RESOURCE("60512", "Invalid policy type provided for the API " +
                 "resource.", "API resource with id: %s doesn't allow the provided policy type: %s."),
 
+        ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED("60513",
+                "Invalid configuration.",
+                "'useMappedLocalSubject' cannot be disabled when 'mappedLocalSubjectMandatory' is enabled."),
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
                 "Error occurred while retrieving SAML Metadata.",
