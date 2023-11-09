@@ -3434,6 +3434,8 @@ components:
           type: string
         replyTo:
           type: string
+        replyToLogout:
+          type: string
     WSTrustConfiguration:
       type: object
       required:
