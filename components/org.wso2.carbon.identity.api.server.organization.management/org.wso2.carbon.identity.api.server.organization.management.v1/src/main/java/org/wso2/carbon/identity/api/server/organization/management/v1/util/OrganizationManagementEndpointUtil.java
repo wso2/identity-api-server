@@ -22,8 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.organization.management.v1.exceptions.OrganizationManagementEndpointException;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
-import org.wso2.carbon.identity.core.ServiceURLBuilder;
-import org.wso2.carbon.identity.core.URLBuilderException;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementClientException;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
 
@@ -31,16 +29,15 @@ import java.net.URI;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForBody;
+import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DISCOVERY_PATH;
-import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL;
-import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ERROR_BUILDING_RESPONSE_HEADER_URL;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_APPLICATION;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_ORGANIZATION;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_USER_NOT_AUTHORIZED_TO_CREATE_ORGANIZATION;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ORGANIZATION_PATH;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.organization.management.service.util.Utils.getContext;
 
 /**
  * This class provides util functions to the organization management endpoint.
@@ -151,6 +148,18 @@ public class OrganizationManagementEndpointUtil {
     }
 
     /**
+     * The relative URL to get the organization.
+     *
+     * @param organizationId The unique identifier of the organization.
+     * @return URI
+     */
+    public static URI organizationGetURL(String organizationId) {
+
+        return buildURIForBody(PATH_SEPARATOR + V1_API_PATH_COMPONENT + PATH_SEPARATOR + ORGANIZATION_PATH +
+                PATH_SEPARATOR + organizationId);
+    }
+
+    /**
      * Get location of the created organization discovery attributes.
      *
      * @param organizationId The unique identifier of the organization.
@@ -162,34 +171,10 @@ public class OrganizationManagementEndpointUtil {
                 + organizationId + PATH_SEPARATOR + DISCOVERY_PATH);
     }
 
-    private static URI buildURIForHeader(String endpoint) {
-
-        String context = getContext(endpoint);
-        try {
-            String url = ServiceURLBuilder.create().addPath(context).build().getAbsolutePublicURL();
-            return URI.create(url);
-        } catch (URLBuilderException e) {
-            LOG.error("Server encountered an error while building URL for response header.");
-            Error error = getError(ERROR_CODE_ERROR_BUILDING_RESPONSE_HEADER_URL.getCode(),
-                    ERROR_CODE_ERROR_BUILDING_RESPONSE_HEADER_URL.getMessage(),
-                    ERROR_CODE_ERROR_BUILDING_RESPONSE_HEADER_URL.getDescription());
-            throw new OrganizationManagementEndpointException(Response.Status.INTERNAL_SERVER_ERROR, error);
-        }
-    }
-
     public static String buildURIForPagination(String paginationURL) {
 
-        String context = getContext(V1_API_PATH_COMPONENT + PATH_SEPARATOR + ORGANIZATION_PATH + paginationURL);
-
-        try {
-            return ServiceURLBuilder.create().addPath(context).build().getRelativePublicURL();
-        } catch (URLBuilderException e) {
-            LOG.error("Server encountered an error while building paginated URL for the response.", e);
-            Error error = getError(ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getCode(),
-                    ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getMessage(),
-                    ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getDescription());
-            throw new OrganizationManagementEndpointException(Response.Status.INTERNAL_SERVER_ERROR, error);
-        }
+        return buildURIForBody(V1_API_PATH_COMPONENT + PATH_SEPARATOR + ORGANIZATION_PATH + paginationURL)
+                .toString();
     }
 
 }
