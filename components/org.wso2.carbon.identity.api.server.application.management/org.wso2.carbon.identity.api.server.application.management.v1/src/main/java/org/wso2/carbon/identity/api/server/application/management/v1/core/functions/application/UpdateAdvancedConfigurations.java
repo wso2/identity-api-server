@@ -92,7 +92,6 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
         return gson.toJson(androidAttestationServiceCredentials);
     }
 
-
     private LocalAndOutboundAuthenticationConfig getLocalAndOutboundConfig(ServiceProvider application) {
 
         if (application.getLocalAndOutBoundAuthenticationConfig() == null) {
