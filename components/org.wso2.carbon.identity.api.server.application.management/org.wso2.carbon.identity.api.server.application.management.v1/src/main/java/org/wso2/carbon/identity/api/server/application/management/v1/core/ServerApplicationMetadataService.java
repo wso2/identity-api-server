@@ -206,10 +206,9 @@ public class ServerApplicationMetadataService {
         List<String> fapiAllowedAuthMethods = new ArrayList<>();
         fapiAllowedAuthMethods.addAll(IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.FAPI_ALLOWED_CLIENT_AUTHENTICATION_METHODS));
-        List<String> serverSupportedFapiAuthMethods = tokenEpAuthMethods.stream()
-                .filter(fapiAllowedAuthMethods::contains).collect(Collectors.toList());
         List<ClientAuthenticationMethod> supportedFapiClientAuthenticationMethods =
-                getClientAuthMethods(serverSupportedFapiAuthMethods);
+                supportedClientAuthMethods.stream().filter(clientAuthenticationMethod ->
+                fapiAllowedAuthMethods.contains(clientAuthenticationMethod.getName())).collect(Collectors.toList());
         FapiMetadata fapiMetadata = new FapiMetadata();
         fapiMetadata.allowedSignatureAlgorithms(new MetadataProperty().options(fapiAllowedSignatureAlgorithms));
         fapiMetadata.allowedEncryptionAlgorithms(new MetadataProperty().options(fapiAllowedEncryptionAlgorithms));
