@@ -795,7 +795,6 @@ components:
         - id
         - name
         - displayName
-        - self
       properties:
         id:
           type: string
@@ -810,9 +809,16 @@ components:
           type: string
           example: SYSTEM
         apiResources:
-          type: array
-          items:
-            $ref: '#/components/schemas/APIResourceCollectionItem'
+          type: object
+          properties:
+            read:
+              type: array
+              items:
+                $ref: '#/components/schemas/APIResourceCollectionItem'
+            write:
+              type: array
+              items:
+                $ref: '#/components/schemas/APIResourceCollectionItem'
 
     ScopeGetModel:
       type: object

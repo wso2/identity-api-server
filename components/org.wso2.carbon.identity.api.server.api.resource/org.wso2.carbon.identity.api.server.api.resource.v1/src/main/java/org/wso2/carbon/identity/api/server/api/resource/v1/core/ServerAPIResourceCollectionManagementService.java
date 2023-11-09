@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.api.resource.v1.core;
 
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.identity.api.resource.collection.mgt.constant.APIResourceCollectionManagementConstants;
 import org.wso2.carbon.identity.api.resource.collection.mgt.exception.APIResourceCollectionMgtException;
 import org.wso2.carbon.identity.api.resource.collection.mgt.model.APIResourceCollection;
 import org.wso2.carbon.identity.api.resource.collection.mgt.model.APIResourceCollectionSearchResult;
@@ -27,6 +28,7 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollection
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionListItem;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionListResponse;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionResponse;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionResponseApiResources;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.api.resource.v1.util.APIResourceMgtEndpointUtil;
@@ -102,12 +104,16 @@ public class ServerAPIResourceCollectionManagementService {
             apiResourceCollectionResponse.setDisplayName(apiResourceCollection.getDisplayName());
             apiResourceCollectionResponse.setType(apiResourceCollection.getType());
 
-            List<APIResourceCollectionItem> apiResourceCollectionItems =
-                    (apiResourceCollection.getApiResources() != null)
-                            ? apiResourceCollection.getApiResources().stream()
-                            .map(this::buildAPIResourceCollectionItem).collect(Collectors.toList())
-                            : Collections.emptyList();
-            apiResourceCollectionResponse.setApiResources(apiResourceCollectionItems);
+            List<APIResourceCollectionItem> readAPIResourceCollectionItems = getAPIResourceCollectionItems(
+                    apiResourceCollection, APIResourceCollectionManagementConstants.READ);
+            List<APIResourceCollectionItem> writeAPIResourceCollectionItems = getAPIResourceCollectionItems(
+                    apiResourceCollection, APIResourceCollectionManagementConstants.WRITE);
+
+            APIResourceCollectionResponseApiResources apiResourceCollectionResponseApiResources =
+                    new APIResourceCollectionResponseApiResources();
+            apiResourceCollectionResponseApiResources.setRead(readAPIResourceCollectionItems);
+            apiResourceCollectionResponseApiResources.setWrite(writeAPIResourceCollectionItems);
+            apiResourceCollectionResponse.setApiResources(apiResourceCollectionResponseApiResources);
         } catch (APIResourceCollectionMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceCollectionMgtException(e);
         }
@@ -145,6 +151,24 @@ public class ServerAPIResourceCollectionManagementService {
                 .name(scope.getName())
                 .displayName(scope.getDisplayName())
                 .description(scope.getDescription());
+    }
+
+    /**
+     * Get API Resource Collection Items.
+     *
+     * @param apiResourceCollection API Resource Collection.
+     * @param resourceType          Resource type.
+     * @return API Resource Collection Items.
+     */
+    private List<APIResourceCollectionItem> getAPIResourceCollectionItems(APIResourceCollection apiResourceCollection,
+                                                                          String resourceType) {
+
+        if (apiResourceCollection.getApiResources() == null || apiResourceCollection.getApiResources()
+                .get(resourceType) == null) {
+            return Collections.emptyList();
+        }
+        return apiResourceCollection.getApiResources().get(resourceType).stream()
+                .map(this::buildAPIResourceCollectionItem).collect(Collectors.toList());
     }
 
     /**

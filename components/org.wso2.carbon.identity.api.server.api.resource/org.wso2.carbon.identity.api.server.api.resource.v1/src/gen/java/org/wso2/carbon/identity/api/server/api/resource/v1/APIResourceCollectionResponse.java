@@ -22,9 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionItem;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionResponseApiResources;
 import javax.validation.constraints.*;
 
 
@@ -39,8 +37,7 @@ public class APIResourceCollectionResponse  {
     private String name;
     private String displayName;
     private String type;
-    private List<APIResourceCollectionItem> apiResources = null;
-
+    private APIResourceCollectionResponseApiResources apiResources;
 
     /**
     **/
@@ -122,7 +119,7 @@ public class APIResourceCollectionResponse  {
 
     /**
     **/
-    public APIResourceCollectionResponse apiResources(List<APIResourceCollectionItem> apiResources) {
+    public APIResourceCollectionResponse apiResources(APIResourceCollectionResponseApiResources apiResources) {
 
         this.apiResources = apiResources;
         return this;
@@ -131,22 +128,14 @@ public class APIResourceCollectionResponse  {
     @ApiModelProperty(value = "")
     @JsonProperty("apiResources")
     @Valid
-    public List<APIResourceCollectionItem> getApiResources() {
+    public APIResourceCollectionResponseApiResources getApiResources() {
         return apiResources;
     }
-    public void setApiResources(List<APIResourceCollectionItem> apiResources) {
+    public void setApiResources(APIResourceCollectionResponseApiResources apiResources) {
         this.apiResources = apiResources;
     }
 
-    public APIResourceCollectionResponse addApiResourcesItem(APIResourceCollectionItem apiResourcesItem) {
-        if (this.apiResources == null) {
-            this.apiResources = new ArrayList<APIResourceCollectionItem>();
-        }
-        this.apiResources.add(apiResourcesItem);
-        return this;
-    }
 
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
