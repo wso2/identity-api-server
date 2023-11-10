@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthe
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationMethodMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.FapiMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.GrantType;
 import org.wso2.carbon.identity.api.server.application.management.v1.GrantTypeMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.MetadataProperty;
@@ -59,6 +60,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_CERTIFICATE_ALIAS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_NAME_ID_FORMAT;
@@ -195,6 +197,24 @@ public class ServerApplicationMetadataService {
         oidcMetaData.setSubjectType(new MetadataProperty()
                 .defaultValue(IdentityUtil.getProperty(ApplicationManagementConstants.DEFAULT_SUBJECT_TYPE))
                 .options(subjectTypes));
+        List<String> fapiAllowedSignatureAlgorithms = new ArrayList<>();
+        fapiAllowedSignatureAlgorithms.addAll(IdentityUtil
+                .getPropertyAsList(ApplicationManagementConstants.FAPI_ALLOWED_SIGNATURE_ALGORITHMS));
+        List<String> fapiAllowedEncryptionAlgorithms = new ArrayList<>();
+        fapiAllowedEncryptionAlgorithms.addAll(requestObjectEncryptionAlgorithms);
+        fapiAllowedEncryptionAlgorithms.removeIf(n -> (n.equals(ApplicationManagementConstants.RSA1_5)));
+        List<String> fapiAllowedAuthMethods = new ArrayList<>();
+        fapiAllowedAuthMethods.addAll(IdentityUtil
+                .getPropertyAsList(ApplicationManagementConstants.FAPI_ALLOWED_CLIENT_AUTHENTICATION_METHODS));
+        List<ClientAuthenticationMethod> supportedFapiClientAuthenticationMethods =
+                supportedClientAuthMethods.stream().filter(clientAuthenticationMethod ->
+                fapiAllowedAuthMethods.contains(clientAuthenticationMethod.getName())).collect(Collectors.toList());
+        FapiMetadata fapiMetadata = new FapiMetadata();
+        fapiMetadata.allowedSignatureAlgorithms(new MetadataProperty().options(fapiAllowedSignatureAlgorithms));
+        fapiMetadata.allowedEncryptionAlgorithms(new MetadataProperty().options(fapiAllowedEncryptionAlgorithms));
+        fapiMetadata.setTokenEndpointAuthMethod(new ClientAuthenticationMethodMetadata()
+                .options(supportedFapiClientAuthenticationMethods));
+        oidcMetaData.setFapiMetadata(fapiMetadata);
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
         List<GrantType> supportedGrantTypeNames = new ArrayList<>();
         // Iterate through the standard grant type names and add matching elements.

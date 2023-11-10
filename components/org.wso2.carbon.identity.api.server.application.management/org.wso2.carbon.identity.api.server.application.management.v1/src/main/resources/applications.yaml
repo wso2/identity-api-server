@@ -3291,6 +3291,11 @@ components:
           $ref: '#/components/schemas/PushAuthorizationRequestConfiguration'
         subject:
           $ref: '#/components/schemas/SubjectConfiguration'
+        isFAPIApplication:
+          type: boolean
+          default: false
+          description: Enabling this option will make the application FAPI conformant.
+          example: false
     OAuth2PKCEConfiguration:
       type: object
       properties:
@@ -3564,6 +3569,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ClientAuthenticationMethod'
+    FapiMetadata:
+      type: object
+      properties:
+        allowedSignatureAlgorithms:
+          $ref: '#/components/schemas/MetadataProperty'
+        allowedEncryptionAlgorithms:
+          $ref: '#/components/schemas/MetadataProperty'
+        tokenEndpointAuthMethod:
+          $ref: '#/components/schemas/ClientAuthenticationMethodMetadata'
     ClientAuthenticationMethod:
       type: object
       properties:
@@ -3646,6 +3660,8 @@ components:
           $ref: '#/components/schemas/MetadataProperty'
         subjectType:
           $ref: '#/components/schemas/MetadataProperty'
+        fapiMetadata:
+          $ref: '#/components/schemas/FapiMetadata'
     WSTrustMetaData:
       type: object
       properties:
