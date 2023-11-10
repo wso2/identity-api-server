@@ -65,7 +65,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -91,9 +90,6 @@ import static org.wso2.carbon.identity.base.IdentityConstants.USE_EXTERNAL_CONSE
 public class ServiceProviderToApiModel implements Function<ServiceProvider, ApplicationResponseModel> {
 
     private static final Log log = LogFactory.getLog(ServiceProviderToApiModel.class);
-
-    private static final Set<String> systemApplications = ApplicationManagementServiceHolder
-            .getApplicationManagementService().getSystemApplications();
     private static final String IS_FRAGMENT_APP = "isFragmentApp";
     private static final String useUserIdForDefaultSubject = "useUserIdForDefaultSubject";
 
@@ -530,12 +526,9 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private ApplicationResponseModel.AccessEnum getAccess(String applicationName) {
 
         String username = ContextLoader.getUsernameFromContext();
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         try {
             if (ApplicationConstants.LOCAL_SP.equals(applicationName) ||
-                    (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && systemApplications != null
-                            && systemApplications.stream().anyMatch(applicationName::equalsIgnoreCase)) ||
                     !ApplicationMgtUtil.isUserAuthorized(applicationName, username)) {
                 return ApplicationResponseModel.AccessEnum.READ;
             }

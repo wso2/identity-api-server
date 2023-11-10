@@ -17,7 +17,6 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.common.Constants;
@@ -26,9 +25,7 @@ import org.wso2.carbon.identity.application.common.IdentityApplicationManagement
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import java.util.Set;
 import java.util.function.Function;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
@@ -39,9 +36,6 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 public class ApplicationBasicInfoToApiModel implements Function<ApplicationBasicInfo, ApplicationListItem> {
 
     private static final Log log = LogFactory.getLog(ServerApplicationManagementService.class);
-
-    private static final Set<String> systemApplications =
-            ApplicationManagementServiceHolder.getApplicationManagementService().getSystemApplications();
 
     @Override
     public ApplicationListItem apply(ApplicationBasicInfo applicationBasicInfo) {
@@ -67,12 +61,9 @@ public class ApplicationBasicInfoToApiModel implements Function<ApplicationBasic
     private ApplicationListItem.AccessEnum getAccess(String applicationName) {
 
         String username = ContextLoader.getUsernameFromContext();
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         try {
             if (ApplicationConstants.LOCAL_SP.equals(applicationName) ||
-                    (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && systemApplications != null
-                            && systemApplications.stream().anyMatch(applicationName::equalsIgnoreCase)) ||
                     !ApplicationMgtUtil.isUserAuthorized(applicationName, username)) {
                 return ApplicationListItem.AccessEnum.READ;
             }

@@ -17,7 +17,6 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationListItem;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -26,14 +25,12 @@ import org.wso2.carbon.identity.application.common.IdentityApplicationManagement
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import javax.ws.rs.core.Response;
@@ -218,18 +215,12 @@ public class Utils {
         return new APIError(status, errorResponse);
     }
 
-    private static final Set<String> systemApplications =
-            ApplicationManagementServiceHolder.getApplicationManagementService().getSystemApplications();
-
     public static ApplicationListItem.AccessEnum getAccessForApplicationListItems(String applicationName) {
 
         String username = ContextLoader.getUsernameFromContext();
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         try {
             if (ApplicationConstants.LOCAL_SP.equals(applicationName) ||
-                    (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && systemApplications != null
-                            && systemApplications.stream().anyMatch(applicationName::equalsIgnoreCase)) ||
                     !ApplicationMgtUtil.isUserAuthorized(applicationName, username)) {
                 return ApplicationListItem.AccessEnum.READ;
             }
