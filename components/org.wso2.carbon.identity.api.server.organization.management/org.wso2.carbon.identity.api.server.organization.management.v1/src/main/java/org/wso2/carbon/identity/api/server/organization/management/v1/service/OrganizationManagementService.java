@@ -86,7 +86,7 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.ASC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DESC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DISCOVERY_PATH;
-import static org.wso2.carbon.identity.api.server.organization.management.v1.util.OrganizationManagementEndpointUtil.organizationGetURL;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.util.OrganizationManagementEndpointUtil.buildOrganizationURL;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_EMPTY_REQUEST_BODY;
@@ -597,7 +597,7 @@ public class OrganizationManagementService {
 
         ParentOrganizationDO parentOrganizationDO = organization.getParent();
         if (parentOrganizationDO != null) {
-            parentOrganizationDO.setRef(organizationGetURL(organization.getParent().getId()).toString());
+            parentOrganizationDO.setRef(buildOrganizationURL(organization.getParent().getId()).toString());
             organizationResponse.setParent(getParentOrganization(parentOrganizationDO));
         }
 
@@ -635,7 +635,7 @@ public class OrganizationManagementService {
 
         ParentOrganizationDO parentOrganizationDO = organization.getParent();
         if (parentOrganizationDO != null) {
-            parentOrganizationDO.setRef(organizationGetURL(organization.getParent().getId()).toString());
+            parentOrganizationDO.setRef(buildOrganizationURL(organization.getParent().getId()).toString());
             organizationResponse.setParent(getParentOrganization(parentOrganizationDO));
         }
 
@@ -751,7 +751,7 @@ public class OrganizationManagementService {
                 organizationDTO.setId(organization.getId());
                 organizationDTO.setName(organization.getName());
                 organizationDTO.setStatus(BasicOrganizationResponse.StatusEnum.valueOf(organization.getStatus()));
-                organizationDTO.setRef(organizationGetURL(organization.getId()).toString());
+                organizationDTO.setRef(buildOrganizationURL(organization.getId()).toString());
                 organizationDTOs.add(organizationDTO);
             }
             organizationsResponse.setOrganizations(organizationDTOs);
@@ -802,7 +802,7 @@ public class OrganizationManagementService {
         for (BasicOrganization org : organizations) {
             BasicOrganizationResponse basicOrganizationResponse =
                     new BasicOrganizationResponse().id(org.getId()).name(org.getName())
-                            .ref(organizationGetURL(org.getId()).toString());
+                            .ref(buildOrganizationURL(org.getId()).toString());
             response.addOrganizationsItem(basicOrganizationResponse);
         }
         return response;

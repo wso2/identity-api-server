@@ -153,7 +153,7 @@ public class OrganizationManagementEndpointUtil {
      * @param organizationId The unique identifier of the organization.
      * @return URI
      */
-    public static URI organizationGetURL(String organizationId) {
+    public static URI buildOrganizationURL(String organizationId) {
 
         return buildURIForBody(PATH_SEPARATOR + V1_API_PATH_COMPONENT + PATH_SEPARATOR + ORGANIZATION_PATH +
                 PATH_SEPARATOR + organizationId);
