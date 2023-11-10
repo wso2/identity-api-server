@@ -2828,6 +2828,29 @@ components:
           type: boolean
           description: Decides whether application is a fragment application.
           example: false
+        enableAPIBasedAuthentication:
+          type: boolean
+          description: Decides whether API Based Authentication is enabled for this application.
+          example: false
+        attestationMetaData:
+          type: object
+          description: Decides the client attestation meta data for the application.
+          properties:
+            enableClientAttestation:
+              type: boolean
+              description: Decides whether client attestation enabled for this application.
+              example: false
+            androidPackageName:
+              type: string
+              description: Decides the android package name of the application.
+              example: "com.wso2.mobile.sample"
+            androidAttestationServiceCredentials:
+              type: object
+              description: Decides the credentials for the service account to access Google Play Integrity Service.
+            appleAppId:
+              type: string
+              description: Decides the apple app id which denotes {apple-teamId}.{bundleId}.
+              example: "APPLETEAMID.com.wso2.mobile.sample"
         additionalSpProperties:
           $ref: '#/components/schemas/AdditionalProperties'
     AdditionalProperties:
