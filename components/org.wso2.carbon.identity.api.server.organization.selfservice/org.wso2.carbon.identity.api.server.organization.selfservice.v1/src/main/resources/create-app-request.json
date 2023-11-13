@@ -1,6 +1,6 @@
 {
   "name": "b2b-self-service-app",
-  "templateId": "custom-application-oidc",
+  "templateId": "m2m-application",
   "isManagementApp": true,
   "isB2BSelfServiceApp": true,
   "inboundProtocolConfiguration": {

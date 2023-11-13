@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.organization.selfservice.common;
 
+import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 
 /**
@@ -29,6 +31,10 @@ public class SelfServiceMgtServiceHolder {
     private static IdentityGovernanceService identityGovernanceService;
 
     private static ApplicationManagementService applicationManagementService;
+
+    private static APIResourceManager apiResourceManager;
+
+    private static AuthorizedAPIManagementService authorizedAPIManagementService;
 
     /**
      * Get Application Management OSGI service.
@@ -69,5 +75,46 @@ public class SelfServiceMgtServiceHolder {
     public static void setIdentityGovernanceService(IdentityGovernanceService identityGovernanceService) {
 
         SelfServiceMgtServiceHolder.identityGovernanceService = identityGovernanceService;
+    }
+
+    /**
+     * Get APIResourceManager.
+     *
+     * @return APIResourceManager.
+     */
+    public static APIResourceManager getAPIResourceManager() {
+
+        return apiResourceManager;
+    }
+
+    /**
+     * Set APIResourceManager.
+     *
+     * @param apiResourceManager APIResourceManager.
+     */
+    public static void setAPIResourceManager(APIResourceManager apiResourceManager) {
+
+        SelfServiceMgtServiceHolder.apiResourceManager = apiResourceManager;
+    }
+
+    /**
+     * Get AuthorizedAPIManagementService.
+     *
+     * @return AuthorizedAPIManagementService.
+     */
+    public static AuthorizedAPIManagementService getAuthorizedAPIManagementService() {
+
+        return authorizedAPIManagementService;
+    }
+
+    /**
+     * Set AuthorizedAPIManagementService.
+     *
+     * @param authorizedAPIManagementService AuthorizedAPIManagementService.
+     */
+    public static void setAuthorizedAPIManagementService(AuthorizedAPIManagementService
+                                                                 authorizedAPIManagementService) {
+
+        SelfServiceMgtServiceHolder.authorizedAPIManagementService = authorizedAPIManagementService;
     }
 }
