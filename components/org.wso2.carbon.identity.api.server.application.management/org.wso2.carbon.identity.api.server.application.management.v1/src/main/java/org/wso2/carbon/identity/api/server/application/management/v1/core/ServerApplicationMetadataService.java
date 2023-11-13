@@ -162,6 +162,9 @@ public class ServerApplicationMetadataService {
         OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
 
         List<ClientAuthenticationMethod> supportedClientAuthMethods = getClientAuthenticationMethods();
+        supportedClientAuthMethods.add(new ClientAuthenticationMethod()
+                .name(ApplicationManagementConstants.NONE)
+                .displayName(ApplicationManagementConstants.NONE));
         oidcMetaData.setTokenEndpointAuthMethod(
                 new ClientAuthenticationMethodMetadata().options(supportedClientAuthMethods));
         List<String> tokenEpSigningAlgorithms = IdentityUtil
