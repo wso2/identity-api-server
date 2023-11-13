@@ -783,7 +783,7 @@
         <identity.verification.version>1.0.3</identity.verification.version>
 
         <!-- Organization management core Version -->
-        <org.wso2.carbon.identity.organization.management.core.version>1.0.64
+        <org.wso2.carbon.identity.organization.management.core.version>1.0.85
         </org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>

@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2023, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.api.server.common;
@@ -27,6 +29,7 @@ import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
+import org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants;
 
 import java.net.URI;
 
@@ -81,7 +84,7 @@ public class ContextLoader {
 
     /**
      * Build URI prepending the server API context with the proxy context path to the endpoint.
-     * Ex: /t/<tenant-domain>/api/server/<endpoint> or /o/<organization-id>/api/server/<endpoint>
+     * Ex: /t/<tenant-domain>/api/server/<endpoint> or /t/<tenant-domain>/o/api/server/<endpoint>
      *
      * @param endpoint relative endpoint path.
      * @return Relative URI.
@@ -103,7 +106,7 @@ public class ContextLoader {
     /**
      * Build the complete URI prepending the server API context without the proxy context path, to the endpoint.
      * Ex: https://localhost:9443/t/<tenant-domain>/api/server/<endpoint> or
-     *     https://localhost:9443/o/<organization-id>/api/server/<endpoint>
+     *     https://localhost:9443/t/<tenant-domain>/o/api/server/<endpoint>
      *
      * @param endpoint relative endpoint path.
      * @return Fully qualified and complete URI.
@@ -137,16 +140,18 @@ public class ContextLoader {
 
         String context;
         String organizationId = getOrganizationIdFromContext();
-        if (StringUtils.isNotBlank(organizationId)) {
-            context = String.format(ORGANIZATION_CONTEXT_PATH_COMPONENT, organizationId) +
-                    SERVER_API_PATH_COMPONENT + endpoint;
-        } else {
-            if (IdentityTenantUtil.isTenantQualifiedUrlsEnabled()) {
-                context = SERVER_API_PATH_COMPONENT + endpoint;
-            } else {
-                context = String.format(TENANT_CONTEXT_PATH_COMPONENT, getTenantDomainFromContext()) +
-                        SERVER_API_PATH_COMPONENT + endpoint;
+        if (IdentityTenantUtil.isTenantQualifiedUrlsEnabled()) {
+            context = SERVER_API_PATH_COMPONENT + endpoint;
+            if (StringUtils.isNotEmpty(organizationId)) {
+                // When accessing organization resources, the URL should be in this format. "/t/<tenant-domain>/o/.."
+                String tenantDomain = (String) IdentityUtil.threadLocalProperties.get()
+                        .get(OrganizationManagementConstants.ROOT_TENANT_DOMAIN);
+                context = String.format(TENANT_CONTEXT_PATH_COMPONENT, tenantDomain) +
+                        ORGANIZATION_CONTEXT_PATH_COMPONENT + context;
             }
+        } else {
+            context = String.format(TENANT_CONTEXT_PATH_COMPONENT, getTenantDomainFromContext()) +
+                    SERVER_API_PATH_COMPONENT + endpoint;
         }
         return context;
     }
