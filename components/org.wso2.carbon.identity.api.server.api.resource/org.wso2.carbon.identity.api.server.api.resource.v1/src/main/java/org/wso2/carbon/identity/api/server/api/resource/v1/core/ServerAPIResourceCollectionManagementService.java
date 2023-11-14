@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.core;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.resource.collection.mgt.constant.APIResourceCollectionManagementConstants;
 import org.wso2.carbon.identity.api.resource.collection.mgt.exception.APIResourceCollectionMgtException;
@@ -32,10 +34,12 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollection
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.api.resource.v1.util.APIResourceMgtEndpointUtil;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.common.model.APIResource;
 import org.wso2.carbon.identity.application.common.model.Scope;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,15 +57,31 @@ public class ServerAPIResourceCollectionManagementService {
      * Get API Resource Collections List.
      *
      * @param filter filter string.
+     * @param requiredAttributes Required attributes.
      * @return API Resource Collections List.
      */
-    public APIResourceCollectionListResponse getAPIResourceCollections(String filter) {
+    public APIResourceCollectionListResponse getAPIResourceCollections(String filter, String requiredAttributes) {
 
         APIResourceCollectionListResponse apiResourceCollectionListResponse = new APIResourceCollectionListResponse();
-
         try {
-            APIResourceCollectionSearchResult apiResourceCollectionSearchResult = APIResourceManagementServiceHolder
-                    .getApiResourceCollectionManager().getAPIResourceCollections(filter);
+            List<String> requestedAttributeList = new ArrayList<>();
+            if (StringUtils.isNotEmpty(requiredAttributes)) {
+                requestedAttributeList = new ArrayList<>(
+                        Arrays.asList(requiredAttributes.split(APIResourceMgtEndpointConstants.ATTRIBUTES_DELIMITER)));
+                validateRequiredAttributes(requestedAttributeList);
+            }
+
+            APIResourceCollectionSearchResult apiResourceCollectionSearchResult;
+            if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
+                apiResourceCollectionSearchResult = APIResourceManagementServiceHolder
+                        .getApiResourceCollectionManager()
+                        .getAPIResourceCollectionsWithRequiredAttributes(filter, requestedAttributeList,
+                                CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            } else {
+                apiResourceCollectionSearchResult = APIResourceManagementServiceHolder
+                        .getApiResourceCollectionManager()
+                        .getAPIResourceCollections(filter);
+            }
 
             List<APIResourceCollection> apiResourceCollections = apiResourceCollectionSearchResult
                     .getAPIResourceCollections();
@@ -191,5 +211,21 @@ public class ServerAPIResourceCollectionManagementService {
                 .scopes(scopesList)
                 .self(V1_API_PATH_COMPONENT + APIResourceMgtEndpointConstants.API_RESOURCE_PATH_COMPONENT
                         + "/" + apiResource.getId());
+    }
+
+    /**
+     * Validate required attributes.
+     *
+     * @param requiredAttributeList Requested attribute list.
+     * @throws APIError if the requested attributes are invalid.
+     */
+    private void validateRequiredAttributes(List<String> requiredAttributeList) throws APIError {
+
+        for (String attribute : requiredAttributeList) {
+            if (!(APIResourceMgtEndpointConstants.SUPPORTED_REQUIRED_ATTRIBUTES_COLLECTIONS_API.contains(attribute))) {
+                throw APIResourceMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                        APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_REQ_ATTRIBUTES);
+            }
+        }
     }
 }

@@ -410,7 +410,8 @@ paths:
           * internal_api_resource_view
       operationId: getAPIResourceCollections
       parameters:
-        - $ref: '#/components/parameters/filter'
+        - $ref: '#/components/parameters/collectionFilter'
+        - $ref: '#/components/parameters/collectionAttributes'
       responses:
         200:
           description: OK
@@ -544,6 +545,16 @@ components:
         type: string
       example: identifier+eq+greetings
 
+    collectionFilter:
+      name: filter
+      in: query
+      required: false
+      description: |
+        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations.
+      schema:
+        type: string
+      example: type+eq+tenant
+
     limit:
       name: limit
       in: query
@@ -559,6 +570,14 @@ components:
       in: query
       required: false
       description: Specifies the required attributes in the response. Only 'properties' attribute is currently supported.
+      schema:
+        type: string
+
+    collectionAttributes:
+      name: attributes
+      in: query
+      required: false
+      description: Specifies the required attributes in the response. Only 'apiResources' attribute is currently supported.
       schema:
         type: string
 

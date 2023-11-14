@@ -43,10 +43,15 @@ public class APIResourceMgtEndpointConstants {
     public static final List<String> SUPPORTED_REQUIRED_ATTRIBUTES = Collections
             .unmodifiableList(supportedRequiredAttributeList);
 
+    private static final List<String> supportedRequiredAttributeListCollectionsAPI = new ArrayList<>();
+    public static final List<String> SUPPORTED_REQUIRED_ATTRIBUTES_COLLECTIONS_API = Collections
+            .unmodifiableList(supportedRequiredAttributeListCollectionsAPI);
+
     public static final String RESTRICTED_OAUTH2_SCOPES = "OAuth.RestrictedScopes.RestrictedScope";
     public static final Integer DEFAULT_LIMIT = 10;
     public static final String ASC_SORT_ORDER = "ASC";
     public static final String DESC_SORT_ORDER = "DESC";
+    public static final String ATTRIBUTES_DELIMITER = ",";
 
     static {
         allowedAttributeList.add("description");
@@ -55,6 +60,7 @@ public class APIResourceMgtEndpointConstants {
         allowedAttributeList.add("scopes");
 
         supportedRequiredAttributeList.add("properties");
+        supportedRequiredAttributeListCollectionsAPI.add("apiResources");
     }
 
     /**

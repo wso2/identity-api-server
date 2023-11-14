@@ -40,8 +40,9 @@ public class ApiResourceCollectionsApiServiceImpl implements ApiResourceCollecti
     }
 
     @Override
-    public Response getAPIResourceCollections(String filter) {
+    public Response getAPIResourceCollections(String filter, String attributes) {
 
-        return Response.ok().entity(serverAPIResourceManagementService.getAPIResourceCollections(filter)).build();
+        return Response.ok().entity(serverAPIResourceManagementService.getAPIResourceCollections(filter, attributes))
+                .build();
     }
 }

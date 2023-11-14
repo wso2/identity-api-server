@@ -34,5 +34,5 @@ public interface ApiResourceCollectionsApiService {
 
       public Response getAPIResourceCollectionByCollectionId(String collectionId);
 
-      public Response getAPIResourceCollections(String filter);
+      public Response getAPIResourceCollections(String filter, String attributes);
 }

@@ -83,9 +83,9 @@ public class ApiResourceCollectionsApi  {
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response getAPIResourceCollections(    @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. ")  @QueryParam("filter") String filter) {
+    public Response getAPIResourceCollections(    @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. ")  @QueryParam("filter") String filter,     @Valid@ApiParam(value = "Specifies the required attributes in the response. Only 'apiResources' attribute is currently supported.")  @QueryParam("attributes") String attributes) {
 
-        return delegate.getAPIResourceCollections(filter );
+        return delegate.getAPIResourceCollections(filter,  attributes );
     }
 
 }
