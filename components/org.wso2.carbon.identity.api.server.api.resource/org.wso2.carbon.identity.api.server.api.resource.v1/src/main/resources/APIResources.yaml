@@ -481,7 +481,7 @@ components:
       schema:
         type: string
         example: er34-gf23-bv54-vb90
-
+    
     collectionId:
       name: collectionId
       in: path
@@ -740,6 +740,18 @@ components:
           items:
             $ref: '#/components/schemas/APIResourceListItem'
 
+    APIResourceMap:
+      type: object
+      properties:
+        read:
+          type: array
+          items:
+            $ref: '#/components/schemas/APIResourceCollectionItem'
+        write:
+          type: array
+          items:
+            $ref: '#/components/schemas/APIResourceCollectionItem'
+
     APIResourceCollectionListItem:
       type: object
       required:
@@ -760,10 +772,12 @@ components:
         type:
           type: string
           example: SYSTEM
+        apiResources:
+          $ref: '#/components/schemas/APIResourceMap'
         self:
           type: string
           example: /t/carbon.super/api/server/v1/api-resource-collections/eDUwOUNlcnRpZmljYXRlQXV0aGVudGljYXRvcg
-
+    
     APIResourceCollectionListResponse:
       type: object
       required:
@@ -776,7 +790,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/APIResourceCollectionListItem'
-
+    
     APIResourceCollectionItem:
       type: object
       required:
@@ -828,16 +842,7 @@ components:
           type: string
           example: SYSTEM
         apiResources:
-          type: object
-          properties:
-            read:
-              type: array
-              items:
-                $ref: '#/components/schemas/APIResourceCollectionItem'
-            write:
-              type: array
-              items:
-                $ref: '#/components/schemas/APIResourceCollectionItem'
+          $ref: '#/components/schemas/APIResourceMap'
 
     ScopeGetModel:
       type: object

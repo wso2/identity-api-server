@@ -30,7 +30,7 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollection
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionListItem;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionListResponse;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionResponse;
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionResponseApiResources;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceMap;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.api.resource.v1.util.APIResourceMgtEndpointUtil;
@@ -71,15 +71,14 @@ public class ServerAPIResourceCollectionManagementService {
                 validateRequiredAttributes(requestedAttributeList);
             }
 
+            boolean hasRequiredAttributes = CollectionUtils.isNotEmpty(requestedAttributeList);
             APIResourceCollectionSearchResult apiResourceCollectionSearchResult;
-            if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
-                apiResourceCollectionSearchResult = APIResourceManagementServiceHolder
-                        .getApiResourceCollectionManager()
+            if (hasRequiredAttributes) {
+                apiResourceCollectionSearchResult = APIResourceManagementServiceHolder.getApiResourceCollectionManager()
                         .getAPIResourceCollectionsWithRequiredAttributes(filter, requestedAttributeList,
                                 CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             } else {
-                apiResourceCollectionSearchResult = APIResourceManagementServiceHolder
-                        .getApiResourceCollectionManager()
+                apiResourceCollectionSearchResult = APIResourceManagementServiceHolder.getApiResourceCollectionManager()
                         .getAPIResourceCollections(filter);
             }
 
@@ -92,7 +91,9 @@ public class ServerAPIResourceCollectionManagementService {
             }
             apiResourceCollectionListResponse.setTotalResults(apiResourceCollectionSearchResult.getTotalCount());
             apiResourceCollectionListResponse.setApiResourceCollections(
-                    apiResourceCollections.stream().map(this::buildAPIResourceCollectionListItem)
+                    apiResourceCollections.stream()
+                            .map(apiResourceCollection -> buildAPIResourceCollectionListItem(apiResourceCollection,
+                                    hasRequiredAttributes))
                             .collect(Collectors.toList()));
         } catch (APIResourceCollectionMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceCollectionMgtException(e);
@@ -123,17 +124,7 @@ public class ServerAPIResourceCollectionManagementService {
             apiResourceCollectionResponse.setName(apiResourceCollection.getName());
             apiResourceCollectionResponse.setDisplayName(apiResourceCollection.getDisplayName());
             apiResourceCollectionResponse.setType(apiResourceCollection.getType());
-
-            List<APIResourceCollectionItem> readAPIResourceCollectionItems = getAPIResourceCollectionItems(
-                    apiResourceCollection, APIResourceCollectionManagementConstants.READ);
-            List<APIResourceCollectionItem> writeAPIResourceCollectionItems = getAPIResourceCollectionItems(
-                    apiResourceCollection, APIResourceCollectionManagementConstants.WRITE);
-
-            APIResourceCollectionResponseApiResources apiResourceCollectionResponseApiResources =
-                    new APIResourceCollectionResponseApiResources();
-            apiResourceCollectionResponseApiResources.setRead(readAPIResourceCollectionItems);
-            apiResourceCollectionResponseApiResources.setWrite(writeAPIResourceCollectionItems);
-            apiResourceCollectionResponse.setApiResources(apiResourceCollectionResponseApiResources);
+            apiResourceCollectionResponse.setApiResources(buildAPIResourceMap(apiResourceCollection));
         } catch (APIResourceCollectionMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceCollectionMgtException(e);
         }
@@ -147,15 +138,20 @@ public class ServerAPIResourceCollectionManagementService {
      * @return API Resource Collection List Item.
      */
     private APIResourceCollectionListItem buildAPIResourceCollectionListItem(
-            APIResourceCollection apiResourceCollection) {
+            APIResourceCollection apiResourceCollection, boolean includeAPIResources) {
 
-        return new APIResourceCollectionListItem()
+        APIResourceCollectionListItem item = new APIResourceCollectionListItem()
                 .id(apiResourceCollection.getId())
                 .name(apiResourceCollection.getName())
                 .displayName(apiResourceCollection.getDisplayName())
                 .type(apiResourceCollection.getType())
                 .self(V1_API_PATH_COMPONENT + APIResourceMgtEndpointConstants.API_RESOURCE_COLLECTION_PATH_COMPONENT +
                         "/" + apiResourceCollection.getId());
+
+        if (includeAPIResources) {
+            item.setApiResources(buildAPIResourceMap(apiResourceCollection));
+        }
+        return item;
     }
 
     /**
@@ -227,5 +223,26 @@ public class ServerAPIResourceCollectionManagementService {
                         APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_REQ_ATTRIBUTES);
             }
         }
+    }
+
+    /**
+     * Build API Resource read write map.
+     *
+     * @param apiResourceCollection API Resource Collection.
+     * @return API Resource read write map.
+     */
+    private APIResourceMap buildAPIResourceMap(
+            APIResourceCollection apiResourceCollection) {
+
+        List<APIResourceCollectionItem> readAPIResourceCollectionItems = getAPIResourceCollectionItems(
+                apiResourceCollection, APIResourceCollectionManagementConstants.READ);
+        List<APIResourceCollectionItem> writeAPIResourceCollectionItems = getAPIResourceCollectionItems(
+                apiResourceCollection, APIResourceCollectionManagementConstants.WRITE);
+
+        APIResourceMap apiResourceCollectionResponseApiResources =
+                new APIResourceMap();
+        apiResourceCollectionResponseApiResources.setRead(readAPIResourceCollectionItems);
+        apiResourceCollectionResponseApiResources.setWrite(writeAPIResourceCollectionItems);
+        return apiResourceCollectionResponseApiResources;
     }
 }

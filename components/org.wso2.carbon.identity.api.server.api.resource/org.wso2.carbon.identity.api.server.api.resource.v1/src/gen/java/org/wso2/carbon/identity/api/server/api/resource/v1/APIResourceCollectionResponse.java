@@ -37,7 +37,7 @@ public class APIResourceCollectionResponse  {
     private String name;
     private String displayName;
     private String type;
-    private APIResourceCollectionResponseApiResources apiResources;
+    private APIResourceMap apiResources;
 
     /**
     **/
@@ -119,7 +119,7 @@ public class APIResourceCollectionResponse  {
 
     /**
     **/
-    public APIResourceCollectionResponse apiResources(APIResourceCollectionResponseApiResources apiResources) {
+    public APIResourceCollectionResponse apiResources(APIResourceMap apiResources) {
 
         this.apiResources = apiResources;
         return this;
@@ -128,10 +128,10 @@ public class APIResourceCollectionResponse  {
     @ApiModelProperty(value = "")
     @JsonProperty("apiResources")
     @Valid
-    public APIResourceCollectionResponseApiResources getApiResources() {
+    public APIResourceMap getApiResources() {
         return apiResources;
     }
-    public void setApiResources(APIResourceCollectionResponseApiResources apiResources) {
+    public void setApiResources(APIResourceMap apiResources) {
         this.apiResources = apiResources;
     }
 

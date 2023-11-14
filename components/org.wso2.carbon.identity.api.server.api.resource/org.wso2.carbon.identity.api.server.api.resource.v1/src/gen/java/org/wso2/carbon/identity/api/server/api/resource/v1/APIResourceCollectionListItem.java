@@ -36,6 +36,7 @@ public class APIResourceCollectionListItem  {
     private String name;
     private String displayName;
     private String type;
+    private APIResourceMap apiResources;
     private String self;
 
     /**
@@ -118,6 +119,24 @@ public class APIResourceCollectionListItem  {
 
     /**
     **/
+    public APIResourceCollectionListItem apiResources(APIResourceMap apiResources) {
+
+        this.apiResources = apiResources;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("apiResources")
+    @Valid
+    public APIResourceMap getApiResources() {
+        return apiResources;
+    }
+    public void setApiResources(APIResourceMap apiResources) {
+        this.apiResources = apiResources;
+    }
+
+    /**
+    **/
     public APIResourceCollectionListItem self(String self) {
 
         this.self = self;
@@ -152,12 +171,13 @@ public class APIResourceCollectionListItem  {
             Objects.equals(this.name, apIResourceCollectionListItem.name) &&
             Objects.equals(this.displayName, apIResourceCollectionListItem.displayName) &&
             Objects.equals(this.type, apIResourceCollectionListItem.type) &&
+            Objects.equals(this.apiResources, apIResourceCollectionListItem.apiResources) &&
             Objects.equals(this.self, apIResourceCollectionListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, type, self);
+        return Objects.hash(id, name, displayName, type, apiResources, self);
     }
 
     @Override
@@ -170,6 +190,7 @@ public class APIResourceCollectionListItem  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("    apiResources: ").append(toIndentedString(apiResources)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
