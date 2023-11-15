@@ -26,7 +26,6 @@ import org.wso2.carbon.identity.application.common.IdentityApplicationManagement
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -224,12 +223,10 @@ public class Utils {
     public static ApplicationListItem.AccessEnum getAccessForApplicationListItems(String applicationName) {
 
         String username = ContextLoader.getUsernameFromContext();
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         try {
-            if (ApplicationConstants.LOCAL_SP.equals(applicationName) ||
-                    (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && systemApplications != null
-                            && systemApplications.stream().anyMatch(applicationName::equalsIgnoreCase)) ||
+            if (ApplicationConstants.LOCAL_SP.equals(applicationName) || (systemApplications != null
+                    && systemApplications.stream().anyMatch(applicationName::equalsIgnoreCase)) ||
                     !ApplicationMgtUtil.isUserAuthorized(applicationName, username)) {
                 return ApplicationListItem.AccessEnum.READ;
             }
@@ -239,4 +236,5 @@ public class Utils {
         }
 
         return ApplicationListItem.AccessEnum.WRITE;
-    }}
+    }
+}
