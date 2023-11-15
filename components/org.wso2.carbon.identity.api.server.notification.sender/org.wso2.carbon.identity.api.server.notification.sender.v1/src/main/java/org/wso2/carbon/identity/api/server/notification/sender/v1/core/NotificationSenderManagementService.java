@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2023, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,11 +18,18 @@
 
 package org.wso2.carbon.identity.api.server.notification.sender.v1.core;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.notification.sender.common.NotificationSenderServiceHolder;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.core.exception.OutputEventAdapterException;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.core.internal.EventAdapterConstants;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.core.internal.config.AdapterConfigs;
+import org.wso2.carbon.identity.api.server.notification.sender.v1.core.internal.config.Property;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSender;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderAdd;
 import org.wso2.carbon.identity.api.server.notification.sender.v1.model.EmailSenderUpdateRequest;
@@ -34,12 +41,22 @@ import org.wso2.carbon.identity.notification.sender.tenant.config.dto.EmailSende
 import org.wso2.carbon.identity.notification.sender.tenant.config.dto.SMSSenderDTO;
 import org.wso2.carbon.identity.notification.sender.tenant.config.exception.NotificationSenderManagementClientException;
 import org.wso2.carbon.identity.notification.sender.tenant.config.exception.NotificationSenderManagementException;
+import org.wso2.carbon.utils.CarbonUtils;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
+import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
+import static org.wso2.carbon.identity.api.server.notification.sender.v1.core.internal.util.EventAdapterConfigHelper.convertToOmElement;
+import static org.wso2.carbon.identity.api.server.notification.sender.v1.core.internal.util.EventAdapterConfigHelper.secureResolveOmElement;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_CONFLICT_PUBLISHER;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_NO_ACTIVE_PUBLISHERS_FOUND;
 import static org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementConstants.ErrorMessage.ERROR_CODE_PUBLISHER_NOT_EXISTS;
@@ -143,9 +160,14 @@ public class NotificationSenderManagementService {
      */
     public List<EmailSender> getEmailSenders() {
 
+        List<EmailSenderDTO> emailSenders;
         try {
-            List<EmailSenderDTO> emailSenders = NotificationSenderServiceHolder.getNotificationSenderManagementService()
-                    .getEmailSenders();
+            if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+                emailSenders = getSuperTenantEmailSender();
+            } else {
+                emailSenders = NotificationSenderServiceHolder.getNotificationSenderManagementService()
+                                .getEmailSenders();
+            }
             return emailSenders.stream().map(this::buildEmailSenderFromDTO).collect(Collectors.toList());
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
@@ -166,6 +188,65 @@ public class NotificationSenderManagementService {
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
         }
+    }
+
+    public static List<EmailSenderDTO> getSuperTenantEmailSender() {
+
+        String path = CarbonUtils.getCarbonConfigDirPath() + File.separator
+                + EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME;
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(AdapterConfigs.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+
+            File configFile = new File(path);
+            if (!configFile.exists()) {
+                log.warn(EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " can not found in " + path + "," +
+                        " hence Output Event Adapters will be running with default global configs.");
+            }
+            OMElement globalConfigDoc = convertToOmElement(configFile);
+            secureResolveOmElement(globalConfigDoc);
+            AdapterConfigs adapterConfigs = (AdapterConfigs) unmarshaller.unmarshal(globalConfigDoc
+                    .getXMLStreamReader());
+            ArrayList<Property> properties =
+                    (ArrayList<Property>) adapterConfigs.getAdapterConfig("email").getGlobalProperties();
+
+            List<EmailSenderDTO> emailSenderDTOList = new ArrayList<>();
+            emailSenderDTOList.add(getEmailSenderDTO(properties));
+            return emailSenderDTOList;
+        } catch (JAXBException e) {
+            log.error("Error in loading " + EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " from " + path + "," +
+                    " hence Output Event Adapters will be running with default global configs.");
+        } catch (OutputEventAdapterException e) {
+            log.error("Error in converting " + EventAdapterConstants.GLOBAL_CONFIG_FILE_NAME + " to parsed document," +
+                    " hence Output Event Adapters will be running with default global configs.");
+        }
+        return new ArrayList<>();
+    }
+
+    private static EmailSenderDTO getEmailSenderDTO(ArrayList<Property> properties) {
+
+        EmailSenderDTO emailSenderDTO = new EmailSenderDTO();
+        emailSenderDTO.setName("EmailPublisher");
+        emailSenderDTO.setFromAddress(getValueFromKey("mail.smtp.from", properties));
+        emailSenderDTO.setUsername(getValueFromKey("mail.smtp.user", properties));
+        emailSenderDTO.setPassword(getValueFromKey("mail.smtp.password", properties));
+        emailSenderDTO.setSmtpPort(Integer.parseInt(getValueFromKey("mail.smtp.port", properties)));
+        emailSenderDTO.setSmtpServerHost(getValueFromKey("mail.smtp.host", properties));
+        Map<String, String> propertiesMap = new HashMap<>();
+        propertiesMap.put("mail.smtp.signature", getValueFromKey("mail.smtp.signature", properties));
+        propertiesMap.put("mail.smtp.replyTo", getValueFromKey("mail.smtp.replyTo", properties));
+        emailSenderDTO.setProperties(propertiesMap);
+
+        return emailSenderDTO;
+    }
+
+    private static String getValueFromKey(String key, ArrayList<Property> list) {
+        for (Property property : list) {
+            if (property.getKey().equals(key)) {
+                return property.getValue();
+            }
+        }
+        return null;
     }
 
     /**

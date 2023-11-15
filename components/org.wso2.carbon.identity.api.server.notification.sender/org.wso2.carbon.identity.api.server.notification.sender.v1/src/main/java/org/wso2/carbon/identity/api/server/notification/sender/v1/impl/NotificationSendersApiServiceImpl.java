@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2023, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -125,9 +125,6 @@ public class NotificationSendersApiServiceImpl implements NotificationSendersApi
     @Override
     public Response getEmailSenders() {
 
-        if (StringUtils.equals(getTenantDomainFromContext(), MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
-        }
         return Response.ok().entity(notificationSenderManagementService.getEmailSenders()).build();
     }
 
