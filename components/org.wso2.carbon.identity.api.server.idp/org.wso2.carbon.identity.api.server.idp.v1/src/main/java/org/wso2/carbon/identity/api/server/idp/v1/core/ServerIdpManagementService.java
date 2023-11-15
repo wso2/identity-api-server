@@ -1960,25 +1960,27 @@ public class ServerIdpManagementService {
                 claimConfig.setRoleClaimURI(claims.getRoleClaim().getUri());
             }
             List<ProvisioningClaim> provClaims = claims.getProvisioningClaims();
-            for (ProvisioningClaim provClaim : provClaims) {
-                String provClaimUri = provClaim.getClaim().getUri();
-                if (CollectionUtils.isNotEmpty(claims.getMappings())) {
-                    for (ClaimMapping internalMapping : claimMappings) {
+            if (provClaims != null) {
+                for (ProvisioningClaim provClaim : provClaims) {
+                    String provClaimUri = provClaim.getClaim().getUri();
+                    if (CollectionUtils.isNotEmpty(claims.getMappings())) {
+                        for (ClaimMapping internalMapping : claimMappings) {
 
-                        if (StringUtils.equals(provClaimUri, internalMapping.getRemoteClaim().getClaimUri())) {
-                            internalMapping.setDefaultValue(provClaim.getDefaultValue());
-                            internalMapping.setRequested(true);
+                            if (StringUtils.equals(provClaimUri, internalMapping.getRemoteClaim().getClaimUri())) {
+                                internalMapping.setDefaultValue(provClaim.getDefaultValue());
+                                internalMapping.setRequested(true);
+                            }
                         }
+                    } else {
+                        ClaimMapping internalMapping = new ClaimMapping();
+                        org.wso2.carbon.identity.application.common.model.Claim localClaim = new org.wso2.carbon
+                                .identity.application.common.model.Claim();
+                        localClaim.setClaimUri(provClaimUri);
+                        internalMapping.setLocalClaim(localClaim);
+                        internalMapping.setDefaultValue(provClaim.getDefaultValue());
+                        internalMapping.setRequested(true);
+                        claimMappings.add(internalMapping);
                     }
-                } else {
-                    ClaimMapping internalMapping = new ClaimMapping();
-                    org.wso2.carbon.identity.application.common.model.Claim localClaim = new org.wso2.carbon.identity
-                            .application.common.model.Claim();
-                    localClaim.setClaimUri(provClaimUri);
-                    internalMapping.setLocalClaim(localClaim);
-                    internalMapping.setDefaultValue(provClaim.getDefaultValue());
-                    internalMapping.setRequested(true);
-                    claimMappings.add(internalMapping);
                 }
             }
             claimConfig.setClaimMappings(claimMappings.toArray(new ClaimMapping[0]));
