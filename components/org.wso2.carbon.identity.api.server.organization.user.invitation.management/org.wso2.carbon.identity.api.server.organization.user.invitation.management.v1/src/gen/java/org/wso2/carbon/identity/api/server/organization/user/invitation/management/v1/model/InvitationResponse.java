@@ -38,7 +38,7 @@ public class InvitationResponse  {
     private String id;
     private String username;
     private String email;
-    private List<RoleAssignmentResponse> roleAssignments = null;
+    private List<RoleAssignmentResponse> roles = null;
 
     private String status;
     private String expiredAt;
@@ -105,27 +105,27 @@ public class InvitationResponse  {
 
     /**
     **/
-    public InvitationResponse roleAssignments(List<RoleAssignmentResponse> roleAssignments) {
+    public InvitationResponse roles(List<RoleAssignmentResponse> roles) {
 
-        this.roleAssignments = roleAssignments;
+        this.roles = roles;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("roleAssignments")
+    @JsonProperty("roles")
     @Valid
-    public List<RoleAssignmentResponse> getRoleAssignments() {
-        return roleAssignments;
+    public List<RoleAssignmentResponse> getRoles() {
+        return roles;
     }
-    public void setRoleAssignments(List<RoleAssignmentResponse> roleAssignments) {
-        this.roleAssignments = roleAssignments;
+    public void setRoles(List<RoleAssignmentResponse> roles) {
+        this.roles = roles;
     }
 
-    public InvitationResponse addRoleAssignmentsItem(RoleAssignmentResponse roleAssignmentsItem) {
-        if (this.roleAssignments == null) {
-            this.roleAssignments = new ArrayList<>();
+    public InvitationResponse addRolesItem(RoleAssignmentResponse rolesItem) {
+        if (this.roles == null) {
+            this.roles = new ArrayList<>();
         }
-        this.roleAssignments.add(roleAssignmentsItem);
+        this.roles.add(rolesItem);
         return this;
     }
 
@@ -182,14 +182,14 @@ public class InvitationResponse  {
         return Objects.equals(this.id, invitationResponse.id) &&
             Objects.equals(this.username, invitationResponse.username) &&
             Objects.equals(this.email, invitationResponse.email) &&
-            Objects.equals(this.roleAssignments, invitationResponse.roleAssignments) &&
+            Objects.equals(this.roles, invitationResponse.roles) &&
             Objects.equals(this.status, invitationResponse.status) &&
             Objects.equals(this.expiredAt, invitationResponse.expiredAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, email, roleAssignments, status, expiredAt);
+        return Objects.hash(id, username, email, roles, status, expiredAt);
     }
 
     @Override
@@ -201,7 +201,7 @@ public class InvitationResponse  {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    username: ").append(toIndentedString(username)).append("\n");
         sb.append("    email: ").append(toIndentedString(email)).append("\n");
-        sb.append("    roleAssignments: ").append(toIndentedString(roleAssignments)).append("\n");
+        sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    expiredAt: ").append(toIndentedString(expiredAt)).append("\n");
         sb.append("}");

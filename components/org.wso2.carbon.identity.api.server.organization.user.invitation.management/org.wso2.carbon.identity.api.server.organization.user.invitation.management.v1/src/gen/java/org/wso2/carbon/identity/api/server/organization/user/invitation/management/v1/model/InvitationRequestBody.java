@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.RoleAssignmentRequestBody;
 import javax.validation.constraints.*;
 
 
@@ -37,7 +36,7 @@ public class InvitationRequestBody  {
   
     private String username;
     private String userDomain;
-    private List<RoleAssignmentRequestBody> roleAssignments = null;
+    private List<String> roles = null;
 
 
     /**
@@ -83,27 +82,27 @@ public class InvitationRequestBody  {
     /**
     * Role assignments which the user will be assigned to.
     **/
-    public InvitationRequestBody roleAssignments(List<RoleAssignmentRequestBody> roleAssignments) {
+    public InvitationRequestBody roles(List<String> roles) {
 
-        this.roleAssignments = roleAssignments;
+        this.roles = roles;
         return this;
     }
     
     @ApiModelProperty(value = "Role assignments which the user will be assigned to.")
-    @JsonProperty("roleAssignments")
+    @JsonProperty("roles")
     @Valid
-    public List<RoleAssignmentRequestBody> getRoleAssignments() {
-        return roleAssignments;
+    public List<String> getRoles() {
+        return roles;
     }
-    public void setRoleAssignments(List<RoleAssignmentRequestBody> roleAssignments) {
-        this.roleAssignments = roleAssignments;
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 
-    public InvitationRequestBody addRoleAssignmentsItem(RoleAssignmentRequestBody roleAssignmentsItem) {
-        if (this.roleAssignments == null) {
-            this.roleAssignments = new ArrayList<>();
+    public InvitationRequestBody addRolesItem(String rolesItem) {
+        if (this.roles == null) {
+            this.roles = new ArrayList<>();
         }
-        this.roleAssignments.add(roleAssignmentsItem);
+        this.roles.add(rolesItem);
         return this;
     }
 
@@ -121,12 +120,12 @@ public class InvitationRequestBody  {
         InvitationRequestBody invitationRequestBody = (InvitationRequestBody) o;
         return Objects.equals(this.username, invitationRequestBody.username) &&
             Objects.equals(this.userDomain, invitationRequestBody.userDomain) &&
-            Objects.equals(this.roleAssignments, invitationRequestBody.roleAssignments);
+            Objects.equals(this.roles, invitationRequestBody.roles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, userDomain, roleAssignments);
+        return Objects.hash(username, userDomain, roles);
     }
 
     @Override
@@ -137,7 +136,7 @@ public class InvitationRequestBody  {
         
         sb.append("    username: ").append(toIndentedString(username)).append("\n");
         sb.append("    userDomain: ").append(toIndentedString(userDomain)).append("\n");
-        sb.append("    roleAssignments: ").append(toIndentedString(roleAssignments)).append("\n");
+        sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
         sb.append("}");
         return sb.toString();
     }
