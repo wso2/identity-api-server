@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.common;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
@@ -29,13 +28,11 @@ import org.wso2.carbon.identity.core.ServiceURLBuilder;
 import org.wso2.carbon.identity.core.URLBuilderException;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
-import org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants;
 
 import java.net.URI;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.common.Constants.ORGANIZATION_CONTEXT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.SERVER_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_CONTEXT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.TENANT_NAME_FROM_CONTEXT;
@@ -70,16 +67,6 @@ public class ContextLoader {
     public static String getUsernameFromContext() {
 
         return PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
-    }
-
-    /**
-     * Retrieves organization id from carbon context.
-     *
-     * @return the organization id.
-     */
-    public static String getOrganizationIdFromContext() {
-
-        return PrivilegedCarbonContext.getThreadLocalCarbonContext().getOrganizationId();
     }
 
     /**
@@ -139,16 +126,8 @@ public class ContextLoader {
     private static String getContext(String endpoint) {
 
         String context;
-        String organizationId = getOrganizationIdFromContext();
         if (IdentityTenantUtil.isTenantQualifiedUrlsEnabled()) {
             context = SERVER_API_PATH_COMPONENT + endpoint;
-            if (StringUtils.isNotEmpty(organizationId)) {
-                // When accessing organization resources, the URL should be in this format. "/t/<tenant-domain>/o/.."
-                String tenantDomain = (String) IdentityUtil.threadLocalProperties.get()
-                        .get(OrganizationManagementConstants.ROOT_TENANT_DOMAIN);
-                context = String.format(TENANT_CONTEXT_PATH_COMPONENT, tenantDomain) +
-                        ORGANIZATION_CONTEXT_PATH_COMPONENT + context;
-            }
         } else {
             context = String.format(TENANT_CONTEXT_PATH_COMPONENT, getTenantDomainFromContext()) +
                     SERVER_API_PATH_COMPONENT + endpoint;
