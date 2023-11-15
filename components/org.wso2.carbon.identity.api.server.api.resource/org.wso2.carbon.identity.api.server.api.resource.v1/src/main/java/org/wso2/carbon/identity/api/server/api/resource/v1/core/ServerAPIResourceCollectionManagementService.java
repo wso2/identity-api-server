@@ -64,37 +64,28 @@ public class ServerAPIResourceCollectionManagementService {
 
         APIResourceCollectionListResponse apiResourceCollectionListResponse = new APIResourceCollectionListResponse();
         try {
-            List<String> requestedAttributeList = new ArrayList<>();
-            if (StringUtils.isNotEmpty(requiredAttributes)) {
-                requestedAttributeList = new ArrayList<>(
-                        Arrays.asList(requiredAttributes.split(APIResourceMgtEndpointConstants.ATTRIBUTES_DELIMITER)));
+            List<String> requestedAttributeList = StringUtils.isNotEmpty(requiredAttributes) ?
+                    Arrays.asList(requiredAttributes.split(APIResourceMgtEndpointConstants.ATTRIBUTES_DELIMITER)) :
+                    Collections.emptyList();
+            if (!requestedAttributeList.isEmpty()) {
                 validateRequiredAttributes(requestedAttributeList);
             }
 
-            boolean hasRequiredAttributes = CollectionUtils.isNotEmpty(requestedAttributeList);
-            APIResourceCollectionSearchResult apiResourceCollectionSearchResult;
-            if (hasRequiredAttributes) {
-                apiResourceCollectionSearchResult = APIResourceManagementServiceHolder.getApiResourceCollectionManager()
-                        .getAPIResourceCollectionsWithRequiredAttributes(filter, requestedAttributeList,
-                                CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            } else {
-                apiResourceCollectionSearchResult = APIResourceManagementServiceHolder.getApiResourceCollectionManager()
-                        .getAPIResourceCollections(filter);
-            }
-
-            List<APIResourceCollection> apiResourceCollections = apiResourceCollectionSearchResult
-                    .getAPIResourceCollections();
+            APIResourceCollectionSearchResult apiResourceCollectionSearchResult =
+                    APIResourceManagementServiceHolder.getApiResourceCollectionManager()
+                            .getAPIResourceCollections(filter, requestedAttributeList,
+                                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            List<APIResourceCollection> apiResourceCollections =
+                    apiResourceCollectionSearchResult.getAPIResourceCollections();
             if (apiResourceCollections == null || apiResourceCollections.isEmpty()) {
                 apiResourceCollectionListResponse.setTotalResults(0);
                 apiResourceCollectionListResponse.setApiResourceCollections(new ArrayList<>());
                 return apiResourceCollectionListResponse;
             }
             apiResourceCollectionListResponse.setTotalResults(apiResourceCollectionSearchResult.getTotalCount());
-            apiResourceCollectionListResponse.setApiResourceCollections(
-                    apiResourceCollections.stream()
-                            .map(apiResourceCollection -> buildAPIResourceCollectionListItem(apiResourceCollection,
-                                    hasRequiredAttributes))
-                            .collect(Collectors.toList()));
+            apiResourceCollectionListResponse.setApiResourceCollections(apiResourceCollections.stream()
+                    .map(apiResourceCollection -> buildAPIResourceCollectionListItem(apiResourceCollection,
+                            CollectionUtils.isNotEmpty(requestedAttributeList))).collect(Collectors.toList()));
         } catch (APIResourceCollectionMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceCollectionMgtException(e);
         }
