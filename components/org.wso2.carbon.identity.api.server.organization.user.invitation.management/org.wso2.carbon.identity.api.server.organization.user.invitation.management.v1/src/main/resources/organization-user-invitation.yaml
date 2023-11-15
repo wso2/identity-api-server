@@ -307,17 +307,18 @@ components:
           type: string
           description: User store domain of the user. If not provided, PRIMARY will be used.
           example: PRIMARY
-        roleAssignments:
+        roles:
           type: array
           description: Role assignments which the user will be assigned to.
           items:
-            $ref: '#/components/schemas/RoleAssignmentRequestBody'
+            type: string
+            example: editor, manager
     InvitationSuccessResponse:
       type: object
       required:
         - username
         - email
-        - roleAssignments
+        - roles
       properties:
         username:
           type: string
@@ -328,7 +329,7 @@ components:
           type: string
           description: Email of the user who will be invited to the organization.
           example: alex@gmail.com
-        roleAssignments:
+        roles:
           type: array
           description: Role assignments which the user will be assigned to.
           items:
@@ -403,7 +404,7 @@ components:
         email:
           type: string
           example: alex@gmail.com
-        roleAssignments:
+        roles:
           type: array
           items:
             $ref: '#/components/schemas/RoleAssignmentResponse'
@@ -415,35 +416,29 @@ components:
           example: 2021-08-10T10:15:30.00Z
     RoleAssignmentResponse:
       type: object
-      required:
-        - applicationId
-        - roles
       properties:
-        applicationId:
+        displayName:
           type: string
-          example: f7594498-5b52-4201-abd5-d7cf72565c73
-        applicationName:
+          example: 'loginRole'
+        id:
           type: string
-          example: b2b_business_sample_application
-        roles:
-          type: array
+          example: '4645709c-ea8c-4495-8590-e1fa0efe3de0'
+        audience:
+          type: object
           items:
-            type: string
-            example: editor, manager
-    RoleAssignmentRequestBody:
+            $ref: '#/components/schemas/Audience'
+    Audience:
       type: object
-      required:
-        - applicationId
-        - roles
       properties:
-        applicationId:
+        value:
           type: string
-          example: f7594498-5b52-4201-abd5-d7cf72565c73
-        roles:
-          type: array
-          items:
-            type: string
-            example: editor, manager
+          example: '3645709f-ea8d-5595-7690-e1fa0efe3df9'
+        display:
+          type: string
+          example: 'My Org'
+        type:
+          type: string
+          example: 'organization'
     Error:
       type: object
       required:

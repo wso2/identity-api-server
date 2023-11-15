@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.Audience;
 import javax.validation.constraints.*;
 
 
@@ -34,71 +35,70 @@ import javax.xml.bind.annotation.*;
 
 public class RoleAssignmentResponse  {
   
-    private String applicationId;
-    private String applicationName;
-    private List<String> roles = new ArrayList<>();
+    private String displayName;
+    private String id;
+    private List<Audience> audience = null;
 
 
     /**
     **/
-    public RoleAssignmentResponse applicationId(String applicationId) {
+    public RoleAssignmentResponse displayName(String displayName) {
 
-        this.applicationId = applicationId;
+        this.displayName = displayName;
         return this;
     }
     
-    @ApiModelProperty(example = "f7594498-5b52-4201-abd5-d7cf72565c73", required = true, value = "")
-    @JsonProperty("applicationId")
+    @ApiModelProperty(example = "loginRole", value = "")
+    @JsonProperty("displayName")
     @Valid
-    @NotNull(message = "Property applicationId cannot be null.")
-
-    public String getApplicationId() {
-        return applicationId;
+    public String getDisplayName() {
+        return displayName;
     }
-    public void setApplicationId(String applicationId) {
-        this.applicationId = applicationId;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     /**
     **/
-    public RoleAssignmentResponse applicationName(String applicationName) {
+    public RoleAssignmentResponse id(String id) {
 
-        this.applicationName = applicationName;
+        this.id = id;
         return this;
     }
     
-    @ApiModelProperty(example = "b2b_business_sample_application", value = "")
-    @JsonProperty("applicationName")
+    @ApiModelProperty(example = "4645709c-ea8c-4495-8590-e1fa0efe3de0", value = "")
+    @JsonProperty("id")
     @Valid
-    public String getApplicationName() {
-        return applicationName;
+    public String getId() {
+        return id;
     }
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
     **/
-    public RoleAssignmentResponse roles(List<String> roles) {
+    public RoleAssignmentResponse audience(List<Audience> audience) {
 
-        this.roles = roles;
+        this.audience = audience;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("roles")
+    @ApiModelProperty(value = "")
+    @JsonProperty("audience")
     @Valid
-    @NotNull(message = "Property roles cannot be null.")
-
-    public List<String> getRoles() {
-        return roles;
+    public List<Audience> getAudience() {
+        return audience;
     }
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
+    public void setAudience(List<Audience> audience) {
+        this.audience = audience;
     }
 
-    public RoleAssignmentResponse addRolesItem(String rolesItem) {
-        this.roles.add(rolesItem);
+    public RoleAssignmentResponse addAudienceItem(Audience audienceItem) {
+        if (this.audience == null) {
+            this.audience = new ArrayList<>();
+        }
+        this.audience.add(audienceItem);
         return this;
     }
 
@@ -114,14 +114,14 @@ public class RoleAssignmentResponse  {
             return false;
         }
         RoleAssignmentResponse roleAssignmentResponse = (RoleAssignmentResponse) o;
-        return Objects.equals(this.applicationId, roleAssignmentResponse.applicationId) &&
-            Objects.equals(this.applicationName, roleAssignmentResponse.applicationName) &&
-            Objects.equals(this.roles, roleAssignmentResponse.roles);
+        return Objects.equals(this.displayName, roleAssignmentResponse.displayName) &&
+            Objects.equals(this.id, roleAssignmentResponse.id) &&
+            Objects.equals(this.audience, roleAssignmentResponse.audience);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(applicationId, applicationName, roles);
+        return Objects.hash(displayName, id, audience);
     }
 
     @Override
@@ -130,9 +130,9 @@ public class RoleAssignmentResponse  {
         StringBuilder sb = new StringBuilder();
         sb.append("class RoleAssignmentResponse {\n");
         
-        sb.append("    applicationId: ").append(toIndentedString(applicationId)).append("\n");
-        sb.append("    applicationName: ").append(toIndentedString(applicationName)).append("\n");
-        sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
+        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    audience: ").append(toIndentedString(audience)).append("\n");
         sb.append("}");
         return sb.toString();
     }
