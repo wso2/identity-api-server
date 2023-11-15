@@ -530,12 +530,10 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private ApplicationResponseModel.AccessEnum getAccess(String applicationName) {
 
         String username = ContextLoader.getUsernameFromContext();
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         try {
-            if (ApplicationConstants.LOCAL_SP.equals(applicationName) ||
-                    (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && systemApplications != null
-                            && systemApplications.stream().anyMatch(applicationName::equalsIgnoreCase)) ||
+            if (ApplicationConstants.LOCAL_SP.equals(applicationName) || (systemApplications != null
+                    && systemApplications.stream().anyMatch(applicationName::equalsIgnoreCase)) ||
                     !ApplicationMgtUtil.isUserAuthorized(applicationName, username)) {
                 return ApplicationResponseModel.AccessEnum.READ;
             }
