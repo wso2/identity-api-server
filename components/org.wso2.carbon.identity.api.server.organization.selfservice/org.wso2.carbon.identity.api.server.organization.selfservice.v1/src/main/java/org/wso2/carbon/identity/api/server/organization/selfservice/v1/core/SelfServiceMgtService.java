@@ -56,6 +56,7 @@ import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.governance.bean.ConnectorConfig;
+import org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -85,8 +86,6 @@ public class SelfServiceMgtService {
 
     @Autowired
     private ServerUserStoreService serverUserStoreService;
-
-    public static final String SHARE_WITH_ALL_CHILDREN = "shareWithAllChildren";
 
     /**
      * Get organization governance configs.
@@ -548,7 +547,7 @@ public class SelfServiceMgtService {
         System.arraycopy(spProperties, 0, newSpProperties, 0, spProperties.length);
 
         ServiceProviderProperty shareWithAllChildrenProperty = new ServiceProviderProperty();
-        shareWithAllChildrenProperty.setName(SHARE_WITH_ALL_CHILDREN);
+        shareWithAllChildrenProperty.setName(OrganizationManagementConstants.SHARE_WITH_ALL_CHILDREN);
         shareWithAllChildrenProperty.setValue(Boolean.TRUE.toString());
         newSpProperties[spProperties.length] = shareWithAllChildrenProperty;
         serviceProvider.setSpProperties(newSpProperties);
