@@ -7,7 +7,7 @@
     "oidc": {
       "grantTypes": [
         "client_credentials",
-        "organization_switch"
+        "organization_switch_cc"
       ],
       "accessToken": {
         "applicationAccessTokenExpiryInSeconds": 7200,
