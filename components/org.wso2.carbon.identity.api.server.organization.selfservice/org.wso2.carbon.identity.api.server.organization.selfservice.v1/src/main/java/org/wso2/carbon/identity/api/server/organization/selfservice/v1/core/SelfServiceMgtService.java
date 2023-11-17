@@ -27,7 +27,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
+import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
+import org.wso2.carbon.identity.api.resource.mgt.constant.APIResourceManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.organization.selfservice.common.SelfServiceMgtServiceHolder;
@@ -40,18 +44,27 @@ import org.wso2.carbon.identity.api.server.organization.selfservice.v1.util.Self
 import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
+import org.wso2.carbon.identity.application.common.model.APIResource;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
+import org.wso2.carbon.identity.application.common.model.AuthorizedAPI;
 import org.wso2.carbon.identity.application.common.model.Property;
+import org.wso2.carbon.identity.application.common.model.Scope;
+import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.governance.bean.ConnectorConfig;
+import org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -275,6 +288,40 @@ public class SelfServiceMgtService {
 
             // Create the application using the Application Management Service.
             applicationManagementService.createApplication(model, null);
+
+            // If legacy authorization runtime is enabled, skip subscribing to APIs.
+            if (isLegacyAuthzRuntime()) {
+                return;
+            }
+
+            // Subscribe to APIs required for Organization Management Self Service.
+            ApplicationBasicInfo sSApplicationBasicInfo = getApplicationManagementService()
+                    .getApplicationBasicInfoByName(appName, tenantDomain);
+
+            if (sSApplicationBasicInfo == null) {
+                LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_CREATING_SYSTEM_APP.getDescription());
+                throw new SelfServiceMgtEndpointException(Response.Status.INTERNAL_SERVER_ERROR,
+                        getError(SelfServiceMgtConstants.ErrorMessage.ERROR_CREATING_SYSTEM_APP.getCode(),
+                                SelfServiceMgtConstants.ErrorMessage.ERROR_CREATING_SYSTEM_APP.getMessage(),
+                                SelfServiceMgtConstants.ErrorMessage.ERROR_CREATING_SYSTEM_APP.getDescription()));
+            }
+            String sSApplicationId = sSApplicationBasicInfo.getApplicationResourceId();
+
+            Map<String, List<String>> authorizedAPIAndScopeNames = getAuthorizedAPIsAndScopeNamesForSSApp();
+
+            // Loop through the APIs and subscribe to them.
+            for (Map.Entry<String, List<String>> entry : authorizedAPIAndScopeNames.entrySet()) {
+                String apiId = entry.getKey();
+                List<String> scopeNames = entry.getValue();
+                authorizeAPItoSelfServiceApp(apiId, scopeNames, tenantDomain, sSApplicationId);
+            }
+
+            // Share the self-service app with all the child organizations.
+            ServiceProvider serviceProvider = getApplicationManagementService()
+                    .getServiceProvider(sSApplicationBasicInfo.getApplicationId());
+            shareWithOrganizations(serviceProvider);
+            getApplicationManagementService().updateApplication(serviceProvider, tenantDomain, userName);
+
         } catch (IOException | IdentityApplicationManagementException e) {
             LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_CREATING_SYSTEM_APP.getDescription(), e);
             throw new SelfServiceMgtEndpointException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -414,6 +461,16 @@ public class SelfServiceMgtService {
         return SelfServiceMgtServiceHolder.getApplicationManagementService();
     }
 
+    private APIResourceManager getAPIResourcesManager() {
+
+        return SelfServiceMgtServiceHolder.getAPIResourceManager();
+    }
+
+    private AuthorizedAPIManagementService getAuthorizedAPIManagementService() {
+
+        return SelfServiceMgtServiceHolder.getAuthorizedAPIManagementService();
+    }
+
     private Error getError(String errorCode, String errorMessage, String errorDescription) {
 
         Error error = new Error();
@@ -421,5 +478,83 @@ public class SelfServiceMgtService {
         error.setMessage(errorMessage);
         error.setDescription(errorDescription);
         return error;
+    }
+
+    private Map<String, List<String>> getAuthorizedAPIsAndScopeNamesForSSApp() {
+
+        Map<String, List<String>> authorizedAPIMap = new HashMap<>();
+
+        // Authorize Organization Management API.
+        authorizedAPIMap.put("/api/server/v1/organizations",
+                new ArrayList<>(Arrays.asList("internal_organization_view", "internal_organization_create")));
+
+        // Authorize Scim User API.
+        authorizedAPIMap.put("/scim2/Users",
+                new ArrayList<>(Arrays.asList("internal_user_mgt_view", "internal_user_mgt_create")));
+
+        // Authorize Scim Organization User API.
+        authorizedAPIMap.put("/o/scim2/Users",
+                new ArrayList<>(Collections.singletonList("internal_org_user_mgt_create")));
+
+        // Authorize Scim Organization Roles API.
+        authorizedAPIMap.put("/o/scim2/Roles",
+                new ArrayList<>(Arrays.asList("internal_org_role_mgt_view", "internal_org_role_mgt_update")));
+
+        return authorizedAPIMap;
+    }
+
+    private void authorizeAPItoSelfServiceApp(String aPIIResourceIdentifier, List<String> scopeNames,
+                                              String tenantDomain, String sSApplicationId) {
+
+        String aPIFilter = "identifier eq " + aPIIResourceIdentifier;
+        try {
+            List<APIResource> apiResources = getAPIResourcesManager().getAPIResources(null, null, 1,
+                    aPIFilter, APIResourceManagementConstants.ASC,
+                    tenantDomain).getAPIResources();
+            if (apiResources != null && !apiResources.isEmpty()) {
+
+                APIResource apiResource = apiResources.get(0);
+
+                String policyId = APIResourceManagementConstants.RBAC_AUTHORIZATION;
+                List<Scope> scopes = getAPIResourcesManager().getAPIScopesById(apiResource.getId(), tenantDomain);
+
+                List<Scope> authorizedScopes = new ArrayList<>();
+                for (Scope scope : scopes) {
+                    if (scopeNames.contains(scope.getName())) {
+                        authorizedScopes.add(scope);
+                    }
+                }
+
+                AuthorizedAPI authorizedAPI = new AuthorizedAPI.AuthorizedAPIBuilder()
+                        .apiId(apiResource.getId())
+                        .appId(sSApplicationId)
+                        .scopes(authorizedScopes)
+                        .policyId(policyId)
+                        .build();
+                getAuthorizedAPIManagementService().addAuthorizedAPI(sSApplicationId,
+                        authorizedAPI, tenantDomain);
+            }
+
+        } catch (APIResourceMgtException | IdentityApplicationManagementException e) {
+            LOG.error("Error while authorizing APIs to the Organization Self Service application.", e);
+        }
+    }
+
+    private void shareWithOrganizations(ServiceProvider serviceProvider) {
+
+        ServiceProviderProperty[] spProperties = serviceProvider.getSpProperties();
+        ServiceProviderProperty[] newSpProperties = new ServiceProviderProperty[spProperties.length + 1];
+        System.arraycopy(spProperties, 0, newSpProperties, 0, spProperties.length);
+
+        ServiceProviderProperty shareWithAllChildrenProperty = new ServiceProviderProperty();
+        shareWithAllChildrenProperty.setName(OrganizationManagementConstants.SHARE_WITH_ALL_CHILDREN);
+        shareWithAllChildrenProperty.setValue(Boolean.TRUE.toString());
+        newSpProperties[spProperties.length] = shareWithAllChildrenProperty;
+        serviceProvider.setSpProperties(newSpProperties);
+    }
+
+    public static boolean isLegacyAuthzRuntime() {
+
+        return CarbonConstants.ENABLE_LEGACY_AUTHZ_RUNTIME;
     }
 }

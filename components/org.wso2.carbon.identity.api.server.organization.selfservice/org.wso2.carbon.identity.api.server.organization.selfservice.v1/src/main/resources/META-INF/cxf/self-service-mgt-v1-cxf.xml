@@ -26,10 +26,16 @@
           class="org.wso2.carbon.identity.api.server.organization.selfservice.common.factory.GovernanceOSGIServiceFactory"/>
     <bean id="ApplicationManagementServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.organization.selfservice.common.factory.ApplicationManagementOSGiServiceFactory"/>
+    <bean id="APIResourceManagementServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.organization.selfservice.common.factory.APIResourceManagementOSGiServiceFactory"/>
+    <bean id="AuthorizedAPIManagementServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.organization.selfservice.common.factory.AuthorizedAPIManagementOSGiServiceFactory"/>
 
     <bean id="SelfServiceMgtServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.organization.selfservice.common.SelfServiceMgtServiceHolder">
         <property name="IdentityGovernanceService" ref="GovernanceConnectorServiceFactoryBean"/>
         <property name="ApplicationManagementService" ref="ApplicationManagementServiceFactoryBean"/>
+        <property name="APIResourceManager" ref="APIResourceManagementServiceFactoryBean"/>
+        <property name="AuthorizedAPIManagementService" ref="AuthorizedAPIManagementServiceFactoryBean"/>
     </bean>
 </beans>
