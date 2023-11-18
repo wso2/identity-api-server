@@ -103,6 +103,7 @@ import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.SpFileContent;
 import org.wso2.carbon.identity.application.common.model.User;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
+import org.wso2.carbon.identity.application.common.util.IdentityApplicationManagementUtil;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
@@ -183,6 +184,7 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.rollbackInbounds;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.updateOrInsertInbound;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.Application.CONSOLE_APP;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.OAUTH2;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.PASSIVE_STS;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.SAML2;
@@ -849,7 +851,13 @@ public class ServerApplicationManagementService {
             new UpdateServiceProvider().apply(appToUpdate, applicationPatchModel);
         }
 
+        boolean isAllowUpdateSystemApps = isAllowUpdateSystemApplication(appToUpdate.getApplicationName(),
+                applicationPatchModel);
+
         try {
+            if (isAllowUpdateSystemApps) {
+                IdentityApplicationManagementUtil.setAllowUpdateSystemApplicationThreadLocal(true);
+            }
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String username = ContextLoader.getUsernameFromContext();
             getApplicationManagementService()
@@ -857,6 +865,10 @@ public class ServerApplicationManagementService {
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error patching application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
+        } finally {
+            if (isAllowUpdateSystemApps) {
+                IdentityApplicationManagementUtil.removeAllowUpdateSystemApplicationThreadLocal();
+            }
         }
     }
 
@@ -1096,6 +1108,35 @@ public class ServerApplicationManagementService {
         } catch (TemplateManagementException e) {
             throw handleTemplateManagementException(e, "Error while listing application templates.");
         }
+    }
+
+    /**
+     * Check updating system application allowed or not.
+     *
+     * @param appName application name
+     * @param applicationPatchModel application patch model
+     * @return true if allowed
+     */
+    private boolean isAllowUpdateSystemApplication(String appName, ApplicationPatchModel applicationPatchModel) {
+
+        Set<String> systemApplications =
+                ApplicationManagementServiceHolder.getApplicationManagementService().getSystemApplications();
+        if (systemApplications == null || systemApplications.stream().noneMatch(appName::equalsIgnoreCase)) {
+            return false;
+        }
+
+        // For the Console it is allowed update associated roles and authentication sequence.
+        if (StringUtils.equalsIgnoreCase(CONSOLE_APP, appName)
+                && StringUtils.equalsIgnoreCase(CONSOLE_APP, applicationPatchModel.getName())) {
+            return applicationPatchModel.getDescription() == null
+                    && applicationPatchModel.getImageUrl() == null
+                    && applicationPatchModel.getAccessUrl() == null
+                    && applicationPatchModel.getTemplateId() == null
+                    && applicationPatchModel.getClaimConfiguration() == null
+                    && applicationPatchModel.getAdvancedConfigurations() == null
+                    && applicationPatchModel.getProvisioningConfigurations() == null;
+        }
+        return false;
     }
 
     /**

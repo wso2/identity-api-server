@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.FapiMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.GrantTypeMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.MetadataProperty;
 import javax.validation.constraints.*;
@@ -51,6 +52,7 @@ public class OIDCMetaData  {
     private MetadataProperty requestObjectEncryptionAlgorithm;
     private MetadataProperty requestObjectEncryptionMethod;
     private MetadataProperty subjectType;
+    private FapiMetadata fapiMetadata;
 
     /**
     **/
@@ -358,6 +360,25 @@ public class OIDCMetaData  {
         this.subjectType = subjectType;
     }
 
+    /**
+    **/
+    public OIDCMetaData fapiMetadata(FapiMetadata fapiMetadata) {
+
+        this.fapiMetadata = fapiMetadata;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("fapiMetadata")
+    @Valid
+    public FapiMetadata getFapiMetadata() {
+        return fapiMetadata;
+    }
+    public void setFapiMetadata(FapiMetadata fapiMetadata) {
+        this.fapiMetadata = fapiMetadata;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -385,12 +406,13 @@ public class OIDCMetaData  {
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.requestObjectSignatureAlgorithm) &&
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.requestObjectEncryptionAlgorithm) &&
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.requestObjectEncryptionMethod) &&
-            Objects.equals(this.subjectType, oiDCMetaData.subjectType);
+            Objects.equals(this.subjectType, oiDCMetaData.subjectType) &&
+            Objects.equals(this.fapiMetadata, oiDCMetaData.fapiMetadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(allowedGrantTypes, defaultUserAccessTokenExpiryTime, defaultApplicationAccessTokenExpiryTime, defaultRefreshTokenExpiryTime, defaultIdTokenExpiryTime, idTokenEncryptionAlgorithm, idTokenEncryptionMethod, scopeValidators, accessTokenType, accessTokenBindingType, tokenEndpointAuthMethod, tokenEndpointSignatureAlgorithm, idTokenSignatureAlgorithm, requestObjectSignatureAlgorithm, requestObjectEncryptionAlgorithm, requestObjectEncryptionMethod, subjectType);
+        return Objects.hash(allowedGrantTypes, defaultUserAccessTokenExpiryTime, defaultApplicationAccessTokenExpiryTime, defaultRefreshTokenExpiryTime, defaultIdTokenExpiryTime, idTokenEncryptionAlgorithm, idTokenEncryptionMethod, scopeValidators, accessTokenType, accessTokenBindingType, tokenEndpointAuthMethod, tokenEndpointSignatureAlgorithm, idTokenSignatureAlgorithm, requestObjectSignatureAlgorithm, requestObjectEncryptionAlgorithm, requestObjectEncryptionMethod, subjectType, fapiMetadata);
     }
 
     @Override
@@ -416,6 +438,7 @@ public class OIDCMetaData  {
         sb.append("    requestObjectEncryptionAlgorithm: ").append(toIndentedString(requestObjectEncryptionAlgorithm)).append("\n");
         sb.append("    requestObjectEncryptionMethod: ").append(toIndentedString(requestObjectEncryptionMethod)).append("\n");
         sb.append("    subjectType: ").append(toIndentedString(subjectType)).append("\n");
+        sb.append("    fapiMetadata: ").append(toIndentedString(fapiMetadata)).append("\n");
         sb.append("}");
         return sb.toString();
     }

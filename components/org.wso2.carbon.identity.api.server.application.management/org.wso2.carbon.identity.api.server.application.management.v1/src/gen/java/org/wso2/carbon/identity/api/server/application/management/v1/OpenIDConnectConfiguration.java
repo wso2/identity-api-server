@@ -93,6 +93,8 @@ public enum StateEnum {
     private RequestObjectConfiguration requestObject;
     private PushAuthorizationRequestConfiguration pushAuthorizationRequest;
     private SubjectConfiguration subject;
+    private Boolean isFAPIApplication = false;
+    private FapiMetadata fapiMetadata;
 
     /**
     **/
@@ -452,6 +454,43 @@ public enum StateEnum {
         this.subject = subject;
     }
 
+    /**
+     * Enabling this option will make the application FAPI conformant.
+     **/
+    public OpenIDConnectConfiguration isFAPIApplication(Boolean isFAPIApplication) {
+
+        this.isFAPIApplication = isFAPIApplication;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "Enabling this option will make the application FAPI conformant.")
+    @JsonProperty("isFAPIApplication")
+    @Valid
+    public Boolean getIsFAPIApplication() {
+        return isFAPIApplication;
+    }
+    public void setIsFAPIApplication(Boolean isFAPIApplication) {
+        this.isFAPIApplication = isFAPIApplication;
+    }
+
+    /**
+     **/
+    public OpenIDConnectConfiguration fapiMetadata(FapiMetadata fapiMetadata) {
+
+        this.fapiMetadata = fapiMetadata;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("fapiMetadata")
+    @Valid
+    public FapiMetadata getFapiMetadata() {
+        return fapiMetadata;
+    }
+    public void setFapiMetadata(FapiMetadata fapiMetadata) {
+        this.fapiMetadata = fapiMetadata;
+    }
+
     @Override
     public boolean equals(java.lang.Object o) {
 
@@ -479,13 +518,14 @@ public enum StateEnum {
             Objects.equals(this.clientAuthentication, openIDConnectConfiguration.clientAuthentication) &&
             Objects.equals(this.requestObject, openIDConnectConfiguration.requestObject) &&
             Objects.equals(this.pushAuthorizationRequest, openIDConnectConfiguration.pushAuthorizationRequest) &&
-            Objects.equals(this.subject, openIDConnectConfiguration.subject);
-
+            Objects.equals(this.subject, openIDConnectConfiguration.subject) &&
+            Objects.equals(this.isFAPIApplication, openIDConnectConfiguration.isFAPIApplication) &&
+            Objects.equals(this.fapiMetadata, openIDConnectConfiguration.fapiMetadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clientId, clientSecret, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, refreshToken, idToken, logout, validateRequestObjectSignature, scopeValidators, clientAuthentication, requestObject, pushAuthorizationRequest, subject);
+        return Objects.hash(clientId, clientSecret, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, accessToken, refreshToken, idToken, logout, validateRequestObjectSignature, scopeValidators, clientAuthentication, requestObject, pushAuthorizationRequest, subject, isFAPIApplication, fapiMetadata);
     }
 
     @Override
@@ -512,6 +552,8 @@ public enum StateEnum {
         sb.append("    requestObject: ").append(toIndentedString(requestObject)).append("\n");
         sb.append("    pushAuthorizationRequest: ").append(toIndentedString(pushAuthorizationRequest)).append("\n");
         sb.append("    subject: ").append(toIndentedString(subject)).append("\n");
+        sb.append("    isFAPIApplication: ").append(toIndentedString(isFAPIApplication)).append("\n");
+        sb.append("    fapiMetadata: ").append(toIndentedString(fapiMetadata)).append("\n");
         sb.append("}");
         return sb.toString();
     }

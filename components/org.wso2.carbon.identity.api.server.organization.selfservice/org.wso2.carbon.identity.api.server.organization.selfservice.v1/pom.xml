@@ -22,7 +22,7 @@
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.server.organization.selfservice</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.2.112-SNAPSHOT</version>
+        <version>1.2.125-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.api.server.organization.selfservice.v1</artifactId>
@@ -156,6 +156,11 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.user.store.configuration</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.api.resource.mgt</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

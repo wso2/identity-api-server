@@ -71,6 +71,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         updateRequestObjectConfiguration(consumerAppDTO, oidcModel.getRequestObject());
         updatePARConfigurations(consumerAppDTO, oidcModel.getPushAuthorizationRequest());
         updateSubjectConfigurations(consumerAppDTO, oidcModel.getSubject());
+        consumerAppDTO.setFapiConformanceEnabled(oidcModel.getIsFAPIApplication());
 
         return consumerAppDTO;
     }

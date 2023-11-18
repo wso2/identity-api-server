@@ -23,12 +23,12 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.common.UserInvitationMgtConstants;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.AcceptanceRequestBody;
+import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.Audience;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.IntrospectSuccessResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationSuccessResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationsListResponse;
-import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.RoleAssignmentRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.RoleAssignmentResponse;
 import org.wso2.carbon.identity.organization.user.invitation.management.InvitationCoreServiceImpl;
 import org.wso2.carbon.identity.organization.user.invitation.management.exception.UserInvitationMgtException;
@@ -36,7 +36,6 @@ import org.wso2.carbon.identity.organization.user.invitation.management.models.I
 import org.wso2.carbon.identity.organization.user.invitation.management.models.RoleAssignments;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
@@ -62,13 +61,20 @@ public class GuestApiServiceCore {
     private static List<RoleAssignmentResponse> buildRoleAssignmentResponse(Invitation invitationRecord) {
 
         List<RoleAssignmentResponse> roleAssignmentResponseList = new ArrayList<>();
+        List<Audience> audienceList = new ArrayList<>();
         for (RoleAssignments roleAssignment : invitationRecord.getRoleAssignments()) {
-            if (roleAssignment.getRoles() != null) {
-                RoleAssignmentResponse roleAssignmentResponse = new RoleAssignmentResponse();
-                roleAssignmentResponse.setApplicationId(roleAssignment.getApplicationId());
-                roleAssignmentResponse.setRoles(Arrays.asList(roleAssignment.getRoles()));
-                roleAssignmentResponseList.add(roleAssignmentResponse);
+            RoleAssignmentResponse roleAssignmentResponse = new RoleAssignmentResponse();
+            roleAssignmentResponse.setDisplayName(roleAssignment.getRoleName());
+            roleAssignmentResponse.setId(roleAssignment.getRoleId());
+            if (roleAssignment.getAudience() != null) {
+                Audience audience = new Audience();
+                audience.setDisplay(roleAssignment.getAudience().getApplicationName());
+                audience.setType(roleAssignment.getAudience().getApplicationType());
+                audience.setValue(roleAssignment.getAudience().getApplicationId());
+                audienceList.add(audience);
+                roleAssignmentResponse.setAudience(audienceList);
             }
+            roleAssignmentResponseList.add(roleAssignmentResponse);
         }
         return roleAssignmentResponseList;
     }
@@ -85,15 +91,12 @@ public class GuestApiServiceCore {
         Invitation invitation = new Invitation();
         invitation.setUsername(invitationRequestBody.getUsername());
         invitation.setUserDomain(invitationRequestBody.getUserDomain());
-        if (invitationRequestBody.getRoleAssignments() != null) {
+        if (invitationRequestBody.getRoles() != null) {
             List<RoleAssignments> roleAssignments = new ArrayList<>();
-            for (RoleAssignmentRequestBody roleAssignmentRequestBody : invitationRequestBody.getRoleAssignments()) {
-                if (roleAssignmentRequestBody.getRoles() != null) {
-                    RoleAssignments roleAssignment = new RoleAssignments();
-                    roleAssignment.setApplicationId(roleAssignmentRequestBody.getApplicationId());
-                    roleAssignment.setRoles(roleAssignmentRequestBody.getRoles().toArray(new String[0]));
-                    roleAssignments.add(roleAssignment);
-                }
+            for (String roleId : invitationRequestBody.getRoles()) {
+                RoleAssignments roleAssignment = new RoleAssignments();
+                roleAssignment.setRole(roleId);
+                roleAssignments.add(roleAssignment);
             }
             invitation.setRoleAssignments(roleAssignments.toArray(new RoleAssignments[0]));
         }
@@ -252,7 +255,7 @@ public class GuestApiServiceCore {
         invitationSuccessResponse.setEmail(invitation.getEmail());
         if (invitation.getRoleAssignments().length > 0) {
             List<RoleAssignmentResponse> roleAssignmentResponses = buildRoleAssignmentResponse(invitation);
-            invitationSuccessResponse.setRoleAssignments(roleAssignmentResponses);
+            invitationSuccessResponse.setRoles(roleAssignmentResponses);
         }
         return invitationSuccessResponse;
     }
@@ -269,7 +272,7 @@ public class GuestApiServiceCore {
             invitationResponse.setExpiredAt(invitationRecord.getExpiredAt().toString());
             if (invitationRecord.getRoleAssignments().length > 0) {
                 List<RoleAssignmentResponse> roleAssignments = buildRoleAssignmentResponse(invitationRecord);
-                invitationResponse.setRoleAssignments(roleAssignments);
+                invitationResponse.setRoles(roleAssignments);
             }
             invitationsListResponse.addInvitationsItem(invitationResponse);
         }

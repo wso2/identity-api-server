@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
 /**
@@ -131,6 +133,12 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
 
         if (subjectApiModel != null) {
 
+            if (Boolean.TRUE.equals(subjectApiModel.getMappedLocalSubjectMandatory()) &&
+                    Boolean.FALSE.equals(subjectApiModel.getUseMappedLocalSubject())) {
+                throw buildBadRequestError(ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED.getCode(),
+                        ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED.getDescription());
+            }
+
             LocalAndOutboundAuthenticationConfig authConfig = getLocalAndOutboundConfig(application);
             if (subjectApiModel.getClaim() != null) {
                 setIfNotNull(subjectApiModel.getClaim().getUri(), authConfig::setSubjectClaimUri);
@@ -142,6 +150,7 @@ public class UpdateClaimConfiguration implements UpdateFunction<ServiceProvider,
 
             ClaimConfig claimConfig = getClaimConfig(application);
             setIfNotNull(subjectApiModel.getUseMappedLocalSubject(), claimConfig::setAlwaysSendMappedLocalSubjectId);
+            setIfNotNull(subjectApiModel.getMappedLocalSubjectMandatory(), claimConfig::setMappedLocalSubjectMandatory);
         }
     }
 

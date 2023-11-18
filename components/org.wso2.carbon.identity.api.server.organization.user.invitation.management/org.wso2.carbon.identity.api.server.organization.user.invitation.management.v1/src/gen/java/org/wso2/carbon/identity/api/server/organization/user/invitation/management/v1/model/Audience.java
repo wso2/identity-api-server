@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.application.management.v1;
+package org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -30,68 +30,64 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class PassiveStsConfiguration  {
+public class Audience  {
   
-    private String realm;
-    private String replyTo;
-    private String replyToLogout;
+    private String value;
+    private String display;
+    private String type;
 
     /**
     **/
-    public PassiveStsConfiguration realm(String realm) {
+    public Audience value(String value) {
 
-        this.realm = realm;
+        this.value = value;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("realm")
+    @ApiModelProperty(example = "3645709f-ea8d-5595-7690-e1fa0efe3df9", value = "")
+    @JsonProperty("value")
     @Valid
-    @NotNull(message = "Property realm cannot be null.")
-
-    public String getRealm() {
-        return realm;
+    public String getValue() {
+        return value;
     }
-    public void setRealm(String realm) {
-        this.realm = realm;
-    }
-
-    /**
-    **/
-    public PassiveStsConfiguration replyTo(String replyTo) {
-
-        this.replyTo = replyTo;
-        return this;
-    }
-    
-    @ApiModelProperty(required = true, value = "")
-    @JsonProperty("replyTo")
-    @Valid
-    @NotNull(message = "Property replyTo cannot be null.")
-
-    public String getReplyTo() {
-        return replyTo;
-    }
-    public void setReplyTo(String replyTo) {
-        this.replyTo = replyTo;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     /**
     **/
-    public PassiveStsConfiguration replyToLogout(String replyToLogout) {
+    public Audience display(String display) {
 
-        this.replyToLogout = replyToLogout;
+        this.display = display;
         return this;
     }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("replyToLogout")
+    @ApiModelProperty(example = "My Org", value = "")
+    @JsonProperty("display")
     @Valid
-    public String getReplyToLogout() {
-        return replyToLogout;
+    public String getDisplay() {
+        return display;
     }
-    public void setReplyToLogout(String replyToLogout) {
-        this.replyToLogout = replyToLogout;
+    public void setDisplay(String display) {
+        this.display = display;
+    }
+
+    /**
+    **/
+    public Audience type(String type) {
+
+        this.type = type;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "organization", value = "")
+    @JsonProperty("type")
+    @Valid
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
     }
 
 
@@ -105,26 +101,26 @@ public class PassiveStsConfiguration  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        PassiveStsConfiguration passiveStsConfiguration = (PassiveStsConfiguration) o;
-        return Objects.equals(this.realm, passiveStsConfiguration.realm) &&
-            Objects.equals(this.replyTo, passiveStsConfiguration.replyTo) &&
-            Objects.equals(this.replyToLogout, passiveStsConfiguration.replyToLogout);
+        Audience audience = (Audience) o;
+        return Objects.equals(this.value, audience.value) &&
+            Objects.equals(this.display, audience.display) &&
+            Objects.equals(this.type, audience.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(realm, replyTo, replyToLogout);
+        return Objects.hash(value, display, type);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class PassiveStsConfiguration {\n");
+        sb.append("class Audience {\n");
         
-        sb.append("    realm: ").append(toIndentedString(realm)).append("\n");
-        sb.append("    replyTo: ").append(toIndentedString(replyTo)).append("\n");
-        sb.append("    replyToLogout: ").append(toIndentedString(replyToLogout)).append("\n");
+        sb.append("    value: ").append(toIndentedString(value)).append("\n");
+        sb.append("    display: ").append(toIndentedString(display)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("}");
         return sb.toString();
     }

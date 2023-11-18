@@ -37,7 +37,7 @@ public class InvitationSuccessResponse  {
   
     private String username;
     private String email;
-    private List<RoleAssignmentResponse> roleAssignments = new ArrayList<>();
+    private List<RoleAssignmentResponse> roles = new ArrayList<>();
 
 
     /**
@@ -85,26 +85,26 @@ public class InvitationSuccessResponse  {
     /**
     * Role assignments which the user will be assigned to.
     **/
-    public InvitationSuccessResponse roleAssignments(List<RoleAssignmentResponse> roleAssignments) {
+    public InvitationSuccessResponse roles(List<RoleAssignmentResponse> roles) {
 
-        this.roleAssignments = roleAssignments;
+        this.roles = roles;
         return this;
     }
     
     @ApiModelProperty(required = true, value = "Role assignments which the user will be assigned to.")
-    @JsonProperty("roleAssignments")
+    @JsonProperty("roles")
     @Valid
-    @NotNull(message = "Property roleAssignments cannot be null.")
+    @NotNull(message = "Property roles cannot be null.")
 
-    public List<RoleAssignmentResponse> getRoleAssignments() {
-        return roleAssignments;
+    public List<RoleAssignmentResponse> getRoles() {
+        return roles;
     }
-    public void setRoleAssignments(List<RoleAssignmentResponse> roleAssignments) {
-        this.roleAssignments = roleAssignments;
+    public void setRoles(List<RoleAssignmentResponse> roles) {
+        this.roles = roles;
     }
 
-    public InvitationSuccessResponse addRoleAssignmentsItem(RoleAssignmentResponse roleAssignmentsItem) {
-        this.roleAssignments.add(roleAssignmentsItem);
+    public InvitationSuccessResponse addRolesItem(RoleAssignmentResponse rolesItem) {
+        this.roles.add(rolesItem);
         return this;
     }
 
@@ -122,12 +122,12 @@ public class InvitationSuccessResponse  {
         InvitationSuccessResponse invitationSuccessResponse = (InvitationSuccessResponse) o;
         return Objects.equals(this.username, invitationSuccessResponse.username) &&
             Objects.equals(this.email, invitationSuccessResponse.email) &&
-            Objects.equals(this.roleAssignments, invitationSuccessResponse.roleAssignments);
+            Objects.equals(this.roles, invitationSuccessResponse.roles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, email, roleAssignments);
+        return Objects.hash(username, email, roles);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class InvitationSuccessResponse  {
         
         sb.append("    username: ").append(toIndentedString(username)).append("\n");
         sb.append("    email: ").append(toIndentedString(email)).append("\n");
-        sb.append("    roleAssignments: ").append(toIndentedString(roleAssignments)).append("\n");
+        sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
         sb.append("}");
         return sb.toString();
     }

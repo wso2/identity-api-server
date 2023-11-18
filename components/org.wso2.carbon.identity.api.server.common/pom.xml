@@ -19,7 +19,7 @@
     <parent>
         <artifactId>identity-api-server</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
-        <version>1.2.112-SNAPSHOT</version>
+        <version>1.2.125-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -120,6 +120,11 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.organization.management.core</groupId>
+            <artifactId>org.wso2.carbon.identity.organization.management.service</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

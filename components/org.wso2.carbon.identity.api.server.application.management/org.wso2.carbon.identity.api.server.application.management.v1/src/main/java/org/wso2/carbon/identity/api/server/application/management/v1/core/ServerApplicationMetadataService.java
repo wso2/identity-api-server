@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthe
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationMethodMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.FapiMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.GrantType;
 import org.wso2.carbon.identity.api.server.application.management.v1.GrantTypeMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.MetadataProperty;
@@ -46,6 +47,7 @@ import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthIDTokenAlgorithmDTO;
 import org.wso2.carbon.identity.oauth.dto.TokenBindingMetaDataDTO;
+import org.wso2.carbon.identity.oauth2.model.ClientAuthenticationMethodModel;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.security.SecurityConfigException;
@@ -53,10 +55,12 @@ import org.wso2.carbon.security.SecurityConfigException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_CERTIFICATE_ALIAS;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.DEFAULT_NAME_ID_FORMAT;
@@ -157,26 +161,12 @@ public class ServerApplicationMetadataService {
         OIDCMetaData oidcMetaData = new OIDCMetaData();
         OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
 
-        List<String> tokenEpAuthMethods = Arrays.asList(OAuth2Util.getSupportedClientAuthMethods());
-        List<ClientAuthenticationMethod> supportedClientAuthenticationMethods = new ArrayList<>();
-        for (String tokenEpAuthMethod : tokenEpAuthMethods) {
-            ClientAuthenticationMethod clientAuthenticationMethod = new ClientAuthenticationMethod();
-            clientAuthenticationMethod.setName(tokenEpAuthMethod);
-            if (tokenEpAuthMethod.equals("client_secret_basic")) {
-                clientAuthenticationMethod.setDisplayName("Client Secret Basic");
-            } else if (tokenEpAuthMethod.equals("client_secret_post")) {
-                clientAuthenticationMethod.setDisplayName("Client Secret Post");
-            } else if (tokenEpAuthMethod.equals("private_key_jwt")) {
-                clientAuthenticationMethod.setDisplayName("Private Key JWT");
-            } else if (tokenEpAuthMethod.equals("tls_client_auth")) {
-                clientAuthenticationMethod.setDisplayName("Mutual TLS");
-            } else {
-                clientAuthenticationMethod.setDisplayName(tokenEpAuthMethod);
-            }
-            supportedClientAuthenticationMethods.add(clientAuthenticationMethod);
-        }
+        List<ClientAuthenticationMethod> supportedClientAuthMethods = getClientAuthenticationMethods();
+        supportedClientAuthMethods.add(new ClientAuthenticationMethod()
+                .name(ApplicationManagementConstants.NONE)
+                .displayName(ApplicationManagementConstants.NONE));
         oidcMetaData.setTokenEndpointAuthMethod(
-                new ClientAuthenticationMethodMetadata().options(supportedClientAuthenticationMethods));
+                new ClientAuthenticationMethodMetadata().options(supportedClientAuthMethods));
         List<String> tokenEpSigningAlgorithms = IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.TOKEN_EP_SIGNATURE_ALGORITHMS_SUPPORTED);
         oidcMetaData.setTokenEndpointSignatureAlgorithm(new MetadataProperty()
@@ -210,6 +200,24 @@ public class ServerApplicationMetadataService {
         oidcMetaData.setSubjectType(new MetadataProperty()
                 .defaultValue(IdentityUtil.getProperty(ApplicationManagementConstants.DEFAULT_SUBJECT_TYPE))
                 .options(subjectTypes));
+        List<String> fapiAllowedSignatureAlgorithms = new ArrayList<>();
+        fapiAllowedSignatureAlgorithms.addAll(IdentityUtil
+                .getPropertyAsList(ApplicationManagementConstants.FAPI_ALLOWED_SIGNATURE_ALGORITHMS));
+        List<String> fapiAllowedEncryptionAlgorithms = new ArrayList<>();
+        fapiAllowedEncryptionAlgorithms.addAll(requestObjectEncryptionAlgorithms);
+        fapiAllowedEncryptionAlgorithms.removeIf(n -> (n.equals(ApplicationManagementConstants.RSA1_5)));
+        List<String> fapiAllowedAuthMethods = new ArrayList<>();
+        fapiAllowedAuthMethods.addAll(IdentityUtil
+                .getPropertyAsList(ApplicationManagementConstants.FAPI_ALLOWED_CLIENT_AUTHENTICATION_METHODS));
+        List<ClientAuthenticationMethod> supportedFapiClientAuthenticationMethods =
+                supportedClientAuthMethods.stream().filter(clientAuthenticationMethod ->
+                fapiAllowedAuthMethods.contains(clientAuthenticationMethod.getName())).collect(Collectors.toList());
+        FapiMetadata fapiMetadata = new FapiMetadata();
+        fapiMetadata.allowedSignatureAlgorithms(new MetadataProperty().options(fapiAllowedSignatureAlgorithms));
+        fapiMetadata.allowedEncryptionAlgorithms(new MetadataProperty().options(fapiAllowedEncryptionAlgorithms));
+        fapiMetadata.setTokenEndpointAuthMethod(new ClientAuthenticationMethodMetadata()
+                .options(supportedFapiClientAuthenticationMethods));
+        oidcMetaData.setFapiMetadata(fapiMetadata);
         List<String> supportedGrantTypes = new LinkedList<>(Arrays.asList(oAuthAdminService.getAllowedGrantTypes()));
         List<GrantType> supportedGrantTypeNames = new ArrayList<>();
         // Iterate through the standard grant type names and add matching elements.
@@ -417,5 +425,18 @@ public class ServerApplicationMetadataService {
         String errorDescription = String.format(ErrorMessage.INVALID_INBOUND_PROTOCOL.getDescription(), inboundName);
 
         return Utils.buildClientError(errorCode, errorMessage, errorDescription);
+    }
+
+    private List<ClientAuthenticationMethod> getClientAuthenticationMethods() {
+
+        HashSet<ClientAuthenticationMethodModel> tokenEpAuthMethods = OAuth2Util.getSupportedAuthenticationMethods();
+        List<ClientAuthenticationMethod> supportedClientAuthMethods = new ArrayList<>();
+        for (ClientAuthenticationMethodModel authMethod : tokenEpAuthMethods) {
+            ClientAuthenticationMethod clientAuthenticationMethod = new ClientAuthenticationMethod();
+            clientAuthenticationMethod.setName(authMethod.getName());
+            clientAuthenticationMethod.setDisplayName(authMethod.getDisplayName());
+            supportedClientAuthMethods.add(clientAuthenticationMethod);
+        }
+        return supportedClientAuthMethods;
     }
 }

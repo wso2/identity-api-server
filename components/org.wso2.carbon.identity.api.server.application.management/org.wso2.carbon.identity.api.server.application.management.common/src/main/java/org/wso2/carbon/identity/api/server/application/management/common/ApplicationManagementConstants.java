@@ -65,6 +65,11 @@ public class ApplicationManagementConstants {
     public static final String REQUEST_OBJECT_ENCRYPTION_METHODS_SUPPORTED = "OAuth.OpenIDConnect." +
             "SupportedRequestObjectEncryptionMethods.SupportedRequestObjectEncryptionMethod";
     public static final String DEFAULT_SUBJECT_TYPE = "OAuth.OpenIDConnect.DefaultSubjectType";
+    public static final String FAPI_ALLOWED_SIGNATURE_ALGORITHMS = "OAuth.OpenIDConnect.FAPI." +
+            "AllowedSignatureAlgorithms.AllowedSignatureAlgorithm";
+    public static final String FAPI_ALLOWED_CLIENT_AUTHENTICATION_METHODS = "OAuth.OpenIDConnect.FAPI." +
+            "AllowedClientAuthenticationMethods.AllowedClientAuthenticationMethod";
+    public static final String RSA1_5 = "RSA1_5";
 
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 
@@ -132,6 +137,9 @@ public class ApplicationManagementConstants {
         INVALID_POLICY_TYPE_FOR_API_RESOURCE("60512", "Invalid policy type provided for the API " +
                 "resource.", "API resource with id: %s doesn't allow the provided policy type: %s."),
 
+        ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED("60513",
+                "Invalid configuration.",
+                "'useMappedLocalSubject' cannot be disabled when 'mappedLocalSubjectMandatory' is enabled."),
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
                 "Error occurred while retrieving SAML Metadata.",

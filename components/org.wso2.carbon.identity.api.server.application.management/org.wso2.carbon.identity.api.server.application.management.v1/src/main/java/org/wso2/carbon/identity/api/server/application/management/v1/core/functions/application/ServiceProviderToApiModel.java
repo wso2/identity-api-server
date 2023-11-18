@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfigurationAttestationMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
@@ -46,6 +47,7 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
+import org.wso2.carbon.identity.application.common.model.ClientAttestationMetaData;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
@@ -70,6 +72,11 @@ import java.util.stream.Collectors;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.arrayToStream;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_JWKS;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_PEM;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.ALLOWED_ROLE_AUDIENCE_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.ANDROID_PACKAGE_NAME_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.APPLE_APP_ID_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_API_BASED_AUTHENTICATION_ENABLED_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_ATTESTATION_ENABLED_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_MANAGEMENT_APP_SP_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.TEMPLATE_ID_SP_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.USE_USER_ID_FOR_DEFAULT_SUBJECT;
@@ -307,6 +314,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         if (application.getClaimConfig() != null) {
             subjectConfig.useMappedLocalSubject(application.getClaimConfig().isAlwaysSendMappedLocalSubjectId());
+            subjectConfig.mappedLocalSubjectMandatory(application.getClaimConfig().isMappedLocalSubjectMandatory());
         }
 
         LocalAndOutboundAuthenticationConfig localAndOutboundAuthConfig =
@@ -416,8 +424,39 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .useExternalConsentPage(authConfig.isUseExternalConsentPage())
                 .certificate(getCertificate(serviceProvider))
                 .fragment(isFragmentApp(serviceProvider))
+                .enableAPIBasedAuthentication(serviceProvider.isAPIBasedAuthenticationEnabled())
+                .attestationMetaData(getAttestationMetaData(serviceProvider))
                 .additionalSpProperties(getSpProperties(serviceProvider));
     }
+
+    /**
+     * Retrieves the attestation metadata for an application's advanced configuration based on the provided
+     * service provider.
+     *
+     * @param serviceProvider The service provider for which attestation metadata is required.
+     * @return An instance of AdvancedApplicationConfigurationAttestationMetaData containing attestation data.
+     */
+    private AdvancedApplicationConfigurationAttestationMetaData getAttestationMetaData
+                                                                (ServiceProvider serviceProvider) {
+
+        // Retrieve the client attestation metadata from the service provider.
+        ClientAttestationMetaData clientAttestationMetaData = serviceProvider.getClientAttestationMetaData();
+
+        // If the client attestation metadata is not available, create a new instance.
+        if (clientAttestationMetaData == null) {
+            clientAttestationMetaData = new ClientAttestationMetaData();
+        }
+
+        // Create and configure an instance of AdvancedApplicationConfigurationAttestationMetaData
+        // based on the client attestation metadata.
+        return new AdvancedApplicationConfigurationAttestationMetaData()
+                .enableClientAttestation(clientAttestationMetaData.isAttestationEnabled())
+                .androidPackageName(clientAttestationMetaData.getAndroidPackageName())
+                .appleAppId(clientAttestationMetaData.getAppleAppId())
+                .androidAttestationServiceCredentials(clientAttestationMetaData
+                        .getAndroidAttestationServiceCredentials());
+    }
+
 
     private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {
 
@@ -451,6 +490,16 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             spPropertyList.removeIf(property -> USE_USER_ID_FOR_DEFAULT_SUBJECT.equals(property.getName()));
             spPropertyList.removeIf(property -> TEMPLATE_ID_SP_PROPERTY_NAME.equals(property.getName()));
             spPropertyList.removeIf(property -> IS_MANAGEMENT_APP_SP_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property -> IS_ATTESTATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property ->
+                    IS_API_BASED_AUTHENTICATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property ->
+                    ANDROID_PACKAGE_NAME_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property ->
+                    ANDROID_PACKAGE_NAME_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property ->
+                    APPLE_APP_ID_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property -> ALLOWED_ROLE_AUDIENCE_PROPERTY_NAME.equals(property.getName()));
             return spPropertyList.toArray(new ServiceProviderProperty[0]);
     }
 
@@ -481,12 +530,10 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private ApplicationResponseModel.AccessEnum getAccess(String applicationName) {
 
         String username = ContextLoader.getUsernameFromContext();
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         try {
-            if (ApplicationConstants.LOCAL_SP.equals(applicationName) ||
-                    (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && systemApplications != null
-                            && systemApplications.stream().anyMatch(applicationName::equalsIgnoreCase)) ||
+            if (ApplicationConstants.LOCAL_SP.equals(applicationName) || (systemApplications != null
+                    && systemApplications.stream().anyMatch(applicationName::equalsIgnoreCase)) ||
                     !ApplicationMgtUtil.isUserAuthorized(applicationName, username)) {
                 return ApplicationResponseModel.AccessEnum.READ;
             }
