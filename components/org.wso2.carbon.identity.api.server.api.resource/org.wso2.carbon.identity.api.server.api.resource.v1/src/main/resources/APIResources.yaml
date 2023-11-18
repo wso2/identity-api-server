@@ -721,7 +721,7 @@ components:
           example: before
         href:
           type: string
-          example: /t/carbon.super/api/server/v1/api-resources?after=NDoy
+          example: /api/server/v1/api-resources?after=NDoy
 
     APIResourceListResponse:
       type: object
