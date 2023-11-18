@@ -397,7 +397,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api-resource-collections:
+  /meta/api-resource-collections:
     get:
       tags:
         - API Resource Collections
@@ -430,7 +430,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api-resource-collections/{collectionId}:
+  /meta/api-resource-collections/{collectionId}:
     get:
       tags:
         - API Resource Collections
@@ -481,7 +481,7 @@ components:
       schema:
         type: string
         example: er34-gf23-bv54-vb90
-    
+
     collectionId:
       name: collectionId
       in: path
@@ -777,7 +777,7 @@ components:
         self:
           type: string
           example: /t/carbon.super/api/server/v1/api-resource-collections/eDUwOUNlcnRpZmljYXRlQXV0aGVudGljYXRvcg
-    
+
     APIResourceCollectionListResponse:
       type: object
       required:
@@ -790,7 +790,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/APIResourceCollectionListItem'
-    
+
     APIResourceCollectionItem:
       type: object
       required:

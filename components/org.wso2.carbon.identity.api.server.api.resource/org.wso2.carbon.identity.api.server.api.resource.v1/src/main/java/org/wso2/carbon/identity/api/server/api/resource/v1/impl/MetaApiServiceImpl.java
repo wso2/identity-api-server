@@ -19,15 +19,15 @@
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourceCollectionsApiService;
+import org.wso2.carbon.identity.api.server.api.resource.v1.MetaApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceCollectionManagementService;
 
 import javax.ws.rs.core.Response;
 
 /**
- * Implementation of the API resource collections REST API.
+ * Implementation of the API resource collections meta REST API.
  */
-public class ApiResourceCollectionsApiServiceImpl implements ApiResourceCollectionsApiService {
+public class MetaApiServiceImpl implements MetaApiService {
 
     @Autowired
     ServerAPIResourceCollectionManagementService serverAPIResourceManagementService;

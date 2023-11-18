@@ -18,14 +18,14 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.factories;
 
-import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourceCollectionsApiService;
-import org.wso2.carbon.identity.api.server.api.resource.v1.impl.ApiResourceCollectionsApiServiceImpl;
+import org.wso2.carbon.identity.api.server.api.resource.v1.MetaApiService;
+import org.wso2.carbon.identity.api.server.api.resource.v1.impl.MetaApiServiceImpl;
 
-public class ApiResourceCollectionsApiServiceFactory {
+public class MetaApiServiceFactory {
 
-   private final static ApiResourceCollectionsApiService service = new ApiResourceCollectionsApiServiceImpl();
+   private final static MetaApiService service = new MetaApiServiceImpl();
 
-   public static ApiResourceCollectionsApiService getApiResourceCollectionsApi()
+   public static MetaApiService getMetaApi()
    {
       return service;
    }

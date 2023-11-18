@@ -23,7 +23,7 @@
     <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceCollectionManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.impl.ApiResourcesApiServiceImpl"/>
-    <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.impl.ApiResourceCollectionsApiServiceImpl"/>
+    <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.impl.MetaApiServiceImpl"/>
     <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.impl.ScopesApiServiceImpl"/>
 
     <bean id="apiResourceManagementServiceHolderBean"

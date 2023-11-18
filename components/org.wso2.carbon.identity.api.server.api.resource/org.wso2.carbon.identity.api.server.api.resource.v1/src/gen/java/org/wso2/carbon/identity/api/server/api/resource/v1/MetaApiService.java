@@ -17,20 +17,9 @@
  */
 
 package org.wso2.carbon.identity.api.server.api.resource.v1;
-
-import org.wso2.carbon.identity.api.server.api.resource.v1.*;
-import org.wso2.carbon.identity.api.server.api.resource.v1.*;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionListResponse;
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionResponse;
-import org.wso2.carbon.identity.api.server.api.resource.v1.Error;
 import javax.ws.rs.core.Response;
 
-
-public interface ApiResourceCollectionsApiService {
+public interface MetaApiService {
 
       public Response getAPIResourceCollectionByCollectionId(String collectionId);
 

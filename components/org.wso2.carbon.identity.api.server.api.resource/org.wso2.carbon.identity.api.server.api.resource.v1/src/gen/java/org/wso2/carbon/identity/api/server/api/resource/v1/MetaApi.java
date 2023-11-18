@@ -18,35 +18,33 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-import java.util.List;
-
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionListResponse;
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionResponse;
-import org.wso2.carbon.identity.api.server.api.resource.v1.Error;
-import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourceCollectionsApiService;
 
 import javax.validation.Valid;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import io.swagger.annotations.*;
 
-import javax.validation.constraints.*;
+@Path("/meta")
+@Api(description = "The meta API")
 
-@Path("/api-resource-collections")
-@Api(description = "The api-resource-collections API")
-
-public class ApiResourceCollectionsApi  {
+public class MetaApi  {
 
     @Autowired
-    private ApiResourceCollectionsApiService delegate;
+    private MetaApiService delegate;
 
     @Valid
     @GET
-    @Path("/{collectionId}")
+    @Path("/api-resource-collections/{collectionId}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Get API resource collection specified by the id", notes = "Get API resource collection specified by the id <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/view <br> <b>Scope required:</b> <br>   * internal_api_resource_view ", response = APIResourceCollectionResponse.class, authorizations = {
@@ -68,7 +66,7 @@ public class ApiResourceCollectionsApi  {
 
     @Valid
     @GET
-    
+    @Path("/api-resource-collections")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "List all API resource collections in the server", notes = "List all API resource collections in the server <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/view <br> <b>Scope required:</b> <br>   * internal_api_resource_view ", response = APIResourceCollectionListResponse.class, authorizations = {
