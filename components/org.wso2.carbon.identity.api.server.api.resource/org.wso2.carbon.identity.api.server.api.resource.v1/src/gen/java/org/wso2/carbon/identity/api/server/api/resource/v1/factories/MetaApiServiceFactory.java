@@ -21,6 +21,9 @@ package org.wso2.carbon.identity.api.server.api.resource.v1.factories;
 import org.wso2.carbon.identity.api.server.api.resource.v1.MetaApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.impl.MetaApiServiceImpl;
 
+/**
+ * Factory class for MetaApiService.
+ */
 public class MetaApiServiceFactory {
 
    private final static MetaApiService service = new MetaApiServiceImpl();
