@@ -34,6 +34,7 @@ public class APIResourceMgtEndpointConstants {
     public static final String SYSTEM_API_RESOURCE_TYPE = "SYSTEM";
     public static final String API_RESOURCE_MANAGEMENT_PREFIX = "API-RESOURCE-";
     public static final String API_RESOURCE_PATH_COMPONENT = "/api-resources";
+    public static final String API_RESOURCE_COLLECTION_PATH_COMPONENT = "/api-resource-collections";
 
     private static final List<String> allowedAttributeList = new ArrayList<>();
     public static final List<String> ALLOWED_SEARCH_ATTRIBUTES = Collections.unmodifiableList(allowedAttributeList);
@@ -42,10 +43,15 @@ public class APIResourceMgtEndpointConstants {
     public static final List<String> SUPPORTED_REQUIRED_ATTRIBUTES = Collections
             .unmodifiableList(supportedRequiredAttributeList);
 
+    private static final List<String> supportedRequiredAttributeListCollectionsAPI = new ArrayList<>();
+    public static final List<String> SUPPORTED_REQUIRED_ATTRIBUTES_COLLECTIONS_API = Collections
+            .unmodifiableList(supportedRequiredAttributeListCollectionsAPI);
+
     public static final String RESTRICTED_OAUTH2_SCOPES = "OAuth.RestrictedScopes.RestrictedScope";
     public static final Integer DEFAULT_LIMIT = 10;
     public static final String ASC_SORT_ORDER = "ASC";
     public static final String DESC_SORT_ORDER = "DESC";
+    public static final String ATTRIBUTES_DELIMITER = ",";
 
     static {
         allowedAttributeList.add("description");
@@ -54,6 +60,7 @@ public class APIResourceMgtEndpointConstants {
         allowedAttributeList.add("scopes");
 
         supportedRequiredAttributeList.add("properties");
+        supportedRequiredAttributeListCollectionsAPI.add("apiResources");
     }
 
     /**
@@ -92,6 +99,9 @@ public class APIResourceMgtEndpointConstants {
                 "Cannot modify or delete the read-only System APIs."),
         ERROR_CODE_INVALID_REQ_ATTRIBUTES("60013", "Invalid attribute name.",
                 "Invalid attribute name provided as required attribute."),
+        ERROR_CODE_API_RESOURCE_COLLECTION_NOT_FOUND("60014",
+                "Unable to find the API resource collection.",
+                "Unable to find the API resource collection with the id: %s in the tenant domain."),
       
         // Server errors.
         ERROR_CODE_ADD_API_RESOURCE("65001", "Error while adding api resource.", "Server encountered an error while " +

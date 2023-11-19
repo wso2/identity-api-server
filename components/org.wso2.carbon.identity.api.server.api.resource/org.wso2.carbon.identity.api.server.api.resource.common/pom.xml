@@ -68,5 +68,10 @@
             <artifactId>org.wso2.carbon.identity.oauth</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.api.resource.collection.mgt</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

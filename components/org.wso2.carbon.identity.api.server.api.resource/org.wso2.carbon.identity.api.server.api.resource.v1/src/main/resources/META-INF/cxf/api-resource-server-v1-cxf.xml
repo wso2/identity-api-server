@@ -21,13 +21,16 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceManagementService"/>
+    <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceCollectionManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.impl.ApiResourcesApiServiceImpl"/>
+    <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.impl.MetaApiServiceImpl"/>
     <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.impl.ScopesApiServiceImpl"/>
 
     <bean id="apiResourceManagementServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.api.resource.common.APIResourceManagementServiceHolder">
         <property name="apiResourceManager" ref="apiResourceManagementServiceFactoryBean"/>
         <property name="oAuthAdminServiceImpl" ref="oAuthAdminOSGiServiceFactoryBean"/>
+        <property name="apiResourceCollectionManager" ref="apiResourceCollectionManagementServiceFactoryBean"/>
     </bean>
 
     <bean id="apiResourceManagementServiceFactoryBean"
@@ -35,4 +38,7 @@
 
     <bean id="oAuthAdminOSGiServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.api.resource.common.factory.OAuthAdminOSGiServiceFactory"/>
+
+    <bean id="apiResourceCollectionManagementServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.api.resource.common.factory.APIResourceCollectionMgtOSGiServiceFactory"/>
 </beans>

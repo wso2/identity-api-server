@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCollectionItem;
 import javax.validation.constraints.*;
 
 
@@ -30,48 +33,66 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class PaginationLink  {
+public class APIResourceMap  {
   
-    private String rel;
-    private String href;
+    private List<APIResourceCollectionItem> read = null;
+
+    private List<APIResourceCollectionItem> write = null;
+
 
     /**
     **/
-    public PaginationLink rel(String rel) {
+    public APIResourceMap read(List<APIResourceCollectionItem> read) {
 
-        this.rel = rel;
+        this.read = read;
         return this;
     }
     
-    @ApiModelProperty(example = "before", value = "")
-    @JsonProperty("rel")
+    @ApiModelProperty(value = "")
+    @JsonProperty("read")
     @Valid
-    public String getRel() {
-        return rel;
+    public List<APIResourceCollectionItem> getRead() {
+        return read;
     }
-    public void setRel(String rel) {
-        this.rel = rel;
+    public void setRead(List<APIResourceCollectionItem> read) {
+        this.read = read;
     }
 
-    /**
+    public APIResourceMap addReadItem(APIResourceCollectionItem readItem) {
+        if (this.read == null) {
+            this.read = new ArrayList<APIResourceCollectionItem>();
+        }
+        this.read.add(readItem);
+        return this;
+    }
+
+        /**
     **/
-    public PaginationLink href(String href) {
+    public APIResourceMap write(List<APIResourceCollectionItem> write) {
 
-        this.href = href;
+        this.write = write;
         return this;
     }
     
-    @ApiModelProperty(example = "/t/carbon.super/api/server/v1/api-resources?after=NDoy", value = "")
-    @JsonProperty("href")
+    @ApiModelProperty(value = "")
+    @JsonProperty("write")
     @Valid
-    public String getHref() {
-        return href;
+    public List<APIResourceCollectionItem> getWrite() {
+        return write;
     }
-    public void setHref(String href) {
-        this.href = href;
+    public void setWrite(List<APIResourceCollectionItem> write) {
+        this.write = write;
     }
 
+    public APIResourceMap addWriteItem(APIResourceCollectionItem writeItem) {
+        if (this.write == null) {
+            this.write = new ArrayList<APIResourceCollectionItem>();
+        }
+        this.write.add(writeItem);
+        return this;
+    }
 
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -82,24 +103,24 @@ public class PaginationLink  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        PaginationLink paginationLink = (PaginationLink) o;
-        return Objects.equals(this.rel, paginationLink.rel) &&
-            Objects.equals(this.href, paginationLink.href);
+        APIResourceMap apIResourceMap = (APIResourceMap) o;
+        return Objects.equals(this.read, apIResourceMap.read) &&
+            Objects.equals(this.write, apIResourceMap.write);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(rel, href);
+        return Objects.hash(read, write);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class PaginationLink {\n");
+        sb.append("class APIResourceMap {\n");
         
-        sb.append("    rel: ").append(toIndentedString(rel)).append("\n");
-        sb.append("    href: ").append(toIndentedString(href)).append("\n");
+        sb.append("    read: ").append(toIndentedString(read)).append("\n");
+        sb.append("    write: ").append(toIndentedString(write)).append("\n");
         sb.append("}");
         return sb.toString();
     }
