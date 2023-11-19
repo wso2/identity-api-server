@@ -222,8 +222,7 @@ public class ServerAPIResourceCollectionManagementService {
      * @param apiResourceCollection API Resource Collection.
      * @return API Resource read write map.
      */
-    private APIResourceMap buildAPIResourceMap(
-            APIResourceCollection apiResourceCollection) {
+    private APIResourceMap buildAPIResourceMap(APIResourceCollection apiResourceCollection) {
 
         List<APIResourceCollectionItem> readAPIResourceCollectionItems = getAPIResourceCollectionItems(
                 apiResourceCollection, APIResourceCollectionManagementConstants.READ);

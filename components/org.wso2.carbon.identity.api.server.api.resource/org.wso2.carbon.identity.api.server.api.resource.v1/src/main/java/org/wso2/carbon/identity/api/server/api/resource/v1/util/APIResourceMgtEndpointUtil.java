@@ -177,7 +177,7 @@ public class APIResourceMgtEndpointUtil {
         } else {
             LOG.error(e.getMessage(), e);
         }
-        String errorCode = e.getErrorCode(); //TODO: Update this
+        String errorCode = e.getErrorCode();
         errorCode = errorCode.contains(ERROR_CODE_DELIMITER) ? errorCode :
                 APIResourceMgtEndpointConstants.API_RESOURCE_MANAGEMENT_PREFIX + errorCode;
         return handleException(status, errorCode, e.getMessage(), e.getDescription());
