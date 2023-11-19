@@ -77,7 +77,7 @@ public class ServerAPIResourceCollectionManagementService {
                                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             List<APIResourceCollection> apiResourceCollections =
                     apiResourceCollectionSearchResult.getAPIResourceCollections();
-            if (apiResourceCollections == null || apiResourceCollections.isEmpty()) {
+            if (CollectionUtils.isEmpty(apiResourceCollections)) {
                 apiResourceCollectionListResponse.setTotalResults(0);
                 apiResourceCollectionListResponse.setApiResourceCollections(new ArrayList<>());
                 return apiResourceCollectionListResponse;
