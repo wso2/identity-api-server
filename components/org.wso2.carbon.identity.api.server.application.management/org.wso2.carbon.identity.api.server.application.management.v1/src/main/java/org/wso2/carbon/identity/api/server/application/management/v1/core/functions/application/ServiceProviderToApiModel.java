@@ -17,6 +17,8 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -65,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -453,8 +456,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .enableClientAttestation(clientAttestationMetaData.isAttestationEnabled())
                 .androidPackageName(clientAttestationMetaData.getAndroidPackageName())
                 .appleAppId(clientAttestationMetaData.getAppleAppId())
-                .androidAttestationServiceCredentials(clientAttestationMetaData
-                        .getAndroidAttestationServiceCredentials());
+                .androidAttestationServiceCredentials(parseAndroidServiceCredentials(clientAttestationMetaData
+                        .getAndroidAttestationServiceCredentials()));
     }
 
 
@@ -559,5 +562,33 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         }
 
         return StringUtils.EMPTY;
+    }
+
+    /**
+     * Parses a JSON string representing Android service credentials and converts it to a Map.
+     *
+     * @param stringJSON A JSON string containing Android service credentials.
+     * @return A Map representing the parsed Android service credentials,
+     * or null if parsing fails or the input is blank.
+     */
+    private Map<String, String> parseAndroidServiceCredentials(String stringJSON) {
+
+        Map<String, String> jsonObject;
+
+        // Check if the input JSON string is blank
+        if (StringUtils.isBlank(stringJSON)) {
+            // Return null if the input is blank
+            return null;
+        }
+
+        try {
+            // Attempt to parse the JSON string into an instance of AndroidAttestationServiceCredentials
+            jsonObject = new Gson().fromJson(stringJSON, Map.class);
+        } catch (JsonSyntaxException exception) {
+            // Return null if an exception occurs during parsing (e.g., due to invalid JSON syntax)
+            return null;
+        }
+        // Return the parsed object
+        return jsonObject;
     }
 }
