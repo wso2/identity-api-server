@@ -582,7 +582,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         }
 
         try {
-            // Attempt to parse the JSON string into an instance of AndroidAttestationServiceCredentials
+            // Attempt to parse the JSON string into an instance of Map.
             jsonObject = new Gson().fromJson(stringJSON, Map.class);
         } catch (JsonSyntaxException exception) {
             // Return null if an exception occurs during parsing (e.g., due to invalid JSON syntax)
