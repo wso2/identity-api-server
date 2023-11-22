@@ -61,13 +61,13 @@ public class GuestApiServiceCore {
     private static List<RoleAssignmentResponse> buildRoleAssignmentResponse(Invitation invitationRecord) {
 
         List<RoleAssignmentResponse> roleAssignmentResponseList = new ArrayList<>();
-        List<Audience> audienceList = new ArrayList<>();
         for (RoleAssignments roleAssignment : invitationRecord.getRoleAssignments()) {
             RoleAssignmentResponse roleAssignmentResponse = new RoleAssignmentResponse();
             roleAssignmentResponse.setDisplayName(roleAssignment.getRoleName());
             roleAssignmentResponse.setId(roleAssignment.getRoleId());
             if (roleAssignment.getAudience() != null) {
                 Audience audience = new Audience();
+                List<Audience> audienceList = new ArrayList<>();
                 audience.setDisplay(roleAssignment.getAudience().getApplicationName());
                 audience.setType(roleAssignment.getAudience().getApplicationType());
                 audience.setValue(roleAssignment.getAudience().getApplicationId());
