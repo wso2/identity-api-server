@@ -277,12 +277,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.challenge.common</artifactId>
-                <scope>provided</scope>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.claim.management.common</artifactId>
                 <scope>provided</scope>
                 <version>${project.version}</version>
@@ -807,7 +801,6 @@
 
     <modules>
         <module>components/org.wso2.carbon.identity.api.server.common</module>
-        <module>components/org.wso2.carbon.identity.api.server.challenge</module>
         <module>components/org.wso2.carbon.identity.api.server.claim.management</module>
         <module>components/org.wso2.carbon.identity.api.server.identity.governance</module>
         <module>components/org.wso2.carbon.identity.api.server.workflow.engine</module>
