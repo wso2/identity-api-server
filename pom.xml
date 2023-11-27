@@ -299,6 +299,12 @@
                 <version>${identity.inbound.oauth2.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
+                <artifactId>org.wso2.carbon.identity.oauth.common</artifactId>
+                <scope>provided</scope>
+                <version>${identity.inbound.oauth2.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.security.mgt</artifactId>
                 <version>${carbon.identity.framework.version}</version>
@@ -760,12 +766,14 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.8.62</identity.governance.version>
-        <carbon.identity.framework.version>5.25.528</carbon.identity.framework.version>
+<!--        TODO: Change to the latest version-->
+        <carbon.identity.framework.version>5.25.542</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.4.4</identity.event.handler.version>
-        <identity.inbound.oauth2.version>6.11.188</identity.inbound.oauth2.version>
+        <!--        TODO: Change to the latest version-->
+        <identity.inbound.oauth2.version>6.11.213</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.16</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>

@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.application.authentication.framework.util.Framew
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.mgt.inbound.dto.InboundProtocolConfigurationDTO;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
@@ -73,6 +74,17 @@ public class SAMLInboundFunctions {
         }
         return createSAMLInbound(application, saml2Configuration);
     }
+    
+    public static InboundProtocolConfigurationDTO getInboundProtocolConfig(
+            ServiceProvider application, SAML2Configuration saml2Configuration) {
+        
+        try {
+            validateSingleSignOnProfileBindings(saml2Configuration);
+        } catch (IdentityException e) {
+            throw handleException(e);
+        }
+        return new ApiModelToSAML2ProtocolConfig().apply(saml2Configuration);
+    }
 
     /**
      * Validate whether the request is trying to disable either HTTP_POST or HTTP_REDIRECT or both.
@@ -81,7 +93,7 @@ public class SAMLInboundFunctions {
      * @throws IdentitySAML2ClientException If the request is trying to disable either HTTP_POST or HTTP_REDIRECT
      *                                      or both.
      */
-    private static void validateSingleSignOnProfileBindings(SAML2Configuration saml2Configuration) throws
+    public  static void validateSingleSignOnProfileBindings(SAML2Configuration saml2Configuration) throws
             IdentitySAML2ClientException {
 
         if (saml2Configuration.getManualConfiguration() == null) {

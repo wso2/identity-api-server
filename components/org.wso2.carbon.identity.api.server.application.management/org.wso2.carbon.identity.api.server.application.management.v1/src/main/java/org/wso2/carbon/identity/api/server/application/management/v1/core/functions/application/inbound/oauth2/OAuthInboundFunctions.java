@@ -16,19 +16,19 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound
-        .InboundFunctions;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.mgt.inbound.InboundFunctions;
+import org.wso2.carbon.identity.application.mgt.inbound.dto.InboundProtocolConfigurationDTO;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceClientException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
@@ -38,6 +38,7 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -55,7 +56,17 @@ public class OAuthInboundFunctions {
     private OAuthInboundFunctions() {
 
     }
-
+    
+    /**
+     * This method used to create or update OAuth inbound authentication request config by calling the AuthAdminService.
+     * Using this method is not recommended since framework will handle the update of OAuth inbound authentication
+     * configurations.
+     *
+     * @param application     Service provider
+     * @param oidcConfigModel OpenIDConnectConfiguration.
+     * @return InboundAuthenticationRequestConfig.
+     */
+    @Deprecated
     public static InboundAuthenticationRequestConfig putOAuthInbound(ServiceProvider application,
                                                                      OpenIDConnectConfiguration oidcConfigModel) {
 
@@ -64,7 +75,7 @@ public class OAuthInboundFunctions {
 
         // First we identify whether this is a insert or update.
         try {
-            String currentClientId = InboundFunctions.getInboundAuthKey(application, StandardInboundProtocols.OAUTH2);
+            Optional<String> optionalInboundAuthKey = InboundFunctions.getInboundAuthKey(application, OAUTH2);
 
             // Retrieve the existing CORS origins for the application.
             existingCORSOrigins = ApplicationManagementServiceHolder.getCorsManagementService()
@@ -76,10 +87,10 @@ public class OAuthInboundFunctions {
             ApplicationManagementServiceHolder.getCorsManagementService()
                     .setCORSOrigins(application.getApplicationResourceId(), corsOrigins, tenantDomain);
 
-            if (currentClientId != null) {
+            if (optionalInboundAuthKey.isPresent()) {
                 // Update an existing application.
                 OAuthConsumerAppDTO oauthApp = ApplicationManagementServiceHolder.getOAuthAdminService
-                        ().getOAuthApplicationData(currentClientId);
+                        ().getOAuthApplicationData(optionalInboundAuthKey.get());
 
                 if (!StringUtils.equals(oauthApp.getOauthConsumerKey(), oidcConfigModel.getClientId())) {
                     throw buildBadRequestError("Invalid ClientID provided for update.");
@@ -111,13 +122,25 @@ public class OAuthInboundFunctions {
             } catch (CORSManagementServiceException corsManagementServiceException) {
                 throw handleException(e);
             }
-
             throw handleException(e);
         } catch (CORSManagementServiceException e) {
             throw handleException(e);
         }
     }
-
+    
+    /**
+     * Get the InboundProtocolConfigurationDTO from the OpenIDConnectConfiguration.
+     *
+     * @param application     Service provider.
+     * @param oidcConfigModel OpenIDConnectConfiguration.
+     * @return InboundProtocolConfigurationDTO.
+     */
+    public static InboundProtocolConfigurationDTO getInboundProtocolConfig(
+            ServiceProvider application, OpenIDConnectConfiguration oidcConfigModel) {
+        
+        return new ApiModelToOAuthConsumerApp().apply(application.getApplicationName(), oidcConfigModel);
+    }
+    
     private static APIError handleException(Exception e) {
 
         String message = "Error while updating OpenIDConnect configuration. " + e.getMessage();
@@ -140,7 +163,16 @@ public class OAuthInboundFunctions {
 
         return createOAuthInbound(UUID.randomUUID().toString(), oidcModel);
     }
-
+    
+    /**
+     * Create OAuth inbound authentication request config by calling the AuthAdminService. It's not recommended to use
+     * this method since framework will handle the creation of OAuth inbound authentication configurations.
+     *
+     * @param appName   Name of the application.
+     * @param oidcModel OpenIDConnectConfiguration.
+     * @return InboundAuthenticationRequestConfig.
+     */
+    @Deprecated
     public static InboundAuthenticationRequestConfig createOAuthInbound(String appName, OpenIDConnectConfiguration
             oidcModel) {
 
