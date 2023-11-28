@@ -552,7 +552,6 @@ components:
         - contentType
         - subject
         - body
-        - footer
       properties:
         contentType:
           type: string
