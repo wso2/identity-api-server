@@ -815,7 +815,6 @@
         <module>components/org.wso2.carbon.identity.api.server.configs</module>
         <module>components/org.wso2.carbon.identity.api.server.tenant.management</module>
         <module>components/org.wso2.carbon.identity.api.server.cors</module>
-        <module>components/org.wso2.carbon.identity.api.server.fetch.remote</module>
         <module>components/org.wso2.carbon.identity.api.server.notification.sender</module>
         <module>components/org.wso2.carbon.identity.api.server.authenticators</module>
         <module>components/org.wso2.carbon.identity.api.server.secret.management</module>
