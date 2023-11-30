@@ -1037,7 +1037,7 @@ public class ServerApplicationManagementService {
          */
         validateCORSOrigins(oidcConfigModel.getAllowedOrigins());
         boolean isAllowUpdateSystemApps =
-                isAllowUpdateSystemApplicationInboundOAuthConfigs(applicationId, oidcConfigModel);
+                isAllowUpdateSystemAppOAuthConfigs(applicationId, oidcConfigModel);
         try {
             if (isAllowUpdateSystemApps) {
                 IdentityApplicationManagementUtil.setAllowUpdateSystemApplicationThreadLocal(true);
@@ -1157,8 +1157,8 @@ public class ServerApplicationManagementService {
      * @param newOidcConfigModel New oidc config model.
      * @return true if allowed.
      */
-    private boolean isAllowUpdateSystemApplicationInboundOAuthConfigs(String appId,
-                                                                      OpenIDConnectConfiguration newOidcConfigModel) {
+    private boolean isAllowUpdateSystemAppOAuthConfigs(String appId,
+                                                       OpenIDConnectConfiguration newOidcConfigModel) {
 
         ServiceProvider application = getServiceProvider(appId);
         Set<String> systemApplications =
