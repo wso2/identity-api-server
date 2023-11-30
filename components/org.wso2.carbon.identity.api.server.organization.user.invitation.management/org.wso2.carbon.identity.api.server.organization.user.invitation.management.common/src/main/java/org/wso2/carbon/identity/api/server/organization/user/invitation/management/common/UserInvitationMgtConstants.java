@@ -76,6 +76,12 @@ public class UserInvitationMgtConstants {
         ERROR_CODE_EXISTING_USER("60012",
                 "Authenticated user exist.",
                 "The authenticated user is already available in the organization."),
+        ERROR_CODE_INVALID_ROLE("60013",
+                "Invalid role list provided.",
+                "The provided role lists are not valid."),
+        ERROR_CODE_INVALID_USER_INFORMATION("60014",
+                "Unable to create an invitation to all the users given in the list.",
+                "User invitation creation failed for the users: %s"),
 
         // Server errors.
         ERROR_CODE_CREATE_INVITATION("65001",

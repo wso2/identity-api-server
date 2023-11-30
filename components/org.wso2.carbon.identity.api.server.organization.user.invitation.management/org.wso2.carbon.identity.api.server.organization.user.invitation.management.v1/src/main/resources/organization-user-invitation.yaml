@@ -38,7 +38,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvitationSuccessResponse'
+                $ref: '#/components/schemas/InvitationSuccessListResponse'
         '400':
           description: Bad Request
           content:
@@ -296,13 +296,14 @@ components:
     InvitationRequestBody:
       type: object
       required:
-        - username
+        - usernames
       properties:
-        username:
-          type: string
-          description: Username of the user who will be invited to the organization. This can be an
-            email or an alphanumeric username.
-          example: alex@gmail.com/alex
+        usernames:
+          type: array
+          description: List of username of the user's who will be invited to the organization. This can be an email or an alphanumeric username.
+          items:
+            type: string
+            example: xyz@gmail.com, abc@gmail.com
         userDomain:
           type: string
           description: User store domain of the user. If not provided, PRIMARY will be used.
@@ -313,6 +314,10 @@ components:
           items:
             type: string
             example: editor, manager
+    InvitationSuccessListResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/InvitationSuccessResponse'
     InvitationSuccessResponse:
       type: object
       required:

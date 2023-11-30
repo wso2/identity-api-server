@@ -43,6 +43,7 @@ import static org.wso2.carbon.identity.organization.user.invitation.management.c
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_CONFIRMATION_CODE;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_FILTER;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_INVITATION_ID;
+import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_ROLE;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_USER;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_STORE_ROLES_APP_ID_INVALID;
@@ -85,11 +86,11 @@ public class GuestApiServiceCore {
      * @param invitationRequestBody Contains the details of the invitation.
      * @return The details of the created invitation.
      */
-    public InvitationSuccessResponse createInvitation(InvitationRequestBody invitationRequestBody) {
+    public List<InvitationSuccessResponse> createInvitation(InvitationRequestBody invitationRequestBody) {
 
         InvitationCoreServiceImpl invitationCoreService = new InvitationCoreServiceImpl();
         Invitation invitation = new Invitation();
-        invitation.setUsername(invitationRequestBody.getUsername());
+        invitation.setUsernamesList(invitationRequestBody.getUsernames());
         invitation.setUserDomain(invitationRequestBody.getUserDomain());
         if (invitationRequestBody.getRoles() != null) {
             List<RoleAssignments> roleAssignments = new ArrayList<>();
@@ -100,7 +101,7 @@ public class GuestApiServiceCore {
             }
             invitation.setRoleAssignments(roleAssignments.toArray(new RoleAssignments[0]));
         }
-        Invitation invitationResponse;
+        List<Invitation> invitationResponse;
         try {
             invitationResponse = invitationCoreService.createInvitation(invitation);
         } catch (UserInvitationMgtException e) {
@@ -116,6 +117,9 @@ public class GuestApiServiceCore {
             } else if (ERROR_CODE_STORE_ROLES_APP_ID_INVALID.getCode().equals(e.getErrorCode())) {
                 throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
                         .ERROR_CODE_INVALID_APPLICATION, StringUtils.EMPTY);
+            } else if (ERROR_CODE_INVALID_ROLE.getCode().equals(e.getErrorCode())) {
+                throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
+                        .ERROR_CODE_INVALID_ROLE, StringUtils.EMPTY);
             }
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_CREATE_INVITATION,
@@ -248,16 +252,25 @@ public class GuestApiServiceCore {
         return error.getDescription();
     }
 
-    private InvitationSuccessResponse createInvitationSuccessResponse(Invitation invitation) {
+    private List<InvitationSuccessResponse> createInvitationSuccessResponse(List<Invitation> invitationList) {
 
-        InvitationSuccessResponse invitationSuccessResponse = new InvitationSuccessResponse();
-        invitationSuccessResponse.setUsername(invitation.getUsername());
-        invitationSuccessResponse.setEmail(invitation.getEmail());
-        if (invitation.getRoleAssignments().length > 0) {
-            List<RoleAssignmentResponse> roleAssignmentResponses = buildRoleAssignmentResponse(invitation);
-            invitationSuccessResponse.setRoles(roleAssignmentResponses);
+        List<InvitationSuccessResponse> invitationSuccessResponseList = new ArrayList<>();
+        for (Invitation invitation : invitationList) {
+            if (invitation.getSkippedUsersList().isEmpty()) {
+                InvitationSuccessResponse invitationSuccessResponse = new InvitationSuccessResponse();
+                invitationSuccessResponse.setUsername(invitation.getUsername());
+                invitationSuccessResponse.setEmail(invitation.getEmail());
+                if (invitation.getRoleAssignments().length > 0) {
+                    List<RoleAssignmentResponse> roleAssignmentResponses = buildRoleAssignmentResponse(invitation);
+                    invitationSuccessResponse.setRoles(roleAssignmentResponses);
+                    invitationSuccessResponseList.add(invitationSuccessResponse);
+                }
+            } else {
+                throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
+                        .ERROR_CODE_INVALID_USER_INFORMATION, invitation.getSkippedUsersList().toString());
+            }
         }
-        return invitationSuccessResponse;
+        return invitationSuccessResponseList;
     }
 
     private InvitationsListResponse buildInvitationsListResponse(List<Invitation> invitationList) {
