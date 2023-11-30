@@ -1040,6 +1040,10 @@ components:
           type: boolean
           default: true
           example: true
+        isAPIBasedAuthenticationSupported:
+          type: boolean
+          default: false
+          example: true
         type:
           type: string
           enum:
