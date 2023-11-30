@@ -87,6 +87,7 @@ import org.wso2.carbon.user.api.UserStoreException;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1231,7 +1232,8 @@ public class ServerConfigManagementService {
                 String metadataValidityPeriod = IdentityApplicationManagementUtil.getPropertyValue(idpProperties,
                         IdentityApplicationConstants.Authenticator.SAML2SSO.SAML_METADATA_VALIDITY_PERIOD);
                 if (StringUtils.isNotEmpty(metadataValidityPeriod)) {
-                    inboundAuthConfig.setMetadataValidityPeriod(Integer.parseInt(metadataValidityPeriod));
+                    inboundAuthConfig.setMetadataValidityPeriod
+                            (BigDecimal.valueOf(Integer.parseInt(metadataValidityPeriod)));
                 }
 
                 inboundAuthConfig.setEnableMetadataSigning(Boolean.parseBoolean(
@@ -1317,7 +1319,7 @@ public class ServerConfigManagementService {
             if (property.getName().equals(
                     IdentityApplicationConstants.Authenticator.SAML2SSO.SAML_METADATA_VALIDITY_PERIOD)) {
                 if (authConfigToUpdate.getMetadataValidityPeriod() != null) {
-                    property.setValue(Integer.toString(authConfigToUpdate.getMetadataValidityPeriod()));
+                    property.setValue(String.valueOf((authConfigToUpdate.getMetadataValidityPeriod())));
                 }
                 updatedPropertyList.add(property);
             } else if (property.getName().equals(

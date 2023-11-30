@@ -61,7 +61,7 @@ public class ConnectedApp  {
         return this;
     }
     
-    @ApiModelProperty(example = "connected-app-url", value = "")
+    @ApiModelProperty(example = "/t/org/api/server/v1/applications/c74d74b2-cb62-4abd-ad66-6c45daeb561c", value = "")
     @JsonProperty("self")
     @Valid
     public String getSelf() {
