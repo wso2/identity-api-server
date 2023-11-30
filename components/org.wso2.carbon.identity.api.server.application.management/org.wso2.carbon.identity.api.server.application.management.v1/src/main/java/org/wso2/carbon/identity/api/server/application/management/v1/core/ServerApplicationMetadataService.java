@@ -161,10 +161,11 @@ public class ServerApplicationMetadataService {
         OIDCMetaData oidcMetaData = new OIDCMetaData();
         OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
 
-        List<ClientAuthenticationMethod> supportedClientAuthMethods = getClientAuthenticationMethods();
+        List<ClientAuthenticationMethod> supportedClientAuthMethods = new ArrayList<>();
         supportedClientAuthMethods.add(new ClientAuthenticationMethod()
-                .name(ApplicationManagementConstants.NONE)
-                .displayName(ApplicationManagementConstants.NONE));
+                .name("")
+                .displayName(ApplicationManagementConstants.SELECT_OPTION));
+        supportedClientAuthMethods.addAll(getClientAuthenticationMethods());
         oidcMetaData.setTokenEndpointAuthMethod(
                 new ClientAuthenticationMethodMetadata().options(supportedClientAuthMethods));
         List<String> tokenEpSigningAlgorithms = IdentityUtil
@@ -172,25 +173,25 @@ public class ServerApplicationMetadataService {
         oidcMetaData.setTokenEndpointSignatureAlgorithm(new MetadataProperty()
                 .options(tokenEpSigningAlgorithms));
         List<String> idTokenSigningAlgorithms = new ArrayList<>();
-        idTokenSigningAlgorithms.add(ApplicationManagementConstants.NONE);
+        idTokenSigningAlgorithms.add(ApplicationManagementConstants.SELECT_OPTION);
         idTokenSigningAlgorithms.addAll(IdentityUtil.
                 getPropertyAsList(ApplicationManagementConstants.ID_TOKEN_SIGNATURE_ALGORITHMS_SUPPORTED));
         oidcMetaData.setIdTokenSignatureAlgorithm(new MetadataProperty()
                 .options(idTokenSigningAlgorithms));
         List<String> requestObjectSigningAlgorithms = new ArrayList<>();
-        requestObjectSigningAlgorithms.add(ApplicationManagementConstants.NONE);
+        requestObjectSigningAlgorithms.add(ApplicationManagementConstants.SELECT_OPTION);
         requestObjectSigningAlgorithms.addAll(IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_SIGNATURE_ALGORITHMS_SUPPORTED));
         oidcMetaData.setRequestObjectSignatureAlgorithm(new MetadataProperty()
                 .options(requestObjectSigningAlgorithms));
         List<String> requestObjectEncryptionAlgorithms = new ArrayList<>();
-        requestObjectEncryptionAlgorithms.add(ApplicationManagementConstants.NONE);
+        requestObjectEncryptionAlgorithms.add(ApplicationManagementConstants.SELECT_OPTION);
         requestObjectEncryptionAlgorithms.addAll(IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_ENCRYPTION_ALGORITHMS_SUPPORTED));
         oidcMetaData.setRequestObjectEncryptionAlgorithm(new MetadataProperty()
                 .options(requestObjectEncryptionAlgorithms));
         List<String> requestObjectEncryptionMethods = new ArrayList<>();
-        requestObjectEncryptionMethods.add(ApplicationManagementConstants.NONE);
+        requestObjectEncryptionMethods.add(ApplicationManagementConstants.SELECT_OPTION);
         requestObjectEncryptionMethods.addAll(IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_ENCRYPTION_METHODS_SUPPORTED));
         oidcMetaData.setRequestObjectEncryptionMethod(new MetadataProperty()
