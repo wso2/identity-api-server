@@ -607,8 +607,8 @@ public class ServerConfigManagementService {
                 authenticatorListItem.setName(config.getName());
                 authenticatorListItem.setDisplayName(config.getDisplayName());
                 authenticatorListItem.setIsEnabled(config.isEnabled());
-                if (config.getProperties().length > 0 && IS_API_BASED_SUPPORTED.equals
-                        (config.getProperties()[0].getName())) {
+                if (config.getProperties() != null && config.getProperties().length > 0 && IS_API_BASED_SUPPORTED.
+                        equals(config.getProperties()[0].getName()))  {
                     authenticatorListItem.setIsAPIBasedAuthenticationSupported(Boolean.parseBoolean
                             (config.getProperties()[0].getValue()));
                 }
