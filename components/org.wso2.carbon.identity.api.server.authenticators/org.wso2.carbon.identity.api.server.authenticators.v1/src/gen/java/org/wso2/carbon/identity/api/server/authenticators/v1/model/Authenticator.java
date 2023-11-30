@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2021, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.authenticators.v1.model;
 
@@ -36,6 +38,7 @@ public class Authenticator  {
     private String name;
     private String displayName;
     private Boolean isEnabled;
+    private Boolean isAPIBasedAuthenticationSupported = true;
 
 @XmlType(name="TypeEnum")
 @XmlEnum(String.class)
@@ -146,6 +149,24 @@ public enum TypeEnum {
     }
     public void setIsEnabled(Boolean isEnabled) {
         this.isEnabled = isEnabled;
+    }
+
+    /**
+    **/
+    public Authenticator isAPIBasedAuthenticationSupported(Boolean isAPIBasedAuthenticationSupported) {
+
+        this.isAPIBasedAuthenticationSupported = isAPIBasedAuthenticationSupported;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "")
+    @JsonProperty("isAPIBasedAuthenticationSupported")
+    @Valid
+    public Boolean getIsAPIBasedAuthenticationSupported() {
+        return isAPIBasedAuthenticationSupported;
+    }
+    public void setIsAPIBasedAuthenticationSupported(Boolean isAPIBasedAuthenticationSupported) {
+        this.isAPIBasedAuthenticationSupported = isAPIBasedAuthenticationSupported;
     }
 
     /**
@@ -262,6 +283,7 @@ public enum TypeEnum {
             Objects.equals(this.name, authenticator.name) &&
             Objects.equals(this.displayName, authenticator.displayName) &&
             Objects.equals(this.isEnabled, authenticator.isEnabled) &&
+            Objects.equals(this.isAPIBasedAuthenticationSupported, authenticator.isAPIBasedAuthenticationSupported) &&
             Objects.equals(this.type, authenticator.type) &&
             Objects.equals(this.image, authenticator.image) &&
             Objects.equals(this.description, authenticator.description) &&
@@ -271,7 +293,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, type, image, description, tags, self);
+        return Objects.hash(id, name, displayName, isEnabled, isAPIBasedAuthenticationSupported, type, image, description, tags, self);
     }
 
     @Override
@@ -284,6 +306,7 @@ public enum TypeEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    isAPIBasedAuthenticationSupported: ").append(toIndentedString(isAPIBasedAuthenticationSupported)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
