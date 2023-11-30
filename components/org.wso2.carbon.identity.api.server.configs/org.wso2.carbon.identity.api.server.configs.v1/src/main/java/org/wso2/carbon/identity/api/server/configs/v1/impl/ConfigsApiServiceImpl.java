@@ -18,172 +18,222 @@
 
 package org.wso2.carbon.identity.api.server.configs.v1.impl;
 
-import org.wso2.carbon.identity.api.server.configs.v1.*;
-import org.wso2.carbon.identity.api.server.configs.v1.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
+import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
+import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
+import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
+import org.wso2.carbon.logging.service.data.RemoteServerLoggerData;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
+/**
+ * Implementation of the Server Configurations Rest API.
+ */
 public class ConfigsApiServiceImpl implements ConfigsApiService {
+
+    @Autowired
+    private ServerConfigManagementService configManagementService;
+
 
     @Override
     public Response getAuthenticator(String authenticatorId) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(configManagementService.getAuthenticator(authenticatorId)).build();
     }
 
     @Override
     public Response getCORSConfiguration() {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(configManagementService.getCORSConfiguration()).build();
     }
 
     @Override
     public Response getConfigs() {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(configManagementService.getConfigs()).build();
     }
 
     @Override
     public Response getHomeRealmIdentifiers() {
-
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(configManagementService.getHomeRealmIdentifiers()).build();
     }
 
     @Override
     public Response getInboundScimConfigs() {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response getPassiveSTSInboundAuthConfig() {
-
-        // do some magic!
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response getPrivatKeyJWTValidationConfiguration() {
-
-        // do some magic!
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response getRemoteLoggingConfig(String logType) {
-
-        // do some magic!
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response getRemoteLoggingConfigs() {
-
-        // do some magic!
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response getSAMLInboundAuthConfig() {
-
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(configManagementService.getInboundScimConfig()).build();
     }
 
     @Override
     public Response getSchema(String schemaId) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(configManagementService.getSchema(schemaId)).build();
     }
 
     @Override
-    public Response getSchemas() {
+    public Response getPrivatKeyJWTValidationConfiguration() {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(configManagementService.getPrivateKeyJWTValidatorConfiguration()).build();
+
     }
 
     @Override
-    public Response listAuthenticators(String type) {
+    public Response getRemoteLoggingConfig(String logType) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        RemoteServerLoggerData remoteServerLoggerResponseData =
+                configManagementService.getRemoteServerConfig(logType);
+        if (remoteServerLoggerResponseData != null) {
+            return Response.ok().entity(createRemoteLoggingConfig(remoteServerLoggerResponseData)).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 
     @Override
-    public Response patchCORSConfiguration(List<CORSPatch> coRSPatch) {
+    public Response getRemoteLoggingConfigs() {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response patchConfigs(List<Patch> patch) {
-
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        List<RemoteServerLoggerData> remoteServerLoggerResponseData =
+                configManagementService.getRemoteServerConfigs();
+        return Response.ok()
+                .entity(remoteServerLoggerResponseData.stream().map(this::createRemoteLoggingConfigListItem)
+                        .collect(Collectors.toList())).build();
     }
 
     @Override
     public Response patchPrivatKeyJWTValidationConfiguration(List<JWTKeyValidatorPatch> jwTKeyValidatorPatch) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        configManagementService.patchPrivateKeyJWTValidatorSConfig(jwTKeyValidatorPatch);
+        return Response.ok().build();
     }
 
     @Override
     public Response restoreServerRemoteLoggingConfiguration(String logType) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        configManagementService.resetRemoteServerConfig(logType);
+        return Response.noContent().build();
     }
 
     @Override
     public Response restoreServerRemoteLoggingConfigurations() {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        configManagementService.resetRemoteServerConfig();
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response getSchemas() {
+
+        return Response.ok().entity(configManagementService.getSchemas()).build();
+    }
+
+    @Override
+    public Response listAuthenticators(String type) {
+
+        return Response.ok().entity(configManagementService.getAuthenticators(type)).build();
+    }
+
+    @Override
+    public Response patchCORSConfiguration(List<CORSPatch> coRSPatch) {
+
+        configManagementService.patchCORSConfig(coRSPatch);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response patchConfigs(List<Patch> patch) {
+
+        configManagementService.patchConfigs(patch);
+        return Response.ok().build();
     }
 
     @Override
     public Response updateInboundScimConfigs(ScimConfig scimConfig) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response updatePassiveSTSInboundAuthConfig(InboundAuthPassiveSTSConfig inboundAuthPassiveSTSConfig) {
-
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        configManagementService.updateInboundScimConfigs(scimConfig);
+        return Response.ok().build();
     }
 
     @Override
     public Response updateRemoteLoggingConfig(String logType, RemoteLoggingConfig remoteLoggingConfig) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        configManagementService.updateRemoteLoggingConfig(logType, remoteLoggingConfig);
+        return Response.accepted().build();
     }
 
     @Override
     public Response updateRemoteLoggingConfigs(List<RemoteLoggingConfigListItem> remoteLoggingConfigListItem) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        configManagementService.updateRemoteLoggingConfigs(remoteLoggingConfigListItem);
+        return Response.accepted().build();
+    }
+
+    @Override
+    public Response getSAMLInboundAuthConfig() {
+
+        return Response.ok().entity(configManagementService.getSAMLInboundAuthConfig()).build();
     }
 
     @Override
     public Response updateSAMLInboundAuthConfig(InboundAuthSAML2Config inboundAuthSAML2Config) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        configManagementService.updateSAMLInboundAuthConfig(inboundAuthSAML2Config);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response getPassiveSTSInboundAuthConfig() {
+
+        return Response.ok().entity(configManagementService.getPassiveSTSInboundAuthConfig()).build();
+    }
+
+    @Override
+    public Response updatePassiveSTSInboundAuthConfig(InboundAuthPassiveSTSConfig inboundAuthPassiveSTSConfig) {
+
+        configManagementService.updatePassiveSTSInboundAuthConfig(inboundAuthPassiveSTSConfig);
+        return Response.ok().build();
+    }
+
+    private RemoteLoggingConfigListItem createRemoteLoggingConfigListItem(
+            RemoteServerLoggerData remoteServerLoggerData) {
+
+        RemoteLoggingConfigListItem remoteLoggingConfigListItem = new RemoteLoggingConfigListItem();
+        remoteLoggingConfigListItem.setRemoteUrl(remoteServerLoggerData.getUrl());
+        remoteLoggingConfigListItem.setConnectTimeoutMillis(remoteServerLoggerData.getConnectTimeoutMillis());
+        remoteLoggingConfigListItem.setVerifyHostname(remoteServerLoggerData.isVerifyHostname());
+        remoteLoggingConfigListItem.setUsername(remoteServerLoggerData.getUsername());
+        remoteLoggingConfigListItem.setPassword(remoteServerLoggerData.getPassword());
+        remoteLoggingConfigListItem.setKeystoreLocation(remoteServerLoggerData.getKeystoreLocation());
+        remoteLoggingConfigListItem.setKeystorePassword(remoteServerLoggerData.getKeystorePassword());
+        remoteLoggingConfigListItem.setTruststoreLocation(remoteServerLoggerData.getTruststoreLocation());
+        remoteLoggingConfigListItem.setTruststorePassword(remoteServerLoggerData.getTruststorePassword());
+        remoteLoggingConfigListItem.setLogType(
+                RemoteLoggingConfigListItem.LogTypeEnum.valueOf(remoteServerLoggerData.getLogType()));
+        return remoteLoggingConfigListItem;
+    }
+
+    private RemoteLoggingConfig createRemoteLoggingConfig(
+            RemoteServerLoggerData remoteServerLoggerData) {
+
+        RemoteLoggingConfig remoteLoggingConfig = new RemoteLoggingConfig();
+        remoteLoggingConfig.setRemoteUrl(remoteServerLoggerData.getUrl());
+        remoteLoggingConfig.setConnectTimeoutMillis(remoteServerLoggerData.getConnectTimeoutMillis());
+        remoteLoggingConfig.setVerifyHostname(remoteServerLoggerData.isVerifyHostname());
+        remoteLoggingConfig.setUsername(remoteServerLoggerData.getUsername());
+        remoteLoggingConfig.setPassword(remoteServerLoggerData.getPassword());
+        remoteLoggingConfig.setKeystoreLocation(remoteServerLoggerData.getKeystoreLocation());
+        remoteLoggingConfig.setKeystorePassword(remoteServerLoggerData.getKeystorePassword());
+        remoteLoggingConfig.setTruststoreLocation(remoteServerLoggerData.getTruststoreLocation());
+        remoteLoggingConfig.setTruststorePassword(remoteServerLoggerData.getTruststorePassword());
+        return remoteLoggingConfig;
     }
 }

@@ -113,6 +113,7 @@ import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_
 public class ServerConfigManagementService {
 
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
+    private static final String IS_API_BASED_SUPPORTED = "IS_API_BASED_SUPPORTED";
 
     /**
      * Get list of local authenticators supported by the server.
@@ -606,6 +607,11 @@ public class ServerConfigManagementService {
                 authenticatorListItem.setName(config.getName());
                 authenticatorListItem.setDisplayName(config.getDisplayName());
                 authenticatorListItem.setIsEnabled(config.isEnabled());
+                if (config.getProperties().length > 0 && IS_API_BASED_SUPPORTED.equals
+                        (config.getProperties()[0].getName())) {
+                    authenticatorListItem.setIsAPIBasedAuthenticationSupported(Boolean.parseBoolean
+                            (config.getProperties()[0].getValue()));
+                }
                 authenticatorListItem.setType(AuthenticatorListItem.TypeEnum.LOCAL);
                 String[] tags = config.getTags();
                 if (ArrayUtils.isNotEmpty(tags)) {

@@ -202,7 +202,7 @@ components:
         isEnabled:
           type: boolean
           example: true
-        isAPIBasedAuthentication:
+        isAPIBasedAuthenticationSupported:
           type: boolean
           default: false
           example: true

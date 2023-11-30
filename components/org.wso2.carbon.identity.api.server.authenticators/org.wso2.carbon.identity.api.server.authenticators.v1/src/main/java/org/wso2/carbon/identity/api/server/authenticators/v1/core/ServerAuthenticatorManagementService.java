@@ -73,6 +73,7 @@ import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 public class ServerAuthenticatorManagementService {
 
     private static final Log log = LogFactory.getLog(ServerAuthenticatorManagementService.class);
+    private static final String IS_API_BASED_SUPPORTED = "IS_API_BASED_SUPPORTED";
 
     /**
      * Retrieves the list of available authenticators.
@@ -511,6 +512,10 @@ public class ServerAuthenticatorManagementService {
         authenticator.setName(config.getName());
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setIsEnabled(config.isEnabled());
+        if (config.getProperties().length > 0 && IS_API_BASED_SUPPORTED.equals(config.getProperties()[0].getName())) {
+            authenticator.setIsAPIBasedAuthenticationSupported
+                    (Boolean.parseBoolean(config.getProperties()[0].getValue()));
+        }
         authenticator.setType(Authenticator.TypeEnum.LOCAL);
         String[] tags = config.getTags();
         if (ArrayUtils.isNotEmpty(tags)) {

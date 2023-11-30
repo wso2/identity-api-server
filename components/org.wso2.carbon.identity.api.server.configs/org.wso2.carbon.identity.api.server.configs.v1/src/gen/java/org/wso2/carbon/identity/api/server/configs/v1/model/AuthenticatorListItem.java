@@ -38,7 +38,7 @@ public class AuthenticatorListItem  {
     private String name;
     private String displayName;
     private Boolean isEnabled = true;
-    private Boolean isAPIBasedAuthentication = false;
+    private Boolean isAPIBasedAuthenticationSupported = false;
 
 @XmlType(name="TypeEnum")
 @XmlEnum(String.class)
@@ -151,20 +151,20 @@ public enum TypeEnum {
 
     /**
     **/
-    public AuthenticatorListItem isAPIBasedAuthentication(Boolean isAPIBasedAuthentication) {
+    public AuthenticatorListItem isAPIBasedAuthenticationSupported(Boolean isAPIBasedAuthenticationSupported) {
 
-        this.isAPIBasedAuthentication = isAPIBasedAuthentication;
+        this.isAPIBasedAuthenticationSupported = isAPIBasedAuthenticationSupported;
         return this;
     }
     
     @ApiModelProperty(example = "true", value = "")
-    @JsonProperty("isAPIBasedAuthentication")
+    @JsonProperty("isAPIBasedAuthenticationSupported")
     @Valid
-    public Boolean getIsAPIBasedAuthentication() {
-        return isAPIBasedAuthentication;
+    public Boolean getIsAPIBasedAuthenticationSupported() {
+        return isAPIBasedAuthenticationSupported;
     }
-    public void setIsAPIBasedAuthentication(Boolean isAPIBasedAuthentication) {
-        this.isAPIBasedAuthentication = isAPIBasedAuthentication;
+    public void setIsAPIBasedAuthenticationSupported(Boolean isAPIBasedAuthenticationSupported) {
+        this.isAPIBasedAuthenticationSupported = isAPIBasedAuthenticationSupported;
     }
 
     /**
@@ -245,7 +245,7 @@ public enum TypeEnum {
             Objects.equals(this.name, authenticatorListItem.name) &&
             Objects.equals(this.displayName, authenticatorListItem.displayName) &&
             Objects.equals(this.isEnabled, authenticatorListItem.isEnabled) &&
-            Objects.equals(this.isAPIBasedAuthentication, authenticatorListItem.isAPIBasedAuthentication) &&
+            Objects.equals(this.isAPIBasedAuthenticationSupported, authenticatorListItem.isAPIBasedAuthenticationSupported) &&
             Objects.equals(this.type, authenticatorListItem.type) &&
             Objects.equals(this.tags, authenticatorListItem.tags) &&
             Objects.equals(this.self, authenticatorListItem.self);
@@ -253,7 +253,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, isAPIBasedAuthentication, type, tags, self);
+        return Objects.hash(id, name, displayName, isEnabled, isAPIBasedAuthenticationSupported, type, tags, self);
     }
 
     @Override
@@ -266,7 +266,7 @@ public enum TypeEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
-        sb.append("    isAPIBasedAuthentication: ").append(toIndentedString(isAPIBasedAuthentication)).append("\n");
+        sb.append("    isAPIBasedAuthenticationSupported: ").append(toIndentedString(isAPIBasedAuthenticationSupported)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");

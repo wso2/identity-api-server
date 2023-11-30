@@ -1040,7 +1040,7 @@ components:
           type: boolean
           default: true
           example: true
-        isAPIBasedAuthentication:
+        isAPIBasedAuthenticationSupported:
           type: boolean
           default: false
           example: true
