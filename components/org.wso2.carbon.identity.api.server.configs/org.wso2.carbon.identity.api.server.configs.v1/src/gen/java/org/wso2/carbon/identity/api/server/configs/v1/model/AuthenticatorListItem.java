@@ -1,20 +1,18 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
- *
- * WSO2 LLC. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+* Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 package org.wso2.carbon.identity.api.server.configs.v1.model;
 
@@ -38,7 +36,6 @@ public class AuthenticatorListItem  {
     private String name;
     private String displayName;
     private Boolean isEnabled = true;
-    private Boolean isAPIBasedAuthenticationSupported = false;
 
 @XmlType(name="TypeEnum")
 @XmlEnum(String.class)
@@ -151,24 +148,6 @@ public enum TypeEnum {
 
     /**
     **/
-    public AuthenticatorListItem isAPIBasedAuthenticationSupported(Boolean isAPIBasedAuthenticationSupported) {
-
-        this.isAPIBasedAuthenticationSupported = isAPIBasedAuthenticationSupported;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "true", value = "")
-    @JsonProperty("isAPIBasedAuthenticationSupported")
-    @Valid
-    public Boolean getIsAPIBasedAuthenticationSupported() {
-        return isAPIBasedAuthenticationSupported;
-    }
-    public void setIsAPIBasedAuthenticationSupported(Boolean isAPIBasedAuthenticationSupported) {
-        this.isAPIBasedAuthenticationSupported = isAPIBasedAuthenticationSupported;
-    }
-
-    /**
-    **/
     public AuthenticatorListItem type(TypeEnum type) {
 
         this.type = type;
@@ -245,7 +224,6 @@ public enum TypeEnum {
             Objects.equals(this.name, authenticatorListItem.name) &&
             Objects.equals(this.displayName, authenticatorListItem.displayName) &&
             Objects.equals(this.isEnabled, authenticatorListItem.isEnabled) &&
-            Objects.equals(this.isAPIBasedAuthenticationSupported, authenticatorListItem.isAPIBasedAuthenticationSupported) &&
             Objects.equals(this.type, authenticatorListItem.type) &&
             Objects.equals(this.tags, authenticatorListItem.tags) &&
             Objects.equals(this.self, authenticatorListItem.self);
@@ -253,7 +231,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, isAPIBasedAuthenticationSupported, type, tags, self);
+        return Objects.hash(id, name, displayName, isEnabled, type, tags, self);
     }
 
     @Override
@@ -266,7 +244,6 @@ public enum TypeEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
-        sb.append("    isAPIBasedAuthenticationSupported: ").append(toIndentedString(isAPIBasedAuthenticationSupported)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");

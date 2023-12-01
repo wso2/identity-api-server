@@ -202,7 +202,7 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
         configManagementService.updatePassiveSTSInboundAuthConfig(inboundAuthPassiveSTSConfig);
         return Response.ok().build();
     }
-
+    
     private RemoteLoggingConfigListItem createRemoteLoggingConfigListItem(
             RemoteServerLoggerData remoteServerLoggerData) {
 

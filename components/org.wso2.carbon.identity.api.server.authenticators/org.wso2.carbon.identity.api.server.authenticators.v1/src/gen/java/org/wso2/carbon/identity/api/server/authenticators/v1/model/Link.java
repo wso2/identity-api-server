@@ -44,7 +44,7 @@ public class Link  {
         return this;
     }
     
-    @ApiModelProperty(example = "'/t/carbon.super/api/server/v1/authenticators/394b8adcce24c64a8a09a8d80abf8c337bd253de'", value = "Path to the target resource.")
+    @ApiModelProperty(example = "'/t/carbon.super/api/server/v1/identity-providers/394b8adcce24c64a8a09a8d80abf8c337bd253de'", value = "Path to the target resource.")
     @JsonProperty("href")
     @Valid
     public String getHref() {
@@ -63,7 +63,7 @@ public class Link  {
         return this;
     }
     
-    @ApiModelProperty(example = "authenticators", value = "Describes how the current context is related to the target resource.")
+    @ApiModelProperty(example = "identity-providers", value = "Describes how the current context is related to the target resource.")
     @JsonProperty("rel")
     @Valid
     public String getRel() {
