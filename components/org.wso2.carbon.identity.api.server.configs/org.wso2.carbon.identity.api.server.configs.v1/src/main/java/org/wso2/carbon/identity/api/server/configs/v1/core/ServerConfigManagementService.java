@@ -87,6 +87,7 @@ import org.wso2.carbon.user.api.UserStoreException;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -112,6 +113,7 @@ import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_
 public class ServerConfigManagementService {
 
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
+    private static final String IS_API_BASED_SUPPORTED = "IS_API_BASED_SUPPORTED";
 
     /**
      * Get list of local authenticators supported by the server.
@@ -605,6 +607,11 @@ public class ServerConfigManagementService {
                 authenticatorListItem.setName(config.getName());
                 authenticatorListItem.setDisplayName(config.getDisplayName());
                 authenticatorListItem.setIsEnabled(config.isEnabled());
+                if (config.getProperties() != null && config.getProperties().length > 0 && IS_API_BASED_SUPPORTED.
+                        equals(config.getProperties()[0].getName()))  {
+                    authenticatorListItem.setIsAPIBasedAuthenticationSupported(Boolean.parseBoolean
+                            (config.getProperties()[0].getValue()));
+                }
                 authenticatorListItem.setType(AuthenticatorListItem.TypeEnum.LOCAL);
                 String[] tags = config.getTags();
                 if (ArrayUtils.isNotEmpty(tags)) {
@@ -1231,7 +1238,8 @@ public class ServerConfigManagementService {
                 String metadataValidityPeriod = IdentityApplicationManagementUtil.getPropertyValue(idpProperties,
                         IdentityApplicationConstants.Authenticator.SAML2SSO.SAML_METADATA_VALIDITY_PERIOD);
                 if (StringUtils.isNotEmpty(metadataValidityPeriod)) {
-                    inboundAuthConfig.setMetadataValidityPeriod(Integer.parseInt(metadataValidityPeriod));
+                    inboundAuthConfig.setMetadataValidityPeriod
+                            (BigDecimal.valueOf(Integer.parseInt(metadataValidityPeriod)));
                 }
 
                 inboundAuthConfig.setEnableMetadataSigning(Boolean.parseBoolean(
@@ -1317,7 +1325,7 @@ public class ServerConfigManagementService {
             if (property.getName().equals(
                     IdentityApplicationConstants.Authenticator.SAML2SSO.SAML_METADATA_VALIDITY_PERIOD)) {
                 if (authConfigToUpdate.getMetadataValidityPeriod() != null) {
-                    property.setValue(Integer.toString(authConfigToUpdate.getMetadataValidityPeriod()));
+                    property.setValue(String.valueOf((authConfigToUpdate.getMetadataValidityPeriod())));
                 }
                 updatedPropertyList.add(property);
             } else if (property.getName().equals(

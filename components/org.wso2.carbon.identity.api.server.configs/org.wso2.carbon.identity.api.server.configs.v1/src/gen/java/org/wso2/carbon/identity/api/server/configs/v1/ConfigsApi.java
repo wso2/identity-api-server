@@ -277,7 +277,7 @@ public class ConfigsApi  {
     @Valid
     @GET
     @Path("/authentication/inbound/saml2")
-
+    
     @Produces({ "application/json" })
     @ApiOperation(value = "Retrieve SAML2 inbound authentication configurations.", notes = "Retrieve server SAML2 inbound authentication configurations. ", response = InboundAuthSAML2Config.class, authorizations = {
         @Authorization(value = "BasicAuth"),
@@ -573,7 +573,7 @@ public class ConfigsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Server Remote Logging Configuration" })
+    }, tags={ "Server Remote Logging Configuration", })
     @ApiResponses(value = { 
         @ApiResponse(code = 202, message = "Accepted", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -610,4 +610,5 @@ public class ConfigsApi  {
 
         return delegate.updateSAMLInboundAuthConfig(inboundAuthSAML2Config );
     }
+
 }

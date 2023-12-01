@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (https://www.wso2.com).
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.*;
@@ -36,7 +37,7 @@ public class InboundAuthSAML2Config  {
   
     private List<String> destinationURLs = null;
 
-    private Integer metadataValidityPeriod;
+    private BigDecimal metadataValidityPeriod;
     private Boolean enableMetadataSigning;
     private String metadataEndpoint;
 
@@ -70,7 +71,7 @@ public class InboundAuthSAML2Config  {
         /**
     * SAML metadata validity period in minutes
     **/
-    public InboundAuthSAML2Config metadataValidityPeriod(Integer metadataValidityPeriod) {
+    public InboundAuthSAML2Config metadataValidityPeriod(BigDecimal metadataValidityPeriod) {
 
         this.metadataValidityPeriod = metadataValidityPeriod;
         return this;
@@ -79,10 +80,10 @@ public class InboundAuthSAML2Config  {
     @ApiModelProperty(example = "60", value = "SAML metadata validity period in minutes")
     @JsonProperty("metadataValidityPeriod")
     @Valid
-    public Integer getMetadataValidityPeriod() {
+    public BigDecimal getMetadataValidityPeriod() {
         return metadataValidityPeriod;
     }
-    public void setMetadataValidityPeriod(Integer metadataValidityPeriod) {
+    public void setMetadataValidityPeriod(BigDecimal metadataValidityPeriod) {
         this.metadataValidityPeriod = metadataValidityPeriod;
     }
 
