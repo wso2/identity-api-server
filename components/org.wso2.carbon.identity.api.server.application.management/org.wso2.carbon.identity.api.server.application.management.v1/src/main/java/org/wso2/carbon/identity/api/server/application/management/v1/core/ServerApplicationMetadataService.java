@@ -162,6 +162,7 @@ public class ServerApplicationMetadataService {
         OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
 
         List<ClientAuthenticationMethod> supportedClientAuthMethods = new ArrayList<>();
+        // 'Select Option' is added to the api until the clearable UI dropdown is implemented
         supportedClientAuthMethods.add(new ClientAuthenticationMethod()
                 .name("")
                 .displayName(ApplicationManagementConstants.SELECT_OPTION));
@@ -173,24 +174,28 @@ public class ServerApplicationMetadataService {
         oidcMetaData.setTokenEndpointSignatureAlgorithm(new MetadataProperty()
                 .options(tokenEpSigningAlgorithms));
         List<String> idTokenSigningAlgorithms = new ArrayList<>();
+        // 'Select Option' is added to the api until the clearable UI dropdown is implemented
         idTokenSigningAlgorithms.add(ApplicationManagementConstants.SELECT_OPTION);
         idTokenSigningAlgorithms.addAll(IdentityUtil.
                 getPropertyAsList(ApplicationManagementConstants.ID_TOKEN_SIGNATURE_ALGORITHMS_SUPPORTED));
         oidcMetaData.setIdTokenSignatureAlgorithm(new MetadataProperty()
                 .options(idTokenSigningAlgorithms));
         List<String> requestObjectSigningAlgorithms = new ArrayList<>();
+        // 'Select Option' is added to the api until the clearable UI dropdown is implemented
         requestObjectSigningAlgorithms.add(ApplicationManagementConstants.SELECT_OPTION);
         requestObjectSigningAlgorithms.addAll(IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_SIGNATURE_ALGORITHMS_SUPPORTED));
         oidcMetaData.setRequestObjectSignatureAlgorithm(new MetadataProperty()
                 .options(requestObjectSigningAlgorithms));
         List<String> requestObjectEncryptionAlgorithms = new ArrayList<>();
+        // 'Select Option' is added to the api until the clearable UI dropdown is implemented
         requestObjectEncryptionAlgorithms.add(ApplicationManagementConstants.SELECT_OPTION);
         requestObjectEncryptionAlgorithms.addAll(IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_ENCRYPTION_ALGORITHMS_SUPPORTED));
         oidcMetaData.setRequestObjectEncryptionAlgorithm(new MetadataProperty()
                 .options(requestObjectEncryptionAlgorithms));
         List<String> requestObjectEncryptionMethods = new ArrayList<>();
+        // 'Select Option' is added to the api until the clearable UI dropdown is implemented
         requestObjectEncryptionMethods.add(ApplicationManagementConstants.SELECT_OPTION);
         requestObjectEncryptionMethods.addAll(IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.REQUEST_OBJECT_ENCRYPTION_METHODS_SUPPORTED));
