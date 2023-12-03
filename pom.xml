@@ -156,12 +156,6 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.identity.workflow.impl.bps</groupId>
-                <artifactId>org.wso2.carbon.identity.workflow.impl</artifactId>
-                <version>${identity.workflow.impl.bps.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.mgt</artifactId>
                 <version>${carbon.identity.framework.version}</version>
@@ -762,7 +756,6 @@
         <identity.governance.version>1.8.62</identity.governance.version>
         <carbon.identity.framework.version>5.25.528</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
-        <identity.workflow.impl.bps.version>5.2.0</identity.workflow.impl.bps.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.4.4</identity.event.handler.version>
         <identity.inbound.oauth2.version>6.11.188</identity.inbound.oauth2.version>
@@ -803,7 +796,6 @@
         <module>components/org.wso2.carbon.identity.api.server.common</module>
         <module>components/org.wso2.carbon.identity.api.server.claim.management</module>
         <module>components/org.wso2.carbon.identity.api.server.identity.governance</module>
-        <module>components/org.wso2.carbon.identity.api.server.workflow.engine</module>
         <module>components/org.wso2.carbon.identity.api.server.permission.management</module>
         <module>components/org.wso2.carbon.identity.api.server.email.template</module>
         <module>components/org.wso2.carbon.identity.api.server.application.management</module>
