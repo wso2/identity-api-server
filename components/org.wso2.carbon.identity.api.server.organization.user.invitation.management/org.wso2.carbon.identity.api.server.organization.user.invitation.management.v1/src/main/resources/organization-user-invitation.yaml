@@ -322,23 +322,29 @@ components:
       type: object
       required:
         - username
-        - email
-        - roles
+        - result
       properties:
         username:
           type: string
           description: Username of the user who will be invited to the organization. This can be an
             email or an alphanumeric username.
           example: alex@gmail.com/alex
-        email:
-          type: string
-          description: Email of the user who will be invited to the organization.
-          example: alex@gmail.com
-        roles:
-          type: array
+        result:
+          type: object
           description: Role assignments which the user will be assigned to.
-          items:
-            $ref: '#/components/schemas/RoleAssignmentResponse'
+          properties:
+            status:
+              type: string
+              example: Success/Fail
+            errorCode:
+              type: string
+              example: OUI-00000
+            errorMessage:
+              type: string
+              example: Some Error Message
+            errorDescription:
+              type: string
+              example: Some Error Description
     IntrospectRequestBody:
       type: object
       required:

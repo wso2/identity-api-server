@@ -22,9 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.RoleAssignmentResponse;
+import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationSuccessResponseResult;
 import javax.validation.constraints.*;
 
 
@@ -36,9 +34,7 @@ import javax.xml.bind.annotation.*;
 public class InvitationSuccessResponse  {
   
     private String username;
-    private String email;
-    private List<RoleAssignmentResponse> roles = new ArrayList<>();
-
+    private InvitationSuccessResponseResult result;
 
     /**
     * Username of the user who will be invited to the organization. This can be an email or an alphanumeric username.
@@ -62,53 +58,26 @@ public class InvitationSuccessResponse  {
     }
 
     /**
-    * Email of the user who will be invited to the organization.
     **/
-    public InvitationSuccessResponse email(String email) {
+    public InvitationSuccessResponse result(InvitationSuccessResponseResult result) {
 
-        this.email = email;
+        this.result = result;
         return this;
     }
     
-    @ApiModelProperty(example = "alex@gmail.com", required = true, value = "Email of the user who will be invited to the organization.")
-    @JsonProperty("email")
+    @ApiModelProperty(required = true, value = "")
+    @JsonProperty("result")
     @Valid
-    @NotNull(message = "Property email cannot be null.")
+    @NotNull(message = "Property result cannot be null.")
 
-    public String getEmail() {
-        return email;
+    public InvitationSuccessResponseResult getResult() {
+        return result;
     }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    /**
-    * Role assignments which the user will be assigned to.
-    **/
-    public InvitationSuccessResponse roles(List<RoleAssignmentResponse> roles) {
-
-        this.roles = roles;
-        return this;
-    }
-    
-    @ApiModelProperty(required = true, value = "Role assignments which the user will be assigned to.")
-    @JsonProperty("roles")
-    @Valid
-    @NotNull(message = "Property roles cannot be null.")
-
-    public List<RoleAssignmentResponse> getRoles() {
-        return roles;
-    }
-    public void setRoles(List<RoleAssignmentResponse> roles) {
-        this.roles = roles;
+    public void setResult(InvitationSuccessResponseResult result) {
+        this.result = result;
     }
 
-    public InvitationSuccessResponse addRolesItem(RoleAssignmentResponse rolesItem) {
-        this.roles.add(rolesItem);
-        return this;
-    }
 
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -121,13 +90,12 @@ public class InvitationSuccessResponse  {
         }
         InvitationSuccessResponse invitationSuccessResponse = (InvitationSuccessResponse) o;
         return Objects.equals(this.username, invitationSuccessResponse.username) &&
-            Objects.equals(this.email, invitationSuccessResponse.email) &&
-            Objects.equals(this.roles, invitationSuccessResponse.roles);
+            Objects.equals(this.result, invitationSuccessResponse.result);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, email, roles);
+        return Objects.hash(username, result);
     }
 
     @Override
@@ -137,8 +105,7 @@ public class InvitationSuccessResponse  {
         sb.append("class InvitationSuccessResponse {\n");
         
         sb.append("    username: ").append(toIndentedString(username)).append("\n");
-        sb.append("    email: ").append(toIndentedString(email)).append("\n");
-        sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
+        sb.append("    result: ").append(toIndentedString(result)).append("\n");
         sb.append("}");
         return sb.toString();
     }

@@ -24,6 +24,7 @@ package org.wso2.carbon.identity.api.server.organization.user.invitation.managem
 public class UserInvitationMgtConstants {
 
     public static final String ERROR_PREFIX = "OUI-";
+    public static final String ERROR_FAIL_STATUS = "Fail";
 
     /**
      * Enum for shared user invitation management related errors.
@@ -45,7 +46,7 @@ public class UserInvitationMgtConstants {
                 "Could not validate the confirmation code %s."),
         ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER("60003",
                 "Unable to create the invitation.",
-                "Multiple invitations found for the user %s."),
+                "Multiple invitations found for users given in the list %s."),
         ERROR_CODE_UNSUPPORTED_LIMIT("60004",
                 "Unsupported param.",
                 "Limit param is not supported yet."),
