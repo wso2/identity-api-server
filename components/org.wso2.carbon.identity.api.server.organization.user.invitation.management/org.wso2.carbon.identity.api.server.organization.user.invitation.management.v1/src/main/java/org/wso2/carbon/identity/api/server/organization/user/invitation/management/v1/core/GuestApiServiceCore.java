@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.organization.user.invitation.management.common.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER;
+import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_CONFIRMATION_CODE;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_FILTER;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_INVITATION_ID;
@@ -107,8 +107,8 @@ public class GuestApiServiceCore {
             invitationResponse = invitationCoreService.createInvitations(invitation);
         } catch (UserInvitationMgtException e) {
             if (ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER.getCode().equals(e.getErrorCode())) {
-                throw handleException(BAD_REQUEST, ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER,
-                        invitation.getUsernamesList().toString());
+                throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
+                        .ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER, invitation.getUsernamesList().toString());
             } else if (ERROR_CODE_STORE_ROLES_APP_ID_INVALID.getCode().equals(e.getErrorCode())) {
                 throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
                         .ERROR_CODE_INVALID_APPLICATION, StringUtils.EMPTY);
