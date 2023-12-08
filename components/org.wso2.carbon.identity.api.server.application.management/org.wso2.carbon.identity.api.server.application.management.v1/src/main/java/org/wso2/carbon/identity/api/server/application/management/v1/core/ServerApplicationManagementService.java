@@ -1036,18 +1036,7 @@ public class ServerApplicationManagementService {
          * But for now we are handling the validation here.
          */
         validateCORSOrigins(oidcConfigModel.getAllowedOrigins());
-        boolean isAllowUpdateSystemApps =
-                isAllowUpdateSystemAppOAuthConfigs(applicationId, oidcConfigModel);
-        try {
-            if (isAllowUpdateSystemApps) {
-                IdentityApplicationManagementUtil.setAllowUpdateSystemApplicationThreadLocal(true);
-            }
-            putInbound(applicationId, oidcConfigModel, OAuthInboundFunctions::putOAuthInbound);
-        } finally {
-            if (isAllowUpdateSystemApps) {
-                IdentityApplicationManagementUtil.removeAllowUpdateSystemApplicationThreadLocal();
-            }
-        }
+        putInbound(applicationId, oidcConfigModel, OAuthInboundFunctions::putOAuthInbound);
     }
 
     public void putInboundSAMLConfiguration(String applicationId, SAML2Configuration saml2Configuration) {
@@ -1146,37 +1135,6 @@ public class ServerApplicationManagementService {
                     && applicationPatchModel.getClaimConfiguration() == null
                     && applicationPatchModel.getAdvancedConfigurations() == null
                     && applicationPatchModel.getProvisioningConfigurations() == null;
-        }
-        return false;
-    }
-
-    /**
-     * Check whether the updating system application's Inbound OAuth Configs are allowed or not.
-     *
-     * @param appId Application id.
-     * @param newOidcConfigModel New oidc config model.
-     * @return true if allowed.
-     */
-    private boolean isAllowUpdateSystemAppOAuthConfigs(String appId,
-                                                       OpenIDConnectConfiguration newOidcConfigModel) {
-
-        ServiceProvider application = getServiceProvider(appId);
-        Set<String> systemApplications =
-                ApplicationManagementServiceHolder.getApplicationManagementService().getSystemApplications();
-        if (systemApplications == null ||
-                systemApplications.stream().noneMatch(application.getApplicationName()::equalsIgnoreCase)) {
-            return false;
-        }
-
-        // For the Console it is allowed to update callbackURLs and allowedOrigins.
-        if (StringUtils.equalsIgnoreCase(CONSOLE_APP, application.getApplicationName())) {
-            OpenIDConnectConfiguration oldOidcConfigModel =
-                    getInbound(appId, OAUTH2, OAuthInboundFunctions::getOAuthConfiguration);
-            oldOidcConfigModel.setCallbackURLs(newOidcConfigModel.getCallbackURLs());
-            oldOidcConfigModel.setAllowedOrigins(newOidcConfigModel.getAllowedOrigins());
-            if (newOidcConfigModel.equals(oldOidcConfigModel)) {
-                return true;
-            }
         }
         return false;
     }
