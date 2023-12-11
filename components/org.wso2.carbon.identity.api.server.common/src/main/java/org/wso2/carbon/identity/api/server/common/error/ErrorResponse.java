@@ -73,7 +73,7 @@ public class ErrorResponse extends ErrorDTO {
             if (!isCorrelationIDPresent()) {
                 errorMsg = String.format("correlationID: %s | " + errorMsg, error.getRef());
             }
-            log.error(errorMsg, e);
+            log.error(errorMsg);
             return error;
         }
 
