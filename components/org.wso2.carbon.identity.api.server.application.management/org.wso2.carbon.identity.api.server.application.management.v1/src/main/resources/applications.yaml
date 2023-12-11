@@ -3870,6 +3870,7 @@ components:
           example: RBAC
         type:
           type: string
+          example: TENANT_ADMIN
         authorizedScopes:
           type: array
           items:
