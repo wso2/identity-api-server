@@ -3868,6 +3868,8 @@ components:
         policyId:
           type: string
           example: RBAC
+        type:
+          type: string
         authorizedScopes:
           type: array
           items:
