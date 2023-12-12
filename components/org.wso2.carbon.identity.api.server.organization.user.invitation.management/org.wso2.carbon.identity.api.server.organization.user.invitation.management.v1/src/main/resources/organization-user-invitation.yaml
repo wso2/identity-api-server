@@ -300,7 +300,7 @@ components:
       properties:
         usernames:
           type: array
-          description: List of username of the user's who will be invited to the organization. This can be an email or an alphanumeric username.
+          description: List of usernames of the users who will be invited to the organization. This can be an email or an alphanumeric username.
           items:
             type: string
             example: xyz@gmail.com, abc@gmail.com
@@ -335,7 +335,7 @@ components:
           properties:
             status:
               type: string
-              example: Success/Fail
+              example: Successful/Failed
             errorCode:
               type: string
               example: OUI-00000

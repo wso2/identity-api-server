@@ -41,7 +41,7 @@ public class InvitationRequestBody  {
 
 
     /**
-    * List of username of the user&#39;s who will be invited to the organization. This can be an email or an alphanumeric username.
+    * List of usernames of the users who will be invited to the organization. This can be an email or an alphanumeric username.
     **/
     public InvitationRequestBody usernames(List<String> usernames) {
 
@@ -49,7 +49,7 @@ public class InvitationRequestBody  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "List of username of the user's who will be invited to the organization. This can be an email or an alphanumeric username.")
+    @ApiModelProperty(required = true, value = "List of usernames of the users who will be invited to the organization. This can be an email or an alphanumeric username.")
     @JsonProperty("usernames")
     @Valid
     @NotNull(message = "Property usernames cannot be null.")

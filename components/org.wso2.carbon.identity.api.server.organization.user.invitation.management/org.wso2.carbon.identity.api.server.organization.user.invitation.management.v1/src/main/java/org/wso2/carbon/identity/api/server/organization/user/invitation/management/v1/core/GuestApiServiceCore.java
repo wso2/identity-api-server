@@ -33,21 +33,21 @@ import org.wso2.carbon.identity.api.server.organization.user.invitation.manageme
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.RoleAssignmentResponse;
 import org.wso2.carbon.identity.organization.user.invitation.management.InvitationCoreServiceImpl;
 import org.wso2.carbon.identity.organization.user.invitation.management.exception.UserInvitationMgtException;
-import org.wso2.carbon.identity.organization.user.invitation.management.models.CreatedInvitation;
 import org.wso2.carbon.identity.organization.user.invitation.management.models.Invitation;
 import org.wso2.carbon.identity.organization.user.invitation.management.models.InvitationDO;
+import org.wso2.carbon.identity.organization.user.invitation.management.models.InvitationResult;
 import org.wso2.carbon.identity.organization.user.invitation.management.models.RoleAssignments;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_CONFIRMATION_CODE;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_FILTER;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_INVITATION_ID;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_ROLE;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_USER;
+import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_STORE_ROLES_APP_ID_INVALID;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE_VALUE;
@@ -102,7 +102,7 @@ public class GuestApiServiceCore {
             }
             invitation.setRoleAssignments(roleAssignments.toArray(new RoleAssignments[0]));
         }
-        List<CreatedInvitation> invitationResponse;
+        List<InvitationResult> invitationResponse;
         try {
             invitationResponse = invitationCoreService.createInvitations(invitation);
         } catch (UserInvitationMgtException e) {
@@ -247,19 +247,19 @@ public class GuestApiServiceCore {
         return error.getDescription();
     }
 
-    private List<InvitationSuccessResponse> createInvitationSuccessResponse(List<CreatedInvitation> invitationList) {
+    private List<InvitationSuccessResponse> createInvitationSuccessResponse(List<InvitationResult> invitationList) {
 
         List<InvitationSuccessResponse> invitationSuccessResponseList = new ArrayList<>();
-        for (CreatedInvitation invitation : invitationList) {
+        for (InvitationResult invitation : invitationList) {
             InvitationSuccessResponse invitationSuccessResponse = new InvitationSuccessResponse();
             InvitationSuccessResponseResult invitationSuccessResponseResult = new InvitationSuccessResponseResult();
-            if (UserInvitationMgtConstants.ERROR_FAIL_STATUS.equals(invitation.getResult().getStatus())) {
-                invitationSuccessResponseResult.setErrorCode(invitation.getResult().getErrorMsg().getCode());
-                invitationSuccessResponseResult.setErrorMessage(invitation.getResult().getErrorMsg().getMessage());
-                invitationSuccessResponseResult.setErrorDescription(invitation.getResult().getErrorMsg()
+            if (UserInvitationMgtConstants.ERROR_FAIL_STATUS.equals(invitation.getStatus())) {
+                invitationSuccessResponseResult.setErrorCode(invitation.getErrorMsg().getCode());
+                invitationSuccessResponseResult.setErrorMessage(invitation.getErrorMsg().getMessage());
+                invitationSuccessResponseResult.setErrorDescription(invitation.getErrorMsg()
                         .getDescription());
             }
-            invitationSuccessResponseResult.setStatus(invitation.getResult().getStatus());
+            invitationSuccessResponseResult.setStatus(invitation.getStatus());
             invitationSuccessResponse.setUsername(invitation.getUsername());
             invitationSuccessResponse.setResult(invitationSuccessResponseResult);
             invitationSuccessResponseList.add(invitationSuccessResponse);

@@ -24,7 +24,7 @@ package org.wso2.carbon.identity.api.server.organization.user.invitation.managem
 public class UserInvitationMgtConstants {
 
     public static final String ERROR_PREFIX = "OUI-";
-    public static final String ERROR_FAIL_STATUS = "Fail";
+    public static final String ERROR_FAIL_STATUS = "Failed";
 
     /**
      * Enum for shared user invitation management related errors.

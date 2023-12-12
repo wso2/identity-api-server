@@ -48,7 +48,7 @@ public class InvitationSuccessResponseResult  {
         return this;
     }
     
-    @ApiModelProperty(example = "Success/Fail", value = "")
+    @ApiModelProperty(example = "Successful/Failed", value = "")
     @JsonProperty("status")
     @Valid
     public String getStatus() {
