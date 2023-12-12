@@ -596,8 +596,8 @@ public class OrganizationManagementService {
         }
 
         ParentOrganizationDO parentOrganizationDO = organization.getParent();
-        if (parentOrganizationDO != null) {
-            parentOrganizationDO.setRef(buildOrganizationURL(organization.getParent().getId()).toString());
+        if (parentOrganizationDO != null && parentOrganizationDO.getId() != null) {
+            parentOrganizationDO.setRef(buildOrganizationURL(parentOrganizationDO.getId()).toString());
             organizationResponse.setParent(getParentOrganization(parentOrganizationDO));
         }
 
@@ -634,8 +634,8 @@ public class OrganizationManagementService {
         }
 
         ParentOrganizationDO parentOrganizationDO = organization.getParent();
-        if (parentOrganizationDO != null) {
-            parentOrganizationDO.setRef(buildOrganizationURL(organization.getParent().getId()).toString());
+        if (parentOrganizationDO != null && parentOrganizationDO.getId() != null) {
+            parentOrganizationDO.setRef(buildOrganizationURL(parentOrganizationDO.getId()).toString());
             organizationResponse.setParent(getParentOrganization(parentOrganizationDO));
         }
 
@@ -889,7 +889,8 @@ public class OrganizationManagementService {
         }
 
         ParentOrganizationDO parentOrganizationDO = organization.getParent();
-        if (parentOrganizationDO != null) {
+        if (parentOrganizationDO != null && parentOrganizationDO.getId() != null) {
+            parentOrganizationDO.setRef(buildOrganizationURL(parentOrganizationDO.getId()).toString());
             organizationMetadata.setParent(getParentOrganization(parentOrganizationDO));
         }
 
