@@ -1489,6 +1489,7 @@ public class ServerApplicationManagementService {
                         .identifier(authorizedAPI.getAPIIdentifier())
                         .displayName(authorizedAPI.getAPIName())
                         .policyId(authorizedAPI.getPolicyId())
+                        .type(authorizedAPI.getType())
                         .authorizedScopes(createAuthorizedScope(authorizedAPI.getScopes())));
             }
             return authorizedAPIResponses;
