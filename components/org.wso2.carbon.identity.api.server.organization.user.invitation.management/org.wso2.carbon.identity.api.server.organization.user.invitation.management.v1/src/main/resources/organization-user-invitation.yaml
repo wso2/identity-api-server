@@ -38,7 +38,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvitationSuccessResponse'
+                $ref: '#/components/schemas/InvitationSuccessListResponse'
         '400':
           description: Bad Request
           content:
@@ -296,13 +296,14 @@ components:
     InvitationRequestBody:
       type: object
       required:
-        - username
+        - usernames
       properties:
-        username:
-          type: string
-          description: Username of the user who will be invited to the organization. This can be an
-            email or an alphanumeric username.
-          example: alex@gmail.com/alex
+        usernames:
+          type: array
+          description: List of usernames of the users who will be invited to the organization. This can be an email or an alphanumeric username.
+          items:
+            type: string
+            example: xyz@gmail.com, abc@gmail.com
         userDomain:
           type: string
           description: User store domain of the user. If not provided, PRIMARY will be used.
@@ -313,27 +314,37 @@ components:
           items:
             type: string
             example: editor, manager
+    InvitationSuccessListResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/InvitationSuccessResponse'
     InvitationSuccessResponse:
       type: object
       required:
         - username
-        - email
-        - roles
+        - result
       properties:
         username:
           type: string
           description: Username of the user who will be invited to the organization. This can be an
             email or an alphanumeric username.
           example: alex@gmail.com/alex
-        email:
-          type: string
-          description: Email of the user who will be invited to the organization.
-          example: alex@gmail.com
-        roles:
-          type: array
+        result:
+          type: object
           description: Role assignments which the user will be assigned to.
-          items:
-            $ref: '#/components/schemas/RoleAssignmentResponse'
+          properties:
+            status:
+              type: string
+              example: Successful/Failed
+            errorCode:
+              type: string
+              example: OUI-00000
+            errorMessage:
+              type: string
+              example: Some Error Message
+            errorDescription:
+              type: string
+              example: Some Error Description
     IntrospectRequestBody:
       type: object
       required:

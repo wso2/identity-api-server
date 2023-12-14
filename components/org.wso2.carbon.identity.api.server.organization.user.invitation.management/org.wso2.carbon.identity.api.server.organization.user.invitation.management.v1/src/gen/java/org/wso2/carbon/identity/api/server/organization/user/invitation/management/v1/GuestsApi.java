@@ -122,9 +122,9 @@ public class GuestsApi  {
     @Path("/invite")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Invite a parent organization user to a child organization", notes = "Initiates an invitation to a user in the parent organization to onboard to the child organization. This will be initiated from the child organization.  <b>Scope required:</b> <br/>  - internal_guest_mgt_invite_add ", response = InvitationSuccessResponse.class, tags={ "Parent Organization User Invitation" })
+    @ApiOperation(value = "Invite a parent organization user to a child organization", notes = "Initiates an invitation to a user in the parent organization to onboard to the child organization. This will be initiated from the child organization.  <b>Scope required:</b> <br/>  - internal_guest_mgt_invite_add ", response = InvitationSuccessResponse.class, responseContainer = "List", tags={ "Parent Organization User Invitation" })
     @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "Successful Response", response = InvitationSuccessResponse.class),
+        @ApiResponse(code = 201, message = "Successful Response", response = InvitationSuccessResponse.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
