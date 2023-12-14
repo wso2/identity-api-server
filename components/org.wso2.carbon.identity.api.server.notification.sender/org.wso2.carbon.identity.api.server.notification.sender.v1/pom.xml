@@ -163,5 +163,9 @@
             <groupId>org.wso2.carbon.identity.event.handler.notification</groupId>
             <artifactId>org.wso2.carbon.identity.notification.sender.tenant.config</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.multitenancy</groupId>
+            <artifactId>org.wso2.carbon.tenant.mgt</artifactId>
+        </dependency>
     </dependencies>
 </project>
