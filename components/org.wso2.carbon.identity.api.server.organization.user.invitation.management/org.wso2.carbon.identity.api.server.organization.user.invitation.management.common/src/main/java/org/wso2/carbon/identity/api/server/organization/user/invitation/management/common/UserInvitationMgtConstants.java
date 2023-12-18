@@ -83,6 +83,9 @@ public class UserInvitationMgtConstants {
         ERROR_CODE_INVALID_USER_INFORMATION("60014",
                 "Unable to create an invitation to all the users given in the list.",
                 "User invitation creation failed for the users: %s"),
+        ERROR_CODE_INVALID_GROUP("60014",
+                "Invalid group list provided.",
+                "The provided group lists are not valid."),
 
         // Server errors.
         ERROR_CODE_CREATE_INVITATION("65001",
