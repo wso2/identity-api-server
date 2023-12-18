@@ -129,7 +129,7 @@ public class NotificationSenderManagementService {
 
         try {
             SMSSenderDTO smsSenderDTO = NotificationSenderServiceHolder.getNotificationSenderManagementService()
-                    .getSMSSender(senderName);
+                    .getSMSSender(senderName, false);
             return buildSMSSenderFromDTO(smsSenderDTO);
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);
@@ -161,7 +161,7 @@ public class NotificationSenderManagementService {
 
         try {
             List<SMSSenderDTO> smsSenders = NotificationSenderServiceHolder.getNotificationSenderManagementService()
-                    .getSMSSenders();
+                    .getSMSSenders(false);
             return smsSenders.stream().map(this::buildSMSSenderFromDTO).collect(Collectors.toList());
         } catch (NotificationSenderManagementException e) {
             throw handleException(e);

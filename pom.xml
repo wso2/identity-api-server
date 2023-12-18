@@ -757,7 +757,7 @@
         <carbon.identity.framework.version>5.25.609</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
-        <identity.event.handler.version>1.4.4</identity.event.handler.version>
+        <identity.event.handler.version>1.7.30</identity.event.handler.version>
         <identity.inbound.oauth2.version>6.11.188</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.16</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
