@@ -313,7 +313,13 @@ components:
           description: Role assignments which the user will be assigned to.
           items:
             type: string
-            example: editor, manager
+            example: f5b761ca-62f2-48ba-935b-f7b460f58e5c, 657fg-62f2-48ba-935b-f7bfgh6438
+        groups:
+          type: array
+          description: Group assignments which the user will be assigned to.
+          items:
+            type: string
+            example: 48badf-rty20-48ba-935b-f7b460f58e5c, fd234100-c115-45dc-ad11-70846b783866
     InvitationSuccessListResponse:
       type: array
       items:
@@ -419,12 +425,25 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RoleAssignmentResponse'
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupAssignmentResponse'
         status:
           type: string
           example: PENDING/EXPIRED
         expiredAt:
           type: string
           example: 2021-08-10T10:15:30.00Z
+    GroupAssignmentResponse:
+      type: object
+      properties:
+        displayName:
+          type: string
+          example: 'sales'
+        id:
+          type: string
+          example: 'f5b761ca-62f2-48ba-935b-f7b460f58e5c'
     RoleAssignmentResponse:
       type: object
       properties:
