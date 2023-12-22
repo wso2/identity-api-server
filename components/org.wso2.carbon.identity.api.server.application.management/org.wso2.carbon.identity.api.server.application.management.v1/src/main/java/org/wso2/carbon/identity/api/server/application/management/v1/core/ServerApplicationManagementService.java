@@ -1453,8 +1453,10 @@ public class ServerApplicationManagementService {
             if (currentAuthorizedAPI == null) {
                 throw buildClientError(ErrorMessage.AUTHORIZED_API_NOT_FOUND, apiId, applicationId);
             }
-            addedScopes.removeIf(scopeName -> currentAuthorizedAPI.getScopes().stream().anyMatch(scope ->
-                    scope.getName().equals(scopeName)));
+            if (currentAuthorizedAPI.getScopes() != null) {
+                addedScopes.removeIf(scopeName -> currentAuthorizedAPI.getScopes().stream().anyMatch(scope ->
+                        scope.getName().equals(scopeName)));
+            }
 
             getAuthorizedAPIManagementService().patchAuthorizedAPI(applicationId, apiId, addedScopes, removedScopes,
                     tenantDomain);
