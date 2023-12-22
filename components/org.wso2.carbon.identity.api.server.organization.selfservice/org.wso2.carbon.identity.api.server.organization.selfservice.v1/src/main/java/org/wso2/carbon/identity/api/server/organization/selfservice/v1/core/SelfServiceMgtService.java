@@ -64,7 +64,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -494,11 +493,15 @@ public class SelfServiceMgtService {
 
         // Authorize Scim Organization User API.
         authorizedAPIMap.put("/o/scim2/Users",
-                new ArrayList<>(Collections.singletonList("internal_org_user_mgt_create")));
+                new ArrayList<>(Arrays.asList("internal_org_user_mgt_create", "internal_org_user_mgt_list")));
 
         // Authorize Scim Organization Roles API.
         authorizedAPIMap.put("/o/scim2/Roles",
                 new ArrayList<>(Arrays.asList("internal_org_role_mgt_view", "internal_org_role_mgt_update")));
+
+        // Authorize organization application Management
+        authorizedAPIMap.put("/o/api/server/v1/applications",
+                new ArrayList<>(Arrays.asList("internal_org_application_mgt_view")));
 
         return authorizedAPIMap;
     }
