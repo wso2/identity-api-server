@@ -127,6 +127,7 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
                 applicationSharePOSTRequest);
     }
 
+    @Deprecated
     @Override
     public Response shareOrgApplicationDelete(String organizationId, String applicationId,
                                               String sharedOrganizationId) {
@@ -135,12 +136,14 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
                 sharedOrganizationId);
     }
 
+    @Deprecated
     @Override
     public Response shareOrgApplicationGet(String organizationId, String applicationId) {
 
         return organizationManagementService.getApplicationSharedOrganizations(organizationId, applicationId);
     }
 
+    @Deprecated
     @Override
     public Response sharedApplicationsAllDelete(String organizationId, String applicationId) {
 
@@ -154,6 +157,7 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
         return organizationManagementService.deleteAllSharedApplications(organizationId, applicationId);
     }
 
+    @Deprecated
     @Override
     public Response sharedApplicationsGet(String organizationId, String applicationId) {
 
