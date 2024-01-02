@@ -2521,19 +2521,17 @@ public class ServerIdpManagementService {
         if (idp.getJustInTimeProvisioningConfig() != null) {
             jitConfig.setIsEnabled(idp.getJustInTimeProvisioningConfig().isProvisioningEnabled());
 
-            if (idp.getJustInTimeProvisioningConfig().isProvisioningEnabled()) {
-                boolean modifyUsername = idp.getJustInTimeProvisioningConfig().isModifyUserNameAllowed();
-                boolean passwordProvision = idp.getJustInTimeProvisioningConfig().isPasswordProvisioningEnabled();
-                boolean promptConsent = idp.getJustInTimeProvisioningConfig().isPromptConsent();
-                if (modifyUsername && passwordProvision && promptConsent) {
-                    jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_USERNAME_PASSWORD_CONSENT);
-                } else if (passwordProvision && promptConsent) {
-                    jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_PASSWORD_CONSENT);
-                } else if (promptConsent) {
-                    jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_CONSENT);
-                } else {
-                    jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROVISION_SILENTLY);
-                }
+            boolean modifyUsername = idp.getJustInTimeProvisioningConfig().isModifyUserNameAllowed();
+            boolean passwordProvision = idp.getJustInTimeProvisioningConfig().isPasswordProvisioningEnabled();
+            boolean promptConsent = idp.getJustInTimeProvisioningConfig().isPromptConsent();
+            if (modifyUsername && passwordProvision && promptConsent) {
+                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_USERNAME_PASSWORD_CONSENT);
+            } else if (passwordProvision && promptConsent) {
+                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_PASSWORD_CONSENT);
+            } else if (promptConsent) {
+                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_CONSENT);
+            } else {
+                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROVISION_SILENTLY);
             }
             if (idp.getJustInTimeProvisioningConfig().getProvisioningUserStore() == null) {
                 jitConfig.setUserstore(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME);
