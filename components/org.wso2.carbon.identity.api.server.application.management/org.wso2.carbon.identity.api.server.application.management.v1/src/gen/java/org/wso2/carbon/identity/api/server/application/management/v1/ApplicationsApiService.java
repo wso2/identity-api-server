@@ -134,6 +134,16 @@ public interface ApplicationsApiService {
 
       public Response revokeOAuthClient(String applicationId);
 
+      public Response shareOrgApplication(String applicationId, ApplicationSharePOSTRequest applicationSharePOSTRequest);
+
+      public Response shareOrgApplicationDelete(String applicationId, String sharedOrganizationId);
+
+      public Response shareOrgApplicationGet(String applicationId);
+
+      public Response sharedApplicationsAllDelete(String applicationId);
+
+      public Response sharedApplicationsGet(String applicationId);
+
       public Response updateApplicationTemplate(String templateId, ApplicationTemplateModel applicationTemplateModel);
 
       public Response updateCustomInboundConfiguration(String applicationId, String inboundProtocolId, CustomInboundProtocolConfiguration customInboundProtocolConfiguration);

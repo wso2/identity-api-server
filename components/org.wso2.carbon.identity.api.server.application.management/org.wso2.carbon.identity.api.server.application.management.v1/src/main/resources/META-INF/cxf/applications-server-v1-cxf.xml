@@ -20,6 +20,7 @@
 
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService"/>
+    <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationSharingService"/>
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.impl.ApplicationsApiServiceImpl"/>
 
     <bean id="applicationManagementServiceHolderBean"
@@ -58,6 +59,10 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
         <property name="apiResourceManager" ref="apiResourceManagerServiceFactoryBean"/>
     </bean>
+    <bean id="orgApplicationManagerHolderBean"
+          class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
+        <property name="orgApplicationManager" ref="orgApplicationManagerServiceFactoryBean"/>
+    </bean>
 
     <bean id="applicationManagementServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.ApplicationManagementOSGiServiceFactory"/>
@@ -78,4 +83,6 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.AuthorizedAPIMgtOSGiServiceFactory" />
     <bean id="apiResourceManagerServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.APIResourceMgtOSGiServiceFactory"/>
+    <bean id="orgApplicationManagerServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.application.management.common.factory.OrgApplicationManagerOSGiServiceFactory"/>
 </beans>
