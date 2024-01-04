@@ -2518,12 +2518,13 @@ public class ServerIdpManagementService {
     private JustInTimeProvisioning createJITResponse(IdentityProvider idp) {
 
         JustInTimeProvisioning jitConfig = new JustInTimeProvisioning();
-        if (idp.getJustInTimeProvisioningConfig() != null) {
-            jitConfig.setIsEnabled(idp.getJustInTimeProvisioningConfig().isProvisioningEnabled());
+        JustInTimeProvisioningConfig jitProvisionConfig = idp.getJustInTimeProvisioningConfig();
+        if (jitProvisionConfig != null) {
+            jitConfig.setIsEnabled(jitProvisionConfig.isProvisioningEnabled());
 
-            boolean modifyUsername = idp.getJustInTimeProvisioningConfig().isModifyUserNameAllowed();
-            boolean passwordProvision = idp.getJustInTimeProvisioningConfig().isPasswordProvisioningEnabled();
-            boolean promptConsent = idp.getJustInTimeProvisioningConfig().isPromptConsent();
+            boolean modifyUsername = jitProvisionConfig.isModifyUserNameAllowed();
+            boolean passwordProvision = jitProvisionConfig.isPasswordProvisioningEnabled();
+            boolean promptConsent = jitProvisionConfig.isPromptConsent();
             if (modifyUsername && passwordProvision && promptConsent) {
                 jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_USERNAME_PASSWORD_CONSENT);
             } else if (passwordProvision && promptConsent) {
@@ -2533,18 +2534,18 @@ public class ServerIdpManagementService {
             } else {
                 jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROVISION_SILENTLY);
             }
-            if (idp.getJustInTimeProvisioningConfig().getProvisioningUserStore() == null) {
+            if (jitProvisionConfig.getProvisioningUserStore() == null) {
                 jitConfig.setUserstore(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME);
             } else {
-                jitConfig.setUserstore(idp.getJustInTimeProvisioningConfig().getProvisioningUserStore());
+                jitConfig.setUserstore(jitProvisionConfig.getProvisioningUserStore());
             }
-            jitConfig.setAssociateLocalUser(idp.getJustInTimeProvisioningConfig().isAssociateLocalUserEnabled());
-            if (idp.getJustInTimeProvisioningConfig().getAttributeSyncMethod() == null) {
+            jitConfig.setAssociateLocalUser(jitProvisionConfig.isAssociateLocalUserEnabled());
+            if (jitProvisionConfig.getAttributeSyncMethod() == null) {
                 jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(
                         FrameworkConstants.OVERRIDE_ALL));
             } else {
                 jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(
-                        idp.getJustInTimeProvisioningConfig().getAttributeSyncMethod()));
+                        jitProvisionConfig.getAttributeSyncMethod()));
             }
         }
         return jitConfig;
