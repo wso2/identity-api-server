@@ -2379,9 +2379,9 @@ paths:
   /applications/{application-id}/share:
     post:
       summary: |
-        Share application from the parent organization to given organization.
+        Share the application from the root organization to the given organization.
       description: |
-        This API provides the capability to share an application with sub organizations.
+        This API provides the capability to share an application with organizations.
         <br><br>
         <b>Scope required:</b> 
         * internal_shared_application_create
@@ -2389,7 +2389,7 @@ paths:
       parameters:
         - name: application-id
           in: path
-          description: ID of the application which will be shared to sub organizations.
+          description: ID of the application which will be shared to organizations.
           required: true
           schema:
             type: string
@@ -2439,7 +2439,7 @@ paths:
       parameters:
         - name: application-id
           in: path
-          description: ID of the application which is shared to sub organizations.
+          description: ID of the application which is shared to organizations.
           required: true
           schema:
             type: string
@@ -2487,7 +2487,7 @@ paths:
       parameters:
         - name: application-id
           in: path
-          description: ID of the application which is shared to sub organizations.
+          description: ID of the application which is shared to organizations.
           required: true
           schema:
             type: string
@@ -2529,7 +2529,7 @@ paths:
         <b>Scope required:</b> 
         * internal_shared_application_delete
       summary: |
-        Stop sharing an application with all sub organizations.
+        Stop sharing an application with all organizations.
       operationId: sharedApplicationsAllDelete
       parameters:
         - name: application-id

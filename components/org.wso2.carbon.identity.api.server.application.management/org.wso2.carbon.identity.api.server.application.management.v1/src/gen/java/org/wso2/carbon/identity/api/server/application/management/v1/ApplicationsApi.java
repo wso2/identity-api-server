@@ -1014,7 +1014,7 @@ public class ApplicationsApi  {
     @Path("/{application-id}/share")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Share application from the parent organization to given organization. ", notes = "This API provides the capability to share an application with sub organizations. <br><br> <b>Scope required:</b>  * internal_shared_application_create ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Share the application from the root organization to the given organization. ", notes = "This API provides the capability to share an application with organizations. <br><br> <b>Scope required:</b>  * internal_shared_application_create ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -1028,7 +1028,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response shareOrgApplication(@ApiParam(value = "ID of the application which will be shared to sub organizations.",required=true) @PathParam("application-id") String applicationId, @ApiParam(value = "" ,required=true) @Valid ApplicationSharePOSTRequest applicationSharePOSTRequest) {
+    public Response shareOrgApplication(@ApiParam(value = "ID of the application which will be shared to organizations.",required=true) @PathParam("application-id") String applicationId, @ApiParam(value = "" ,required=true) @Valid ApplicationSharePOSTRequest applicationSharePOSTRequest) {
 
         return delegate.shareOrgApplication(applicationId,  applicationSharePOSTRequest );
     }
@@ -1076,7 +1076,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response shareOrgApplicationGet(@ApiParam(value = "ID of the application which is shared to sub organizations.",required=true) @PathParam("application-id") String applicationId) {
+    public Response shareOrgApplicationGet(@ApiParam(value = "ID of the application which is shared to organizations.",required=true) @PathParam("application-id") String applicationId) {
 
         return delegate.shareOrgApplicationGet(applicationId );
     }
@@ -1086,7 +1086,7 @@ public class ApplicationsApi  {
     @Path("/{application-id}/shared-apps")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Stop sharing an application with all sub organizations. ", notes = "This API provides the capability to stop sharing an application to all organizations the application is shared to. <br><br> <b>Scope required:</b>  * internal_shared_application_delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Stop sharing an application with all organizations. ", notes = "This API provides the capability to stop sharing an application to all organizations the application is shared to. <br><br> <b>Scope required:</b>  * internal_shared_application_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -1124,7 +1124,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response sharedApplicationsGet(@ApiParam(value = "ID of the application which is shared to sub organizations.",required=true) @PathParam("application-id") String applicationId) {
+    public Response sharedApplicationsGet(@ApiParam(value = "ID of the application which is shared to organizations.",required=true) @PathParam("application-id") String applicationId) {
 
         return delegate.sharedApplicationsGet(applicationId );
     }
