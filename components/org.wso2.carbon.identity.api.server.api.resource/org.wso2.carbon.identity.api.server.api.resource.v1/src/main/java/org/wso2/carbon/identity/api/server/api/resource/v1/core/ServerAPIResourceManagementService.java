@@ -536,19 +536,10 @@ public class ServerAPIResourceManagementService {
      */
     private void handleSystemAPI(APIResource apiResource) {
 
-        if (apiResource.getType() == null) {
-            return;
-        }
-        if (apiResource.getType().startsWith(APIResourceMgtEndpointConstants.SYSTEM_API_RESOURCE_TYPE) ||
-                apiResource.getType().startsWith(APIResourceMgtEndpointConstants.TENANT_ADMIN_API_RESOURCE_TYPE) ||
-                apiResource.getType().startsWith(APIResourceMgtEndpointConstants.TENANT_USER_API_RESOURCE_TYPE) ||
-                apiResource.getType().startsWith(APIResourceMgtEndpointConstants.ORG_ADMIN_API_RESOURCE_TYPE) ||
-                apiResource.getType().startsWith(APIResourceMgtEndpointConstants.ORG_USER_API_RESOURCE_TYPE) ||
-                apiResource.getType().startsWith(APIResourceMgtEndpointConstants.OTHER_API_RESOURCE_TYPE)) {
-
+        if (apiResource.getType() != null &&
+                !apiResource.getType().startsWith(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE)) {
             throw APIResourceMgtEndpointUtil.handleException(Response.Status.FORBIDDEN,
                     ErrorMessage.ERROR_CODE_SYSTEM_API_RESOURCE_NOT_MODIFIABLE);
         }
     }
-
 }
