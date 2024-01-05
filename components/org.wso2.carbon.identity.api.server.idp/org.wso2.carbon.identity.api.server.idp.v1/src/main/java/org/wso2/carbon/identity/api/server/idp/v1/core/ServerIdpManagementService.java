@@ -2529,7 +2529,8 @@ public class ServerIdpManagementService {
             jitConfig.setAssociateLocalUser(jitProvisionConfig.isAssociateLocalUserEnabled());
             String attributeSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getAttributeSyncMethod()) ?
                     jitProvisionConfig.getAttributeSyncMethod() : FrameworkConstants.OVERRIDE_ALL;
-            jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(attributeSyncMethod));
+            jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum
+                    .valueOf(attributeSyncMethod));
         }
         return jitConfig;
     }
