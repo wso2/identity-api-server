@@ -1011,7 +1011,7 @@ public class ApplicationsApi  {
 
     @Valid
     @POST
-    @Path("/{application-id}/share")
+    @Path("/{applicationId}/share")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @ApiOperation(value = "Share the application from the root organization to the given organization. ", notes = "This API provides the capability to share an application with organizations. <br><br> <b>Scope required:</b>  * internal_shared_application_create ", response = Void.class, authorizations = {
@@ -1028,14 +1028,14 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response shareOrgApplication(@ApiParam(value = "ID of the application which will be shared to organizations.",required=true) @PathParam("application-id") String applicationId, @ApiParam(value = "" ,required=true) @Valid ApplicationSharePOSTRequest applicationSharePOSTRequest) {
+    public Response shareOrgApplication(@ApiParam(value = "ID of the application which will be shared to organizations.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "" ,required=true) @Valid ApplicationSharePOSTRequest applicationSharePOSTRequest) {
 
         return delegate.shareOrgApplication(applicationId,  applicationSharePOSTRequest );
     }
 
     @Valid
     @DELETE
-    @Path("/{application-id}/share/{shared-organization-id}")
+    @Path("/{applicationId}/share/{shared-organization-id}")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Stop sharing an application to a organization. ", notes = "This API provides the capability to stop sharing an application to an organization by providing its ID. <br><br> <b>Scope required:</b>  * internal_shared_application_delete ", response = Void.class, authorizations = {
@@ -1052,14 +1052,14 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response shareOrgApplicationDelete(@ApiParam(value = "ID of the application.",required=true) @PathParam("application-id") String applicationId, @ApiParam(value = "ID of the organization to stop sharing.",required=true) @PathParam("shared-organization-id") String sharedOrganizationId) {
+    public Response shareOrgApplicationDelete(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "ID of the organization to stop sharing.",required=true) @PathParam("shared-organization-id") String sharedOrganizationId) {
 
         return delegate.shareOrgApplicationDelete(applicationId,  sharedOrganizationId );
     }
 
     @Valid
     @GET
-    @Path("/{application-id}/share")
+    @Path("/{applicationId}/share")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "List of organizations that the application is shared to. ", notes = "This API returns the list of organizations that the application is shared to. <br><br> <b>Scope required:</b>  * internal_shared_application_view ", response = SharedOrganizationsResponse.class, authorizations = {
@@ -1076,14 +1076,14 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response shareOrgApplicationGet(@ApiParam(value = "ID of the application which is shared to organizations.",required=true) @PathParam("application-id") String applicationId) {
+    public Response shareOrgApplicationGet(@ApiParam(value = "ID of the application which is shared to organizations.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.shareOrgApplicationGet(applicationId );
     }
 
     @Valid
     @DELETE
-    @Path("/{application-id}/shared-apps")
+    @Path("/{applicationId}/shared-apps")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Stop sharing an application with all organizations. ", notes = "This API provides the capability to stop sharing an application to all organizations the application is shared to. <br><br> <b>Scope required:</b>  * internal_shared_application_delete ", response = Void.class, authorizations = {
@@ -1100,14 +1100,14 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response sharedApplicationsAllDelete(@ApiParam(value = "ID of the application.",required=true) @PathParam("application-id") String applicationId) {
+    public Response sharedApplicationsAllDelete(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.sharedApplicationsAllDelete(applicationId );
     }
 
     @Valid
     @GET
-    @Path("/{application-id}/shared-apps")
+    @Path("/{applicationId}/shared-apps")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "List of shared applications along with its organization. ", notes = "This API returns the list of shared app ids along with the shared organization id. <br><br> <b>Scope required:</b>  * internal_shared_application_view ", response = SharedApplicationsResponse.class, authorizations = {
@@ -1124,7 +1124,7 @@ public class ApplicationsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response sharedApplicationsGet(@ApiParam(value = "ID of the application which is shared to organizations.",required=true) @PathParam("application-id") String applicationId) {
+    public Response sharedApplicationsGet(@ApiParam(value = "ID of the application which is shared to organizations.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.sharedApplicationsGet(applicationId );
     }

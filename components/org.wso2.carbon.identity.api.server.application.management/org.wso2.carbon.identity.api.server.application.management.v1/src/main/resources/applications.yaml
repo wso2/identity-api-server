@@ -2376,7 +2376,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /applications/{application-id}/share:
+  /applications/{applicationId}/share:
     post:
       summary: |
         Share the application from the root organization to the given organization.
@@ -2387,7 +2387,7 @@ paths:
         * internal_shared_application_create
       operationId: shareOrgApplication
       parameters:
-        - name: application-id
+        - name: applicationId
           in: path
           description: ID of the application which will be shared to organizations.
           required: true
@@ -2437,7 +2437,7 @@ paths:
         * internal_shared_application_view
       operationId: shareOrgApplicationGet
       parameters:
-        - name: application-id
+        - name: applicationId
           in: path
           description: ID of the application which is shared to organizations.
           required: true
@@ -2474,7 +2474,7 @@ paths:
                 $ref: '#/components/schemas/Error'
       tags:
         - Organization Application Sharing
-  /applications/{application-id}/shared-apps:
+  /applications/{applicationId}/shared-apps:
     get:
       summary: |
         List of shared applications along with its organization.
@@ -2485,7 +2485,7 @@ paths:
         * internal_shared_application_view
       operationId: sharedApplicationsGet
       parameters:
-        - name: application-id
+        - name: applicationId
           in: path
           description: ID of the application which is shared to organizations.
           required: true
@@ -2532,7 +2532,7 @@ paths:
         Stop sharing an application with all organizations.
       operationId: sharedApplicationsAllDelete
       parameters:
-        - name: application-id
+        - name: applicationId
           in: path
           description: ID of the application.
           required: true
@@ -2565,7 +2565,7 @@ paths:
                 $ref: '#/components/schemas/Error'
       tags:
         - Organization Application Sharing
-  /applications/{application-id}/share/{shared-organization-id}:
+  /applications/{applicationId}/share/{shared-organization-id}:
     delete:
       description: |
         This API provides the capability to stop sharing an application to an organization by providing its ID.
@@ -2576,7 +2576,7 @@ paths:
         Stop sharing an application to a organization.
       operationId: shareOrgApplicationDelete
       parameters:
-        - name: application-id
+        - name: applicationId
           in: path
           description: ID of the application.
           required: true
