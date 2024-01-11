@@ -41,6 +41,7 @@ public class ApplicationListItem  {
     private String accessUrl;
     private String clientId;
     private String issuer;
+    private String realm;
 
 @XmlType(name="AccessEnum")
 @XmlEnum(String.class)
@@ -208,6 +209,24 @@ public enum AccessEnum {
 
     /**
     **/
+    public ApplicationListItem realm(String realm) {
+
+        this.realm = realm;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "PassiveSTSSampleApp", value = "")
+    @JsonProperty("realm")
+    @Valid
+    public String getRealm() {
+        return realm;
+    }
+    public void setRealm(String realm) {
+        this.realm = realm;
+    }
+
+    /**
+    **/
     public ApplicationListItem access(AccessEnum access) {
 
         this.access = access;
@@ -315,6 +334,7 @@ public enum AccessEnum {
             Objects.equals(this.accessUrl, applicationListItem.accessUrl) &&
             Objects.equals(this.clientId, applicationListItem.clientId) &&
             Objects.equals(this.issuer, applicationListItem.issuer) &&
+            Objects.equals(this.realm, applicationListItem.realm) &&
             Objects.equals(this.access, applicationListItem.access) &&
             Objects.equals(this.self, applicationListItem.self) &&
             Objects.equals(this.advancedConfigurations, applicationListItem.advancedConfigurations) &&
@@ -324,7 +344,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, access, self, advancedConfigurations, templateId, associatedRoles);
+        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, associatedRoles);
     }
 
     @Override
@@ -340,6 +360,7 @@ public enum AccessEnum {
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
         sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
+        sb.append("    realm: ").append(toIndentedString(realm)).append("\n");
         sb.append("    access: ").append(toIndentedString(access)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
