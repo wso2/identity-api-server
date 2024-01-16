@@ -122,6 +122,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .accessUrl(application.getAccessUrl())
                     .clientId(getInboundKey(application, "oauth2"))
                     .issuer(getInboundKey(application, "samlsso"))
+                    .realm(getInboundKey(application, "passivests"))
                     .templateId(application.getTemplateId())
                     .isManagementApp(application.isManagementApp())
                     .associatedRoles(buildAssociatedRoles(application))
@@ -564,8 +565,10 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .getInboundAuthenticationRequestConfigs();
 
             if (authRequestConfigs != null && authRequestConfigs.length > 0) {
-                if (authRequestConfigs[0].getInboundAuthType().equals(authType)) {
-                    return authRequestConfigs[0].getInboundAuthKey();
+                for (InboundAuthenticationRequestConfig authRequestConfig: authRequestConfigs) {
+                    if (authRequestConfig.getInboundAuthType().equals(authType)) {
+                        return authRequestConfig.getInboundAuthKey();
+                    }
                 }
             }
         }

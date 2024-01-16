@@ -2813,6 +2813,9 @@ components:
         issuer:
           type: string
           example: 'http://idp.example.com/metadata.php'
+        realm:
+          type: string
+          example: 'PassiveSTSSampleApp'
         access:
           type: string
           enum:
@@ -2828,8 +2831,8 @@ components:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
         associatedRoles:
-           type: object
-           $ref: '#/components/schemas/AssociatedRolesConfig'
+          type: object
+          $ref: '#/components/schemas/AssociatedRolesConfig'
     ApplicationModel:
       type: object
       required:
@@ -2903,6 +2906,9 @@ components:
         issuer:
           type: string
           example: 'http://idp.example.com/metadata.php'
+        realm:
+          type: string
+          example: 'PassiveSTSSampleApp'
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"

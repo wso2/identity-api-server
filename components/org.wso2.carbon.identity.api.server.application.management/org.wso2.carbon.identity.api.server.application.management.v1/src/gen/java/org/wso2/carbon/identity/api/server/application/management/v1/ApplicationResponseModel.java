@@ -47,6 +47,7 @@ public class ApplicationResponseModel  {
     private String accessUrl;
     private String clientId;
     private String issuer;
+    private String realm;
     private String templateId;
     private Boolean isManagementApp;
     private Boolean isB2BSelfServiceApp;
@@ -222,6 +223,24 @@ public enum AccessEnum {
 
     /**
     **/
+    public ApplicationResponseModel realm(String realm) {
+
+        this.realm = realm;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "PassiveSTSSampleApp", value = "")
+    @JsonProperty("realm")
+    @Valid
+    public String getRealm() {
+        return realm;
+    }
+    public void setRealm(String realm) {
+        this.realm = realm;
+    }
+
+    /**
+    **/
     public ApplicationResponseModel templateId(String templateId) {
 
         this.templateId = templateId;
@@ -265,12 +284,11 @@ public enum AccessEnum {
         this.isB2BSelfServiceApp = isB2BSelfServiceApp;
         return this;
     }
-
+    
     @ApiModelProperty(example = "false", value = "Decides whether the application used to for B2B self service")
     @JsonProperty("isB2BSelfServiceApp")
     @Valid
     public Boolean getIsB2BSelfServiceApp() {
-
         return isB2BSelfServiceApp;
     }
     public void setIsB2BSelfServiceApp(Boolean isB2BSelfServiceApp) {
@@ -430,6 +448,7 @@ public enum AccessEnum {
             Objects.equals(this.accessUrl, applicationResponseModel.accessUrl) &&
             Objects.equals(this.clientId, applicationResponseModel.clientId) &&
             Objects.equals(this.issuer, applicationResponseModel.issuer) &&
+            Objects.equals(this.realm, applicationResponseModel.realm) &&
             Objects.equals(this.templateId, applicationResponseModel.templateId) &&
             Objects.equals(this.isManagementApp, applicationResponseModel.isManagementApp) &&
             Objects.equals(this.isB2BSelfServiceApp, applicationResponseModel.isB2BSelfServiceApp) &&
@@ -444,7 +463,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, isB2BSelfServiceApp, associatedRoles, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, realm, templateId, isManagementApp, isB2BSelfServiceApp, associatedRoles, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
     }
 
     @Override
@@ -460,6 +479,7 @@ public enum AccessEnum {
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
         sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
+        sb.append("    realm: ").append(toIndentedString(realm)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
