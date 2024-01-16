@@ -262,6 +262,7 @@ paths:
         - Organization
   /organizations/{organization-id}/applications/{application-id}/share:
     post:
+      deprecated: true
       summary: |
         Share application from the parent organization to given organization
       description: |
@@ -305,6 +306,7 @@ paths:
       tags:
         - Organization Application Management
     get:
+      deprecated: true
       summary: |
         List of organizations that the application is shared to.
       description: |
@@ -380,6 +382,7 @@ paths:
         - Organization Application Management
   /organizations/{organization-id}/applications/{application-id}/shared-apps:
     get:
+      deprecated: true
       summary: |
         List of shared applications along with its organization.
       description: |
@@ -418,6 +421,7 @@ paths:
       tags:
         - Organization Application Management
     delete:
+      deprecated: true
       description: |
         This API provides the capability to stop sharing an application to all organizations the application is shared to.
       summary: |
@@ -453,6 +457,7 @@ paths:
         - Organization Application Management
   /organizations/{organization-id}/applications/{application-id}/share/{shared-organization-id}:
     delete:
+      deprecated: true
       description: |
         This API provides the capability to stop sharing an application to an organization by providing its ID.
       summary: |

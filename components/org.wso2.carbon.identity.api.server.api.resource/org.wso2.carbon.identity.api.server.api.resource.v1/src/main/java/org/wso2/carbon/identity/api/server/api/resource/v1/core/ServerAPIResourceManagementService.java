@@ -381,7 +381,7 @@ public class ServerAPIResourceManagementService {
                         .collect(Collectors.toList()))
                 .requiresAuthorization(apiResource.isAuthorizationRequired())
                 .properties(apiResource.getProperties().stream().map(this::buildAPIResourceProperty)
-                           .collect(Collectors.toList()));
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -537,7 +537,7 @@ public class ServerAPIResourceManagementService {
     private void handleSystemAPI(APIResource apiResource) {
 
         if (apiResource.getType() != null &&
-                apiResource.getType().startsWith(APIResourceMgtEndpointConstants.SYSTEM_API_RESOURCE_TYPE)) {
+                !apiResource.getType().startsWith(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE)) {
             throw APIResourceMgtEndpointUtil.handleException(Response.Status.FORBIDDEN,
                     ErrorMessage.ERROR_CODE_SYSTEM_API_RESOURCE_NOT_MODIFIABLE);
         }

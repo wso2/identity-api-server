@@ -50,13 +50,11 @@ import org.wso2.carbon.identity.application.common.model.AuthorizedAPI;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.Scope;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
-import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.governance.bean.ConnectorConfig;
-import org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,7 +62,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -319,7 +316,6 @@ public class SelfServiceMgtService {
             // Share the self-service app with all the child organizations.
             ServiceProvider serviceProvider = getApplicationManagementService()
                     .getServiceProvider(sSApplicationBasicInfo.getApplicationId());
-            shareWithOrganizations(serviceProvider);
             getApplicationManagementService().updateApplication(serviceProvider, tenantDomain, userName);
 
         } catch (IOException | IdentityApplicationManagementException e) {
@@ -494,11 +490,15 @@ public class SelfServiceMgtService {
 
         // Authorize Scim Organization User API.
         authorizedAPIMap.put("/o/scim2/Users",
-                new ArrayList<>(Collections.singletonList("internal_org_user_mgt_create")));
+                new ArrayList<>(Arrays.asList("internal_org_user_mgt_create", "internal_org_user_mgt_list")));
 
         // Authorize Scim Organization Roles API.
         authorizedAPIMap.put("/o/scim2/Roles",
                 new ArrayList<>(Arrays.asList("internal_org_role_mgt_view", "internal_org_role_mgt_update")));
+
+        // Authorize organization application Management
+        authorizedAPIMap.put("/o/api/server/v1/applications",
+                new ArrayList<>(Arrays.asList("internal_org_application_mgt_view")));
 
         return authorizedAPIMap;
     }
@@ -538,19 +538,6 @@ public class SelfServiceMgtService {
         } catch (APIResourceMgtException | IdentityApplicationManagementException e) {
             LOG.error("Error while authorizing APIs to the Organization Self Service application.", e);
         }
-    }
-
-    private void shareWithOrganizations(ServiceProvider serviceProvider) {
-
-        ServiceProviderProperty[] spProperties = serviceProvider.getSpProperties();
-        ServiceProviderProperty[] newSpProperties = new ServiceProviderProperty[spProperties.length + 1];
-        System.arraycopy(spProperties, 0, newSpProperties, 0, spProperties.length);
-
-        ServiceProviderProperty shareWithAllChildrenProperty = new ServiceProviderProperty();
-        shareWithAllChildrenProperty.setName(OrganizationManagementConstants.SHARE_WITH_ALL_CHILDREN);
-        shareWithAllChildrenProperty.setValue(Boolean.TRUE.toString());
-        newSpProperties[spProperties.length] = shareWithAllChildrenProperty;
-        serviceProvider.setSpProperties(newSpProperties);
     }
 
     public static boolean isLegacyAuthzRuntime() {

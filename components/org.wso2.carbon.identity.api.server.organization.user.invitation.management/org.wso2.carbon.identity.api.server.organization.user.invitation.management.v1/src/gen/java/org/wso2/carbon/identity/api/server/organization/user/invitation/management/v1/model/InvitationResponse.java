@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.GroupAssignmentResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.RoleAssignmentResponse;
 import javax.validation.constraints.*;
 
@@ -39,6 +40,8 @@ public class InvitationResponse  {
     private String username;
     private String email;
     private List<RoleAssignmentResponse> roles = null;
+
+    private List<GroupAssignmentResponse> groups = null;
 
     private String status;
     private String expiredAt;
@@ -131,6 +134,32 @@ public class InvitationResponse  {
 
         /**
     **/
+    public InvitationResponse groups(List<GroupAssignmentResponse> groups) {
+
+        this.groups = groups;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("groups")
+    @Valid
+    public List<GroupAssignmentResponse> getGroups() {
+        return groups;
+    }
+    public void setGroups(List<GroupAssignmentResponse> groups) {
+        this.groups = groups;
+    }
+
+    public InvitationResponse addGroupsItem(GroupAssignmentResponse groupsItem) {
+        if (this.groups == null) {
+            this.groups = new ArrayList<>();
+        }
+        this.groups.add(groupsItem);
+        return this;
+    }
+
+        /**
+    **/
     public InvitationResponse status(String status) {
 
         this.status = status;
@@ -183,13 +212,14 @@ public class InvitationResponse  {
             Objects.equals(this.username, invitationResponse.username) &&
             Objects.equals(this.email, invitationResponse.email) &&
             Objects.equals(this.roles, invitationResponse.roles) &&
+            Objects.equals(this.groups, invitationResponse.groups) &&
             Objects.equals(this.status, invitationResponse.status) &&
             Objects.equals(this.expiredAt, invitationResponse.expiredAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, email, roles, status, expiredAt);
+        return Objects.hash(id, username, email, roles, groups, status, expiredAt);
     }
 
     @Override
@@ -202,6 +232,7 @@ public class InvitationResponse  {
         sb.append("    username: ").append(toIndentedString(username)).append("\n");
         sb.append("    email: ").append(toIndentedString(email)).append("\n");
         sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
+        sb.append("    groups: ").append(toIndentedString(groups)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    expiredAt: ").append(toIndentedString(expiredAt)).append("\n");
         sb.append("}");
