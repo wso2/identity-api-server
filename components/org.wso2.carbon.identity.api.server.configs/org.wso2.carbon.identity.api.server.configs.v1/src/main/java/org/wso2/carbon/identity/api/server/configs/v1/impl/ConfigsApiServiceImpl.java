@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.configs.v1.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
@@ -28,6 +29,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch
 import org.wso2.carbon.identity.api.server.configs.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem;
+import org.wso2.carbon.identity.api.server.configs.v1.model.RemoteLoggingConfigListItem.LogTypeEnum;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ScimConfig;
 import org.wso2.carbon.logging.service.data.RemoteServerLoggerData;
 
@@ -216,9 +218,19 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
         remoteLoggingConfigListItem.setKeystorePassword(remoteServerLoggerData.getKeystorePassword());
         remoteLoggingConfigListItem.setTruststoreLocation(remoteServerLoggerData.getTruststoreLocation());
         remoteLoggingConfigListItem.setTruststorePassword(remoteServerLoggerData.getTruststorePassword());
-        remoteLoggingConfigListItem.setLogType(
-                RemoteLoggingConfigListItem.LogTypeEnum.valueOf(remoteServerLoggerData.getLogType()));
+        remoteLoggingConfigListItem.setLogType(getLogType(remoteServerLoggerData));
         return remoteLoggingConfigListItem;
+    }
+
+    private RemoteLoggingConfigListItem.LogTypeEnum getLogType(RemoteServerLoggerData remoteServerLoggerData) {
+
+        switch (remoteServerLoggerData.getLogType()) {
+            case Constants.AUDIT:
+                return LogTypeEnum.AUDIT;
+            case Constants.CARBON:
+                return LogTypeEnum.CARBON;
+        }
+        return null;
     }
 
     private RemoteLoggingConfig createRemoteLoggingConfig(
