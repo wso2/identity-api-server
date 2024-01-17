@@ -48,8 +48,8 @@ public class Constants {
     public static final String CORS_CONFIG_SUPPORTS_CREDENTIALS_PATH_REGEX = "^/supportsCredentials$";
     public static final String CORS_CONFIG_MAX_AGE_PATH_REGEX = "^/maxAge$";
 
-    public static final String AUDIT = "AUDIT";
-    public static final String CARBON = "CARBON";
+    public static final String AUDIT = "audit";
+    public static final String CARBON = "carbon";
 
     /**
      * PATCH operation path for Private Key JWT Validation configuration.
@@ -137,7 +137,7 @@ public class Constants {
 
         ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG("60507",
                 "Invalid log type provided remote logging config service",
-                "Remote logging configuration service only supports AUDIT or CARBON."),
+                "Remote logging configuration service only supports audit or carbon."),
         ERROR_CODE_REMOTE_LOGGING_CONFIG_NOT_FOUND("60508",
                 "Resource not found.",
                 "Unable to find a resource matching the provided log type %s."),
