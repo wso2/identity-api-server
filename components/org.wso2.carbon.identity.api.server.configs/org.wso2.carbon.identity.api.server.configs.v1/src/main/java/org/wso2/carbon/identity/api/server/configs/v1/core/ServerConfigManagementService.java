@@ -92,6 +92,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -482,6 +483,7 @@ public class ServerConfigManagementService {
 
         RemoteServerLoggerData remoteServerLoggerData = new RemoteServerLoggerData();
 
+        logType = logType.toUpperCase(Locale.ENGLISH);
         validateLogType(logType);
         remoteServerLoggerData.setLogType(logType);
 
@@ -565,6 +567,7 @@ public class ServerConfigManagementService {
         validateTenantDomain(tenantDomain, "Resetting remote server configuration service is not available for %s");
 
         RemoteServerLoggerData remoteServerLoggerData = getRemoteServerLoggerData(remoteLoggingConfig);
+        logType = logType.toUpperCase(Locale.ENGLISH);
         validateLogType(logType);
         remoteServerLoggerData.setLogType(logType);
 
@@ -1178,7 +1181,8 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         validateTenantDomain(tenantDomain, "Getting remote server configuration service is not available for %s");
         try {
-            return ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService().getRemoteServerConfig(logType);
+            return ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService().getRemoteServerConfig(
+                    logType.toUpperCase(Locale.ENGLISH));
         } catch (ConfigurationException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS, null);
