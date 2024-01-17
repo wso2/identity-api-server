@@ -57,7 +57,15 @@ public class ApiModelToServiceProvider implements Function<ApplicationModel, Ser
         addProvisioningConfiguration(application, applicationModel.getProvisioningConfigurations());
         addInboundAuthenticationProtocolsToApplication(application, applicationModel.getInboundProtocolConfiguration());
         addAssociatedRolesConfigurations(application, applicationModel.getAssociatedRoles());
+        addLogoutReturnUrl(application, applicationModel.getLogoutReturnUrl());
         return application;
+    }
+
+    private void addLogoutReturnUrl(ServiceProvider application, String logoutReturnUrl) {
+
+        if (logoutReturnUrl != null) {
+            new UpdateLogoutReturnUrl().apply(application, logoutReturnUrl);
+        }
     }
 
     private void addAssociatedRolesConfigurations(ServiceProvider application, AssociatedRolesConfig associatedRoles) {
