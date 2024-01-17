@@ -466,8 +466,8 @@ public class ServerConfigManagementService {
      */
     public void resetRemoteServerConfig() {
 
-        resetRemoteServerConfig(Constants.AUDIT_LOWER_CASE);
-        resetRemoteServerConfig(Constants.CARBON_LOWER_CASE);
+        resetRemoteServerConfig(Constants.AUDIT);
+        resetRemoteServerConfig(Constants.CARBON);
     }
 
     /**
@@ -483,7 +483,7 @@ public class ServerConfigManagementService {
         RemoteServerLoggerData remoteServerLoggerData = new RemoteServerLoggerData();
 
         validateLogType(logType);
-        remoteServerLoggerData.setLogType(resolveLogType(logType));
+        remoteServerLoggerData.setLogType(logType);
 
         try {
             ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService()
@@ -509,22 +509,10 @@ public class ServerConfigManagementService {
 
     private void validateLogType(String logType) {
 
-        if (!Constants.AUDIT_LOWER_CASE.equals(logType) && !Constants.CARBON_LOWER_CASE.equals(logType)) {
+        if (!Constants.AUDIT.equals(logType) && !Constants.CARBON.equals(logType)) {
             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                     .ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG, null);
         }
-    }
-
-    private String resolveLogType(String logType) {
-
-        switch (logType) {
-            case Constants.AUDIT_LOWER_CASE:
-                return Constants.AUDIT;
-            case Constants.CARBON_LOWER_CASE:
-                return Constants.CARBON;
-        }
-        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                .ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG, null);
     }
 
     /**
@@ -578,7 +566,7 @@ public class ServerConfigManagementService {
 
         RemoteServerLoggerData remoteServerLoggerData = getRemoteServerLoggerData(remoteLoggingConfig);
         validateLogType(logType);
-        remoteServerLoggerData.setLogType(resolveLogType(logType));
+        remoteServerLoggerData.setLogType(logType);
 
         try {
             ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService()
@@ -1190,8 +1178,7 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         validateTenantDomain(tenantDomain, "Getting remote server configuration service is not available for %s");
         try {
-            return ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService()
-                    .getRemoteServerConfig(resolveLogType(logType));
+            return ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService().getRemoteServerConfig(logType);
         } catch (ConfigurationException e) {
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     Constants.ErrorMessage.ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS, null);

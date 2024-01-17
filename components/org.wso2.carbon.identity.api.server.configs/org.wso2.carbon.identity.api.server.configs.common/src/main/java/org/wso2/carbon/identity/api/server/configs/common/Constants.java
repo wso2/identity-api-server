@@ -50,8 +50,6 @@ public class Constants {
 
     public static final String AUDIT = "AUDIT";
     public static final String CARBON = "CARBON";
-    public static final String AUDIT_LOWER_CASE = "audit";
-    public static final String CARBON_LOWER_CASE = "carbon";
 
     /**
      * PATCH operation path for Private Key JWT Validation configuration.
@@ -139,7 +137,7 @@ public class Constants {
 
         ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG("60507",
                 "Invalid log type provided remote logging config service",
-                "Remote logging configuration service only supports audit or carbon."),
+                "Remote logging configuration service only supports AUDIT or CARBON."),
         ERROR_CODE_REMOTE_LOGGING_CONFIG_NOT_FOUND("60508",
                 "Resource not found.",
                 "Unable to find a resource matching the provided log type %s."),
