@@ -49,8 +49,7 @@ public class DCRMgtOGSiServiceFactory {
             try {
                 // Call class for name to check the class is available in the run time.
                 // This method will call only once at the first api call.
-                Class.forName("org.wso2.carbon.identity.oauth2.token.handler." +
-                        "clientauth.jwt.core.DCRMgtService");
+                Class.forName("org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService");
                 DCRConfigurationMgtService taskOperationService
                         = (DCRConfigurationMgtService) PrivilegedCarbonContext.
                         getThreadLocalCarbonContext().getOSGiService

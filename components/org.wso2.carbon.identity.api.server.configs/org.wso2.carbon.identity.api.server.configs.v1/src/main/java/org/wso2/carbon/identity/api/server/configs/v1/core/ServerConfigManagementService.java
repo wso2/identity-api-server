@@ -1078,7 +1078,7 @@ public class ServerConfigManagementService {
 
         } catch (Exception e) {
             if (ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message().equals(e.getMessage())) {
-                throw handleNotFoundError();
+                throw handleNotFoundError(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND);
             } else {
                 throw JWTConnectorUtil.handlePrivateKeyJWTValidationException(e,
                         Constants.ErrorMessage.ERROR_CODE_PRIVATE_KEY_JWT_VALIDATOR_CONFIG_RETRIEVE,
@@ -1109,7 +1109,7 @@ public class ServerConfigManagementService {
             }
         } catch (Exception e) {
             if (e.getMessage().equals(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message())) {
-                throw handleNotFoundError();
+                throw handleNotFoundError(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND);
             } else {
                 throw JWTConnectorUtil.handlePrivateKeyJWTValidationException(e,
                         Constants.ErrorMessage.ERROR_CODE_CORS_CONFIG_RETRIEVE, null);
@@ -1177,7 +1177,7 @@ public class ServerConfigManagementService {
 
         } catch (Exception e) {
             if (ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message().equals(e.getMessage())) {
-                throw handleNotFoundError();
+                throw handleNotFoundError(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND);
             } else {
                 throw DCRConnectorUtil.handleDCRConfigException(e,
                         Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_RETRIEVE,
@@ -1203,15 +1203,15 @@ public class ServerConfigManagementService {
             if (DCRMgtOGSiServiceFactory.getInstance() != null) {
                 dcrConfig = DCRConnectorUtil.getDCRConfig(tenantDomain);
             } else {
-                throw new JWTClientAuthenticatorException(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message(),
-                        ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.code());
+                throw new JWTClientAuthenticatorException(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message(),
+                        ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.code());
             }
         } catch (Exception e) {
-            if (e.getMessage().equals(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message())) {
-                throw handleNotFoundError();
+            if (e.getMessage().equals(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message())) {
+                throw handleNotFoundError(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND);
             } else {
-                throw JWTConnectorUtil.handlePrivateKeyJWTValidationException(e,
-                        Constants.ErrorMessage.ERROR_CODE_CORS_CONFIG_RETRIEVE, null);
+                throw DCRConnectorUtil.handleDCRConfigException(e,
+                        Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_RETRIEVE, null);
             }
         }
 
@@ -1220,7 +1220,7 @@ public class ServerConfigManagementService {
                 String path = dcrPatch.getPath();
                 DCRPatch.OperationEnum operation = dcrPatch.getOperation();
 
-                // We support only 'REPLACE' and 'ADD' patch operations.
+                // We support only 'REPLACE' patch operation.
                 if (operation == DCRPatch.OperationEnum.REPLACE) {
                     if (path.matches(Constants.DCR_CONFIG_ENABLE_FAPI_ENFORCEMENT)) {
                         String value = dcrPatch.getValue();
@@ -1274,10 +1274,7 @@ public class ServerConfigManagementService {
      *
      * @return APIError with exception code, message and description.
      */
-    private APIError handleNotFoundError() {
-
-        Constants.ErrorMessage errorEnum = ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND;
-
+    private APIError handleNotFoundError(Constants.ErrorMessage errorEnum) {
 
         ErrorResponse errorResponse = new ErrorResponse.Builder()
                 .withCode(errorEnum.code())
