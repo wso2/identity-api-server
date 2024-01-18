@@ -483,9 +483,9 @@ public class ServerConfigManagementService {
 
         RemoteServerLoggerData remoteServerLoggerData = new RemoteServerLoggerData();
 
-        logType = logType.toUpperCase(Locale.ENGLISH);
         validateLogType(logType);
-        remoteServerLoggerData.setLogType(logType);
+        // Backend logic supports logType in Uppercase.
+        remoteServerLoggerData.setLogType(logType.toUpperCase(Locale.ENGLISH));
 
         try {
             ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService()
@@ -567,9 +567,9 @@ public class ServerConfigManagementService {
         validateTenantDomain(tenantDomain, "Resetting remote server configuration service is not available for %s");
 
         RemoteServerLoggerData remoteServerLoggerData = getRemoteServerLoggerData(remoteLoggingConfig);
-        logType = logType.toUpperCase(Locale.ENGLISH);
         validateLogType(logType);
-        remoteServerLoggerData.setLogType(logType);
+        // Backend logic supports logType in Uppercase.
+        remoteServerLoggerData.setLogType(logType.toUpperCase(Locale.ENGLISH));
 
         try {
             ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService()
@@ -1180,7 +1180,9 @@ public class ServerConfigManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         validateTenantDomain(tenantDomain, "Getting remote server configuration service is not available for %s");
+        validateLogType(logType);
         try {
+            // Backend logic supports logType in Uppercase.
             return ConfigsServiceHolder.getInstance().getRemoteLoggingConfigService().getRemoteServerConfig(
                     logType.toUpperCase(Locale.ENGLISH));
         } catch (ConfigurationException e) {
