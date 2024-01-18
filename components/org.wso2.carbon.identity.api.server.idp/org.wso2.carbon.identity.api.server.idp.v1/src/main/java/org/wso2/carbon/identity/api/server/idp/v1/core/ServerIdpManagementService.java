@@ -2521,34 +2521,34 @@ public class ServerIdpManagementService {
         JustInTimeProvisioningConfig jitProvisionConfig = idp.getJustInTimeProvisioningConfig();
         if (jitProvisionConfig != null) {
             jitConfig.setIsEnabled(jitProvisionConfig.isProvisioningEnabled());
-
-            boolean modifyUsername = jitProvisionConfig.isModifyUserNameAllowed();
-            boolean passwordProvision = jitProvisionConfig.isPasswordProvisioningEnabled();
-            boolean promptConsent = jitProvisionConfig.isPromptConsent();
-            if (modifyUsername && passwordProvision && promptConsent) {
-                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_USERNAME_PASSWORD_CONSENT);
-            } else if (passwordProvision && promptConsent) {
-                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_PASSWORD_CONSENT);
-            } else if (promptConsent) {
-                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_CONSENT);
-            } else {
-                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROVISION_SILENTLY);
-            }
-            if (jitProvisionConfig.getProvisioningUserStore() == null) {
-                jitConfig.setUserstore(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME);
-            } else {
-                jitConfig.setUserstore(jitProvisionConfig.getProvisioningUserStore());
-            }
+            JustInTimeProvisioning.SchemeEnum provisioningType = getProvisioningType(jitProvisionConfig);
+            jitConfig.setScheme(provisioningType);
+            String provisioningUserStore = StringUtils.isNotBlank(jitProvisionConfig.getProvisioningUserStore()) ?
+                    jitProvisionConfig.getProvisioningUserStore() : UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME;
+            jitConfig.setUserstore(provisioningUserStore);
             jitConfig.setAssociateLocalUser(jitProvisionConfig.isAssociateLocalUserEnabled());
-            if (jitProvisionConfig.getAttributeSyncMethod() == null) {
-                jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(
-                        FrameworkConstants.OVERRIDE_ALL));
-            } else {
-                jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(
-                        jitProvisionConfig.getAttributeSyncMethod()));
-            }
+            String attributeSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getAttributeSyncMethod()) ?
+                    jitProvisionConfig.getAttributeSyncMethod() : FrameworkConstants.OVERRIDE_ALL;
+            jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum
+                    .valueOf(attributeSyncMethod));
         }
         return jitConfig;
+    }
+
+    private JustInTimeProvisioning.SchemeEnum getProvisioningType(JustInTimeProvisioningConfig jitProvisionConfig) {
+
+        boolean modifyUsername = jitProvisionConfig.isModifyUserNameAllowed();
+        boolean passwordProvision = jitProvisionConfig.isPasswordProvisioningEnabled();
+        boolean promptConsent = jitProvisionConfig.isPromptConsent();
+
+        if (modifyUsername && passwordProvision && promptConsent) {
+            return JustInTimeProvisioning.SchemeEnum.PROMPT_USERNAME_PASSWORD_CONSENT;
+        } else if (passwordProvision && promptConsent) {
+            return JustInTimeProvisioning.SchemeEnum.PROMPT_PASSWORD_CONSENT;
+        } else if (promptConsent) {
+            return JustInTimeProvisioning.SchemeEnum.PROMPT_CONSENT;
+        }
+        return JustInTimeProvisioning.SchemeEnum.PROVISION_SILENTLY;
     }
 
     private Function<SubProperty, MetaProperty> subPropertyToExternalMeta = property -> {
