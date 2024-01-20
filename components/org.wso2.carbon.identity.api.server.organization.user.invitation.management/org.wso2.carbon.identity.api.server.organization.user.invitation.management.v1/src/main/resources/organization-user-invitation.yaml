@@ -1,22 +1,24 @@
 openapi: 3.0.0
 info:
   version: 1.0.0
-  title: 'Private CIAM Cloud - Parent User Invitation API Definition'
+  title: 'Parent Organization User Invitation API Definition'
   description: |-
-    This is the RESTful API for parent organization user invitation for child organizations in CIAM Cloud. This API 
+    This is the RESTful API for parent organization user invitation for child organizations. This API 
     allows administrators to invite users, manage the invitations and invitees are allowed to accept the invitation.
   contact:
     name: WSO2
-    url: 'https://wso2.com/ciam-suite/private-ciam-cloud/b2b-ciam'
+    url: 'http://wso2.com/products/identity-server/'
     email: iam-dev@wso2.org
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
-  - url: 'https://localhost:9443/o/{organization-domain}/api/server/v1'
+  - url: 'https://{server-url}/t/{tenant-domain}/o/api/server/v1'
     variables:
-      organization-domain:
-        default: 10084a8d-113f-4211-a0d5-efe36b082211
+      tenant-domain:
+        default: "carbon.super"
+      server-url:
+        default: "localhost:9443"
 paths:
   /guests/invite:
     post:
@@ -27,8 +29,7 @@ paths:
         Initiates an invitation to a user in the parent organization to onboard to the child organization.
         This will be initiated from the child organization.
         
-        <b>Scope required:</b> <br/> 
-        - internal_guest_mgt_invite_add
+        <b>Scope(Permission) required:</b> `internal_org_guest_mgt_invite_add`
       operationId: invitationTriggerPost
       requestBody:
         $ref: '#/components/requestBodies/InvitationRequestPayload'
@@ -62,8 +63,7 @@ paths:
         was logged into the application and switched to the organization where 
         the user resides in.
 
-        <b>Scope required:</b> <br/> 
-        - none
+        <b>Scope(Permission) required:</b> `internal_org_guest_mgt_invite_list`
       operationId: invitationIntrospectPost
       requestBody:
         $ref: '#/components/requestBodies/IntrospectRequestPayload'
@@ -108,14 +108,13 @@ paths:
         This API is a public API and this should be invoked with the confirmation code which is 
         appended to the notification.
         
-        <b>Scope required:</b> <br/> 
-        - none
+        <b>Scope(Permission) required:</b> None
       operationId: invitationAcceptPost
       requestBody:
         $ref: '#/components/requestBodies/AcceptanceRequestPayload'
       responses:
-        '200':
-          description: Successful Response
+        '204':
+          description: No Content
         '400':
           description: Bad Request
           content:
@@ -137,8 +136,7 @@ paths:
         List down the invitations triggered from the current organization. This should be invoked
         from an access token issued from an administrator of that organization.
         
-        <b>Scope required:</b> <br/> 
-        - internal_guest_mgt_invite_list
+        <b>Scope(Permission) required:</b> `internal_org_guest_mgt_invite_list`
       operationId: invitationListGet
       parameters:
         - $ref: '#/components/parameters/FilterQueryParam'
@@ -180,8 +178,7 @@ paths:
         Based on the requirements the invitations which are initiated by the same organization
         can be deleted. This should be invoked from an access token issued from an administrator of that organization.
         
-        <b>Scope required:</b> <br/> 
-        - internal_guest_mgt_invite_delete
+        <b>Scope(Permission) required:</b> `internal_org_guest_mgt_invite_delete`
       operationId: invitationDelete
       parameters:
         - name: invitationId
@@ -303,27 +300,51 @@ components:
           description: List of usernames of the users who will be invited to the organization. This can be an email or an alphanumeric username.
           items:
             type: string
-            example: xyz@gmail.com, abc@gmail.com
+          example:
+            - xyz@gmail.com
+            - abc@gmail.com
         userDomain:
           type: string
-          description: User store domain of the user. If not provided, PRIMARY will be used.
+          description: User store domain of the user. If not provided, default userstore will be used.
           example: PRIMARY
         roles:
           type: array
           description: Role assignments which the user will be assigned to.
           items:
             type: string
-            example: f5b761ca-62f2-48ba-935b-f7b460f58e5c, 657fg-62f2-48ba-935b-f7bfgh6438
+          example:
+            - f5b761ca-62f2-48ba-935b-f7b460f58e5c
+            - 657fgq22-62f2-48ba-935b-f7bfgh6438fd
         groups:
           type: array
           description: Group assignments which the user will be assigned to.
           items:
             type: string
-            example: 48badf-rty20-48ba-935b-f7b460f58e5c, fd234100-c115-45dc-ad11-70846b783866
+          example:
+            - 48badf-rty20-48ba-935b-f7b460f58e5c
+            - fd234100-c115-45dc-ad11-70846b783866
     InvitationSuccessListResponse:
       type: array
       items:
         $ref: '#/components/schemas/InvitationSuccessResponse'
+      example:
+        [
+          {
+            "username": "xyz@gmail.com",
+            "result": {
+              "status": "Failed",
+              "errorCode": "OUI-10018",
+              "errorMessage": "Invitation already exists.",
+              "errorDescription": "An active invitation already exists for the user."
+            }
+          },
+          {
+            "username": "abc@gmail.com",
+            "result": {
+              "status": "Successful"
+            }
+          }
+        ]
     InvitationSuccessResponse:
       type: object
       required:
@@ -351,6 +372,7 @@ components:
             errorDescription:
               type: string
               example: Some Error Description
+
     IntrospectRequestBody:
       type: object
       required:
@@ -389,6 +411,14 @@ components:
           type: string
           description: Status of the invitation.
           example: PENDING/EXPIRED
+      example:
+        {
+          "confirmationCode": "bc1cd944-2af0-4f63-8609-469fdec4eefd",
+          "username": "abc@gmail.com",
+          "userOrganization": "10084a8d-113f-4211-a0d5-efe36b082211",
+          "initiatedOrganization": "c7af5764-ceb9-4f64-8848-f04520df99ef",
+          "status": "PENDING"
+        }
     AcceptanceRequestBody:
       type: object
       required:
@@ -404,6 +434,93 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InvitationResponse'
+      example:
+        {
+          "invitations": [
+            {
+              "id": "4ec7e4d6-7979-4b0f-b7e1-e5737b1006b6",
+              "username": "john",
+              "email": "john@gmail.com",
+              "roles": [
+                {
+                  "displayName": "Administrator",
+                  "id": "78b97c7a-faf1-441f-8c93-c22e5daf39f0",
+                  "audience": [
+                    {
+                      "value": "85504311-3a66-4a2f-bda1-eb37592a3d7c",
+                      "display": "Console",
+                      "type": "application"
+                    }
+                  ]
+                },
+                {
+                  "displayName": "Administartor",
+                  "id": "aa82a741-1bf9-4855-b676-d590381f2453",
+                  "audience": [
+                    {
+                      "value": "43f8a68b-1a39-40a6-a4cd-25e9581c95a0",
+                      "display": "Pet Care App",
+                      "type": "application"
+                    }
+                  ]
+                }
+              ],
+              "groups": [
+                {
+                  "displayName": "group2",
+                  "id": "47cb13fa-3c15-4dc4-8f7a-1b5bf63d451b"
+                },
+                {
+                  "displayName": "group1",
+                  "id": "69c833c5-ee01-4ad1-95ab-3e01a58efc73"
+                }
+              ],
+              "status": "PENDING",
+              "expiredAt": "2024-01-22 13:09:41.702"
+            },
+            {
+              "id": "78652ff3-b9ab-4252-b73e-f7a1545fd50a",
+              "username": "abc",
+              "email": "abc@gmail.com",
+              "roles": [
+                {
+                  "displayName": "Administrator",
+                  "id": "78b97c7a-faf1-441f-8c93-c22e5daf39f0",
+                  "audience": [
+                    {
+                      "value": "85504311-3a66-4a2f-bda1-eb37592a3d7c",
+                      "display": "Console",
+                      "type": "application"
+                    }
+                  ]
+                },
+                {
+                  "displayName": "Administartor",
+                  "id": "aa82a741-1bf9-4855-b676-d590381f2453",
+                  "audience": [
+                    {
+                      "value": "43f8a68b-1a39-40a6-a4cd-25e9581c95a0",
+                      "display": "Pet Care App",
+                      "type": "application"
+                    }
+                  ]
+                }
+              ],
+              "groups": [
+                {
+                  "displayName": "group2",
+                  "id": "47cb13fa-3c15-4dc4-8f7a-1b5bf63d451b"
+                },
+                {
+                  "displayName": "group1",
+                  "id": "69c833c5-ee01-4ad1-95ab-3e01a58efc73"
+                }
+              ],
+              "status": "PENDING",
+              "expiredAt": "2024-01-23 12:48:41.064"
+            }
+          ]
+        }
     InvitationResponse:
       type: object
       required:
