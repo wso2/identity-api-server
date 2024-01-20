@@ -2124,12 +2124,11 @@ public class ServerIdpManagementService {
             jwksProperty.setValue(idpJWKSUri);
             idpProperties.add(jwksProperty);
         }
-        if (StringUtils.isNotEmpty(identityProviderPOSTRequest.getIdpIssuerName())) {
-            IdentityProviderProperty idpIssuerProperty = new IdentityProviderProperty();
-            idpIssuerProperty.setName(Constants.IDP_ISSUER_NAME);
-            idpIssuerProperty.setValue(identityProviderPOSTRequest.getIdpIssuerName());
-            idpProperties.add(idpIssuerProperty);
-        }
+        // IDP issuer name can be empty. Hence, no need to check for blank value.
+        IdentityProviderProperty idpIssuerProperty = new IdentityProviderProperty();
+        idpIssuerProperty.setName(Constants.IDP_ISSUER_NAME);
+        idpIssuerProperty.setValue(identityProviderPOSTRequest.getIdpIssuerName());
+        idpProperties.add(idpIssuerProperty);
         idp.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
         return idp;
     }
