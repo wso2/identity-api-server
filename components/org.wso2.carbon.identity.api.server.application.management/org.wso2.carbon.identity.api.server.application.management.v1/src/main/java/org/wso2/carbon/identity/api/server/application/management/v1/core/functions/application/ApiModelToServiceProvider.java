@@ -63,9 +63,7 @@ public class ApiModelToServiceProvider implements Function<ApplicationModel, Ser
 
     private void addLogoutReturnUrl(ServiceProvider application, String logoutReturnUrl) {
 
-        if (logoutReturnUrl != null) {
-            new UpdateLogoutReturnUrl().apply(application, logoutReturnUrl);
-        }
+        new UpdateLogoutReturnUrl().apply(application, logoutReturnUrl);
     }
 
     private void addAssociatedRolesConfigurations(ServiceProvider application, AssociatedRolesConfig associatedRoles) {

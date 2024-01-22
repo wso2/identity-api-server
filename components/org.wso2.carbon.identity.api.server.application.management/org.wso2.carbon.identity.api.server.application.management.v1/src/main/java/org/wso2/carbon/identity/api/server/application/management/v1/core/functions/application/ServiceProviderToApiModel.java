@@ -121,7 +121,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .description(application.getDescription())
                     .imageUrl(application.getImageUrl())
                     .accessUrl(application.getAccessUrl())
-                    .logoutReturnUrl(loadLogoutReturnUrl(application))
+                    .logoutReturnUrl(getLogoutReturnUrl(application))
                     .clientId(getInboundKey(application, "oauth2"))
                     .issuer(getInboundKey(application, "samlsso"))
                     .realm(getInboundKey(application, "passivests"))
@@ -137,14 +137,14 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         }
     }
 
-    private String loadLogoutReturnUrl(ServiceProvider application) {
+    private String getLogoutReturnUrl(ServiceProvider application) {
 
         for (ServiceProviderProperty property : application.getSpProperties()) {
             if (ApplicationManagementConstants.PROP_LOGOUT_RETURN_URL.equals(property.getName())) {
                 return property.getValue();
             }
         }
-        return null;
+        return null; // null value returned to avoid API response returning an empty string.
     }
 
     private AssociatedRolesConfig buildAssociatedRoles(ServiceProvider application) {
