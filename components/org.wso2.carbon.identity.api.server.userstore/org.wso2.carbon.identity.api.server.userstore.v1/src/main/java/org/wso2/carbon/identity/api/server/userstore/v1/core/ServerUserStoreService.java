@@ -97,6 +97,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -122,6 +123,10 @@ public class ServerUserStoreService {
     private static final Log LOG = LogFactory.getLog(ServerUserStoreService.class);
 
     private static final String DUMMY_MESSAGE_ID = "DUMMY-MESSAGE-ID";
+
+    private static final String EXPRESSION_LANGUAGE_REGEX = "^(\\$\\{|#\\{).+}$";
+
+    private static final String PASSWORD = "password";
 
     private static boolean isAvailableUserStoreTypes(List<AvailableUserStoreClassesRes> userStoreList, String typeID) {
 
@@ -582,8 +587,13 @@ public class ServerUserStoreService {
      */
     public UserStoreResponse patchUserStore(String domainId, List<PatchDocument> patchDocument) {
 
+        Pattern pattern = Pattern.compile(EXPRESSION_LANGUAGE_REGEX);
         List<PatchDocument> supportedPatchOperations = new ArrayList<>();
         for (PatchDocument patch : patchDocument) {
+            if (pattern.matcher(patch.getValue()).matches()) {
+                throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
+                        .ERROR_CODE_INVALID_INPUT);
+            }
             //Only the Replace operation supported with PATCH request
             PatchDocument.OperationEnum operation = patch.getOperation();
             if (operation == PatchDocument.OperationEnum.REPLACE) {
@@ -1234,6 +1244,7 @@ public class ServerUserStoreService {
      */
     private void validateMandatoryProperties(UserStoreReq userStoreReq) {
 
+        validateUserStoreProperty(userStoreReq);
         String userStoreType = getUserStoreType(base64URLDecodeId(userStoreReq.getTypeId()));
         if (StringUtils.isBlank(userStoreType)) {
             throw handleException(Response.Status.BAD_REQUEST,
@@ -1375,6 +1386,7 @@ public class ServerUserStoreService {
     private void validateUserstoreUpdateRequest(String domainID, UserStoreReq userStoreReq)
             throws IdentityUserStoreClientException {
 
+       validateUserStoreProperty(userStoreReq);
         if (StringUtils.isBlank(domainID)) {
             throw new IdentityUserStoreClientException(
                     UserStoreConstants.ErrorMessage.ERROR_CODE_EMPTY_DOMAIN_ID.getCode(),
@@ -1685,6 +1697,27 @@ public class ServerUserStoreService {
         } catch (JsonProcessingException e) {
             throw new UserStoreException(String.format("Error in reading JSON " +
                     "file configuration for the userstore: %s.", fileContent.getFileName()), e);
+        }
+    }
+
+    private void validateUserStoreProperty(UserStoreReq userStoreReq) {
+
+        Pattern pattern = Pattern.compile(EXPRESSION_LANGUAGE_REGEX);
+        if (userStoreReq != null) {
+            if ((StringUtils.isNotBlank(userStoreReq.getName()) && pattern.matcher(userStoreReq.getName()).matches()) ||
+                    (StringUtils.isNotBlank(userStoreReq.getDescription()) &&
+                            pattern.matcher(userStoreReq.getDescription()).matches())) {
+                throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
+                        .ERROR_CODE_INVALID_INPUT);
+            } else if (userStoreReq.getProperties() != null) {
+                for (org.wso2.carbon.identity.api.server.userstore.v1.model.Property property :
+                        userStoreReq.getProperties()) {
+                    if (!PASSWORD.equals(property.getName()) && pattern.matcher(property.getValue()).matches()) {
+                        throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT);
+                    }
+                }
+            }
         }
     }
 }
