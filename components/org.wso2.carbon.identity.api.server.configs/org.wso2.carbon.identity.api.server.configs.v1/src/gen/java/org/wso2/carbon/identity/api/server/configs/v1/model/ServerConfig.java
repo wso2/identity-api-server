@@ -45,6 +45,7 @@ public class ServerConfig  {
     private List<AuthenticatorListItem> authenticators = null;
 
     private CORSConfig cors;
+    private DCRConfig dcr;
 
     /**
     * The home realm identifier for the resident identity provider
@@ -189,6 +190,24 @@ public class ServerConfig  {
     }
     public void setCors(CORSConfig cors) {
         this.cors = cors;
+    }
+
+    /** DCR Configurations
+     **/
+    public ServerConfig dcrConfig(DCRConfig dcr) {
+
+        this.dcr = dcr;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("dcr")
+    @Valid
+    public DCRConfig getDcr() {
+        return dcr;
+    }
+    public void setDcr(DCRConfig dcr) {
+        this.dcr = dcr;
     }
 
 

@@ -228,6 +228,7 @@ public class ServerConfigManagementService {
         serverConfig.setProvisioning(buildProvisioningConfig());
         serverConfig.setAuthenticators(getAuthenticators(null));
         serverConfig.setCors(getCORSConfiguration());
+        serverConfig.setDcr(getDCRConfiguration());
         return serverConfig;
     }
 

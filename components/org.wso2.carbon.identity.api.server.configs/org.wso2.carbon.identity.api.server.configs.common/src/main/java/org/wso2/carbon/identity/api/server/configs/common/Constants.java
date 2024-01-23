@@ -118,11 +118,6 @@ public class Constants {
                                               "Unable to update Private Key JWT Validation configuration.",
                                               "Server encountered an error while updating the " +
                                                       "Private Key JWT Validation configuration."),
-
-//        TODO : check for the error codes
-        ERROR_CODE_DCR_CONFIG_UPDATE("65007",
-                "Unable to update DCR configuration.",
-                "Server encountered an error while updating the DCR configuration."),
         ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND("60505",
                 "Private Key JWT Authenticator is not supported.",
                 "Private Key JWT Authenticator service is unavailable at the moment."),
@@ -137,7 +132,7 @@ public class Constants {
                 "Unable to update remote logging  configs.",
                 "Server encountered an " +
                         "error while updating the remote logging configs."),
-        ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS("65008",
+        ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS("65017",
                 "Unable to get remote logging  configs.",
                 "Server encountered an " +
                         "error while getting the remote logging configs."),
@@ -161,10 +156,14 @@ public class Constants {
                 "DCR Management Service not found.",
                 "DCR Management Service is unavailable at the moment."),
 
-        ERROR_CODE_DCR_CONFIG_RETRIEVE("65017",
+        ERROR_CODE_DCR_CONFIG_RETRIEVE("65018",
                 "Unable to retrieve DCR configuration.",
                 "Server encountered an error while retrieving the " +
                         "DCR configuration."),
+
+        ERROR_CODE_DCR_CONFIG_UPDATE("65019",
+                "Unable to update DCR configuration.",
+                "Server encountered an error while updating the DCR configuration."),
 
         /**
          * Inbound auth config error messages.
