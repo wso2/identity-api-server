@@ -23,6 +23,7 @@ security:
 paths:
   /self-service/preferences:
     patch:
+      deprecated: true
       description:
         This API provides the capability to update properties related to self service for an organization<br>
         <b>Permission required:</b> <br>
@@ -54,6 +55,7 @@ paths:
       tags:
         - SelfService
     get:
+      deprecated: true
       description:
         This API provides the capability to retrieve properties related to self service <br>
         <b>Permission required:</b> <br>
