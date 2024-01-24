@@ -161,6 +161,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXT
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.ErrorMessage.ERROR_CODE_IDP_LIMIT_REACHED;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.GOOGLE_PRIVATE_KEY;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPLATE_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_CATEGORY;
@@ -2053,6 +2054,9 @@ public class ServerIdpManagementService {
         Property property = new Property();
         property.setName(apiProperty.getKey());
         property.setValue(apiProperty.getValue());
+        if (StringUtils.equals(GOOGLE_PRIVATE_KEY, apiProperty.getKey())) {
+            property.setType(IdentityApplicationConstants.ConfigElements.PROPERTY_TYPE_BLOB);
+        }
         return property;
     };
 

@@ -72,6 +72,7 @@ public class Constants {
     public static final String GROUPS = "groups";
     public static final String FEDERATED_AUTHENTICATORS = "federatedAuthenticators";
     public static final String PROVISIONING = "provisioning";
+    public static final String GOOGLE_PRIVATE_KEY = "google_prov_private_key";
 
     // IdP template property keys
     public static final String PROP_CATEGORY = "category";
