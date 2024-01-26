@@ -124,7 +124,7 @@ public class ServerUserStoreService {
 
     private static final String DUMMY_MESSAGE_ID = "DUMMY-MESSAGE-ID";
 
-    private static final String EXPRESSION_LANGUAGE_REGEX = "^(\\$\\{|#\\{).+}$";
+    private static final String EXPRESSION_LANGUAGE_REGEX = "^.*(\\$\\{|#\\{).+}.*$";
 
     private static final String PASSWORD = "password";
 
