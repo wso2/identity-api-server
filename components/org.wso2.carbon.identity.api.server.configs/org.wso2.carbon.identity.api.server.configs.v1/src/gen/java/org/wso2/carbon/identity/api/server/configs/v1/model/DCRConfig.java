@@ -42,9 +42,11 @@ public class DCRConfig  {
     @JsonProperty("clientAuthenticationRequired")
     @Valid
     public Boolean getClientAuthenticationRequired() {
+
         return clientAuthenticationRequired;
     }
     public void setClientAuthenticationRequired(Boolean clientAuthenticationRequired) {
+
         this.clientAuthenticationRequired = clientAuthenticationRequired;
     }
 
@@ -61,9 +63,11 @@ public class DCRConfig  {
     @JsonProperty("ssaJwks")
     @Valid
     public String getSsaJwks() {
+
         return ssaJwks;
     }
     public void setSsaJwks(String ssaJwks) {
+
         this.ssaJwks = ssaJwks;
     }
 
@@ -80,9 +84,11 @@ public class DCRConfig  {
     @JsonProperty("enableFapiEnforcement")
     @Valid
     public Boolean getEnableFapiEnforcement() {
+
         return enableFapiEnforcement;
     }
     public void setEnableFapiEnforcement(Boolean enableFapiEnforcement) {
+
         this.enableFapiEnforcement = enableFapiEnforcement;
     }
 
@@ -105,6 +111,7 @@ public class DCRConfig  {
 
     @Override
     public int hashCode() {
+
         return Objects.hash(clientAuthenticationRequired, ssaJwks, enableFapiEnforcement);
     }
 

@@ -1161,9 +1161,9 @@ public class ServerConfigManagementService {
     }
 
     /**
-     * Get the private key JWT validator configuration.
+     * Get the DCR Configuration.
      *
-     * @return JWTValidatorConfig  JWTValidatorConfig.
+     * @return DCRConfig  DCRConfig.
      */
     public DCRConfig getDCRConfiguration() {
 

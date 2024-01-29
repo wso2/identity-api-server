@@ -24,7 +24,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 
 /**
- * Since this factory produces JWTClientAuthenticatorMgtService connector service,  there is a possibility that said
+ * Since this factory produces DCRConfigurationMgtService connector service,  there is a possibility that said
  * connector not available in the distribution.
  * So rather than designing as Factory Beans this class designed as Singleton.
  */
@@ -38,13 +38,13 @@ public class DCRMgtOGSiServiceFactory {
      * This method return  the instance if the OSGi service exists.
      * Else throw Null pointer Exception. We handle the exception gracefully.
      *
-     * @return JWTClientAuthenticatorMgtService
+     * @return DCRConfigurationMgtService
      */
     public static DCRConfigurationMgtService getInstance() {
 
         if (dcrConfigurationMgtService == null) {
             /* Try catch statement is included due to a  NullPointerException which occurs at the server startup and
-            runtime when the DCRMgtService is not available in the product. */
+            runtime when the DCRConfigurationMgtService is not available in the product. */
 
             try {
                 // Call class for name to check the class is available in the run time.
@@ -59,14 +59,15 @@ public class DCRMgtOGSiServiceFactory {
                 }
 
             } catch (NullPointerException | ClassNotFoundException  e) {
-                /* Catch block without implementation so that the DCRMgtService will be set to null
+                /* Catch block without implementation so that the DCRConfigurationMgtService will be set to null
                    in-turn helps in validating the rest API requests. */
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to find the DCRMgtService. " +
-                            "DCRMgtService is not available in the server.");
+                    log.debug("Unable to find the DCRConfigurationMgtService. " +
+                            "DCRConfigurationMgtService is not available in the server.");
                 }
             }
         }
+
         return dcrConfigurationMgtService;
     }
 }
