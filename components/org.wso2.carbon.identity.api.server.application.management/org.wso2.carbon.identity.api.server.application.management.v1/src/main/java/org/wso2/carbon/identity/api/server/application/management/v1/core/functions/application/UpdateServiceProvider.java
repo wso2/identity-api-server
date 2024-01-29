@@ -48,6 +48,14 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
         patchAuthenticationSequence(applicationPatchModel.getAuthenticationSequence(), serviceProvider);
         patchAdvancedConfiguration(serviceProvider, applicationPatchModel.getAdvancedConfigurations());
         patchProvisioningConfiguration(applicationPatchModel.getProvisioningConfigurations(), serviceProvider);
+        patchLogoutReturnUrl(serviceProvider, applicationPatchModel.getLogoutReturnUrl());
+    }
+
+    private void patchLogoutReturnUrl(ServiceProvider application, String logoutReturnUrl) {
+
+        if (logoutReturnUrl != null) {
+            new UpdateLogoutReturnUrl().apply(application, logoutReturnUrl);
+        }
     }
 
     private void patchAssociatedRolesConfigurations(ServiceProvider serviceProvider,

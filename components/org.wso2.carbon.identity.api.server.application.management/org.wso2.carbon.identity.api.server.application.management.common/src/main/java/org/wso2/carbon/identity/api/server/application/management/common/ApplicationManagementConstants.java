@@ -70,6 +70,9 @@ public class ApplicationManagementConstants {
     public static final String FAPI_ALLOWED_CLIENT_AUTHENTICATION_METHODS = "OAuth.OpenIDConnect.FAPI." +
             "AllowedClientAuthenticationMethods.AllowedClientAuthenticationMethod";
     public static final String RSA1_5 = "RSA1_5";
+    public static final String PROP_LOGOUT_RETURN_URL = "logoutReturnUrl";
+    public static final String DEFAULT_LOGOUT_RETURN_URL_VALUE = ".*";
+    public static final String LOGOUT_RETURN_URL_DISPLAY_NAME = "Logout Return URL";
 
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 
