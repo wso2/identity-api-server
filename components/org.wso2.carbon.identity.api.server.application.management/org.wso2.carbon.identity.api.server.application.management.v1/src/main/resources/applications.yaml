@@ -762,9 +762,9 @@ paths:
       description: |
         This API provides the capability to delete an authorized API of the application.<br>
           <b>Permission required:</b> <br>
-              * /permission/admin/manage/identity/applicationmgt/delete <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
           <b>Scope required:</b> <br>
-              * internal_application_mgt_delete
+              * internal_application_mgt_update
       parameters:
         - name: applicationId
           in: path
