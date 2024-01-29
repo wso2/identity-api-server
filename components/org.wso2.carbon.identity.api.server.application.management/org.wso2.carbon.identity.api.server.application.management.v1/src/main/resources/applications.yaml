@@ -762,9 +762,9 @@ paths:
       description: |
         This API provides the capability to delete an authorized API of the application.<br>
           <b>Permission required:</b> <br>
-              * /permission/admin/manage/identity/applicationmgt/delete <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
           <b>Scope required:</b> <br>
-              * internal_application_mgt_delete
+              * internal_application_mgt_update
       parameters:
         - name: applicationId
           in: path
@@ -2854,6 +2854,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        logoutReturnUrl:
+          type: string
+          example: 'https://example.com/app/logout'
         templateId:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
@@ -2900,6 +2903,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        logoutReturnUrl:
+          type: string
+          example: 'https://example.com/app/logout'
         clientId:
           type: string
           example: 'SmrrDNXRYf1lMmDlnleeHTuXx_Ea'
@@ -2954,6 +2960,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        logoutReturnUrl:
+          type: string
+          example: 'https://example.com/app/logout'
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
