@@ -114,6 +114,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 import static org.wso2.carbon.identity.api.server.common.Constants.XML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants.ErrorMessage.ERROR_CODE_USER_STORE_LIMIT_REACHED;
+import static org.wso2.carbon.identity.core.util.IdentityUtil.isValidFileName;
 
 /**
  * Call internal osgi services to perform user store related operations.
@@ -1700,13 +1701,23 @@ public class ServerUserStoreService {
         }
     }
 
+    /**
+     * Method to validate whether the user store request contains properties with invalid characters.
+     *
+     * @param userStoreReq User store request.
+     */
     private void validateUserStoreProperty(UserStoreReq userStoreReq) {
 
         Pattern pattern = Pattern.compile(EXPRESSION_LANGUAGE_REGEX);
         if (userStoreReq != null) {
-            if ((StringUtils.isNotBlank(userStoreReq.getName()) && pattern.matcher(userStoreReq.getName()).matches()) ||
-                    (StringUtils.isNotBlank(userStoreReq.getDescription()) &&
-                            pattern.matcher(userStoreReq.getDescription()).matches())) {
+            if (StringUtils.isNotBlank(userStoreReq.getName())) {
+                if (pattern.matcher(userStoreReq.getName()).matches() || !isValidFileName(userStoreReq.getName())) {
+                    throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
+                            .ERROR_CODE_INVALID_INPUT);
+                }
+            }
+            if (StringUtils.isNotBlank(userStoreReq.getDescription()) &&
+                            pattern.matcher(userStoreReq.getDescription()).matches()) {
                 throw handleException(Response.Status.BAD_REQUEST, UserStoreConstants.ErrorMessage
                         .ERROR_CODE_INVALID_INPUT);
             } else if (userStoreReq.getProperties() != null) {
