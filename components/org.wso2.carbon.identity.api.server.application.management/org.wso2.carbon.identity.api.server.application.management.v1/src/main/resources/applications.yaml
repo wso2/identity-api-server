@@ -522,7 +522,7 @@ paths:
           <b>Permission required:</b> <br>
               * /permission/admin <br>
           <b>Scope required:</b> <br>
-              * SYSTEM
+              * internal_organization_admin
       parameters:
         - name: applicationId
           in: path
@@ -611,13 +611,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /applications/{applicationId}/user-registrants:
+
+  /applications/{applicationId}/authorized-apis:
     get:
       tags:
-        - User registrants
+        - Authorized APIs
       summary: |
-        Get the list of user registrants configured for the given application.
-      operationId: getConfiguredUserRegistrants
+        Get authorized APIs of the application.
+      operationId: getAuthorizedAPIs
+      description: |
+        This API provides the capability to retrieve all the authorized APIs of the application.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/view <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_view
       parameters:
         - name: applicationId
           in: path
@@ -631,7 +638,48 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserRegistrantsList'
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuthorizedAPIResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Authorized APIs
+      summary: |
+        Authorized an API to the application
+      operationId: addAuthorizedAPI
+      description: |
+        This API provides the capability to authorized an API to the application.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_update
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizedAPICreationModel'
+      responses:
+        '201':
+          description: Created
         '400':
           description: Bad Request
           content:
@@ -644,16 +692,107 @@ paths:
           description: Forbidden
         '404':
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+
+  /applications/{applicationId}/authorized-apis/{apiId}:
+    patch:
+      tags:
+        - Authorized APIs
+      summary: |
+        Update authorized API scopes
+      operationId: patchAuthorizedAPI
+      description: |
+        This API provides the capability to update an authorized API of the application.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_update
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+        - name: apiId
+          in: path
+          description: ID of the API resource.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizedAPIPatchModel'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Authorized APIs
+      summary: |
+        Remove API authorization from the application
+      operationId: deleteAuthorizedAPI
+      description: |
+        This API provides the capability to delete an authorized API of the application.<br>
+          <b>Permission required:</b> <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
+          <b>Scope required:</b> <br>
+              * internal_application_mgt_update
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+        - name: apiId
+          in: path
+          description: ID of the API resource.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
   /applications/resident:
     get:
       tags:
@@ -2237,6 +2376,246 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /applications/{applicationId}/share:
+    post:
+      summary: |
+        Share the application from the root organization to the given organization.
+      description: |
+        This API provides the capability to share an application with organizations.
+        <br><br>
+        <b>Scope required:</b> 
+        * internal_shared_application_create
+      operationId: shareOrgApplication
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application which will be shared to organizations.
+          required: true
+          schema:
+            type: string
+            example: c75e27f9-98c7-4518-a968-c6cd59f0ac6b
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationSharePOSTRequest'
+        required: true
+      responses:
+        '200':
+          description: Ok
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - Organization Application Sharing
+    get:
+      summary: |
+        List of organizations that the application is shared to.
+      description: |
+        This API returns the list of organizations that the application is shared to.
+        <br><br>
+        <b>Scope required:</b> 
+        * internal_shared_application_view
+      operationId: shareOrgApplicationGet
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application which is shared to organizations.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SharedOrganizationsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - Organization Application Sharing
+  /applications/{applicationId}/shared-apps:
+    get:
+      summary: |
+        List of shared applications along with its organization.
+      description: |
+        This API returns the list of shared app ids along with the shared organization id.
+        <br><br>
+        <b>Scope required:</b> 
+        * internal_shared_application_view
+      operationId: sharedApplicationsGet
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application which is shared to organizations.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SharedApplicationsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - Organization Application Sharing
+    delete:
+      description: |
+        This API provides the capability to stop sharing an application to all organizations the application is shared to.
+        <br><br>
+        <b>Scope required:</b> 
+        * internal_shared_application_delete
+      summary: |
+        Stop sharing an application with all organizations.
+      operationId: sharedApplicationsAllDelete
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - Organization Application Sharing
+  /applications/{applicationId}/share/{shared-organization-id}:
+    delete:
+      description: |
+        This API provides the capability to stop sharing an application to an organization by providing its ID.
+        <br><br>
+        <b>Scope required:</b> 
+        * internal_shared_application_delete
+      summary: |
+        Stop sharing an application to a organization.
+      operationId: shareOrgApplicationDelete
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+        - name: shared-organization-id
+          in: path
+          description: ID of the organization to stop sharing.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - Organization Application Sharing
+
 components:
   parameters:
     limitQueryParam:
@@ -2317,9 +2696,9 @@ components:
       required: false
       description: |
         Specifies the required parameters in the response.
-        Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', and 'issuer' attributes.
+        Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', 'issuer', and 'associatedRoles.allowedAudience' attributes.
 
-        /applications?attributes=advancedConfigurations,templateId,clientId
+        /applications?attributes=advancedConfigurations,templateId,clientId,associatedRoles.allowedAudience
       schema:
         type: string
     exportSecretsQueryParam:
@@ -2434,6 +2813,9 @@ components:
         issuer:
           type: string
           example: 'http://idp.example.com/metadata.php'
+        realm:
+          type: string
+          example: 'PassiveSTSSampleApp'
         access:
           type: string
           enum:
@@ -2448,7 +2830,9 @@ components:
         templateId:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
-
+        associatedRoles:
+          type: object
+          $ref: '#/components/schemas/AssociatedRolesConfig'
     ApplicationModel:
       type: object
       required:
@@ -2470,6 +2854,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        logoutReturnUrl:
+          type: string
+          example: 'https://example.com/app/logout'
         templateId:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
@@ -2483,6 +2870,8 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to for B2B self service
+        associatedRoles:
+          $ref: '#/components/schemas/AssociatedRolesConfig'
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocolConfiguration:
@@ -2493,7 +2882,6 @@ components:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
           $ref: '#/components/schemas/ProvisioningConfiguration'
-
     ApplicationResponseModel:
       type: object
       required:
@@ -2515,12 +2903,18 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        logoutReturnUrl:
+          type: string
+          example: 'https://example.com/app/logout'
         clientId:
           type: string
           example: 'SmrrDNXRYf1lMmDlnleeHTuXx_Ea'
         issuer:
           type: string
           example: 'http://idp.example.com/metadata.php'
+        realm:
+          type: string
+          example: 'PassiveSTSSampleApp'
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
@@ -2532,14 +2926,14 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to for B2B self service
+        associatedRoles:
+          $ref: '#/components/schemas/AssociatedRolesConfig'
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         inboundProtocols:
           $ref: '#/components/schemas/InboundProtocolsListResponse'
         authenticationSequence:
           $ref: '#/components/schemas/AuthenticationSequence'
-        appRoleConfigurations:
-          $ref: '#/components/schemas/AppRoleConfigurations'
         advancedConfigurations:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
@@ -2566,15 +2960,18 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        logoutReturnUrl:
+          type: string
+          example: 'https://example.com/app/logout'
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
+        associatedRoles:
+          $ref: '#/components/schemas/AssociatedRolesConfig'
         claimConfiguration:
           $ref: '#/components/schemas/ClaimConfiguration'
         authenticationSequence:
           $ref: '#/components/schemas/AuthenticationSequence'
-        appRoleConfigurations:
-          $ref: '#/components/schemas/AppRoleConfigurations'
         advancedConfigurations:
           $ref: '#/components/schemas/AdvancedApplicationConfiguration'
         provisioningConfigurations:
@@ -2686,6 +3083,29 @@ components:
           type: boolean
           description: Decides whether application is a fragment application.
           example: false
+        enableAPIBasedAuthentication:
+          type: boolean
+          description: Decides whether API Based Authentication is enabled for this application.
+          example: false
+        attestationMetaData:
+          type: object
+          description: Decides the client attestation meta data for the application.
+          properties:
+            enableClientAttestation:
+              type: boolean
+              description: Decides whether client attestation enabled for this application.
+              example: false
+            androidPackageName:
+              type: string
+              description: Decides the android package name of the application.
+              example: "com.wso2.mobile.sample"
+            androidAttestationServiceCredentials:
+              type: object
+              description: Decides the credentials for the service account to access Google Play Integrity Service.
+            appleAppId:
+              type: string
+              description: Decides the apple app id which denotes {apple-teamId}.{bundleId}.
+              example: "APPLETEAMID.com.wso2.mobile.sample"
         additionalSpProperties:
           $ref: '#/components/schemas/AdditionalProperties'
     AdditionalProperties:
@@ -2792,6 +3212,9 @@ components:
         useMappedLocalSubject:
           type: boolean
           example: false
+        mappedLocalSubjectMandatory:
+          type: boolean
+          example: false
     RoleConfig:
       type: object
       properties:
@@ -2816,6 +3239,33 @@ components:
         applicationRole:
           type: string
           example: Administrator
+    AssociatedRolesConfig:
+      type: object
+      required:
+        - allowedAudience
+      properties:
+        allowedAudience:
+          type: string
+          example: "ORGANIZATION"
+          enum:
+            - ORGANIZATION
+            - APPLICATION
+          default: ORGANIZATION
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+    Role:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          example: "bf5abd05-3667-4a2a-a6c2-2fb9f4d26e47"
+        name:
+          type: string
+          example: "RoleA"
     RequestedClaimConfiguration:
       type: object
       required:
@@ -3111,6 +3561,19 @@ components:
             - XACML Scope Validator
           items:
             type: string
+        clientAuthentication:
+          $ref: '#/components/schemas/ClientAuthenticationConfiguration'
+        requestObject:
+          $ref: '#/components/schemas/RequestObjectConfiguration'
+        pushAuthorizationRequest:
+          $ref: '#/components/schemas/PushAuthorizationRequestConfiguration'
+        subject:
+          $ref: '#/components/schemas/SubjectConfiguration'
+        isFAPIApplication:
+          type: boolean
+          default: false
+          description: Enabling this option will make the application FAPI conformant.
+          example: false
     OAuth2PKCEConfiguration:
       type: object
       properties:
@@ -3173,6 +3636,9 @@ components:
             - 'http://idp.abc.com'
           items:
             type: string
+        idTokenSignedResponseAlg:
+          type: string
+          example: 'PS256'
         encryption:
           $ref: '#/components/schemas/IdTokenEncryptionConfiguration'
     IdTokenEncryptionConfiguration:
@@ -3188,6 +3654,50 @@ components:
         method:
           type: string
           example: A128CBC+HS256
+    ClientAuthenticationConfiguration:
+      type: object
+      properties:
+        tokenEndpointAuthMethod:
+          type: string
+          example: 'client_secret_basic'
+        tokenEndpointAuthSigningAlg:
+          type: string
+          example: 'PS256'
+        tlsClientAuthSubjectDn:
+          type: string
+          example: 'CN=John Doe,OU=OrgUnit,O=Organization,L=Colombo,ST=Western,C=LK'
+    RequestObjectConfiguration:
+      type: object
+      properties:
+        requestObjectSigningAlg:
+          type: string
+          example: 'PS256'
+        encryption:
+          $ref: '#/components/schemas/RequestObjectEncryptionConfiguration'
+    RequestObjectEncryptionConfiguration:
+      type: object
+      properties:
+        algorithm:
+          type: string
+          example: RSA-OAEP
+        method:
+          type: string
+          example: A128CBC+HS256
+    PushAuthorizationRequestConfiguration:
+      type: object
+      properties:
+        requirePushAuthorizationRequest:
+          type: boolean
+          example: false
+    SubjectConfiguration:
+      type: object
+      properties:
+        subjectType:
+          type: string
+          example: 'public'
+        sectorIdentifierUri:
+          type: string
+          example: 'https://app.example.com'
     OIDCLogoutConfiguration:
       type: object
       properties:
@@ -3206,6 +3716,8 @@ components:
         realm:
           type: string
         replyTo:
+          type: string
+        replyToLogout:
           type: string
     WSTrustConfiguration:
       type: object
@@ -3308,30 +3820,6 @@ components:
           type: string
           example: basic
 
-    AppRoleConfigurations:
-      type: array
-      description: Decides whether the attribute step FIdPs use app role mappings.
-      items:
-        $ref: '#/components/schemas/AppRoleConfig'
-      minItems: 0
-
-    AppRoleConfig:
-      type: object
-      description: Decides whether an FIdP uses app role mappings.
-      required:
-        - idp
-        - useAppRoleMappings
-      properties:
-        idp:
-          type: string
-          description: FIdP name.
-          example: googleIdP
-        useAppRoleMappings:
-          type: boolean
-          description: FIdP use application role mappings.
-          example: false
-          default: false
-
     AuthProtocolMetadata:
       type: object
       properties:
@@ -3352,6 +3840,31 @@ components:
         defaultValue:
           type: string
           example: 'Option 1'
+    ClientAuthenticationMethodMetadata:
+      type: object
+      properties:
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientAuthenticationMethod'
+    FapiMetadata:
+      type: object
+      properties:
+        allowedSignatureAlgorithms:
+          $ref: '#/components/schemas/MetadataProperty'
+        allowedEncryptionAlgorithms:
+          $ref: '#/components/schemas/MetadataProperty'
+        tokenEndpointAuthMethod:
+          $ref: '#/components/schemas/ClientAuthenticationMethodMetadata'
+    ClientAuthenticationMethod:
+      type: object
+      properties:
+        name:
+          type: string
+          example: private_key_jwt
+        displayName:
+          type: string
+          example: Private Key JWT
     GrantTypeMetaData:
       type: object
       properties:
@@ -3411,6 +3924,22 @@ components:
           $ref: '#/components/schemas/MetadataProperty'
         accessTokenBindingType:
           $ref: '#/components/schemas/MetadataProperty'
+        tokenEndpointAuthMethod:
+          $ref: '#/components/schemas/ClientAuthenticationMethodMetadata'
+        tokenEndpointSignatureAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        idTokenSignatureAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        requestObjectSignatureAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        requestObjectEncryptionAlgorithm:
+          $ref: '#/components/schemas/MetadataProperty'
+        requestObjectEncryptionMethod:
+          $ref: '#/components/schemas/MetadataProperty'
+        subjectType:
+          $ref: '#/components/schemas/MetadataProperty'
+        fapiMetadata:
+          $ref: '#/components/schemas/FapiMetadata'
     WSTrustMetaData:
       type: object
       properties:
@@ -3579,54 +4108,127 @@ components:
       required:
         - id
 
-    UserRegistrantsList:
-      type: object
-      properties:
-        totalResults:
-          type: integer
-          description: "Number of user registrants."
-          example: 2
-        userRegistrants:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserRegistrant'
-
-    UserRegistrant:
+    AuthorizedAPIResponse:
       type: object
       properties:
         id:
           type: string
-          description: "Unique id for the user registrant based on its name."
-          example: "8we2f4b8-0d22-8234-l4n7-1682a91b12cn"
-        name:
+          example: 012df-232gf-545fg-dff23
+        identifier:
           type: string
-          description: "Name of the user registrant."
-          example: "BasicAuthAttributeHandler"
-        authAttributes:
+          example: https://greetings.io/v1/greet
+        displayName:
+          type: string
+          example: Greetings API
+        policyId:
+          type: string
+          example: RBAC
+        type:
+          type: string
+          example: TENANT_ADMIN
+        authorizedScopes:
           type: array
           items:
-            $ref: '#/components/schemas/AuthAttribute'
+            $ref: '#/components/schemas/AuthorizedScope'
 
-    AuthAttribute:
+    AuthorizedScope:
       type: object
-      description: "The authentication attributes required by a user registrant."
       properties:
-        attribute:
+        id:
           type: string
-          description: "Name of the attribute."
-          example: "password"
-        isClaim:
-          type: boolean
-          description: "Defines whether the attribute is a claim."
-          example: true
-        isConfidential:
-          type: boolean
-          description: "Defines whether the attribute contains confidential data."
-          example: true
-        attributeType:
+          example: 012df-232gf-545fg-dff23
+        name:
           type: string
-          description: "Data type of value of the attribute."
-          example: "STRING"
+          example: bookings:read
+        displayName:
+          type: string
+          example: Read Bookings
+
+    AuthorizedAPICreationModel:
+      type: object
+      properties:
+        id :
+          type: string
+          example: 012df-232gf-545fg-dff23
+        policyIdentifier:
+          type: string
+          example: RBAC
+        scopes:
+          type: array
+          items:
+            type: string
+            example: bookings:read
+
+    AuthorizedAPIPatchModel:
+      type: object
+      properties:
+        addedScopes:
+          type: array
+          items:
+            type: string
+            example: bookings:edit
+        removedScopes:
+          type: array
+          items:
+            type: string
+            example: bookings:view
+
+    ApplicationSharePOSTRequest:
+      type: object
+      properties:
+        shareWithAllChildren:
+          type: boolean
+          default: false
+        sharedOrganizations:
+          type: array
+          items:
+            type: string
+    SharedOrganizationsResponse:
+      type: object
+      properties:
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/BasicOrganizationResponse'
+    SharedApplicationsResponse:
+      type: object
+      properties:
+        sharedApplications:
+          type: array
+          items:
+            $ref: '#/components/schemas/SharedApplicationResponse'
+    SharedApplicationResponse:
+      type: object
+      properties:
+        applicationId:
+          type: string
+          description: Shared application's id.
+          example: 'ca322554-fe79-4c04-9c94-492855ef92a3'
+        organizationId:
+          type: string
+          description: Shared application residing organization id.
+          example: '682edf68-4835-4bb8-961f-0a16bc6cc866'
+    BasicOrganizationResponse:
+      type: object
+      required:
+        - id
+        - name
+        - status
+        - ref
+      properties:
+        id:
+          type: string
+          example: 'b4526d91-a8bf-43d2-8b14-c548cf73065b'
+        name:
+          type: string
+          example: 'ABC Builders'
+        status:
+          type: string
+          enum: [ ACTIVE, DISABLED ]
+          example: ACTIVE
+        ref:
+          type: string
+          example: '/t/wso2.com/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
 
     Error:
       type: object

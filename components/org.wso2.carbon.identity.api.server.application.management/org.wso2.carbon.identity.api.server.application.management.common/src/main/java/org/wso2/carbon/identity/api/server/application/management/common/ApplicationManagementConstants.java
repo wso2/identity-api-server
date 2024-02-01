@@ -51,6 +51,28 @@ public class ApplicationManagementConstants {
     public static final String NAME = "name";
     public static final String CLIENT_ID = "clientId";
     public static final String ISSUER = "issuer";
+    public static final String RBAC = "RBAC";
+    public static final String NO_POLICY = "NO POLICY";
+    public static final String SELECT_OPTION = "Select Option";
+    public static final String TOKEN_EP_SIGNATURE_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
+            "SupportedTokenEndpointSigningAlgorithms.SupportedTokenEndpointSigningAlgorithm";
+    public static final String ID_TOKEN_SIGNATURE_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
+            "SupportedIDTokenSigningAlgorithms.SupportedIDTokenSigningAlgorithm";
+    public static final String REQUEST_OBJECT_SIGNATURE_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
+            "SupportedRequestObjectSigningAlgorithms.SupportedRequestObjectSigningAlgorithm";
+    public static final String REQUEST_OBJECT_ENCRYPTION_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
+            "SupportedRequestObjectEncryptionAlgorithms.SupportedRequestObjectEncryptionAlgorithm";
+    public static final String REQUEST_OBJECT_ENCRYPTION_METHODS_SUPPORTED = "OAuth.OpenIDConnect." +
+            "SupportedRequestObjectEncryptionMethods.SupportedRequestObjectEncryptionMethod";
+    public static final String DEFAULT_SUBJECT_TYPE = "OAuth.OpenIDConnect.DefaultSubjectType";
+    public static final String FAPI_ALLOWED_SIGNATURE_ALGORITHMS = "OAuth.OpenIDConnect.FAPI." +
+            "AllowedSignatureAlgorithms.AllowedSignatureAlgorithm";
+    public static final String FAPI_ALLOWED_CLIENT_AUTHENTICATION_METHODS = "OAuth.OpenIDConnect.FAPI." +
+            "AllowedClientAuthenticationMethods.AllowedClientAuthenticationMethod";
+    public static final String RSA1_5 = "RSA1_5";
+    public static final String PROP_LOGOUT_RETURN_URL = "logoutReturnUrl";
+    public static final String DEFAULT_LOGOUT_RETURN_URL_VALUE = ".*";
+    public static final String LOGOUT_RETURN_URL_DISPLAY_NAME = "Logout Return URL";
 
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 
@@ -102,7 +124,25 @@ public class ApplicationManagementConstants {
         USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED("60506",
                 "Unsupported application property.",
                 "'useExternalConsentPage' is not yet supported for SAML applications in this version of the API."),
+        API_RESOURCE_NOT_FOUND("60507",
+                "API resource not found.",
+                "API resource with id: %s is not found in the tenant domain: %s."),
+        SCOPES_NOT_FOUND("60508",
+                "API scopes not found.",
+                "One or more scopes in the request is not found for the API resource with Id: %s in the " +
+                        "tenant domain: %s."),
+        API_RESOURCE_ALREADY_AUTHORIZED("60509", "API resource already authorized.",
+                "API resource with id: %s is already authorized for the application with id: %s."),
+        AUTHORIZED_API_NOT_FOUND("60510", "API resource not authorized for the application.",
+                "API resource with id: %s is not authorized for the application with id: %s."),
+        INVALID_POLICY_VALUE("60511", "Invalid policy id value provided.",
+                "Invalid policy id value. It should be 'RBAC' or 'No Policy'."),
+        INVALID_POLICY_TYPE_FOR_API_RESOURCE("60512", "Invalid policy type provided for the API " +
+                "resource.", "API resource with id: %s doesn't allow the provided policy type: %s."),
 
+        ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED("60513",
+                "Invalid configuration.",
+                "'useMappedLocalSubject' cannot be disabled when 'mappedLocalSubjectMandatory' is enabled."),
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
                 "Error occurred while retrieving SAML Metadata.",
@@ -125,10 +165,6 @@ public class ApplicationManagementConstants {
         ERROR_PROCESSING_REQUEST("65006",
                 "Unexpected Processing Error.",
                 "Server encountered an unexpected error when creating the application."),
-        ERROR_RETRIEVING_USER_REGISTRANTS("65007",
-                "Error while retrieving user registrants.",
-                "Server encountered an error while retrieving the user registrants of the application: %s in the " +
-                        "tenantDomain: %s."),
 
         // Server errors defined at REST API layer.
         APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED("65501",

@@ -37,6 +37,7 @@ public class IdTokenConfiguration  {
   
     private Long expiryInSeconds;
     private List<String> audience = null;
+    private String idTokenSignedResponseAlg;
 
     private IdTokenEncryptionConfiguration encryption;
 
@@ -84,6 +85,24 @@ public class IdTokenConfiguration  {
         return this;
     }
 
+    /**
+     **/
+    public IdTokenConfiguration idTokenSignedResponseAlg(String idTokenSignedResponseAlg) {
+
+        this.idTokenSignedResponseAlg = idTokenSignedResponseAlg;
+        return this;
+    }
+
+    @ApiModelProperty(example = "PS256", value = "")
+    @JsonProperty("idTokenSignedResponseAlg")
+    @Valid
+    public String getIdTokenSignedResponseAlg() {
+        return idTokenSignedResponseAlg;
+    }
+    public void setIdTokenSignedResponseAlg(String idTokenSignedResponseAlg) {
+        this.idTokenSignedResponseAlg = idTokenSignedResponseAlg;
+    }
+
         /**
     **/
     public IdTokenConfiguration encryption(IdTokenEncryptionConfiguration encryption) {
@@ -116,12 +135,13 @@ public class IdTokenConfiguration  {
         IdTokenConfiguration idTokenConfiguration = (IdTokenConfiguration) o;
         return Objects.equals(this.expiryInSeconds, idTokenConfiguration.expiryInSeconds) &&
             Objects.equals(this.audience, idTokenConfiguration.audience) &&
+            Objects.equals(this.idTokenSignedResponseAlg, idTokenConfiguration.idTokenSignedResponseAlg) &&
             Objects.equals(this.encryption, idTokenConfiguration.encryption);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(expiryInSeconds, audience, encryption);
+        return Objects.hash(expiryInSeconds, audience, idTokenSignedResponseAlg, encryption);
     }
 
     @Override
@@ -132,6 +152,7 @@ public class IdTokenConfiguration  {
         
         sb.append("    expiryInSeconds: ").append(toIndentedString(expiryInSeconds)).append("\n");
         sb.append("    audience: ").append(toIndentedString(audience)).append("\n");
+        sb.append("    idTokenSignedResponseAlg: ").append(toIndentedString(idTokenSignedResponseAlg)).append("\n");
         sb.append("    encryption: ").append(toIndentedString(encryption)).append("\n");
         sb.append("}");
         return sb.toString();

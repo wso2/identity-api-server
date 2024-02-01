@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.wso2.carbon.identity.api.server.application.management.v1.*;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+
 import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
@@ -48,13 +49,14 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApp
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.UserRegistrantsList;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import javax.ws.rs.core.Response;
 
 
 public interface ApplicationsApiService {
+
+      public Response addAuthorizedAPI(String applicationId, AuthorizedAPICreationModel authorizedAPICreationModel);
 
       public Response changeApplicationOwner(String applicationId, ApplicationOwner applicationOwner);
 
@@ -65,6 +67,8 @@ public interface ApplicationsApiService {
       public Response deleteApplication(String applicationId);
 
       public Response deleteApplicationTemplate(String templateId);
+
+      public Response deleteAuthorizedAPI(String applicationId, String apiId);
 
       public Response deleteCustomInboundConfiguration(String applicationId, String inboundProtocolId);
 
@@ -90,9 +94,9 @@ public interface ApplicationsApiService {
 
       public Response getApplicationTemplate(String templateId);
 
-      public Response getConfiguredAuthenticators(String applicationId);
+      public Response getAuthorizedAPIs(String applicationId);
 
-      public Response getConfiguredUserRegistrants(String applicationId);
+      public Response getConfiguredAuthenticators(String applicationId);
 
       public Response getCustomInboundConfiguration(String applicationId, String inboundProtocolId);
 
@@ -124,9 +128,21 @@ public interface ApplicationsApiService {
 
       public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel);
 
+      public Response patchAuthorizedAPI(String applicationId, String apiId, AuthorizedAPIPatchModel authorizedAPIPatchModel);
+
       public Response regenerateOAuthClientSecret(String applicationId);
 
       public Response revokeOAuthClient(String applicationId);
+
+      public Response shareOrgApplication(String applicationId, ApplicationSharePOSTRequest applicationSharePOSTRequest);
+
+      public Response shareOrgApplicationDelete(String applicationId, String sharedOrganizationId);
+
+      public Response shareOrgApplicationGet(String applicationId);
+
+      public Response sharedApplicationsAllDelete(String applicationId);
+
+      public Response sharedApplicationsGet(String applicationId);
 
       public Response updateApplicationTemplate(String templateId, ApplicationTemplateModel applicationTemplateModel);
 

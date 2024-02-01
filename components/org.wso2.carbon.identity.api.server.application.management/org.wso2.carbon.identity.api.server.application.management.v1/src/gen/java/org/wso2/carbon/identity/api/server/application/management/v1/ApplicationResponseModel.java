@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.AppRoleConfig;
+import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
@@ -45,17 +45,18 @@ public class ApplicationResponseModel  {
     private String description;
     private String imageUrl;
     private String accessUrl;
+    private String logoutReturnUrl;
     private String clientId;
     private String issuer;
+    private String realm;
     private String templateId;
     private Boolean isManagementApp;
     private Boolean isB2BSelfServiceApp;
+    private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
     private List<InboundProtocolListItem> inboundProtocols = null;
 
     private AuthenticationSequence authenticationSequence;
-    private List<AppRoleConfig> appRoleConfigurations = null;
-
     private AdvancedApplicationConfiguration advancedConfigurations;
     private ProvisioningConfiguration provisioningConfigurations;
 
@@ -187,6 +188,24 @@ public enum AccessEnum {
 
     /**
     **/
+    public ApplicationResponseModel logoutReturnUrl(String logoutReturnUrl) {
+
+        this.logoutReturnUrl = logoutReturnUrl;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "https://example.com/app/logout", value = "")
+    @JsonProperty("logoutReturnUrl")
+    @Valid
+    public String getLogoutReturnUrl() {
+        return logoutReturnUrl;
+    }
+    public void setLogoutReturnUrl(String logoutReturnUrl) {
+        this.logoutReturnUrl = logoutReturnUrl;
+    }
+
+    /**
+    **/
     public ApplicationResponseModel clientId(String clientId) {
 
         this.clientId = clientId;
@@ -219,6 +238,24 @@ public enum AccessEnum {
     }
     public void setIssuer(String issuer) {
         this.issuer = issuer;
+    }
+
+    /**
+    **/
+    public ApplicationResponseModel realm(String realm) {
+
+        this.realm = realm;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "PassiveSTSSampleApp", value = "")
+    @JsonProperty("realm")
+    @Valid
+    public String getRealm() {
+        return realm;
+    }
+    public void setRealm(String realm) {
+        this.realm = realm;
     }
 
     /**
@@ -266,13 +303,33 @@ public enum AccessEnum {
         this.isB2BSelfServiceApp = isB2BSelfServiceApp;
         return this;
     }
-
+    
     @ApiModelProperty(example = "false", value = "Decides whether the application used to for B2B self service")
     @JsonProperty("isB2BSelfServiceApp")
     @Valid
     public Boolean getIsB2BSelfServiceApp() {
-
         return isB2BSelfServiceApp;
+    }
+    public void setIsB2BSelfServiceApp(Boolean isB2BSelfServiceApp) {
+        this.isB2BSelfServiceApp = isB2BSelfServiceApp;
+    }
+
+    /**
+    **/
+    public ApplicationResponseModel associatedRoles(AssociatedRolesConfig associatedRoles) {
+
+        this.associatedRoles = associatedRoles;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("associatedRoles")
+    @Valid
+    public AssociatedRolesConfig getAssociatedRoles() {
+        return associatedRoles;
+    }
+    public void setAssociatedRoles(AssociatedRolesConfig associatedRoles) {
+        this.associatedRoles = associatedRoles;
     }
 
     /**
@@ -338,33 +395,6 @@ public enum AccessEnum {
     }
 
     /**
-    * Decides whether the attribute step FIdPs use app role mappings.
-    **/
-    public ApplicationResponseModel appRoleConfigurations(List<AppRoleConfig> appRoleConfigurations) {
-
-        this.appRoleConfigurations = appRoleConfigurations;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "Decides whether the attribute step FIdPs use app role mappings.")
-    @JsonProperty("appRoleConfigurations")
-    @Valid @Size(min=0)
-    public List<AppRoleConfig> getAppRoleConfigurations() {
-        return appRoleConfigurations;
-    }
-    public void setAppRoleConfigurations(List<AppRoleConfig> appRoleConfigurations) {
-        this.appRoleConfigurations = appRoleConfigurations;
-    }
-
-    public ApplicationResponseModel addAppRoleConfigurationsItem(AppRoleConfig appRoleConfigurationsItem) {
-        if (this.appRoleConfigurations == null) {
-            this.appRoleConfigurations = new ArrayList<>();
-        }
-        this.appRoleConfigurations.add(appRoleConfigurationsItem);
-        return this;
-    }
-
-        /**
     **/
     public ApplicationResponseModel advancedConfigurations(AdvancedApplicationConfiguration advancedConfigurations) {
 
@@ -435,15 +465,17 @@ public enum AccessEnum {
             Objects.equals(this.description, applicationResponseModel.description) &&
             Objects.equals(this.imageUrl, applicationResponseModel.imageUrl) &&
             Objects.equals(this.accessUrl, applicationResponseModel.accessUrl) &&
+            Objects.equals(this.logoutReturnUrl, applicationResponseModel.logoutReturnUrl) &&
             Objects.equals(this.clientId, applicationResponseModel.clientId) &&
             Objects.equals(this.issuer, applicationResponseModel.issuer) &&
+            Objects.equals(this.realm, applicationResponseModel.realm) &&
             Objects.equals(this.templateId, applicationResponseModel.templateId) &&
             Objects.equals(this.isManagementApp, applicationResponseModel.isManagementApp) &&
             Objects.equals(this.isB2BSelfServiceApp, applicationResponseModel.isB2BSelfServiceApp) &&
+            Objects.equals(this.associatedRoles, applicationResponseModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationResponseModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocols, applicationResponseModel.inboundProtocols) &&
             Objects.equals(this.authenticationSequence, applicationResponseModel.authenticationSequence) &&
-            Objects.equals(this.appRoleConfigurations, applicationResponseModel.appRoleConfigurations) &&
             Objects.equals(this.advancedConfigurations, applicationResponseModel.advancedConfigurations) &&
             Objects.equals(this.provisioningConfigurations, applicationResponseModel.provisioningConfigurations) &&
             Objects.equals(this.access, applicationResponseModel.access);
@@ -451,7 +483,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, templateId, isManagementApp, isB2BSelfServiceApp, claimConfiguration, inboundProtocols, authenticationSequence, appRoleConfigurations, advancedConfigurations, provisioningConfigurations, access);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, logoutReturnUrl, clientId, issuer, realm, templateId, isManagementApp, isB2BSelfServiceApp, associatedRoles, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
     }
 
     @Override
@@ -465,15 +497,17 @@ public enum AccessEnum {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
+        sb.append("    logoutReturnUrl: ").append(toIndentedString(logoutReturnUrl)).append("\n");
         sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
         sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
+        sb.append("    realm: ").append(toIndentedString(realm)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
+        sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocols: ").append(toIndentedString(inboundProtocols)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
-        sb.append("    appRoleConfigurations: ").append(toIndentedString(appRoleConfigurations)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
         sb.append("    provisioningConfigurations: ").append(toIndentedString(provisioningConfigurations)).append("\n");
         sb.append("    access: ").append(toIndentedString(access)).append("\n");

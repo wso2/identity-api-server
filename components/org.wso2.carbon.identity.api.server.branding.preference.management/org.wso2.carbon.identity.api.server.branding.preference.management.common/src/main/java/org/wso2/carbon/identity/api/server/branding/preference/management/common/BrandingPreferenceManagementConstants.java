@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
+ * Copyright (c) 2021-2023, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,8 +25,10 @@ public class BrandingPreferenceManagementConstants {
 
     public static final String BRANDING_PREFERENCE_ERROR_PREFIX = "BPM-";
     public static final String BRANDING_PREFERENCE_CONTEXT_PATH = "/branding-preference";
+    public static final String CUSTOM_TEXT_PREFERENCE_CONTEXT_PATH = "/branding-preference/text";
     public static final String QUERY_PARAM_INDICATOR = "?";
     public static final String GET_PREFERENCE_COMPONENT_WITH_QUERY_PARAM = "type=%s&name=%s&locale=%s";
+    public static final String GET_CUSTOM_TEXT_COMPONENT_WITH_QUERY_PARAM = "type=%s&name=%s&screen=%s&locale=%s";
     public static final String ORGANIZATION_TYPE = "ORG";
     public static final String APPLICATION_TYPE = "APP";
     public static final String CUSTOM_TYPE = "CUSTOM";
@@ -36,6 +38,8 @@ public class BrandingPreferenceManagementConstants {
     public static final String BRANDING_PREFERENCE_NOT_EXISTS_ERROR_CODE = "BRANDINGM_00002";
     public static final String BRANDING_PREFERENCE_ALREADY_EXISTS_ERROR_CODE = "BRANDINGM_00003";
     public static final String BRANDING_PREFERENCE_NOT_ALLOWED_ERROR_CODE = "BRANDINGM_00011";
+    public static final String CUSTOM_TEXT_PREFERENCE_NOT_EXISTS_ERROR_CODE = "BRANDINGM_00023";
+    public static final String CUSTOM_TEXT_PREFERENCE_ALREADY_EXISTS_ERROR_CODE = "BRANDINGM_00024";
 
     /**
      * Enums for error messages.
@@ -54,6 +58,14 @@ public class BrandingPreferenceManagementConstants {
         ERROR_CODE_NOT_ALLOWED_BRANDING_PREFERENCE_CONFIGURATIONS("60004",
                 "Not allowed branding preference configurations.",
                 "Requested branding preference configuration: %s is not allowed for the organization."),
+        ERROR_CODE_INVALID_CUSTOM_TEXT_PREFERENCE("60005",
+                "Invalid custom text preference configurations.",
+                "Invalid custom text preference configurations in request"),
+        ERROR_CODE_CUSTOM_TEXT_PREFERENCE_NOT_EXISTS("60006",
+                "Custom text preferences are not configured.",
+                "Custom text preferences are not configured for organization: %s."),
+        ERROR_CODE_CONFLICT_CUSTOM_TEXT_PREFERENCE("60007", "Custom Text preference already exists.",
+                "There exists a custom text preference configurations in the organization: %s."),
 
         // Server errors 650xx.
         ERROR_CODE_ERROR_GETTING_BRANDING_PREFERENCE("65001",
@@ -67,7 +79,20 @@ public class BrandingPreferenceManagementConstants {
                 "Server encountered an error while deleting branding preference configurations for organization: %s"),
         ERROR_CODE_ERROR_UPDATING_BRANDING_PREFERENCE("65004",
                 "Unable to update branding preference configurations.",
-                "Error while updating branding preference configurations for organization: %s.");
+                "Error while updating branding preference configurations for organization: %s."),
+        ERROR_CODE_ERROR_GETTING_CUSTOM_TEXT_PREFERENCE("65005",
+                "Error while getting custom text preference configurations.",
+                "Error while retrieving custom text preference configurations for organization: %s."),
+        ERROR_CODE_ERROR_ADDING_CUSTOM_TEXT_PREFERENCE("65006",
+                "Unable to add custom text preference configurations.",
+                "Server encountered an error while adding the custom text configurations for organization: %s"),
+        ERROR_CODE_ERROR_DELETING_CUSTOM_TEXT_PREFERENCE("65007",
+                "Unable to delete custom text preference configurations.",
+                "Server encountered an error while deleting custom text configurations for organization: %s"),
+        ERROR_CODE_ERROR_UPDATING_CUSTOM_TEXT_PREFERENCE("65008",
+                "Unable to update custom text preference configurations.",
+                "Error while updating custom text preference configurations for organization: %s.");
+
 
         private final String code;
         private final String message;

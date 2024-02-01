@@ -48,10 +48,18 @@ public class Constants {
     public static final String CORS_CONFIG_SUPPORTS_CREDENTIALS_PATH_REGEX = "^/supportsCredentials$";
     public static final String CORS_CONFIG_MAX_AGE_PATH_REGEX = "^/maxAge$";
 
+    public static final String AUDIT = "audit";
+    public static final String CARBON = "carbon";
+
     /**
      * PATCH operation path for Private Key JWT Validation configuration.
      */
     public static final String PRIVATE_KEY_JWT_VALIDATION_CONFIG_TOKEN_REUSE = "/enableTokenReuse";
+
+    /**
+     * SAML2 metadata endpoint uri path.
+     */
+    public static final String SAML2_METADATA_ENDPOINT_URI_PATH = "/identity/metadata/saml2";
 
     /**
      * Enum for error messages.
@@ -105,7 +113,58 @@ public class Constants {
                                                       "Private Key JWT Validation configuration."),
         ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND("60505",
                 "Private Key JWT Authenticator is not supported.",
-                "Private Key JWT Authenticator service is unavailable at the moment.");
+                "Private Key JWT Authenticator service is unavailable at the moment."),
+
+        //Remote logging server configuration error.
+        ERROR_CODE_ERROR_RESETTING_REMOTE_LOGGING_CONFIGS("65008",
+                "Unable to reset remote logging  configs.",
+                "Server encountered an " +
+                        "error while resetting the remote logging configs."),
+
+        ERROR_CODE_ERROR_UPDATING_REMOTE_LOGGING_CONFIGS("65009",
+                "Unable to update remote logging  configs.",
+                "Server encountered an " +
+                        "error while updating the remote logging configs."),
+        ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS("65008",
+                "Unable to get remote logging  configs.",
+                "Server encountered an " +
+                        "error while getting the remote logging configs."),
+
+
+        ERROR_CODE_INVALID_TENANT_DOMAIN_FOR_REMOTE_LOGGING_CONFIG("60506",
+                "Invalid tenant domain for accessing remote logging config service",
+                "Remote logging configuration service is only supported for super tenant."),
+
+        ERROR_CODE_INVALID_LOG_TYPE_FOR_REMOTE_LOGGING_CONFIG("60507",
+                "Invalid log type provided remote logging config service",
+                "Remote logging configuration service only supports audit or carbon."),
+        ERROR_CODE_REMOTE_LOGGING_CONFIG_NOT_FOUND("60508",
+                "Resource not found.",
+                "Unable to find a resource matching the provided log type %s."),
+
+        /**
+         * Inbound auth config error messages.
+         */
+        ERROR_CODE_RESIDENT_IDP_NOT_FOUND("65010", "Resident IDP not found.",
+                "Unable to find the resident IDP for the tenant domain %s."),
+        ERROR_CODE_FEDERATED_AUTHENTICATOR_CONFIG_NOT_FOUND("65011",
+                "Federated authenticator config not found.",
+                "Unable to find the federated authenticator config for %s in the resident IDP."),
+        ERROR_CODE_FEDERATED_AUTHENTICATOR_PROPERTIES_NOT_FOUND("65012",
+                "Federated authenticator properties not found.",
+                "Unable to find the authenticator properties for the federated authenticator %s."),
+        ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_RETRIEVE("65013",
+                "Unable to retrieve SAML inbound auth configs.",
+                "Server encountered an error while retrieving the SAML inbound auth configs."),
+        ERROR_CODE_ERROR_SAML_INBOUND_AUTH_CONFIG_UPDATE("65014",
+                "Unable to update SAML inbound auth configs.",
+                "Server encountered an error while updating the SAML inbound auth configs."),
+        ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_RETRIEVE("65015",
+                "Unable to retrieve Passive STS inbound auth configs.",
+                "Server encountered an error while retrieving the Passive STS inbound auth configs."),
+        ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_UPDATE("65016",
+                "Unable to update Passive STS inbound auth configs.",
+                "Server encountered an error while updating the Passive STS inbound auth configs.");
 
         private final String code;
         private final String message;

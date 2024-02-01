@@ -1,0 +1,22 @@
+{
+  "name": "b2b-self-service-app",
+  "templateId": "m2m-application",
+  "isManagementApp": true,
+  "isB2BSelfServiceApp": true,
+  "inboundProtocolConfiguration": {
+    "oidc": {
+      "grantTypes": [
+        "client_credentials",
+        "organization_switch_cc"
+      ],
+      "accessToken": {
+        "applicationAccessTokenExpiryInSeconds": 7200,
+        "bindingType": "None",
+        "revokeTokensWhenIDPSessionTerminated": false,
+        "type": "Default",
+        "userAccessTokenExpiryInSeconds": 7200,
+        "validateTokenBinding": false
+      }
+    }
+  }
+}

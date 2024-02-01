@@ -28,10 +28,13 @@ import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.model.Ad
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.model.Error;
 
 import javax.validation.Valid;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import io.swagger.annotations.ApiParam;
 
 /**
  * Admin Advisory Management API.
@@ -58,6 +61,22 @@ public class AdminAdvisoryManagementApi  {
     public Response getAdminAdvisoryConfig() {
 
         return delegate.getAdminAdvisoryConfig();
+    }
+
+    @Valid
+    @PATCH
+    @Path("/banner")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json", "*/*" })
+    @ApiOperation(value = "Update admin advisory banner related configurations.", notes = "Update admin advisory banner related configurations.<br>  <b>Permission required:</b> <br>     * None <br>   <b>Scope required:</b> <br>     * None     requestBody: ", response = AdminAdvisoryConfig.class, tags={ "Management" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Admin advisory banner configuration.", response = AdminAdvisoryConfig.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response updateAdminAdvisoryConfig(@ApiParam(value = "" ,required=true) @Valid AdminAdvisoryConfig adminAdvisoryConfig) {
+
+        return delegate.updateAdminAdvisoryConfig(adminAdvisoryConfig );
     }
 
 }

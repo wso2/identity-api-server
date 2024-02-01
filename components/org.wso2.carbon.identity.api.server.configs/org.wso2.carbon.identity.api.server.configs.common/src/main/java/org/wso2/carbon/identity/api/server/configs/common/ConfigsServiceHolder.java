@@ -19,6 +19,7 @@ package org.wso2.carbon.identity.api.server.configs.common;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
+import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
 
 /**
  * Service holder class for server configuration related services.
@@ -30,6 +31,7 @@ public class ConfigsServiceHolder {
     private ApplicationManagementService applicationManagementService;
     private IdentityProviderManager identityProviderManager;
     private CORSManagementService corsManagementService;
+    private RemoteLoggingConfigService remoteLoggingConfigService;
 
     private ConfigsServiceHolder() {}
 
@@ -96,5 +98,24 @@ public class ConfigsServiceHolder {
     public void setCorsManagementService(CORSManagementService corsManagementService) {
 
         ConfigsServiceHolder.getInstance().corsManagementService = corsManagementService;
+    }
+
+    /**
+     * Get RemoteLoggingConfigService osgi service.
+     *
+     * @return RemoteLoggingConfigService
+     */
+    public RemoteLoggingConfigService getRemoteLoggingConfigService() {
+
+        return ConfigsServiceHolder.getInstance().remoteLoggingConfigService;
+    }
+    /**
+     * Set RemoteLoggingConfigService osgi service.
+     *
+     * @param remoteLoggingConfigService RemoteLoggingConfigService.
+     */
+    public void setRemoteLoggingConfigService(RemoteLoggingConfigService remoteLoggingConfigService) {
+
+        ConfigsServiceHolder.getInstance().remoteLoggingConfigService = remoteLoggingConfigService;
     }
 }

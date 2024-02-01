@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfigurationAttestationMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
 import javax.validation.constraints.*;
 
@@ -44,6 +45,8 @@ public class AdvancedApplicationConfiguration  {
     private Boolean returnAuthenticatedIdpList;
     private Boolean enableAuthorization;
     private Boolean fragment;
+    private Boolean enableAPIBasedAuthentication;
+    private AdvancedApplicationConfigurationAttestationMetaData attestationMetaData;
     private List<AdditionalSpProperty> additionalSpProperties = null;
     private Boolean useExternalConsentPage;
 
@@ -218,6 +221,43 @@ public class AdvancedApplicationConfiguration  {
     }
 
     /**
+    * Decides whether API Based Authentication is enabled for this application.
+    **/
+    public AdvancedApplicationConfiguration enableAPIBasedAuthentication(Boolean enableAPIBasedAuthentication) {
+
+        this.enableAPIBasedAuthentication = enableAPIBasedAuthentication;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Decides whether API Based Authentication is enabled for this application.")
+    @JsonProperty("enableAPIBasedAuthentication")
+    @Valid
+    public Boolean getEnableAPIBasedAuthentication() {
+        return enableAPIBasedAuthentication;
+    }
+    public void setEnableAPIBasedAuthentication(Boolean enableAPIBasedAuthentication) {
+        this.enableAPIBasedAuthentication = enableAPIBasedAuthentication;
+    }
+
+    /**
+    **/
+    public AdvancedApplicationConfiguration attestationMetaData(AdvancedApplicationConfigurationAttestationMetaData attestationMetaData) {
+
+        this.attestationMetaData = attestationMetaData;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("attestationMetaData")
+    @Valid
+    public AdvancedApplicationConfigurationAttestationMetaData getAttestationMetaData() {
+        return attestationMetaData;
+    }
+    public void setAttestationMetaData(AdvancedApplicationConfigurationAttestationMetaData attestationMetaData) {
+        this.attestationMetaData = attestationMetaData;
+    }
+
+    /**
     **/
     public AdvancedApplicationConfiguration additionalSpProperties(List<AdditionalSpProperty> additionalSpProperties) {
 
@@ -264,12 +304,14 @@ public class AdvancedApplicationConfiguration  {
             Objects.equals(this.returnAuthenticatedIdpList, advancedApplicationConfiguration.returnAuthenticatedIdpList) &&
             Objects.equals(this.enableAuthorization, advancedApplicationConfiguration.enableAuthorization) &&
             Objects.equals(this.fragment, advancedApplicationConfiguration.fragment) &&
+            Objects.equals(this.enableAPIBasedAuthentication, advancedApplicationConfiguration.enableAPIBasedAuthentication) &&
+            Objects.equals(this.attestationMetaData, advancedApplicationConfiguration.attestationMetaData) &&
             Objects.equals(this.additionalSpProperties, advancedApplicationConfiguration.additionalSpProperties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, useExternalConsentPage, returnAuthenticatedIdpList, enableAuthorization, fragment, additionalSpProperties);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, useExternalConsentPage, returnAuthenticatedIdpList, enableAuthorization, fragment, enableAPIBasedAuthentication, attestationMetaData, additionalSpProperties);
     }
 
     @Override
@@ -287,6 +329,8 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    returnAuthenticatedIdpList: ").append(toIndentedString(returnAuthenticatedIdpList)).append("\n");
         sb.append("    enableAuthorization: ").append(toIndentedString(enableAuthorization)).append("\n");
         sb.append("    fragment: ").append(toIndentedString(fragment)).append("\n");
+        sb.append("    enableAPIBasedAuthentication: ").append(toIndentedString(enableAPIBasedAuthentication)).append("\n");
+        sb.append("    attestationMetaData: ").append(toIndentedString(attestationMetaData)).append("\n");
         sb.append("    additionalSpProperties: ").append(toIndentedString(additionalSpProperties)).append("\n");
         sb.append("}");
         return sb.toString();

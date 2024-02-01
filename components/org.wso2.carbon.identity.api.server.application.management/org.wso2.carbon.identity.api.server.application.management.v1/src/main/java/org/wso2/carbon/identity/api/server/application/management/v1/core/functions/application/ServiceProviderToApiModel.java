@@ -1,28 +1,34 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2023, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.AppRoleConfig;
+import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfigurationAttestationMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationStepModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.Authenticator;
@@ -33,6 +39,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappin
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.Role;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
@@ -41,14 +48,15 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
-import org.wso2.carbon.identity.application.common.model.AppRoleMappingConfig;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
+import org.wso2.carbon.identity.application.common.model.ClientAttestationMetaData;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
+import org.wso2.carbon.identity.application.common.model.RoleV2;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
@@ -60,6 +68,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -67,6 +76,14 @@ import java.util.stream.Collectors;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.arrayToStream;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_JWKS;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_PEM;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.Application.CONSOLE_APP;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.Application.MY_ACCOUNT_APP;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.ORGANIZATION_AUTHENTICATOR;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.ALLOWED_ROLE_AUDIENCE_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.ANDROID_PACKAGE_NAME_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.APPLE_APP_ID_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_API_BASED_AUTHENTICATION_ENABLED_PROPERTY_NAME;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_ATTESTATION_ENABLED_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_MANAGEMENT_APP_SP_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.TEMPLATE_ID_SP_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.USE_USER_ID_FOR_DEFAULT_SUBJECT;
@@ -85,6 +102,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private static final Set<String> systemApplications = ApplicationManagementServiceHolder
             .getApplicationManagementService().getSystemApplications();
     private static final String IS_FRAGMENT_APP = "isFragmentApp";
+    private static final String useUserIdForDefaultSubject = "useUserIdForDefaultSubject";
 
     @Override
     public ApplicationResponseModel apply(ServiceProvider application) {
@@ -103,18 +121,56 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .description(application.getDescription())
                     .imageUrl(application.getImageUrl())
                     .accessUrl(application.getAccessUrl())
+                    .logoutReturnUrl(getLogoutReturnUrl(application))
                     .clientId(getInboundKey(application, "oauth2"))
                     .issuer(getInboundKey(application, "samlsso"))
+                    .realm(getInboundKey(application, "passivests"))
                     .templateId(application.getTemplateId())
                     .isManagementApp(application.isManagementApp())
+                    .associatedRoles(buildAssociatedRoles(application))
                     .claimConfiguration(buildClaimConfiguration(application))
                     .inboundProtocols(buildInboundProtocols(application))
                     .advancedConfigurations(buildAdvancedAppConfiguration(application))
                     .provisioningConfigurations(buildProvisioningConfiguration(application))
                     .authenticationSequence(buildAuthenticationSequence(application))
-                    .appRoleConfigurations(buildAppRoleConfigurations(application))
                     .access(getAccess(application.getApplicationName()));
         }
+    }
+
+    private String getLogoutReturnUrl(ServiceProvider application) {
+
+        for (ServiceProviderProperty property : application.getSpProperties()) {
+            if (ApplicationManagementConstants.PROP_LOGOUT_RETURN_URL.equals(property.getName())) {
+                return property.getValue();
+            }
+        }
+        return null; // null value returned to avoid API response returning an empty string.
+    }
+
+    private AssociatedRolesConfig buildAssociatedRoles(ServiceProvider application) {
+
+        AssociatedRolesConfig associatedRolesConfig = new AssociatedRolesConfig();
+        if (application.getAssociatedRolesConfig() == null) {
+            return null;
+        }
+
+        String allowedAudience = application.getAssociatedRolesConfig().getAllowedAudience();
+        AssociatedRolesConfig.AllowedAudienceEnum allowedAudienceEnum = null;
+        switch (allowedAudience) {
+            case "application":
+                allowedAudienceEnum = AssociatedRolesConfig.AllowedAudienceEnum.APPLICATION;
+                break;
+            case "organization":
+                allowedAudienceEnum = AssociatedRolesConfig.AllowedAudienceEnum.ORGANIZATION;
+                break;
+            default:
+                break;
+        }
+        associatedRolesConfig.setAllowedAudience(allowedAudienceEnum);
+        RoleV2[] roles = application.getAssociatedRolesConfig().getRoles();
+        Arrays.asList(roles).forEach(role -> associatedRolesConfig.addRolesItem(
+                new Role().id(role.getId()).name(role.getName())));
+        return associatedRolesConfig;
     }
 
     private List<InboundProtocolListItem> buildInboundProtocols(ServiceProvider application) {
@@ -148,33 +204,14 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             authSequence.script(authConfig.getAuthenticationScriptConfig().getContent());
         }
 
-        addAuthenticationStepInformation(authConfig, authSequence);
+        boolean hideOrganizationSsoAuthenticator = StringUtils.equals(application.getApplicationName(), CONSOLE_APP) ||
+                StringUtils.equals(application.getApplicationName(), MY_ACCOUNT_APP);
+        addAuthenticationStepInformation(hideOrganizationSsoAuthenticator, authConfig, authSequence);
 
         List<String> requestPathAuthenticators = getRequestPathAuthenticators(application);
         authSequence.setRequestPathAuthenticators(requestPathAuthenticators);
 
         return authSequence;
-    }
-
-    /**
-     * Build application role configurations API model from the given application.
-     *
-     * @param application Service Provider for which the Application Role Configurations API model is built.
-     * @return List of application role configurations.
-     */
-    private List<AppRoleConfig> buildAppRoleConfigurations(ServiceProvider application) {
-
-        AppRoleMappingConfig[] applicationRoleMappingConfig = application.getApplicationRoleMappingConfig();
-
-        if (applicationRoleMappingConfig == null) {
-            return Collections.emptyList();
-        }
-        return Arrays.stream(applicationRoleMappingConfig).map(appRoleMappingConfig -> {
-            AppRoleConfig appRoleConfig = new AppRoleConfig();
-            appRoleConfig.setIdp(appRoleMappingConfig.getIdPName());
-            appRoleConfig.setUseAppRoleMappings(appRoleMappingConfig.isUseAppRoleMappings());
-            return appRoleConfig;
-        }).collect(Collectors.toList());
     }
 
     private List<String> getRequestPathAuthenticators(ServiceProvider application) {
@@ -183,12 +220,13 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return arrayToStream(requestPathConfigs).map(LocalAuthenticatorConfig::getName).collect(Collectors.toList());
     }
 
-    private void addAuthenticationStepInformation(LocalAndOutboundAuthenticationConfig authConfig,
+    private void addAuthenticationStepInformation(boolean hideOrganizationSsoAuthenticator,
+                                                  LocalAndOutboundAuthenticationConfig authConfig,
                                                   AuthenticationSequence authSequence) {
 
         if (authConfig.getAuthenticationSteps() != null) {
             Arrays.stream(authConfig.getAuthenticationSteps()).forEach(authenticationStep -> {
-                authSequence.addStepsItem(buildAuthStep(authenticationStep));
+                authSequence.addStepsItem(buildAuthStep(hideOrganizationSsoAuthenticator, authenticationStep));
                 if (authenticationStep.isSubjectStep()) {
                     authSequence.setSubjectStepId(authenticationStep.getStepOrder());
                 }
@@ -240,13 +278,16 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return defaultSP;
     }
 
-    private AuthenticationStepModel buildAuthStep(AuthenticationStep authenticationStep) {
+    private AuthenticationStepModel buildAuthStep(boolean hideOrganizationSsoAuthenticator,
+                                                  AuthenticationStep authenticationStep) {
 
         AuthenticationStepModel authStep = new AuthenticationStepModel();
         authStep.setId(authenticationStep.getStepOrder());
 
-        arrayToStream(authenticationStep.getFederatedIdentityProviders()).forEach(y -> authStep.addOptionsItem(
-                new Authenticator().idp(y.getIdentityProviderName())
+        arrayToStream(authenticationStep.getFederatedIdentityProviders()).filter(y ->
+                        !hideOrganizationSsoAuthenticator ||
+                                !(ORGANIZATION_AUTHENTICATOR.equals(y.getDefaultAuthenticatorConfig().getName())))
+                .forEach(y -> authStep.addOptionsItem(new Authenticator().idp(y.getIdentityProviderName())
                         .authenticator(y.getDefaultAuthenticatorConfig().getName())));
 
         arrayToStream(authenticationStep.getLocalAuthenticatorConfigs()).forEach(y -> authStep.addOptionsItem(
@@ -298,6 +339,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         if (application.getClaimConfig() != null) {
             subjectConfig.useMappedLocalSubject(application.getClaimConfig().isAlwaysSendMappedLocalSubjectId());
+            subjectConfig.mappedLocalSubjectMandatory(application.getClaimConfig().isMappedLocalSubjectMandatory());
         }
 
         LocalAndOutboundAuthenticationConfig localAndOutboundAuthConfig =
@@ -307,15 +349,34 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             subjectConfig.includeUserDomain(localAndOutboundAuthConfig.isUseUserstoreDomainInLocalSubjectIdentifier());
 
             if (StringUtils.isBlank(localAndOutboundAuthConfig.getSubjectClaimUri())) {
-                if (isLocalClaimDialectUsedBySp(application)) {
-                    subjectConfig.claim(buildClaimModel(FrameworkConstants.USERNAME_CLAIM));
-                }
+                assignClaimForSubjectValue(application, subjectConfig);
             } else {
                 subjectConfig.claim(buildClaimModel(localAndOutboundAuthConfig.getSubjectClaimUri()));
             }
         }
 
         return subjectConfig;
+    }
+
+    private void assignClaimForSubjectValue(ServiceProvider application, SubjectConfig subjectConfig) {
+        
+        if (isLocalClaimDialectUsedBySp(application)) {
+            if (isUserIdUsedAsDefaultSubject(application.getSpProperties())) {
+                subjectConfig.claim(buildClaimModel(FrameworkConstants.USER_ID_CLAIM));
+            } else {
+                subjectConfig.claim(buildClaimModel(FrameworkConstants.USERNAME_CLAIM));
+            }
+        }
+    }
+
+    private boolean isUserIdUsedAsDefaultSubject (ServiceProviderProperty[] spProperties) {
+
+        for (ServiceProviderProperty spProperty : spProperties) {
+            if (useUserIdForDefaultSubject.equals(spProperty.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private ClaimConfiguration.DialectEnum getDialect(ServiceProvider application) {
@@ -388,8 +449,39 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .useExternalConsentPage(authConfig.isUseExternalConsentPage())
                 .certificate(getCertificate(serviceProvider))
                 .fragment(isFragmentApp(serviceProvider))
+                .enableAPIBasedAuthentication(serviceProvider.isAPIBasedAuthenticationEnabled())
+                .attestationMetaData(getAttestationMetaData(serviceProvider))
                 .additionalSpProperties(getSpProperties(serviceProvider));
     }
+
+    /**
+     * Retrieves the attestation metadata for an application's advanced configuration based on the provided
+     * service provider.
+     *
+     * @param serviceProvider The service provider for which attestation metadata is required.
+     * @return An instance of AdvancedApplicationConfigurationAttestationMetaData containing attestation data.
+     */
+    private AdvancedApplicationConfigurationAttestationMetaData getAttestationMetaData
+                                                                (ServiceProvider serviceProvider) {
+
+        // Retrieve the client attestation metadata from the service provider.
+        ClientAttestationMetaData clientAttestationMetaData = serviceProvider.getClientAttestationMetaData();
+
+        // If the client attestation metadata is not available, create a new instance.
+        if (clientAttestationMetaData == null) {
+            clientAttestationMetaData = new ClientAttestationMetaData();
+        }
+
+        // Create and configure an instance of AdvancedApplicationConfigurationAttestationMetaData
+        // based on the client attestation metadata.
+        return new AdvancedApplicationConfigurationAttestationMetaData()
+                .enableClientAttestation(clientAttestationMetaData.isAttestationEnabled())
+                .androidPackageName(clientAttestationMetaData.getAndroidPackageName())
+                .appleAppId(clientAttestationMetaData.getAppleAppId())
+                .androidAttestationServiceCredentials(parseAndroidServiceCredentials(clientAttestationMetaData
+                        .getAndroidAttestationServiceCredentials()));
+    }
+
 
     private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {
 
@@ -423,6 +515,16 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             spPropertyList.removeIf(property -> USE_USER_ID_FOR_DEFAULT_SUBJECT.equals(property.getName()));
             spPropertyList.removeIf(property -> TEMPLATE_ID_SP_PROPERTY_NAME.equals(property.getName()));
             spPropertyList.removeIf(property -> IS_MANAGEMENT_APP_SP_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property -> IS_ATTESTATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property ->
+                    IS_API_BASED_AUTHENTICATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property ->
+                    ANDROID_PACKAGE_NAME_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property ->
+                    ANDROID_PACKAGE_NAME_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property ->
+                    APPLE_APP_ID_PROPERTY_NAME.equals(property.getName()));
+            spPropertyList.removeIf(property -> ALLOWED_ROLE_AUDIENCE_PROPERTY_NAME.equals(property.getName()));
             return spPropertyList.toArray(new ServiceProviderProperty[0]);
     }
 
@@ -453,12 +555,10 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private ApplicationResponseModel.AccessEnum getAccess(String applicationName) {
 
         String username = ContextLoader.getUsernameFromContext();
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         try {
-            if (ApplicationConstants.LOCAL_SP.equals(applicationName) ||
-                    (MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain) && systemApplications != null
-                            && systemApplications.stream().anyMatch(applicationName::equalsIgnoreCase)) ||
+            if (ApplicationConstants.LOCAL_SP.equals(applicationName) || (systemApplications != null
+                    && systemApplications.stream().anyMatch(applicationName::equalsIgnoreCase)) ||
                     !ApplicationMgtUtil.isUserAuthorized(applicationName, username)) {
                 return ApplicationResponseModel.AccessEnum.READ;
             }
@@ -477,12 +577,42 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .getInboundAuthenticationRequestConfigs();
 
             if (authRequestConfigs != null && authRequestConfigs.length > 0) {
-                if (authRequestConfigs[0].getInboundAuthType().equals(authType)) {
-                    return authRequestConfigs[0].getInboundAuthKey();
+                for (InboundAuthenticationRequestConfig authRequestConfig: authRequestConfigs) {
+                    if (authRequestConfig.getInboundAuthType().equals(authType)) {
+                        return authRequestConfig.getInboundAuthKey();
+                    }
                 }
             }
         }
 
         return StringUtils.EMPTY;
+    }
+
+    /**
+     * Parses a JSON string representing Android service credentials and converts it to a Map.
+     *
+     * @param stringJSON A JSON string containing Android service credentials.
+     * @return A Map representing the parsed Android service credentials,
+     * or null if parsing fails or the input is blank.
+     */
+    private Map<String, String> parseAndroidServiceCredentials(String stringJSON) {
+
+        Map<String, String> jsonObject;
+
+        // Check if the input JSON string is blank
+        if (StringUtils.isBlank(stringJSON)) {
+            // Return null if the input is blank
+            return null;
+        }
+
+        try {
+            // Attempt to parse the JSON string into an instance of Map.
+            jsonObject = new Gson().fromJson(stringJSON, Map.class);
+        } catch (JsonSyntaxException exception) {
+            // Return null if an exception occurs during parsing (e.g., due to invalid JSON syntax)
+            return null;
+        }
+        // Return the parsed object
+        return jsonObject;
     }
 }

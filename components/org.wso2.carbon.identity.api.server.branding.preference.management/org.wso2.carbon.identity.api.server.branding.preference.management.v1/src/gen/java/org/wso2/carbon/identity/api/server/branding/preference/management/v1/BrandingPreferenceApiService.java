@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
+ * Copyright (c) 2021-2023, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.Error;
 import javax.ws.rs.core.Response;
 
@@ -33,11 +34,21 @@ public interface BrandingPreferenceApiService {
 
       public Response addBrandingPreference(BrandingPreferenceModel brandingPreferenceModel);
 
+      public Response addCustomText(CustomTextModel customTextModel);
+
       public Response deleteBrandingPreference(String type, String name, String locale);
+
+      public Response deleteCustomText(String type, String name, String locale, String screen);
 
       public Response getBrandingPreference(String type, String name, String locale);
 
+      public Response getCustomText(String type, String name, String locale, String screen);
+
       public Response resolveBrandingPreference(String type, String name, String locale);
 
+      public Response resolveCustomText(String type, String name, String locale, String screen);
+
       public Response updateBrandingPreference(BrandingPreferenceModel brandingPreferenceModel);
+
+      public Response updateCustomText(CustomTextModel customTextModel);
 }

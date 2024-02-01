@@ -20,7 +20,7 @@
         <artifactId>org.wso2.carbon.identity.api.server.claim.management</artifactId>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <relativePath>../pom.xml</relativePath>
-        <version>1.2.52-SNAPSHOT</version>
+        <version>1.2.167-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.api.server.claim.management.common</artifactId>
@@ -43,6 +43,11 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.claim.metadata.mgt</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity.organization.management.core</groupId>
+            <artifactId>org.wso2.carbon.identity.organization.management.service</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -38,7 +38,6 @@ import org.wso2.carbon.identity.functions.library.mgt.exception.FunctionLibraryM
 import org.wso2.carbon.identity.functions.library.mgt.exception.FunctionLibraryManagementServerException;
 import org.wso2.carbon.identity.functions.library.mgt.model.FunctionLibrary;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -150,9 +149,9 @@ public class ServerScriptLibrariesService {
         ScriptLibraryPOSTRequest scriptLibraryPOSTRequest = new ScriptLibraryPOSTRequest();
         scriptLibraryPOSTRequest.setName(name);
         scriptLibraryPOSTRequest.setDescription(description);
+        String scriptLibraryPOSTRequestContent;
         try {
-            scriptLibraryPOSTRequest.setContent(
-                    new File(IOUtils.toString(contentInputStream, StandardCharsets.UTF_8.name())));
+            scriptLibraryPOSTRequestContent = IOUtils.toString(contentInputStream, StandardCharsets.UTF_8.name());
         } catch (IOException e) {
             log.error("Error occurred while reading contentInputStream: " + e);
             throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_SCRIPT_LIBRARY,
@@ -163,7 +162,8 @@ public class ServerScriptLibrariesService {
                     Response.Status.CONFLICT, scriptLibraryPOSTRequest.getName(),
                     ContextLoader.getTenantDomainFromContext());
         } else {
-            FunctionLibrary functionLibrary = createScriptLibrary(scriptLibraryPOSTRequest);
+            FunctionLibrary functionLibrary = createScriptLibrary(scriptLibraryPOSTRequestContent,
+                    scriptLibraryPOSTRequest);
             try {
                 if (scriptLibraryPOSTRequest.getName().contains(Constants.SCRIPT_LIBRARY_EXTENSION)) {
                     ScriptLibraryServiceHolder.getScriptLibraryManagementService()
@@ -192,16 +192,17 @@ public class ServerScriptLibrariesService {
 
         ScriptLibraryPUTRequest scriptLibraryPUTRequest = new ScriptLibraryPUTRequest();
         scriptLibraryPUTRequest.setDescription(description);
+        String scriptLibraryPUTRequestContent;
         try {
-            scriptLibraryPUTRequest.setContent(
-                    new File(IOUtils.toString(contentInputStream, StandardCharsets.UTF_8.name())));
+            scriptLibraryPUTRequestContent = IOUtils.toString(contentInputStream, StandardCharsets.UTF_8.name());
         } catch (IOException e) {
             log.error("Error occurred while reading contentInputStream: " + e);
             throw handleScriptLibraryClientError(Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_SCRIPT_LIBRARY,
                     Response.Status.INTERNAL_SERVER_ERROR);
         }
         if (isScriptLibraryAvailable(scriptLibraryName)) {
-            FunctionLibrary functionLibrary = createScriptLibraryPut(scriptLibraryName, scriptLibraryPUTRequest);
+            FunctionLibrary functionLibrary = createScriptLibraryPut(scriptLibraryName, scriptLibraryPUTRequestContent,
+                    scriptLibraryPUTRequest);
             try {
                 ScriptLibraryServiceHolder.getScriptLibraryManagementService()
                         .updateFunctionLibrary(scriptLibraryName, functionLibrary,
@@ -305,12 +306,13 @@ public class ServerScriptLibrariesService {
      * @param scriptLibraryPOSTRequest ScriptLibraryPOSTRequest
      * @return functionLibrary
      */
-    private FunctionLibrary createScriptLibrary(ScriptLibraryPOSTRequest scriptLibraryPOSTRequest) {
+    private FunctionLibrary createScriptLibrary(String scriptLibraryPOSTRequestContent,
+                                                ScriptLibraryPOSTRequest scriptLibraryPOSTRequest) {
 
         FunctionLibrary functionLibrary = new FunctionLibrary();
         functionLibrary.setFunctionLibraryName(scriptLibraryPOSTRequest.getName());
         functionLibrary.setDescription(scriptLibraryPOSTRequest.getDescription());
-        functionLibrary.setFunctionLibraryScript(String.valueOf(scriptLibraryPOSTRequest.getContent()));
+        functionLibrary.setFunctionLibraryScript(scriptLibraryPOSTRequestContent);
         return functionLibrary;
     }
 
@@ -321,13 +323,13 @@ public class ServerScriptLibrariesService {
      * @param scriptLibraryPUTRequest ScriptLibraryPUTRequest
      * @return functionLibrary
      */
-    private FunctionLibrary createScriptLibraryPut(String scriptLibraryName,
+    private FunctionLibrary createScriptLibraryPut(String scriptLibraryName, String scriptLibraryPUTRequestContent,
                                                    ScriptLibraryPUTRequest scriptLibraryPUTRequest) {
 
         FunctionLibrary functionLibrary = new FunctionLibrary();
         functionLibrary.setFunctionLibraryName(scriptLibraryName);
         functionLibrary.setDescription(scriptLibraryPUTRequest.getDescription());
-        functionLibrary.setFunctionLibraryScript(String.valueOf(scriptLibraryPUTRequest.getContent()));
+        functionLibrary.setFunctionLibraryScript(scriptLibraryPUTRequestContent);
         return functionLibrary;
     }
 

@@ -41,6 +41,8 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.idp.common.Constants;
 import org.wso2.carbon.identity.api.server.idp.common.IdentityProviderServiceHolder;
+import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claim;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
@@ -51,6 +53,7 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorLi
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorRequest;
+import org.wso2.carbon.identity.api.server.idp.v1.model.IdPGroup;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListItem;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderPOSTRequest;
@@ -79,6 +82,7 @@ import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorServi
 import org.wso2.carbon.identity.application.common.model.CertificateInfo;
 import org.wso2.carbon.identity.application.common.model.ClaimConfig;
 import org.wso2.carbon.identity.application.common.model.ClaimMapping;
+import org.wso2.carbon.identity.application.common.model.FederatedAssociationConfig;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.IdentityProviderProperty;
@@ -107,12 +111,19 @@ import org.wso2.carbon.identity.template.mgt.model.Template;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
+import org.wso2.carbon.idp.mgt.dao.IdPManagementDAO;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 import org.wso2.carbon.user.core.UserCoreConstants;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.inspector.TagInspector;
+import org.yaml.snakeyaml.inspector.TrustedPrefixesTagInspector;
+import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -150,6 +161,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXT
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.ErrorMessage.ERROR_CODE_IDP_LIMIT_REACHED;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.GOOGLE_PRIVATE_KEY;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPLATE_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_CATEGORY;
@@ -158,6 +170,7 @@ import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_SERV
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.SERV_AUTHENTICATION;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.SERV_PROVISIONING;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.TEMPLATE_MGT_ERROR_CODE_DELIMITER;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.RESIDENT_IDP_RESERVED_NAME;
 import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
 
 /**
@@ -188,10 +201,38 @@ public class ServerIdpManagementService {
             }
             return createIDPListResponse(
                     IdentityProviderServiceHolder.getIdentityProviderManager().getIdPs(limit, offset, filter,
-                            sortBy, sortOrder, ContextLoader.getTenantDomainFromContext(), requestedAttributeList),
+                            sortOrder, sortBy, ContextLoader.getTenantDomainFromContext(), requestedAttributeList),
                     requestedAttributeList);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
+        }
+    }
+
+    /**
+     * Get list of identity providers.
+     *
+     * @param requiredAttributes Required attributes in the IDP list response.
+     * @param limit      Items per page.
+     * @param offset     Offset.
+     * @param filter     Filter string. E.g. filter="name" sw "google" and "isEnabled" eq "true"
+     * @param sortBy     Attribute to sort the IDPs by. E.g. name
+     * @param sortOrder  Order in which IDPs should be sorted. Can be either ASC or DESC.
+     * @return IdentityProviderListResponse.
+     */
+    public IdentityProviderListResponse getTrustedTokenIssuers(String requiredAttributes, Integer limit, Integer offset,
+                                                      String filter, String sortBy, String sortOrder) {
+
+        try {
+            List<String> requestedAttributeList = null;
+            if (StringUtils.isNotBlank(requiredAttributes)) {
+                requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
+            }
+            return createIDPListResponse(
+                    IdentityProviderServiceHolder.getIdentityProviderManager().getTrustedTokenIssuers(limit, offset,
+                            filter, sortBy, sortOrder, ContextLoader.getTenantDomainFromContext(),
+                            requestedAttributeList), requestedAttributeList);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_TRUSTED_TOKEN_ISSUERS, null);
         }
     }
 
@@ -317,10 +358,13 @@ public class ServerIdpManagementService {
 
         IdentityProvider identityProvider;
         IdentityProvider idpToExport;
+        IdPManagementDAO dao = new IdPManagementDAO();
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId,
-                            tenantDomain, true);
+            identityProvider = RESIDENT_IDP_RESERVED_NAME.equals(idpId) ? dao.getIdPByName(null,
+                    RESIDENT_IDP_RESERVED_NAME, IdentityTenantUtil.getTenantId(tenantDomain), tenantDomain) :
+                    IdentityProviderServiceHolder.getIdentityProviderManager().
+                            getIdPByResourceId(idpId, tenantDomain, true);
             idpToExport = createIdPClone(identityProvider);
             if (idpToExport == null) {
                 throw handleException(Response.Status.NOT_FOUND,
@@ -374,19 +418,23 @@ public class ServerIdpManagementService {
      * @param identityProviderId Resource ID of the Identity Provider to be updated.
      * @param fileInputStream    File to be imported as an input stream.
      * @param fileDetail         File details.
-     * @return Unique identifier of the updated identity provider.
      */
-    public String updateIDPFromFile(String identityProviderId, InputStream fileInputStream, Attachment fileDetail) {
+    public void updateIDPFromFile(String identityProviderId, InputStream fileInputStream, Attachment fileDetail) {
 
         IdentityProvider identityProvider;
         try {
+            identityProvider = getIDPFromFile(fileInputStream, fileDetail);
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
-            identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(
-                    identityProviderId, getIDPFromFile(fileInputStream, fileDetail), tenantDomain);
+            if (RESIDENT_IDP_RESERVED_NAME.equals(identityProviderId)) {
+                IdentityProviderServiceHolder.getIdentityProviderManager().updateResidentIdP(identityProvider,
+                        tenantDomain);
+            } else {
+                IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(identityProviderId,
+                        identityProvider, tenantDomain);
+            }
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP, null);
         }
-        return identityProvider.getResourceId();
     }
 
     /**
@@ -962,6 +1010,54 @@ public class ServerIdpManagementService {
     }
 
     /**
+     * Get Group Configuration for API response.
+     *
+     * @param idpId Identity Provider resource ID.
+     * @return Groups of the Identity Provider.
+     */
+    public List<IdPGroup> getGroupConfig(String idpId) {
+
+        try {
+            IdentityProvider identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager()
+                    .getIdPByResourceId(idpId, ContextLoader.getTenantDomainFromContext(), true);
+            if (identityProvider == null) {
+                throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
+                        idpId);
+            }
+            return createGroupResponse(identityProvider);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_GROUPS, idpId);
+        }
+    }
+
+    /**
+     * Update IdP group configuration.
+     *
+     * @param idpId  Identity Provider resource ID.
+     * @param groups IdP Groups from the request.
+     * @return Updated IdP Groups.
+     */
+    public List<IdPGroup> updateGroupConfig(String idpId, List<IdPGroup> groups) {
+
+        try {
+            IdentityProvider idP = IdentityProviderServiceHolder.getIdentityProviderManager()
+                    .getIdPByResourceId(idpId, ContextLoader.getTenantDomainFromContext(), true);
+            if (idP == null) {
+                throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
+                        idpId);
+            }
+            updateGroups(idP, groups);
+
+            IdentityProvider updatedIdP =
+                    IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(idpId,
+                            idP, ContextLoader.getTenantDomainFromContext());
+            return createGroupResponse(updatedIdP);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_GROUPS, idpId);
+        }
+    }
+
+    /**
      * Get Provisioning configuration. Includes JIT config and outbound provisioning connectors.
      *
      * @param idpId Identity Provider resource ID.
@@ -980,6 +1076,47 @@ public class ServerIdpManagementService {
             return createProvisioningResponse(identityProvider);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_PROVISIONING, idpId);
+        }
+    }
+
+    public AssociationResponse getFederatedAssociationConfig(String idpId) {
+
+        try {
+            IdentityProvider identityProvider =
+                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
+                            .getTenantDomainFromContext(), true);
+            if (identityProvider == null) {
+                throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
+                        idpId);
+            }
+
+            return createAssociationResponse(identityProvider);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_ASSOCIATION, idpId);
+        }
+    }
+
+    public AssociationResponse updateFederatedAssociationConfig(String idpId, AssociationRequest associationRequest) {
+
+        try {
+            IdentityProvider idP =
+                    IdentityProviderServiceHolder.getIdentityProviderManager().getIdPByResourceId(idpId, ContextLoader
+                            .getTenantDomainFromContext(), true);
+
+            if (idP == null) {
+                throw handleException(Response.Status.NOT_FOUND, Constants.ErrorMessage.ERROR_CODE_IDP_NOT_FOUND,
+                        idpId);
+            }
+
+            updateFederatedAssociation(idP, associationRequest);
+
+            IdentityProvider updatedIdP =
+                    IdentityProviderServiceHolder.getIdentityProviderManager().updateIdPByResourceId(idpId,
+                            idP, ContextLoader.getTenantDomainFromContext());
+
+            return createAssociationResponse(updatedIdP);
+        } catch (IdentityProviderManagementException e) {
+            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_IDP_ASSOCIATION, idpId);
         }
     }
 
@@ -1767,6 +1904,24 @@ public class ServerIdpManagementService {
         }
     }
 
+    private void updateFederatedAssociation(IdentityProvider identityProvider, AssociationRequest associationRequest) {
+
+        if (associationRequest != null) {
+
+            if (associationRequest.getIsEnabled() == null ||
+                    associationRequest.getLookupAttribute().isEmpty()) {
+                throw handleException(Response.Status.BAD_REQUEST,
+                        Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT,
+                        "Provided request body content is not in the expected format.");
+            }
+
+            FederatedAssociationConfig associationConfig = new FederatedAssociationConfig();
+            associationConfig.setEnabled(associationRequest.getIsEnabled());
+            associationConfig.setLookupAttributes(associationRequest.getLookupAttribute().toArray(new String[0]));
+            identityProvider.setFederatedAssociationConfig(associationConfig);
+        }
+    }
+
     private void updateClaims(IdentityProvider idp, Claims claims) {
 
         if (claims != null) {
@@ -1806,25 +1961,27 @@ public class ServerIdpManagementService {
                 claimConfig.setRoleClaimURI(claims.getRoleClaim().getUri());
             }
             List<ProvisioningClaim> provClaims = claims.getProvisioningClaims();
-            for (ProvisioningClaim provClaim : provClaims) {
-                String provClaimUri = provClaim.getClaim().getUri();
-                if (CollectionUtils.isNotEmpty(claims.getMappings())) {
-                    for (ClaimMapping internalMapping : claimMappings) {
+            if (provClaims != null) {
+                for (ProvisioningClaim provClaim : provClaims) {
+                    String provClaimUri = provClaim.getClaim().getUri();
+                    if (CollectionUtils.isNotEmpty(claims.getMappings())) {
+                        for (ClaimMapping internalMapping : claimMappings) {
 
-                        if (StringUtils.equals(provClaimUri, internalMapping.getRemoteClaim().getClaimUri())) {
-                            internalMapping.setDefaultValue(provClaim.getDefaultValue());
-                            internalMapping.setRequested(true);
+                            if (StringUtils.equals(provClaimUri, internalMapping.getRemoteClaim().getClaimUri())) {
+                                internalMapping.setDefaultValue(provClaim.getDefaultValue());
+                                internalMapping.setRequested(true);
+                            }
                         }
+                    } else {
+                        ClaimMapping internalMapping = new ClaimMapping();
+                        org.wso2.carbon.identity.application.common.model.Claim localClaim = new org.wso2.carbon
+                                .identity.application.common.model.Claim();
+                        localClaim.setClaimUri(provClaimUri);
+                        internalMapping.setLocalClaim(localClaim);
+                        internalMapping.setDefaultValue(provClaim.getDefaultValue());
+                        internalMapping.setRequested(true);
+                        claimMappings.add(internalMapping);
                     }
-                } else {
-                    ClaimMapping internalMapping = new ClaimMapping();
-                    org.wso2.carbon.identity.application.common.model.Claim localClaim = new org.wso2.carbon.identity
-                            .application.common.model.Claim();
-                    localClaim.setClaimUri(provClaimUri);
-                    internalMapping.setLocalClaim(localClaim);
-                    internalMapping.setDefaultValue(provClaim.getDefaultValue());
-                    internalMapping.setRequested(true);
-                    claimMappings.add(internalMapping);
                 }
             }
             claimConfig.setClaimMappings(claimMappings.toArray(new ClaimMapping[0]));
@@ -1848,7 +2005,6 @@ public class ServerIdpManagementService {
 
                     RoleMapping internalMapping = new RoleMapping();
 
-
                     internalMapping.setLocalRole(new LocalRole(mapping.getLocalRole()));
                     internalMapping.setRemoteRole(mapping.getIdpRole());
                     idpRoles.add(mapping.getIdpRole());
@@ -1862,12 +2018,45 @@ public class ServerIdpManagementService {
         }
     }
 
+    /**
+     * Update groups of the identity provider.
+     *
+     * @param idp    Identity Provider to be updated.
+     * @param groups Groups returned from the request.
+     */
+    private void updateGroups(IdentityProvider idp, List<IdPGroup> groups) {
+
+        if (groups == null || groups.isEmpty()) {
+            idp.setIdPGroupConfig(null);
+            return;
+        }
+        /*
+         * For each group in groups, check if the group name is not null or empty and then add it to the idPGroupConfig
+         * array.
+         */
+        idp.setIdPGroupConfig(groups
+                .stream()
+                .filter(group -> StringUtils.isNotBlank(group.getName()))
+                .map(group -> {
+                    org.wso2.carbon.identity.application.common.model.IdPGroup idPGroup =
+                            new org.wso2.carbon.identity.application.common.model.IdPGroup();
+                    idPGroup.setIdpGroupName(group.getName());
+                    if (StringUtils.isNotBlank(group.getId())) {
+                        idPGroup.setIdpGroupId(group.getId());
+                    }
+                    return idPGroup;
+                }).toArray(org.wso2.carbon.identity.application.common.model.IdPGroup[]::new));
+    }
+
     private Function<org.wso2.carbon.identity.api.server.idp.v1.model.Property, Property> propertyToInternal
             = apiProperty -> {
 
         Property property = new Property();
         property.setName(apiProperty.getKey());
         property.setValue(apiProperty.getValue());
+        if (StringUtils.equals(GOOGLE_PRIVATE_KEY, apiProperty.getKey())) {
+            property.setType(IdentityApplicationConstants.ConfigElements.PROPERTY_TYPE_BLOB);
+        }
         return property;
     };
 
@@ -1924,8 +2113,13 @@ public class ServerIdpManagementService {
             updateOutboundConnectorConfig(idp, identityProviderPOSTRequest.getProvisioning().getOutboundConnectors());
             updateJIT(idp, identityProviderPOSTRequest.getProvisioning().getJit());
         }
+
+        if (identityProviderPOSTRequest.getImplicitAssociation() != null) {
+            updateFederatedAssociation(idp, identityProviderPOSTRequest.getImplicitAssociation());
+        }
         updateClaims(idp, identityProviderPOSTRequest.getClaims());
         updateRoles(idp, identityProviderPOSTRequest.getRoles());
+        updateGroups(idp, identityProviderPOSTRequest.getGroups());
 
         List<IdentityProviderProperty> idpProperties = new ArrayList<>();
         if (StringUtils.isNotBlank(idpJWKSUri)) {
@@ -1934,12 +2128,11 @@ public class ServerIdpManagementService {
             jwksProperty.setValue(idpJWKSUri);
             idpProperties.add(jwksProperty);
         }
-        if (StringUtils.isNotEmpty(identityProviderPOSTRequest.getIdpIssuerName())) {
-            IdentityProviderProperty idpIssuerProperty = new IdentityProviderProperty();
-            idpIssuerProperty.setName(Constants.IDP_ISSUER_NAME);
-            idpIssuerProperty.setValue(identityProviderPOSTRequest.getIdpIssuerName());
-            idpProperties.add(idpIssuerProperty);
-        }
+        // IDP issuer name can be empty. Hence, no need to check for blank value.
+        IdentityProviderProperty idpIssuerProperty = new IdentityProviderProperty();
+        idpIssuerProperty.setName(Constants.IDP_ISSUER_NAME);
+        idpIssuerProperty.setValue(identityProviderPOSTRequest.getIdpIssuerName());
+        idpProperties.add(idpIssuerProperty);
         idp.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
         return idp;
     }
@@ -2007,6 +2200,9 @@ public class ServerIdpManagementService {
                         break;
                     case Constants.ROLES:
                         identityProviderListItem.setRoles(createRoleResponse(idp));
+                        break;
+                    case Constants.GROUPS:
+                        identityProviderListItem.setGroups(createGroupResponse(idp));
                         break;
                     case Constants.FEDERATED_AUTHENTICATORS:
                         identityProviderListItem.setFederatedAuthenticators(createFederatedAuthenticatorResponse(idp));
@@ -2083,8 +2279,10 @@ public class ServerIdpManagementService {
         idpResponse.setCertificate(createIDPCertificate(identityProvider));
         idpResponse.setClaims(createClaimResponse(identityProvider.getClaimConfig()));
         idpResponse.setRoles(createRoleResponse(identityProvider));
+        idpResponse.setGroups(createGroupResponse(identityProvider));
         idpResponse.setFederatedAuthenticators(createFederatedAuthenticatorResponse(identityProvider));
         idpResponse.setProvisioning(createProvisioningResponse(identityProvider));
+        idpResponse.setImplicitAssociation(createAssociationResponse(identityProvider));
         return idpResponse;
     }
 
@@ -2224,6 +2422,28 @@ public class ServerIdpManagementService {
         return roleConfig;
     }
 
+    /**
+     * Create IdP Groups response for the Identity Provider.
+     *
+     * @param identityProvider Identity Provider.
+     * @return Groups of the Identity Provider.
+     */
+    private List<IdPGroup> createGroupResponse(IdentityProvider identityProvider) {
+
+        org.wso2.carbon.identity.application.common.model.IdPGroup[] idPGroupConfig =
+                identityProvider.getIdPGroupConfig();
+        List<IdPGroup> groupConfigAPIModel = new ArrayList<>();
+        if (idPGroupConfig != null) {
+            Arrays.stream(idPGroupConfig).forEach(idPGroup -> {
+                IdPGroup idPGroupAPIModel = new IdPGroup();
+                idPGroupAPIModel.setName(idPGroup.getIdpGroupName());
+                idPGroupAPIModel.setId(idPGroup.getIdpGroupId());
+                groupConfigAPIModel.add(idPGroupAPIModel);
+            });
+        }
+        return groupConfigAPIModel;
+    }
+
     private FederatedAuthenticatorListResponse createFederatedAuthenticatorResponse(IdentityProvider idp) {
 
         FederatedAuthenticatorConfig[] fedAuthConfigs = idp.getFederatedAuthenticatorConfigs();
@@ -2264,6 +2484,15 @@ public class ServerIdpManagementService {
         return provisioningResponse;
     }
 
+    private AssociationResponse createAssociationResponse(IdentityProvider idp) {
+
+        AssociationResponse associationResponse = new AssociationResponse();
+        associationResponse.setIsEnabled(idp.getFederatedAssociationConfig().isEnabled());
+        associationResponse.setLookupAttribute(
+                Arrays.asList(idp.getFederatedAssociationConfig().getLookupAttributes()));;
+        return associationResponse;
+    }
+
     private OutboundConnectorListResponse createOutboundProvisioningResponse(IdentityProvider idp) {
 
         ProvisioningConnectorConfig[] connectorConfigs = idp.getProvisioningConnectorConfigs();
@@ -2292,38 +2521,37 @@ public class ServerIdpManagementService {
     private JustInTimeProvisioning createJITResponse(IdentityProvider idp) {
 
         JustInTimeProvisioning jitConfig = new JustInTimeProvisioning();
-        if (idp.getJustInTimeProvisioningConfig() != null) {
-            jitConfig.setIsEnabled(idp.getJustInTimeProvisioningConfig().isProvisioningEnabled());
-
-            if (idp.getJustInTimeProvisioningConfig().isProvisioningEnabled()) {
-                boolean modifyUsername = idp.getJustInTimeProvisioningConfig().isModifyUserNameAllowed();
-                boolean passwordProvision = idp.getJustInTimeProvisioningConfig().isPasswordProvisioningEnabled();
-                boolean promptConsent = idp.getJustInTimeProvisioningConfig().isPromptConsent();
-                if (modifyUsername && passwordProvision && promptConsent) {
-                    jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_USERNAME_PASSWORD_CONSENT);
-                } else if (passwordProvision && promptConsent) {
-                    jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_PASSWORD_CONSENT);
-                } else if (promptConsent) {
-                    jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_CONSENT);
-                } else {
-                    jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROVISION_SILENTLY);
-                }
-            }
-            if (idp.getJustInTimeProvisioningConfig().getProvisioningUserStore() == null) {
-                jitConfig.setUserstore(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME);
-            } else {
-                jitConfig.setUserstore(idp.getJustInTimeProvisioningConfig().getProvisioningUserStore());
-            }
-            jitConfig.setAssociateLocalUser(idp.getJustInTimeProvisioningConfig().isAssociateLocalUserEnabled());
-            if (idp.getJustInTimeProvisioningConfig().getAttributeSyncMethod() == null) {
-                jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(
-                        FrameworkConstants.OVERRIDE_ALL));
-            } else {
-                jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(
-                        idp.getJustInTimeProvisioningConfig().getAttributeSyncMethod()));
-            }
+        JustInTimeProvisioningConfig jitProvisionConfig = idp.getJustInTimeProvisioningConfig();
+        if (jitProvisionConfig != null) {
+            jitConfig.setIsEnabled(jitProvisionConfig.isProvisioningEnabled());
+            JustInTimeProvisioning.SchemeEnum provisioningType = getProvisioningType(jitProvisionConfig);
+            jitConfig.setScheme(provisioningType);
+            String provisioningUserStore = StringUtils.isNotBlank(jitProvisionConfig.getProvisioningUserStore()) ?
+                    jitProvisionConfig.getProvisioningUserStore() : UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME;
+            jitConfig.setUserstore(provisioningUserStore);
+            jitConfig.setAssociateLocalUser(jitProvisionConfig.isAssociateLocalUserEnabled());
+            String attributeSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getAttributeSyncMethod()) ?
+                    jitProvisionConfig.getAttributeSyncMethod() : FrameworkConstants.OVERRIDE_ALL;
+            jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum
+                    .valueOf(attributeSyncMethod));
         }
         return jitConfig;
+    }
+
+    private JustInTimeProvisioning.SchemeEnum getProvisioningType(JustInTimeProvisioningConfig jitProvisionConfig) {
+
+        boolean modifyUsername = jitProvisionConfig.isModifyUserNameAllowed();
+        boolean passwordProvision = jitProvisionConfig.isPasswordProvisioningEnabled();
+        boolean promptConsent = jitProvisionConfig.isPromptConsent();
+
+        if (modifyUsername && passwordProvision && promptConsent) {
+            return JustInTimeProvisioning.SchemeEnum.PROMPT_USERNAME_PASSWORD_CONSENT;
+        } else if (passwordProvision && promptConsent) {
+            return JustInTimeProvisioning.SchemeEnum.PROMPT_PASSWORD_CONSENT;
+        } else if (promptConsent) {
+            return JustInTimeProvisioning.SchemeEnum.PROMPT_CONSENT;
+        }
+        return JustInTimeProvisioning.SchemeEnum.PROVISION_SILENTLY;
     }
 
     private Function<SubProperty, MetaProperty> subPropertyToExternalMeta = property -> {
@@ -2627,7 +2855,7 @@ public class ServerIdpManagementService {
      * @param oidcAuthenticatorProperties Authenticator properties of OIDC authenticator.
      */
     private void validateDuplicateOpenIDConnectScopes(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
-                                                     oidcAuthenticatorProperties) {
+                                                              oidcAuthenticatorProperties) {
 
         if (oidcAuthenticatorProperties != null) {
             boolean scopesFieldFilled = false;
@@ -2652,12 +2880,12 @@ public class ServerIdpManagementService {
     }
 
     /**
-     * Verify if scopes contain `openid`
+     * Verify if scopes contain `openid`.
      *
      * @param oidcAuthenticatorProperties Authenticator properties of OIDC authenticator.
      */
     private void validateDefaultOpenIDConnectScopes(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
-                                                     oidcAuthenticatorProperties) {
+                                                            oidcAuthenticatorProperties) {
 
         if (oidcAuthenticatorProperties != null) {
             for (org.wso2.carbon.identity.api.server.idp.v1
@@ -3396,6 +3624,13 @@ public class ServerIdpManagementService {
                 .getProvisioningConnectorConfigs()) {
             removeSecretsFromProperties(provisioningConnectorConfig.getProvisioningProperties());
         }
+
+        // Mask the secret values of the IDP properties identified by the prefix '__secret__'.
+        for (IdentityProviderProperty idpProperty : identityProvider.getIdpProperties()) {
+            if (idpProperty.getName().startsWith("__secret__")) {
+                idpProperty.setValue(MASKING_VALUE);
+            }
+        }
     }
 
     private void removeSecretsFromProperties(Property[] properties) {
@@ -3468,7 +3703,14 @@ public class ServerIdpManagementService {
 
         StringBuilder fileNameSB = new StringBuilder(identityProvider.getIdentityProviderName());
         fileNameSB.append(YAML_FILE_EXTENSION);
-        Yaml yaml = new Yaml();
+
+        Representer representer = new Representer(new DumperOptions());
+        TypeDescription typeDescription = new TypeDescription(IdentityProvider.class);
+        typeDescription.setExcludes("id", "resourceId");
+        representer.addTypeDescription(typeDescription);
+        representer.getPropertyUtils().setSkipMissingProperties(true);
+
+        Yaml yaml = new Yaml(representer);
         try {
             return new FileContent(fileNameSB.toString(), MEDIA_TYPE_YAML, yaml.dump(identityProvider));
         } catch (YAMLException e) {
@@ -3536,7 +3778,14 @@ public class ServerIdpManagementService {
             throws IdentityProviderManagementClientException {
 
         try {
-            Yaml yaml = new Yaml(new Constructor(IdentityProvider.class));
+            // Add trusted tags included in the IDP YAML files.
+            List<String> trustedTagList = new ArrayList<>();
+            trustedTagList.add(IdentityProvider.class.getName());
+
+            LoaderOptions loaderOptions = new LoaderOptions();
+            TagInspector tagInspector = new TrustedPrefixesTagInspector(trustedTagList);
+            loaderOptions.setTagInspector(tagInspector);
+            Yaml yaml = new Yaml(new Constructor(IdentityProvider.class, loaderOptions));
             return yaml.loadAs(fileContent.getContent(), IdentityProvider.class);
         } catch (YAMLException e) {
             throw new IdentityProviderManagementClientException(String.format("Error in reading YAML file " +

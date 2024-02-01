@@ -1,31 +1,31 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2023, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application;
 
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
-import org.wso2.carbon.identity.api.server.application.management.v1.AppRoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
-
-import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
@@ -43,11 +43,27 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
         setIfNotNull(applicationPatchModel.getAccessUrl(), serviceProvider::setAccessUrl);
         setIfNotNull(applicationPatchModel.getTemplateId(), serviceProvider::setTemplateId);
 
+        patchAssociatedRolesConfigurations(serviceProvider, applicationPatchModel.getAssociatedRoles());
         patchClaimConfiguration(serviceProvider, applicationPatchModel.getClaimConfiguration());
         patchAuthenticationSequence(applicationPatchModel.getAuthenticationSequence(), serviceProvider);
-        patchAppRoleConfigurations(applicationPatchModel.getAppRoleConfigurations(), serviceProvider);
         patchAdvancedConfiguration(serviceProvider, applicationPatchModel.getAdvancedConfigurations());
         patchProvisioningConfiguration(applicationPatchModel.getProvisioningConfigurations(), serviceProvider);
+        patchLogoutReturnUrl(serviceProvider, applicationPatchModel.getLogoutReturnUrl());
+    }
+
+    private void patchLogoutReturnUrl(ServiceProvider application, String logoutReturnUrl) {
+
+        if (logoutReturnUrl != null) {
+            new UpdateLogoutReturnUrl().apply(application, logoutReturnUrl);
+        }
+    }
+
+    private void patchAssociatedRolesConfigurations(ServiceProvider serviceProvider,
+                                                    AssociatedRolesConfig associatedRoles) {
+
+        if (associatedRoles != null) {
+            new UpdateAssociatedRoles().apply(serviceProvider, associatedRoles);
+        }
     }
 
     private void patchClaimConfiguration(ServiceProvider serviceProvider, ClaimConfiguration claimConfiguration) {
@@ -62,14 +78,6 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
 
         if (authenticationSequence != null) {
             new UpdateAuthenticationSequence().apply(serviceProvider, authenticationSequence);
-        }
-    }
-
-    private void patchAppRoleConfigurations(List<AppRoleConfig> appRoleConfigurations,
-                                               ServiceProvider serviceProvider) {
-
-        if (appRoleConfigurations != null) {
-            new UpdateAppRoleConfigurations().apply(serviceProvider, appRoleConfigurations);
         }
     }
 

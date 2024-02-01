@@ -15,11 +15,13 @@
  */
 package org.wso2.carbon.identity.api.server.application.management.common;
 
+import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
-import org.wso2.carbon.identity.auth.attribute.handler.AuthAttributeHandlerManager;
+import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
+import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
@@ -37,8 +39,10 @@ public class ApplicationManagementServiceHolder {
     private static OAuthServerConfiguration oAuthServerConfiguration;
     private static TemplateManager templateManager;
     private static CORSManagementService corsManagementService;
-    private static AuthAttributeHandlerManager authAttributeHandlerManager;
     private static RealmService realmService;
+    private static APIResourceManager apiResourceManager;
+    private static AuthorizedAPIManagementService authorizedAPIManagementService;
+    private static OrgApplicationManager orgApplicationManager;
 
     public static ApplicationManagementService getApplicationManagementService() {
 
@@ -110,16 +114,6 @@ public class ApplicationManagementServiceHolder {
         ApplicationManagementServiceHolder.corsManagementService = corsManagementService;
     }
 
-    public static AuthAttributeHandlerManager getAuthAttributeHandlerManager() {
-
-        return authAttributeHandlerManager;
-    }
-
-    public static void setAuthAttributeHandlerManager(AuthAttributeHandlerManager authAttributeHandlerManager) {
-
-        ApplicationManagementServiceHolder.authAttributeHandlerManager = authAttributeHandlerManager;
-    }
-
     /**
      * Get RealmService.
      *
@@ -138,5 +132,66 @@ public class ApplicationManagementServiceHolder {
     public static void setRealmService(RealmService realmService) {
 
         ApplicationManagementServiceHolder.realmService = realmService;
+    }
+
+    /**
+     * Get APIResourceManager.
+     *
+     * @return APIResourceManager.
+     */
+    public static APIResourceManager getApiResourceManager() {
+
+        return apiResourceManager;
+    }
+
+    /**
+     * Set APIResourceManager.
+     *
+     * @param apiResourceManager APIResourceManager.
+     */
+    public static void setApiResourceManager(APIResourceManager apiResourceManager) {
+
+        ApplicationManagementServiceHolder.apiResourceManager = apiResourceManager;
+    }
+
+    /**
+     * Get AuthorizedAPIManagementService.
+     *
+     * @return AuthorizedAPIManagementService.
+     */
+    public static AuthorizedAPIManagementService getAuthorizedAPIManagementService() {
+
+        return authorizedAPIManagementService;
+    }
+
+    /**
+     * Set AuthorizedAPIManagementService.
+     *
+     * @param authorizedAPIManagementService AuthorizedAPIManagementService.
+     */
+    public static void setAuthorizedAPIManagementService(AuthorizedAPIManagementService
+                                                                 authorizedAPIManagementService) {
+
+        ApplicationManagementServiceHolder.authorizedAPIManagementService = authorizedAPIManagementService;
+    }
+
+    /**
+     * Get OrgApplicationManager OSGi service.
+     *
+     * @return OrgApplicationManager.
+     */
+    public static OrgApplicationManager getOrgApplicationManager() {
+
+        return orgApplicationManager;
+    }
+
+    /**
+     * Set OrgApplicationManager OSGi service.
+     *
+     * @param orgApplicationManager OrgApplicationManager.
+     */
+    public static void setOrgApplicationManager(OrgApplicationManager orgApplicationManager) {
+
+        ApplicationManagementServiceHolder.orgApplicationManager = orgApplicationManager;
     }
 }

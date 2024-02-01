@@ -20,6 +20,7 @@
 
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService"/>
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService"/>
+    <bean class="org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationSharingService"/>
     <bean class="org.wso2.carbon.identity.api.server.application.management.v1.impl.ApplicationsApiServiceImpl"/>
 
     <bean id="applicationManagementServiceHolderBean"
@@ -50,9 +51,17 @@
           class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
         <property name="realmService" ref="realmServiceFactoryBean"/>
     </bean>
-    <bean id="authAttributeServiceHolderBean"
+    <bean id="authorizedAPIManagementServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
-        <property name="authAttributeHandlerManager" ref="authAttributeServiceFactoryBean"/>
+        <property name="authorizedAPIManagementService" ref="authorizedAPIManagerServiceFactoryBean"/>
+    </bean>
+    <bean id="apiResourceManagerHolderBean"
+          class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
+        <property name="apiResourceManager" ref="apiResourceManagerServiceFactoryBean"/>
+    </bean>
+    <bean id="orgApplicationManagerHolderBean"
+          class="org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder">
+        <property name="orgApplicationManager" ref="orgApplicationManagerServiceFactoryBean"/>
     </bean>
 
     <bean id="applicationManagementServiceFactoryBean"
@@ -70,7 +79,10 @@
     <bean id="realmServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.application.management.common.factory.RealmServiceOSGIServiceFactory">
     </bean>
-    <bean id="authAttributeServiceFactoryBean"
-          class="org.wso2.carbon.identity.api.server.application.management.common.factory.AuthAttributeHandlerOSGiServiceFactory">
-    </bean>
+    <bean id="authorizedAPIManagerServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.application.management.common.factory.AuthorizedAPIMgtOSGiServiceFactory" />
+    <bean id="apiResourceManagerServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.application.management.common.factory.APIResourceMgtOSGiServiceFactory"/>
+    <bean id="orgApplicationManagerServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.application.management.common.factory.OrgApplicationManagerOSGiServiceFactory"/>
 </beans>

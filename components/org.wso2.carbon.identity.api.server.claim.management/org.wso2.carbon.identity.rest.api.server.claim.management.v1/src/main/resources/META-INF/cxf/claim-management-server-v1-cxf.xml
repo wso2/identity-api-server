@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) (2019-2023), WSO2 LLC. (http://www.wso2.org).
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,6 +22,12 @@
           class="org.wso2.carbon.identity.api.server.claim.management.common.ClaimManagementDataHolder">
         <property name="claimMetadataManagementService" ref="claimManagerFactoryBean"/>
     </bean>
+    <bean id="organizationManagerHolderBean"
+          class="org.wso2.carbon.identity.api.server.claim.management.common.ClaimManagementDataHolder">
+        <property name="organizationManager" ref="organizationManagerFactoryBean"/>
+    </bean>
     <bean id="claimManagerFactoryBean"
           class="org.wso2.carbon.identity.api.server.claim.management.common.factory.OSGIServiceFactory"/>
+    <bean id="organizationManagerFactoryBean"
+          class="org.wso2.carbon.identity.api.server.claim.management.common.factory.OrganizationManagementOSGIServiceFactory"/>
 </beans>

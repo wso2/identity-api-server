@@ -26,8 +26,11 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationOwner;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationSharePOSTRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
@@ -39,6 +42,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Servic
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationSharingService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.TransferResource;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -59,6 +63,9 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Autowired
     private ServerApplicationMetadataService applicationMetadataService;
+
+    @Autowired
+    private ServerApplicationSharingService applicationSharingService;
 
     @Override
     public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
@@ -83,15 +90,22 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
-    public Response getConfiguredUserRegistrants(String applicationId) {
-
-        return Response.ok().entity(applicationManagementService.getConfiguredUserRegistrants(applicationId)).build();
-    }
-
-    @Override
     public Response getApplicationTemplate(String templateId) {
 
         return Response.ok().entity(applicationManagementService.getApplicationTemplateById(templateId)).build();
+    }
+
+    @Override
+    public Response getAuthorizedAPIs(String applicationId) {
+
+        return Response.ok().entity(applicationManagementService.getAuthorizedAPIs(applicationId)).build();
+    }
+
+    @Override
+    public Response addAuthorizedAPI(String applicationId, AuthorizedAPICreationModel authorizedAPICreationModel) {
+
+        applicationManagementService.addAuthorizedAPI(applicationId, authorizedAPICreationModel);
+        return Response.ok().build();
     }
 
     @Override
@@ -130,9 +144,24 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response deleteAuthorizedAPI(String applicationId, String authorizationId) {
+
+        applicationManagementService.deleteAuthorizedAPI(applicationId, authorizationId);
+        return Response.noContent().build();
+    }
+
+    @Override
     public Response patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         applicationManagementService.patchApplication(applicationId, applicationPatchModel);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response patchAuthorizedAPI(String applicationId, String authorizationId,
+                                       AuthorizedAPIPatchModel authorizedAPIPatchModel) {
+
+        applicationManagementService.updateAuthorizedAPI(applicationId, authorizationId, authorizedAPIPatchModel);
         return Response.ok().build();
     }
 
@@ -283,6 +312,36 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
         applicationManagementService.revokeOAuthClient(applicationId);
         return Response.ok().build();
+    }
+
+    @Override
+    public Response shareOrgApplication(String applicationId, ApplicationSharePOSTRequest applicationSharePOSTRequest) {
+
+        return applicationSharingService.shareOrganizationApplication(applicationId, applicationSharePOSTRequest);
+    }
+
+    @Override
+    public Response shareOrgApplicationDelete(String applicationId, String sharedOrganizationId) {
+
+        return applicationSharingService.deleteSharedApplication(applicationId, sharedOrganizationId);
+    }
+
+    @Override
+    public Response shareOrgApplicationGet(String applicationId) {
+
+        return applicationSharingService.getApplicationSharedOrganizations(applicationId);
+    }
+
+    @Override
+    public Response sharedApplicationsAllDelete(String applicationId) {
+
+        return applicationSharingService.deleteAllSharedApplications(applicationId);
+    }
+
+    @Override
+    public Response sharedApplicationsGet(String applicationId) {
+
+        return applicationSharingService.getSharedApplications(applicationId);
     }
 
     @Override

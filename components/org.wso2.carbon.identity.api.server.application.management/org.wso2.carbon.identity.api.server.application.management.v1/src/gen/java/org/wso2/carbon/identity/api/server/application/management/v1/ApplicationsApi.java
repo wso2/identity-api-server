@@ -31,9 +31,13 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationOwner;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationResponseModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationSharePOSTRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolMetaData;
@@ -48,7 +52,8 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApp
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAMLMetaData;
-import org.wso2.carbon.identity.api.server.application.management.v1.UserRegistrantsList;
+import org.wso2.carbon.identity.api.server.application.management.v1.SharedApplicationsResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.SharedOrganizationsResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
@@ -70,11 +75,35 @@ public class ApplicationsApi  {
     private ApplicationsApiService delegate;
 
     @Valid
+    @POST
+    @Path("/{applicationId}/authorized-apis")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Authorized an API to the application ", notes = "This API provides the capability to authorized an API to the application.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/create <br>   <b>Scope required:</b> <br>       * internal_application_mgt_create ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Authorized APIs", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Created", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response addAuthorizedAPI(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "" ) @Valid AuthorizedAPICreationModel authorizedAPICreationModel) {
+
+        return delegate.addAuthorizedAPI(applicationId,  authorizedAPICreationModel );
+    }
+
+    @Valid
     @PUT
     @Path("/{applicationId}/owner")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Change application owner ", notes = "This API provides the capability to change the application owner.<br>   <b>Permission required:</b> <br>       * /permission/admin <br>   <b>Scope required:</b> <br>       * SYSTEM ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Change application owner ", notes = "This API provides the capability to change the application owner.<br>   <b>Permission required:</b> <br>       * /permission/admin <br>   <b>Scope required:</b> <br>       * internal_organization_admin ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -189,6 +218,28 @@ public class ApplicationsApi  {
     public Response deleteApplicationTemplate(@ApiParam(value = "Application template ID. This should be a valid locale. ",required=true) @PathParam("template-id") String templateId) {
 
         return delegate.deleteApplicationTemplate(templateId );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/{applicationId}/authorized-apis/{apiId}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Remove API authorization from the application ", notes = "This API provides the capability to delete an authorized API of the application.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/delete <br>   <b>Scope required:</b> <br>       * internal_application_mgt_delete ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Authorized APIs", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "No Content", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteAuthorizedAPI(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "ID of the API resource.",required=true) @PathParam("apiId") String apiId) {
+
+        return delegate.deleteAuthorizedAPI(applicationId,  apiId );
     }
 
     @Valid
@@ -485,6 +536,29 @@ public class ApplicationsApi  {
 
     @Valid
     @GET
+    @Path("/{applicationId}/authorized-apis")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get authorized APIs of the application. ", notes = "This API provides the capability to retrieve all the authorized APIs of the application.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/view <br>   <b>Scope required:</b> <br>       * internal_application_mgt_view ", response = AuthorizedAPIResponse.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Authorized APIs", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = AuthorizedAPIResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getAuthorizedAPIs(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.getAuthorizedAPIs(applicationId );
+    }
+
+    @Valid
+    @GET
     @Path("/{applicationId}/authenticators")
     
     @Produces({ "application/json" })
@@ -505,30 +579,6 @@ public class ApplicationsApi  {
     public Response getConfiguredAuthenticators(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getConfiguredAuthenticators(applicationId );
-    }
-
-    @Valid
-    @GET
-    @Path("/{applicationId}/user-registrants")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Get the list of user registrants configured for the given application. ", notes = "", response = UserRegistrantsList.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "User registrants", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = UserRegistrantsList.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response getConfiguredUserRegistrants(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
-
-        return delegate.getConfiguredUserRegistrants(applicationId );
     }
 
     @Valid
@@ -888,6 +938,30 @@ public class ApplicationsApi  {
     }
 
     @Valid
+    @PATCH
+    @Path("/{applicationId}/authorized-apis/{apiId}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update authorized API scopes ", notes = "This API provides the capability to update an authorized API of the application.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/applicationmgt/update <br>   <b>Scope required:</b> <br>       * internal_application_mgt_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Authorized APIs", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchAuthorizedAPI(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "ID of the API resource.",required=true) @PathParam("apiId") String apiId, @ApiParam(value = "" ) @Valid AuthorizedAPIPatchModel authorizedAPIPatchModel) {
+
+        return delegate.patchAuthorizedAPI(applicationId,  apiId,  authorizedAPIPatchModel );
+    }
+
+    @Valid
     @POST
     @Path("/{applicationId}/inbound-protocols/oidc/regenerate-secret")
     
@@ -933,6 +1007,126 @@ public class ApplicationsApi  {
     public Response revokeOAuthClient(@ApiParam(value = "ID of the application",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.revokeOAuthClient(applicationId );
+    }
+
+    @Valid
+    @POST
+    @Path("/{applicationId}/share")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Share the application from the root organization to the given organization. ", notes = "This API provides the capability to share an application with organizations. <br><br> <b>Scope required:</b>  * internal_shared_application_create ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Application Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Ok", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response shareOrgApplication(@ApiParam(value = "ID of the application which will be shared to organizations.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "" ,required=true) @Valid ApplicationSharePOSTRequest applicationSharePOSTRequest) {
+
+        return delegate.shareOrgApplication(applicationId,  applicationSharePOSTRequest );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/{applicationId}/share/{shared-organization-id}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Stop sharing an application to a organization. ", notes = "This API provides the capability to stop sharing an application to an organization by providing its ID. <br><br> <b>Scope required:</b>  * internal_shared_application_delete ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Application Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Successfully deleted", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response shareOrgApplicationDelete(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId, @ApiParam(value = "ID of the organization to stop sharing.",required=true) @PathParam("shared-organization-id") String sharedOrganizationId) {
+
+        return delegate.shareOrgApplicationDelete(applicationId,  sharedOrganizationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/{applicationId}/share")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "List of organizations that the application is shared to. ", notes = "This API returns the list of organizations that the application is shared to. <br><br> <b>Scope required:</b>  * internal_shared_application_view ", response = SharedOrganizationsResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Application Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = SharedOrganizationsResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response shareOrgApplicationGet(@ApiParam(value = "ID of the application which is shared to organizations.",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.shareOrgApplicationGet(applicationId );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/{applicationId}/shared-apps")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Stop sharing an application with all organizations. ", notes = "This API provides the capability to stop sharing an application to all organizations the application is shared to. <br><br> <b>Scope required:</b>  * internal_shared_application_delete ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Application Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Successfully deleted", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response sharedApplicationsAllDelete(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.sharedApplicationsAllDelete(applicationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/{applicationId}/shared-apps")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "List of shared applications along with its organization. ", notes = "This API returns the list of shared app ids along with the shared organization id. <br><br> <b>Scope required:</b>  * internal_shared_application_view ", response = SharedApplicationsResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Application Sharing", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = SharedApplicationsResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response sharedApplicationsGet(@ApiParam(value = "ID of the application which is shared to organizations.",required=true) @PathParam("applicationId") String applicationId) {
+
+        return delegate.sharedApplicationsGet(applicationId );
     }
 
     @Valid
