@@ -21,7 +21,7 @@ package org.wso2.carbon.identity.api.server.configs.v1.exception;
 /**
  * Server exception class for the DCR Config Management Service.
  */
-public class DCRConfigServerException extends JWTClientAuthenticatorException {
+public class DCRConfigServerException extends DCRConfigException {
 
     /**
      * The default constructor.

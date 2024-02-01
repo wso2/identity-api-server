@@ -26,11 +26,15 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.factory.DCRMgtOGSiServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigClientException;
+import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigException;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigServerException;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
+import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
 import org.wso2.carbon.identity.oauth.dcr.model.DCRConfiguration;
 
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.configs.common.Constants.ErrorMessage.ERROR_DCR_CONFIG_SERVICE_NOT_FOUND;
 
 
 /**
@@ -45,12 +49,31 @@ public class DCRConnectorUtil {
      *
      * @param tenantDomain Tenant domain.
      * @return DCRConfig.
-     * @throws Exception Exception.
+     * @throws DCRMException DCRMException.
      */
-    public static DCRConfig getDCRConfig(String tenantDomain) throws Exception {
+    public static DCRConfig getDCRConfig(String tenantDomain) throws DCRMException, DCRConfigException {
 
-        DCRConfiguration dcrConfiguration = DCRMgtOGSiServiceFactory.getInstance().getDCRConfiguration(tenantDomain);
-        return dcrConfigurationToDCRConfig(dcrConfiguration);
+        if (DCRMgtOGSiServiceFactory.getInstance() != null) {
+            DCRConfiguration dcrConfiguration = DCRMgtOGSiServiceFactory.getInstance()
+                    .getDCRConfiguration(tenantDomain);
+            return dcrConfigurationToDCRConfig(dcrConfiguration);
+        } else {
+            throw new DCRConfigException(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message(),
+                    ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.code());
+        }
+
+    }
+
+    public static void setDCRConfig(DCRConfig dcrConfig, String tenantDomain) throws
+            DCRConfigException, DCRMException {
+
+        if (DCRMgtOGSiServiceFactory.getInstance() != null) {
+            DCRMgtOGSiServiceFactory.getInstance()
+                    .setDCRConfiguration((getDCRConfigurationFromDCRConfig(dcrConfig)), tenantDomain);
+        } else {
+            throw new DCRConfigException(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message(),
+                    ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.code());
+        }
     }
 
     public static DCRConfig dcrConfigurationToDCRConfig(DCRConfiguration dcrConfiguration) {

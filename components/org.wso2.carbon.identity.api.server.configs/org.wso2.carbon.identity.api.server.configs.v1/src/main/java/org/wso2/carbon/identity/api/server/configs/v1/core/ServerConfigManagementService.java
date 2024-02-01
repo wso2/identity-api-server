@@ -83,6 +83,7 @@ import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceCli
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
+import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
@@ -1201,12 +1202,7 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         DCRConfig dcrConfig = null;
         try {
-            if (DCRMgtOGSiServiceFactory.getInstance() != null) {
-                dcrConfig = DCRConnectorUtil.getDCRConfig(tenantDomain);
-            } else {
-                throw new JWTClientAuthenticatorException(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message(),
-                        ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.code());
-            }
+            dcrConfig = DCRConnectorUtil.getDCRConfig(tenantDomain);
         } catch (Exception e) {
             if (e.getMessage().equals(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message())) {
                 throw handleNotFoundError(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND);
@@ -1216,7 +1212,7 @@ public class ServerConfigManagementService {
             }
         }
 
-        try {
+
             for (DCRPatch dcrPatch : dcrPatchList) {
                 String path = dcrPatch.getPath();
                 DCRPatch.OperationEnum operation = dcrPatch.getOperation();
@@ -1259,15 +1255,13 @@ public class ServerConfigManagementService {
             }
 
             // Set the patched configuration object as the new DCR configuration for the tenant.
-            if (DCRMgtOGSiServiceFactory.getInstance() != null) {
-                DCRMgtOGSiServiceFactory.getInstance()
-                        .setDCRConfiguration(
-                                (DCRConnectorUtil.getDCRConfigurationFromDCRConfig(dcrConfig)), tenantDomain);
-            }
-        } catch (Exception e) {
+        try {
+            DCRConnectorUtil.setDCRConfig(dcrConfig, tenantDomain);
+        } catch (DCRConfigException | DCRMException e) {
             throw DCRConnectorUtil.handleDCRConfigException(e,
-                    Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_UPDATE, null);
+                    Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_UPDATE, e.getMessage());
         }
+
     }
 
     /**

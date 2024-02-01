@@ -1261,7 +1261,7 @@ components:
         ssaJwks:
           type: string
           description: The JWKS endpoint to validate the SSA.
-          example: https://keystore.openbankingtest.org.uk/0015800001HQQrZAAX/oQ4KoaavpOuoE7rvQsZEOV.jwks
+          example: https://example.com/samplejwks.jwks
         enableFapiEnforcement:
           type: boolean
           description: If true, the FAPI security profile will be enforced for the DCR request.
