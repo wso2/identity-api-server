@@ -202,7 +202,7 @@ public class BrandingPreferenceManagementService {
             if (APPLICATION_TYPE.equals(type)) {
                 // Get application specific branding preference.
                 responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                        resolveApplicationBrandingPreference(APPLICATION_TYPE, name, DEFAULT_LOCALE);
+                        resolveApplicationBrandingPreference(name, DEFAULT_LOCALE);
             } else {
                 // Get default branding preference.
                 responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
