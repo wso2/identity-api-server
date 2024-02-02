@@ -61,7 +61,8 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         if (StringUtils.isBlank(brandingPreferenceModel.getType().toString())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (!ORGANIZATION_TYPE.equals(brandingPreferenceModel.getType().toString())) {
+        if (!(ORGANIZATION_TYPE.equals(brandingPreferenceModel.getType().toString()) ||
+                APPLICATION_TYPE.equals(brandingPreferenceModel.getType().toString()))) {
             return Response.status(Response.Status.NOT_IMPLEMENTED).entity("Not Implemented.").build();
         }
         if ((!DEFAULT_LOCALE.equals(brandingPreferenceModel.getLocale())) &&
@@ -124,7 +125,7 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
             if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
-            if (!ORGANIZATION_TYPE.equals(type)) {
+            if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type))) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
         } else {
@@ -235,7 +236,8 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         if (StringUtils.isBlank(brandingPreferenceModel.getType().toString())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (!ORGANIZATION_TYPE.equals(brandingPreferenceModel.getType().toString())) {
+        if (!(ORGANIZATION_TYPE.equals(brandingPreferenceModel.getType().toString()) ||
+                APPLICATION_TYPE.equals(brandingPreferenceModel.getType().toString()))) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         if ((!DEFAULT_LOCALE.equals(brandingPreferenceModel.getLocale())) &&
