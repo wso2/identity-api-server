@@ -71,7 +71,6 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
 public class BrandingPreferenceManagementService {
 
     private static final Log log = LogFactory.getLog(BrandingPreferenceManagementService.class);
-    //TODO: Improve API to manage custom level & language level theming resources in addition to the tenant level.
 
     /**
      * Create a branding preference resource with a resource file.
