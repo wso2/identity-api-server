@@ -221,6 +221,7 @@ public class ApplicationManagementConstants {
         OAUTH_GRANT_TYPE_NAMES.put("urn:ietf:params:oauth:grant-type:saml1-bearer", "SAML1");
         OAUTH_GRANT_TYPE_NAMES.put(GrantType.SAML20_BEARER.toString(), "SAML2");
         OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.IWA_NTLM, "IWA-NTLM");
+        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.JWT_BEARER, "JWT Bearer");
         OAUTH_GRANT_TYPE_NAMES.put("organization_switch", "Organization Switch");
         OAUTH_GRANT_TYPE_NAMES.put(Constants.DEVICE_FLOW_GRANT_TYPE, "Device Code");
         OAUTH_GRANT_TYPE_NAMES.put("urn:ietf:params:oauth:grant-type:token-exchange", "Token Exchange");
