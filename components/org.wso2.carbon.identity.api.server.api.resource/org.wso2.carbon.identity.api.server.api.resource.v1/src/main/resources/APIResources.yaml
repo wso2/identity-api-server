@@ -781,7 +781,8 @@ components:
     APIResourceCollectionListResponse:
       type: object
       required:
-        - links
+        - totalResults
+        - apiResourceCollections
       properties:
         totalResults:
           type: integer
