@@ -22,6 +22,7 @@ import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
@@ -120,6 +121,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .description(application.getDescription())
                     .imageUrl(application.getImageUrl())
                     .accessUrl(application.getAccessUrl())
+                    .logoutReturnUrl(getLogoutReturnUrl(application))
                     .clientId(getInboundKey(application, "oauth2"))
                     .issuer(getInboundKey(application, "samlsso"))
                     .realm(getInboundKey(application, "passivests"))
@@ -133,6 +135,16 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .authenticationSequence(buildAuthenticationSequence(application))
                     .access(getAccess(application.getApplicationName()));
         }
+    }
+
+    private String getLogoutReturnUrl(ServiceProvider application) {
+
+        for (ServiceProviderProperty property : application.getSpProperties()) {
+            if (ApplicationManagementConstants.PROP_LOGOUT_RETURN_URL.equals(property.getName())) {
+                return property.getValue();
+            }
+        }
+        return null; // null value returned to avoid API response returning an empty string.
     }
 
     private AssociatedRolesConfig buildAssociatedRoles(ServiceProvider application) {

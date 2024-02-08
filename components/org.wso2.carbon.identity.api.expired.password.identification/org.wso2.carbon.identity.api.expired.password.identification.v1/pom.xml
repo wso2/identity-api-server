@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>org.wso2.carbon.identity.api.expired.password.identification</artifactId>
-        <version>1.2.154-SNAPSHOT</version>
+        <version>1.2.172-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -50,6 +50,7 @@
                                   <packageName>org.wso2.carbon.identity.api.expired.password.identification.v1</packageName>
                                   <dateLibrary>java8</dateLibrary>
                                   <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                  <ignoreFileOverride>${project.basedir}/.openapi-generator-ignore</ignoreFileOverride>
                               </configOptions>
                               <output>.</output>
                               <skipOverwrite>false</skipOverwrite>

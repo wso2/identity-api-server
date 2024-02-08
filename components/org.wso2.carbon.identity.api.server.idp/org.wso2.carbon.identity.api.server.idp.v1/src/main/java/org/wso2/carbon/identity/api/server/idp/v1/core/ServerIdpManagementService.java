@@ -161,6 +161,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXT
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.ErrorMessage.ERROR_CODE_IDP_LIMIT_REACHED;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.GOOGLE_PRIVATE_KEY;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_TEMPLATE_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.PROP_CATEGORY;
@@ -2053,6 +2054,9 @@ public class ServerIdpManagementService {
         Property property = new Property();
         property.setName(apiProperty.getKey());
         property.setValue(apiProperty.getValue());
+        if (StringUtils.equals(GOOGLE_PRIVATE_KEY, apiProperty.getKey())) {
+            property.setType(IdentityApplicationConstants.ConfigElements.PROPERTY_TYPE_BLOB);
+        }
         return property;
     };
 
@@ -2124,12 +2128,11 @@ public class ServerIdpManagementService {
             jwksProperty.setValue(idpJWKSUri);
             idpProperties.add(jwksProperty);
         }
-        if (StringUtils.isNotEmpty(identityProviderPOSTRequest.getIdpIssuerName())) {
-            IdentityProviderProperty idpIssuerProperty = new IdentityProviderProperty();
-            idpIssuerProperty.setName(Constants.IDP_ISSUER_NAME);
-            idpIssuerProperty.setValue(identityProviderPOSTRequest.getIdpIssuerName());
-            idpProperties.add(idpIssuerProperty);
-        }
+        // IDP issuer name can be empty. Hence, no need to check for blank value.
+        IdentityProviderProperty idpIssuerProperty = new IdentityProviderProperty();
+        idpIssuerProperty.setName(Constants.IDP_ISSUER_NAME);
+        idpIssuerProperty.setValue(identityProviderPOSTRequest.getIdpIssuerName());
+        idpProperties.add(idpIssuerProperty);
         idp.setIdpProperties(idpProperties.toArray(new IdentityProviderProperty[0]));
         return idp;
     }
@@ -2521,34 +2524,34 @@ public class ServerIdpManagementService {
         JustInTimeProvisioningConfig jitProvisionConfig = idp.getJustInTimeProvisioningConfig();
         if (jitProvisionConfig != null) {
             jitConfig.setIsEnabled(jitProvisionConfig.isProvisioningEnabled());
-
-            boolean modifyUsername = jitProvisionConfig.isModifyUserNameAllowed();
-            boolean passwordProvision = jitProvisionConfig.isPasswordProvisioningEnabled();
-            boolean promptConsent = jitProvisionConfig.isPromptConsent();
-            if (modifyUsername && passwordProvision && promptConsent) {
-                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_USERNAME_PASSWORD_CONSENT);
-            } else if (passwordProvision && promptConsent) {
-                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_PASSWORD_CONSENT);
-            } else if (promptConsent) {
-                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROMPT_CONSENT);
-            } else {
-                jitConfig.setScheme(JustInTimeProvisioning.SchemeEnum.PROVISION_SILENTLY);
-            }
-            if (jitProvisionConfig.getProvisioningUserStore() == null) {
-                jitConfig.setUserstore(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME);
-            } else {
-                jitConfig.setUserstore(jitProvisionConfig.getProvisioningUserStore());
-            }
+            JustInTimeProvisioning.SchemeEnum provisioningType = getProvisioningType(jitProvisionConfig);
+            jitConfig.setScheme(provisioningType);
+            String provisioningUserStore = StringUtils.isNotBlank(jitProvisionConfig.getProvisioningUserStore()) ?
+                    jitProvisionConfig.getProvisioningUserStore() : UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME;
+            jitConfig.setUserstore(provisioningUserStore);
             jitConfig.setAssociateLocalUser(jitProvisionConfig.isAssociateLocalUserEnabled());
-            if (jitProvisionConfig.getAttributeSyncMethod() == null) {
-                jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(
-                        FrameworkConstants.OVERRIDE_ALL));
-            } else {
-                jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum.valueOf(
-                        jitProvisionConfig.getAttributeSyncMethod()));
-            }
+            String attributeSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getAttributeSyncMethod()) ?
+                    jitProvisionConfig.getAttributeSyncMethod() : FrameworkConstants.OVERRIDE_ALL;
+            jitConfig.setAttributeSyncMethod(JustInTimeProvisioning.AttributeSyncMethodEnum
+                    .valueOf(attributeSyncMethod));
         }
         return jitConfig;
+    }
+
+    private JustInTimeProvisioning.SchemeEnum getProvisioningType(JustInTimeProvisioningConfig jitProvisionConfig) {
+
+        boolean modifyUsername = jitProvisionConfig.isModifyUserNameAllowed();
+        boolean passwordProvision = jitProvisionConfig.isPasswordProvisioningEnabled();
+        boolean promptConsent = jitProvisionConfig.isPromptConsent();
+
+        if (modifyUsername && passwordProvision && promptConsent) {
+            return JustInTimeProvisioning.SchemeEnum.PROMPT_USERNAME_PASSWORD_CONSENT;
+        } else if (passwordProvision && promptConsent) {
+            return JustInTimeProvisioning.SchemeEnum.PROMPT_PASSWORD_CONSENT;
+        } else if (promptConsent) {
+            return JustInTimeProvisioning.SchemeEnum.PROMPT_CONSENT;
+        }
+        return JustInTimeProvisioning.SchemeEnum.PROVISION_SILENTLY;
     }
 
     private Function<SubProperty, MetaProperty> subPropertyToExternalMeta = property -> {

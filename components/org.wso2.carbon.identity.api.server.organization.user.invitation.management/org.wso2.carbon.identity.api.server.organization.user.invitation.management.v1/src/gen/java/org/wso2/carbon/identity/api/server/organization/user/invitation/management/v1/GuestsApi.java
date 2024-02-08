@@ -53,9 +53,9 @@ public class GuestsApi  {
     @Path("/invitation/accept")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Accepts an invitation from a user in the parent organization", notes = "After user clicks on the link provided, the redirected application should invoke this API. This API is a public API and this should be invoked with the confirmation code which is  appended to the notification.  <b>Scope required:</b> <br/>  - none ", response = Void.class, tags={ "Parent Organization User Invitation", })
+    @ApiOperation(value = "Accepts an invitation from a user in the parent organization", notes = "After user clicks on the link provided, the redirected application should invoke this API. This API is a public API and this should be invoked with the confirmation code which is  appended to the notification.  <b>Scope(Permission) required:</b> None ", response = Void.class, tags={ "Parent Organization User Invitation", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful Response", response = Void.class),
+        @ApiResponse(code = 204, message = "No Content", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
@@ -69,7 +69,7 @@ public class GuestsApi  {
     @Path("/invitations/{invitationId}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete an invitation", notes = "Based on the requirements the invitations which are initiated by the same organization can be deleted. This should be invoked from an access token issued from an administrator of that organization.  <b>Scope required:</b> <br/>  - internal_guest_mgt_invite_delete ", response = Void.class, tags={ "Invitation Management", })
+    @ApiOperation(value = "Delete an invitation", notes = "Based on the requirements the invitations which are initiated by the same organization can be deleted. This should be invoked from an access token issued from an administrator of that organization.  <b>Scope(Permission) required:</b> `internal_org_guest_mgt_invite_delete` ", response = Void.class, tags={ "Invitation Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 204, message = "Successful Response and if the resource not found", response = Void.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -87,7 +87,7 @@ public class GuestsApi  {
     @Path("/invitation/introspect")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "introspect an invitation's confirmation code", notes = "This API can be used to introspect the confirmation code. This will be  invoked from the application with the access token of the user which was logged into the application and switched to the organization where  the user resides in.  <b>Scope required:</b> <br/>  - none ", response = IntrospectSuccessResponse.class, tags={ "Parent Organization User Invitation", })
+    @ApiOperation(value = "introspect an invitation's confirmation code", notes = "This API can be used to introspect the confirmation code. This will be  invoked from the application with the access token of the user which was logged into the application and switched to the organization where  the user resides in.  <b>Scope(Permission) required:</b> `internal_org_guest_mgt_invite_list` ", response = IntrospectSuccessResponse.class, tags={ "Parent Organization User Invitation", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = IntrospectSuccessResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -105,7 +105,7 @@ public class GuestsApi  {
     @Path("/invitations")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List down the user invitations", notes = "List down the invitations triggered from the current organization. This should be invoked from an access token issued from an administrator of that organization.  <b>Scope required:</b> <br/>  - internal_guest_mgt_invite_list ", response = InvitationsListResponse.class, tags={ "Invitation Management", })
+    @ApiOperation(value = "List down the user invitations", notes = "List down the invitations triggered from the current organization. This should be invoked from an access token issued from an administrator of that organization.  <b>Scope(Permission) required:</b> `internal_org_guest_mgt_invite_list` ", response = InvitationsListResponse.class, tags={ "Invitation Management", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = InvitationsListResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
@@ -122,7 +122,7 @@ public class GuestsApi  {
     @Path("/invite")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Invite a parent organization user to a child organization", notes = "Initiates an invitation to a user in the parent organization to onboard to the child organization. This will be initiated from the child organization.  <b>Scope required:</b> <br/>  - internal_guest_mgt_invite_add ", response = InvitationSuccessResponse.class, responseContainer = "List", tags={ "Parent Organization User Invitation" })
+    @ApiOperation(value = "Invite a parent organization user to a child organization", notes = "Initiates an invitation to a user in the parent organization to onboard to the child organization. This will be initiated from the child organization.  <b>Scope(Permission) required:</b> `internal_org_guest_mgt_invite_add` ", response = InvitationSuccessResponse.class, responseContainer = "List", tags={ "Parent Organization User Invitation" })
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Successful Response", response = InvitationSuccessResponse.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),

@@ -477,8 +477,9 @@ public class ServerAPIResourceManagementService {
                 .type(apiResource.getType())
                 .requiresAuthorization(apiResource.isAuthorizationRequired())
                 .properties(properties)
-                .self(V1_API_PATH_COMPONENT + APIResourceMgtEndpointConstants.API_RESOURCE_PATH_COMPONENT + "/"
-                        + apiResource.getId());
+                .self(ContextLoader.buildURIForBody(V1_API_PATH_COMPONENT +
+                                APIResourceMgtEndpointConstants.API_RESOURCE_PATH_COMPONENT + "/" + apiResource.getId())
+                        .toString());
     }
 
     /**

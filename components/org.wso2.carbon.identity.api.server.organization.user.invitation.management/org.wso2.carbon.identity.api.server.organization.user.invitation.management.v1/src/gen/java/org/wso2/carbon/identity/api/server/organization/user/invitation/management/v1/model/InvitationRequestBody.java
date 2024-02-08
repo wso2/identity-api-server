@@ -51,7 +51,7 @@ public class InvitationRequestBody  {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "List of usernames of the users who will be invited to the organization. This can be an email or an alphanumeric username.")
+    @ApiModelProperty(example = "[\"xyz@gmail.com\",\"abc@gmail.com\"]", required = true, value = "List of usernames of the users who will be invited to the organization. This can be an email or an alphanumeric username.")
     @JsonProperty("usernames")
     @Valid
     @NotNull(message = "Property usernames cannot be null.")
@@ -69,7 +69,7 @@ public class InvitationRequestBody  {
     }
 
         /**
-    * User store domain of the user. If not provided, PRIMARY will be used.
+    * User store domain of the user. If not provided, default userstore will be used.
     **/
     public InvitationRequestBody userDomain(String userDomain) {
 
@@ -77,7 +77,7 @@ public class InvitationRequestBody  {
         return this;
     }
     
-    @ApiModelProperty(example = "PRIMARY", value = "User store domain of the user. If not provided, PRIMARY will be used.")
+    @ApiModelProperty(example = "PRIMARY", value = "User store domain of the user. If not provided, default userstore will be used.")
     @JsonProperty("userDomain")
     @Valid
     public String getUserDomain() {
@@ -96,7 +96,7 @@ public class InvitationRequestBody  {
         return this;
     }
     
-    @ApiModelProperty(value = "Role assignments which the user will be assigned to.")
+    @ApiModelProperty(example = "[\"f5b761ca-62f2-48ba-935b-f7b460f58e5c\",\"657fgq22-62f2-48ba-935b-f7bfgh6438fd\"]", value = "Role assignments which the user will be assigned to.")
     @JsonProperty("roles")
     @Valid
     public List<String> getRoles() {
@@ -114,7 +114,7 @@ public class InvitationRequestBody  {
         return this;
     }
 
-    /**
+        /**
     * Group assignments which the user will be assigned to.
     **/
     public InvitationRequestBody groups(List<String> groups) {
@@ -123,7 +123,7 @@ public class InvitationRequestBody  {
         return this;
     }
     
-    @ApiModelProperty(value = "Group assignments which the user will be assigned to.")
+    @ApiModelProperty(example = "[\"48badf-rty20-48ba-935b-f7b460f58e5c\",\"fd234100-c115-45dc-ad11-70846b783866\"]", value = "Group assignments which the user will be assigned to.")
     @JsonProperty("groups")
     @Valid
     public List<String> getGroups() {

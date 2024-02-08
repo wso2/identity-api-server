@@ -43,6 +43,7 @@ public class ApplicationModel  {
     private String description;
     private String imageUrl;
     private String accessUrl;
+    private String logoutReturnUrl;
     private String templateId;
     private Boolean isManagementApp = false;
     private Boolean isB2BSelfServiceApp = false;
@@ -147,6 +148,24 @@ public class ApplicationModel  {
 
     /**
     **/
+    public ApplicationModel logoutReturnUrl(String logoutReturnUrl) {
+
+        this.logoutReturnUrl = logoutReturnUrl;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "https://example.com/app/logout", value = "")
+    @JsonProperty("logoutReturnUrl")
+    @Valid
+    public String getLogoutReturnUrl() {
+        return logoutReturnUrl;
+    }
+    public void setLogoutReturnUrl(String logoutReturnUrl) {
+        this.logoutReturnUrl = logoutReturnUrl;
+    }
+
+    /**
+    **/
     public ApplicationModel templateId(String templateId) {
 
         this.templateId = templateId;
@@ -171,7 +190,7 @@ public class ApplicationModel  {
         this.isManagementApp = isManagementApp;
         return this;
     }
-
+    
     @ApiModelProperty(example = "false", value = "Decides whether the application used to access System APIs")
     @JsonProperty("isManagementApp")
     @Valid
@@ -190,12 +209,11 @@ public class ApplicationModel  {
         this.isB2BSelfServiceApp = isB2BSelfServiceApp;
         return this;
     }
-
+    
     @ApiModelProperty(example = "false", value = "Decides whether the application used to for B2B self service")
     @JsonProperty("isB2BSelfServiceApp")
     @Valid
     public Boolean getIsB2BSelfServiceApp() {
-
         return isB2BSelfServiceApp;
     }
     public void setIsB2BSelfServiceApp(Boolean isB2BSelfServiceApp) {
@@ -327,6 +345,7 @@ public class ApplicationModel  {
             Objects.equals(this.description, applicationModel.description) &&
             Objects.equals(this.imageUrl, applicationModel.imageUrl) &&
             Objects.equals(this.accessUrl, applicationModel.accessUrl) &&
+            Objects.equals(this.logoutReturnUrl, applicationModel.logoutReturnUrl) &&
             Objects.equals(this.templateId, applicationModel.templateId) &&
             Objects.equals(this.isManagementApp, applicationModel.isManagementApp) &&
             Objects.equals(this.isB2BSelfServiceApp, applicationModel.isB2BSelfServiceApp) &&
@@ -340,7 +359,7 @@ public class ApplicationModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, templateId, isManagementApp, isB2BSelfServiceApp, associatedRoles, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, isManagementApp, isB2BSelfServiceApp, associatedRoles, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -354,6 +373,7 @@ public class ApplicationModel  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
+        sb.append("    logoutReturnUrl: ").append(toIndentedString(logoutReturnUrl)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");

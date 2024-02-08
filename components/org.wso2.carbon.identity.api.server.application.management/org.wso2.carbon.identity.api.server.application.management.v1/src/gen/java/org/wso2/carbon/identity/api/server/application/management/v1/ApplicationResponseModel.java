@@ -45,6 +45,7 @@ public class ApplicationResponseModel  {
     private String description;
     private String imageUrl;
     private String accessUrl;
+    private String logoutReturnUrl;
     private String clientId;
     private String issuer;
     private String realm;
@@ -183,6 +184,24 @@ public enum AccessEnum {
     }
     public void setAccessUrl(String accessUrl) {
         this.accessUrl = accessUrl;
+    }
+
+    /**
+    **/
+    public ApplicationResponseModel logoutReturnUrl(String logoutReturnUrl) {
+
+        this.logoutReturnUrl = logoutReturnUrl;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "https://example.com/app/logout", value = "")
+    @JsonProperty("logoutReturnUrl")
+    @Valid
+    public String getLogoutReturnUrl() {
+        return logoutReturnUrl;
+    }
+    public void setLogoutReturnUrl(String logoutReturnUrl) {
+        this.logoutReturnUrl = logoutReturnUrl;
     }
 
     /**
@@ -446,6 +465,7 @@ public enum AccessEnum {
             Objects.equals(this.description, applicationResponseModel.description) &&
             Objects.equals(this.imageUrl, applicationResponseModel.imageUrl) &&
             Objects.equals(this.accessUrl, applicationResponseModel.accessUrl) &&
+            Objects.equals(this.logoutReturnUrl, applicationResponseModel.logoutReturnUrl) &&
             Objects.equals(this.clientId, applicationResponseModel.clientId) &&
             Objects.equals(this.issuer, applicationResponseModel.issuer) &&
             Objects.equals(this.realm, applicationResponseModel.realm) &&
@@ -463,7 +483,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, clientId, issuer, realm, templateId, isManagementApp, isB2BSelfServiceApp, associatedRoles, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, logoutReturnUrl, clientId, issuer, realm, templateId, isManagementApp, isB2BSelfServiceApp, associatedRoles, claimConfiguration, inboundProtocols, authenticationSequence, advancedConfigurations, provisioningConfigurations, access);
     }
 
     @Override
@@ -477,6 +497,7 @@ public enum AccessEnum {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    imageUrl: ").append(toIndentedString(imageUrl)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
+        sb.append("    logoutReturnUrl: ").append(toIndentedString(logoutReturnUrl)).append("\n");
         sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
         sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");
         sb.append("    realm: ").append(toIndentedString(realm)).append("\n");

@@ -34,6 +34,7 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceMap;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.api.resource.v1.util.APIResourceMgtEndpointUtil;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.common.model.APIResource;
 import org.wso2.carbon.identity.application.common.model.Scope;
@@ -136,9 +137,9 @@ public class ServerAPIResourceCollectionManagementService {
                 .name(apiResourceCollection.getName())
                 .displayName(apiResourceCollection.getDisplayName())
                 .type(apiResourceCollection.getType())
-                .self(V1_API_PATH_COMPONENT + APIResourceMgtEndpointConstants.API_RESOURCE_COLLECTION_PATH_COMPONENT +
-                        "/" + apiResourceCollection.getId());
-
+                .self(ContextLoader.buildURIForBody(V1_API_PATH_COMPONENT +
+                        APIResourceMgtEndpointConstants.API_RESOURCE_COLLECTION_PATH_COMPONENT + "/" +
+                        apiResourceCollection.getId()).toString());
         if (includeAPIResources) {
             item.setApiResources(buildAPIResourceMap(apiResourceCollection));
         }
@@ -196,8 +197,9 @@ public class ServerAPIResourceCollectionManagementService {
                 .description(apiResource.getDescription())
                 .type(apiResource.getType())
                 .scopes(scopesList)
-                .self(V1_API_PATH_COMPONENT + APIResourceMgtEndpointConstants.API_RESOURCE_PATH_COMPONENT
-                        + "/" + apiResource.getId());
+                .self(ContextLoader.buildURIForBody(V1_API_PATH_COMPONENT +
+                                APIResourceMgtEndpointConstants.API_RESOURCE_PATH_COMPONENT + "/" + apiResource.getId())
+                        .toString());
     }
 
     /**
