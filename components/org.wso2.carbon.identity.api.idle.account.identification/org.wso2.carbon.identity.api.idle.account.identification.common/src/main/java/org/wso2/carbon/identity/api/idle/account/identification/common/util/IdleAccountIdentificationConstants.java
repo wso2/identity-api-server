@@ -47,6 +47,10 @@ public class IdleAccountIdentificationConstants {
                    "Invalid date provided.",
                    "The date provided for %s parameter is invalid"),
 
+        ERROR_INVALID_DATE_COMBINATION("60004",
+                "Invalid date combination is provided.",
+                "The inactive after date must be before the exclude after date."),
+
         // Server errors 650xx.
         ERROR_RETRIEVING_INACTIVE_USERS("65001",
                 "Error while retrieving inactive users.",
