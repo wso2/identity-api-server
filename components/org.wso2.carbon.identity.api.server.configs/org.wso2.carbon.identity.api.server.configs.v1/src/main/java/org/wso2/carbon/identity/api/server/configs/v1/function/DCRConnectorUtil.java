@@ -82,6 +82,7 @@ public class DCRConnectorUtil {
         dcrConfig.setClientAuthenticationRequired(dcrConfiguration.isClientAuthenticationRequired());
         dcrConfig.setEnableFapiEnforcement(dcrConfiguration.isFAPIEnforced());
         dcrConfig.setSsaJwks(dcrConfiguration.getSsaJwks());
+        dcrConfig.setMandateSSA(dcrConfiguration.getMandateSSA());
 
         return dcrConfig;
     }

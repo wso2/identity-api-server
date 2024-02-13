@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,15 +19,23 @@
 package org.wso2.carbon.identity.api.server.configs.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.*;
+
+
+import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
+import javax.xml.bind.annotation.*;
 
 public class DCRConfig  {
   
     private Boolean clientAuthenticationRequired;
     private String ssaJwks;
     private Boolean enableFapiEnforcement;
+    private String mandateSSA;
 
     /**
     * If false, the client authentication is not required for the DCR request, otherwise, the configured authentication mechanism will be used.
@@ -42,11 +50,9 @@ public class DCRConfig  {
     @JsonProperty("clientAuthenticationRequired")
     @Valid
     public Boolean getClientAuthenticationRequired() {
-
         return clientAuthenticationRequired;
     }
     public void setClientAuthenticationRequired(Boolean clientAuthenticationRequired) {
-
         this.clientAuthenticationRequired = clientAuthenticationRequired;
     }
 
@@ -59,20 +65,18 @@ public class DCRConfig  {
         return this;
     }
     
-    @ApiModelProperty(example = "https://keystore.openbankingtest.org.uk/0015800001HQQrZAAX/oQ4KoaavpOuoE7rvQsZEOV.jwks", value = "The JWKS endpoint to validate the SSA.")
+    @ApiModelProperty(example = "https://example.com/samplejwks.jwks", value = "The JWKS endpoint to validate the SSA.")
     @JsonProperty("ssaJwks")
     @Valid
     public String getSsaJwks() {
-
         return ssaJwks;
     }
     public void setSsaJwks(String ssaJwks) {
-
         this.ssaJwks = ssaJwks;
     }
 
     /**
-    * If true, the FAPI security profile will be enforced for the DCR request.
+    * If true, a FAPI compliant app will be create with DCR create request.
     **/
     public DCRConfig enableFapiEnforcement(Boolean enableFapiEnforcement) {
 
@@ -80,16 +84,33 @@ public class DCRConfig  {
         return this;
     }
     
-    @ApiModelProperty(example = "true", value = "If true, the FAPI security profile will be enforced for the DCR request.")
+    @ApiModelProperty(example = "true", value = "If true, a FAPI compliant app will be create with DCR create request.")
     @JsonProperty("enableFapiEnforcement")
     @Valid
     public Boolean getEnableFapiEnforcement() {
-
         return enableFapiEnforcement;
     }
     public void setEnableFapiEnforcement(Boolean enableFapiEnforcement) {
-
         this.enableFapiEnforcement = enableFapiEnforcement;
+    }
+
+    /**
+    * If true, the SSA is mandatory for the DCR create request.
+    **/
+    public DCRConfig mandateSSA(String mandateSSA) {
+
+        this.mandateSSA = mandateSSA;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "If true, the SSA is mandatory for the DCR create request.")
+    @JsonProperty("mandateSSA")
+    @Valid
+    public String getMandateSSA() {
+        return mandateSSA;
+    }
+    public void setMandateSSA(String mandateSSA) {
+        this.mandateSSA = mandateSSA;
     }
 
 
@@ -106,13 +127,13 @@ public class DCRConfig  {
         DCRConfig dcRConfig = (DCRConfig) o;
         return Objects.equals(this.clientAuthenticationRequired, dcRConfig.clientAuthenticationRequired) &&
             Objects.equals(this.ssaJwks, dcRConfig.ssaJwks) &&
-            Objects.equals(this.enableFapiEnforcement, dcRConfig.enableFapiEnforcement);
+            Objects.equals(this.enableFapiEnforcement, dcRConfig.enableFapiEnforcement) &&
+            Objects.equals(this.mandateSSA, dcRConfig.mandateSSA);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(clientAuthenticationRequired, ssaJwks, enableFapiEnforcement);
+        return Objects.hash(clientAuthenticationRequired, ssaJwks, enableFapiEnforcement, mandateSSA);
     }
 
     @Override
@@ -124,6 +145,7 @@ public class DCRConfig  {
         sb.append("    clientAuthenticationRequired: ").append(toIndentedString(clientAuthenticationRequired)).append("\n");
         sb.append("    ssaJwks: ").append(toIndentedString(ssaJwks)).append("\n");
         sb.append("    enableFapiEnforcement: ").append(toIndentedString(enableFapiEnforcement)).append("\n");
+        sb.append("    mandateSSA: ").append(toIndentedString(mandateSSA)).append("\n");
         sb.append("}");
         return sb.toString();
     }

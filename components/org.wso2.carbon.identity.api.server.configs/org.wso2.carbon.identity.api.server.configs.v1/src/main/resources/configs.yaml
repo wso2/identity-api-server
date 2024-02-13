@@ -1264,7 +1264,11 @@ components:
           example: https://example.com/samplejwks.jwks
         enableFapiEnforcement:
           type: boolean
-          description: If true, the FAPI security profile will be enforced for the DCR request.
+          description: If true, a FAPI compliant app will be create with DCR create request.
+          example: true
+        mandateSSA:
+          type: string
+          description: If true, the SSA is mandatory for the DCR create request.
           example: true
     DCRPatchRequest:
       type: array

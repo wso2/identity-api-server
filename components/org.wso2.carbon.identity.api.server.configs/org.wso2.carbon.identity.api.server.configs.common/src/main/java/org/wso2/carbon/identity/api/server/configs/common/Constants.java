@@ -62,6 +62,7 @@ public class Constants {
     public static final String DCR_CONFIG_ENABLE_FAPI_ENFORCEMENT = "/enableFapiEnforcement";
     public static final String DCR_CONFIG_SSA_JWKS = "/ssaJwks";
     public static final String DCR_CONFIG_CLIENT_AUTHENTICATION_REQUIRED = "/clientAuthenticationRequired";
+    public static final String DCR_CONFIG_MANDATE_SSA = "/mandateSSA";
 
     /**
      * SAML2 metadata endpoint uri path.
