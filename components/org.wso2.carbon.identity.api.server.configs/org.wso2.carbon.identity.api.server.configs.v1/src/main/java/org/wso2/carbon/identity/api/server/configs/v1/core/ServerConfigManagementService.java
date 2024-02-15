@@ -1171,11 +1171,10 @@ public class ServerConfigManagementService {
      */
     public DCRConfig getDCRConfiguration() {
 
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
             if (DCRMgtOGSiServiceFactory.getInstance() != null) {
 
-                return DCRConnectorUtil.getDCRConfig(tenantDomain);
+                return DCRConnectorUtil.getDCRConfig();
             }
             throw new DCRConfigException(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message(),
                     ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.code());
@@ -1202,10 +1201,9 @@ public class ServerConfigManagementService {
             return;
         }
 
-        String tenantDomain = ContextLoader.getTenantDomainFromContext();
         DCRConfig dcrConfig = null;
         try {
-            dcrConfig = DCRConnectorUtil.getDCRConfig(tenantDomain);
+            dcrConfig = DCRConnectorUtil.getDCRConfig();
         } catch (Exception e) {
             if (e.getMessage().equals(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message())) {
                 throw handleNotFoundError(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND);
@@ -1267,7 +1265,7 @@ public class ServerConfigManagementService {
 
             // Set the patched configuration object as the new DCR configuration for the tenant.
         try {
-            DCRConnectorUtil.setDCRConfig(dcrConfig, tenantDomain);
+            DCRConnectorUtil.setDCRConfig(dcrConfig);
         } catch (DCRConfigException | DCRMException e) {
             throw DCRConnectorUtil.handleDCRConfigException(e,
                     Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_UPDATE, e.getMessage());

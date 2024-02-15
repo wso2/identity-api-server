@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigExcepti
 import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigServerException;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
+import org.wso2.carbon.identity.oauth.dcr.exception.DCRMServerException;
 import org.wso2.carbon.identity.oauth.dcr.model.DCRConfiguration;
 
 import javax.ws.rs.core.Response;
@@ -47,15 +48,14 @@ public class DCRConnectorUtil {
     /**
      * Get the DCRConfig from the DCRConfiguration for said tenant domain.
      *
-     * @param tenantDomain Tenant domain.
      * @return DCRConfig.
      * @throws DCRMException DCRMException.
      */
-    public static DCRConfig getDCRConfig(String tenantDomain) throws DCRMException, DCRConfigException {
+    public static DCRConfig getDCRConfig() throws DCRMException, DCRConfigException {
 
         if (DCRMgtOGSiServiceFactory.getInstance() != null) {
             DCRConfiguration dcrConfiguration = DCRMgtOGSiServiceFactory.getInstance()
-                    .getDCRConfiguration(tenantDomain);
+                    .getDCRConfiguration();
             return dcrConfigurationToDCRConfig(dcrConfiguration);
         } else {
             throw new DCRConfigException(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message(),
@@ -64,12 +64,12 @@ public class DCRConnectorUtil {
 
     }
 
-    public static void setDCRConfig(DCRConfig dcrConfig, String tenantDomain) throws
+    public static void setDCRConfig(DCRConfig dcrConfig) throws
             DCRConfigException, DCRMException {
 
         if (DCRMgtOGSiServiceFactory.getInstance() != null) {
             DCRMgtOGSiServiceFactory.getInstance()
-                    .setDCRConfiguration((getDCRConfigurationFromDCRConfig(dcrConfig)), tenantDomain);
+                    .setDCRConfiguration((getDCRConfigurationFromDCRConfig(dcrConfig)));
         } else {
             throw new DCRConfigException(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message(),
                     ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.code());
@@ -163,12 +163,13 @@ public class DCRConnectorUtil {
      * @param dcrConfig DCRConfig.
      * @return  DCRConfiguration.
      */
-    public static DCRConfiguration getDCRConfigurationFromDCRConfig (DCRConfig dcrConfig) {
+    public static DCRConfiguration getDCRConfigurationFromDCRConfig (DCRConfig dcrConfig) throws DCRMServerException {
 
         DCRConfiguration dcrConfiguration = new DCRConfiguration();
         dcrConfiguration.setFAPIEnforced(dcrConfig.getEnableFapiEnforcement());
         dcrConfiguration.setSsaJwks(dcrConfig.getSsaJwks());
         dcrConfiguration.setClientAuthenticationRequired(dcrConfig.getClientAuthenticationRequired());
+        dcrConfiguration.setMandateSSA(dcrConfig.getMandateSSA());
         return dcrConfiguration;
     }
 }
