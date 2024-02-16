@@ -24,12 +24,15 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.*;
 
+/**
+ * This property is disabled by default as of Identity Server version 7.0 onwards.
+ **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-
+@ApiModel(description = "This property is disabled by default as of Identity Server version 7.0 onwards.")
 public class OutboundProvisioningConfiguration  {
   
     private String idp;
