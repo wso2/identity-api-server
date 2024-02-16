@@ -83,7 +83,6 @@ import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceCli
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
-import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
@@ -1268,7 +1267,7 @@ public class ServerConfigManagementService {
             // Set the patched configuration object as the new DCR configuration for the tenant.
         try {
             DCRConnectorUtil.setDCRConfig(dcrConfig);
-        } catch (DCRConfigException | DCRMException e) {
+        } catch (DCRConfigException e) {
             throw DCRConnectorUtil.handleDCRConfigException(e,
                     Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_UPDATE, e.getMessage());
         }
