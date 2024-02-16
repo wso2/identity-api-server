@@ -1254,9 +1254,9 @@ components:
     DCRConfig:
       type: object
       properties:
-        clientAuthenticationRequired:
+        authenticationRequired:
           type: boolean
-          description: If false, the client authentication is not required for the DCR request, otherwise, the configured authentication mechanism will be used.
+          description: If false, the authentication is not required for the DCR create request, otherwise, the configured authentication mechanism will be used.
           example: false
         ssaJwks:
           type: string
@@ -1267,8 +1267,8 @@ components:
           description: If true, a FAPI compliant app will be create with DCR create request.
           example: true
         mandateSSA:
-          type: string
-          description: If true, the SSA is mandatory for the DCR create request.
+          type: boolean
+          description: If true, the software_statement parameter is mandatory for the DCR create request.
           example: true
     DCRPatchRequest:
       type: array

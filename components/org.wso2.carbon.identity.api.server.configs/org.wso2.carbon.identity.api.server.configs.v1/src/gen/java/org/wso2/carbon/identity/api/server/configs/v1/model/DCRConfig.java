@@ -32,28 +32,28 @@ import javax.xml.bind.annotation.*;
 
 public class DCRConfig  {
   
-    private Boolean clientAuthenticationRequired;
+    private Boolean authenticationRequired;
     private String ssaJwks;
     private Boolean enableFapiEnforcement;
-    private String mandateSSA;
+    private Boolean mandateSSA;
 
     /**
-    * If false, the client authentication is not required for the DCR request, otherwise, the configured authentication mechanism will be used.
+    * If false, the authentication is not required for the DCR create request, otherwise, the configured authentication mechanism will be used.
     **/
-    public DCRConfig clientAuthenticationRequired(Boolean clientAuthenticationRequired) {
+    public DCRConfig authenticationRequired(Boolean authenticationRequired) {
 
-        this.clientAuthenticationRequired = clientAuthenticationRequired;
+        this.authenticationRequired = authenticationRequired;
         return this;
     }
     
-    @ApiModelProperty(example = "false", value = "If false, the client authentication is not required for the DCR request, otherwise, the configured authentication mechanism will be used.")
-    @JsonProperty("clientAuthenticationRequired")
+    @ApiModelProperty(example = "false", value = "If false, the authentication is not required for the DCR create request, otherwise, the configured authentication mechanism will be used.")
+    @JsonProperty("authenticationRequired")
     @Valid
-    public Boolean getClientAuthenticationRequired() {
-        return clientAuthenticationRequired;
+    public Boolean getAuthenticationRequired() {
+        return authenticationRequired;
     }
-    public void setClientAuthenticationRequired(Boolean clientAuthenticationRequired) {
-        this.clientAuthenticationRequired = clientAuthenticationRequired;
+    public void setAuthenticationRequired(Boolean authenticationRequired) {
+        this.authenticationRequired = authenticationRequired;
     }
 
     /**
@@ -95,21 +95,21 @@ public class DCRConfig  {
     }
 
     /**
-    * If true, the SSA is mandatory for the DCR create request.
+    * If true, the software_statement parameter is mandatory for the DCR create request.
     **/
-    public DCRConfig mandateSSA(String mandateSSA) {
+    public DCRConfig mandateSSA(Boolean mandateSSA) {
 
         this.mandateSSA = mandateSSA;
         return this;
     }
     
-    @ApiModelProperty(example = "true", value = "If true, the SSA is mandatory for the DCR create request.")
+    @ApiModelProperty(example = "true", value = "If true, the software_statement parameter is mandatory for the DCR create request.")
     @JsonProperty("mandateSSA")
     @Valid
-    public String getMandateSSA() {
+    public Boolean getMandateSSA() {
         return mandateSSA;
     }
-    public void setMandateSSA(String mandateSSA) {
+    public void setMandateSSA(Boolean mandateSSA) {
         this.mandateSSA = mandateSSA;
     }
 
@@ -125,7 +125,7 @@ public class DCRConfig  {
             return false;
         }
         DCRConfig dcRConfig = (DCRConfig) o;
-        return Objects.equals(this.clientAuthenticationRequired, dcRConfig.clientAuthenticationRequired) &&
+        return Objects.equals(this.authenticationRequired, dcRConfig.authenticationRequired) &&
             Objects.equals(this.ssaJwks, dcRConfig.ssaJwks) &&
             Objects.equals(this.enableFapiEnforcement, dcRConfig.enableFapiEnforcement) &&
             Objects.equals(this.mandateSSA, dcRConfig.mandateSSA);
@@ -133,7 +133,7 @@ public class DCRConfig  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(clientAuthenticationRequired, ssaJwks, enableFapiEnforcement, mandateSSA);
+        return Objects.hash(authenticationRequired, ssaJwks, enableFapiEnforcement, mandateSSA);
     }
 
     @Override
@@ -142,7 +142,7 @@ public class DCRConfig  {
         StringBuilder sb = new StringBuilder();
         sb.append("class DCRConfig {\n");
         
-        sb.append("    clientAuthenticationRequired: ").append(toIndentedString(clientAuthenticationRequired)).append("\n");
+        sb.append("    authenticationRequired: ").append(toIndentedString(authenticationRequired)).append("\n");
         sb.append("    ssaJwks: ").append(toIndentedString(ssaJwks)).append("\n");
         sb.append("    enableFapiEnforcement: ").append(toIndentedString(enableFapiEnforcement)).append("\n");
         sb.append("    mandateSSA: ").append(toIndentedString(mandateSSA)).append("\n");

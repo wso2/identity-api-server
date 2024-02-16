@@ -30,7 +30,6 @@ import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigExcepti
 import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigServerException;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
-import org.wso2.carbon.identity.oauth.dcr.exception.DCRMServerException;
 import org.wso2.carbon.identity.oauth.dcr.model.DCRConfiguration;
 
 import javax.ws.rs.core.Response;
@@ -79,7 +78,7 @@ public class DCRConnectorUtil {
     public static DCRConfig dcrConfigurationToDCRConfig(DCRConfiguration dcrConfiguration) {
 
         DCRConfig dcrConfig = new DCRConfig();
-        dcrConfig.setClientAuthenticationRequired(dcrConfiguration.isClientAuthenticationRequired());
+        dcrConfig.setAuthenticationRequired(dcrConfiguration.isAuthenticationRequired());
         dcrConfig.setEnableFapiEnforcement(dcrConfiguration.isFAPIEnforced());
         dcrConfig.setSsaJwks(dcrConfiguration.getSsaJwks());
         dcrConfig.setMandateSSA(dcrConfiguration.getMandateSSA());
@@ -163,12 +162,12 @@ public class DCRConnectorUtil {
      * @param dcrConfig DCRConfig.
      * @return  DCRConfiguration.
      */
-    public static DCRConfiguration getDCRConfigurationFromDCRConfig (DCRConfig dcrConfig) throws DCRMServerException {
+    public static DCRConfiguration getDCRConfigurationFromDCRConfig (DCRConfig dcrConfig) {
 
         DCRConfiguration dcrConfiguration = new DCRConfiguration();
         dcrConfiguration.setFAPIEnforced(dcrConfig.getEnableFapiEnforcement());
         dcrConfiguration.setSsaJwks(dcrConfig.getSsaJwks());
-        dcrConfiguration.setClientAuthenticationRequired(dcrConfig.getClientAuthenticationRequired());
+        dcrConfiguration.setAuthenticationRequired(dcrConfig.getAuthenticationRequired());
         dcrConfiguration.setMandateSSA(dcrConfig.getMandateSSA());
         return dcrConfiguration;
     }

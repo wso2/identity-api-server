@@ -1230,20 +1230,22 @@ public class ServerConfigManagementService {
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                     .ERROR_CODE_INVALID_INPUT, "Unsupported patch value for the given path");
                         }
-                    } else if (path.matches(Constants.DCR_CONFIG_CLIENT_AUTHENTICATION_REQUIRED)) {
+                    } else if (path.matches(Constants.DCR_CONFIG_AUTHENTICATION_REQUIRED)) {
                         String value = dcrPatch.getValue();
                         if (Objects.equals(value, "true")) {
-                            dcrConfig.setClientAuthenticationRequired(true);
+                            dcrConfig.setAuthenticationRequired(true);
                         } else if (Objects.equals(value, "false")) {
-                            dcrConfig.setClientAuthenticationRequired(false);
+                            dcrConfig.setAuthenticationRequired(false);
                         } else {
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                     .ERROR_CODE_INVALID_INPUT, "Unsupported patch value for the given path");
                         }
                     } else if (path.matches(Constants.DCR_CONFIG_MANDATE_SSA)) {
                         String value = dcrPatch.getValue();
-                        if (Objects.equals(value, "true") || Objects.equals(value, "false")) {
-                            dcrConfig.setMandateSSA(value);
+                        if (Objects.equals(value, "true")) {
+                            dcrConfig.setMandateSSA(true);
+                        } else if (Objects.equals(value, "false")) {
+                            dcrConfig.setMandateSSA(false);
                         } else {
                             throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
                                     .ERROR_CODE_INVALID_INPUT, "Unsupported patch value for the given path");
