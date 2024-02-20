@@ -242,6 +242,7 @@ public class ServerAPIResourceManagementService {
             APIResource.APIResourceBuilder apiResourceBuilder = new APIResource.APIResourceBuilder()
                     .name(displayName)
                     .id(apiResourceID)
+                    .type(currentAPIResource.getType())
                     .description(description);
             APIResource apiResource = apiResourceBuilder.build();
             APIResourceManagementServiceHolder.getApiResourceManager().updateAPIResource(apiResource, addedScopes,
