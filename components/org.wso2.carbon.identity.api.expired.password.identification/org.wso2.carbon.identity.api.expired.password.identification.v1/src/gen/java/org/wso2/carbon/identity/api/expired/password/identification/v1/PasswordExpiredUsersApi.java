@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -49,7 +49,7 @@ public class PasswordExpiredUsersApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "", notes = "Get password expired users list for a specified period.", response = PasswordExpiredUser.class, responseContainer = "List", tags={ "Get password expired users" })
+    @ApiOperation(value = "", notes = "Get password expired users list for a specified period.<br>    <b>Scope(Permission) required:</b> `internal_password_expired_user_view` ", response = PasswordExpiredUser.class, responseContainer = "List", tags={ "Get password expired users" })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Password expired users returned successfully", response = PasswordExpiredUser.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),

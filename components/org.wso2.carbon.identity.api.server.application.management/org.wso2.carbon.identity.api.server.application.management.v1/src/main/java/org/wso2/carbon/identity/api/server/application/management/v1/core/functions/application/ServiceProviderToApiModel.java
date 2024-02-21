@@ -22,6 +22,7 @@ import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
@@ -75,6 +76,9 @@ import java.util.stream.Collectors;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.arrayToStream;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_JWKS;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_PEM;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.Application.CONSOLE_APP;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.Application.MY_ACCOUNT_APP;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.ORGANIZATION_AUTHENTICATOR;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.ALLOWED_ROLE_AUDIENCE_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.ANDROID_PACKAGE_NAME_PROPERTY_NAME;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.APPLE_APP_ID_PROPERTY_NAME;
@@ -117,8 +121,10 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .description(application.getDescription())
                     .imageUrl(application.getImageUrl())
                     .accessUrl(application.getAccessUrl())
+                    .logoutReturnUrl(getLogoutReturnUrl(application))
                     .clientId(getInboundKey(application, "oauth2"))
                     .issuer(getInboundKey(application, "samlsso"))
+                    .realm(getInboundKey(application, "passivests"))
                     .templateId(application.getTemplateId())
                     .isManagementApp(application.isManagementApp())
                     .associatedRoles(buildAssociatedRoles(application))
@@ -129,6 +135,16 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .authenticationSequence(buildAuthenticationSequence(application))
                     .access(getAccess(application.getApplicationName()));
         }
+    }
+
+    private String getLogoutReturnUrl(ServiceProvider application) {
+
+        for (ServiceProviderProperty property : application.getSpProperties()) {
+            if (ApplicationManagementConstants.PROP_LOGOUT_RETURN_URL.equals(property.getName())) {
+                return property.getValue();
+            }
+        }
+        return null; // null value returned to avoid API response returning an empty string.
     }
 
     private AssociatedRolesConfig buildAssociatedRoles(ServiceProvider application) {
@@ -188,7 +204,9 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
             authSequence.script(authConfig.getAuthenticationScriptConfig().getContent());
         }
 
-        addAuthenticationStepInformation(authConfig, authSequence);
+        boolean hideOrganizationSsoAuthenticator = StringUtils.equals(application.getApplicationName(), CONSOLE_APP) ||
+                StringUtils.equals(application.getApplicationName(), MY_ACCOUNT_APP);
+        addAuthenticationStepInformation(hideOrganizationSsoAuthenticator, authConfig, authSequence);
 
         List<String> requestPathAuthenticators = getRequestPathAuthenticators(application);
         authSequence.setRequestPathAuthenticators(requestPathAuthenticators);
@@ -202,12 +220,13 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return arrayToStream(requestPathConfigs).map(LocalAuthenticatorConfig::getName).collect(Collectors.toList());
     }
 
-    private void addAuthenticationStepInformation(LocalAndOutboundAuthenticationConfig authConfig,
+    private void addAuthenticationStepInformation(boolean hideOrganizationSsoAuthenticator,
+                                                  LocalAndOutboundAuthenticationConfig authConfig,
                                                   AuthenticationSequence authSequence) {
 
         if (authConfig.getAuthenticationSteps() != null) {
             Arrays.stream(authConfig.getAuthenticationSteps()).forEach(authenticationStep -> {
-                authSequence.addStepsItem(buildAuthStep(authenticationStep));
+                authSequence.addStepsItem(buildAuthStep(hideOrganizationSsoAuthenticator, authenticationStep));
                 if (authenticationStep.isSubjectStep()) {
                     authSequence.setSubjectStepId(authenticationStep.getStepOrder());
                 }
@@ -259,13 +278,16 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return defaultSP;
     }
 
-    private AuthenticationStepModel buildAuthStep(AuthenticationStep authenticationStep) {
+    private AuthenticationStepModel buildAuthStep(boolean hideOrganizationSsoAuthenticator,
+                                                  AuthenticationStep authenticationStep) {
 
         AuthenticationStepModel authStep = new AuthenticationStepModel();
         authStep.setId(authenticationStep.getStepOrder());
 
-        arrayToStream(authenticationStep.getFederatedIdentityProviders()).forEach(y -> authStep.addOptionsItem(
-                new Authenticator().idp(y.getIdentityProviderName())
+        arrayToStream(authenticationStep.getFederatedIdentityProviders()).filter(y ->
+                        !hideOrganizationSsoAuthenticator ||
+                                !(ORGANIZATION_AUTHENTICATOR.equals(y.getDefaultAuthenticatorConfig().getName())))
+                .forEach(y -> authStep.addOptionsItem(new Authenticator().idp(y.getIdentityProviderName())
                         .authenticator(y.getDefaultAuthenticatorConfig().getName())));
 
         arrayToStream(authenticationStep.getLocalAuthenticatorConfigs()).forEach(y -> authStep.addOptionsItem(
@@ -555,8 +577,10 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .getInboundAuthenticationRequestConfigs();
 
             if (authRequestConfigs != null && authRequestConfigs.length > 0) {
-                if (authRequestConfigs[0].getInboundAuthType().equals(authType)) {
-                    return authRequestConfigs[0].getInboundAuthKey();
+                for (InboundAuthenticationRequestConfig authRequestConfig: authRequestConfigs) {
+                    if (authRequestConfig.getInboundAuthType().equals(authType)) {
+                        return authRequestConfig.getInboundAuthKey();
+                    }
                 }
             }
         }

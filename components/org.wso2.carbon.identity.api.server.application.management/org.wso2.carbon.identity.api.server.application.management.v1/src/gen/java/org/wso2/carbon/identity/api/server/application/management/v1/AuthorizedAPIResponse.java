@@ -39,6 +39,7 @@ public class AuthorizedAPIResponse  {
     private String identifier;
     private String displayName;
     private String policyId;
+    private String type;
     private List<AuthorizedScope> authorizedScopes = null;
 
 
@@ -116,6 +117,24 @@ public class AuthorizedAPIResponse  {
 
     /**
     **/
+    public AuthorizedAPIResponse type(String type) {
+
+        this.type = type;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("type")
+    @Valid
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+    **/
     public AuthorizedAPIResponse authorizedScopes(List<AuthorizedScope> authorizedScopes) {
 
         this.authorizedScopes = authorizedScopes;
@@ -156,12 +175,13 @@ public class AuthorizedAPIResponse  {
             Objects.equals(this.identifier, authorizedAPIResponse.identifier) &&
             Objects.equals(this.displayName, authorizedAPIResponse.displayName) &&
             Objects.equals(this.policyId, authorizedAPIResponse.policyId) &&
+            Objects.equals(this.type, authorizedAPIResponse.type) &&
             Objects.equals(this.authorizedScopes, authorizedAPIResponse.authorizedScopes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, identifier, displayName, policyId, authorizedScopes);
+        return Objects.hash(id, identifier, displayName, policyId, type, authorizedScopes);
     }
 
     @Override
@@ -174,6 +194,7 @@ public class AuthorizedAPIResponse  {
         sb.append("    identifier: ").append(toIndentedString(identifier)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    policyId: ").append(toIndentedString(policyId)).append("\n");
+        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    authorizedScopes: ").append(toIndentedString(authorizedScopes)).append("\n");
         sb.append("}");
         return sb.toString();

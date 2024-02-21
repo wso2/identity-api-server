@@ -762,9 +762,9 @@ paths:
       description: |
         This API provides the capability to delete an authorized API of the application.<br>
           <b>Permission required:</b> <br>
-              * /permission/admin/manage/identity/applicationmgt/delete <br>
+              * /permission/admin/manage/identity/applicationmgt/update <br>
           <b>Scope required:</b> <br>
-              * internal_application_mgt_delete
+              * internal_application_mgt_update
       parameters:
         - name: applicationId
           in: path
@@ -2376,6 +2376,246 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /applications/{applicationId}/share:
+    post:
+      summary: |
+        Share the application from the root organization to the given organization.
+      description: |
+        This API provides the capability to share an application with organizations.
+        <br><br>
+        <b>Scope required:</b> 
+        * internal_shared_application_create
+      operationId: shareOrgApplication
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application which will be shared to organizations.
+          required: true
+          schema:
+            type: string
+            example: c75e27f9-98c7-4518-a968-c6cd59f0ac6b
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationSharePOSTRequest'
+        required: true
+      responses:
+        '200':
+          description: Ok
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - Organization Application Sharing
+    get:
+      summary: |
+        List of organizations that the application is shared to.
+      description: |
+        This API returns the list of organizations that the application is shared to.
+        <br><br>
+        <b>Scope required:</b> 
+        * internal_shared_application_view
+      operationId: shareOrgApplicationGet
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application which is shared to organizations.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SharedOrganizationsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - Organization Application Sharing
+  /applications/{applicationId}/shared-apps:
+    get:
+      summary: |
+        List of shared applications along with its organization.
+      description: |
+        This API returns the list of shared app ids along with the shared organization id.
+        <br><br>
+        <b>Scope required:</b> 
+        * internal_shared_application_view
+      operationId: sharedApplicationsGet
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application which is shared to organizations.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SharedApplicationsResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - Organization Application Sharing
+    delete:
+      description: |
+        This API provides the capability to stop sharing an application to all organizations the application is shared to.
+        <br><br>
+        <b>Scope required:</b> 
+        * internal_shared_application_delete
+      summary: |
+        Stop sharing an application with all organizations.
+      operationId: sharedApplicationsAllDelete
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - Organization Application Sharing
+  /applications/{applicationId}/share/{shared-organization-id}:
+    delete:
+      description: |
+        This API provides the capability to stop sharing an application to an organization by providing its ID.
+        <br><br>
+        <b>Scope required:</b> 
+        * internal_shared_application_delete
+      summary: |
+        Stop sharing an application to a organization.
+      operationId: shareOrgApplicationDelete
+      parameters:
+        - name: applicationId
+          in: path
+          description: ID of the application.
+          required: true
+          schema:
+            type: string
+        - name: shared-organization-id
+          in: path
+          description: ID of the organization to stop sharing.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - Organization Application Sharing
+
 components:
   parameters:
     limitQueryParam:
@@ -2573,6 +2813,9 @@ components:
         issuer:
           type: string
           example: 'http://idp.example.com/metadata.php'
+        realm:
+          type: string
+          example: 'PassiveSTSSampleApp'
         access:
           type: string
           enum:
@@ -2588,8 +2831,8 @@ components:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
         associatedRoles:
-           type: object
-           $ref: '#/components/schemas/AssociatedRolesConfig'
+          type: object
+          $ref: '#/components/schemas/AssociatedRolesConfig'
     ApplicationModel:
       type: object
       required:
@@ -2611,6 +2854,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        logoutReturnUrl:
+          type: string
+          example: 'https://example.com/app/logout'
         templateId:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
@@ -2657,12 +2903,18 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        logoutReturnUrl:
+          type: string
+          example: 'https://example.com/app/logout'
         clientId:
           type: string
           example: 'SmrrDNXRYf1lMmDlnleeHTuXx_Ea'
         issuer:
           type: string
           example: 'http://idp.example.com/metadata.php'
+        realm:
+          type: string
+          example: 'PassiveSTSSampleApp'
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
@@ -2708,6 +2960,9 @@ components:
         accessUrl:
           type: string
           example: 'https://example.com/login'
+        logoutReturnUrl:
+          type: string
+          example: 'https://example.com/app/logout'
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
@@ -2768,6 +3023,8 @@ components:
         jit:
           type: boolean
           example: false
+      description: >-
+        This property is disabled by default as of Identity Server version 7.0 onwards.
     ConfiguredAuthenticatorsModal:
       type: object
       properties:
@@ -3868,6 +4125,9 @@ components:
         policyId:
           type: string
           example: RBAC
+        type:
+          type: string
+          example: TENANT_ADMIN
         authorizedScopes:
           type: array
           items:
@@ -3914,6 +4174,63 @@ components:
           items:
             type: string
             example: bookings:view
+
+    ApplicationSharePOSTRequest:
+      type: object
+      properties:
+        shareWithAllChildren:
+          type: boolean
+          default: false
+        sharedOrganizations:
+          type: array
+          items:
+            type: string
+    SharedOrganizationsResponse:
+      type: object
+      properties:
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/BasicOrganizationResponse'
+    SharedApplicationsResponse:
+      type: object
+      properties:
+        sharedApplications:
+          type: array
+          items:
+            $ref: '#/components/schemas/SharedApplicationResponse'
+    SharedApplicationResponse:
+      type: object
+      properties:
+        applicationId:
+          type: string
+          description: Shared application's id.
+          example: 'ca322554-fe79-4c04-9c94-492855ef92a3'
+        organizationId:
+          type: string
+          description: Shared application residing organization id.
+          example: '682edf68-4835-4bb8-961f-0a16bc6cc866'
+    BasicOrganizationResponse:
+      type: object
+      required:
+        - id
+        - name
+        - status
+        - ref
+      properties:
+        id:
+          type: string
+          example: 'b4526d91-a8bf-43d2-8b14-c548cf73065b'
+        name:
+          type: string
+          example: 'ABC Builders'
+        status:
+          type: string
+          enum: [ ACTIVE, DISABLED ]
+          example: ACTIVE
+        ref:
+          type: string
+          example: '/t/wso2.com/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
 
     Error:
       type: object

@@ -242,6 +242,7 @@ public class ServerAPIResourceManagementService {
             APIResource.APIResourceBuilder apiResourceBuilder = new APIResource.APIResourceBuilder()
                     .name(displayName)
                     .id(apiResourceID)
+                    .type(currentAPIResource.getType())
                     .description(description);
             APIResource apiResource = apiResourceBuilder.build();
             APIResourceManagementServiceHolder.getApiResourceManager().updateAPIResource(apiResource, addedScopes,
@@ -381,7 +382,7 @@ public class ServerAPIResourceManagementService {
                         .collect(Collectors.toList()))
                 .requiresAuthorization(apiResource.isAuthorizationRequired())
                 .properties(apiResource.getProperties().stream().map(this::buildAPIResourceProperty)
-                           .collect(Collectors.toList()));
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -477,8 +478,9 @@ public class ServerAPIResourceManagementService {
                 .type(apiResource.getType())
                 .requiresAuthorization(apiResource.isAuthorizationRequired())
                 .properties(properties)
-                .self(V1_API_PATH_COMPONENT + APIResourceMgtEndpointConstants.API_RESOURCE_PATH_COMPONENT + "/"
-                        + apiResource.getId());
+                .self(ContextLoader.buildURIForBody(V1_API_PATH_COMPONENT +
+                                APIResourceMgtEndpointConstants.API_RESOURCE_PATH_COMPONENT + "/" + apiResource.getId())
+                        .toString());
     }
 
     /**
@@ -537,7 +539,7 @@ public class ServerAPIResourceManagementService {
     private void handleSystemAPI(APIResource apiResource) {
 
         if (apiResource.getType() != null &&
-                apiResource.getType().startsWith(APIResourceMgtEndpointConstants.SYSTEM_API_RESOURCE_TYPE)) {
+                !apiResource.getType().startsWith(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE)) {
             throw APIResourceMgtEndpointUtil.handleException(Response.Status.FORBIDDEN,
                     ErrorMessage.ERROR_CODE_SYSTEM_API_RESOURCE_NOT_MODIFIABLE);
         }

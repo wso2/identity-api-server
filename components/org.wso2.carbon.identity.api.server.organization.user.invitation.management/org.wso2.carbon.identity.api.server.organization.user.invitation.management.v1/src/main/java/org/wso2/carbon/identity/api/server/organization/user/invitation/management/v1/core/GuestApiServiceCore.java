@@ -24,32 +24,36 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.common.UserInvitationMgtConstants;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.AcceptanceRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.Audience;
+import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.GroupAssignmentResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.IntrospectSuccessResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationSuccessResponse;
+import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationSuccessResponseResult;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationsListResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.RoleAssignmentResponse;
 import org.wso2.carbon.identity.organization.user.invitation.management.InvitationCoreServiceImpl;
 import org.wso2.carbon.identity.organization.user.invitation.management.exception.UserInvitationMgtException;
+import org.wso2.carbon.identity.organization.user.invitation.management.models.GroupAssignments;
 import org.wso2.carbon.identity.organization.user.invitation.management.models.Invitation;
+import org.wso2.carbon.identity.organization.user.invitation.management.models.InvitationDO;
+import org.wso2.carbon.identity.organization.user.invitation.management.models.InvitationResult;
 import org.wso2.carbon.identity.organization.user.invitation.management.models.RoleAssignments;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_ACTIVE_INVITATION_EXISTS;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_CONFIRMATION_CODE;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_FILTER;
+import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_GROUP;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_INVITATION_ID;
+import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_ROLE;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_USER;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER;
-import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_STORE_ROLES_APP_ID_INVALID;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE_VALUE;
 import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_USER_ALREADY_EXISTS;
-import static org.wso2.carbon.identity.organization.user.invitation.management.constant.UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_USER_NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
@@ -79,17 +83,29 @@ public class GuestApiServiceCore {
         return roleAssignmentResponseList;
     }
 
+    private static List<GroupAssignmentResponse> buildGroupAssignmentResponse(Invitation invitationRecord) {
+
+        List<GroupAssignmentResponse> groupAssignmentResponseList = new ArrayList<>();
+        for (GroupAssignments groupAssignment : invitationRecord.getGroupAssignments()) {
+            GroupAssignmentResponse groupAssignmentResponse = new GroupAssignmentResponse();
+            groupAssignmentResponse.setDisplayName(groupAssignment.getDisplayName());
+            groupAssignmentResponse.setId(groupAssignment.getGroupId());
+            groupAssignmentResponseList.add(groupAssignmentResponse);
+        }
+        return groupAssignmentResponseList;
+    }
+
     /**
      * Creates the invitation to the shared user.
      *
      * @param invitationRequestBody Contains the details of the invitation.
      * @return The details of the created invitation.
      */
-    public InvitationSuccessResponse createInvitation(InvitationRequestBody invitationRequestBody) {
+    public List<InvitationSuccessResponse> createInvitation(InvitationRequestBody invitationRequestBody) {
 
         InvitationCoreServiceImpl invitationCoreService = new InvitationCoreServiceImpl();
-        Invitation invitation = new Invitation();
-        invitation.setUsername(invitationRequestBody.getUsername());
+        InvitationDO invitation = new InvitationDO();
+        invitation.setUsernamesList(invitationRequestBody.getUsernames());
         invitation.setUserDomain(invitationRequestBody.getUserDomain());
         if (invitationRequestBody.getRoles() != null) {
             List<RoleAssignments> roleAssignments = new ArrayList<>();
@@ -100,26 +116,32 @@ public class GuestApiServiceCore {
             }
             invitation.setRoleAssignments(roleAssignments.toArray(new RoleAssignments[0]));
         }
-        Invitation invitationResponse;
+        if (invitationRequestBody.getGroups() != null) {
+            List<GroupAssignments> groupAssignments = new ArrayList<>();
+            for (String groupId : invitationRequestBody.getGroups()) {
+                GroupAssignments groupAssignment = new GroupAssignments();
+                groupAssignment.setGroupId(groupId);
+                groupAssignments.add(groupAssignment);
+            }
+            invitation.setGroupAssignments(groupAssignments.toArray(new GroupAssignments[0]));
+        }
+        List<InvitationResult> invitationResponse;
         try {
-            invitationResponse = invitationCoreService.createInvitation(invitation);
+            invitationResponse = invitationCoreService.createInvitations(invitation);
         } catch (UserInvitationMgtException e) {
-            if (ERROR_CODE_USER_NOT_FOUND.getCode().equals(e.getErrorCode())) {
+            if (ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER.getCode().equals(e.getErrorCode())) {
                 throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
-                        .ERROR_CODE_USER_NOT_FOUND, invitation.getUsername());
-            } else if (ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER.getCode().equals(e.getErrorCode())) {
+                        .ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER, invitation.getUsernamesList().toString());
+            } else if (ERROR_CODE_INVALID_ROLE.getCode().equals(e.getErrorCode())) {
                 throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
-                        .ERROR_CODE_MULTIPLE_INVITATIONS_FOR_USER, invitation.getUsername());
-            } else if (ERROR_CODE_ACTIVE_INVITATION_EXISTS.getCode().equals(e.getErrorCode())) {
-                throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
-                        .ERROR_CODE_ACTIVE_INVITATION_AVAILABLE, invitation.getUsername());
-            } else if (ERROR_CODE_STORE_ROLES_APP_ID_INVALID.getCode().equals(e.getErrorCode())) {
-                throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage
-                        .ERROR_CODE_INVALID_APPLICATION, StringUtils.EMPTY);
+                        .ERROR_CODE_INVALID_ROLE, StringUtils.EMPTY);
+            } else if (ERROR_CODE_INVALID_GROUP.getCode().equals(e.getErrorCode())) {
+                throw handleException(BAD_REQUEST, UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_INVALID_GROUP,
+                        StringUtils.EMPTY);
             }
             throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                     UserInvitationMgtConstants.ErrorMessage.ERROR_CODE_CREATE_INVITATION,
-                    invitation.getUsername());
+                    invitation.getUsernamesList().toString());
         }
         return createInvitationSuccessResponse(invitationResponse);
     }
@@ -248,16 +270,24 @@ public class GuestApiServiceCore {
         return error.getDescription();
     }
 
-    private InvitationSuccessResponse createInvitationSuccessResponse(Invitation invitation) {
+    private List<InvitationSuccessResponse> createInvitationSuccessResponse(List<InvitationResult> invitationList) {
 
-        InvitationSuccessResponse invitationSuccessResponse = new InvitationSuccessResponse();
-        invitationSuccessResponse.setUsername(invitation.getUsername());
-        invitationSuccessResponse.setEmail(invitation.getEmail());
-        if (invitation.getRoleAssignments().length > 0) {
-            List<RoleAssignmentResponse> roleAssignmentResponses = buildRoleAssignmentResponse(invitation);
-            invitationSuccessResponse.setRoles(roleAssignmentResponses);
+        List<InvitationSuccessResponse> invitationSuccessResponseList = new ArrayList<>();
+        for (InvitationResult invitation : invitationList) {
+            InvitationSuccessResponse invitationSuccessResponse = new InvitationSuccessResponse();
+            InvitationSuccessResponseResult invitationSuccessResponseResult = new InvitationSuccessResponseResult();
+            if (UserInvitationMgtConstants.ERROR_FAIL_STATUS.equals(invitation.getStatus())) {
+                invitationSuccessResponseResult.setErrorCode(invitation.getErrorMsg().getCode());
+                invitationSuccessResponseResult.setErrorMessage(invitation.getErrorMsg().getMessage());
+                invitationSuccessResponseResult.setErrorDescription(invitation.getErrorMsg()
+                        .getDescription());
+            }
+            invitationSuccessResponseResult.setStatus(invitation.getStatus());
+            invitationSuccessResponse.setUsername(invitation.getUsername());
+            invitationSuccessResponse.setResult(invitationSuccessResponseResult);
+            invitationSuccessResponseList.add(invitationSuccessResponse);
         }
-        return invitationSuccessResponse;
+        return invitationSuccessResponseList;
     }
 
     private InvitationsListResponse buildInvitationsListResponse(List<Invitation> invitationList) {
@@ -273,6 +303,10 @@ public class GuestApiServiceCore {
             if (invitationRecord.getRoleAssignments().length > 0) {
                 List<RoleAssignmentResponse> roleAssignments = buildRoleAssignmentResponse(invitationRecord);
                 invitationResponse.setRoles(roleAssignments);
+            }
+            if (invitationRecord.getGroupAssignments().length > 0) {
+                List<GroupAssignmentResponse> groupAssignments = buildGroupAssignmentResponse(invitationRecord);
+                invitationResponse.setGroups(groupAssignments);
             }
             invitationsListResponse.addInvitationsItem(invitationResponse);
         }

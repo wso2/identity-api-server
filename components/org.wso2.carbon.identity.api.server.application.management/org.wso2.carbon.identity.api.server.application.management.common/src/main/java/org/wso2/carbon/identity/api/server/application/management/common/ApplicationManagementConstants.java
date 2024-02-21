@@ -53,7 +53,7 @@ public class ApplicationManagementConstants {
     public static final String ISSUER = "issuer";
     public static final String RBAC = "RBAC";
     public static final String NO_POLICY = "NO POLICY";
-    public static final String NONE = "None";
+    public static final String SELECT_OPTION = "Select Option";
     public static final String TOKEN_EP_SIGNATURE_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
             "SupportedTokenEndpointSigningAlgorithms.SupportedTokenEndpointSigningAlgorithm";
     public static final String ID_TOKEN_SIGNATURE_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
@@ -70,8 +70,14 @@ public class ApplicationManagementConstants {
     public static final String FAPI_ALLOWED_CLIENT_AUTHENTICATION_METHODS = "OAuth.OpenIDConnect.FAPI." +
             "AllowedClientAuthenticationMethods.AllowedClientAuthenticationMethod";
     public static final String RSA1_5 = "RSA1_5";
+    public static final String PROP_LOGOUT_RETURN_URL = "logoutReturnUrl";
+    public static final String DEFAULT_LOGOUT_RETURN_URL_VALUE = ".*";
+    public static final String LOGOUT_RETURN_URL_DISPLAY_NAME = "Logout Return URL";
 
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
+    public static final String APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED =
+            "OutboundProvisioning.enableApplicationBasedOutboundProvisioning";
+
 
     /**
      * Enums for error messages.
@@ -140,6 +146,10 @@ public class ApplicationManagementConstants {
         ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED("60513",
                 "Invalid configuration.",
                 "'useMappedLocalSubject' cannot be disabled when 'mappedLocalSubjectMandatory' is enabled."),
+        UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION("60514",
+                "Outbound provisioning configuration not supported.",
+                "Application-based outbound provisioning support is disabled."),
+
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
                 "Error occurred while retrieving SAML Metadata.",
@@ -218,6 +228,7 @@ public class ApplicationManagementConstants {
         OAUTH_GRANT_TYPE_NAMES.put("urn:ietf:params:oauth:grant-type:saml1-bearer", "SAML1");
         OAUTH_GRANT_TYPE_NAMES.put(GrantType.SAML20_BEARER.toString(), "SAML2");
         OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.IWA_NTLM, "IWA-NTLM");
+        OAUTH_GRANT_TYPE_NAMES.put(OAuthConstants.GrantTypes.JWT_BEARER, "JWT Bearer");
         OAUTH_GRANT_TYPE_NAMES.put("organization_switch", "Organization Switch");
         OAUTH_GRANT_TYPE_NAMES.put(Constants.DEVICE_FLOW_GRANT_TYPE, "Device Code");
         OAUTH_GRANT_TYPE_NAMES.put("urn:ietf:params:oauth:grant-type:token-exchange", "Token Exchange");

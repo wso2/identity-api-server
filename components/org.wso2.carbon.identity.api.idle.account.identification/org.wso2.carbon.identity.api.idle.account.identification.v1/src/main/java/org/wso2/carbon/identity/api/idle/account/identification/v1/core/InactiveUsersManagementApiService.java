@@ -67,6 +67,9 @@ public class InactiveUsersManagementApiService {
             validateDates(inactiveAfter, excludeBefore);
             LocalDateTime inactiveAfterDate = convertToDateObject(inactiveAfter, DATE_INACTIVE_AFTER);
             LocalDateTime excludeBeforeDate = convertToDateObject(excludeBefore, DATE_EXCLUDE_BEFORE);
+
+            validateDatesCombination(inactiveAfterDate, excludeBeforeDate);
+
             if (excludeBeforeDate == null) {
                 inactiveUsers = IdleAccountIdentificationServiceHolder.getIdleAccountIdentificationService().
                         getInactiveUsersFromSpecificDate(inactiveAfterDate, tenantDomain);
@@ -234,6 +237,24 @@ public class InactiveUsersManagementApiService {
             return String.format(error.getDescription(), data);
         } else {
             return error.getDescription();
+        }
+    }
+
+    /**
+     * Check inactive after date comes before exclude after date.
+     *
+     * @throws IdleAccountIdentificationClientException if the date combination is invalid.
+     */
+    private void validateDatesCombination(LocalDateTime inactiveAfterDate, LocalDateTime excludeBeforeDate)
+            throws IdleAccountIdentificationClientException {
+
+        // check excludeBefore data is before than inactiveAfterDate date.
+        if (inactiveAfterDate != null && excludeBeforeDate != null
+                && inactiveAfterDate.isBefore(excludeBeforeDate)) {
+
+            ErrorMessage error = ErrorMessage.ERROR_INVALID_DATE_COMBINATION;
+            throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
+                    String.format(error.getDescription()));
         }
     }
 }

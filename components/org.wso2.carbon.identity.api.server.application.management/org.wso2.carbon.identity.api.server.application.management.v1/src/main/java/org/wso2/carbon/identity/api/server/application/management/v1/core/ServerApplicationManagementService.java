@@ -167,12 +167,14 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.CLIENT_ID;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
@@ -784,6 +786,14 @@ public class ServerApplicationManagementService {
             }
         }
 
+        // Validate whether application-based outbound provisioning support is enabled.
+        if (applicationModel.getProvisioningConfigurations() != null &&
+                applicationModel.getProvisioningConfigurations().getOutboundProvisioningIdps() != null &&
+                !isApplicationBasedOutboundProvisioningEnabled()) {
+            throw buildBadRequestError(UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getCode(),
+                    UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getDescription());
+        }
+
         String username = ContextLoader.getUsernameFromContext();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
@@ -840,9 +850,19 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
+
+        // Validate whether application-based outbound provisioning support is enabled.
+        if (applicationPatchModel != null && applicationPatchModel.getProvisioningConfigurations() != null &&
+                applicationPatchModel.getProvisioningConfigurations().getOutboundProvisioningIdps() != null &&
+                !isApplicationBasedOutboundProvisioningEnabled()) {
+            throw buildBadRequestError(UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getCode(),
+                    UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getDescription());
+        }
+
         if (applicationPatchModel != null) {
             new UpdateServiceProvider().apply(appToUpdate, applicationPatchModel);
         }
+
 
         boolean isAllowUpdateSystemApps = isAllowUpdateSystemApplication(appToUpdate.getApplicationName(),
                 applicationPatchModel);
@@ -1446,8 +1466,10 @@ public class ServerApplicationManagementService {
             if (currentAuthorizedAPI == null) {
                 throw buildClientError(ErrorMessage.AUTHORIZED_API_NOT_FOUND, apiId, applicationId);
             }
-            addedScopes.removeIf(scopeName -> currentAuthorizedAPI.getScopes().stream().anyMatch(scope ->
-                    scope.getName().equals(scopeName)));
+            if (currentAuthorizedAPI.getScopes() != null) {
+                addedScopes.removeIf(scopeName -> currentAuthorizedAPI.getScopes().stream().anyMatch(scope ->
+                        scope.getName().equals(scopeName)));
+            }
 
             getAuthorizedAPIManagementService().patchAuthorizedAPI(applicationId, apiId, addedScopes, removedScopes,
                     tenantDomain);
@@ -1482,6 +1504,7 @@ public class ServerApplicationManagementService {
                         .identifier(authorizedAPI.getAPIIdentifier())
                         .displayName(authorizedAPI.getAPIName())
                         .policyId(authorizedAPI.getPolicyId())
+                        .type(authorizedAPI.getType())
                         .authorizedScopes(createAuthorizedScope(authorizedAPI.getScopes())));
             }
             return authorizedAPIResponses;
@@ -1980,5 +2003,17 @@ public class ServerApplicationManagementService {
         return Utils.buildConflictError(ErrorMessage.API_RESOURCE_ALREADY_AUTHORIZED.getCode(),
                 ErrorMessage.API_RESOURCE_ALREADY_AUTHORIZED.getMessage(),
                 String.format(ErrorMessage.API_RESOURCE_ALREADY_AUTHORIZED.getDescription(), apiId, appId));
+    }
+
+    private boolean isApplicationBasedOutboundProvisioningEnabled() {
+
+        boolean applicationBasedOutboundProvisioningEnabled = false;
+
+        if (StringUtils.isNotEmpty(
+                IdentityUtil.getProperty(APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED))) {
+            applicationBasedOutboundProvisioningEnabled = Boolean
+                    .parseBoolean(IdentityUtil.getProperty(APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED));
+        }
+        return applicationBasedOutboundProvisioningEnabled;
     }
 }

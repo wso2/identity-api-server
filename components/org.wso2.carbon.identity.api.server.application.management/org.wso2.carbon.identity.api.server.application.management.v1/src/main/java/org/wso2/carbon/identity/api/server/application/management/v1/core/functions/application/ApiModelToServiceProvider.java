@@ -19,6 +19,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
@@ -55,10 +56,10 @@ public class ApiModelToServiceProvider implements ModelToDTO<ApplicationModel, A
         addClaimConfigurationToApplication(application, applicationModel.getClaimConfiguration());
         addAuthenticationSequence(application, applicationModel.getAuthenticationSequence());
         addProvisioningConfiguration(application, applicationModel.getProvisioningConfigurations());
-        
+
         ApplicationDTO.Builder applicationDTOBuilder = new ApplicationDTO.Builder();
         applicationDTOBuilder.serviceProvider(application);
-        
+
         // Converting InboundProtocols to InboundProtocolsDTO and adding it to the ApplicationModel.
         applicationDTOBuilder.inboundProtocolConfigurationDto(
                 createInboundProtocolConfiguration(application, applicationModel.getInboundProtocolConfiguration()));
@@ -80,7 +81,7 @@ public class ApiModelToServiceProvider implements ModelToDTO<ApplicationModel, A
                                                                    InboundProtocols inboundProtocolsModel)
             throws IdentityApplicationManagementClientException {
 
-        
+
         if (inboundProtocolsModel != null) {
             return new InboundProtocolToDTO().apply(serviceProvider, inboundProtocolsModel);
         }

@@ -14,7 +14,7 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
-  - url: 'https://localhost:9443/o/{organization-domain}/api/server/v1'
+  - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
     variables:
       organization-domain:
         default: 10084a8d-113f-4211-a0d5-efe36b082211
@@ -135,6 +135,7 @@ paths:
           required: true
           schema:
             type: string
+            example: 5355f3f0-f8b3-457f-805a-b32a668c5125
         - $ref: '#/components/parameters/includePermissionsQueryParam'
       responses:
         '200':
@@ -261,6 +262,7 @@ paths:
         - Organization
   /organizations/{organization-id}/applications/{application-id}/share:
     post:
+      deprecated: true
       summary: |
         Share application from the parent organization to given organization
       description: |
@@ -273,12 +275,14 @@ paths:
           required: true
           schema:
             type: string
+            example: 10084a8d-113f-4211-a0d5-efe36b082211
         - name: application-id
           in: path
           description: ID of the application which will be shared to child organizations.
           required: true
           schema:
             type: string
+            example: c75e27f9-98c7-4518-a968-c6cd59f0ac6b
       requestBody:
         description: ApplicationSharePOSTRequest object containing the sharing attributes.
         content:
@@ -302,6 +306,7 @@ paths:
       tags:
         - Organization Application Management
     get:
+      deprecated: true
       summary: |
         List of organizations that the application is shared to.
       description: |
@@ -377,6 +382,7 @@ paths:
         - Organization Application Management
   /organizations/{organization-id}/applications/{application-id}/shared-apps:
     get:
+      deprecated: true
       summary: |
         List of shared applications along with its organization.
       description: |
@@ -415,6 +421,7 @@ paths:
       tags:
         - Organization Application Management
     delete:
+      deprecated: true
       description: |
         This API provides the capability to stop sharing an application to all organizations the application is shared to.
       summary: |
@@ -450,6 +457,7 @@ paths:
         - Organization Application Management
   /organizations/{organization-id}/applications/{application-id}/share/{shared-organization-id}:
     delete:
+      deprecated: true
       description: |
         This API provides the capability to stop sharing an application to an organization by providing its ID.
       summary: |

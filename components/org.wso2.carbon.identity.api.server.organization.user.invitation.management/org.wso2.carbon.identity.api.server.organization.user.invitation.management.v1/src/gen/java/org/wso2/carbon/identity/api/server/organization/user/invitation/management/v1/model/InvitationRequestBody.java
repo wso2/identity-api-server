@@ -34,34 +34,42 @@ import javax.xml.bind.annotation.*;
 
 public class InvitationRequestBody  {
   
-    private String username;
+    private List<String> usernames = new ArrayList<>();
+
     private String userDomain;
     private List<String> roles = null;
 
+    private List<String> groups = null;
+
 
     /**
-    * Username of the user who will be invited to the organization. This can be an email or an alphanumeric username.
+    * List of usernames of the users who will be invited to the organization. This can be an email or an alphanumeric username.
     **/
-    public InvitationRequestBody username(String username) {
+    public InvitationRequestBody usernames(List<String> usernames) {
 
-        this.username = username;
+        this.usernames = usernames;
         return this;
     }
     
-    @ApiModelProperty(example = "alex@gmail.com/alex", required = true, value = "Username of the user who will be invited to the organization. This can be an email or an alphanumeric username.")
-    @JsonProperty("username")
+    @ApiModelProperty(example = "[\"xyz@gmail.com\",\"abc@gmail.com\"]", required = true, value = "List of usernames of the users who will be invited to the organization. This can be an email or an alphanumeric username.")
+    @JsonProperty("usernames")
     @Valid
-    @NotNull(message = "Property username cannot be null.")
+    @NotNull(message = "Property usernames cannot be null.")
 
-    public String getUsername() {
-        return username;
+    public List<String> getUsernames() {
+        return usernames;
     }
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUsernames(List<String> usernames) {
+        this.usernames = usernames;
     }
 
-    /**
-    * User store domain of the user. If not provided, PRIMARY will be used.
+    public InvitationRequestBody addUsernamesItem(String usernamesItem) {
+        this.usernames.add(usernamesItem);
+        return this;
+    }
+
+        /**
+    * User store domain of the user. If not provided, default userstore will be used.
     **/
     public InvitationRequestBody userDomain(String userDomain) {
 
@@ -69,7 +77,7 @@ public class InvitationRequestBody  {
         return this;
     }
     
-    @ApiModelProperty(example = "PRIMARY", value = "User store domain of the user. If not provided, PRIMARY will be used.")
+    @ApiModelProperty(example = "PRIMARY", value = "User store domain of the user. If not provided, default userstore will be used.")
     @JsonProperty("userDomain")
     @Valid
     public String getUserDomain() {
@@ -88,7 +96,7 @@ public class InvitationRequestBody  {
         return this;
     }
     
-    @ApiModelProperty(value = "Role assignments which the user will be assigned to.")
+    @ApiModelProperty(example = "[\"f5b761ca-62f2-48ba-935b-f7b460f58e5c\",\"657fgq22-62f2-48ba-935b-f7bfgh6438fd\"]", value = "Role assignments which the user will be assigned to.")
     @JsonProperty("roles")
     @Valid
     public List<String> getRoles() {
@@ -106,6 +114,33 @@ public class InvitationRequestBody  {
         return this;
     }
 
+        /**
+    * Group assignments which the user will be assigned to.
+    **/
+    public InvitationRequestBody groups(List<String> groups) {
+
+        this.groups = groups;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "[\"48badf-rty20-48ba-935b-f7b460f58e5c\",\"fd234100-c115-45dc-ad11-70846b783866\"]", value = "Group assignments which the user will be assigned to.")
+    @JsonProperty("groups")
+    @Valid
+    public List<String> getGroups() {
+        return groups;
+    }
+    public void setGroups(List<String> groups) {
+        this.groups = groups;
+    }
+
+    public InvitationRequestBody addGroupsItem(String groupsItem) {
+        if (this.groups == null) {
+            this.groups = new ArrayList<>();
+        }
+        this.groups.add(groupsItem);
+        return this;
+    }
+
     
 
     @Override
@@ -118,14 +153,15 @@ public class InvitationRequestBody  {
             return false;
         }
         InvitationRequestBody invitationRequestBody = (InvitationRequestBody) o;
-        return Objects.equals(this.username, invitationRequestBody.username) &&
+        return Objects.equals(this.usernames, invitationRequestBody.usernames) &&
             Objects.equals(this.userDomain, invitationRequestBody.userDomain) &&
-            Objects.equals(this.roles, invitationRequestBody.roles);
+            Objects.equals(this.roles, invitationRequestBody.roles) &&
+            Objects.equals(this.groups, invitationRequestBody.groups);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, userDomain, roles);
+        return Objects.hash(usernames, userDomain, roles, groups);
     }
 
     @Override
@@ -134,9 +170,10 @@ public class InvitationRequestBody  {
         StringBuilder sb = new StringBuilder();
         sb.append("class InvitationRequestBody {\n");
         
-        sb.append("    username: ").append(toIndentedString(username)).append("\n");
+        sb.append("    usernames: ").append(toIndentedString(usernames)).append("\n");
         sb.append("    userDomain: ").append(toIndentedString(userDomain)).append("\n");
         sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
+        sb.append("    groups: ").append(toIndentedString(groups)).append("\n");
         sb.append("}");
         return sb.toString();
     }

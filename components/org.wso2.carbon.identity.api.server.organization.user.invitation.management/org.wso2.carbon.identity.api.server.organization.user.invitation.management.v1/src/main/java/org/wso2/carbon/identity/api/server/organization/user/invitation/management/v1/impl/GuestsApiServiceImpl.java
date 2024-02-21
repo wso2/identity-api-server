@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.organization.user.invitation.manageme
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationSuccessResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationsListResponse;
 
+import java.util.List;
 import javax.ws.rs.core.Response;
 
 /**
@@ -71,7 +72,7 @@ public class GuestsApiServiceImpl implements GuestsApiService {
     @Override
     public Response invitationTriggerPost(InvitationRequestBody invitationRequestBody) {
 
-        InvitationSuccessResponse invitationSuccessResponse =
+        List<InvitationSuccessResponse> invitationSuccessResponse =
                 guestApiServiceCore.createInvitation(invitationRequestBody);
         return Response.ok().entity(invitationSuccessResponse).build();
     }

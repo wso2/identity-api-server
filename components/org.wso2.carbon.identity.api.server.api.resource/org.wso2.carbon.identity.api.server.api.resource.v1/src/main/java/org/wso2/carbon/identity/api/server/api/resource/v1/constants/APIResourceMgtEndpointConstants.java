@@ -31,7 +31,6 @@ public class APIResourceMgtEndpointConstants {
     }
 
     public static final String BUSINESS_API_RESOURCE_TYPE = "BUSINESS";
-    public static final String SYSTEM_API_RESOURCE_TYPE = "SYSTEM";
     public static final String API_RESOURCE_MANAGEMENT_PREFIX = "API-RESOURCE-";
     public static final String API_RESOURCE_PATH_COMPONENT = "/api-resources";
     public static final String API_RESOURCE_COLLECTION_PATH_COMPONENT = "/api-resource-collections";
