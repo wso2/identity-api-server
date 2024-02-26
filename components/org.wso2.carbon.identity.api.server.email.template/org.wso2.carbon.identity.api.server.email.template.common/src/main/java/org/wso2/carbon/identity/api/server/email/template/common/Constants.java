@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ public class Constants {
     public static final String EMAIL_TEMPLATES_API_BASE_PATH = "/email";
     public static final String EMAIL_TEMPLATE_TYPES_PATH = "/template-types";
     public static final String EMAIL_TEMPLATES_PATH = "/templates";
+    public static final String ORG_EMAIL_TEMPLATES_PATH = "/org-templates";
+    public static final String APP_EMAIL_TEMPLATES_PATH = "/app-templates";
     public static final String PATH_SEPARATOR = "/";
 
     // Required attributes.
