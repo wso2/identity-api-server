@@ -765,7 +765,7 @@
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.7.30</identity.event.handler.version>
         <identity.inbound.oauth2.version>7.0.15</identity.inbound.oauth2.version>
-        <identity.inbound.saml2.version>5.11.38-SNAPSHOT</identity.inbound.saml2.version>
+        <identity.inbound.saml2.version>5.11.38</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
         <carbon.kernel.version>4.9.17</carbon.kernel.version>
