@@ -33,27 +33,27 @@ import javax.xml.bind.annotation.*;
 
 public class EmailTemplateWithID extends EmailTemplate {
   
-    private String id;
+    private String locale;
 
     /**
-    * Unique ID of the email template. This ID represents the locale of the email template.
+    * Locale of the email template.
     **/
-    public EmailTemplateWithID id(String id) {
+    public EmailTemplateWithID locale(String locale) {
 
-        this.id = id;
+        this.locale = locale;
         return this;
     }
     
-    @ApiModelProperty(example = "en_US", required = true, value = "Unique ID of the email template. This ID represents the locale of the email template.")
-    @JsonProperty("id")
+    @ApiModelProperty(example = "en_US", required = true, value = "Locale of the email template.")
+    @JsonProperty("locale")
     @Valid
-    @NotNull(message = "Property id cannot be null.")
+    @NotNull(message = "Property locale cannot be null.")
 
-    public String getId() {
-        return id;
+    public String getLocale() {
+        return locale;
     }
-    public void setId(String id) {
-        this.id = id;
+    public void setLocale(String locale) {
+        this.locale = locale;
     }
 
 
@@ -72,12 +72,12 @@ public class EmailTemplateWithID extends EmailTemplate {
         }
         
         EmailTemplateWithID emailTemplateWithID = (EmailTemplateWithID) o;
-        return Objects.equals(this.id, emailTemplateWithID.id);
+        return Objects.equals(this.locale, emailTemplateWithID.locale);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(locale);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class EmailTemplateWithID extends EmailTemplate {
         StringBuilder sb = new StringBuilder();
         sb.append("class EmailTemplateWithID {\n");
         sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    locale: ").append(toIndentedString(locale)).append("\n");
         sb.append("}");
         return sb.toString();
     }

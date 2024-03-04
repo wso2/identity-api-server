@@ -22,9 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
-import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateWithID;
 import javax.validation.constraints.*;
 
 
@@ -36,8 +33,7 @@ import javax.xml.bind.annotation.*;
 public class EmailTemplateType  {
   
     private String displayName;
-    private List<EmailTemplateWithID> templates = new ArrayList<>();
-
+    private String self;
 
     /**
     * Display name of the email template type.
@@ -61,32 +57,27 @@ public class EmailTemplateType  {
     }
 
     /**
-    * Email templates for the template type.
+    * Location of the created/updated resource.
     **/
-    public EmailTemplateType templates(List<EmailTemplateWithID> templates) {
+    public EmailTemplateType self(String self) {
 
-        this.templates = templates;
+        this.self = self;
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "Email templates for the template type.")
-    @JsonProperty("templates")
+    @ApiModelProperty(example = "/t/{tenant-domain}/api/server/v2/email/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg", required = true, value = "Location of the created/updated resource.")
+    @JsonProperty("self")
     @Valid
-    @NotNull(message = "Property templates cannot be null.")
+    @NotNull(message = "Property self cannot be null.")
 
-    public List<EmailTemplateWithID> getTemplates() {
-        return templates;
+    public String getSelf() {
+        return self;
     }
-    public void setTemplates(List<EmailTemplateWithID> templates) {
-        this.templates = templates;
-    }
-
-    public EmailTemplateType addTemplatesItem(EmailTemplateWithID templatesItem) {
-        this.templates.add(templatesItem);
-        return this;
+    public void setSelf(String self) {
+        this.self = self;
     }
 
-    
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -99,12 +90,12 @@ public class EmailTemplateType  {
         }
         EmailTemplateType emailTemplateType = (EmailTemplateType) o;
         return Objects.equals(this.displayName, emailTemplateType.displayName) &&
-            Objects.equals(this.templates, emailTemplateType.templates);
+            Objects.equals(this.self, emailTemplateType.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(displayName, templates);
+        return Objects.hash(displayName, self);
     }
 
     @Override
@@ -114,7 +105,7 @@ public class EmailTemplateType  {
         sb.append("class EmailTemplateType {\n");
         
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
-        sb.append("    templates: ").append(toIndentedString(templates)).append("\n");
+        sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();
     }

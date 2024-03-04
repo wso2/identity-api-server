@@ -22,9 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.List;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateType;
-import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateWithID;
 import javax.validation.constraints.*;
 
 

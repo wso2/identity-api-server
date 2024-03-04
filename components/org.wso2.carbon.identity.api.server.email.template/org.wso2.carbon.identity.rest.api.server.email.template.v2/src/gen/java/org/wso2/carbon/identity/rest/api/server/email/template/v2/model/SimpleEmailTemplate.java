@@ -32,28 +32,28 @@ import javax.xml.bind.annotation.*;
 
 public class SimpleEmailTemplate  {
   
-    private String id;
+    private String locale;
     private String self;
 
     /**
-    * Unique ID of the email template. This ID represents the locale of the email template.
+    * Locale of the email template.
     **/
-    public SimpleEmailTemplate id(String id) {
+    public SimpleEmailTemplate locale(String locale) {
 
-        this.id = id;
+        this.locale = locale;
         return this;
     }
     
-    @ApiModelProperty(example = "en_US", required = true, value = "Unique ID of the email template. This ID represents the locale of the email template.")
-    @JsonProperty("id")
+    @ApiModelProperty(example = "en_US", required = true, value = "Locale of the email template.")
+    @JsonProperty("locale")
     @Valid
-    @NotNull(message = "Property id cannot be null.")
+    @NotNull(message = "Property locale cannot be null.")
 
-    public String getId() {
-        return id;
+    public String getLocale() {
+        return locale;
     }
-    public void setId(String id) {
-        this.id = id;
+    public void setLocale(String locale) {
+        this.locale = locale;
     }
 
     /**
@@ -89,13 +89,13 @@ public class SimpleEmailTemplate  {
             return false;
         }
         SimpleEmailTemplate simpleEmailTemplate = (SimpleEmailTemplate) o;
-        return Objects.equals(this.id, simpleEmailTemplate.id) &&
+        return Objects.equals(this.locale, simpleEmailTemplate.locale) &&
             Objects.equals(this.self, simpleEmailTemplate.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, self);
+        return Objects.hash(locale, self);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class SimpleEmailTemplate  {
         StringBuilder sb = new StringBuilder();
         sb.append("class SimpleEmailTemplate {\n");
         
-        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    locale: ").append(toIndentedString(locale)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");
         return sb.toString();

@@ -135,7 +135,7 @@ public class ApplicationEmailTemplatesService {
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
             boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager()
-                    .isEmailTemplateExists(templateTypeDisplayName, emailTemplateWithID.getId(),
+                    .isEmailTemplateExists(templateTypeDisplayName, emailTemplateWithID.getLocale(),
                             getTenantDomainFromContext(), applicationUuid);
             if (!isTemplateExists) {
                 // Email template is new, hence add to the system.
@@ -144,8 +144,8 @@ public class ApplicationEmailTemplatesService {
                 // Create and send the location of the created object as the response.
                 SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
                 simpleEmailTemplate.setSelf(
-                        getTemplateLocation(templateTypeId, emailTemplateWithID.getId(), applicationUuid));
-                simpleEmailTemplate.setId(emailTemplateWithID.getId());
+                        getTemplateLocation(templateTypeId, emailTemplateWithID.getLocale(), applicationUuid));
+                simpleEmailTemplate.setLocale(emailTemplateWithID.getLocale());
                 return simpleEmailTemplate;
             } else {
                 throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_ALREADY_EXISTS);
@@ -184,6 +184,34 @@ public class ApplicationEmailTemplatesService {
     }
 
     /**
+     * Delete all email templates of a given template type for application.
+     *
+     * @param templateTypeId ID of the template type.
+     * @param applicationUuid Application UUID.
+     */
+    public void deleteAllAppEmailTemplates(String templateTypeId, String applicationUuid) {
+
+        String templateTypeDisplayName;
+        try {
+            templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
+        } catch (APIError e) {
+            // Ignoring the delete operation and return 204 response code, since the resource does not exist.
+            return;
+        }
+        try {
+            boolean isTemplateTypeExists =
+                    EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateTypeExists(
+                            templateTypeDisplayName, getTenantDomainFromContext());
+            if (isTemplateTypeExists) {
+                EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplates(templateTypeDisplayName,
+                        getTenantDomainFromContext(), applicationUuid);
+            }
+        } catch (I18nEmailMgtException e) {
+            throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_DELETING_APP_EMAIL_TEMPLATES);
+        }
+    }
+
+    /**
      * Replace the application email template Identified by the template type id and the template id.
      *
      * @param templateTypeId      ID of the email template type.
@@ -215,7 +243,7 @@ public class ApplicationEmailTemplatesService {
         EmailTemplate internalEmailTemplate = new EmailTemplate();
         internalEmailTemplate.setTemplateDisplayName(templateTypeDisplayName);
         internalEmailTemplate.setTemplateType(I18nEmailUtil.getNormalizedName(templateTypeDisplayName));
-        internalEmailTemplate.setLocale(emailTemplateWithID.getId());
+        internalEmailTemplate.setLocale(emailTemplateWithID.getLocale());
         internalEmailTemplate.setEmailContentType(emailTemplateWithID.getContentType());
         internalEmailTemplate.setSubject(emailTemplateWithID.getSubject());
         internalEmailTemplate.setBody(emailTemplateWithID.getBody());
@@ -240,7 +268,7 @@ public class ApplicationEmailTemplatesService {
             SimpleEmailTemplate simpleEmailTemplate = new SimpleEmailTemplate();
             String templateLocation = getTemplateLocation(
                     templateTypeId, internalTemplate.getLocale(), applicationUuid);
-            simpleEmailTemplate.setId(internalTemplate.getLocale());
+            simpleEmailTemplate.setLocale(internalTemplate.getLocale());
             simpleEmailTemplate.setSelf(templateLocation);
             simpleEmailTemplates.add(simpleEmailTemplate);
         }
@@ -253,7 +281,7 @@ public class ApplicationEmailTemplatesService {
     private EmailTemplateWithID buildEmailTemplateWithID(EmailTemplate internalTemplate) {
 
         EmailTemplateWithID templateWithID = new EmailTemplateWithID();
-        templateWithID.setId(internalTemplate.getLocale());
+        templateWithID.setLocale(internalTemplate.getLocale());
         templateWithID.setContentType(internalTemplate.getEmailContentType());
         templateWithID.setSubject(internalTemplate.getSubject());
         templateWithID.setBody(internalTemplate.getBody());

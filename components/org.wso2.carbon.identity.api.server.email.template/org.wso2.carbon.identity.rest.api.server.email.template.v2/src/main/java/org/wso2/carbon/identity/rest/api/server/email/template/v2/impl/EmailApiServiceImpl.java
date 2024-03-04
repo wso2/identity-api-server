@@ -28,7 +28,6 @@ import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTem
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.SimpleEmailTemplate;
 
 import java.net.URI;
-import java.util.List;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V2_API_PATH_COMPONENT;
@@ -51,15 +50,15 @@ public class EmailApiServiceImpl implements EmailApiService {
     private ApplicationEmailTemplatesService applicationEmailTemplatesService;
 
     @Override
-    public Response addAppEmailTemplate(String templateTypeId, String appUuid,
-                                        EmailTemplateWithID emailTemplateWithID) {
+    public Response addAppEmailTemplate(
+            String templateTypeId, String appUuid, EmailTemplateWithID emailTemplateWithID) {
 
         SimpleEmailTemplate simpleEmailTemplate = applicationEmailTemplatesService.addEmailTemplate(templateTypeId,
                 emailTemplateWithID, appUuid);
         URI headerLocation = buildURIForHeader(
                 V2_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
                         PATH_SEPARATOR + templateTypeId + APP_EMAIL_TEMPLATES_PATH +
-                        PATH_SEPARATOR + simpleEmailTemplate.getId());
+                        PATH_SEPARATOR + simpleEmailTemplate.getLocale());
         return Response.created(headerLocation).entity(simpleEmailTemplate).build();
     }
 
@@ -81,8 +80,22 @@ public class EmailApiServiceImpl implements EmailApiService {
         URI headerLocation = buildURIForHeader(
                 V2_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
                         PATH_SEPARATOR + templateTypeId + ORG_EMAIL_TEMPLATES_PATH +
-                        PATH_SEPARATOR + simpleEmailTemplate.getId());
+                        PATH_SEPARATOR + simpleEmailTemplate.getLocale());
         return Response.created(headerLocation).entity(simpleEmailTemplate).build();
+    }
+
+    @Override
+    public Response deleteAllAppEmailTemplates(String templateTypeId, String appUuid) {
+
+        applicationEmailTemplatesService.deleteAllAppEmailTemplates(templateTypeId, appUuid);
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response deleteAllOrgEmailTemplates(String templateTypeId) {
+
+        emailTemplatesService.deleteAllOrgEmailTemplates(templateTypeId);
+        return Response.noContent().build();
     }
 
     @Override
@@ -107,11 +120,10 @@ public class EmailApiServiceImpl implements EmailApiService {
     }
 
     @Override
-    public Response getAllEmailTemplateTypes(
-            Integer limit, Integer offset, String sortOrder, String sortBy, String requiredAttributes) {
+    public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sortOrder, String sortBy) {
 
-        return Response.ok().entity(emailTemplatesService
-                .getAllEmailTemplateTypes(limit, offset, sortOrder, sortBy, requiredAttributes)).build();
+        return Response.ok().entity(
+                emailTemplatesService.getAllEmailTemplateTypes(limit, offset, sortOrder, sortBy)).build();
     }
 
     @Override
@@ -131,16 +143,14 @@ public class EmailApiServiceImpl implements EmailApiService {
     }
 
     @Override
-    public Response getEmailTemplateType(
-            String templateTypeId, Integer limit, Integer offset, String sortOrder, String sortBy) {
+    public Response getEmailTemplateType(String templateTypeId) {
 
-        return Response.ok().entity(emailTemplatesService.
-                getEmailTemplateType(templateTypeId, limit, offset, sortOrder, sortBy)).build();
+        return Response.ok().entity(emailTemplatesService.getEmailTemplateType(templateTypeId)).build();
     }
 
     @Override
-    public Response getOrgEmailTemplate(
-            String templateTypeId, String locale, Integer limit, Integer offset, String sortOrder, String sortBy) {
+    public Response getOrgEmailTemplate(String templateTypeId, String locale, Integer limit, Integer offset,
+                                        String sortOrder, String sortBy) {
 
         return Response.ok().entity(emailTemplatesService.
                 getEmailTemplate(templateTypeId, locale, limit, offset, sortOrder, sortBy)).build();
@@ -159,13 +169,6 @@ public class EmailApiServiceImpl implements EmailApiService {
             String templateTypeId, String appUuid, String locale, EmailTemplateWithID emailTemplateWithID) {
 
         applicationEmailTemplatesService.updateEmailTemplate(templateTypeId, locale, emailTemplateWithID, appUuid);
-        return Response.ok().build();
-    }
-
-    @Override
-    public Response updateEmailTemplateType(String templateTypeId, List<EmailTemplateWithID> emailTemplateWithID) {
-
-        emailTemplatesService.updateEmailTemplateType(templateTypeId, emailTemplateWithID);
         return Response.ok().build();
     }
 

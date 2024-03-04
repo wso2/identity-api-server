@@ -18,11 +18,18 @@
 
 package org.wso2.carbon.identity.rest.api.server.email.template.v2;
 
-import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateType;
-import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateWithID;
-
-import javax.ws.rs.core.Response;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.*;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.*;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
 import java.util.List;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateType;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeWithID;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateWithID;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.Error;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.SimpleEmailTemplate;
+import javax.ws.rs.core.Response;
 
 
 public interface EmailApiService {
@@ -33,27 +40,29 @@ public interface EmailApiService {
 
       public Response addOrgEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID);
 
+      public Response deleteAllAppEmailTemplates(String templateTypeId, String appUuid);
+
+      public Response deleteAllOrgEmailTemplates(String templateTypeId);
+
       public Response deleteAppEmailTemplate(String templateTypeId, String appUuid, String locale);
 
       public Response deleteEmailTemplateType(String templateTypeId);
 
       public Response deleteOrgEmailTemplate(String templateTypeId, String locale);
 
-      public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sortOrder, String sortBy, String requiredAttributes);
+      public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sortOrder, String sortBy);
 
       public Response getAppEmailTemplate(String templateTypeId, String appUuid, String locale, Integer limit, Integer offset, String sortOrder, String sortBy);
 
       public Response getAppTemplatesListOfEmailTemplateType(String templateTypeId, String appUuid, Integer limit, Integer offset, String sortOrder, String sortBy);
 
-      public Response getEmailTemplateType(String templateTypeId, Integer limit, Integer offset, String sortOrder, String sortBy);
+      public Response getEmailTemplateType(String templateTypeId);
 
       public Response getOrgEmailTemplate(String templateTypeId, String locale, Integer limit, Integer offset, String sortOrder, String sortBy);
 
       public Response getOrgTemplatesListOfEmailTemplateType(String templateTypeId, Integer limit, Integer offset, String sortOrder, String sortBy);
 
       public Response updateAppEmailTemplate(String templateTypeId, String appUuid, String locale, EmailTemplateWithID emailTemplateWithID);
-
-      public Response updateEmailTemplateType(String templateTypeId, List<EmailTemplateWithID> emailTemplateWithID);
 
       public Response updateOrgEmailTemplate(String templateTypeId, String locale, EmailTemplateWithID emailTemplateWithID);
 }

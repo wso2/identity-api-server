@@ -31,7 +31,7 @@ paths:
       summary: Retrieves all the email template types.
       operationId: getAllEmailTemplateTypes
       description: |
-        Retrieves all the email template types in the system, with limited details of the email templates.
+        Retrieves all the email template types in the system. <br>
 
         <b>Permission required:</b><br>
         * /permission/admin/manage/identity/emailmgt/view
@@ -43,7 +43,6 @@ paths:
         - $ref: '#/components/parameters/offsetQueryParam'
         - $ref: '#/components/parameters/sortOrderQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
-        - $ref: '#/components/parameters/requiredAttributesQueryParam'
       responses:
         '200':
           description: Search results matching the given criteria.
@@ -52,7 +51,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EmailTemplateTypeWithoutTemplates'
+                  $ref: '#/components/schemas/EmailTemplateType'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -67,7 +66,8 @@ paths:
       summary: Adds a new email template type.
       operationId: addEmailTemplateType
       description: |
-        Adds a new email template type to the system. An email template type can have any number of email templates. <br>
+        Adds a new email template type to the system. An email template type can have any number of 
+        organization or application email templates. <br>
 
         * Attribute _**displayName**_ of the template type should be unique. <br>
 
@@ -93,7 +93,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/EmailTemplateTypeWithoutTemplates'
+                $ref: '#/components/schemas/EmailTemplateType'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -119,10 +119,6 @@ paths:
         * internal_email_mgt_view<br>
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
-        - $ref: '#/components/parameters/limitQueryParam'
-        - $ref: '#/components/parameters/offsetQueryParam'
-        - $ref: '#/components/parameters/sortOrderQueryParam'
-        - $ref: '#/components/parameters/sortByQueryParam'
       responses:
         '200':
           description: Search results matching the given criteria.
@@ -130,42 +126,6 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/EmailTemplateTypeWithID'
-        '400':
-          $ref: '#/components/responses/InvalidInput'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-    put:
-      tags:
-        - Email Template Types
-      summary: Replaces all email templates of the respective email template type
-      operationId: updateEmailTemplateType
-      description: |
-        Replaces all email templates of the respective email template type with
-        the newly provided email templates. <br>
-
-        <b>Permission required:</b> <br>
-        * /permission/admin/manage/identity/emailmgt/update <br>
-        <b>Scopes required:</b><br>
-        * internal_email_mgt_update
-      parameters:
-        - $ref: '#/components/parameters/templateTypeIdPathParam'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/EmailTemplateWithID'
-        description: Email templates for the template type.
-      responses:
-        '200':
-          $ref: '#/components/responses/Updated'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -284,6 +244,33 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - Email Templates
+      summary: Removes all email templates under organization for the given template type.
+      operationId: deleteAllOrgEmailTemplates
+      description: |
+        Removes all email templates identified by the template-type-id from the organization. <br>
+        
+        <b>Permission required:</b> <br>
+          * /permission/admin/manage/identity/emailmgt/delete <br>
+          <b>Scopes required:</b><br>
+        * internal_email_mgt_delete
+      parameters:
+        - $ref: '#/components/parameters/templateTypeIdPathParam'
+      responses:
+        '204':
+          $ref: '#/components/responses/Deleted'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
   '/email/template-types/{template-type-id}/app-templates/{app-uuid}':
     get:
       tags:
@@ -364,6 +351,34 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '409':
           $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - Application Email Templates
+      summary: Removes all email templates under application for the given template type.
+      operationId: deleteAllAppEmailTemplates
+      description: |
+        Removes all email templates identified by the template-type-id and the application uuid. <br>
+        
+        <b>Permission required:</b> <br>
+          * /permission/admin/manage/identity/emailmgt/delete <br>
+          <b>Scopes required:</b><br>
+        * internal_email_mgt_delete
+      parameters:
+        - $ref: '#/components/parameters/templateTypeIdPathParam'
+        - $ref: '#/components/parameters/appUuidPathParam'
+      responses:
+        '204':
+          $ref: '#/components/responses/Deleted'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
   '/email/template-types/{template-type-id}/org-templates/{locale}':
@@ -690,45 +705,20 @@ components:
           tokenUrl: 'https://localhost:9443/oauth2/token'
           scopes: {}
   schemas:
-    EmailTemplateTypeWithoutTemplates:
-      type: object
-      required:
-        - id
-        - displayName
-        - self
-      properties:
-        id:
-          type: string
-          example: YWNjb3VudGNvbmZpcm1hdGlvbg
-          description: Unique ID of the email template type.
-        displayName:
-          type: string
-          example: Account Confirmation
-          description: Display name of the email template type.
-        templates:
-          type: array
-          description: Email templates for the template type.
-          items:
-            $ref: '#/components/schemas/EmailTemplateWithID'
-        self:
-          type: string
-          example: /t/{tenant-domain}/api/server/v2/email/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg
-          description: Location of the created/updated resource.
     EmailTemplateType:
       type: object
       required:
         - displayName
-        - templates
+        - self
       properties:
         displayName:
           type: string
           example: Account Confirmation
           description: Display name of the email template type.
-        templates:
-          type: array
-          description: Email templates for the template type.
-          items:
-            $ref: '#/components/schemas/EmailTemplateWithID'
+        self:
+          type: string
+          example: /t/{tenant-domain}/api/server/v2/email/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg
+          description: Location of the created/updated resource.
     EmailTemplateTypeWithID:
       allOf:
         - $ref: '#/components/schemas/EmailTemplateType'
@@ -766,24 +756,24 @@ components:
       allOf:
         - $ref: '#/components/schemas/EmailTemplate'
         - required:
-            - id
+            - locale
           properties:
-            id:
+            locale:
               type: string
               example: en_US
               description: >-
-                Unique ID of the email template. This ID represents the locale of the email template.
+                Locale of the email template.
     SimpleEmailTemplate:
       type: object
       required:
-        - id
+        - locale
         - self
       properties:
-        id:
+        locale:
           type: string
           example: en_US
           description: >-
-            Unique ID of the email template. This ID represents the locale of the email template.
+            Locale of the email template.
         self:
           type: string
           example: /t/{tenant-domain}/api/server/v2/email/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg/templates/en_US
