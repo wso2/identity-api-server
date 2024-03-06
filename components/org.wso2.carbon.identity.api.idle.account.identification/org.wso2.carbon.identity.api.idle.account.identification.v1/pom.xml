@@ -167,11 +167,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity.governance</groupId>
-            <artifactId>org.wso2.carbon.identity.idle.account.identification</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
             <scope>compile</scope>
