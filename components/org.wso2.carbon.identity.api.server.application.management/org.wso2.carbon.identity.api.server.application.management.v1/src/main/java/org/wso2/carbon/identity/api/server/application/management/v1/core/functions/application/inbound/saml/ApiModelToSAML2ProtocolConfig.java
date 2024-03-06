@@ -34,7 +34,7 @@ public class ApiModelToSAML2ProtocolConfig implements Function<SAML2Configuratio
         SAML2ProtocolConfigDTO saml2ProtocolConfigDTO = new SAML2ProtocolConfigDTO();
         saml2ProtocolConfigDTO.setMetadataFile(saml2Configuration.getMetadataFile());
         saml2ProtocolConfigDTO.setMetadataURL(saml2Configuration.getMetadataURL());
-        if(saml2Configuration.getManualConfiguration() != null) {
+        if (saml2Configuration.getManualConfiguration() != null) {
             saml2ProtocolConfigDTO.setManualConfiguration(new ApiModelToSAMLSSOServiceProvider().apply(
                     saml2Configuration.getManualConfiguration()));
         }
