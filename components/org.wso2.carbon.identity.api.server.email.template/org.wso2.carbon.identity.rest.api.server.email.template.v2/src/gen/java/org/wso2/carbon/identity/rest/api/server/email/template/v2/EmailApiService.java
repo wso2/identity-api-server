@@ -25,6 +25,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateType;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeOverview;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.Error;
@@ -36,13 +37,9 @@ public interface EmailApiService {
 
       public Response addAppEmailTemplate(String templateTypeId, String appUuid, EmailTemplateWithID emailTemplateWithID);
 
-      public Response addEmailTemplateType(EmailTemplateType emailTemplateType);
+      public Response addEmailTemplateType(EmailTemplateTypeOverview emailTemplateTypeOverview);
 
       public Response addOrgEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID);
-
-      public Response deleteAllAppEmailTemplates(String templateTypeId, String appUuid);
-
-      public Response deleteAllOrgEmailTemplates(String templateTypeId);
 
       public Response deleteAppEmailTemplate(String templateTypeId, String appUuid, String locale);
 

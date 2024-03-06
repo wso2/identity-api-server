@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateType;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeOverview;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.Error;
@@ -89,9 +90,9 @@ public class EmailApi  {
         @ApiResponse(code = 409, message = "Item Already Exists.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response addEmailTemplateType(@ApiParam(value = "Email template type to be added." ) @Valid EmailTemplateType emailTemplateType) {
+    public Response addEmailTemplateType(@ApiParam(value = "Email template type to be added." ) @Valid EmailTemplateTypeOverview emailTemplateTypeOverview) {
 
-        return delegate.addEmailTemplateType(emailTemplateType );
+        return delegate.addEmailTemplateType(emailTemplateTypeOverview );
     }
 
     @Valid
@@ -116,54 +117,6 @@ public class EmailApi  {
     public Response addOrgEmailTemplate(@ApiParam(value = "Email Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Email template to be added." ) @Valid EmailTemplateWithID emailTemplateWithID) {
 
         return delegate.addOrgEmailTemplate(templateTypeId,  emailTemplateWithID );
-    }
-
-    @Valid
-    @DELETE
-    @Path("/template-types/{template-type-id}/app-templates/{app-uuid}")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Removes all email templates under application for the given template type.", notes = "Removes all email templates identified by the template-type-id and the application uuid. <br>  <b>Permission required:</b> <br>   * /permission/admin/manage/identity/emailmgt/delete <br>   <b>Scopes required:</b><br> * internal_email_mgt_delete ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Application Email Templates", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response deleteAllAppEmailTemplates(@ApiParam(value = "Email Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid) {
-
-        return delegate.deleteAllAppEmailTemplates(templateTypeId,  appUuid );
-    }
-
-    @Valid
-    @DELETE
-    @Path("/template-types/{template-type-id}/org-templates")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Removes all email templates under organization for the given template type.", notes = "Removes all email templates identified by the template-type-id from the organization. <br>  <b>Permission required:</b> <br>   * /permission/admin/manage/identity/emailmgt/delete <br>   <b>Scopes required:</b><br> * internal_email_mgt_delete ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Email Templates", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response deleteAllOrgEmailTemplates(@ApiParam(value = "Email Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
-
-        return delegate.deleteAllOrgEmailTemplates(templateTypeId );
     }
 
     @Valid

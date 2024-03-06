@@ -22,8 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.EmailApiService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.core.ApplicationEmailTemplatesService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.core.ServerEmailTemplatesService;
-import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateType;
-import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeWithoutTemplates;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeOverview;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.SimpleEmailTemplate;
 
@@ -63,9 +63,9 @@ public class EmailApiServiceImpl implements EmailApiService {
     }
 
     @Override
-    public Response addEmailTemplateType(EmailTemplateType emailTemplateType) {
+    public Response addEmailTemplateType(EmailTemplateTypeOverview emailTemplateTypeOverview) {
 
-        EmailTemplateTypeWithoutTemplates templateType = emailTemplatesService.addEmailTemplateType(emailTemplateType);
+        EmailTemplateTypeWithID templateType = emailTemplatesService.addEmailTemplateType(emailTemplateTypeOverview);
         URI headerLocation = buildURIForHeader(
                 V2_API_PATH_COMPONENT + EMAIL_TEMPLATES_API_BASE_PATH + EMAIL_TEMPLATE_TYPES_PATH +
                         PATH_SEPARATOR + templateType.getId());
@@ -82,20 +82,6 @@ public class EmailApiServiceImpl implements EmailApiService {
                         PATH_SEPARATOR + templateTypeId + ORG_EMAIL_TEMPLATES_PATH +
                         PATH_SEPARATOR + simpleEmailTemplate.getLocale());
         return Response.created(headerLocation).entity(simpleEmailTemplate).build();
-    }
-
-    @Override
-    public Response deleteAllAppEmailTemplates(String templateTypeId, String appUuid) {
-
-        applicationEmailTemplatesService.deleteAllAppEmailTemplates(templateTypeId, appUuid);
-        return Response.noContent().build();
-    }
-
-    @Override
-    public Response deleteAllOrgEmailTemplates(String templateTypeId) {
-
-        emailTemplatesService.deleteAllOrgEmailTemplates(templateTypeId);
-        return Response.noContent().build();
     }
 
     @Override

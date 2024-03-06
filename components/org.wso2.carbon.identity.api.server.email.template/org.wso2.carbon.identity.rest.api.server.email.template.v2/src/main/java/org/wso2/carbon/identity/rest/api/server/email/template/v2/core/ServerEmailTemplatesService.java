@@ -32,14 +32,12 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.email.template.common.Constants;
 import org.wso2.carbon.identity.api.server.email.template.common.EmailTemplatesServiceHolder;
-import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateType;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeOverview;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeWithID;
-import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeWithoutTemplates;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.SimpleEmailTemplate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,54 +68,32 @@ public class ServerEmailTemplatesService {
      * @param offset    Offset to be used with the limit parameter. **Not supported at the moment**
      * @param sortOrder Sort the response in ascending order or descending order. **Not supported at the moment**
      * @param sortBy    Element to sort the responses. **Not supported at the moment**
-     * @param requiredAttributes Required attributes in the email template types list response.
      * @return A list of email template types.
      */
-    public List<EmailTemplateTypeWithoutTemplates> getAllEmailTemplateTypes(Integer limit, Integer offset,
-                                                                            String sortOrder, String sortBy,
-                                                                            String requiredAttributes) {
+    public List<EmailTemplateTypeWithID> getAllEmailTemplateTypes(Integer limit, Integer offset,
+                                                                            String sortOrder, String sortBy) {
 
         handleNoteSupportedParameters(limit, offset, sortOrder, sortBy);
-
         try {
-            List<String> requestedAttributeList = null;
-            List<EmailTemplate> allTemplates = null;
             List<String> availableTemplateTypes = EmailTemplatesServiceHolder.getEmailTemplateManager()
                     .getAvailableTemplateTypes(getTenantDomainFromContext());
-            if (StringUtils.isNotBlank(requiredAttributes)) {
-                requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
-                List<String> supportedAttributes =
-                        Arrays.asList(Constants.TEMPLATES, Constants.LOCALE, Constants.CONTENT_TYPE, Constants.SUBJECT,
-                                Constants.BODY, Constants.FOOTER);
-                for (String requestedAttribute : requestedAttributeList) {
-                    if (!supportedAttributes.contains(requestedAttribute)) {
-                        throw handleError(Constants.ErrorMessage.ERROR_ATTRIBUTE_NOT_SUPPORTED);
-                    }
-                }
-                allTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager()
-                        .getAllEmailTemplates(getTenantDomainFromContext());
-            }
 
-            return buildEmailTemplateTypeWithoutTemplatesList(availableTemplateTypes, allTemplates,
-                    requestedAttributeList);
+            List<EmailTemplateTypeWithID> templateList = new ArrayList<>();
+            for (String templateType : availableTemplateTypes) {
+
+                EmailTemplateTypeWithID emailTemplateType = new EmailTemplateTypeWithID();
+                // Set display name.
+                emailTemplateType.setDisplayName(templateType);
+                // Set id.
+                String templateTypeId = getEmailTemplateIdFromDisplayName(templateType);
+                emailTemplateType.setId(templateTypeId);
+                // Set location.
+                emailTemplateType.setSelf(getTemplateTypeLocation(templateTypeId));
+            }
+            return templateList;
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPES);
         }
-    }
-
-    /**
-     * Return all email template types in the system with limited information of the templates inside.
-     *
-     * @param limit     Limit the number of email template types in the response. **Not supported at the moment**
-     * @param offset    Offset to be used with the limit parameter. **Not supported at the moment**
-     * @param sortOrder Sort the response in ascending order or descending order. **Not supported at the moment**
-     * @param sortBy    Element to sort the responses. **Not supported at the moment**
-     * @return A list of email template types.
-     */
-    public List<EmailTemplateTypeWithoutTemplates> getAllEmailTemplateTypes(Integer limit, Integer offset,
-                                                                            String sortOrder, String sortBy) {
-
-        return getAllEmailTemplateTypes(limit, offset, sortOrder, sortBy, null);
     }
 
     /**
@@ -222,18 +198,18 @@ public class ServerEmailTemplatesService {
      * Adds a new email template type to the system. Another template with the same display name should not exists in
      * the system. 0 or more email templates can be provided.
      *
-     * @param emailTemplateType  Email template type with or without templates.
+     * @param emailTemplateTypeOverview  Email template type with display name.
      * @return Object with id and location of the newly created template type.
      */
-    public EmailTemplateTypeWithoutTemplates addEmailTemplateType(EmailTemplateType emailTemplateType) {
+    public EmailTemplateTypeWithID addEmailTemplateType(EmailTemplateTypeOverview emailTemplateTypeOverview) {
 
-        String templateTypeDisplayName = emailTemplateType.getDisplayName();
+        String templateTypeDisplayName = emailTemplateTypeOverview.getDisplayName();
         try {
             EmailTemplatesServiceHolder.getEmailTemplateManager().addEmailTemplateType(templateTypeDisplayName,
                     getTenantDomainFromContext());
 
             // Build a response object and send if everything is successful.
-            EmailTemplateTypeWithoutTemplates response = new EmailTemplateTypeWithoutTemplates();
+            EmailTemplateTypeWithID response = new EmailTemplateTypeWithID();
             response.setDisplayName(templateTypeDisplayName);
             String templateTypeId = getEmailTemplateIdFromDisplayName(templateTypeDisplayName);
             response.setId(templateTypeId);
@@ -422,18 +398,15 @@ public class ServerEmailTemplatesService {
      * Create a list EmailTemplateTypeWithoutTemplates objects by reading an internal EmailTemplate list.
      *
      * @param emailTemplateTypes List of available email template types.
-     * @param internalEmailTemplates List of EmailTemplate objects.
-     * @param requestedAttributeList List of required attributes.
      * @return List of EmailTemplateTypeWithoutTemplates objects.
      */
-    private List<EmailTemplateTypeWithoutTemplates> buildEmailTemplateTypeWithoutTemplatesList(
-            List<String> emailTemplateTypes, List<EmailTemplate> internalEmailTemplates,
-            List<String> requestedAttributeList) {
+    private List<EmailTemplateTypeWithID> buildEmailTemplateTypeWithoutTemplatesList(
+            List<String> emailTemplateTypes) {
 
-        Map<String, EmailTemplateTypeWithoutTemplates> templateTypeMap = new HashMap<>();
+        Map<String, EmailTemplateTypeWithID> templateTypeMap = new HashMap<>();
         for (String templateType : emailTemplateTypes) {
 
-            EmailTemplateTypeWithoutTemplates emailTemplateType = new EmailTemplateTypeWithoutTemplates();
+            EmailTemplateTypeWithID emailTemplateType = new EmailTemplateTypeWithID();
             // Set display name.
             emailTemplateType.setDisplayName(templateType);
             // Set id.
@@ -441,54 +414,7 @@ public class ServerEmailTemplatesService {
             emailTemplateType.setId(templateTypeId);
             // Set location.
             emailTemplateType.setSelf(getTemplateTypeLocation(templateTypeId));
-
-            if (requestedAttributeList != null) {
-                emailTemplateType.setTemplates(new ArrayList<>());
-            }
             templateTypeMap.put(templateType, emailTemplateType);
-        }
-
-        // Populate optional email template information if exists.
-        if (requestedAttributeList != null) {
-            for (EmailTemplate emailTemplate : internalEmailTemplates) {
-                EmailTemplateWithID templateWithID = new EmailTemplateWithID();
-                for (String requestedAttribute : requestedAttributeList) {
-                    switch (requestedAttribute) {
-                        case Constants.TEMPLATES:
-                            templateWithID.setContentType(emailTemplate.getEmailContentType());
-                            templateWithID.setSubject(emailTemplate.getSubject());
-                            templateWithID.setBody(emailTemplate.getBody());
-                            templateWithID.setFooter(emailTemplate.getFooter());
-                            templateWithID.setLocale(emailTemplate.getLocale());
-                            break;
-                        case Constants.LOCALE:
-                            templateWithID.setLocale(emailTemplate.getLocale());
-                            break;
-                        case Constants.CONTENT_TYPE:
-                            templateWithID.setContentType(emailTemplate.getEmailContentType());
-                            break;
-                        case Constants.SUBJECT:
-                            templateWithID.setSubject(emailTemplate.getSubject());
-                            break;
-                        case Constants.BODY:
-                            templateWithID.setBody(emailTemplate.getBody());
-                            break;
-                        case Constants.FOOTER:
-                            templateWithID.setFooter(emailTemplate.getFooter());
-                            break;
-                        default:
-                            if (log.isDebugEnabled()) {
-                                log.debug("Unknown requested attribute: " + requestedAttribute);
-                            }
-                            break;
-                    }
-                }
-                /*
-                  Email template's display name is used to search templateTypeMap key because
-                  Template's display name and Template type's display name are equal.
-                 */
-                templateTypeMap.get(emailTemplate.getTemplateDisplayName()).getTemplates().add(templateWithID);
-            }
         }
 
         return new ArrayList<>(templateTypeMap.values());
