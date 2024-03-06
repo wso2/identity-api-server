@@ -1654,15 +1654,6 @@ public class ServerApplicationManagementService {
         return application;
     }
 
-    private List<InboundAuthenticationRequestConfig> getConfiguredInbounds(ServiceProvider app) {
-
-        if (app.getInboundAuthenticationConfig() != null &&
-                app.getInboundAuthenticationConfig().getInboundAuthenticationRequestConfigs() != null) {
-            return Arrays.asList(app.getInboundAuthenticationConfig().getInboundAuthenticationRequestConfigs());
-        }
-        return Collections.emptyList();
-    }
-
     private List<ApplicationListItem> getApplicationListItems(ApplicationBasicInfo[] allApplicationBasicInfo) {
 
         return Arrays.stream(allApplicationBasicInfo)
