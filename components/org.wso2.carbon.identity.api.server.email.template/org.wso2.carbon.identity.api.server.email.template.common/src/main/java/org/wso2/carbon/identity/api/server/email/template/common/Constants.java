@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ public class Constants {
     public static final String EMAIL_TEMPLATES_API_BASE_PATH = "/email";
     public static final String EMAIL_TEMPLATE_TYPES_PATH = "/template-types";
     public static final String EMAIL_TEMPLATES_PATH = "/templates";
+    public static final String ORG_EMAIL_TEMPLATES_PATH = "/org-templates";
+    public static final String APP_EMAIL_TEMPLATES_PATH = "/app-templates";
     public static final String PATH_SEPARATOR = "/";
 
     // Required attributes.
@@ -84,6 +86,12 @@ public class Constants {
         ERROR_SORTING_NOT_SUPPORTED("55012", Status.NOT_IMPLEMENTED,
                 "Sorting is not yet supported.",
                 "Please remove 'sortOrder' and 'sortBy' parameters from the request and try again."),
+        ERROR_DELETING_ORG_EMAIL_TEMPLATES("55013", Status.INTERNAL_SERVER_ERROR,
+                "Unable to delete organization email templates.",
+                "Server encountered an error while deleting organization email templates."),
+        ERROR_DELETING_APP_EMAIL_TEMPLATES("55013", Status.INTERNAL_SERVER_ERROR,
+                "Unable to delete application email templates.",
+                "Server encountered an error while deleting application email templates."),
         ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND("50002", Status.NOT_FOUND,
                 "Email Template Type does not exists.",
                 "Specified email template type does not exist in the system."),
