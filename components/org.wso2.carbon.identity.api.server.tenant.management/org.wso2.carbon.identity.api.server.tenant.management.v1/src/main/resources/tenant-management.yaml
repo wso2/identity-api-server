@@ -637,6 +637,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AdditionalClaims'
+        userId:
+          type: string
+          example: "4875-jhgr-454hb"
+          description: id of the tenant owner.
 
     OwnerResponse:
       type: object

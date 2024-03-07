@@ -131,6 +131,25 @@ public class OrganizationManagementService {
     }
 
     /**
+     * Retrieve organization Id by organization name.
+     *
+     * @param organizationName Organization Name
+     * @return The list of organization IDs.
+     */
+    public Response getOrganizationByName(String organizationName) {
+
+        try {
+
+            String organizationId = getOrganizationManager().getOrganizationIdByName(organizationName);
+            return Response.ok().entity(organizationId).build();
+        } catch (OrganizationManagementClientException e) {
+            return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
+    }
+
+    /**
      * Check if organization exist for given name.
      *
      * @param organizationName Organization name.

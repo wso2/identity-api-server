@@ -175,4 +175,10 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
 
         return organizationManagementService.getOrganizationsDiscoveryAttributes(filter, offset, limit);
     }
+
+    @Override
+    public Response organizationsNameOrganizationNameGet(String organizationName, Boolean includePermissions) {
+
+        return organizationManagementService.getOrganizationByName(organizationName);
+    }
 }

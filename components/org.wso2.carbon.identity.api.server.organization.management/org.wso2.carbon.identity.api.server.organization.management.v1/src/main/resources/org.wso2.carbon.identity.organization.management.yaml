@@ -121,7 +121,40 @@ paths:
           $ref: '#/components/responses/ServerError'
       tags:
         - Organization
-
+  /organizations/name/{organization-name}:
+    get:
+      description:
+        This API is used to get an existing organization identified by the organization name.
+      summary:
+        Get an existing organization, identified by the organization name.
+      parameters:
+        - name: organization-name
+          in: path
+          description: Name of the organization.
+          required: true
+          schema:
+            type: string
+            example: org1
+        - $ref: '#/components/parameters/includePermissionsQueryParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOrganizationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      tags:
+        - Organization
   /organizations/{organization-id}:
     get:
       description:

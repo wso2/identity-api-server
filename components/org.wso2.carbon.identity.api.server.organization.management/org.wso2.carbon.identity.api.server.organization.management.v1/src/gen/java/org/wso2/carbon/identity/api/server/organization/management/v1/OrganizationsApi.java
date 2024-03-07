@@ -250,6 +250,30 @@ public class OrganizationsApi  {
     }
 
     @Valid
+    @GET
+    @Path("/name/{organization-name}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get an existing organization, identified by the organization name.", notes = "This API is used to get an existing organization identified by the organization name.", response = GetOrganizationResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = GetOrganizationResponse.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response organizationsNameOrganizationNameGet(@ApiParam(value = "Name of the organization.",required=true) @PathParam("organization-name") String organizationName,     @Valid@ApiParam(value = "Returns the organization details along with permissions assigned for the requested user in this organization.", defaultValue="false") @DefaultValue("false")  @QueryParam("includePermissions") Boolean includePermissions) {
+
+        return delegate.organizationsNameOrganizationNameGet(organizationName,  includePermissions );
+    }
+
+    @Valid
     @DELETE
     @Path("/{organization-id}")
     

@@ -43,6 +43,8 @@ import org.wso2.carbon.stratos.common.exception.TenantManagementClientException;
 import org.wso2.carbon.stratos.common.exception.TenantManagementServerException;
 import org.wso2.carbon.stratos.common.exception.TenantMgtException;
 import org.wso2.carbon.tenant.mgt.services.TenantMgtService;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.core.common.AbstractUserStoreManager;
 import org.wso2.carbon.user.core.common.User;
 import org.wso2.carbon.user.core.tenant.Tenant;
 import org.wso2.carbon.user.core.tenant.TenantSearchResult;
@@ -92,10 +94,28 @@ public class ServerTenantManagementService {
         TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
         try {
             Tenant tenant = createTenantInfoBean(tenantModel);
+            tenant.setAdminUserId(tenantModel.getOwners().get(0).getUserId());
             resourceId = tenantMgtService.addTenant(tenant);
+            tenant = tenantMgtService.getTenantByDomain(tenantModel.getDomain());
+            String userId =
+                    ((AbstractUserStoreManager) (TenantManagementServiceHolder.getRealmService()).getTenantUserRealm(
+                            tenant.getId()).getUserStoreManager()).getUserIDFromUserName(tenant.getAdminName());
+            try {
+                TenantManagementServiceHolder.getOrganizationUserSharingService()
+                        .createOrganizationUserAssociation(userId, tenant.getAssociatedOrganizationUUID(),
+                                tenantModel.getOwners().get(0).getUserId(), "10084a8d-113f-4211-a0d5-efe36b082211");
+//                TenantManagementServiceHolder.getOrganizationUserSharingService()
+//                        .shareOrganizationUser(tenant.getAssociatedOrganizationUUID(),
+//                                tenantModel.getOwners().get(0).getUserId(), "10084a8d-113f-4211-a0d5-efe36b082211",
+//                                tenant.getAdminName());
+            } catch (Exception e) {
+                log.error("Error while sharing organization user.", e);
+            }
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage
                     .ERROR_CODE_ERROR_ADDING_TENANT, null);
+        } catch (UserStoreException e) {
+            throw new APIError(Response.Status.INTERNAL_SERVER_ERROR, new ErrorResponse());
         }
         return resourceId;
     }

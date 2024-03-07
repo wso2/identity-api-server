@@ -15,7 +15,9 @@
  */
 package org.wso2.carbon.identity.api.server.tenant.management.common;
 
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.OrganizationUserSharingService;
 import org.wso2.carbon.tenant.mgt.services.TenantMgtService;
+import org.wso2.carbon.user.core.service.RealmService;
 
 /**
  * Service holder class for tenant management.
@@ -23,6 +25,8 @@ import org.wso2.carbon.tenant.mgt.services.TenantMgtService;
 public class TenantManagementServiceHolder {
 
     private static TenantMgtService tenantMgtService;
+    private static OrganizationUserSharingService organizationUserSharingService;
+    private static RealmService realmService;
 
     /**
      * Get TenantMgtService osgi service.
@@ -42,5 +46,36 @@ public class TenantManagementServiceHolder {
     public static void setTenantMgtService(TenantMgtService tenantMgtService) {
 
         TenantManagementServiceHolder.tenantMgtService = tenantMgtService;
+    }
+
+    /**
+     * Get OrganizationUserSharingService osgi service.
+     *
+     * @return OrganizationUserSharingService
+     */
+    public static OrganizationUserSharingService getOrganizationUserSharingService() {
+
+        return organizationUserSharingService;
+    }
+
+    /**
+     * Set OrganizationUserSharingService osgi service.
+     *
+     * @param organizationUserSharingService OrganizationUserSharingService.
+     */
+    public static void setOrganizationUserSharingService(
+            OrganizationUserSharingService organizationUserSharingService) {
+
+        TenantManagementServiceHolder.organizationUserSharingService = organizationUserSharingService;
+    }
+
+    public static RealmService getRealmService() {
+
+        return realmService;
+    }
+
+    public static void setRealmService(RealmService realmService) {
+
+        TenantManagementServiceHolder.realmService = realmService;
     }
 }
