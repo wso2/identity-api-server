@@ -38,9 +38,7 @@ import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTem
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.SimpleEmailTemplate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.V2_API_PATH_COMPONENT;
@@ -392,32 +390,6 @@ public class ServerEmailTemplatesService {
             simpleEmailTemplates.add(simpleEmailTemplate);
         }
         return simpleEmailTemplates;
-    }
-
-    /**
-     * Create a list EmailTemplateTypeWithoutTemplates objects by reading an internal EmailTemplate list.
-     *
-     * @param emailTemplateTypes List of available email template types.
-     * @return List of EmailTemplateTypeWithoutTemplates objects.
-     */
-    private List<EmailTemplateTypeWithID> buildEmailTemplateTypeWithoutTemplatesList(
-            List<String> emailTemplateTypes) {
-
-        Map<String, EmailTemplateTypeWithID> templateTypeMap = new HashMap<>();
-        for (String templateType : emailTemplateTypes) {
-
-            EmailTemplateTypeWithID emailTemplateType = new EmailTemplateTypeWithID();
-            // Set display name.
-            emailTemplateType.setDisplayName(templateType);
-            // Set id.
-            String templateTypeId = getEmailTemplateIdFromDisplayName(templateType);
-            emailTemplateType.setId(templateTypeId);
-            // Set location.
-            emailTemplateType.setSelf(getTemplateTypeLocation(templateTypeId));
-            templateTypeMap.put(templateType, emailTemplateType);
-        }
-
-        return new ArrayList<>(templateTypeMap.values());
     }
 
     /**
