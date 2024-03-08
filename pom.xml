@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.178-SNAPSHOT</version>
+    <version>1.2.179-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -291,12 +291,6 @@
                 <artifactId>org.wso2.carbon.identity.oauth</artifactId>
                 <scope>provided</scope>
                 <version>${identity.inbound.oauth2.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
-                <artifactId>org.wso2.carbon.identity.oauth.common</artifactId>
-                <version>${identity.inbound.oauth2.version}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
@@ -766,10 +760,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-            </plugin>
         </plugins>
     </build>
 
@@ -793,7 +783,7 @@
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
-        <identity.event.handler.version>1.7.30</identity.event.handler.version>
+        <identity.event.handler.version>1.8.7</identity.event.handler.version>
         <identity.inbound.oauth2.version>7.0.15</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.38</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>

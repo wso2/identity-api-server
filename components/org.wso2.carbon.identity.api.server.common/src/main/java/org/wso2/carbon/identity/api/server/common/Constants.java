@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ public class Constants {
     public static final String CORRELATION_ID_MDC = "Correlation-ID";
     public static final String SERVER_API_PATH_COMPONENT = "/api/server";
     public static final String V1_API_PATH_COMPONENT = "/v1";
+    public static final String V2_API_PATH_COMPONENT = "/v2";
     public static final String TENANT_CONTEXT_PATH_COMPONENT = "/t/%s";
     public static final String ERROR_CODE_RESOURCE_LIMIT_REACHED = "RLS-10001";
 
