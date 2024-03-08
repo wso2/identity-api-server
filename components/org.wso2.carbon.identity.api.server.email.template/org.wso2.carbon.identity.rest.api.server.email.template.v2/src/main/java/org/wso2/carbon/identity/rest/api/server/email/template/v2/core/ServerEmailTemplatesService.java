@@ -87,6 +87,7 @@ public class ServerEmailTemplatesService {
                 emailTemplateType.setId(templateTypeId);
                 // Set location.
                 emailTemplateType.setSelf(getTemplateTypeLocation(templateTypeId));
+                templateList.add(emailTemplateType);
             }
             return templateList;
         } catch (I18nEmailMgtException e) {
