@@ -76,7 +76,7 @@ public class PassiveSTSInboundFunctions {
         } else {
             passiveStsInbound.setProperties(new Property[]{passiveStsReplyUrl});
         }
-        passiveStsInbound.setData(buildAuditLogData(config));
+        passiveStsInbound.setData(buildPassiveSTSData(config));
         return passiveStsInbound;
     }
 
@@ -96,12 +96,12 @@ public class PassiveSTSInboundFunctions {
                 .replyToLogout(replyToLogout);
     }
     
-    private static Map<String, Object> buildAuditLogData(PassiveStsConfiguration passiveSTSConfig) {
+    private static Map<String, Object> buildPassiveSTSData(PassiveStsConfiguration passiveSTSConfig) {
         
-        Map<String, Object> auditLogData = new HashMap<>();
-        auditLogData.put("realm", passiveSTSConfig.getRealm());
-        auditLogData.put("replyTo", passiveSTSConfig.getReplyTo());
-        auditLogData.put("replyToLogout", passiveSTSConfig.getReplyToLogout());
-        return auditLogData;
+        Map<String, Object> passiveSTSData = new HashMap<>();
+        passiveSTSData.put("realm", passiveSTSConfig.getRealm());
+        passiveSTSData.put("replyTo", passiveSTSConfig.getReplyTo());
+        passiveSTSData.put("replyToLogout", passiveSTSConfig.getReplyToLogout());
+        return passiveSTSData;
     }
 }
