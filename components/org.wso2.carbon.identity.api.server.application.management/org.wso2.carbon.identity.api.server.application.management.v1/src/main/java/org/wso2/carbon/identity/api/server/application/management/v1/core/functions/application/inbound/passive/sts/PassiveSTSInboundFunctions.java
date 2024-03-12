@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound;
+package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.passive.sts;
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.arrayToStream;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
@@ -72,7 +76,7 @@ public class PassiveSTSInboundFunctions {
         } else {
             passiveStsInbound.setProperties(new Property[]{passiveStsReplyUrl});
         }
-
+        passiveStsInbound.setData(buildPassiveSTSData(config));
         return passiveStsInbound;
     }
 
@@ -90,5 +94,14 @@ public class PassiveSTSInboundFunctions {
 
         return new PassiveStsConfiguration().realm(inboundAuth.getInboundAuthKey()).replyTo(replyTo)
                 .replyToLogout(replyToLogout);
+    }
+    
+    private static Map<String, Object> buildPassiveSTSData(PassiveStsConfiguration passiveSTSConfig) {
+        
+        Map<String, Object> passiveSTSData = new HashMap<>();
+        passiveSTSData.put("realm", passiveSTSConfig.getRealm());
+        passiveSTSData.put("replyTo", passiveSTSConfig.getReplyTo());
+        passiveSTSData.put("replyToLogout", passiveSTSConfig.getReplyToLogout());
+        return passiveSTSData;
     }
 }

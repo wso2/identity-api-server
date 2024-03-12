@@ -132,8 +132,10 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
     }
 
     private void updateAllowedOrigins(OAuthConsumerAppDTO consumerAppDTO, List<String> allowedOrigins) {
-
-        // CORS are updated directly at the REST API level through the CORS Management OSGi service.
+        
+        // Setting the allowed origins since now the cors origin services will be called and handle by the Oauth2
+        // Inbound config handler
+        consumerAppDTO.setAllowedOrigins(allowedOrigins);
     }
 
     private void updateAccessTokenConfiguration(OAuthConsumerAppDTO consumerAppDTO,

@@ -19,26 +19,26 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.UpdateInboundProtocols;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
+import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
-
-import java.util.function.Function;
+import org.wso2.carbon.identity.application.mgt.inbound.dto.ApplicationDTO;
+import org.wso2.carbon.identity.application.mgt.inbound.dto.InboundProtocolsDTO;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
 /**
  * Converts the API model object into a ServiceProvider object.
  */
-public class ApiModelToServiceProvider implements Function<ApplicationModel, ServiceProvider> {
+public class ApiModelToServiceProvider implements ModelToDTO<ApplicationModel, ApplicationDTO> {
 
     @Override
-    public ServiceProvider apply(ApplicationModel applicationModel) {
+    public ApplicationDTO apply(ApplicationModel applicationModel) throws IdentityApplicationManagementClientException {
 
         ServiceProvider application = new ServiceProvider();
 
@@ -55,22 +55,17 @@ public class ApiModelToServiceProvider implements Function<ApplicationModel, Ser
         addClaimConfigurationToApplication(application, applicationModel.getClaimConfiguration());
         addAuthenticationSequence(application, applicationModel.getAuthenticationSequence());
         addProvisioningConfiguration(application, applicationModel.getProvisioningConfigurations());
+
+        ApplicationDTO.Builder applicationDTOBuilder = new ApplicationDTO.Builder();
+        applicationDTOBuilder.serviceProvider(application);
+
+        // Converting InboundProtocols to InboundProtocolsDTO and adding it to the ApplicationModel.
+        applicationDTOBuilder.inboundProtocolConfigurationDto(
+                createInboundProtocolConfiguration(application, applicationModel.getInboundProtocolConfiguration()));
+        // This is to add the inbound authentication protocols to the application that doesn't have inbound auth
+        // config handler.
         addInboundAuthenticationProtocolsToApplication(application, applicationModel.getInboundProtocolConfiguration());
-        addAssociatedRolesConfigurations(application, applicationModel.getAssociatedRoles());
-        addLogoutReturnUrl(application, applicationModel.getLogoutReturnUrl());
-        return application;
-    }
-
-    private void addLogoutReturnUrl(ServiceProvider application, String logoutReturnUrl) {
-
-        new UpdateLogoutReturnUrl().apply(application, logoutReturnUrl);
-    }
-
-    private void addAssociatedRolesConfigurations(ServiceProvider application, AssociatedRolesConfig associatedRoles) {
-
-        if (associatedRoles != null) {
-            new UpdateAssociatedRoles().apply(application, associatedRoles);
-        }
+        return applicationDTOBuilder.build();
     }
 
     private void addInboundAuthenticationProtocolsToApplication(ServiceProvider application,
@@ -79,6 +74,17 @@ public class ApiModelToServiceProvider implements Function<ApplicationModel, Ser
         if (inboundProtocolsModel != null) {
             new UpdateInboundProtocols().apply(application, inboundProtocolsModel);
         }
+    }
+
+    private InboundProtocolsDTO createInboundProtocolConfiguration(ServiceProvider serviceProvider,
+                                                                   InboundProtocols inboundProtocolsModel)
+            throws IdentityApplicationManagementClientException {
+
+
+        if (inboundProtocolsModel != null) {
+            return new InboundProtocolToDTO().apply(serviceProvider, inboundProtocolsModel);
+        }
+        return null;
     }
 
     private void addAuthenticationSequence(ServiceProvider application, AuthenticationSequence authSequenceApiModel) {
