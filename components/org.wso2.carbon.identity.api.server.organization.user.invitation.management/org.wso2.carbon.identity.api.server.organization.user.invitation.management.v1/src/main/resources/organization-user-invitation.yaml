@@ -387,7 +387,9 @@ components:
             errorDescription:
               type: string
               example: Some Error Description
-
+        confirmationCode:
+          type: string
+          example: "3363329b-c8c5-4c71-9500-9ea8c4e77d45"
     IntrospectRequestBody:
       type: object
       required:

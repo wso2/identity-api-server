@@ -285,6 +285,9 @@ public class GuestApiServiceCore {
             invitationSuccessResponseResult.setStatus(invitation.getStatus());
             invitationSuccessResponse.setUsername(invitation.getUsername());
             invitationSuccessResponse.setResult(invitationSuccessResponseResult);
+            if (StringUtils.isNotBlank(invitation.getConfirmationCode())) {
+                invitationSuccessResponse.setConfirmationCode(invitation.getConfirmationCode());
+            }
             invitationSuccessResponseList.add(invitationSuccessResponse);
         }
         return invitationSuccessResponseList;
