@@ -41,6 +41,7 @@ public class Owner  {
     private String provisioningMethod;
     private List<AdditionalClaims> additionalClaims = null;
 
+    private String userId;
 
     /**
     * Username for the tenant owner.
@@ -188,7 +189,26 @@ public class Owner  {
         return this;
     }
 
+        /**
+    * id of the tenant owner.
+    **/
+    public Owner userId(String userId) {
+
+        this.userId = userId;
+        return this;
+    }
     
+    @ApiModelProperty(example = "4875-jhgr-454hb", value = "id of the tenant owner.")
+    @JsonProperty("userId")
+    @Valid
+    public String getUserId() {
+        return userId;
+    }
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -206,12 +226,13 @@ public class Owner  {
             Objects.equals(this.firstname, owner.firstname) &&
             Objects.equals(this.lastname, owner.lastname) &&
             Objects.equals(this.provisioningMethod, owner.provisioningMethod) &&
-            Objects.equals(this.additionalClaims, owner.additionalClaims);
+            Objects.equals(this.additionalClaims, owner.additionalClaims) &&
+            Objects.equals(this.userId, owner.userId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, password, email, firstname, lastname, provisioningMethod, additionalClaims);
+        return Objects.hash(username, password, email, firstname, lastname, provisioningMethod, additionalClaims, userId);
     }
 
     @Override
@@ -227,6 +248,7 @@ public class Owner  {
         sb.append("    lastname: ").append(toIndentedString(lastname)).append("\n");
         sb.append("    provisioningMethod: ").append(toIndentedString(provisioningMethod)).append("\n");
         sb.append("    additionalClaims: ").append(toIndentedString(additionalClaims)).append("\n");
+        sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
         sb.append("}");
         return sb.toString();
     }
