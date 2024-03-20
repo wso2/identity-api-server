@@ -124,6 +124,15 @@ public class ServerEmailTemplatesService {
         EmailTemplateTypeWithID emailTemplateTypeWithID = new EmailTemplateTypeWithID();
         String decodedTemplateTypeId = decodeTemplateTypeId(templateTypeId);
 
+        try {
+            if (!EmailTemplatesServiceHolder.getEmailTemplateManager()
+                    .isEmailTemplateTypeExists(decodedTemplateTypeId, getTenantDomainFromContext())) {
+                throw handleError(Constants.ErrorMessage.ERROR_EMAIL_TEMPLATE_TYPE_NOT_FOUND);
+            }
+        } catch (I18nEmailMgtException e) {
+            throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_RETRIEVING_EMAIL_TEMPLATE_TYPE);
+        }
+
         emailTemplateTypeWithID.setId(templateTypeId);
         emailTemplateTypeWithID.setDisplayName(decodedTemplateTypeId);
         emailTemplateTypeWithID.setSelf(getTemplateTypeLocation(templateTypeId));
