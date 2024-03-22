@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.api.server.organization.user.invitation.manageme
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationSuccessResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationSuccessResponseResult;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationsListResponse;
+import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.Property;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.RoleAssignmentResponse;
 import org.wso2.carbon.identity.organization.user.invitation.management.InvitationCoreServiceImpl;
 import org.wso2.carbon.identity.organization.user.invitation.management.exception.UserInvitationMgtException;
@@ -124,6 +125,10 @@ public class GuestApiServiceCore {
                 groupAssignments.add(groupAssignment);
             }
             invitation.setGroupAssignments(groupAssignments.toArray(new GroupAssignments[0]));
+        }
+        List<Property> properties = invitationRequestBody.getProperties();
+        if (properties != null) {
+            properties.forEach((prop) -> invitation.getInvitationProperties().put(prop.getKey(), prop.getValue()));
         }
         List<InvitationResult> invitationResponse;
         try {

@@ -323,6 +323,12 @@ components:
           example:
             - 48badf-rty20-48ba-935b-f7b460f58e5c
             - fd234100-c115-45dc-ad11-70846b783866
+        properties:
+          type: array
+          description: Custom properties of invitation which can be used in runtime but doesn't 
+                       persist as invitation information.
+          items:
+            $ref: '#/components/schemas/Property'
       example:
         {
           "usernames": [
@@ -336,6 +342,12 @@ components:
           "groups": [
             "48badf-rty20-48ba-935b-f7b460f58e5c",
             "fd234100-c115-45dc-ad11-70846b783866"
+          ],
+          "properties": [
+            {
+              "key" : "manageNotificationsInternally",
+              "value" : "true"
+            }
           ]
         }
     InvitationSuccessListResponse:
@@ -603,6 +615,15 @@ components:
         type:
           type: string
           example: 'organization'
+    Property:
+      type: object
+      properties:
+        key:
+          type: string
+          example: "manageNotificationsInternally"
+        value:
+          type: string
+          example: "false"
     Error:
       type: object
       required:
