@@ -815,7 +815,7 @@
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>1.3.142
+        <org.wso2.carbon.identity.organization.management.version>1.4.10
         </org.wso2.carbon.identity.organization.management.version>
 
         <!-- Unit test versions -->
