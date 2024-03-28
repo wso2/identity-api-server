@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
   ~
-  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ WSO2 LLC. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
   ~ in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.wso2.carbon.identity.server.api</groupId>
         <artifactId>identity-api-server</artifactId>
-        <version>1.2.172-SNAPSHOT</version>
+        <version>1.2.184-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -32,6 +32,7 @@
     <modules>
         <module>org.wso2.carbon.identity.api.server.email.template.common</module>
         <module>org.wso2.carbon.identity.rest.api.server.email.template.v1</module>
+        <module>org.wso2.carbon.identity.rest.api.server.email.template.v2</module>
     </modules>
 
 </project>

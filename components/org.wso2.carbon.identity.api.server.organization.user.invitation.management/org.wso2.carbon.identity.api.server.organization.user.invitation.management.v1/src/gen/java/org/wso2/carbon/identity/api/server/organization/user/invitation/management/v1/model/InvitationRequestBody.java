@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.Property;
 import javax.validation.constraints.*;
 
 
@@ -40,6 +41,8 @@ public class InvitationRequestBody  {
     private List<String> roles = null;
 
     private List<String> groups = null;
+
+    private List<Property> properties = null;
 
 
     /**
@@ -141,6 +144,33 @@ public class InvitationRequestBody  {
         return this;
     }
 
+        /**
+    * Custom properties of invitation which can be used in runtime but doesn&#39;t persist as invitation information.
+    **/
+    public InvitationRequestBody properties(List<Property> properties) {
+
+        this.properties = properties;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "Custom properties of invitation which can be used in runtime but doesn't persist as invitation information.")
+    @JsonProperty("properties")
+    @Valid
+    public List<Property> getProperties() {
+        return properties;
+    }
+    public void setProperties(List<Property> properties) {
+        this.properties = properties;
+    }
+
+    public InvitationRequestBody addPropertiesItem(Property propertiesItem) {
+        if (this.properties == null) {
+            this.properties = new ArrayList<>();
+        }
+        this.properties.add(propertiesItem);
+        return this;
+    }
+
     
 
     @Override
@@ -156,12 +186,13 @@ public class InvitationRequestBody  {
         return Objects.equals(this.usernames, invitationRequestBody.usernames) &&
             Objects.equals(this.userDomain, invitationRequestBody.userDomain) &&
             Objects.equals(this.roles, invitationRequestBody.roles) &&
-            Objects.equals(this.groups, invitationRequestBody.groups);
+            Objects.equals(this.groups, invitationRequestBody.groups) &&
+            Objects.equals(this.properties, invitationRequestBody.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(usernames, userDomain, roles, groups);
+        return Objects.hash(usernames, userDomain, roles, groups, properties);
     }
 
     @Override
@@ -174,6 +205,7 @@ public class InvitationRequestBody  {
         sb.append("    userDomain: ").append(toIndentedString(userDomain)).append("\n");
         sb.append("    roles: ").append(toIndentedString(roles)).append("\n");
         sb.append("    groups: ").append(toIndentedString(groups)).append("\n");
+        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
     }

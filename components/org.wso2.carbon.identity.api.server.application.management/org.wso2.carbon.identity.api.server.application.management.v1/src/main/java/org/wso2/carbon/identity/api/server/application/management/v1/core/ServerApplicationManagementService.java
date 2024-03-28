@@ -71,10 +71,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.ServiceProviderToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundFunctions;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundFunctions;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundFunctions;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundFunctions;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.passive.sts.PassiveSTSInboundFunctions;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundFunctions;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.UpdateProvisioningConfiguration;
@@ -107,6 +107,8 @@ import org.wso2.carbon.identity.application.common.util.IdentityApplicationManag
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
+import org.wso2.carbon.identity.application.mgt.inbound.dto.ApplicationDTO;
+import org.wso2.carbon.identity.application.mgt.inbound.dto.InboundProtocolConfigurationDTO;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceSearchBean;
 import org.wso2.carbon.identity.configuration.mgt.core.search.ComplexCondition;
@@ -151,7 +153,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -159,19 +160,20 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.CLIENT_ID;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
@@ -181,7 +183,6 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthKey;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthenticationRequestConfig;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.rollbackInbound;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.rollbackInbounds;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.updateOrInsertInbound;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.Application.CONSOLE_APP;
@@ -762,7 +763,8 @@ public class ServerApplicationManagementService {
 
         /*
          * CORS adding step should be moved to the service layer and the validation also should happen there.
-         * But for now we are handling the validation here.
+         * But for now we are handling the validation here. (This should move when the CORS management is
+         * moved to the service layer).
          */
         if (applicationModel.getInboundProtocolConfiguration() != null &&
                 applicationModel.getInboundProtocolConfiguration().getOidc() != null) {
@@ -783,18 +785,26 @@ public class ServerApplicationManagementService {
             }
         }
 
+        // Validate whether application-based outbound provisioning support is enabled.
+        if (applicationModel.getProvisioningConfigurations() != null &&
+                applicationModel.getProvisioningConfigurations().getOutboundProvisioningIdps() != null &&
+                !isApplicationBasedOutboundProvisioningEnabled()) {
+            throw buildBadRequestError(UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getCode(),
+                    UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getDescription());
+        }
+
         String username = ContextLoader.getUsernameFromContext();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
         String applicationId = null;
-        ServiceProvider application = new ApiModelToServiceProvider().apply(applicationModel);
         try {
-            applicationId = getApplicationManagementService().createApplication(application, tenantDomain, username);
-
+            ApplicationDTO applicationDTO = new ApiModelToServiceProvider().apply(applicationModel);
+            applicationId = getApplicationManagementService().createApplication(applicationDTO, tenantDomain, username);
+            
             // Update owner for B2B Self Service applications.
-            if (application.isB2BSelfServiceApp()) {
+            if (applicationDTO.getServiceProvider().isB2BSelfServiceApp()) {
                 String systemUserID = org.wso2.carbon.identity.organization.management.service.util.Utils
-                                .getB2BSelfServiceSystemUser(tenantDomain);
+                        .getB2BSelfServiceSystemUser(tenantDomain);
                 if (StringUtils.isNotEmpty(systemUserID)) {
                     ApplicationOwner systemOwner = new ApplicationOwner();
                     systemOwner.id(systemUserID);
@@ -809,10 +819,6 @@ public class ServerApplicationManagementService {
             }
             return applicationId;
         } catch (IdentityApplicationManagementException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Error while creating application. Rolling back possibly created inbound config data.", e);
-            }
-            rollbackInbounds(getConfiguredInbounds(application));
             throw handleIdentityApplicationManagementException(e, "Error creating application.");
         } catch (CORSManagementServiceException e) {
             if (log.isDebugEnabled()) {
@@ -831,14 +837,10 @@ public class ServerApplicationManagementService {
              * For more information read https://github.com/wso2/product-is/issues/12579. This is to overcome the
              * above issue.
              */
-            if (log.isDebugEnabled()) {
-                log.debug("Server encountered unexpected error. Rolling back created application data.", e);
-            }
             if (applicationId != null) {
                 deleteApplication(applicationId);
-            } else {
-                rollbackInbounds(getConfiguredInbounds(application));
             }
+            log.error(ERROR_PROCESSING_REQUEST.getDescription(), e);
             throw Utils.buildServerError(ERROR_PROCESSING_REQUEST.getCode(), ERROR_PROCESSING_REQUEST.getMessage(),
                     ERROR_PROCESSING_REQUEST.getDescription());
         }
@@ -847,9 +849,19 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
+
+        // Validate whether application-based outbound provisioning support is enabled.
+        if (applicationPatchModel != null && applicationPatchModel.getProvisioningConfigurations() != null &&
+                applicationPatchModel.getProvisioningConfigurations().getOutboundProvisioningIdps() != null &&
+                !isApplicationBasedOutboundProvisioningEnabled()) {
+            throw buildBadRequestError(UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getCode(),
+                    UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getDescription());
+        }
+
         if (applicationPatchModel != null) {
             new UpdateServiceProvider().apply(appToUpdate, applicationPatchModel);
         }
+
 
         boolean isAllowUpdateSystemApps = isAllowUpdateSystemApplication(appToUpdate.getApplicationName(),
                 applicationPatchModel);
@@ -1036,12 +1048,12 @@ public class ServerApplicationManagementService {
          * But for now we are handling the validation here.
          */
         validateCORSOrigins(oidcConfigModel.getAllowedOrigins());
-        putInbound(applicationId, oidcConfigModel, OAuthInboundFunctions::putOAuthInbound);
+        putApplicationInbound(applicationId, oidcConfigModel, OAuthInboundFunctions::getInboundProtocolConfig);
     }
 
     public void putInboundSAMLConfiguration(String applicationId, SAML2Configuration saml2Configuration) {
 
-        putInbound(applicationId, saml2Configuration, SAMLInboundFunctions::putSAMLInbound);
+        putApplicationInbound(applicationId, saml2Configuration, SAMLInboundFunctions::getInboundProtocolConfig);
     }
 
     public void putInboundPassiveSTSConfiguration(String applicationId,
@@ -1599,7 +1611,9 @@ public class ServerApplicationManagementService {
                             .toArray(InboundAuthenticationRequestConfig[]::new);
 
             appToUpdate.getInboundAuthenticationConfig().setInboundAuthenticationRequestConfigs(filteredInbounds);
-            updateServiceProvider(applicationId, appToUpdate);
+            // We don't need to pass the inboundDTO information here since the updated inbound is already removed at
+            // this point and also updated in the appToUpdate object.
+            updateServiceProvider(applicationId, appToUpdate, null);
         }
 
         // Delete the associated CORS origins if the inboundType is oauth2.
@@ -1637,15 +1651,6 @@ public class ServerApplicationManagementService {
             throw handleIdentityApplicationManagementException(e, msg);
         }
         return application;
-    }
-
-    private List<InboundAuthenticationRequestConfig> getConfiguredInbounds(ServiceProvider app) {
-
-        if (app.getInboundAuthenticationConfig() != null &&
-                app.getInboundAuthenticationConfig().getInboundAuthenticationRequestConfigs() != null) {
-            return Arrays.asList(app.getInboundAuthenticationConfig().getInboundAuthenticationRequestConfigs());
-        }
-        return Collections.emptyList();
     }
 
     private List<ApplicationListItem> getApplicationListItems(ApplicationBasicInfo[] allApplicationBasicInfo) {
@@ -1716,6 +1721,34 @@ public class ServerApplicationManagementService {
             throw error;
         }
     }
+    
+    /**
+     * Create or replace the provided inbound configuration.
+     *
+     * @param applicationId     Resource id of the app.
+     * @param inboundApiModel   Inbound API model to be created or replaced.
+     * @param getInboundDTO     A function that takes the inbound API model and application as input and provides the
+     *                          InboundProtocolConfigurationDTO that matches with the protocol.
+     */
+    private <I> void putApplicationInbound(String applicationId, I inboundApiModel, BiFunction<ServiceProvider, I,
+            InboundProtocolConfigurationDTO> getInboundDTO) {
+        
+        // We need a cloned copy of the Service Provider so that we changes we do not make cache dirty.
+        ServiceProvider application = cloneApplication(applicationId);
+        
+        // Update the service provider with the inbound configuration.
+        InboundProtocolConfigurationDTO inboundDTO = getInboundDTO.apply(application, inboundApiModel);
+        try {
+            // Call the app-mgt service and update the inbound auth configs and application details
+            updateServiceProvider(applicationId, application, inboundDTO);
+        } catch (APIError error) {
+            if (log.isDebugEnabled()) {
+                log.debug("Error while updating application: " + applicationId + ". The possible rollbacks will be " +
+                        "handle from the framework level.");
+            }
+            throw error;
+        }
+    }
 
     private void doRollback(String applicationId, InboundAuthenticationRequestConfig updatedInbound) {
 
@@ -1736,13 +1769,30 @@ public class ServerApplicationManagementService {
     }
 
     private void updateServiceProvider(String applicationId, ServiceProvider updatedApplication) {
-
+        
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String username = ContextLoader.getUsernameFromContext();
-
+            
+            // Inbound auth config details are already added to the service provider. Therefore we don't need to pass
+            // the inboundDTO information here.
             getApplicationManagementService().updateApplicationByResourceId(
-                    applicationId, updatedApplication, tenantDomain, username);
+                    applicationId, updatedApplication, null, tenantDomain, username);
+        } catch (IdentityApplicationManagementException e) {
+            String msg = "Error updating application with id: " + applicationId;
+            throw handleIdentityApplicationManagementException(e, msg);
+        }
+    }
+    
+    private void updateServiceProvider(String applicationId, ServiceProvider updatedApplication,
+                                       InboundProtocolConfigurationDTO inboundDTO) {
+        
+        try {
+            String tenantDomain = ContextLoader.getTenantDomainFromContext();
+            String username = ContextLoader.getUsernameFromContext();
+            
+            getApplicationManagementService().updateApplicationByResourceId(
+                    applicationId, updatedApplication, inboundDTO, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error updating application with id: " + applicationId;
             throw handleIdentityApplicationManagementException(e, msg);
@@ -1943,5 +1993,17 @@ public class ServerApplicationManagementService {
         return Utils.buildConflictError(ErrorMessage.API_RESOURCE_ALREADY_AUTHORIZED.getCode(),
                 ErrorMessage.API_RESOURCE_ALREADY_AUTHORIZED.getMessage(),
                 String.format(ErrorMessage.API_RESOURCE_ALREADY_AUTHORIZED.getDescription(), apiId, appId));
+    }
+
+    private boolean isApplicationBasedOutboundProvisioningEnabled() {
+
+        boolean applicationBasedOutboundProvisioningEnabled = false;
+
+        if (StringUtils.isNotEmpty(
+                IdentityUtil.getProperty(APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED))) {
+            applicationBasedOutboundProvisioningEnabled = Boolean
+                    .parseBoolean(IdentityUtil.getProperty(APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED));
+        }
+        return applicationBasedOutboundProvisioningEnabled;
     }
 }

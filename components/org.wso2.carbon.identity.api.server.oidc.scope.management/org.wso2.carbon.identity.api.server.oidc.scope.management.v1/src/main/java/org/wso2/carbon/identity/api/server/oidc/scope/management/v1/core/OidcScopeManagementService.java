@@ -173,15 +173,19 @@ public class OidcScopeManagementService {
 
         ErrorResponse.Builder builder = new ErrorResponse.Builder().withCode(e.getErrorCode())
                 .withMessage(message).withDescription(e.getMessage());
-        ErrorResponse errorResponse = builder.build(LOG, e, message);
+        ErrorResponse errorResponse;
         Response.Status status;
         if (OidcScopeConstants.ErrorMessage.INVALID_REQUEST.getCode().equals(e.getErrorCode())) {
+            errorResponse = builder.build(LOG, message);
             status = Response.Status.BAD_REQUEST;
         } else if (OidcScopeConstants.ErrorMessage.ERROR_CONFLICT_REQUEST.getCode().equals(e.getErrorCode())) {
+            errorResponse = builder.build(LOG, message);
             status = Response.Status.CONFLICT;
         } else if (OidcScopeConstants.ErrorMessage.SCOPE_NOT_FOUND.getCode().equals(e.getErrorCode())) {
+            errorResponse = builder.build(LOG, message);
             status = Response.Status.NOT_FOUND;
         } else {
+            errorResponse = builder.build(LOG, e, message);
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);

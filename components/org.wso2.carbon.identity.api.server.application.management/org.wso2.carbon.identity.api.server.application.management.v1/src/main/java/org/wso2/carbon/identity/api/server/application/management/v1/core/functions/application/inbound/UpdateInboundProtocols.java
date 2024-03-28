@@ -28,11 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.rollbackInbounds;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.PassiveSTSInboundFunctions.createPassiveSTSInboundConfig;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.WSTrustInboundFunctions.createWsTrustInbound;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.custom.CustomInboundFunctions.createCustomInbound;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2.OAuthInboundFunctions.createOAuthInbound;
-import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.saml.SAMLInboundFunctions.createSAMLInbound;
+import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.passive.sts.PassiveSTSInboundFunctions.createPassiveSTSInboundConfig;
 
 /**
  * Updates the inbound authentication protocols defined by the API model in the Service Provider model.
@@ -47,14 +45,8 @@ public class UpdateInboundProtocols implements UpdateFunction<ServiceProvider, I
         List<InboundAuthenticationRequestConfig> inbounds = new ArrayList<>();
 
         try {
-            if (inboundProtocols.getOidc() != null) {
-                inbounds.add(createOAuthInbound(application.getApplicationName(), inboundProtocols.getOidc()));
-            }
-
-            if (inboundProtocols.getSaml() != null) {
-                inbounds.add(createSAMLInbound(application, inboundProtocols.getSaml()));
-            }
-
+            // SAML2 and OAuth2 will not be handle here, it will be handled by the relevant InboundAuthConfigHandlers
+            // from the framework.
             if (inboundProtocols.getWsTrust() != null) {
                 inbounds.add(createWsTrustInbound(inboundProtocols.getWsTrust()));
             }

@@ -75,6 +75,9 @@ public class ApplicationManagementConstants {
     public static final String LOGOUT_RETURN_URL_DISPLAY_NAME = "Logout Return URL";
 
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
+    public static final String APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED =
+            "OutboundProvisioning.enableApplicationBasedOutboundProvisioning";
+
 
     /**
      * Enums for error messages.
@@ -143,6 +146,10 @@ public class ApplicationManagementConstants {
         ERROR_ASSERT_LOCAL_SUBJECT_IDENTIFIER_DISABLED("60513",
                 "Invalid configuration.",
                 "'useMappedLocalSubject' cannot be disabled when 'mappedLocalSubjectMandatory' is enabled."),
+        UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION("60514",
+                "Outbound provisioning configuration not supported.",
+                "Application-based outbound provisioning support is disabled."),
+
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
                 "Error occurred while retrieving SAML Metadata.",

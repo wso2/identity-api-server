@@ -35,6 +35,7 @@ public class InvitationSuccessResponse  {
   
     private String username;
     private InvitationSuccessResponseResult result;
+    private String confirmationCode;
 
     /**
     * Username of the user who will be invited to the organization. This can be an email or an alphanumeric username.
@@ -77,6 +78,24 @@ public class InvitationSuccessResponse  {
         this.result = result;
     }
 
+    /**
+    **/
+    public InvitationSuccessResponse confirmationCode(String confirmationCode) {
+
+        this.confirmationCode = confirmationCode;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "3363329b-c8c5-4c71-9500-9ea8c4e77d45", value = "")
+    @JsonProperty("confirmationCode")
+    @Valid
+    public String getConfirmationCode() {
+        return confirmationCode;
+    }
+    public void setConfirmationCode(String confirmationCode) {
+        this.confirmationCode = confirmationCode;
+    }
+
 
 
     @Override
@@ -90,12 +109,13 @@ public class InvitationSuccessResponse  {
         }
         InvitationSuccessResponse invitationSuccessResponse = (InvitationSuccessResponse) o;
         return Objects.equals(this.username, invitationSuccessResponse.username) &&
-            Objects.equals(this.result, invitationSuccessResponse.result);
+            Objects.equals(this.result, invitationSuccessResponse.result) &&
+            Objects.equals(this.confirmationCode, invitationSuccessResponse.confirmationCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, result);
+        return Objects.hash(username, result, confirmationCode);
     }
 
     @Override
@@ -106,6 +126,7 @@ public class InvitationSuccessResponse  {
         
         sb.append("    username: ").append(toIndentedString(username)).append("\n");
         sb.append("    result: ").append(toIndentedString(result)).append("\n");
+        sb.append("    confirmationCode: ").append(toIndentedString(confirmationCode)).append("\n");
         sb.append("}");
         return sb.toString();
     }
