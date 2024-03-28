@@ -57,6 +57,14 @@ public class Constants {
     public static final String PRIVATE_KEY_JWT_VALIDATION_CONFIG_TOKEN_REUSE = "/enableTokenReuse";
 
     /**
+     * PATCH operation paths for DCR configuration.
+     */
+    public static final String DCR_CONFIG_ENABLE_FAPI_ENFORCEMENT = "/enableFapiEnforcement";
+    public static final String DCR_CONFIG_SSA_JWKS = "/ssaJwks";
+    public static final String DCR_CONFIG_AUTHENTICATION_REQUIRED = "/authenticationRequired";
+    public static final String DCR_CONFIG_MANDATE_SSA = "/mandateSSA";
+
+    /**
      * SAML2 metadata endpoint uri path.
      */
     public static final String SAML2_METADATA_ENDPOINT_URI_PATH = "/identity/metadata/saml2";
@@ -125,7 +133,7 @@ public class Constants {
                 "Unable to update remote logging  configs.",
                 "Server encountered an " +
                         "error while updating the remote logging configs."),
-        ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS("65008",
+        ERROR_CODE_ERROR_GETTING_REMOTE_LOGGING_CONFIGS("65017",
                 "Unable to get remote logging  configs.",
                 "Server encountered an " +
                         "error while getting the remote logging configs."),
@@ -141,6 +149,26 @@ public class Constants {
         ERROR_CODE_REMOTE_LOGGING_CONFIG_NOT_FOUND("60508",
                 "Resource not found.",
                 "Unable to find a resource matching the provided log type %s."),
+
+        /**
+         * DCR Configuration errors.
+         */
+        ERROR_DCR_CONFIG_SERVICE_NOT_FOUND("60509",
+                "DCR Management Service not found.",
+                "DCR Management Service is unavailable at the moment."),
+
+        ERROR_CODE_DCR_CONFIG_RETRIEVE("65018",
+                "Unable to retrieve DCR configuration.",
+                "Server encountered an error while retrieving the " +
+                        "DCR configuration."),
+
+        ERROR_CODE_DCR_CONFIG_UPDATE("65019",
+                "Unable to update DCR configuration.",
+                "Server encountered an error while updating the DCR configuration."),
+
+        ERROR_CODE_DCR_CONFIG_SSA_MANDATE("650290",
+                "SSA JWKS url is required to mandate SSA validation",
+                "SSA is mandated but SSA JWKS url is not configured."),
 
         /**
          * Inbound auth config error messages.

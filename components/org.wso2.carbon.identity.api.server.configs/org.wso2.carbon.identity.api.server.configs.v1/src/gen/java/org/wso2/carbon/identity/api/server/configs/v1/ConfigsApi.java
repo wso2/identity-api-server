@@ -28,6 +28,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
@@ -47,6 +49,7 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
 
 import javax.validation.constraints.*;
 
@@ -224,6 +227,30 @@ public class ConfigsApi  {
     public Response getPrivatKeyJWTValidationConfiguration() {
 
         return delegate.getPrivatKeyJWTValidationConfiguration();
+    }
+
+    @Valid
+    @GET
+    @Path("/dcr")
+
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the tenant dcr configuration.", notes = "Retrieve the tenant dcr configuration.", response = DCRConfig.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "DCR Configurations", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Response", response = DCRConfig.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getDCRConfiguration() {
+
+        return delegate.getDCRConfiguration();
     }
 
     @Valid
@@ -444,6 +471,30 @@ public class ConfigsApi  {
     }
 
     @Valid
+    @PATCH
+    @Path("/dcr")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch the tenant dcr configuration.", notes = "Patch the tenant dcr authentication configuration.  A JSONPatch as defined by RFC 6902.", response = Void.class, authorizations = {
+            @Authorization(value = "BasicAuth"),
+            @Authorization(value = "OAuth2", scopes = {
+
+            })
+    }, tags={ "DCR Configurations", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful Response", response = Void.class),
+            @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+            @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchDCRConfiguration(@ApiParam(value = "" ,required=true) @Valid List<DCRPatch> dcrPatch) {
+
+        return delegate.patchDCRConfiguration(dcrPatch );
+    }
+
+    @Valid
     @DELETE
     @Path("/remote-logging/{log-type}")
     
@@ -526,7 +577,7 @@ public class ConfigsApi  {
             
         })
     }, tags={ "Inbound Authentication Configurations", })
-    @ApiResponses(value = { 
+    @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Successful response", response = Void.class),
         @ApiResponse(code = 400, message = "Bad request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),

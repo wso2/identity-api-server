@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
@@ -88,6 +89,13 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     }
 
     @Override
+    public Response getDCRConfiguration() {
+
+        return Response.ok().entity(configManagementService.getDCRConfiguration()).build();
+
+    }
+
+    @Override
     public Response getRemoteLoggingConfig(String logType) {
 
         RemoteServerLoggerData remoteServerLoggerResponseData =
@@ -113,6 +121,13 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response patchPrivatKeyJWTValidationConfiguration(List<JWTKeyValidatorPatch> jwTKeyValidatorPatch) {
 
         configManagementService.patchPrivateKeyJWTValidatorSConfig(jwTKeyValidatorPatch);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response patchDCRConfiguration(List<DCRPatch> dcrPatch) {
+
+        configManagementService.patchDCRConfig(dcrPatch);
         return Response.ok().build();
     }
 

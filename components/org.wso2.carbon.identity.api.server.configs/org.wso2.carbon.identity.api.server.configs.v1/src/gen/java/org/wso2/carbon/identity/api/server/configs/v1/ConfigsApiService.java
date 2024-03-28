@@ -59,6 +59,7 @@ public interface ConfigsApiService {
       public Response getPassiveSTSInboundAuthConfig();
 
       public Response getPrivatKeyJWTValidationConfiguration();
+      public Response getDCRConfiguration();
 
       public Response getRemoteLoggingConfig(String logType);
 
@@ -77,6 +78,8 @@ public interface ConfigsApiService {
       public Response patchConfigs(List<Patch> patch);
 
       public Response patchPrivatKeyJWTValidationConfiguration(List<JWTKeyValidatorPatch> jwTKeyValidatorPatch);
+
+      public Response patchDCRConfiguration(List<DCRPatch> patch);
 
       public Response restoreServerRemoteLoggingConfiguration(String logType);
 

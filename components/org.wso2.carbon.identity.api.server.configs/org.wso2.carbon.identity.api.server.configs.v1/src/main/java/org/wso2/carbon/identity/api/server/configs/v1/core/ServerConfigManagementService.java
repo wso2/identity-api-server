@@ -35,15 +35,20 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
+import org.wso2.carbon.identity.api.server.configs.common.factory.DCRMgtOGSiServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.common.factory.JWTAuthenticationMgtOGSiServiceFactory;
+import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigException;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthenticatorException;
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.function.DCRConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.function.JWTConnectorUtil;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorProperty;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
+import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundConfig;
@@ -94,6 +99,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -104,6 +110,7 @@ import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.CONFIGS_AUTHENTICATOR_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.CONFIGS_SCHEMAS_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.configs.common.Constants.ErrorMessage.ERROR_DCR_CONFIG_SERVICE_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.ErrorMessage.ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_SEPERATOR;
 
@@ -222,6 +229,7 @@ public class ServerConfigManagementService {
         serverConfig.setProvisioning(buildProvisioningConfig());
         serverConfig.setAuthenticators(getAuthenticators(null));
         serverConfig.setCors(getCORSConfiguration());
+        serverConfig.setDcr(getDCRConfiguration());
         return serverConfig;
     }
 
@@ -1074,7 +1082,7 @@ public class ServerConfigManagementService {
 
         } catch (Exception e) {
             if (ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message().equals(e.getMessage())) {
-                throw handleNotFoundError();
+                throw handleNotFoundError(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND);
             } else {
                 throw JWTConnectorUtil.handlePrivateKeyJWTValidationException(e,
                         Constants.ErrorMessage.ERROR_CODE_PRIVATE_KEY_JWT_VALIDATOR_CONFIG_RETRIEVE,
@@ -1105,7 +1113,7 @@ public class ServerConfigManagementService {
             }
         } catch (Exception e) {
             if (e.getMessage().equals(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND.message())) {
-                throw handleNotFoundError();
+                throw handleNotFoundError(ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND);
             } else {
                 throw JWTConnectorUtil.handlePrivateKeyJWTValidationException(e,
                         Constants.ErrorMessage.ERROR_CODE_CORS_CONFIG_RETRIEVE, null);
@@ -1122,7 +1130,6 @@ public class ServerConfigManagementService {
                 if (operation == JWTKeyValidatorPatch.OperationEnum.REPLACE) {
                     if (path.matches(Constants.PRIVATE_KEY_JWT_VALIDATION_CONFIG_TOKEN_REUSE)) {
                         jwtValidatorConfig.setEnableTokenReuse(value);
-                        ;
                     } else {
                         // Throw an error if any other patch operations are sent in the request.
                         throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
@@ -1143,7 +1150,7 @@ public class ServerConfigManagementService {
                 }
             }
 
-            // Set the patched configuration object as the new CORS configuration for the tenant.
+            // Set the patched configuration object as the new JWT Authentication configuration for the tenant.
             if (JWTAuthenticationMgtOGSiServiceFactory.getInstance() != null) {
                 JWTAuthenticationMgtOGSiServiceFactory.getInstance()
                         .setPrivateKeyJWTClientAuthenticatorConfiguration
@@ -1157,14 +1164,122 @@ public class ServerConfigManagementService {
     }
 
     /**
+     * Get the DCR Configuration.
+     *
+     * @return DCRConfig  DCRConfig.
+     */
+    public DCRConfig getDCRConfiguration() {
+
+        try {
+            if (DCRMgtOGSiServiceFactory.getInstance() != null) {
+
+                return DCRConnectorUtil.getDCRConfig();
+            }
+            throw new DCRConfigException(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message(),
+                    ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.code());
+
+        } catch (Exception e) {
+            if (ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message().equals(e.getMessage())) {
+                throw handleNotFoundError(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND);
+            } else {
+                throw DCRConnectorUtil.handleDCRConfigException(e,
+                        Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_RETRIEVE,
+                        null);
+            }
+        }
+    }
+
+    /**
+     * Patch the DCR config of a tenant.
+     *
+     * @param dcrPatchList List of patch operations.
+     */
+    public void patchDCRConfig(List<DCRPatch> dcrPatchList) {
+
+        if (CollectionUtils.isEmpty(dcrPatchList)) {
+            return;
+        }
+
+        DCRConfig dcrConfig = null;
+        try {
+            dcrConfig = DCRConnectorUtil.getDCRConfig();
+        } catch (Exception e) {
+            if (e.getMessage().equals(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message())) {
+                throw handleNotFoundError(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND);
+            } else {
+                throw DCRConnectorUtil.handleDCRConfigException(e,
+                        Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_RETRIEVE, null);
+            }
+        }
+
+
+            for (DCRPatch dcrPatch : dcrPatchList) {
+                String path = dcrPatch.getPath();
+                DCRPatch.OperationEnum operation = dcrPatch.getOperation();
+
+                // We support only 'REPLACE' patch operation.
+                if (operation == DCRPatch.OperationEnum.REPLACE) {
+                    if (path.matches(Constants.DCR_CONFIG_ENABLE_FAPI_ENFORCEMENT)) {
+                        String value = dcrPatch.getValue();
+                        if (Objects.equals(value, "true")) {
+                            dcrConfig.setEnableFapiEnforcement(true);
+                        } else if (Objects.equals(value, "false")) {
+                            dcrConfig.setEnableFapiEnforcement(false);
+                        } else {
+                            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                    .ERROR_CODE_INVALID_INPUT, "Unsupported patch value for the given path");
+                        }
+                    } else if (path.matches(Constants.DCR_CONFIG_AUTHENTICATION_REQUIRED)) {
+                        String value = dcrPatch.getValue();
+                        if (Objects.equals(value, "true")) {
+                            dcrConfig.setAuthenticationRequired(true);
+                        } else if (Objects.equals(value, "false")) {
+                            dcrConfig.setAuthenticationRequired(false);
+                        } else {
+                            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                    .ERROR_CODE_INVALID_INPUT, "Unsupported patch value for the given path");
+                        }
+                    } else if (path.matches(Constants.DCR_CONFIG_MANDATE_SSA)) {
+                        String value = dcrPatch.getValue();
+                        if (Objects.equals(value, "true")) {
+                            dcrConfig.setMandateSSA(true);
+                        } else if (Objects.equals(value, "false")) {
+                            dcrConfig.setMandateSSA(false);
+                        } else {
+                            throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                    .ERROR_CODE_INVALID_INPUT, "Unsupported patch value for the given path");
+                        }
+                    } else if (path.matches(Constants.DCR_CONFIG_SSA_JWKS)) {
+                        String value = dcrPatch.getValue();
+                        dcrConfig.setSsaJwks(value);
+                    } else {
+                        // Throw an error if any other patch operations are sent in the request.
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                    }
+                } else {
+                    // Throw an error if any other patch operations are sent in the request.
+                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                            .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                }
+            }
+
+            // Set the patched configuration object as the new DCR configuration for the tenant.
+        try {
+            DCRConnectorUtil.setDCRConfig(dcrConfig);
+        } catch (DCRConfigException e) {
+            throw DCRConnectorUtil.handleDCRConfigException(e,
+                    Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_UPDATE, e.getMessage());
+        }
+
+    }
+
+    /**
      * Extract the required arguments and build a not found error.
      *
      * @return APIError with exception code, message and description.
      */
-    private APIError handleNotFoundError() {
-
-        Constants.ErrorMessage errorEnum = ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND;
-
+    private APIError handleNotFoundError(Constants.ErrorMessage errorEnum) {
 
         ErrorResponse errorResponse = new ErrorResponse.Builder()
                 .withCode(errorEnum.code())
