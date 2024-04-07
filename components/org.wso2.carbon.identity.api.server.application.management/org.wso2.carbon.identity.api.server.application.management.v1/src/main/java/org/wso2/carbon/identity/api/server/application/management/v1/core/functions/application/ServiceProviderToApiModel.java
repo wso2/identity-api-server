@@ -56,12 +56,12 @@ import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthent
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
-import org.wso2.carbon.identity.application.common.model.RoleV2;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
+import org.wso2.carbon.identity.role.v2.mgt.core.RoleConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.ArrayList;
@@ -150,26 +150,31 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private AssociatedRolesConfig buildAssociatedRoles(ServiceProvider application) {
 
         AssociatedRolesConfig associatedRolesConfig = new AssociatedRolesConfig();
-        if (application.getAssociatedRolesConfig() == null) {
+        org.wso2.carbon.identity.application.common.model.AssociatedRolesConfig associatedRolesConfiguration =
+                application.getAssociatedRolesConfig();
+        if (associatedRolesConfiguration == null) {
             return null;
         }
 
-        String allowedAudience = application.getAssociatedRolesConfig().getAllowedAudience();
+        String allowedAudience = associatedRolesConfiguration.getAllowedAudience();
         AssociatedRolesConfig.AllowedAudienceEnum allowedAudienceEnum = null;
+
         switch (allowedAudience) {
-            case "application":
+            case RoleConstants.APPLICATION:
                 allowedAudienceEnum = AssociatedRolesConfig.AllowedAudienceEnum.APPLICATION;
                 break;
-            case "organization":
+            case RoleConstants.ORGANIZATION:
                 allowedAudienceEnum = AssociatedRolesConfig.AllowedAudienceEnum.ORGANIZATION;
                 break;
             default:
                 break;
         }
         associatedRolesConfig.setAllowedAudience(allowedAudienceEnum);
-        RoleV2[] roles = application.getAssociatedRolesConfig().getRoles();
-        Arrays.asList(roles).forEach(role -> associatedRolesConfig.addRolesItem(
-                new Role().id(role.getId()).name(role.getName())));
+        if (RoleConstants.APPLICATION.equals(allowedAudience)) {
+            Arrays.stream(associatedRolesConfiguration.getRoles())
+                    .map(role -> new Role().id(role.getId()).name(role.getName()))
+                    .forEach(associatedRolesConfig::addRolesItem);
+        }
         return associatedRolesConfig;
     }
 
@@ -359,7 +364,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     }
 
     private void assignClaimForSubjectValue(ServiceProvider application, SubjectConfig subjectConfig) {
-        
+
         if (isLocalClaimDialectUsedBySp(application)) {
             if (isUserIdUsedAsDefaultSubject(application.getSpProperties())) {
                 subjectConfig.claim(buildClaimModel(FrameworkConstants.USER_ID_CLAIM));
@@ -369,7 +374,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         }
     }
 
-    private boolean isUserIdUsedAsDefaultSubject (ServiceProviderProperty[] spProperties) {
+    private boolean isUserIdUsedAsDefaultSubject(ServiceProviderProperty[] spProperties) {
 
         for (ServiceProviderProperty spProperty : spProperties) {
             if (useUserIdForDefaultSubject.equals(spProperty.getName())) {
@@ -462,7 +467,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
      * @return An instance of AdvancedApplicationConfigurationAttestationMetaData containing attestation data.
      */
     private AdvancedApplicationConfigurationAttestationMetaData getAttestationMetaData
-                                                                (ServiceProvider serviceProvider) {
+    (ServiceProvider serviceProvider) {
 
         // Retrieve the client attestation metadata from the service provider.
         ClientAttestationMetaData clientAttestationMetaData = serviceProvider.getClientAttestationMetaData();
@@ -506,26 +511,26 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         /* These properties are part of advanced configurations and hence removing
         them as they can't be packed as a part of additional sp properties again.*/
-            List<ServiceProviderProperty> spPropertyList =
-                    Arrays.stream(propertyList).collect(Collectors.toList());
-            spPropertyList.removeIf(property -> SKIP_CONSENT.equals(property.getName()));
-            spPropertyList.removeIf(property -> SKIP_LOGOUT_CONSENT.equals(property.getName()));
-            spPropertyList.removeIf(property -> USE_EXTERNAL_CONSENT_PAGE.equals(property.getName()));
-            spPropertyList.removeIf(property -> USE_DOMAIN_IN_ROLES.equals(property.getName()));
-            spPropertyList.removeIf(property -> USE_USER_ID_FOR_DEFAULT_SUBJECT.equals(property.getName()));
-            spPropertyList.removeIf(property -> TEMPLATE_ID_SP_PROPERTY_NAME.equals(property.getName()));
-            spPropertyList.removeIf(property -> IS_MANAGEMENT_APP_SP_PROPERTY_NAME.equals(property.getName()));
-            spPropertyList.removeIf(property -> IS_ATTESTATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
-            spPropertyList.removeIf(property ->
-                    IS_API_BASED_AUTHENTICATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
-            spPropertyList.removeIf(property ->
-                    ANDROID_PACKAGE_NAME_PROPERTY_NAME.equals(property.getName()));
-            spPropertyList.removeIf(property ->
-                    ANDROID_PACKAGE_NAME_PROPERTY_NAME.equals(property.getName()));
-            spPropertyList.removeIf(property ->
-                    APPLE_APP_ID_PROPERTY_NAME.equals(property.getName()));
-            spPropertyList.removeIf(property -> ALLOWED_ROLE_AUDIENCE_PROPERTY_NAME.equals(property.getName()));
-            return spPropertyList.toArray(new ServiceProviderProperty[0]);
+        List<ServiceProviderProperty> spPropertyList =
+                Arrays.stream(propertyList).collect(Collectors.toList());
+        spPropertyList.removeIf(property -> SKIP_CONSENT.equals(property.getName()));
+        spPropertyList.removeIf(property -> SKIP_LOGOUT_CONSENT.equals(property.getName()));
+        spPropertyList.removeIf(property -> USE_EXTERNAL_CONSENT_PAGE.equals(property.getName()));
+        spPropertyList.removeIf(property -> USE_DOMAIN_IN_ROLES.equals(property.getName()));
+        spPropertyList.removeIf(property -> USE_USER_ID_FOR_DEFAULT_SUBJECT.equals(property.getName()));
+        spPropertyList.removeIf(property -> TEMPLATE_ID_SP_PROPERTY_NAME.equals(property.getName()));
+        spPropertyList.removeIf(property -> IS_MANAGEMENT_APP_SP_PROPERTY_NAME.equals(property.getName()));
+        spPropertyList.removeIf(property -> IS_ATTESTATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
+        spPropertyList.removeIf(property ->
+                IS_API_BASED_AUTHENTICATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
+        spPropertyList.removeIf(property ->
+                ANDROID_PACKAGE_NAME_PROPERTY_NAME.equals(property.getName()));
+        spPropertyList.removeIf(property ->
+                ANDROID_PACKAGE_NAME_PROPERTY_NAME.equals(property.getName()));
+        spPropertyList.removeIf(property ->
+                APPLE_APP_ID_PROPERTY_NAME.equals(property.getName()));
+        spPropertyList.removeIf(property -> ALLOWED_ROLE_AUDIENCE_PROPERTY_NAME.equals(property.getName()));
+        return spPropertyList.toArray(new ServiceProviderProperty[0]);
     }
 
     private Certificate getCertificate(ServiceProvider serviceProvider) {
@@ -538,6 +543,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         return null;
     }
+
     private boolean isFragmentApp(ServiceProvider serviceProvider) {
 
         return serviceProvider != null && serviceProvider.getSpProperties() != null &&
@@ -577,7 +583,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .getInboundAuthenticationRequestConfigs();
 
             if (authRequestConfigs != null && authRequestConfigs.length > 0) {
-                for (InboundAuthenticationRequestConfig authRequestConfig: authRequestConfigs) {
+                for (InboundAuthenticationRequestConfig authRequestConfig : authRequestConfigs) {
                     if (authRequestConfig.getInboundAuthType().equals(authType)) {
                         return authRequestConfig.getInboundAuthKey();
                     }

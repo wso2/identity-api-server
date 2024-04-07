@@ -102,6 +102,9 @@ public class ApplicationManagementConstants {
         DISABLE_REDIRECT_OR_POST_BINDINGS("APP-60007",
                 "Disabling HTTP_POST or HTTP_REDIRECT is not allowed",
                 "HTTP_POST or HTTP_REDIRECT cannot be disabled"),
+        INVALID_ROLE_ASSOCIATION_FOR_ORGANIZATION_AUDIENCE("60008",
+                "Applications can not be updated by modifying the associated roles.",
+                "Applications can not be updated by modifying the associated roles."),
 
         // Client errors defined at API level.
         INVALID_INBOUND_PROTOCOL("60501",
