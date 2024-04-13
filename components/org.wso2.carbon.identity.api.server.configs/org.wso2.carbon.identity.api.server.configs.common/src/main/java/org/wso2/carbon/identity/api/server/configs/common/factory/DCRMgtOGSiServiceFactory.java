@@ -33,7 +33,6 @@ public class DCRMgtOGSiServiceFactory {
     private static DCRConfigurationMgtService dcrConfigurationMgtService = null;
     private static final Log log = LogFactory.getLog(DCRMgtOGSiServiceFactory.class);
 
-
     /**
      * This method return  the instance if the OSGi service exists.
      * Else throw Null pointer Exception. We handle the exception gracefully.
@@ -61,10 +60,8 @@ public class DCRMgtOGSiServiceFactory {
             } catch (NullPointerException | ClassNotFoundException  e) {
                 /* Catch block without implementation so that the DCRConfigurationMgtService will be set to null
                    in-turn helps in validating the rest API requests. */
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to find the DCRConfigurationMgtService. " +
-                            "DCRConfigurationMgtService is not available in the server.");
-                }
+                log.debug("Unable to find the DCRConfigurationMgtService. " +
+                        "DCRConfigurationMgtService is not available in the server.");
             }
         }
 
