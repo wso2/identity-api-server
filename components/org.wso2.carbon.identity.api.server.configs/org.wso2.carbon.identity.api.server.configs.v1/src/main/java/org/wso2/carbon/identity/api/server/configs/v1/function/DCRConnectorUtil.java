@@ -37,9 +37,8 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_SSA_MANDATE;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.ErrorMessage.ERROR_DCR_CONFIG_SERVICE_NOT_FOUND;
 
-
 /**
- * Util class for DCR connector
+ * Util class for DCR connector.
  */
 public class DCRConnectorUtil {
 
@@ -64,8 +63,12 @@ public class DCRConnectorUtil {
 
     }
 
-    public static void setDCRConfig(DCRConfig dcrConfig) throws
-            DCRConfigException {
+    /**
+     * Set the provided DCR Configurations for the tenant.
+     * @param dcrConfig DCRConfig instance.
+     * @throws DCRConfigException DCRConfigException.
+     */
+    public static void setDCRConfig(DCRConfig dcrConfig) throws DCRConfigException {
 
         if (DCRMgtOGSiServiceFactory.getInstance() != null) {
             try {
@@ -81,7 +84,7 @@ public class DCRConnectorUtil {
         }
     }
 
-    public static DCRConfig dcrConfigurationToDCRConfig(DCRConfiguration dcrConfiguration) {
+    private static DCRConfig dcrConfigurationToDCRConfig(DCRConfiguration dcrConfiguration) {
 
         DCRConfig dcrConfig = new DCRConfig();
         dcrConfig.setAuthenticationRequired(dcrConfiguration.isAuthenticationRequired());
@@ -92,6 +95,13 @@ public class DCRConnectorUtil {
         return dcrConfig;
     }
 
+    /**
+     * Handle DCR Config Exception and return corresponding APIError.
+     * @param e Exception.
+     * @param errorEnum Error Message enum.
+     * @param data Extra data.
+     * @return APIError.
+     */
     public static APIError handleDCRConfigException(Exception e, Constants.ErrorMessage errorEnum, String data) {
 
         ErrorResponse errorResponse;
@@ -168,7 +178,7 @@ public class DCRConnectorUtil {
      * @param dcrConfig DCRConfig.
      * @return  DCRConfiguration.
      */
-    public static DCRConfiguration getDCRConfigurationFromDCRConfig (DCRConfig dcrConfig) {
+    private static DCRConfiguration getDCRConfigurationFromDCRConfig (DCRConfig dcrConfig) {
 
         DCRConfiguration dcrConfiguration = new DCRConfiguration();
         dcrConfiguration.setFAPIEnforced(dcrConfig.getEnableFapiEnforcement());
