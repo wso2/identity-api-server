@@ -153,20 +153,20 @@ public class Constants {
         /**
          * DCR Configuration errors.
          */
-        ERROR_DCR_CONFIG_SERVICE_NOT_FOUND("60509",
+        ERROR_DCR_CONFIG_SERVICE_NOT_FOUND("60515",
                 "DCR Management Service not found.",
                 "DCR Management Service is unavailable at the moment."),
 
-        ERROR_CODE_DCR_CONFIG_RETRIEVE("65018",
+        ERROR_CODE_DCR_CONFIG_RETRIEVE("60516",
                 "Unable to retrieve DCR configuration.",
                 "Server encountered an error while retrieving the " +
                         "DCR configuration."),
 
-        ERROR_CODE_DCR_CONFIG_UPDATE("65019",
+        ERROR_CODE_DCR_CONFIG_UPDATE("60517",
                 "Unable to update DCR configuration.",
                 "Server encountered an error while updating the DCR configuration."),
 
-        ERROR_CODE_DCR_CONFIG_SSA_MANDATE("650290",
+        ERROR_CODE_DCR_CONFIG_SSA_MANDATE("60518",
                 "SSA JWKS url is required to mandate SSA validation",
                 "SSA is mandated but SSA JWKS url is not configured."),
 
