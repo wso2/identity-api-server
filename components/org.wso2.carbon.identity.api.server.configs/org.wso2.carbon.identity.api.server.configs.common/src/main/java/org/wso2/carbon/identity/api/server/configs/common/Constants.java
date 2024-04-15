@@ -166,10 +166,6 @@ public class Constants {
                 "Unable to update DCR configuration.",
                 "Server encountered an error while updating the DCR configuration."),
 
-        ERROR_CODE_DCR_CONFIG_SSA_MANDATE("60518",
-                "SSA JWKS url is required to mandate SSA validation",
-                "SSA is mandated but SSA JWKS url is not configured."),
-
         /**
          * Inbound auth config error messages.
          */

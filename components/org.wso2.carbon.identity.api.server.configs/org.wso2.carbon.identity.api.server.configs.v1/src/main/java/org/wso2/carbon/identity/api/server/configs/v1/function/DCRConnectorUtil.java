@@ -34,7 +34,6 @@ import org.wso2.carbon.identity.oauth.dcr.model.DCRConfiguration;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.api.server.configs.common.Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_SSA_MANDATE;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.ErrorMessage.ERROR_DCR_CONFIG_SERVICE_NOT_FOUND;
 
 /**
@@ -75,8 +74,7 @@ public class DCRConnectorUtil {
                 DCRMgtOGSiServiceFactory.getInstance()
                         .setDCRConfiguration((getDCRConfigurationFromDCRConfig(dcrConfig)));
             } catch (DCRMException e) {
-                throw new DCRConfigClientException(ERROR_CODE_DCR_CONFIG_SSA_MANDATE.message(),
-                        ERROR_CODE_DCR_CONFIG_SSA_MANDATE.code());
+                throw new DCRConfigClientException(e.getErrorDescription(), e.getErrorCode());
             }
         } else {
             throw new DCRConfigException(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message(),
