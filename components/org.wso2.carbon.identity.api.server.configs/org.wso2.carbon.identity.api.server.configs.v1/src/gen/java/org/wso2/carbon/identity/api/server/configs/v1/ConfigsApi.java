@@ -49,7 +49,6 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
-import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
 
 import javax.validation.constraints.*;
 
