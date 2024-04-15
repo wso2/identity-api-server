@@ -85,8 +85,8 @@ public class DCRConnectorUtil {
     private static DCRConfig dcrConfigurationToDCRConfig(DCRConfiguration dcrConfiguration) {
 
         DCRConfig dcrConfig = new DCRConfig();
-        dcrConfig.setAuthenticationRequired(dcrConfiguration.isAuthenticationRequired());
-        dcrConfig.setEnableFapiEnforcement(dcrConfiguration.isFAPIEnforced());
+        dcrConfig.setAuthenticationRequired(dcrConfiguration.getAuthenticationRequired());
+        dcrConfig.setEnableFapiEnforcement(dcrConfiguration.getEnableFapiEnforcement());
         dcrConfig.setSsaJwks(dcrConfiguration.getSsaJwks());
         dcrConfig.setMandateSSA(dcrConfiguration.getMandateSSA());
 
@@ -179,7 +179,7 @@ public class DCRConnectorUtil {
     private static DCRConfiguration getDCRConfigurationFromDCRConfig (DCRConfig dcrConfig) {
 
         DCRConfiguration dcrConfiguration = new DCRConfiguration();
-        dcrConfiguration.setFAPIEnforced(dcrConfig.getEnableFapiEnforcement());
+        dcrConfiguration.setEnableFapiEnforcement(dcrConfig.getEnableFapiEnforcement());
         dcrConfiguration.setSsaJwks(dcrConfig.getSsaJwks());
         dcrConfiguration.setAuthenticationRequired(dcrConfig.getAuthenticationRequired());
         dcrConfiguration.setMandateSSA(dcrConfig.getMandateSSA());
