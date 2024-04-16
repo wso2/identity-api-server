@@ -47,7 +47,6 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Application
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplateModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesList;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationTemplatesListItem;
-import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
@@ -851,10 +850,9 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
-        AssociatedRolesConfig associatedRoles = applicationPatchModel.getAssociatedRoles();
-        if (associatedRoles != null) {
-            List<Role> listRole = associatedRoles.getRoles();
-            if (listRole.isEmpty()) {
+        if (applicationPatchModel != null && applicationPatchModel.getAssociatedRoles() != null) {
+            List<Role> listRole = applicationPatchModel.getAssociatedRoles().getRoles();
+            if (!listRole.isEmpty()) {
                 throw buildClientError(ErrorMessage.INVALID_ROLE_ASSOCIATION_FOR_ORGANIZATION_AUDIENCE);
             }
         }
