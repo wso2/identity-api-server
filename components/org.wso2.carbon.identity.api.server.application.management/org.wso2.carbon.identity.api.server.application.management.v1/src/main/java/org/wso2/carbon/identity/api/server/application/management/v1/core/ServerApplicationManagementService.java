@@ -61,6 +61,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConne
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApplication;
+import org.wso2.carbon.identity.api.server.application.management.v1.Role;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
@@ -219,8 +220,8 @@ public class ServerApplicationManagementService {
     private static final String[] VALID_MEDIA_TYPES_XML = {"application/xml", "text/xml"};
     private static final String[] VALID_MEDIA_TYPES_YAML = {"application/yaml", "text/yaml", "application/x-yaml"};
     private static final String[] VALID_MEDIA_TYPES_JSON = {"application/json", "text/json"};
-    private static final Class<?>[] INBOUND_CONFIG_PROTOCOLS = new Class<?>[] {ServiceProvider.class,
-                                                                SAMLSSOServiceProviderDTO.class, OAuthAppDO.class};
+    private static final Class<?>[] INBOUND_CONFIG_PROTOCOLS = new Class<?>[]{ServiceProvider.class,
+            SAMLSSOServiceProviderDTO.class, OAuthAppDO.class};
 
     static {
         SUPPORTED_FILTER_ATTRIBUTES.add(NAME);
@@ -800,7 +801,7 @@ public class ServerApplicationManagementService {
         try {
             ApplicationDTO applicationDTO = new ApiModelToServiceProvider().apply(applicationModel);
             applicationId = getApplicationManagementService().createApplication(applicationDTO, tenantDomain, username);
-            
+
             // Update owner for B2B Self Service applications.
             if (applicationDTO.getServiceProvider().isB2BSelfServiceApp()) {
                 String systemUserID = org.wso2.carbon.identity.organization.management.service.util.Utils
@@ -849,6 +850,12 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
+        if (applicationPatchModel != null && applicationPatchModel.getAssociatedRoles() != null) {
+            List<Role> listRole = applicationPatchModel.getAssociatedRoles().getRoles();
+            if (!listRole.isEmpty()) {
+                throw buildClientError(ErrorMessage.INVALID_ROLE_ASSOCIATION_FOR_ORGANIZATION_AUDIENCE);
+            }
+        }
 
         // Validate whether application-based outbound provisioning support is enabled.
         if (applicationPatchModel != null && applicationPatchModel.getProvisioningConfigurations() != null &&
@@ -1125,7 +1132,7 @@ public class ServerApplicationManagementService {
     /**
      * Check updating system application allowed or not.
      *
-     * @param appName application name
+     * @param appName               application name
      * @param applicationPatchModel application patch model
      * @return true if allowed
      */
@@ -1721,21 +1728,21 @@ public class ServerApplicationManagementService {
             throw error;
         }
     }
-    
+
     /**
      * Create or replace the provided inbound configuration.
      *
-     * @param applicationId     Resource id of the app.
-     * @param inboundApiModel   Inbound API model to be created or replaced.
-     * @param getInboundDTO     A function that takes the inbound API model and application as input and provides the
-     *                          InboundProtocolConfigurationDTO that matches with the protocol.
+     * @param applicationId   Resource id of the app.
+     * @param inboundApiModel Inbound API model to be created or replaced.
+     * @param getInboundDTO   A function that takes the inbound API model and application as input and provides the
+     *                        InboundProtocolConfigurationDTO that matches with the protocol.
      */
     private <I> void putApplicationInbound(String applicationId, I inboundApiModel, BiFunction<ServiceProvider, I,
             InboundProtocolConfigurationDTO> getInboundDTO) {
-        
+
         // We need a cloned copy of the Service Provider so that we changes we do not make cache dirty.
         ServiceProvider application = cloneApplication(applicationId);
-        
+
         // Update the service provider with the inbound configuration.
         InboundProtocolConfigurationDTO inboundDTO = getInboundDTO.apply(application, inboundApiModel);
         try {
@@ -1769,11 +1776,11 @@ public class ServerApplicationManagementService {
     }
 
     private void updateServiceProvider(String applicationId, ServiceProvider updatedApplication) {
-        
+
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String username = ContextLoader.getUsernameFromContext();
-            
+
             // Inbound auth config details are already added to the service provider. Therefore we don't need to pass
             // the inboundDTO information here.
             getApplicationManagementService().updateApplicationByResourceId(
@@ -1783,14 +1790,14 @@ public class ServerApplicationManagementService {
             throw handleIdentityApplicationManagementException(e, msg);
         }
     }
-    
+
     private void updateServiceProvider(String applicationId, ServiceProvider updatedApplication,
                                        InboundProtocolConfigurationDTO inboundDTO) {
-        
+
         try {
             String tenantDomain = ContextLoader.getTenantDomainFromContext();
             String username = ContextLoader.getUsernameFromContext();
-            
+
             getApplicationManagementService().updateApplicationByResourceId(
                     applicationId, updatedApplication, inboundDTO, tenantDomain, username);
         } catch (IdentityApplicationManagementException e) {
