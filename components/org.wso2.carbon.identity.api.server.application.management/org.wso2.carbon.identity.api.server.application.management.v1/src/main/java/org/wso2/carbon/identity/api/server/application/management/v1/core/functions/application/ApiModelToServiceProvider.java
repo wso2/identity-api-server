@@ -19,6 +19,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
+import org.wso2.carbon.identity.api.server.application.management.v1.AssociatedRolesConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthenticationSequence;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocols;
@@ -55,6 +56,7 @@ public class ApiModelToServiceProvider implements ModelToDTO<ApplicationModel, A
         addClaimConfigurationToApplication(application, applicationModel.getClaimConfiguration());
         addAuthenticationSequence(application, applicationModel.getAuthenticationSequence());
         addProvisioningConfiguration(application, applicationModel.getProvisioningConfigurations());
+        addAssociatedRolesConfigurations(application, applicationModel.getAssociatedRoles());
 
         ApplicationDTO.Builder applicationDTOBuilder = new ApplicationDTO.Builder();
         applicationDTOBuilder.serviceProvider(application);
@@ -73,6 +75,13 @@ public class ApiModelToServiceProvider implements ModelToDTO<ApplicationModel, A
 
         if (inboundProtocolsModel != null) {
             new UpdateInboundProtocols().apply(application, inboundProtocolsModel);
+        }
+    }
+
+    private void addAssociatedRolesConfigurations(ServiceProvider application, AssociatedRolesConfig associatedRoles) {
+
+        if (associatedRoles != null) {
+            new UpdateAssociatedRoles().apply(application, associatedRoles);
         }
     }
 
