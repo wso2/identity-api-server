@@ -126,6 +126,7 @@ import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceCli
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSOrigin;
 import org.wso2.carbon.identity.oauth.dao.OAuthAppDO;
+import org.wso2.carbon.identity.role.v2.mgt.core.RoleConstants;
 import org.wso2.carbon.identity.sso.saml.dto.SAMLSSOServiceProviderDTO;
 import org.wso2.carbon.identity.template.mgt.TemplateManager;
 import org.wso2.carbon.identity.template.mgt.TemplateMgtConstants;
@@ -850,12 +851,7 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
-        if (applicationPatchModel != null && applicationPatchModel.getAssociatedRoles() != null) {
-            List<Role> listRole = applicationPatchModel.getAssociatedRoles().getRoles();
-            if (!listRole.isEmpty()) {
-                throw buildClientError(ErrorMessage.INVALID_ROLE_ASSOCIATION_FOR_ORGANIZATION_AUDIENCE);
-            }
-        }
+        restrictRoleAssociationUpdateInOrgAudience(applicationId, applicationPatchModel);
 
         // Validate whether application-based outbound provisioning support is enabled.
         if (applicationPatchModel != null && applicationPatchModel.getProvisioningConfigurations() != null &&
@@ -887,6 +883,22 @@ public class ServerApplicationManagementService {
         } finally {
             if (isAllowUpdateSystemApps) {
                 IdentityApplicationManagementUtil.removeAllowUpdateSystemApplicationThreadLocal();
+            }
+        }
+    }
+
+    private void restrictRoleAssociationUpdateInOrgAudience(String applicationId,
+                                                            ApplicationPatchModel applicationPatchModel) {
+
+        ServiceProvider application = getServiceProvider(applicationId);
+        String allowedAudience = application.getAssociatedRolesConfig().getAllowedAudience();
+        if (RoleConstants.ORGANIZATION.equals(allowedAudience)) {
+            ApplicationPatchModel patchModel = applicationPatchModel;
+            if (patchModel != null && patchModel.getAssociatedRoles() != null) {
+                List<Role> associatedRoles = patchModel.getAssociatedRoles().getRoles();
+                if (!associatedRoles.isEmpty()) {
+                    throw buildClientError(ErrorMessage.INVALID_ROLE_ASSOCIATION_FOR_ORGANIZATION_AUDIENCE);
+                }
             }
         }
     }
