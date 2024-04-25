@@ -196,6 +196,7 @@ import static org.wso2.carbon.identity.application.common.util.IdentityApplicati
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.Error.UNEXPECTED_SERVER_ERROR;
 import static org.wso2.carbon.identity.configuration.mgt.core.search.constant.ConditionType.PrimitiveOperator.EQUALS;
 import static org.wso2.carbon.identity.cors.mgt.core.constant.ErrorMessages.ERROR_CODE_INVALID_APP_ID;
+import static org.wso2.carbon.identity.organization.management.service.util.Utils.isLegacyAuthzRuntime;
 
 /**
  * Calls internal osgi services to perform server application management related operations.
@@ -851,7 +852,9 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
-        restrictRoleAssociationUpdateInOrgAudience(applicationId, applicationPatchModel);
+        if (!isLegacyAuthzRuntime()) {
+            restrictRoleAssociationUpdateInOrgAudience(applicationId, applicationPatchModel);
+        }
 
         // Validate whether application-based outbound provisioning support is enabled.
         if (applicationPatchModel != null && applicationPatchModel.getProvisioningConfigurations() != null &&
