@@ -899,7 +899,7 @@ public class ServerApplicationManagementService {
             ApplicationPatchModel patchModel = applicationPatchModel;
             if (patchModel != null && patchModel.getAssociatedRoles() != null) {
                 List<Role> associatedRoles = patchModel.getAssociatedRoles().getRoles();
-                if (!associatedRoles.isEmpty()) {
+                if (associatedRoles != null && !associatedRoles.isEmpty()) {
                     throw buildClientError(ErrorMessage.INVALID_ROLE_ASSOCIATION_FOR_ORGANIZATION_AUDIENCE);
                 }
             }
