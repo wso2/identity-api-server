@@ -36,7 +36,7 @@ public class UpdateAssociatedRoles implements UpdateFunction<ServiceProvider, As
 
         org.wso2.carbon.identity.application.common.model.AssociatedRolesConfig rolesConfig =
                 new org.wso2.carbon.identity.application.common.model.AssociatedRolesConfig();
-        if (associatedRolesConfig != null) {
+        if (associatedRolesConfig != null && associatedRolesConfig.getRoles() != null) {
             rolesConfig.setAllowedAudience(associatedRolesConfig.getAllowedAudience().toString());
             List<org.wso2.carbon.identity.application.common.model.RoleV2> listOfRoles =
                     associatedRolesConfig.getRoles().stream()
