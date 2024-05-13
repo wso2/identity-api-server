@@ -31,7 +31,7 @@ import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 public class DCRMgtOGSiServiceFactory {
 
     private static DCRConfigurationMgtService dcrConfigurationMgtService = null;
-    private static final Log log = LogFactory.getLog(DCRMgtOGSiServiceFactory.class);
+    private static final Log LOG = LogFactory.getLog(DCRMgtOGSiServiceFactory.class);
 
     /**
      * This method return  the instance if the OSGi service exists.
@@ -60,7 +60,7 @@ public class DCRMgtOGSiServiceFactory {
             } catch (NullPointerException | ClassNotFoundException  e) {
                 /* Catch block without implementation so that the DCRConfigurationMgtService will be set to null
                    in-turn helps in validating the rest API requests. */
-                log.debug("Unable to find the DCRConfigurationMgtService. " +
+                LOG.debug("Unable to find the DCRConfigurationMgtService. " +
                         "DCRConfigurationMgtService is not available in the server.");
             }
         }

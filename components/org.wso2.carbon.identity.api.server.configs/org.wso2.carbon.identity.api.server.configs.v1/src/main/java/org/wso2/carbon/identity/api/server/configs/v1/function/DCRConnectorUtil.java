@@ -41,7 +41,7 @@ import static org.wso2.carbon.identity.api.server.configs.common.Constants.Error
  */
 public class DCRConnectorUtil {
 
-    private static final Log log = LogFactory.getLog(DCRConnectorUtil.class);
+    private static final Log LOG = LogFactory.getLog(DCRConnectorUtil.class);
 
     /**
      * Get the DCRConfig from the DCRConfiguration for said tenant domain.
@@ -108,7 +108,7 @@ public class DCRConnectorUtil {
 
         if (e instanceof DCRConfigClientException) {
             DCRConfigClientException exception = (DCRConfigClientException) e;
-            errorResponse = getErrorBuilder(errorEnum, data).build(log, exception.getMessage());
+            errorResponse = getErrorBuilder(errorEnum, data).build(LOG, exception.getMessage());
             if (exception.getErrorCode() != null) {
                 String errorCode = exception.getErrorCode();
                 errorCode =
@@ -121,7 +121,7 @@ public class DCRConnectorUtil {
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof DCRConfigServerException) {
             DCRConfigServerException exception = (DCRConfigServerException) e;
-            errorResponse = getErrorBuilder(errorEnum, data).build(log, exception, errorEnum.description());
+            errorResponse = getErrorBuilder(errorEnum, data).build(LOG, exception, errorEnum.description());
             if (exception.getErrorCode() != null) {
                 String errorCode = exception.getErrorCode();
                 errorCode =
@@ -133,7 +133,7 @@ public class DCRConnectorUtil {
             errorResponse.setDescription(exception.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
-            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+            errorResponse = getErrorBuilder(errorEnum, data).build(LOG, e, errorEnum.description());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
 
