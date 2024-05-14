@@ -18,6 +18,7 @@ package org.wso2.carbon.identity.api.server.configs.common;
 
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
+import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
 
@@ -32,6 +33,7 @@ public class ConfigsServiceHolder {
     private IdentityProviderManager identityProviderManager;
     private CORSManagementService corsManagementService;
     private RemoteLoggingConfigService remoteLoggingConfigService;
+    private DCRConfigurationMgtService dcrConfigurationMgtService;
 
     private ConfigsServiceHolder() {}
 
@@ -117,5 +119,24 @@ public class ConfigsServiceHolder {
     public void setRemoteLoggingConfigService(RemoteLoggingConfigService remoteLoggingConfigService) {
 
         ConfigsServiceHolder.getInstance().remoteLoggingConfigService = remoteLoggingConfigService;
+    }
+
+    /**
+     * Get DCRConfigurationMgtService osgi service.
+     *
+     * @return DCRConfigurationMgtService
+     */
+    public DCRConfigurationMgtService getDcrConfigurationMgtService() {
+
+        return ConfigsServiceHolder.getInstance().dcrConfigurationMgtService;
+    }
+    /**
+     * Set DCRConfigurationMgtService osgi service.
+     *
+     * @param dcrConfigurationMgtService DCRConfigurationMgtService.
+     */
+    public void setDcrConfigurationMgtService(DCRConfigurationMgtService dcrConfigurationMgtService) {
+
+        ConfigsServiceHolder.getInstance().dcrConfigurationMgtService = dcrConfigurationMgtService;
     }
 }

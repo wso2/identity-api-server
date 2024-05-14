@@ -35,7 +35,6 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
-import org.wso2.carbon.identity.api.server.configs.common.factory.DCRMgtOGSiServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.common.factory.JWTAuthenticationMgtOGSiServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigException;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthenticatorException;
@@ -83,6 +82,7 @@ import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceCli
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceException;
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
+import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
@@ -110,7 +110,6 @@ import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.CONFIGS_AUTHENTICATOR_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.CONFIGS_SCHEMAS_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.configs.common.Constants.ErrorMessage.ERROR_DCR_CONFIG_SERVICE_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.ErrorMessage.ERROR_JWT_AUTHENTICATOR_SERVICE_NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_SEPERATOR;
 
@@ -1171,21 +1170,11 @@ public class ServerConfigManagementService {
     public DCRConfig getDCRConfiguration() {
 
         try {
-            if (DCRMgtOGSiServiceFactory.getInstance() != null) {
 
-                return DCRConnectorUtil.getDCRConfig();
-            }
-            throw new DCRConfigException(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message(),
-                    ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.code());
-
-        } catch (Exception e) {
-            if (ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message().equals(e.getMessage())) {
-                throw handleNotFoundError(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND);
-            } else {
-                throw DCRConnectorUtil.handleDCRConfigException(e,
-                        Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_RETRIEVE,
-                        null);
-            }
+            return DCRConnectorUtil.getDCRConfig();
+        } catch (DCRMException e) {
+            throw DCRConnectorUtil.handleDCRConfigException(e, Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_RETRIEVE,
+                    null);
         }
     }
 
@@ -1204,14 +1193,9 @@ public class ServerConfigManagementService {
         try {
             dcrConfig = DCRConnectorUtil.getDCRConfig();
         } catch (Exception e) {
-            if (e.getMessage().equals(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message())) {
-                throw handleNotFoundError(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND);
-            } else {
-                throw DCRConnectorUtil.handleDCRConfigException(e,
-                        Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_RETRIEVE, null);
-            }
+            throw DCRConnectorUtil.handleDCRConfigException(e,
+                    Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_RETRIEVE, null);
         }
-
 
             for (DCRPatch dcrPatch : dcrPatchList) {
                 String path = dcrPatch.getPath();

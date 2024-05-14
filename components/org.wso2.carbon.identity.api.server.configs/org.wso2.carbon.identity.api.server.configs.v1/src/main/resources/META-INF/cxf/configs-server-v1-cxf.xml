@@ -26,12 +26,15 @@
           class="org.wso2.carbon.identity.api.server.configs.common.factory.CORSMgtOGSiServiceFactory"/>
     <bean id="RemoteLoggingOGSiServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.configs.common.factory.RemoteLoggingOGSiServiceFactory"/>
+    <bean id="DCRMgtOGSiServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.configs.common.factory.DCRMgtOGSiServiceFactory"/>
     <bean id="ConfigsServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder">
         <property name="applicationManagementService" ref="ApplicationMgtServiceFactoryBean"/>
         <property name="identityProviderManager" ref="IdPMgtServiceFactoryBean"/>
         <property name="corsManagementService" ref="CORSMgtServiceFactoryBean"/>
         <property name="remoteLoggingConfigService" ref="RemoteLoggingOGSiServiceFactoryBean"/>
+        <property name="dcrConfigurationMgtService" ref="DCRMgtOGSiServiceFactoryBean"/>
     </bean>
 </beans>
 

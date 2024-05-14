@@ -18,53 +18,36 @@
 
 package org.wso2.carbon.identity.api.server.configs.common.factory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 
 /**
- * Since this factory produces DCRConfigurationMgtService connector service,  there is a possibility that said
- * connector not available in the distribution.
- * So rather than designing as Factory Beans this class designed as Singleton.
+ * Factory Beans serves as a factory for creating other beans within the IOC container. This factory bean is used to
+ * instantiate the DCRConfigurationMgtService type of object inside the container.
  */
-public class DCRMgtOGSiServiceFactory {
+public class DCRMgtOGSiServiceFactory extends AbstractFactoryBean<DCRConfigurationMgtService>  {
 
-    private static DCRConfigurationMgtService dcrConfigurationMgtService = null;
-    private static final Log LOG = LogFactory.getLog(DCRMgtOGSiServiceFactory.class);
+    private DCRConfigurationMgtService dcrConfigurationMgtService;
 
-    /**
-     * This method return  the instance if the OSGi service exists.
-     * Else throw Null pointer Exception. We handle the exception gracefully.
-     *
-     * @return DCRConfigurationMgtService
-     */
-    public static DCRConfigurationMgtService getInstance() {
+    @Override
+    public Class<?> getObjectType() {
 
-        if (dcrConfigurationMgtService == null) {
-            /* Try catch statement is included due to a  NullPointerException which occurs at the server startup and
-            runtime when the DCRConfigurationMgtService is not available in the product. */
+        return Object.class;
+    }
 
-            try {
-                // Call class for name to check the class is available in the run time.
-                // This method will call only once at the first api call.
-                Class.forName("org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService");
-                DCRConfigurationMgtService taskOperationService
-                        = (DCRConfigurationMgtService) PrivilegedCarbonContext.
-                        getThreadLocalCarbonContext().getOSGiService
-                                (DCRConfigurationMgtService.class, null);
-                if (taskOperationService != null) {
-                    dcrConfigurationMgtService = taskOperationService;
-                }
+    @Override
+    protected DCRConfigurationMgtService createInstance() throws Exception {
 
-            } catch (NullPointerException | ClassNotFoundException  e) {
-                /* Catch block without implementation so that the DCRConfigurationMgtService will be set to null
-                   in-turn helps in validating the rest API requests. */
-                LOG.debug("Unable to find the DCRConfigurationMgtService. " +
-                        "DCRConfigurationMgtService is not available in the server.");
+        if (this.dcrConfigurationMgtService == null) {
+            DCRConfigurationMgtService taskOperationService = (DCRConfigurationMgtService) PrivilegedCarbonContext.
+                    getThreadLocalCarbonContext().getOSGiService(DCRConfigurationMgtService.class, null);
+            if (taskOperationService != null) {
+                this.dcrConfigurationMgtService = taskOperationService;
+            } else {
+                throw new Exception("Unable to retrieve DCRConfigurationMgtService service.");
             }
         }
-
-        return dcrConfigurationMgtService;
+        return this.dcrConfigurationMgtService;
     }
 }

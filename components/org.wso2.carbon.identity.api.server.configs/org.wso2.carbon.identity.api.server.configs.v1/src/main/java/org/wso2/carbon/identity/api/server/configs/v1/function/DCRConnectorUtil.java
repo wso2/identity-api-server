@@ -23,8 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
-import org.wso2.carbon.identity.api.server.configs.common.factory.DCRMgtOGSiServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigClientException;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigException;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigServerException;
@@ -33,8 +33,6 @@ import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
 import org.wso2.carbon.identity.oauth.dcr.model.DCRConfiguration;
 
 import javax.ws.rs.core.Response;
-
-import static org.wso2.carbon.identity.api.server.configs.common.Constants.ErrorMessage.ERROR_DCR_CONFIG_SERVICE_NOT_FOUND;
 
 /**
  * Util class for DCR connector.
@@ -49,16 +47,12 @@ public class DCRConnectorUtil {
      * @return DCRConfig.
      * @throws DCRMException DCRMException.
      */
-    public static DCRConfig getDCRConfig() throws DCRMException, DCRConfigException {
+    public static DCRConfig getDCRConfig() throws DCRMException {
 
-        if (DCRMgtOGSiServiceFactory.getInstance() != null) {
-            DCRConfiguration dcrConfiguration = DCRMgtOGSiServiceFactory.getInstance()
-                    .getDCRConfiguration();
-            return dcrConfigurationToDCRConfig(dcrConfiguration);
-        } else {
-            throw new DCRConfigException(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message(),
-                    ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.code());
-        }
+        DCRConfiguration dcrConfiguration = ConfigsServiceHolder.getInstance().getDcrConfigurationMgtService()
+                .getDCRConfiguration();
+
+        return dcrConfigurationToDCRConfig(dcrConfiguration);
 
     }
 
@@ -69,16 +63,11 @@ public class DCRConnectorUtil {
      */
     public static void setDCRConfig(DCRConfig dcrConfig) throws DCRConfigException {
 
-        if (DCRMgtOGSiServiceFactory.getInstance() != null) {
-            try {
-                DCRMgtOGSiServiceFactory.getInstance()
-                        .setDCRConfiguration((getDCRConfigurationFromDCRConfig(dcrConfig)));
-            } catch (DCRMException e) {
-                throw new DCRConfigClientException(e.getErrorDescription(), e.getErrorCode());
-            }
-        } else {
-            throw new DCRConfigException(ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.message(),
-                    ERROR_DCR_CONFIG_SERVICE_NOT_FOUND.code());
+        try {
+            ConfigsServiceHolder.getInstance().getDcrConfigurationMgtService()
+                    .setDCRConfiguration((getDCRConfigurationFromDCRConfig(dcrConfig)));
+        } catch (DCRMException e) {
+            throw new DCRConfigClientException(e.getErrorDescription(), e.getErrorCode());
         }
     }
 

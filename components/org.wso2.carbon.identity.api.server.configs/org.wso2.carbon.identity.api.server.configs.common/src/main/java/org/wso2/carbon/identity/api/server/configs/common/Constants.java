@@ -153,9 +153,6 @@ public class Constants {
         /**
          * DCR Configuration errors.
          */
-        ERROR_DCR_CONFIG_SERVICE_NOT_FOUND("60515",
-                "DCR Management Service not found.",
-                "DCR Management Service is unavailable at the moment."),
 
         ERROR_CODE_DCR_CONFIG_RETRIEVE("60516",
                 "Unable to retrieve DCR configuration.",
