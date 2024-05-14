@@ -36,7 +36,6 @@ import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.common.SchemaConfigParser;
 import org.wso2.carbon.identity.api.server.configs.common.factory.JWTAuthenticationMgtOGSiServiceFactory;
-import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigException;
 import org.wso2.carbon.identity.api.server.configs.v1.exception.JWTClientAuthenticatorException;
 import org.wso2.carbon.identity.api.server.configs.v1.function.CORSConfigurationToCORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.function.DCRConnectorUtil;
@@ -1192,7 +1191,7 @@ public class ServerConfigManagementService {
         DCRConfig dcrConfig = null;
         try {
             dcrConfig = DCRConnectorUtil.getDCRConfig();
-        } catch (Exception e) {
+        } catch (DCRMException e) {
             throw DCRConnectorUtil.handleDCRConfigException(e,
                     Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_RETRIEVE, null);
         }
@@ -1251,7 +1250,7 @@ public class ServerConfigManagementService {
             // Set the patched configuration object as the new DCR configuration for the tenant.
         try {
             DCRConnectorUtil.setDCRConfig(dcrConfig);
-        } catch (DCRConfigException e) {
+        } catch (DCRMException e) {
             throw DCRConnectorUtil.handleDCRConfigException(e,
                     Constants.ErrorMessage.ERROR_CODE_DCR_CONFIG_UPDATE, e.getMessage());
         }

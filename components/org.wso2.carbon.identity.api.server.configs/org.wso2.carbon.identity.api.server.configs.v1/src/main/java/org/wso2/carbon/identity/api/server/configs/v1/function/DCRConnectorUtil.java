@@ -25,11 +25,10 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
-import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigClientException;
-import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigException;
-import org.wso2.carbon.identity.api.server.configs.v1.exception.DCRConfigServerException;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
+import org.wso2.carbon.identity.oauth.dcr.exception.DCRMClientException;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
+import org.wso2.carbon.identity.oauth.dcr.exception.DCRMServerException;
 import org.wso2.carbon.identity.oauth.dcr.model.DCRConfiguration;
 
 import javax.ws.rs.core.Response;
@@ -59,16 +58,12 @@ public class DCRConnectorUtil {
     /**
      * Set the provided DCR Configurations for the tenant.
      * @param dcrConfig DCRConfig instance.
-     * @throws DCRConfigException DCRConfigException.
+     * @throws DCRMException DCRMException.
      */
-    public static void setDCRConfig(DCRConfig dcrConfig) throws DCRConfigException {
+    public static void setDCRConfig(DCRConfig dcrConfig) throws DCRMException {
 
-        try {
-            ConfigsServiceHolder.getInstance().getDcrConfigurationMgtService()
-                    .setDCRConfiguration((getDCRConfigurationFromDCRConfig(dcrConfig)));
-        } catch (DCRMException e) {
-            throw new DCRConfigClientException(e.getErrorDescription(), e.getErrorCode());
-        }
+        ConfigsServiceHolder.getInstance().getDcrConfigurationMgtService()
+                .setDCRConfiguration((getDCRConfigurationFromDCRConfig(dcrConfig)));
     }
 
     private static DCRConfig dcrConfigurationToDCRConfig(DCRConfiguration dcrConfiguration) {
@@ -95,8 +90,8 @@ public class DCRConnectorUtil {
 
         Response.Status status;
 
-        if (e instanceof DCRConfigClientException) {
-            DCRConfigClientException exception = (DCRConfigClientException) e;
+        if (e instanceof DCRMClientException) {
+            DCRMClientException exception = (DCRMClientException) e;
             errorResponse = getErrorBuilder(errorEnum, data).build(LOG, exception.getMessage());
             if (exception.getErrorCode() != null) {
                 String errorCode = exception.getErrorCode();
@@ -108,8 +103,8 @@ public class DCRConnectorUtil {
             }
             errorResponse.setDescription(exception.getMessage());
             status = Response.Status.BAD_REQUEST;
-        } else if (e instanceof DCRConfigServerException) {
-            DCRConfigServerException exception = (DCRConfigServerException) e;
+        } else if (e instanceof DCRMServerException) {
+            DCRMServerException exception = (DCRMServerException) e;
             errorResponse = getErrorBuilder(errorEnum, data).build(LOG, exception, errorEnum.description());
             if (exception.getErrorCode() != null) {
                 String errorCode = exception.getErrorCode();
