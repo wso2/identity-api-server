@@ -102,6 +102,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private static final Set<String> systemApplications = ApplicationManagementServiceHolder
             .getApplicationManagementService().getSystemApplications();
     private static final String IS_FRAGMENT_APP = "isFragmentApp";
+    private static final String APPLICATION_ACCESS_ENABLED = "applicationAccessEnabled";
     private static final String useUserIdForDefaultSubject = "useUserIdForDefaultSubject";
 
     @Override
@@ -446,6 +447,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         return new AdvancedApplicationConfiguration()
                 .saas(serviceProvider.isSaasApp())
+                .applicationAccessEnabled(serviceProvider.isApplicationAccessEnabled())
                 .discoverableByEndUsers(serviceProvider.isDiscoverable())
                 .enableAuthorization(authConfig.isEnableAuthorization())
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
@@ -521,6 +523,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         spPropertyList.removeIf(property -> TEMPLATE_ID_SP_PROPERTY_NAME.equals(property.getName()));
         spPropertyList.removeIf(property -> IS_MANAGEMENT_APP_SP_PROPERTY_NAME.equals(property.getName()));
         spPropertyList.removeIf(property -> IS_ATTESTATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
+        spPropertyList.removeIf(property -> APPLICATION_ACCESS_ENABLED.equals(property.getName()));
         spPropertyList.removeIf(property ->
                 IS_API_BASED_AUTHENTICATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
         spPropertyList.removeIf(property ->

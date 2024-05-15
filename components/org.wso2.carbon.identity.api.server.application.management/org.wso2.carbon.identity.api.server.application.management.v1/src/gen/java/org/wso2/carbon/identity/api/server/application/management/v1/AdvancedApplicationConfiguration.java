@@ -40,6 +40,7 @@ public class AdvancedApplicationConfiguration  {
     private Boolean saas;
     private Boolean discoverableByEndUsers;
     private Certificate certificate;
+    private Boolean applicationAccessEnabled;
     private Boolean skipLoginConsent;
     private Boolean skipLogoutConsent;
     private Boolean returnAuthenticatedIdpList;
@@ -104,6 +105,26 @@ public class AdvancedApplicationConfiguration  {
     }
     public void setCertificate(Certificate certificate) {
         this.certificate = certificate;
+    }
+
+    /**
+    * Decides whether the application can be accessed.
+    **/
+    public AdvancedApplicationConfiguration applicationAccessEnabled(Boolean applicationAccessEnabled) {
+
+        this.applicationAccessEnabled = applicationAccessEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "Decides whether the application can be accessed.")
+    @JsonProperty("applicationAccessEnabled")
+    @Valid
+    public Boolean getApplicationAccessEnabled() {
+        return applicationAccessEnabled;
+    }
+
+    public void setApplicationAccessEnabled(Boolean applicationAccessEnabled) {
+        this.applicationAccessEnabled = applicationAccessEnabled;
     }
 
     /**
@@ -298,6 +319,7 @@ public class AdvancedApplicationConfiguration  {
         return Objects.equals(this.saas, advancedApplicationConfiguration.saas) &&
             Objects.equals(this.discoverableByEndUsers, advancedApplicationConfiguration.discoverableByEndUsers) &&
             Objects.equals(this.certificate, advancedApplicationConfiguration.certificate) &&
+            Objects.equals(this.applicationAccessEnabled, advancedApplicationConfiguration.applicationAccessEnabled) &&
             Objects.equals(this.skipLoginConsent, advancedApplicationConfiguration.skipLoginConsent) &&
             Objects.equals(this.skipLogoutConsent, advancedApplicationConfiguration.skipLogoutConsent) &&
             Objects.equals(this.useExternalConsentPage, advancedApplicationConfiguration.useExternalConsentPage) &&
@@ -311,7 +333,7 @@ public class AdvancedApplicationConfiguration  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, useExternalConsentPage, returnAuthenticatedIdpList, enableAuthorization, fragment, enableAPIBasedAuthentication, attestationMetaData, additionalSpProperties);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, applicationAccessEnabled, skipLoginConsent, skipLogoutConsent, useExternalConsentPage, returnAuthenticatedIdpList, enableAuthorization, fragment, enableAPIBasedAuthentication, attestationMetaData, additionalSpProperties);
     }
 
     @Override
@@ -323,6 +345,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    saas: ").append(toIndentedString(saas)).append("\n");
         sb.append("    discoverableByEndUsers: ").append(toIndentedString(discoverableByEndUsers)).append("\n");
         sb.append("    certificate: ").append(toIndentedString(certificate)).append("\n");
+        sb.append("    applicationAccessEnabled: ").append(toIndentedString(applicationAccessEnabled)).append("\n");
         sb.append("    skipLoginConsent: ").append(toIndentedString(skipLoginConsent)).append("\n");
         sb.append("    skipLogoutConsent: ").append(toIndentedString(skipLogoutConsent)).append("\n");
         sb.append("    useExternalConsentPage: ").append(toIndentedString(useExternalConsentPage)).append("\n");

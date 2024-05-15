@@ -3061,6 +3061,10 @@ components:
           description: Decides whether the application is visible for end users.
         certificate:
           $ref: '#/components/schemas/Certificate'
+        applicationAccessEnabled:
+          type: boolean
+          example: true
+          description: Decides whether the application can be accessed.
         skipLoginConsent:
           type: boolean
           example: false
