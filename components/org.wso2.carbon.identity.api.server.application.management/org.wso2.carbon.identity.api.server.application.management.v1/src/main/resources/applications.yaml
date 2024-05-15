@@ -3561,6 +3561,8 @@ components:
           $ref: '#/components/schemas/AccessTokenConfiguration'
         refreshToken:
           $ref: '#/components/schemas/RefreshTokenConfiguration'
+        subjectToken:
+          $ref: '#/components/schemas/SubjectTokenConfiguration'
         idToken:
           $ref: '#/components/schemas/IdTokenConfiguration'
         logout:
@@ -3637,6 +3639,15 @@ components:
           description: Decides whether the refresh token needs to be renewed during refresh grant flow.
           type: boolean
           example: true
+    SubjectTokenConfiguration:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          description: "If enabled, subject token can be issued for token exchange grant type."
+        applicationSubjectTokenExpiryInSeconds:
+          type: integer
+          example: 3600
     IdTokenConfiguration:
       type: object
       properties:

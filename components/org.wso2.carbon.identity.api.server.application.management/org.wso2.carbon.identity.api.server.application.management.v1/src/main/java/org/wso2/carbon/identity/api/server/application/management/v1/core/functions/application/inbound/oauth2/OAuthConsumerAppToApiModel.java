@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RefreshToke
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectEncryptionConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SubjectTokenConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.util.ArrayList;
@@ -63,7 +64,8 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .requestObject(buildRequestObjectConfiguration(oauthAppDTO))
                 .pushAuthorizationRequest(buildPARAuthenticationConfiguration(oauthAppDTO))
                 .subject(buildSubjectConfiguration(oauthAppDTO))
-                .isFAPIApplication(oauthAppDTO.isFapiConformanceEnabled());
+                .isFAPIApplication(oauthAppDTO.isFapiConformanceEnabled())
+                .subjectToken(buildSubjectTokenConfiguration(oauthAppDTO));
     }
 
     private List<String> getScopeValidators(OAuthConsumerAppDTO oauthAppDTO) {
@@ -200,5 +202,12 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         return new SubjectConfiguration()
                 .subjectType(oAuthConsumerAppDTO.getSubjectType())
                 .sectorIdentifierUri(oAuthConsumerAppDTO.getSectorIdentifierURI());
+    }
+
+    private SubjectTokenConfiguration buildSubjectTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+
+        return new SubjectTokenConfiguration()
+                .enable(oAuthConsumerAppDTO.isSubjectTokenEnabled())
+                .applicationSubjectTokenExpiryInSeconds(oAuthConsumerAppDTO.getSubjectTokenExpiryTime());
     }
 }
