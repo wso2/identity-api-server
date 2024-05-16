@@ -2870,6 +2870,11 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to for B2B self service
+        applicationEnabled:
+          default: true
+          type: boolean
+          example: true
+          description: Decides whether the application is enabled.
         associatedRoles:
           $ref: '#/components/schemas/AssociatedRolesConfig'
         claimConfiguration:
@@ -2926,6 +2931,10 @@ components:
           type: boolean
           example: false
           description: Decides whether the application used to for B2B self service
+        applicationEnabled:
+          type: boolean
+          example: true
+          description: Decides whether the application is enabled.
         associatedRoles:
           $ref: '#/components/schemas/AssociatedRolesConfig'
         claimConfiguration:
@@ -2966,6 +2975,10 @@ components:
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
+        applicationEnabled:
+          type: boolean
+          example: true
+          description: Decides whether the application is enabled.
         associatedRoles:
           $ref: '#/components/schemas/AssociatedRolesConfig'
         claimConfiguration:
@@ -3061,10 +3074,6 @@ components:
           description: Decides whether the application is visible for end users.
         certificate:
           $ref: '#/components/schemas/Certificate'
-        applicationAccessEnabled:
-          type: boolean
-          example: true
-          description: Decides whether the application can be accessed.
         skipLoginConsent:
           type: boolean
           example: false

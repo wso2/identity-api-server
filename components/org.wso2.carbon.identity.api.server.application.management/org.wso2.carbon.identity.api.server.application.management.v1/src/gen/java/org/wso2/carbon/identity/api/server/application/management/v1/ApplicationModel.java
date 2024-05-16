@@ -47,6 +47,7 @@ public class ApplicationModel  {
     private String templateId;
     private Boolean isManagementApp = false;
     private Boolean isB2BSelfServiceApp = false;
+    private Boolean applicationEnabled = true;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
     private InboundProtocols inboundProtocolConfiguration;
@@ -221,6 +222,25 @@ public class ApplicationModel  {
     }
 
     /**
+    * Decides whether the application is enabled.
+    **/
+    public ApplicationModel applicationEnabled(Boolean applicationEnabled) {
+
+        this.applicationEnabled = applicationEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "Decides whether the application is enabled.")
+    @JsonProperty("applicationEnabled")
+    @Valid
+    public Boolean getApplicationEnabled() {
+        return applicationEnabled;
+    }
+    public void setApplicationEnabled(Boolean applicationEnabled) {
+        this.applicationEnabled = applicationEnabled;
+    }
+
+    /**
     **/
     public ApplicationModel associatedRoles(AssociatedRolesConfig associatedRoles) {
 
@@ -349,6 +369,7 @@ public class ApplicationModel  {
             Objects.equals(this.templateId, applicationModel.templateId) &&
             Objects.equals(this.isManagementApp, applicationModel.isManagementApp) &&
             Objects.equals(this.isB2BSelfServiceApp, applicationModel.isB2BSelfServiceApp) &&
+            Objects.equals(this.applicationEnabled, applicationModel.applicationEnabled) &&
             Objects.equals(this.associatedRoles, applicationModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationModel.claimConfiguration) &&
             Objects.equals(this.inboundProtocolConfiguration, applicationModel.inboundProtocolConfiguration) &&
@@ -359,7 +380,7 @@ public class ApplicationModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, isManagementApp, isB2BSelfServiceApp, associatedRoles, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(id, name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, isManagementApp, isB2BSelfServiceApp, applicationEnabled, associatedRoles, claimConfiguration, inboundProtocolConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -377,6 +398,7 @@ public class ApplicationModel  {
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    isManagementApp: ").append(toIndentedString(isManagementApp)).append("\n");
         sb.append("    isB2BSelfServiceApp: ").append(toIndentedString(isB2BSelfServiceApp)).append("\n");
+        sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    inboundProtocolConfiguration: ").append(toIndentedString(inboundProtocolConfiguration)).append("\n");

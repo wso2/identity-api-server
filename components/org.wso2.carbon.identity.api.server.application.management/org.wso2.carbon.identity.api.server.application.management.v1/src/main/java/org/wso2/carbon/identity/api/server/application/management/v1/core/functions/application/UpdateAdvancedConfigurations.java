@@ -57,8 +57,6 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(advancedConfigurations.getUseExternalConsentPage(), config::setUseExternalConsentPage);
             setIfNotNull(advancedConfigurations.getEnableAPIBasedAuthentication(),
                     serviceProvider::setAPIBasedAuthenticationEnabled);
-            setIfNotNull(advancedConfigurations.getApplicationAccessEnabled(),
-                        serviceProvider::setApplicationAccessEnabled);
             if (advancedConfigurations.getAttestationMetaData() != null) {
                 ClientAttestationMetaData clientAttestationMetaData = new ClientAttestationMetaData();
                 setIfNotNull(advancedConfigurations.getAttestationMetaData().getEnableClientAttestation(),

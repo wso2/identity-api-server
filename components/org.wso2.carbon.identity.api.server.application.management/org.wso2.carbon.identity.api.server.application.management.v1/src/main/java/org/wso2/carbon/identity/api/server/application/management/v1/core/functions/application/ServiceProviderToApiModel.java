@@ -128,6 +128,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .realm(getInboundKey(application, "passivests"))
                     .templateId(application.getTemplateId())
                     .isManagementApp(application.isManagementApp())
+                    .applicationEnabled(application.isApplicationAccessEnabled())
                     .associatedRoles(buildAssociatedRoles(application))
                     .claimConfiguration(buildClaimConfiguration(application))
                     .inboundProtocols(buildInboundProtocols(application))
@@ -447,7 +448,6 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         return new AdvancedApplicationConfiguration()
                 .saas(serviceProvider.isSaasApp())
-                .applicationAccessEnabled(serviceProvider.isApplicationAccessEnabled())
                 .discoverableByEndUsers(serviceProvider.isDiscoverable())
                 .enableAuthorization(authConfig.isEnableAuthorization())
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
