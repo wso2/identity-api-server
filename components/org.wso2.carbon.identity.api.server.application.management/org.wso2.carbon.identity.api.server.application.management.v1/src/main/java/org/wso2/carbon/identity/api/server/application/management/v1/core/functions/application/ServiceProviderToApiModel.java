@@ -102,7 +102,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private static final Set<String> systemApplications = ApplicationManagementServiceHolder
             .getApplicationManagementService().getSystemApplications();
     private static final String IS_FRAGMENT_APP = "isFragmentApp";
-    private static final String APPLICATION_ACCESS_ENABLED = "applicationAccessEnabled";
+    private static final String APPLICATION_ACCESS_ENABLED = "IsApplicationAccessEnabled";
     private static final String useUserIdForDefaultSubject = "useUserIdForDefaultSubject";
 
     @Override
