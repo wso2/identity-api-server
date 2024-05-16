@@ -3562,6 +3562,8 @@ components:
           $ref: '#/components/schemas/OAuth2PKCEConfiguration'
         accessToken:
           $ref: '#/components/schemas/AccessTokenConfiguration'
+        hybridFlow:
+          $ref: '#/components/schemas/HybridFlowConfiguration'
         refreshToken:
           $ref: '#/components/schemas/RefreshTokenConfiguration'
         subjectToken:
@@ -3603,6 +3605,15 @@ components:
         supportPlainTransformAlgorithm:
           type: boolean
           example: true
+    HybridFlowConfiguration:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: true
+        responseType:
+          type: string
+          example: code id_token
     AccessTokenConfiguration:
       type: object
       properties:
