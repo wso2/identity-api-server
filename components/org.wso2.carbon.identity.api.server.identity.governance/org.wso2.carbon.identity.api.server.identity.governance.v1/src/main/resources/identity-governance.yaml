@@ -407,7 +407,7 @@ paths:
               <td>Disable, if the client application handles notification sending</td>
             </tr>
             <tr>
-              <td rowspan="22">account-recovery</td>
+              <td rowspan="20">account-recovery</td>
               <td>Recovery.Notification.Password.Enable</td>
               <td>Notification based password recovery</td>
             </tr>
@@ -482,14 +482,6 @@ paths:
             </tr><tr>
               <td>Recovery.AutoLogin.Enable</td>
               <td>User will be logged in automatically after completing the Password Reset wizard</td>
-            </tr>
-            <tr>
-              <td>Recovery.Notification.Password.emailLink.Enable</td>
-              <td>Notification based password recovery via an email</td>
-            </tr>
-            <tr>
-              <td>Recovery.Notification.Password.smsOtp.Enable</td>
-              <td>Notification based password recovery using SMS OTP</td>
             </tr>
             <tr>
             <td rowspan="3">admin-forced-password-reset</td>
