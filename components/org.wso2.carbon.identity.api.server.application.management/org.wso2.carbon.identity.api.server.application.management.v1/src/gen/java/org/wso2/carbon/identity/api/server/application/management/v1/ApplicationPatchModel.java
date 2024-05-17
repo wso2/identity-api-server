@@ -43,6 +43,7 @@ public class ApplicationPatchModel  {
     private String accessUrl;
     private String logoutReturnUrl;
     private String templateId;
+    private Boolean applicationEnabled;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
     private AuthenticationSequence authenticationSequence;
@@ -158,6 +159,25 @@ public class ApplicationPatchModel  {
     }
 
     /**
+    * Decides whether the application is enabled.
+    **/
+    public ApplicationPatchModel applicationEnabled(Boolean applicationEnabled) {
+
+        this.applicationEnabled = applicationEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "Decides whether the application is enabled.")
+    @JsonProperty("applicationEnabled")
+    @Valid
+    public Boolean getApplicationEnabled() {
+        return applicationEnabled;
+    }
+    public void setApplicationEnabled(Boolean applicationEnabled) {
+        this.applicationEnabled = applicationEnabled;
+    }
+
+    /**
     **/
     public ApplicationPatchModel associatedRoles(AssociatedRolesConfig associatedRoles) {
 
@@ -265,6 +285,7 @@ public class ApplicationPatchModel  {
             Objects.equals(this.accessUrl, applicationPatchModel.accessUrl) &&
             Objects.equals(this.logoutReturnUrl, applicationPatchModel.logoutReturnUrl) &&
             Objects.equals(this.templateId, applicationPatchModel.templateId) &&
+            Objects.equals(this.applicationEnabled, applicationPatchModel.applicationEnabled) &&
             Objects.equals(this.associatedRoles, applicationPatchModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
             Objects.equals(this.authenticationSequence, applicationPatchModel.authenticationSequence) &&
@@ -274,7 +295,7 @@ public class ApplicationPatchModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -289,6 +310,7 @@ public class ApplicationPatchModel  {
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    logoutReturnUrl: ").append(toIndentedString(logoutReturnUrl)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
+        sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");
         sb.append("    authenticationSequence: ").append(toIndentedString(authenticationSequence)).append("\n");
