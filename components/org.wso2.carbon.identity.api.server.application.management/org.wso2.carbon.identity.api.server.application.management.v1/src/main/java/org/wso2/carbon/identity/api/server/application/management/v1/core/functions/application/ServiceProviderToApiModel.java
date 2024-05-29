@@ -79,14 +79,7 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.Application.CONSOLE_APP;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.Application.MY_ACCOUNT_APP;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.ORGANIZATION_AUTHENTICATOR;
-import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.ALLOWED_ROLE_AUDIENCE_PROPERTY_NAME;
-import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.ANDROID_PACKAGE_NAME_PROPERTY_NAME;
-import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.APPLE_APP_ID_PROPERTY_NAME;
-import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_API_BASED_AUTHENTICATION_ENABLED_PROPERTY_NAME;
-import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_ATTESTATION_ENABLED_PROPERTY_NAME;
-import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.IS_MANAGEMENT_APP_SP_PROPERTY_NAME;
-import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.TEMPLATE_ID_SP_PROPERTY_NAME;
-import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.USE_USER_ID_FOR_DEFAULT_SUBJECT;
+import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.*;
 import static org.wso2.carbon.identity.application.mgt.dao.impl.ApplicationDAOImpl.USE_DOMAIN_IN_ROLES;
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_CONSENT;
 import static org.wso2.carbon.identity.base.IdentityConstants.SKIP_LOGOUT_CONSENT;
@@ -102,7 +95,6 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private static final Set<String> systemApplications = ApplicationManagementServiceHolder
             .getApplicationManagementService().getSystemApplications();
     private static final String IS_FRAGMENT_APP = "isFragmentApp";
-    private static final String IS_APPLICATION_ENABLED = "IsApplicationEnabled";
     private static final String useUserIdForDefaultSubject = "useUserIdForDefaultSubject";
 
     @Override
@@ -523,7 +515,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         spPropertyList.removeIf(property -> TEMPLATE_ID_SP_PROPERTY_NAME.equals(property.getName()));
         spPropertyList.removeIf(property -> IS_MANAGEMENT_APP_SP_PROPERTY_NAME.equals(property.getName()));
         spPropertyList.removeIf(property -> IS_ATTESTATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
-        spPropertyList.removeIf(property -> IS_APPLICATION_ENABLED.equals(property.getName()));
+        spPropertyList.removeIf(property -> IS_APPLICATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
         spPropertyList.removeIf(property ->
                 IS_API_BASED_AUTHENTICATION_ENABLED_PROPERTY_NAME.equals(property.getName()));
         spPropertyList.removeIf(property ->
