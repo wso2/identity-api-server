@@ -133,4 +133,15 @@
             <Bug pattern="IMPROPER_UNICODE" />
         </Match>
     </FindBugsFilter>
+    <!--
+    The following exclusions added because the find bug issue is false positive.
+        The method is used to update the password recovery property values.
+    -->
+    <FindBugsFilter>
+        <Match>
+            <Class name="org.wso2.carbon.identity.api.server.identity.governance.v1.core.ServerIdentityGovernanceService" />
+            <Method name="updatePasswordRecoveryPropertyValues" />
+            <Bug pattern="HARD_CODE_PASSWORD" />
+        </Match>
+    </FindBugsFilter>
 </FindBugsFilter>
