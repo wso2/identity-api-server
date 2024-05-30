@@ -19,6 +19,7 @@ package org.wso2.carbon.identity.api.server.configs.common;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
+import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
 
@@ -33,6 +34,7 @@ public class ConfigsServiceHolder {
     private IdentityProviderManager identityProviderManager;
     private CORSManagementService corsManagementService;
     private RemoteLoggingConfigService remoteLoggingConfigService;
+    private ImpersonationConfigMgtService impersonationConfigMgtService;
     private DCRConfigurationMgtService dcrConfigurationMgtService;
 
     private ConfigsServiceHolder() {}
@@ -138,5 +140,25 @@ public class ConfigsServiceHolder {
     public void setDcrConfigurationMgtService(DCRConfigurationMgtService dcrConfigurationMgtService) {
 
         ConfigsServiceHolder.getInstance().dcrConfigurationMgtService = dcrConfigurationMgtService;
+    }
+
+    /**
+     * Get Impersonation Config Mgt osgi service.
+     *
+     * @return RemoteLoggingConfigService
+     */
+    public ImpersonationConfigMgtService getImpersonationConfigMgtService() {
+
+        return ConfigsServiceHolder.getInstance().impersonationConfigMgtService;
+    }
+
+    /**
+     * Set  Impersonation Config Mgt osgi service.
+     *
+     * @param impersonationConfigMgtService ImpersonationConfigMgtService.
+     */
+    public void setImpersonationConfigMgtService(ImpersonationConfigMgtService impersonationConfigMgtService) {
+
+        ConfigsServiceHolder.getInstance().impersonationConfigMgtService = impersonationConfigMgtService;
     }
 }

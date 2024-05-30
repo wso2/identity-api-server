@@ -57,6 +57,11 @@ public class Constants {
     public static final String PRIVATE_KEY_JWT_VALIDATION_CONFIG_TOKEN_REUSE = "/enableTokenReuse";
 
     /**
+     * PATCH operation path for Impersonation configuration.
+     */
+    public static final String IMPERSONATION_CONFIG_ENABLE_EMAIL_NOTIFICATION = "/enableEmailNotification";
+
+    /**
      * PATCH operation paths for DCR configuration.
      */
     public static final String DCR_CONFIG_ENABLE_FAPI_ENFORCEMENT = "/enableFapiEnforcement";
@@ -185,7 +190,14 @@ public class Constants {
                 "Server encountered an error while retrieving the Passive STS inbound auth configs."),
         ERROR_CODE_ERROR_PASSIVE_STS_INBOUND_AUTH_CONFIG_UPDATE("65016",
                 "Unable to update Passive STS inbound auth configs.",
-                "Server encountered an error while updating the Passive STS inbound auth configs.");
+                "Server encountered an error while updating the Passive STS inbound auth configs."),
+        ERROR_CODE_IMP_CONFIG_RETRIEVE("65018",
+                "Unable to retrieve Impersonation configuration.",
+                "Server encountered an error while retrieving the Impersonation configuration of %s."),
+
+        ERROR_CODE_IMP_CONFIG_UPDATE("65019",
+                "Unable to update Impersonation configuration.",
+                "Server encountered an error while updating the Impersonation configuration of %s.");
 
         private final String code;
         private final String message;

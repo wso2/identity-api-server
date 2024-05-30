@@ -31,6 +31,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
@@ -154,6 +156,30 @@ public class ConfigsApi  {
     public Response getHomeRealmIdentifiers() {
 
         return delegate.getHomeRealmIdentifiers();
+    }
+
+    @Valid
+    @GET
+    @Path("/impersonation")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieve the tenant impersonation configuration.", notes = "Retrieve the tenant impersonation configuration.", response = ImpersonationConfiguration.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Impersonation Configurations", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = ImpersonationConfiguration.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response getImpersonationConfiguration() {
+
+        return delegate.getImpersonationConfiguration();
     }
 
     @Valid
@@ -443,6 +469,30 @@ public class ConfigsApi  {
     public Response patchConfigs(@ApiParam(value = "" ,required=true) @Valid List<Patch> patch) {
 
         return delegate.patchConfigs(patch );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/impersonation")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch the tenant impersonation configuration.", notes = "Patch the tenant impersonation configuration.  A JSONPatch as defined by RFC 6902.", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+
+        })
+    }, tags={ "Impersonation Configurations", })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successful Response", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response patchImpersonationConfiguration(@ApiParam(value = "" ,required=true) @Valid List<ImpersonationPatch> impersonationPatch) {
+
+        return delegate.patchImpersonationConfiguration(impersonationPatch );
     }
 
     @Valid
