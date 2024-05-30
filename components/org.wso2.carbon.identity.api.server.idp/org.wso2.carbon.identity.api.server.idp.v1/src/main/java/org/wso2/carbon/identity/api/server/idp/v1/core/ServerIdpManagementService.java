@@ -299,6 +299,7 @@ public class ServerIdpManagementService {
             }
             IdentityProvider idpToUpdate = createIdPClone(identityProvider);
             processPatchRequest(patchRequest, idpToUpdate);
+            validateSystemReservedIDP(idpToUpdate.getIdentityProviderName());
             IdentityProvider updatedIdP = IdentityProviderServiceHolder.getIdentityProviderManager()
                     .updateIdPByResourceId(identityProviderId, idpToUpdate,
                             ContextLoader.getTenantDomainFromContext());
