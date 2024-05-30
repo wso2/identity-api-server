@@ -246,6 +246,7 @@ public class ServerIdpManagementService {
 
         IdentityProvider identityProvider;
         try {
+            validateSystemReservedIDP(identityProviderPOSTRequest.getName());
             identityProvider = IdentityProviderServiceHolder.getIdentityProviderManager().addIdPWithResourceId(
                     createIDP(identityProviderPOSTRequest), ContextLoader.getTenantDomainFromContext());
         } catch (IdentityProviderManagementException e) {
@@ -298,6 +299,7 @@ public class ServerIdpManagementService {
             }
             IdentityProvider idpToUpdate = createIdPClone(identityProvider);
             processPatchRequest(patchRequest, idpToUpdate);
+            validateSystemReservedIDP(idpToUpdate.getIdentityProviderName());
             IdentityProvider updatedIdP = IdentityProviderServiceHolder.getIdentityProviderManager()
                     .updateIdPByResourceId(identityProviderId, idpToUpdate,
                             ContextLoader.getTenantDomainFromContext());
@@ -3801,6 +3803,14 @@ public class ServerIdpManagementService {
         } catch (JsonProcessingException e) {
             throw new IdentityProviderManagementClientException(String.format("Error in reading JSON " +
                     "file configuration for Identity Provider: %s.", fileContent.getFileName()), e);
+        }
+    }
+
+    private void validateSystemReservedIDP(String idpName) throws IdentityProviderManagementClientException {
+
+        if (FrameworkConstants.ORGANIZATION_LOGIN_IDP_NAME.equals(idpName)) {
+            throw new IdentityProviderManagementClientException(String.format("The Connection with name %s is " +
+                    "a system reserved name.", idpName));
         }
     }
 }
