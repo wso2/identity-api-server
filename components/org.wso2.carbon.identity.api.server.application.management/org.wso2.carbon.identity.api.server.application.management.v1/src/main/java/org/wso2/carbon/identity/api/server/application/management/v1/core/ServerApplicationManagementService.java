@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -174,10 +177,10 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.CLIENT_ID;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.BLOCK_RENAME_APP_NAME_TO_RESERVED_APP_NAME;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.BLOCK_SYSTEM_RESERVED_APP_CREATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.BLOCK_SYSTEM_RESERVED_APP_CREATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
@@ -861,7 +864,9 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
-        blockRenameAppsToSystemReservedApps(applicationPatchModel.getName(), appToUpdate.getApplicationName());
+        if (applicationPatchModel != null) {
+            blockRenameAppsToSystemReservedApps(applicationPatchModel.getName(), appToUpdate.getApplicationName());
+        }
         if (!isLegacyAuthzRuntime()) {
             restrictRoleAssociationUpdateInOrgAudience(applicationId, applicationPatchModel);
         }
