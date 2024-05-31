@@ -85,6 +85,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants;
 import org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementClientException;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
@@ -172,9 +173,11 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.CLIENT_ID;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.BLOCK_RENAME_APP_NAME_TO_RESERVED_APP_NAME;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_APPLICATION_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_PROCESSING_REQUEST;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INBOUND_NOT_CONFIGURED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.BLOCK_SYSTEM_RESERVED_APP_CREATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.USE_EXTERNAL_CONSENT_PAGE_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
@@ -188,6 +191,7 @@ import static org.wso2.carbon.identity.api.server.application.management.v1.core
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.updateOrInsertInbound;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.Application.CONSOLE_APP;
+import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.Application.MY_ACCOUNT_APP;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.OAUTH2;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.PASSIVE_STS;
 import static org.wso2.carbon.identity.application.authentication.framework.util.FrameworkConstants.StandardInboundProtocols.SAML2;
@@ -796,6 +800,11 @@ public class ServerApplicationManagementService {
                     UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION.getDescription());
         }
 
+        // Block application creation with name Console or MyAccount.
+        if (FrameworkConstants.Application.CONSOLE_APP.equals(applicationModel.getName()) ||
+                FrameworkConstants.Application.MY_ACCOUNT_APP.equals(applicationModel.getName())) {
+            throw buildClientError(BLOCK_SYSTEM_RESERVED_APP_CREATION, applicationModel.getName());
+        }
         String username = ContextLoader.getUsernameFromContext();
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
 
@@ -852,6 +861,7 @@ public class ServerApplicationManagementService {
     public void patchApplication(String applicationId, ApplicationPatchModel applicationPatchModel) {
 
         ServiceProvider appToUpdate = cloneApplication(applicationId);
+        blockRenameAppsToSystemReservedApps(applicationPatchModel.getName(), appToUpdate.getApplicationName());
         if (!isLegacyAuthzRuntime()) {
             restrictRoleAssociationUpdateInOrgAudience(applicationId, applicationPatchModel);
         }
@@ -2027,5 +2037,13 @@ public class ServerApplicationManagementService {
                     .parseBoolean(IdentityUtil.getProperty(APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED));
         }
         return applicationBasedOutboundProvisioningEnabled;
+    }
+
+    private void blockRenameAppsToSystemReservedApps(String newAppName, String oldAppName) {
+
+        if ((CONSOLE_APP.equals(newAppName) || MY_ACCOUNT_APP.equals(newAppName)) &&
+                !StringUtils.equals(newAppName, oldAppName)) {
+            throw buildClientError(BLOCK_RENAME_APP_NAME_TO_RESERVED_APP_NAME, newAppName);
+        }
     }
 }

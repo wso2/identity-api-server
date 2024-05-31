@@ -152,6 +152,12 @@ public class ApplicationManagementConstants {
         UNSUPPORTED_OUTBOUND_PROVISIONING_CONFIGURATION("60514",
                 "Outbound provisioning configuration not supported.",
                 "Application-based outbound provisioning support is disabled."),
+        BLOCK_SYSTEM_RESERVED_APP_CREATION("60515",
+                "Creating application with system reserved name is blocked",
+                "The application name %s is marked as systems reserved application name."),
+        BLOCK_RENAME_APP_NAME_TO_RESERVED_APP_NAME("60516",
+                "Renaming application name to a system reserved name is blocked",
+                "The application name %s is marked as systems reserved application name."),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",
