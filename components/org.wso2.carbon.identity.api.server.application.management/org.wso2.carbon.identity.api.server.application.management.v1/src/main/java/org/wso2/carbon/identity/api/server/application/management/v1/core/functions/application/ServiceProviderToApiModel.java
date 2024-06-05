@@ -42,6 +42,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RequestedCl
 import org.wso2.carbon.identity.api.server.application.management.v1.Role;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfig;
+import org.wso2.carbon.identity.api.server.application.management.v1.TrustedAppConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
@@ -54,6 +55,7 @@ import org.wso2.carbon.identity.application.common.model.ClientAttestationMetaDa
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
+import org.wso2.carbon.identity.application.common.model.TrustedAppMetadata;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
@@ -458,6 +460,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .fragment(isFragmentApp(serviceProvider))
                 .enableAPIBasedAuthentication(serviceProvider.isAPIBasedAuthenticationEnabled())
                 .attestationMetaData(getAttestationMetaData(serviceProvider))
+                .trustedAppConfiguration(getTrustedAppConfiguration(serviceProvider))
                 .additionalSpProperties(getSpProperties(serviceProvider));
     }
 
@@ -487,6 +490,28 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .appleAppId(clientAttestationMetaData.getAppleAppId())
                 .androidAttestationServiceCredentials(parseAndroidServiceCredentials(clientAttestationMetaData
                         .getAndroidAttestationServiceCredentials()));
+    }
+
+    /**
+     * Retrieves the trusted app configuration for an application's advanced configuration based on the provided
+     * service provider.
+     *
+     * @param serviceProvider The service provider for which trusted app configuration is required.
+     * @return An instance of TrustedAppConfiguration containing trusted app configurations of the application.
+     */
+    private TrustedAppConfiguration getTrustedAppConfiguration(ServiceProvider serviceProvider) {
+
+        //TODO Need to add error handling
+        TrustedAppMetadata trustedAppMetadata = serviceProvider.getTrustedAppMetadata();
+        if (trustedAppMetadata == null) {
+            trustedAppMetadata = new TrustedAppMetadata();
+        }
+
+        return new TrustedAppConfiguration()
+                .isFIDOTrustedApp(trustedAppMetadata.getIsFidoTrusted())
+                .androidPackageName(trustedAppMetadata.getAndroidPackageName())
+                .androidThumbprints(trustedAppMetadata.getAndroidThumbprints())
+                .appleAppId(trustedAppMetadata.getAppleAppId());
     }
 
 

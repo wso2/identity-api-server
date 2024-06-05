@@ -24,6 +24,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.application.common.model.ClientAttestationMetaData;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.TrustedAppMetadata;
 
 import java.util.List;
 
@@ -75,6 +76,18 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                             clientAttestationMetaData::setAndroidAttestationServiceCredentials);
                 }
                 serviceProvider.setClientAttestationMetaData(clientAttestationMetaData);
+            }
+            if (advancedConfigurations.getTrustedAppConfiguration() != null) {
+                TrustedAppMetadata trustedAppMetadata = new TrustedAppMetadata();
+                setIfNotNull(advancedConfigurations.getTrustedAppConfiguration().getIsFIDOTrustedApp(),
+                        trustedAppMetadata::setIsFidoTrusted);
+                setIfNotNull(advancedConfigurations.getTrustedAppConfiguration().getAndroidPackageName(),
+                        trustedAppMetadata::setAndroidPackageName);
+                setIfNotNull(advancedConfigurations.getTrustedAppConfiguration().getAndroidThumbprints(),
+                        trustedAppMetadata::setAndroidThumbprints);
+                setIfNotNull(advancedConfigurations.getTrustedAppConfiguration().getAppleAppId(),
+                        trustedAppMetadata::setAppleAppId);
+                serviceProvider.setTrustedAppMetadata(trustedAppMetadata);
             }
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
         }
