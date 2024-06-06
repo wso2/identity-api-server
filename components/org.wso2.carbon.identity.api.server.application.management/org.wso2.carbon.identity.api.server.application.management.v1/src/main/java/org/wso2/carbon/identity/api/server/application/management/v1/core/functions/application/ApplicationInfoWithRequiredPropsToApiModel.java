@@ -58,6 +58,7 @@ public class ApplicationInfoWithRequiredPropsToApiModel implements Function<Appl
                 .advancedConfigurations(getAdvancedConfigurations(applicationResponseModel))
                 .templateId(applicationResponseModel.getTemplateId())
                 .self(getApplicationLocation(applicationResponseModel.getId()))
+                .applicationEnabled(applicationResponseModel.getApplicationEnabled())
                 .associatedRoles(excludeAssociatedRoles(applicationResponseModel.getAssociatedRoles()));
     }
 

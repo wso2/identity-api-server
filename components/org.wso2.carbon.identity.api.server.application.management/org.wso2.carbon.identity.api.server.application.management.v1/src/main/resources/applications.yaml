@@ -2833,6 +2833,9 @@ components:
         associatedRoles:
           type: object
           $ref: '#/components/schemas/AssociatedRolesConfig'
+        applicationEnabled:
+          type: boolean
+          example: true
     ApplicationModel:
       type: object
       required:
