@@ -171,7 +171,11 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.*;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ADVANCED_CONFIGURATIONS;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_ENABLED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.APPLICATION_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.CLIENT_ID;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.APPLICATION_CREATION_WITH_TEMPLATES_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.BLOCK_RENAME_APP_NAME_TO_RESERVED_APP_NAME;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.BLOCK_SYSTEM_RESERVED_APP_CREATION;
