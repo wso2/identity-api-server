@@ -2696,9 +2696,9 @@ components:
       required: false
       description: |
         Specifies the required parameters in the response.
-        Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', 'issuer', and 'associatedRoles.allowedAudience' attributes.
+        Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', 'issuer', 'applicationEnabled' and 'associatedRoles.allowedAudience' attributes.
 
-        /applications?attributes=advancedConfigurations,templateId,clientId,associatedRoles.allowedAudience
+        /applications?attributes=advancedConfigurations,templateId,clientId,applicationEnabled,associatedRoles.allowedAudience
       schema:
         type: string
     exportSecretsQueryParam:
@@ -2833,6 +2833,9 @@ components:
         associatedRoles:
           type: object
           $ref: '#/components/schemas/AssociatedRolesConfig'
+        applicationEnabled:
+          type: boolean
+          example: true
     ApplicationModel:
       type: object
       required:

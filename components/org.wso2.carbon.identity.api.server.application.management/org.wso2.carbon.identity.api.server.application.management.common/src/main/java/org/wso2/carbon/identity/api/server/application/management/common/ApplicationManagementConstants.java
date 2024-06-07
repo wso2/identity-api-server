@@ -49,6 +49,7 @@ public class ApplicationManagementConstants {
     public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
     public static final String DEFAULT_CERTIFICATE_ALIAS = "wso2carbon";
     public static final String ADVANCED_CONFIGURATIONS = "advancedConfigurations";
+    public static final String APPLICATION_ENABLED = "applicationEnabled";
     public static final String TEMPLATE_ID = "templateId";
     public static final String NAME = "name";
     public static final String CLIENT_ID = "clientId";
