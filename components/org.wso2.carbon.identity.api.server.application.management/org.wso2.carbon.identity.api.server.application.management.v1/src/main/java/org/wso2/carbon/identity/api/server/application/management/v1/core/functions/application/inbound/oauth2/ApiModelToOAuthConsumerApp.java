@@ -27,6 +27,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.PushAuthori
 import org.wso2.carbon.identity.api.server.application.management.v1.RefreshTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SubjectTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
@@ -72,6 +73,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         updatePARConfigurations(consumerAppDTO, oidcModel.getPushAuthorizationRequest());
         updateSubjectConfigurations(consumerAppDTO, oidcModel.getSubject());
         consumerAppDTO.setFapiConformanceEnabled(oidcModel.getIsFAPIApplication());
+        updateSubjectTokenConfigurations(consumerAppDTO, oidcModel.getSubjectToken());
 
         return consumerAppDTO;
     }
@@ -231,6 +233,15 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         if (subject != null) {
             consumerAppDTO.setSubjectType(subject.getSubjectType());
             consumerAppDTO.setSectorIdentifierURI(subject.getSectorIdentifierUri());
+        }
+    }
+
+    private void updateSubjectTokenConfigurations(OAuthConsumerAppDTO consumerAppDTO,
+                                                  SubjectTokenConfiguration subjectToken) {
+
+        if (subjectToken != null) {
+            consumerAppDTO.setSubjectTokenEnabled(subjectToken.getEnable());
+            consumerAppDTO.setSubjectTokenExpiryTime(subjectToken.getApplicationSubjectTokenExpiryInSeconds());
         }
     }
 }
