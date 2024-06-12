@@ -72,6 +72,7 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
 
     @Override
     public Response getImpersonationConfiguration() {
+
         return Response.ok().entity(configManagementService.getImpersonationConfiguration()).build();
     }
 
@@ -181,7 +182,8 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response patchImpersonationConfiguration(List<ImpersonationPatch> impersonationPatch) {
 
         configManagementService.patchImpersonationConfiguration(impersonationPatch);
-        return Response.ok().build();    }
+        return Response.ok().build();
+    }
 
     @Override
     public Response updateInboundScimConfigs(ScimConfig scimConfig) {

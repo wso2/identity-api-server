@@ -194,7 +194,6 @@ public class Constants {
         ERROR_CODE_IMP_CONFIG_RETRIEVE("65018",
                 "Unable to retrieve Impersonation configuration.",
                 "Server encountered an error while retrieving the Impersonation configuration of %s."),
-
         ERROR_CODE_IMP_CONFIG_UPDATE("65019",
                 "Unable to update Impersonation configuration.",
                 "Server encountered an error while updating the Impersonation configuration of %s.");
