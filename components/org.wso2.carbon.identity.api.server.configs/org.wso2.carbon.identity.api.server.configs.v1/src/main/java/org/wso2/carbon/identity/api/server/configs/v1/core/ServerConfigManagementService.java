@@ -47,6 +47,8 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationConfiguration;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundConfig;
@@ -82,6 +84,10 @@ import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceExc
 import org.wso2.carbon.identity.cors.mgt.core.exception.CORSManagementServiceServerException;
 import org.wso2.carbon.identity.cors.mgt.core.model.CORSConfiguration;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
+import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtClientException;
+import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtException;
+import org.wso2.carbon.identity.oauth2.impersonation.exceptions.ImpersonationConfigMgtServerException;
+import org.wso2.carbon.identity.oauth2.impersonation.models.ImpersonationConfig;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
@@ -305,6 +311,89 @@ public class ServerConfigManagementService {
             }
         }
     }
+
+    /**
+     * Retrieves the impersonation configuration for the current tenant domain.
+     *
+     * @return ImpersonationConfiguration The current impersonation configuration.
+     * @throws ImpersonationConfigMgtException If there is an error retrieving the impersonation configuration.
+     */
+    public ImpersonationConfiguration getImpersonationConfiguration() {
+
+        // Retrieve the tenant domain from the current context
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        ImpersonationConfiguration impersonationConfiguration = new ImpersonationConfiguration();
+        try {
+            // Get the impersonation configuration for the tenant domain
+            ImpersonationConfig impersonationConfig = ConfigsServiceHolder.getInstance()
+                    .getImpersonationConfigMgtService().getImpersonationConfig(tenantDomain);
+
+            // Enable email notifications based on the retrieved configuration
+            return impersonationConfiguration.enableEmailNotification(impersonationConfig.isEnableEmailNotification());
+        } catch (ImpersonationConfigMgtException e) {
+            // Handle exceptions related to retrieving impersonation configuration
+            throw handleImpersonationConfigException(e, Constants.ErrorMessage.ERROR_CODE_IMP_CONFIG_RETRIEVE, null);
+        }
+    }
+
+    /**
+     * Applies patch operations to the impersonation configuration for the current tenant domain.
+     *
+     * @param impersonationPatchList List of patch operations to apply.
+     * @throws ImpersonationConfigMgtException If there is an error updating the impersonation configuration.
+     */
+    public void patchImpersonationConfiguration(List<ImpersonationPatch> impersonationPatchList) {
+
+        // Return if the patch list is empty
+        if (CollectionUtils.isEmpty(impersonationPatchList)) {
+            return;
+        }
+
+        // Retrieve the tenant domain from the current context
+        String tenantDomain = ContextLoader.getTenantDomainFromContext();
+        ImpersonationConfig impersonationConfig;
+        try {
+            // Get the current impersonation configuration for the tenant domain
+            impersonationConfig = ConfigsServiceHolder.getInstance()
+                    .getImpersonationConfigMgtService().getImpersonationConfig(tenantDomain);
+        } catch (ImpersonationConfigMgtException e) {
+            // Handle exceptions related to retrieving impersonation configuration
+            throw handleImpersonationConfigException(e, Constants.ErrorMessage.ERROR_CODE_IMP_CONFIG_RETRIEVE, null);
+        }
+
+        try {
+            // Iterate over each patch operation in the list
+            for (ImpersonationPatch impersonationPatch : impersonationPatchList) {
+                String path = impersonationPatch.getPath();
+                ImpersonationPatch.OperationEnum operation = impersonationPatch.getOperation();
+                boolean value = impersonationPatch.getValue();
+
+                // Support only 'REPLACE' and 'ADD' patch operations for email notifications
+                if (operation == ImpersonationPatch.OperationEnum.REPLACE
+                        || operation == ImpersonationPatch.OperationEnum.ADD) {
+                    if (path.matches(Constants.IMPERSONATION_CONFIG_ENABLE_EMAIL_NOTIFICATION)) {
+                        impersonationConfig.setEnableEmailNotification(value);
+                    } else {
+                        // Throw an error if the patch path is unsupported
+                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                                .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                    }
+                } else {
+                    // Throw an error if the patch operation is unsupported
+                    throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
+                            .ERROR_CODE_INVALID_INPUT, "Unsupported patch operation");
+                }
+            }
+
+            // Update the impersonation configuration for the tenant with the patched configuration
+            ConfigsServiceHolder.getInstance().getImpersonationConfigMgtService()
+                    .setImpersonationConfig(impersonationConfig, tenantDomain);
+        } catch (ImpersonationConfigMgtException e) {
+            // Handle exceptions related to updating impersonation configuration
+            throw handleImpersonationConfigException(e, Constants.ErrorMessage.ERROR_CODE_IMP_CONFIG_UPDATE, null);
+        }
+    }
+
 
     /**
      * Get the CORS config for a tenant.
@@ -1001,6 +1090,42 @@ public class ServerConfigManagementService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof CORSManagementServiceServerException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        } else {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
+            status = Response.Status.INTERNAL_SERVER_ERROR;
+        }
+        return new APIError(status, errorResponse);
+    }
+
+    private APIError handleImpersonationConfigException(ImpersonationConfigMgtException e,
+                                         Constants.ErrorMessage errorEnum, String data) {
+
+        ErrorResponse errorResponse;
+
+        Response.Status status;
+
+        if (e instanceof ImpersonationConfigMgtClientException) {
+            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
+            if (e.getErrorCode() != null) {
+                String errorCode = e.getErrorCode();
+                errorCode =
+                        errorCode.contains(org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER) ?
+                                errorCode : Constants.CONFIG_ERROR_PREFIX + errorCode;
+                errorResponse.setCode(errorCode);
+            }
+            errorResponse.setDescription(e.getMessage());
+            status = Response.Status.BAD_REQUEST;
+        } else if (e instanceof ImpersonationConfigMgtServerException) {
             errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.description());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
