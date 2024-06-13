@@ -795,7 +795,7 @@
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
-        <identity.event.handler.version>1.8.7</identity.event.handler.version>
+        <identity.event.handler.version>1.8.19</identity.event.handler.version>
         <identity.inbound.oauth2.version>7.0.97</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.41</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>

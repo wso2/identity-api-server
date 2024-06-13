@@ -187,6 +187,7 @@ public class ServerEmailTemplatesService {
 
         try {
             String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
+            templateId = I18nEmailUtil.normalizeLocaleFormat(templateId);
             EmailTemplate internalEmailTemplate = EmailTemplatesServiceHolder.getEmailTemplateManager().
                     getEmailTemplate(templateTypeDisplayName, templateId, getTenantDomainFromContext());
             // EmailTemplateManager sends the default template if no matching template found. We need to check for
