@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,7 +19,6 @@
 package org.wso2.carbon.identity.api.server.identity.governance.v1.core;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -43,6 +42,7 @@ import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.governance.bean.ConnectorConfig;
+import org.wso2.carbon.identity.governance.exceptions.general.IdentityGovernanceClientException;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -65,10 +65,6 @@ import static org.wso2.carbon.identity.api.server.identity.governance.common.Gov
  */
 public class ServerIdentityGovernanceService {
 
-    private static final String RECOVERY_NOTIFICATION_PASSWORD_PROPERTY = "Recovery.Notification.Password.Enable";
-    private static final String EMAIL_LINK_PASSWORD_RECOVERY_PROPERTY
-            = "Recovery.Notification.Password.emailLink.Enable";
-    private static final String SMS_OTP_PASSWORD_RECOVERY_PROPERTY = "Recovery.Notification.Password.smsOtp.Enable";
     private static final Log LOG = LogFactory.getLog(ServerIdentityGovernanceService.class);
 
     /**
@@ -301,9 +297,10 @@ public class ServerIdentityGovernanceService {
             for (PropertyReq propertyReqDTO : governanceConnector.getProperties()) {
                 configurationDetails.put(propertyReqDTO.getName(), propertyReqDTO.getValue());
             }
-            validatePasswordRecoveryPropertyValues(configurationDetails);
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
-
+        } catch (IdentityGovernanceClientException e) {
+            throw handleBadRequestError(GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_CONNECTOR_CONFIGURATION,
+                    e.getMessage());
         } catch (IdentityGovernanceException e) {
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONNECTOR_PROPERTY;
@@ -515,43 +512,4 @@ public class ServerIdentityGovernanceService {
         return new APIError(status, errorResponse);
     }
 
-    /**
-     * This method is used to update the password recovery property values.
-     *
-     * @param configurationDetails Configuration updates for governance configuration.
-     */
-    private void validatePasswordRecoveryPropertyValues(Map<String, String> configurationDetails) {
-
-        if (configurationDetails.containsKey(RECOVERY_NOTIFICATION_PASSWORD_PROPERTY) ||
-                configurationDetails.containsKey(EMAIL_LINK_PASSWORD_RECOVERY_PROPERTY) ||
-                configurationDetails.containsKey(SMS_OTP_PASSWORD_RECOVERY_PROPERTY)) {
-            // Perform process only if notification based password recovery connector or options are updated.
-            String recNotPwProp = configurationDetails.get(RECOVERY_NOTIFICATION_PASSWORD_PROPERTY);
-            String emailLinkPwRecProp = configurationDetails.get(EMAIL_LINK_PASSWORD_RECOVERY_PROPERTY);
-            String smsOtpPwRecProp = configurationDetails.get(SMS_OTP_PASSWORD_RECOVERY_PROPERTY);
-            boolean recoveryNotificationPasswordProperty = Boolean.parseBoolean(recNotPwProp);
-            boolean smsOtpPasswordRecoveryProperty = Boolean.parseBoolean(emailLinkPwRecProp);
-            boolean emailLinkPasswordRecoveryProperty = Boolean.parseBoolean(smsOtpPwRecProp);
-
-            if (recoveryNotificationPasswordProperty &&
-                    StringUtils.isNotBlank(emailLinkPwRecProp) && !emailLinkPasswordRecoveryProperty &&
-                    StringUtils.isNotBlank(smsOtpPwRecProp) && !smsOtpPasswordRecoveryProperty) {
-                    // Disabling all recovery options when recovery connector is enabled is not allowed.
-                    // WARNING : Be mindful about compatibility of earlier recovery api versions when changing
-                    // this behaviour.
-                    throw handleBadRequestError(
-                            GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_CONNECTOR_CONFIGURATION,
-                            "Disabling all recovery options when recovery connector is enabled, is not allowed.");
-            }
-            if (StringUtils.isNotBlank(recNotPwProp) && !recoveryNotificationPasswordProperty &&
-                (emailLinkPasswordRecoveryProperty || smsOtpPasswordRecoveryProperty)) {
-                // Enabling any recovery options when connector is disabled is not allowed.
-                // WARNING : Be mindful about compatibility of earlier recovery api versions when changing
-                // this behaviour.
-                throw handleBadRequestError(
-                        GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_CONNECTOR_CONFIGURATION,
-                        "Enabling recovery options when connector is disabled, is not allowed.");
-            }
-        }
-    }
 }
