@@ -55,11 +55,11 @@ import org.wso2.carbon.identity.application.common.model.ClientAttestationMetaDa
 import org.wso2.carbon.identity.application.common.model.InboundAuthenticationRequestConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
-import org.wso2.carbon.identity.application.common.model.TrustedAppMetadata;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
+import org.wso2.carbon.identity.application.common.model.SpTrustedAppMetadata;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
@@ -502,9 +502,9 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
     private TrustedAppConfiguration getTrustedAppConfiguration(ServiceProvider serviceProvider) {
 
         //TODO Need to add error handling
-        TrustedAppMetadata trustedAppMetadata = serviceProvider.getTrustedAppMetadata();
+        SpTrustedAppMetadata trustedAppMetadata = serviceProvider.getTrustedAppMetadata();
         if (trustedAppMetadata == null) {
-            trustedAppMetadata = new TrustedAppMetadata();
+            trustedAppMetadata = new SpTrustedAppMetadata();
         }
 
         return new TrustedAppConfiguration()
@@ -513,7 +513,6 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .androidThumbprints(trustedAppMetadata.getAndroidThumbprints())
                 .appleAppId(trustedAppMetadata.getAppleAppId());
     }
-
 
     private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {
 

@@ -17,6 +17,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import com.google.gson.Gson;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
@@ -24,11 +25,12 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.application.common.model.ClientAttestationMetaData;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
-import org.wso2.carbon.identity.application.common.model.TrustedAppMetadata;
+import org.wso2.carbon.identity.application.common.model.SpTrustedAppMetadata;
 
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_SUPPORTED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ANDROID_THUMBPRINT_NOT_PROVIDED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
@@ -78,7 +80,13 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                 serviceProvider.setClientAttestationMetaData(clientAttestationMetaData);
             }
             if (advancedConfigurations.getTrustedAppConfiguration() != null) {
-                TrustedAppMetadata trustedAppMetadata = new TrustedAppMetadata();
+                if (StringUtils.isNotBlank(advancedConfigurations.getTrustedAppConfiguration().getAndroidPackageName())
+                        && StringUtils.isBlank(advancedConfigurations.getTrustedAppConfiguration()
+                        .getAndroidThumbprints())) {
+                    throw buildBadRequestError(ANDROID_THUMBPRINT_NOT_PROVIDED.getCode(),
+                            ANDROID_THUMBPRINT_NOT_PROVIDED.getDescription());
+                }
+                SpTrustedAppMetadata trustedAppMetadata = new SpTrustedAppMetadata();
                 setIfNotNull(advancedConfigurations.getTrustedAppConfiguration().getIsFIDOTrustedApp(),
                         trustedAppMetadata::setIsFidoTrusted);
                 setIfNotNull(advancedConfigurations.getTrustedAppConfiguration().getAndroidPackageName(),
