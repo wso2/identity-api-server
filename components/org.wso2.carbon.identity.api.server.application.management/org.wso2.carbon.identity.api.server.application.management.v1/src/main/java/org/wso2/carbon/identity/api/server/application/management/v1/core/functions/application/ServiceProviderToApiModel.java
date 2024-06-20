@@ -501,7 +501,6 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
      */
     private TrustedAppConfiguration getTrustedAppConfiguration(ServiceProvider serviceProvider) {
 
-        //TODO Need to add error handling
         SpTrustedAppMetadata trustedAppMetadata = serviceProvider.getTrustedAppMetadata();
         if (trustedAppMetadata == null) {
             trustedAppMetadata = new SpTrustedAppMetadata();
