@@ -26,6 +26,9 @@ import javax.validation.constraints.*;
 
 
 import io.swagger.annotations.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
@@ -69,12 +72,38 @@ public enum StatusEnum {
 
     private StatusEnum status;
     private String ref;
+    private List<Attribute> attributes = null;
 
     /**
     **/
     public BasicOrganizationResponse id(String id) {
 
         this.id = id;
+        return this;
+    }
+
+    public BasicOrganizationResponse attributes(List<Attribute> attributes) {
+
+        this.attributes = attributes;
+        return this;
+    }
+
+    @ApiModelProperty(value = "")
+    @JsonProperty("attributes")
+    @Valid
+    public List<Attribute> getAttributes() {
+        return attributes;
+    }
+    public void setAttributes(List<Attribute> attributes) {
+        this.attributes = attributes;
+    }
+
+    public BasicOrganizationResponse addAttributesItem(Attribute attributesItem) {
+
+        if (this.attributes == null) {
+            this.attributes = new ArrayList<>();
+        }
+        this.attributes.add(attributesItem);
         return this;
     }
     
@@ -165,12 +194,13 @@ public enum StatusEnum {
         return Objects.equals(this.id, basicOrganizationResponse.id) &&
             Objects.equals(this.name, basicOrganizationResponse.name) &&
             Objects.equals(this.status, basicOrganizationResponse.status) &&
+            Objects.equals(this.attributes, basicOrganizationResponse.attributes) &&
             Objects.equals(this.ref, basicOrganizationResponse.ref);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, status, ref);
+        return Objects.hash(id, name, status, attributes, ref);
     }
 
     @Override
@@ -182,6 +212,7 @@ public enum StatusEnum {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
+        sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("    ref: ").append(toIndentedString(ref)).append("\n");
         sb.append("}");
         return sb.toString();
