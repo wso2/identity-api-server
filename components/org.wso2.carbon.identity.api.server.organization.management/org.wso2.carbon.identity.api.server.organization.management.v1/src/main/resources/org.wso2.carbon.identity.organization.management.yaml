@@ -971,6 +971,10 @@ components:
         ref:
           type: string
           example: 'o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attribute'
     OrganizationResponse:
       type: object
       required:
