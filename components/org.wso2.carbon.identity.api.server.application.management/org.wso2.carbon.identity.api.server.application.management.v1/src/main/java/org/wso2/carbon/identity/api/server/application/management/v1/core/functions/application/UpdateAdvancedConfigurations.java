@@ -30,7 +30,7 @@ import org.wso2.carbon.identity.application.common.model.SpTrustedAppMetadata;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_SUPPORTED;
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ANDROID_THUMBPRINT_NOT_PROVIDED;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INCORRECT_ANDROID_APP_DETAILS;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
@@ -80,19 +80,19 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                 serviceProvider.setClientAttestationMetaData(clientAttestationMetaData);
             }
             if (advancedConfigurations.getTrustedAppConfiguration() != null) {
-                if (StringUtils.isNotBlank(advancedConfigurations.getTrustedAppConfiguration().getAndroidPackageName())
-                        && StringUtils.isBlank(advancedConfigurations.getTrustedAppConfiguration()
-                        .getAndroidThumbprints())) {
-                    throw buildBadRequestError(ANDROID_THUMBPRINT_NOT_PROVIDED.getCode(),
-                            ANDROID_THUMBPRINT_NOT_PROVIDED.getDescription());
+                String androidPackageName = advancedConfigurations.getTrustedAppConfiguration().getAndroidPackageName();
+                String androidThumbprints = advancedConfigurations.getTrustedAppConfiguration().getAndroidThumbprints();
+
+                if ((StringUtils.isNotBlank(androidPackageName) && StringUtils.isBlank(androidThumbprints)) ||
+                        (StringUtils.isBlank(androidPackageName) && StringUtils.isNotBlank(androidThumbprints))) {
+                    throw buildBadRequestError(INCORRECT_ANDROID_APP_DETAILS.getCode(),
+                            INCORRECT_ANDROID_APP_DETAILS.getDescription());
                 }
                 SpTrustedAppMetadata trustedAppMetadata = new SpTrustedAppMetadata();
+                setIfNotNull(androidPackageName, trustedAppMetadata::setAndroidPackageName);
+                setIfNotNull(androidThumbprints, trustedAppMetadata::setAndroidThumbprints);
                 setIfNotNull(advancedConfigurations.getTrustedAppConfiguration().getIsFIDOTrustedApp(),
                         trustedAppMetadata::setIsFidoTrusted);
-                setIfNotNull(advancedConfigurations.getTrustedAppConfiguration().getAndroidPackageName(),
-                        trustedAppMetadata::setAndroidPackageName);
-                setIfNotNull(advancedConfigurations.getTrustedAppConfiguration().getAndroidThumbprints(),
-                        trustedAppMetadata::setAndroidThumbprints);
                 setIfNotNull(advancedConfigurations.getTrustedAppConfiguration().getAppleAppId(),
                         trustedAppMetadata::setAppleAppId);
                 serviceProvider.setTrustedAppMetadata(trustedAppMetadata);

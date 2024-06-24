@@ -160,7 +160,7 @@ public class ApplicationManagementConstants {
         BLOCK_RENAME_APP_NAME_TO_RESERVED_APP_NAME("60516",
                 "Renaming application name to a system reserved name is blocked",
                 "The application name %s is marked as systems reserved application name."),
-        ANDROID_THUMBPRINT_NOT_PROVIDED("60516",
+        INCORRECT_ANDROID_APP_DETAILS("60516",
                 "Invalid trusted app configuration.",
                 "Both package name and thumbprints are required when configuring an android application as a trusted " +
                         "mobile application."),
