@@ -36,6 +36,7 @@ import javax.xml.bind.annotation.*;
 public class TrustedAppConfiguration  {
   
     private Boolean isFIDOTrustedApp;
+    private Boolean isConsentGranted;
     private String androidPackageName;
     private String androidThumbprints;
     private String appleAppId;
@@ -57,6 +58,25 @@ public class TrustedAppConfiguration  {
     }
     public void setIsFIDOTrustedApp(Boolean isFIDOTrustedApp) {
         this.isFIDOTrustedApp = isFIDOTrustedApp;
+    }
+
+    /**
+    * Decides whether consent is granted for the trusted app.
+    **/
+    public TrustedAppConfiguration isConsentGranted(Boolean isConsentGranted) {
+
+        this.isConsentGranted = isConsentGranted;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "false", value = "Decides whether consent is granted for the trusted app.")
+    @JsonProperty("isConsentGranted")
+    @Valid
+    public Boolean getIsConsentGranted() {
+        return isConsentGranted;
+    }
+    public void setIsConsentGranted(Boolean isConsentGranted) {
+        this.isConsentGranted = isConsentGranted;
     }
 
     /**
@@ -129,6 +149,7 @@ public class TrustedAppConfiguration  {
         }
         TrustedAppConfiguration trustedAppConfiguration = (TrustedAppConfiguration) o;
         return Objects.equals(this.isFIDOTrustedApp, trustedAppConfiguration.isFIDOTrustedApp) &&
+            Objects.equals(this.isConsentGranted, trustedAppConfiguration.isConsentGranted) &&
             Objects.equals(this.androidPackageName, trustedAppConfiguration.androidPackageName) &&
             Objects.equals(this.androidThumbprints, trustedAppConfiguration.androidThumbprints) &&
             Objects.equals(this.appleAppId, trustedAppConfiguration.appleAppId);
@@ -136,7 +157,7 @@ public class TrustedAppConfiguration  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(isFIDOTrustedApp, androidPackageName, androidThumbprints, appleAppId);
+        return Objects.hash(isFIDOTrustedApp, isConsentGranted, androidPackageName, androidThumbprints, appleAppId);
     }
 
     @Override
@@ -146,6 +167,7 @@ public class TrustedAppConfiguration  {
         sb.append("class TrustedAppConfiguration {\n");
         
         sb.append("    isFIDOTrustedApp: ").append(toIndentedString(isFIDOTrustedApp)).append("\n");
+        sb.append("    isConsentGranted: ").append(toIndentedString(isConsentGranted)).append("\n");
         sb.append("    androidPackageName: ").append(toIndentedString(androidPackageName)).append("\n");
         sb.append("    androidThumbprints: ").append(toIndentedString(androidThumbprints)).append("\n");
         sb.append("    appleAppId: ").append(toIndentedString(appleAppId)).append("\n");

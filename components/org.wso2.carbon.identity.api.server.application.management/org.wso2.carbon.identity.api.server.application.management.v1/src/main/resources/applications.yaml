@@ -3152,6 +3152,10 @@ components:
           type: boolean
           description: Decides whether the application is a FIDO trusted app.
           example: false
+        isConsentGranted:
+          type: boolean
+          description: Decides whether consent is granted for the trusted app.
+          example: false
         androidPackageName:
           type: string
           description: Decides the android package name for the application.
