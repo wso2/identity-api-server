@@ -17,7 +17,6 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 
 import com.google.gson.Gson;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
@@ -34,7 +33,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_SUPPORTED;
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.INCORRECT_ANDROID_APP_DETAILS;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.TRUSTED_APP_CONSENT_GRANTED_SP_PROPERTY_DISPLAY_NAME;
@@ -137,13 +135,6 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                                                 ServiceProvider serviceProvider) {
 
         if (trustedAppConfiguration != null) {
-            if ((StringUtils.isNotBlank(trustedAppConfiguration.getAndroidPackageName()) &&
-                    StringUtils.isBlank(trustedAppConfiguration.getAndroidThumbprints())) ||
-                    (StringUtils.isBlank(trustedAppConfiguration.getAndroidPackageName()) &&
-                            StringUtils.isNotBlank(trustedAppConfiguration.getAndroidThumbprints()))) {
-                throw buildBadRequestError(INCORRECT_ANDROID_APP_DETAILS.getCode(),
-                        INCORRECT_ANDROID_APP_DETAILS.getDescription());
-            }
             SpTrustedAppMetadata trustedAppMetadata = new SpTrustedAppMetadata();
             setIfNotNull(trustedAppConfiguration.getAndroidPackageName(), trustedAppMetadata::setAndroidPackageName);
             setIfNotNull(trustedAppConfiguration.getAndroidThumbprints(), trustedAppMetadata::setAndroidThumbprints);
@@ -151,21 +142,24 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(trustedAppConfiguration.getAppleAppId(), trustedAppMetadata::setAppleAppId);
             serviceProvider.setTrustedAppMetadata(trustedAppMetadata);
 
-            // Update the SP properties with the consent granted status of the trusted app.
-            ArrayList<ServiceProviderProperty> serviceProviderProperties =
-                    new ArrayList<>(Arrays.asList(serviceProvider.getSpProperties()));
+            if (trustedAppConfiguration.getIsConsentGranted() != null) {
+                // Update the SP properties with the consent granted status of the trusted app.
+                ArrayList<ServiceProviderProperty> serviceProviderProperties =
+                        new ArrayList<>(Arrays.asList(serviceProvider.getSpProperties()));
 
-            for (ServiceProviderProperty spProperty : serviceProviderProperties) {
-                if (TRUSTED_APP_CONSENT_GRANTED_SP_PROPERTY_NAME.equals(spProperty.getName())) {
-                    serviceProviderProperties.remove(spProperty);
-                    break;
+                for (ServiceProviderProperty spProperty : serviceProviderProperties) {
+                    if (TRUSTED_APP_CONSENT_GRANTED_SP_PROPERTY_NAME.equals(spProperty.getName())) {
+                        serviceProviderProperties.remove(spProperty);
+                        break;
+                    }
                 }
+                ServiceProviderProperty serviceProviderProperty = new ServiceProviderProperty();
+                serviceProviderProperty.setName(TRUSTED_APP_CONSENT_GRANTED_SP_PROPERTY_NAME);
+                serviceProviderProperty.setValue(trustedAppConfiguration.getIsConsentGranted().toString());
+                serviceProviderProperty.setDisplayName(TRUSTED_APP_CONSENT_GRANTED_SP_PROPERTY_DISPLAY_NAME);
+                serviceProviderProperties.add(serviceProviderProperty);
+                serviceProvider.setSpProperties(serviceProviderProperties.toArray(new ServiceProviderProperty[0]));
             }
-            ServiceProviderProperty serviceProviderProperty = new ServiceProviderProperty();
-            serviceProviderProperty.setName(TRUSTED_APP_CONSENT_GRANTED_SP_PROPERTY_NAME);
-            serviceProviderProperty.setValue(trustedAppConfiguration.getIsConsentGranted().toString());
-            serviceProviderProperty.setDisplayName(TRUSTED_APP_CONSENT_GRANTED_SP_PROPERTY_DISPLAY_NAME);
-            serviceProviderProperties.add(serviceProviderProperty);
         }
     }
 }
