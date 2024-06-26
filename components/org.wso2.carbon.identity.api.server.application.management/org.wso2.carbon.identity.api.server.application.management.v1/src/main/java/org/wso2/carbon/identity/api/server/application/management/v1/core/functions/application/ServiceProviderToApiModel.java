@@ -510,7 +510,8 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .isFIDOTrustedApp(trustedAppMetadata.getIsFidoTrusted())
                 .androidPackageName(trustedAppMetadata.getAndroidPackageName())
                 .androidThumbprints(trustedAppMetadata.getAndroidThumbprints())
-                .appleAppId(trustedAppMetadata.getAppleAppId());
+                .appleAppId(trustedAppMetadata.getAppleAppId())
+                .isConsentGranted(ApplicationMgtUtil.isTrustedAppConsentGranted(serviceProvider));
     }
 
     private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {

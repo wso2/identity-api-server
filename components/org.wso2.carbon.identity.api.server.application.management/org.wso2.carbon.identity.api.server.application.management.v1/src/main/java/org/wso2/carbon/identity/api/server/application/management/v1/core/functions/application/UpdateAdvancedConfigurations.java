@@ -131,6 +131,12 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
         }
     }
 
+    /**
+     * Handles the trusted app configurations from the API model and sets them to the Service Provider object.
+     *
+     * @param trustedAppConfiguration The trusted app configuration of the API model.
+     * @param serviceProvider         The service provider to update.
+     */
     private void handleTrustedAppConfigurations(TrustedAppConfiguration trustedAppConfiguration,
                                                 ServiceProvider serviceProvider) {
 
