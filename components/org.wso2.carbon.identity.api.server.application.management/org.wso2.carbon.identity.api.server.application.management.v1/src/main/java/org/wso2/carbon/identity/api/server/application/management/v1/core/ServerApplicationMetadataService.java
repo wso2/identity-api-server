@@ -169,6 +169,9 @@ public class ServerApplicationMetadataService {
         supportedClientAuthMethods.addAll(getClientAuthenticationMethods());
         oidcMetaData.setTokenEndpointAuthMethod(
                 new ClientAuthenticationMethodMetadata().options(supportedClientAuthMethods));
+        boolean tokenEpAllowReusePvtKeyJwtDefaultValue = Boolean.parseBoolean(IdentityUtil
+                .getProperty(ApplicationManagementConstants.TOKEN_EP_ALLOW_REUSE_PVT_KEY_JWT_DEFAULT_VALUE));
+        oidcMetaData.setTokenEndpointAllowReusePvtKeyJwt(tokenEpAllowReusePvtKeyJwtDefaultValue);
         List<String> tokenEpSigningAlgorithms = IdentityUtil
                 .getPropertyAsList(ApplicationManagementConstants.TOKEN_EP_SIGNATURE_ALGORITHMS_SUPPORTED);
         oidcMetaData.setTokenEndpointSignatureAlgorithm(new MetadataProperty()
