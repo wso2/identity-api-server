@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ATTRIBUTE_SEPARATOR;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
@@ -143,7 +144,8 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
         if (trustedAppConfiguration != null) {
             SpTrustedAppMetadata trustedAppMetadata = new SpTrustedAppMetadata();
             setIfNotNull(trustedAppConfiguration.getAndroidPackageName(), trustedAppMetadata::setAndroidPackageName);
-            setIfNotNull(trustedAppConfiguration.getAndroidThumbprints(), trustedAppMetadata::setAndroidThumbprints);
+            setIfNotNull(String.join(ATTRIBUTE_SEPARATOR, trustedAppConfiguration.getAndroidThumbprints()),
+                    trustedAppMetadata::setAndroidThumbprints);
             setIfNotNull(trustedAppConfiguration.getIsFIDOTrustedApp(), trustedAppMetadata::setIsFidoTrusted);
             setIfNotNull(trustedAppConfiguration.getAppleAppId(), trustedAppMetadata::setAppleAppId);
             serviceProvider.setTrustedAppMetadata(trustedAppMetadata);

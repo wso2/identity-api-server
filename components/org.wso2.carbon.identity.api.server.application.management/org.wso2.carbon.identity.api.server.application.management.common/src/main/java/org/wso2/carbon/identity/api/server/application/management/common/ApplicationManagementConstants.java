@@ -79,6 +79,7 @@ public class ApplicationManagementConstants {
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
     public static final String APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED =
             "OutboundProvisioning.enableApplicationBasedOutboundProvisioning";
+    public static final String ATTRIBUTE_SEPARATOR = ",";
 
 
     /**

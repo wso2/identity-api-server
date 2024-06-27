@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 
 /**
@@ -38,7 +40,8 @@ public class TrustedAppConfiguration  {
     private Boolean isFIDOTrustedApp;
     private Boolean isConsentGranted;
     private String androidPackageName;
-    private String androidThumbprints;
+    private List<String> androidThumbprints = null;
+
     private String appleAppId;
 
     /**
@@ -101,23 +104,31 @@ public class TrustedAppConfiguration  {
     /**
     * Decides the android thumbprints for the application.
     **/
-    public TrustedAppConfiguration androidThumbprints(String androidThumbprints) {
+    public TrustedAppConfiguration androidThumbprints(List<String> androidThumbprints) {
 
         this.androidThumbprints = androidThumbprints;
         return this;
     }
     
-    @ApiModelProperty(example = "18:94:0A:DE:63:77:B6:84:43:1E:85:8F:03:CF:8A:14:87:9C:DE:DF:EA:7A:25:53:CD:53:5A:AF:C3:54:A5:56", value = "Decides the android thumbprints for the application.")
+    @ApiModelProperty(value = "Decides the android thumbprints for the application.")
     @JsonProperty("androidThumbprints")
     @Valid
-    public String getAndroidThumbprints() {
+    public List<String> getAndroidThumbprints() {
         return androidThumbprints;
     }
-    public void setAndroidThumbprints(String androidThumbprints) {
+    public void setAndroidThumbprints(List<String> androidThumbprints) {
         this.androidThumbprints = androidThumbprints;
     }
 
-    /**
+    public TrustedAppConfiguration addAndroidThumbprintsItem(String androidThumbprintsItem) {
+        if (this.androidThumbprints == null) {
+            this.androidThumbprints = new ArrayList<>();
+        }
+        this.androidThumbprints.add(androidThumbprintsItem);
+        return this;
+    }
+
+        /**
     * Decides the apple app id for the application.
     **/
     public TrustedAppConfiguration appleAppId(String appleAppId) {
@@ -126,7 +137,7 @@ public class TrustedAppConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(example = "APPLETEAMID.com.wso2.mobile.sample", value = "Decides the apple app id for the application.")
+    @ApiModelProperty(example = "APPLETEAMID.com.org.mobile.sample", value = "Decides the apple app id for the application.")
     @JsonProperty("appleAppId")
     @Valid
     public String getAppleAppId() {

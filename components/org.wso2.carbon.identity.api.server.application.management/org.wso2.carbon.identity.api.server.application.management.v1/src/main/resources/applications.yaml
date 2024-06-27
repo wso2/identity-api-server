@@ -3161,13 +3161,16 @@ components:
           description: Decides the android package name for the application.
           example: "com.wso2.mobile.sample"
         androidThumbprints:
-          type: string
+          type: array
+          items:
+            type: string
+            example:
+              - "18:94:0A:DE:63:77:B6:84:43:1E:85:8F:03:CF:8A:14:87:9C:DE:DF:EA:7A:25:53:CD:53:5A:AF:C3:54:A5:56"
           description: Decides the android thumbprints for the application.
-          example: "18:94:0A:DE:63:77:B6:84:43:1E:85:8F:03:CF:8A:14:87:9C:DE:DF:EA:7A:25:53:CD:53:5A:AF:C3:54:A5:56"
         appleAppId:
           type: string
           description: Decides the apple app id for the application.
-          example: "APPLETEAMID.com.wso2.mobile.sample"
+          example: "APPLETEAMID.com.org.mobile.sample"
     Certificate:
       type: object
       properties:
