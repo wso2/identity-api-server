@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.Attribute;
 import javax.validation.constraints.*;
 
 
@@ -69,6 +72,8 @@ public enum StatusEnum {
 
     private StatusEnum status;
     private String ref;
+    private List<Attribute> attributes = null;
+
 
     /**
     **/
@@ -150,7 +155,33 @@ public enum StatusEnum {
         this.ref = ref;
     }
 
+    /**
+    **/
+    public BasicOrganizationResponse attributes(List<Attribute> attributes) {
 
+        this.attributes = attributes;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("attributes")
+    @Valid
+    public List<Attribute> getAttributes() {
+        return attributes;
+    }
+    public void setAttributes(List<Attribute> attributes) {
+        this.attributes = attributes;
+    }
+
+    public BasicOrganizationResponse addAttributesItem(Attribute attributesItem) {
+        if (this.attributes == null) {
+            this.attributes = new ArrayList<>();
+        }
+        this.attributes.add(attributesItem);
+        return this;
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -165,12 +196,13 @@ public enum StatusEnum {
         return Objects.equals(this.id, basicOrganizationResponse.id) &&
             Objects.equals(this.name, basicOrganizationResponse.name) &&
             Objects.equals(this.status, basicOrganizationResponse.status) &&
-            Objects.equals(this.ref, basicOrganizationResponse.ref);
+            Objects.equals(this.ref, basicOrganizationResponse.ref) &&
+            Objects.equals(this.attributes, basicOrganizationResponse.attributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, status, ref);
+        return Objects.hash(id, name, status, ref, attributes);
     }
 
     @Override
@@ -183,6 +215,7 @@ public enum StatusEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    ref: ").append(toIndentedString(ref)).append("\n");
+        sb.append("    attributes: ").append(toIndentedString(attributes)).append("\n");
         sb.append("}");
         return sb.toString();
     }
