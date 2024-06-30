@@ -28,6 +28,7 @@ public class ClientAuthenticationConfiguration {
 
     private String tokenEndpointAuthMethod;
     private String tokenEndpointAuthSigningAlg;
+    private Boolean tokenEndpointAllowReusePvtKeyJwt;
     private String tlsClientAuthSubjectDn;
 
     /**
@@ -67,6 +68,30 @@ public class ClientAuthenticationConfiguration {
     }
 
     /**
+     * Allow reuse of the private key for JWT generation at the token endpoint.
+     *
+     * @param tokenEndpointAllowReusePvtKeyJwt Allow reuse of the private key for JWT generation at the token endpoint.
+     * @return ClientAuthenticationConfiguration object.
+     **/
+    public ClientAuthenticationConfiguration tokenEndpointAllowReusePvtKeyJwt(
+            Boolean tokenEndpointAllowReusePvtKeyJwt) {
+
+        this.tokenEndpointAllowReusePvtKeyJwt = tokenEndpointAllowReusePvtKeyJwt;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("tokenEndpointAllowReusePvtKeyJwt")
+    @Valid
+    public Boolean isTokenEndpointAllowReusePvtKeyJwt() {
+        return tokenEndpointAllowReusePvtKeyJwt;
+    }
+
+    public void setTokenEndpointAllowReusePvtKeyJwt(Boolean tokenEndpointAllowReusePvtKeyJwt) {
+        this.tokenEndpointAllowReusePvtKeyJwt = tokenEndpointAllowReusePvtKeyJwt;
+    }
+
+    /**
      **/
     public ClientAuthenticationConfiguration tlsClientAuthSubjectDn(String tlsClientAuthSubjectDn) {
 
@@ -94,14 +119,20 @@ public class ClientAuthenticationConfiguration {
             return false;
         }
         ClientAuthenticationConfiguration clientAuthenticationConfiguration = (ClientAuthenticationConfiguration) o;
-        return Objects.equals(this.tokenEndpointAuthMethod, clientAuthenticationConfiguration.tokenEndpointAuthMethod) &&
-            Objects.equals(this.tokenEndpointAuthSigningAlg, clientAuthenticationConfiguration.tokenEndpointAuthSigningAlg) &&
-            Objects.equals(this.tlsClientAuthSubjectDn, clientAuthenticationConfiguration.tlsClientAuthSubjectDn);
+        return Objects.equals(this.tokenEndpointAuthMethod,
+                clientAuthenticationConfiguration.tokenEndpointAuthMethod) &&
+                Objects.equals(this.tokenEndpointAuthSigningAlg,
+                        clientAuthenticationConfiguration.tokenEndpointAuthSigningAlg) &&
+                Objects.equals(this.tlsClientAuthSubjectDn, clientAuthenticationConfiguration.tlsClientAuthSubjectDn) &&
+                Objects.equals(this.tokenEndpointAllowReusePvtKeyJwt,
+                        clientAuthenticationConfiguration.tokenEndpointAllowReusePvtKeyJwt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tokenEndpointAuthMethod, tokenEndpointAuthSigningAlg, tlsClientAuthSubjectDn);
+
+        return Objects.hash(tokenEndpointAuthMethod, tokenEndpointAuthSigningAlg, tokenEndpointAllowReusePvtKeyJwt,
+                tlsClientAuthSubjectDn);
     }
 
     @Override
@@ -112,6 +143,8 @@ public class ClientAuthenticationConfiguration {
 
         sb.append("    tokenEndpointAuthMethod: ").append(toIndentedString(tokenEndpointAuthMethod)).append("\n");
         sb.append("    tokenEndpointAuthSigningAlg: ").append(toIndentedString(tokenEndpointAuthSigningAlg)).append("\n");
+        sb.append("    tokenEndpointAllowReusePvtKeyJwt: ").append(toIndentedString(tokenEndpointAllowReusePvtKeyJwt))
+                .append("\n");
         sb.append("    tlsClientAuthSubjectDn: ").append(toIndentedString(tlsClientAuthSubjectDn)).append("\n");
         sb.append("}");
         return sb.toString();
