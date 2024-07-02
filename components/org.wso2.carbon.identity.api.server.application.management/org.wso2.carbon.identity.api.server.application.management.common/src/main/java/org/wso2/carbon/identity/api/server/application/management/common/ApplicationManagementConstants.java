@@ -49,6 +49,7 @@ public class ApplicationManagementConstants {
     public static final String DEFAULT_NAME_ID_FORMAT = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified";
     public static final String DEFAULT_CERTIFICATE_ALIAS = "wso2carbon";
     public static final String ADVANCED_CONFIGURATIONS = "advancedConfigurations";
+    public static final String APPLICATION_ENABLED = "applicationEnabled";
     public static final String TEMPLATE_ID = "templateId";
     public static final String NAME = "name";
     public static final String CLIENT_ID = "clientId";
@@ -79,8 +80,9 @@ public class ApplicationManagementConstants {
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
     public static final String APPLICATION_BASED_OUTBOUND_PROVISIONING_ENABLED =
             "OutboundProvisioning.enableApplicationBasedOutboundProvisioning";
-    public static final String ATTRIBUTE_SEPARATOR = ",";
-
+    public static final String CODE_TOKEN = "code token";
+    public static final String CODE_IDTOKEN = "code id_token";
+    public static final String CODE_IDTOKEN_TOKEN = "code id_token token";
 
     /**
      * Enums for error messages.
@@ -161,6 +163,13 @@ public class ApplicationManagementConstants {
         BLOCK_RENAME_APP_NAME_TO_RESERVED_APP_NAME("60516",
                 "Renaming application name to a system reserved name is blocked",
                 "The application name %s is marked as systems reserved application name."),
+        Hybrid_FLOW_RESPONSE_TYPE_NOT_FOUND("60517",
+                "Hybrid flow response type not found.",
+                "Hybrid flow response type cannot be found for the application"),
+        Hybrid_FLOW_RESPONSE_TYPE_INCORRECT("60518",
+                "Hybrid flow response type is incorrect.",
+                "The response type for the hybrid flow should be either 'code token' or 'code id_token' or " +
+                        "'code id_token token'"),
 
         // Server Errors.
         ERROR_RETRIEVING_SAML_METADATA("65001",

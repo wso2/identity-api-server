@@ -2696,9 +2696,9 @@ components:
       required: false
       description: |
         Specifies the required parameters in the response.
-        Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', 'issuer', and 'associatedRoles.allowedAudience' attributes.
+        Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', 'issuer', 'applicationEnabled' and 'associatedRoles.allowedAudience' attributes.
 
-        /applications?attributes=advancedConfigurations,templateId,clientId,associatedRoles.allowedAudience
+        /applications?attributes=advancedConfigurations,templateId,clientId,applicationEnabled,associatedRoles.allowedAudience
       schema:
         type: string
     exportSecretsQueryParam:
@@ -2833,6 +2833,9 @@ components:
         associatedRoles:
           type: object
           $ref: '#/components/schemas/AssociatedRolesConfig'
+        applicationEnabled:
+          type: boolean
+          example: true
     ApplicationModel:
       type: object
       required:
@@ -3588,8 +3591,12 @@ components:
           $ref: '#/components/schemas/OAuth2PKCEConfiguration'
         accessToken:
           $ref: '#/components/schemas/AccessTokenConfiguration'
+        hybridFlow:
+          $ref: '#/components/schemas/HybridFlowConfiguration'
         refreshToken:
           $ref: '#/components/schemas/RefreshTokenConfiguration'
+        subjectToken:
+          $ref: '#/components/schemas/SubjectTokenConfiguration'
         idToken:
           $ref: '#/components/schemas/IdTokenConfiguration'
         logout:
@@ -3627,6 +3634,15 @@ components:
         supportPlainTransformAlgorithm:
           type: boolean
           example: true
+    HybridFlowConfiguration:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: true
+        responseType:
+          type: string
+          example: code id_token
     AccessTokenConfiguration:
       type: object
       properties:
@@ -3666,6 +3682,15 @@ components:
           description: Decides whether the refresh token needs to be renewed during refresh grant flow.
           type: boolean
           example: true
+    SubjectTokenConfiguration:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          description: "If enabled, subject token can be issued for token exchange grant type."
+        applicationSubjectTokenExpiryInSeconds:
+          type: integer
+          example: 3600
     IdTokenConfiguration:
       type: object
       properties:

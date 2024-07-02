@@ -22,6 +22,8 @@
           class="org.wso2.carbon.identity.api.server.configs.common.factory.ApplicationMgtOSGIServiceFactory"/>
     <bean id="IdPMgtServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.configs.common.factory.IdPMgtOSGIServiceFactory"/>
+    <bean id="ImpersonationConfigMgtServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.configs.common.factory.ImpersonationMgtOGSiServiceFactory"/>
     <bean id="CORSMgtServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.configs.common.factory.CORSMgtOGSiServiceFactory"/>
     <bean id="RemoteLoggingOGSiServiceFactoryBean"
@@ -35,6 +37,7 @@
         <property name="corsManagementService" ref="CORSMgtServiceFactoryBean"/>
         <property name="remoteLoggingConfigService" ref="RemoteLoggingOGSiServiceFactoryBean"/>
         <property name="dcrConfigurationMgtService" ref="DCRMgtOGSiServiceFactoryBean"/>
+        <property name="impersonationConfigMgtService" ref="ImpersonationConfigMgtServiceFactoryBean"/>
     </bean>
 </beans>
 

@@ -16,9 +16,12 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.oauth2;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.HybridFlowConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OAuth2PKCEConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCLogoutConfiguration;
@@ -27,12 +30,17 @@ import org.wso2.carbon.identity.api.server.application.management.v1.PushAuthori
 import org.wso2.carbon.identity.api.server.application.management.v1.RefreshTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SubjectTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.util.List;
 import java.util.Optional;
+
+import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
 
@@ -63,6 +71,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
 
         updateAllowedOrigins(consumerAppDTO, oidcModel.getAllowedOrigins());
         updatePkceConfigurations(consumerAppDTO, oidcModel.getPkce());
+        updateHybridFlowConfigurations(consumerAppDTO, oidcModel.getHybridFlow());
         updateAccessTokenConfiguration(consumerAppDTO, oidcModel.getAccessToken());
         updateRefreshTokenConfiguration(consumerAppDTO, oidcModel.getRefreshToken());
         updateIdTokenConfiguration(consumerAppDTO, oidcModel.getIdToken());
@@ -72,6 +81,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         updatePARConfigurations(consumerAppDTO, oidcModel.getPushAuthorizationRequest());
         updateSubjectConfigurations(consumerAppDTO, oidcModel.getSubject());
         consumerAppDTO.setFapiConformanceEnabled(oidcModel.getIsFAPIApplication());
+        updateSubjectTokenConfigurations(consumerAppDTO, oidcModel.getSubjectToken());
 
         return consumerAppDTO;
     }
@@ -168,6 +178,47 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         }
     }
 
+    private void updateHybridFlowConfigurations(OAuthConsumerAppDTO consumerAppDTO,
+                                                HybridFlowConfiguration hybridFlow) {
+
+        if (hybridFlow != null) {
+
+            consumerAppDTO.setHybridFlowEnabled(hybridFlow.getEnable());
+            if (hybridFlow.getEnable()) {
+                validateHybridFlowResponseType(consumerAppDTO, hybridFlow);
+                consumerAppDTO.setHybridFlowResponseType(hybridFlow.getResponseType());
+            }
+        }
+    }
+
+    private void validateHybridFlowResponseType(OAuthConsumerAppDTO consumerAppDTO,
+                                                HybridFlowConfiguration hybridFlowResponseType) {
+
+        String[] allowedResponseTypes = {ApplicationManagementConstants.CODE_TOKEN,
+                                         ApplicationManagementConstants.CODE_IDTOKEN,
+                                         ApplicationManagementConstants.CODE_IDTOKEN_TOKEN};
+
+        if (StringUtils.isBlank(hybridFlowResponseType.getResponseType())) {
+            throw new APIError(Response.Status.BAD_REQUEST,
+                    new ErrorResponse.Builder().withCode(ApplicationManagementConstants.ErrorMessage
+                                    .Hybrid_FLOW_RESPONSE_TYPE_NOT_FOUND.getCode())
+                            .withMessage(ApplicationManagementConstants.ErrorMessage
+                                    .Hybrid_FLOW_RESPONSE_TYPE_NOT_FOUND.getMessage())
+                            .withDescription(ApplicationManagementConstants.ErrorMessage
+                                    .Hybrid_FLOW_RESPONSE_TYPE_NOT_FOUND.getDescription()).build());
+        }
+
+        if (!ArrayUtils.contains(allowedResponseTypes, hybridFlowResponseType.getResponseType())) {
+            throw new APIError(Response.Status.BAD_REQUEST,
+                    new ErrorResponse.Builder().withCode(ApplicationManagementConstants.ErrorMessage
+                                    .Hybrid_FLOW_RESPONSE_TYPE_INCORRECT.getCode())
+                            .withMessage(ApplicationManagementConstants.ErrorMessage
+                                    .Hybrid_FLOW_RESPONSE_TYPE_INCORRECT.getMessage())
+                            .withDescription(ApplicationManagementConstants.ErrorMessage
+                                    .Hybrid_FLOW_RESPONSE_TYPE_INCORRECT.getDescription()).build());
+        }
+    }
+
     private String[] getScopeValidators(OpenIDConnectConfiguration oidcModel) {
 
         return Optional.ofNullable(oidcModel.getScopeValidators())
@@ -231,6 +282,15 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         if (subject != null) {
             consumerAppDTO.setSubjectType(subject.getSubjectType());
             consumerAppDTO.setSectorIdentifierURI(subject.getSectorIdentifierUri());
+        }
+    }
+
+    private void updateSubjectTokenConfigurations(OAuthConsumerAppDTO consumerAppDTO,
+                                                  SubjectTokenConfiguration subjectToken) {
+
+        if (subjectToken != null) {
+            consumerAppDTO.setSubjectTokenEnabled(subjectToken.getEnable());
+            consumerAppDTO.setSubjectTokenExpiryTime(subjectToken.getApplicationSubjectTokenExpiryInSeconds());
         }
     }
 }

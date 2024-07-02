@@ -29,6 +29,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListIte
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Error;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
@@ -54,6 +55,8 @@ public interface ConfigsApiService {
 
       public Response getHomeRealmIdentifiers();
 
+      public Response getImpersonationConfiguration();
+
       public Response getInboundScimConfigs();
 
       public Response getPassiveSTSInboundAuthConfig();
@@ -76,6 +79,8 @@ public interface ConfigsApiService {
       public Response patchCORSConfiguration(List<CORSPatch> coRSPatch);
 
       public Response patchConfigs(List<Patch> patch);
+
+      public Response patchImpersonationConfiguration(List<ImpersonationPatch> impersonationPatch);
 
       public Response patchPrivatKeyJWTValidationConfiguration(List<JWTKeyValidatorPatch> jwTKeyValidatorPatch);
 

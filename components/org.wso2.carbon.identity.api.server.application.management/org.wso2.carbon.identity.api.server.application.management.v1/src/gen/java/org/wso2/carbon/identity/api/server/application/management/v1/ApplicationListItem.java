@@ -80,6 +80,7 @@ public enum AccessEnum {
     private AdvancedApplicationConfiguration advancedConfigurations;
     private String templateId;
     private AssociatedRolesConfig associatedRoles;
+    private Boolean applicationEnabled;
 
     /**
     **/
@@ -315,6 +316,24 @@ public enum AccessEnum {
         this.associatedRoles = associatedRoles;
     }
 
+    /**
+    **/
+    public ApplicationListItem applicationEnabled(Boolean applicationEnabled) {
+
+        this.applicationEnabled = applicationEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "true", value = "")
+    @JsonProperty("applicationEnabled")
+    @Valid
+    public Boolean getApplicationEnabled() {
+        return applicationEnabled;
+    }
+    public void setApplicationEnabled(Boolean applicationEnabled) {
+        this.applicationEnabled = applicationEnabled;
+    }
+
 
 
     @Override
@@ -339,12 +358,13 @@ public enum AccessEnum {
             Objects.equals(this.self, applicationListItem.self) &&
             Objects.equals(this.advancedConfigurations, applicationListItem.advancedConfigurations) &&
             Objects.equals(this.templateId, applicationListItem.templateId) &&
-            Objects.equals(this.associatedRoles, applicationListItem.associatedRoles);
+            Objects.equals(this.associatedRoles, applicationListItem.associatedRoles) &&
+            Objects.equals(this.applicationEnabled, applicationListItem.applicationEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, associatedRoles);
+        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, associatedRoles, applicationEnabled);
     }
 
     @Override
@@ -366,6 +386,7 @@ public enum AccessEnum {
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
+        sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("}");
         return sb.toString();
     }

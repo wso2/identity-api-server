@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.197-SNAPSHOT</version>
+    <version>1.2.203-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -790,13 +790,13 @@
         <version.org.wso2.orbit.javax.xml.bind>2.3.1.wso2v1</version.org.wso2.orbit.javax.xml.bind>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
-        <identity.governance.version>1.8.62</identity.governance.version>
-        <carbon.identity.framework.version>7.2.42-SNAPSHOT</carbon.identity.framework.version>
+        <identity.governance.version>1.9.17</identity.governance.version>
+        <carbon.identity.framework.version>7.2.37</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
-        <identity.event.handler.version>1.8.7</identity.event.handler.version>
-        <identity.inbound.oauth2.version>7.0.65</identity.inbound.oauth2.version>
+        <identity.event.handler.version>1.8.19</identity.event.handler.version>
+        <identity.inbound.oauth2.version>7.0.103</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.41</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
