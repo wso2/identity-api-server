@@ -25,19 +25,13 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.application.common.model.ClientAttestationMetaData;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
-import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
 import org.wso2.carbon.identity.application.common.model.SpTrustedAppMetadata;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ATTRIBUTE_SEPARATOR;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_SUPPORTED;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.setIfNotNull;
-import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.TRUSTED_APP_CONSENT_GRANTED_SP_PROPERTY_DISPLAY_NAME;
-import static org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants.TRUSTED_APP_CONSENT_GRANTED_SP_PROPERTY_NAME;
 
 /**
  * Updates the advanced application configurations defined by the API model in the Service Provider model.
@@ -144,30 +138,12 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
         if (trustedAppConfiguration != null) {
             SpTrustedAppMetadata trustedAppMetadata = new SpTrustedAppMetadata();
             setIfNotNull(trustedAppConfiguration.getAndroidPackageName(), trustedAppMetadata::setAndroidPackageName);
-            setIfNotNull(String.join(ATTRIBUTE_SEPARATOR, trustedAppConfiguration.getAndroidThumbprints()),
+            setIfNotNull(trustedAppConfiguration.getAndroidThumbprints().toArray(new String[0]),
                     trustedAppMetadata::setAndroidThumbprints);
-            setIfNotNull(trustedAppConfiguration.getIsFIDOTrustedApp(), trustedAppMetadata::setIsFidoTrusted);
             setIfNotNull(trustedAppConfiguration.getAppleAppId(), trustedAppMetadata::setAppleAppId);
+            setIfNotNull(trustedAppConfiguration.getIsFIDOTrustedApp(), trustedAppMetadata::setIsFidoTrusted);
+            setIfNotNull(trustedAppConfiguration.getIsConsentGranted(), trustedAppMetadata::setIsConsentGranted);
             serviceProvider.setTrustedAppMetadata(trustedAppMetadata);
-
-            if (trustedAppConfiguration.getIsConsentGranted() != null) {
-                // Update the SP properties with the consent granted status of the trusted app.
-                ArrayList<ServiceProviderProperty> serviceProviderProperties =
-                        new ArrayList<>(Arrays.asList(serviceProvider.getSpProperties()));
-
-                for (ServiceProviderProperty spProperty : serviceProviderProperties) {
-                    if (TRUSTED_APP_CONSENT_GRANTED_SP_PROPERTY_NAME.equals(spProperty.getName())) {
-                        serviceProviderProperties.remove(spProperty);
-                        break;
-                    }
-                }
-                ServiceProviderProperty serviceProviderProperty = new ServiceProviderProperty();
-                serviceProviderProperty.setName(TRUSTED_APP_CONSENT_GRANTED_SP_PROPERTY_NAME);
-                serviceProviderProperty.setValue(trustedAppConfiguration.getIsConsentGranted().toString());
-                serviceProviderProperty.setDisplayName(TRUSTED_APP_CONSENT_GRANTED_SP_PROPERTY_DISPLAY_NAME);
-                serviceProviderProperties.add(serviceProviderProperty);
-                serviceProvider.setSpProperties(serviceProviderProperties.toArray(new ServiceProviderProperty[0]));
-            }
         }
     }
 }

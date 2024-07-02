@@ -75,7 +75,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ATTRIBUTE_SEPARATOR;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.arrayToStream;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_JWKS;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.UpdateAdvancedConfigurations.TYPE_PEM;
@@ -510,10 +509,9 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return new TrustedAppConfiguration()
                 .isFIDOTrustedApp(trustedAppMetadata.getIsFidoTrusted())
                 .androidPackageName(trustedAppMetadata.getAndroidPackageName())
-                .androidThumbprints(Arrays.asList(trustedAppMetadata.getAndroidThumbprints()
-                        .split(ATTRIBUTE_SEPARATOR)))
+                .androidThumbprints(Arrays.asList(trustedAppMetadata.getAndroidThumbprints()))
                 .appleAppId(trustedAppMetadata.getAppleAppId())
-                .isConsentGranted(ApplicationMgtUtil.isTrustedAppConsentGranted(serviceProvider));
+                .isConsentGranted(trustedAppMetadata.getIsConsentGranted());
     }
 
     private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {
