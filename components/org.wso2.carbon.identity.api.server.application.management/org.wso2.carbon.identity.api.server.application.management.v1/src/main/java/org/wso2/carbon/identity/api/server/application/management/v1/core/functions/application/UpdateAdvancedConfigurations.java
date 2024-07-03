@@ -135,15 +135,17 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
     private void handleTrustedAppConfigurations(TrustedAppConfiguration trustedAppConfiguration,
                                                 ServiceProvider serviceProvider) {
 
+        SpTrustedAppMetadata trustedAppMetadata = new SpTrustedAppMetadata();
         if (trustedAppConfiguration != null) {
-            SpTrustedAppMetadata trustedAppMetadata = new SpTrustedAppMetadata();
+            List<String> thumbprints = trustedAppConfiguration.getAndroidThumbprints();
+
             setIfNotNull(trustedAppConfiguration.getAndroidPackageName(), trustedAppMetadata::setAndroidPackageName);
-            setIfNotNull(trustedAppConfiguration.getAndroidThumbprints().toArray(new String[0]),
+            setIfNotNull(thumbprints != null ? thumbprints.toArray(new String[0]) : null,
                     trustedAppMetadata::setAndroidThumbprints);
             setIfNotNull(trustedAppConfiguration.getAppleAppId(), trustedAppMetadata::setAppleAppId);
             setIfNotNull(trustedAppConfiguration.getIsFIDOTrustedApp(), trustedAppMetadata::setIsFidoTrusted);
             setIfNotNull(trustedAppConfiguration.getIsConsentGranted(), trustedAppMetadata::setIsConsentGranted);
-            serviceProvider.setTrustedAppMetadata(trustedAppMetadata);
         }
+        serviceProvider.setTrustedAppMetadata(trustedAppMetadata);
     }
 }
