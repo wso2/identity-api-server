@@ -18,11 +18,11 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.util;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.action.mgt.exception.ActionMgtClientException;
 import org.wso2.carbon.identity.action.mgt.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.mgt.model.TypeEnums;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.common.Constants;
@@ -30,19 +30,13 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ACTION_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_ACTION_ENDPOINT;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_ACTION_ENDPOINT_AUTHENTICATION;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_ACTION_ENDPOINT_AUTHENTICATION_TYPE;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_ACTION_ENDPOINT_URI;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_ACTION_NAME;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_ACTION_TYPE;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_CODE_NOT_SUPPORTED_ACTION_ENDPOINT_AUTHENTICATION_TYPE;
+import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.PATH_CONSTANT;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
 
@@ -55,60 +49,37 @@ public class ActionMgtEndpointUtil {
     private static final String ACTION_TYPE_LINK_FORMAT = Constants.V1_API_PATH_COMPONENT + ACTION_PATH_COMPONENT
             + PATH_CONSTANT;
 
-    public static String getValidatedActionType(String actionType) {
-
-        for (ActionMgtEndpointConstants.ActionTypes type: ActionMgtEndpointConstants.ActionTypes.values()) {
-
-            if (type.getPathParam().equals(actionType)) {
-                return type.getActionType();
-            }
-        }
-        throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_ACTION_TYPE);
-    }
-
-    public static void validateAction(ActionModel actionModel) {
-
-        if (StringUtils.isBlank(actionModel.getName())) {
-            throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_ACTION_NAME);
-        }
-        if (actionModel.getEndpoint() == null) {
-            throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_ACTION_ENDPOINT);
-        }
-        if (StringUtils.isBlank(actionModel.getEndpoint().getUri())) {
-            throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_ACTION_ENDPOINT_URI);
-        }
-        if (actionModel.getEndpoint().getAuthentication() == null) {
-            throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_ACTION_ENDPOINT_AUTHENTICATION);
-        }
-        if (StringUtils.isBlank(actionModel.getEndpoint().getAuthentication().getType().toString())) {
-            throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_ACTION_ENDPOINT_AUTHENTICATION_TYPE);
-        }
+    public static void validateActionEndpointAuthProperties(ActionModel actionModel) {
 
         String authnType = actionModel.getEndpoint().getAuthentication().getType().toString();
         Map<String, Object> authnProperties = actionModel.getEndpoint().getAuthentication().getProperties();
+        Map<String, Object> validatedAuthnProperties = new HashMap<>();
 
-        for (ActionMgtEndpointConstants.AuthenticationType type:
-                ActionMgtEndpointConstants.AuthenticationType.values()) {
-
+        for (TypeEnums.AuthenticationType type: TypeEnums.AuthenticationType.values()) {
             if (type.getType().equals(authnType)) {
                 for (String property: type.getProperties()) {
                     if (authnProperties == null || authnProperties.get(property) == null) {
                         throw handleException(Response.Status.BAD_REQUEST,
-                                ERROR_CODE_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES);
+                                ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES);
                     }
+                    validatedAuthnProperties.put(property, authnProperties.get(property));
+                }
+                if (authnProperties.size() > type.getProperties().length) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Removing the given unnecessary properties from the Action Endpoint " +
+                                "authentication properties of Authentication Type: " + authnType);
+                    }
+                    actionModel.getEndpoint().getAuthentication().setProperties(validatedAuthnProperties);
                 }
                 return;
             }
         }
-        throw handleException(Response.Status.BAD_REQUEST,
-                ERROR_CODE_NOT_SUPPORTED_ACTION_ENDPOINT_AUTHENTICATION_TYPE);
     }
-
 
     public static String buildURIForActionType(String actionType) {
 
         return ContextLoader.buildURIForBody(ACTION_TYPE_LINK_FORMAT +
-                ActionMgtEndpointConstants.ActionTypes.valueOf(actionType).getPathParam()).toString();
+                TypeEnums.ActionTypes.valueOf(actionType).getPathParam()).toString();
     }
 
     public static APIError handleException(Response.Status status,

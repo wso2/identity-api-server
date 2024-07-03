@@ -338,7 +338,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ActionResponse'
+                $ref: '#/components/schemas/ActionBasicResponse'
         '400':
           description: Bad Request
           content:
@@ -394,7 +394,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ActionResponse'
+                $ref: '#/components/schemas/ActionBasicResponse'
         '400':
           description: Bad Request
           content:
@@ -488,6 +488,33 @@ components:
             - INACTIVE
         endpoint:
           $ref: '#/components/schemas/Endpoint'
+
+    ActionBasicResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '24f64d17-9824-4e28-8413-de45728d8e84'
+        type:
+          type: string
+          enum:
+            - PRE_ISSUE_ACCESS_TOKEN
+            - PRE_UPDATE_PASSWORD
+            - PRE_UPDATE_PROFILE
+            - PRE_REGISTRATION
+            - POST_LOGIN
+            - PRE_LOGIN
+        name:
+          type: string
+          example: Access Token Pre Issue
+        description:
+          type: string
+          example: This is the configuration of pre-action for issuing access token.
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
 
     ActionResponseList:
       type: array

@@ -20,14 +20,14 @@ package org.wso2.carbon.identity.api.server.action.management.common.factory;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.action.mgt.ActionManager;
+import org.wso2.carbon.identity.action.mgt.ActionManagementService;
 
 /**
  * Factory class for ActionManagementOSGiService.
  */
-public class ActionMgtOSGiServiceFactory extends AbstractFactoryBean<ActionManager> {
+public class ActionMgtOSGiServiceFactory extends AbstractFactoryBean<ActionManagementService> {
 
-    private ActionManager actionManager;
+    private ActionManagementService actionManagementService;
 
     @Override
     public Class<?> getObjectType() {
@@ -36,15 +36,15 @@ public class ActionMgtOSGiServiceFactory extends AbstractFactoryBean<ActionManag
     }
 
     @Override
-    protected ActionManager createInstance() throws Exception {
+    protected ActionManagementService createInstance() throws Exception {
 
-        if (this.actionManager == null) {
-            actionManager = (ActionManager) PrivilegedCarbonContext.
-                    getThreadLocalCarbonContext().getOSGiService(ActionManager.class, null);
-            if (actionManager == null) {
-                throw new Exception("Unable to retrieve ActionManager service.");
+        if (this.actionManagementService == null) {
+            actionManagementService = (ActionManagementService) PrivilegedCarbonContext.
+                    getThreadLocalCarbonContext().getOSGiService(ActionManagementService.class, null);
+            if (actionManagementService == null) {
+                throw new Exception("Action Management Service is not available.");
             }
         }
-        return this.actionManager;
+        return this.actionManagementService;
     }
 }

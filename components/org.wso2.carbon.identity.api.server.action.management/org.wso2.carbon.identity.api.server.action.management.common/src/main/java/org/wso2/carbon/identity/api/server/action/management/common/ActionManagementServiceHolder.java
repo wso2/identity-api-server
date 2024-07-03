@@ -18,32 +18,32 @@
 
 package org.wso2.carbon.identity.api.server.action.management.common;
 
-import org.wso2.carbon.identity.action.mgt.ActionManager;
+import org.wso2.carbon.identity.action.mgt.ActionManagementService;
 
 /**
  * Service holder class for action management.
  */
 public class ActionManagementServiceHolder {
 
-    private static ActionManager actionManager;
+    private static ActionManagementService actionManagementService;
 
     /**
-     * Get ActionManager osgi service.
+     * Get ActionManagementService osgi service.
      *
-     * @return ActionManager.
+     * @return ActionManagementService.
      */
-    public static ActionManager getActionManager() {
+    public static ActionManagementService getActionManagementService() {
 
-        return actionManager;
+        return actionManagementService;
     }
 
     /**
-     * Set ActionManager osgi service.
+     * Set ActionManagementService osgi service.
      *
-     * @param actionManager ActionManager.
+     * @param actionManagementService ActionManagementService.
      */
-    public static void setActionManager(ActionManager actionManager) {
+    public static void setActionManagementService(ActionManagementService actionManagementService) {
 
-        ActionManagementServiceHolder.actionManager = actionManager;
+        ActionManagementServiceHolder.actionManagementService = actionManagementService;
     }
 }

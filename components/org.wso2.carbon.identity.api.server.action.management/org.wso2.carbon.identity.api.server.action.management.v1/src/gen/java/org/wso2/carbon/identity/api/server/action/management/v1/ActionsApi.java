@@ -24,6 +24,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
@@ -50,14 +51,14 @@ public class ActionsApi  {
     @Path("/{actionType}/{actionId}/activate")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Activates the action by given Id. ", notes = "This API provides the capability to activate an action by action Id. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/actionmgt/update <br>   <b>Scope required:</b> <br>       * internal_action_mgt_update ", response = ActionResponse.class, authorizations = {
+    @ApiOperation(value = "Activates the action by given Id. ", notes = "This API provides the capability to activate an action by action Id. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/actionmgt/update <br>   <b>Scope required:</b> <br>       * internal_action_mgt_update ", response = ActionBasicResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Actions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ActionResponse.class),
+        @ApiResponse(code = 200, message = "OK", response = ActionBasicResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -99,14 +100,14 @@ public class ActionsApi  {
     @Path("/{actionType}/{actionId}/deactivate")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Deactivates the action by given Id. ", notes = "This API provides the capability to deactivate an action by action Id. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/actionmgt/update <br>   <b>Scope required:</b> <br>       * internal_action_mgt_update ", response = ActionResponse.class, authorizations = {
+    @ApiOperation(value = "Deactivates the action by given Id. ", notes = "This API provides the capability to deactivate an action by action Id. <br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/actionmgt/update <br>   <b>Scope required:</b> <br>       * internal_action_mgt_update ", response = ActionBasicResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Actions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ActionResponse.class),
+        @ApiResponse(code = 200, message = "OK", response = ActionBasicResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),

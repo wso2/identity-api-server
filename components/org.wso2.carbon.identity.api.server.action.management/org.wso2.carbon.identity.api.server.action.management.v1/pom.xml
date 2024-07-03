@@ -108,6 +108,8 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <!--This plugin is used to generate the API classes from the OpenAPI definition.-->
+            <!--Uncomment and execute if the API is updated.-->
 <!--            <plugin>-->
 <!--                <groupId>org.openapitools</groupId>-->
 <!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->

@@ -25,7 +25,7 @@
 
     <bean id="actionManagementServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.action.management.common.ActionManagementServiceHolder">
-        <property name="actionManager" ref="actionManagementServiceFactoryBean"/>
+        <property name="actionManagementService" ref="actionManagementServiceFactoryBean"/>
     </bean>
 
     <bean id="actionManagementServiceFactoryBean"
