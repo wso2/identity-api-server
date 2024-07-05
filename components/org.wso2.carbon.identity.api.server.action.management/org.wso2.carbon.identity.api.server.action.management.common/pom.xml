@@ -58,7 +58,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
-            <artifactId>org.wso2.carbon.identity.action.mgt</artifactId>
+            <artifactId>org.wso2.carbon.identity.action.management</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

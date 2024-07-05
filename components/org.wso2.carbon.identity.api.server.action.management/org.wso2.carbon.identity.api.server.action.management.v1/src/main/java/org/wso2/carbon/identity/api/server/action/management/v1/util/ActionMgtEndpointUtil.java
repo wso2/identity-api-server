@@ -20,9 +20,10 @@ package org.wso2.carbon.identity.api.server.action.management.v1.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.action.mgt.exception.ActionMgtClientException;
-import org.wso2.carbon.identity.action.mgt.exception.ActionMgtException;
-import org.wso2.carbon.identity.action.mgt.model.TypeEnums;
+import org.wso2.carbon.identity.action.management.exception.ActionMgtClientException;
+import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.model.Action;
+import org.wso2.carbon.identity.action.management.model.AuthType;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.common.Constants;
@@ -55,7 +56,7 @@ public class ActionMgtEndpointUtil {
         Map<String, Object> authnProperties = actionModel.getEndpoint().getAuthentication().getProperties();
         Map<String, Object> validatedAuthnProperties = new HashMap<>();
 
-        for (TypeEnums.AuthenticationType type: TypeEnums.AuthenticationType.values()) {
+        for (AuthType.AuthenticationType type: AuthType.AuthenticationType.values()) {
             if (type.getType().equals(authnType)) {
                 for (String property: type.getProperties()) {
                     if (authnProperties == null || authnProperties.get(property) == null) {
@@ -79,7 +80,7 @@ public class ActionMgtEndpointUtil {
     public static String buildURIForActionType(String actionType) {
 
         return ContextLoader.buildURIForBody(ACTION_TYPE_LINK_FORMAT +
-                TypeEnums.ActionTypes.valueOf(actionType).getPathParam()).toString();
+                Action.ActionTypes.valueOf(actionType).getPathParam()).toString();
     }
 
     public static APIError handleException(Response.Status status,

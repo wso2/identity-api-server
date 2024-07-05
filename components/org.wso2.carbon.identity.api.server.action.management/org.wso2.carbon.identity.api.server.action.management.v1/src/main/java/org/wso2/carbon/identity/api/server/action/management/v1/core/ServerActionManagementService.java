@@ -21,11 +21,10 @@ package org.wso2.carbon.identity.api.server.action.management.v1.core;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
-import org.wso2.carbon.identity.action.mgt.exception.ActionMgtException;
-import org.wso2.carbon.identity.action.mgt.model.Action;
-import org.wso2.carbon.identity.action.mgt.model.AuthType;
-import org.wso2.carbon.identity.action.mgt.model.EndpointConfig;
-import org.wso2.carbon.identity.action.mgt.model.TypeEnums;
+import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
+import org.wso2.carbon.identity.action.management.model.Action;
+import org.wso2.carbon.identity.action.management.model.AuthType;
+import org.wso2.carbon.identity.action.management.model.EndpointConfig;
 import org.wso2.carbon.identity.api.server.action.management.common.ActionManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
@@ -199,7 +198,7 @@ public class ServerActionManagementService {
                     .getActionsCountPerType(CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
 
             List<ActionTypesResponseItem> actionTypesResponseItems = new ArrayList<>();
-            for (TypeEnums.ActionTypes actionType : TypeEnums.ActionTypes.values()) {
+            for (Action.ActionTypes actionType : Action.ActionTypes.values()) {
 
                 actionTypesResponseItems.add(new ActionTypesResponseItem()
                         .type(ActionTypesResponseItem.TypeEnum.valueOf(actionType.getActionType()))
@@ -269,7 +268,7 @@ public class ServerActionManagementService {
                 .endpoint(new EndpointConfig.EndpointConfigBuilder()
                         .uri(actionModel.getEndpoint().getUri())
                         .authentication(new AuthType.AuthTypeBuilder()
-                                .type(TypeEnums.AuthenticationType.valueOf(actionModel.getEndpoint().getAuthentication()
+                                .type(AuthType.AuthenticationType.valueOf(actionModel.getEndpoint().getAuthentication()
                                         .getType().toString()))
                                 .properties(actionModel.getEndpoint().getAuthentication().getProperties())
                                 .build())

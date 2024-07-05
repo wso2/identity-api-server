@@ -235,7 +235,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.framework</groupId>
-                <artifactId>org.wso2.carbon.identity.action.mgt</artifactId>
+                <artifactId>org.wso2.carbon.identity.action.management</artifactId>
                 <version>${carbon.identity.framework.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -803,7 +803,7 @@
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.9.17</identity.governance.version>
-        <carbon.identity.framework.version>7.3.22-SNAPSHOT</carbon.identity.framework.version>
+        <carbon.identity.framework.version>7.3.25-SNAPSHOT</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>

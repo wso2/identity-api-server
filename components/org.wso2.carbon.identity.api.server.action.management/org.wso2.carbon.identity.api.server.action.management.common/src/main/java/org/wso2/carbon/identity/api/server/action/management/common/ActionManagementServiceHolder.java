@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.action.management.common;
 
-import org.wso2.carbon.identity.action.mgt.ActionManagementService;
+import org.wso2.carbon.identity.action.management.ActionManagementService;
 
 /**
  * Service holder class for action management.
