@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -230,7 +230,7 @@ public class OrganizationsApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieve organizations created for this tenant which matches the defined search criteria, if any.", notes = "This API is used to search and retrieve organizations created for this tenant.", response = OrganizationsResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve organizations created for this tenant which matches the defined search criteria, if any.", notes = "This API is used to search and retrieve organizations created for this tenant.  Organizations can be filtered by id, name, description, created, lastModified, status, parentId, and meta attributes.         Supported operators: \"eq\" (equals), \"co\" (contains), \"sw\" (starts with), \"ew\" (ends with), \"ge\" (greater than or equals), \"le\" (less than or equals), \"gt\" (greater than), \"lt\" (less than)  Multiple attributes can be combined using the \"and\" operator.  Examples:   - filter=name+eq+ABC Builders   - filter=attributes.Country+eq+Sri Lanka  <b>Scope(Permission) required:</b> `internal_organization_view` ", response = OrganizationsResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
