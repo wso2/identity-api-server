@@ -503,7 +503,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
 
         SpTrustedAppMetadata trustedAppMetadata = serviceProvider.getTrustedAppMetadata();
         if (trustedAppMetadata == null) {
-            trustedAppMetadata = new SpTrustedAppMetadata();
+            return null;
         }
         String[] thumbprints = trustedAppMetadata.getAndroidThumbprints();
 
