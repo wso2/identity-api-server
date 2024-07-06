@@ -38,15 +38,7 @@ public class ActionMgtEndpointConstants {
         // Client errors.
         ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES("60001",
                 "Unable to perform the operation.",
-                "Required authentication properties are not provided or invalid."),
-        ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ID("60002", "Unable to perform the operation.",
-                "No Action is configured for the given action ID."),
-
-        // Server errors.
-        ERROR_CODE_ADD_ACTION("65001", "Error while adding action.",
-                "Server encountered an error while adding the action."),
-        ERROR_CODE_UPDATE_ACTION("65002", "Error while updating action.",
-                                      "Server encountered an error while updating the action.");
+                "Required authentication properties are not provided or invalid.");
 
         private final String code;
         private final String message;

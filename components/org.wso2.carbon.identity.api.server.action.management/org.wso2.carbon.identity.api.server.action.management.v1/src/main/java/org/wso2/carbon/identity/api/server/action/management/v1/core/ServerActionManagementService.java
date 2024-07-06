@@ -35,15 +35,8 @@ import org.wso2.carbon.identity.api.server.action.management.v1.Endpoint;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMgtEndpointUtil;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import javax.ws.rs.core.Response;
-
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_CODE_ADD_ACTION;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_CODE_UPDATE_ACTION;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ID;
 
 /**
  * Server Action Management Service.
@@ -52,28 +45,12 @@ public class ServerActionManagementService {
 
     private static final Log LOG = LogFactory.getLog(ServerActionManagementService.class);
 
-    /**
-     * Create a new action.
-     *
-     * @param actionType   Action type.
-     * @param actionModel  Action model.
-     * @return Action response.
-     */
     public ActionResponse createAction(String actionType, ActionModel actionModel) {
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Adding Action for Action Type: " + actionType);
-        }
         try {
-            Action action = buildAction(actionModel);
-            Action createdAction = ActionManagementServiceHolder.getActionManagementService().addAction(actionType,
-                    action, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            if (createdAction == null) {
-                LOG.error(ERROR_CODE_ADD_ACTION.getDescription());
-                throw ActionMgtEndpointUtil.handleException(Response.Status.INTERNAL_SERVER_ERROR,
-                        ERROR_CODE_ADD_ACTION);
-            }
-            return buildActionResponse(createdAction);
+            return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
+                    .addAction(actionType, buildAction(actionModel),
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -81,16 +58,10 @@ public class ServerActionManagementService {
 
     public List<ActionResponse> getActionsByActionType(String actionType) {
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Retrieving Actions for Action Type: " + actionType);
-        }
         try {
             List<Action> actions = ActionManagementServiceHolder.getActionManagementService()
                     .getActionsByActionType(actionType,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            if (actions == null) {
-                return Collections.emptyList();
-            }
 
             List<ActionResponse> actionResponses = new ArrayList<>();
             for (Action action : actions) {
@@ -104,25 +75,10 @@ public class ServerActionManagementService {
 
     public ActionResponse updateAction(String actionType, String actionId, ActionModel actionModel) {
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Updating Action for Action Type: " + actionType + " and Action Id: " + actionId);
-        }
         try {
-            Action action = ActionManagementServiceHolder.getActionManagementService().getActionByActionId(actionId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            if (action == null) {
-                throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
-                        ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ID);
-            }
-            action = buildAction(actionModel);
-            Action updatedAction = ActionManagementServiceHolder.getActionManagementService().updateAction(actionType,
-                    actionId, action, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            if (updatedAction == null) {
-                LOG.error(ERROR_CODE_UPDATE_ACTION.getDescription());
-                throw ActionMgtEndpointUtil.handleException(Response.Status.INTERNAL_SERVER_ERROR,
-                        ERROR_CODE_UPDATE_ACTION);
-            }
-            return buildActionResponse(updatedAction);
+            return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
+                    .updateAction(actionType, actionId, buildAction(actionModel),
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -130,15 +86,8 @@ public class ServerActionManagementService {
 
     public void deleteAction(String actionType, String actionId) {
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Deleting Action for Action Type: " + actionType + " and Action Id: " + actionId);
-        }
+
         try {
-            Action action = ActionManagementServiceHolder.getActionManagementService().getActionByActionId(actionId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            if (action == null) {
-                return;
-            }
             ActionManagementServiceHolder.getActionManagementService().deleteAction(actionType, actionId,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         } catch (ActionMgtException e) {
@@ -148,20 +97,10 @@ public class ServerActionManagementService {
 
     public ActionBasicResponse activateAction(String actionType, String actionId) {
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Activating Action for Action Type: " + actionType + " and Action Id: " + actionId);
-        }
         try {
-            Action action = ActionManagementServiceHolder.getActionManagementService().getActionByActionId(actionId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            if (action == null) {
-                throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
-                        ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ID);
-            }
-            Action activatedAction = ActionManagementServiceHolder.getActionManagementService()
+            return buildActionBasicResponse(ActionManagementServiceHolder.getActionManagementService()
                     .activateAction(actionType, actionId,
-                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            return buildActionBasicResponse(activatedAction);
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -169,20 +108,10 @@ public class ServerActionManagementService {
 
     public ActionBasicResponse deactivateAction(String actionType, String actionId) {
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Deactivating Action for Action Type: " + actionType + " and Action Id: " + actionId);
-        }
         try {
-            Action action = ActionManagementServiceHolder.getActionManagementService().getActionByActionId(actionId,
-                    CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            if (action == null) {
-                throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
-                        ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ID);
-            }
-            Action deactivatedAction = ActionManagementServiceHolder.getActionManagementService()
+            return buildActionBasicResponse(ActionManagementServiceHolder.getActionManagementService()
                     .deactivateAction(actionType, actionId,
-                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
-            return buildActionBasicResponse(deactivatedAction);
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -204,8 +133,7 @@ public class ServerActionManagementService {
                         .type(ActionTypesResponseItem.TypeEnum.valueOf(actionType.getActionType()))
                         .displayName(actionType.getDisplayName())
                         .description(actionType.getDescription())
-                        .count(actionsCountPerType.get(actionType.getActionType()) == null ? 0 :
-                                actionsCountPerType.get(actionType.getActionType()))
+                        .count(actionsCountPerType.getOrDefault(actionType.getActionType(), 0))
                         .self(ActionMgtEndpointUtil.buildURIForActionType(actionType.getActionType())));
             }
 
