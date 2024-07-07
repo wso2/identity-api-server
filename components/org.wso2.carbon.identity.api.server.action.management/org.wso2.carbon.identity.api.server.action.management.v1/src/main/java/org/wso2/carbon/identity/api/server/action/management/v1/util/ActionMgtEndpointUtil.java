@@ -36,6 +36,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.action.management.constant.ActionMgtConstants.ErrorMessages.ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ID;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ACTION_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.PATH_CONSTANT;
@@ -109,7 +110,11 @@ public class ActionMgtEndpointUtil {
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
         if (e instanceof ActionMgtClientException) {
             LOG.debug(e.getMessage(), e);
-            status = Response.Status.BAD_REQUEST;
+            if (ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ID.getCode().equals(e.getErrorCode())) {
+                status = Response.Status.NOT_FOUND;
+            } else {
+                status = Response.Status.BAD_REQUEST;
+            }
         } else {
             LOG.error(e.getMessage(), e);
         }
