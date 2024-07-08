@@ -117,7 +117,7 @@ public class ServerActionManagementService {
         }
     }
 
-    public List<ActionTypesResponseItem> getActions() {
+    public List<ActionTypesResponseItem> getActionTypes() {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Retrieving Action Types.");

@@ -82,8 +82,8 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     }
 
     @Override
-    public Response getActions() {
+    public Response getActionTypes() {
 
-        return Response.ok().entity(serverActionManagementService.getActions()).build();
+        return Response.ok().entity(serverActionManagementService.getActionTypes()).build();
     }
 }

@@ -188,9 +188,9 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getActions() {
+    public Response getActionTypes() {
 
-        return delegate.getActions();
+        return delegate.getActionTypes();
     }
 
     @Valid
