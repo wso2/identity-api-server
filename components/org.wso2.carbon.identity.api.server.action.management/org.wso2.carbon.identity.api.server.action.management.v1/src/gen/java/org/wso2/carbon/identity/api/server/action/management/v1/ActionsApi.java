@@ -170,7 +170,7 @@ public class ActionsApi  {
 
     @Valid
     @GET
-    
+    @Path("/types")
     
     @Produces({ "application/json" })
     @ApiOperation(value = "Detailed summary of the Action Types ", notes = "This API provides the capability to retrieve the detailed summary of the action types.<br>   <b>Permission required:</b> <br>       * /permission/admin/manage/identity/actionmgt/view <br>   <b>Scope required:</b> <br>       * internal_action_mgt_view ", response = ActionTypesResponseItem.class, responseContainer = "List", authorizations = {

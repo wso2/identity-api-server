@@ -18,7 +18,7 @@ security:
   - OAuth2: []
   - BasicAuth: []
 paths:
-  /actions:
+  /actions/types:
     get:
       tags:
         - Actions
