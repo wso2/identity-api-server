@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -119,7 +119,7 @@ public class OrganizationManagementService {
         try {
             limit = validateLimit(limit);
             String sortOrder = StringUtils.isNotBlank(before) ? ASC_SORT_ORDER : DESC_SORT_ORDER;
-            List<BasicOrganization> organizations = getOrganizationManager().getOrganizations(limit + 1, after,
+            List<Organization> organizations = getOrganizationManager().getOrganizationsList(limit + 1, after,
                     before, sortOrder, filter, Boolean.TRUE.equals(recursive));
             return Response.ok().entity(getOrganizationsResponse(limit, after, before, filter, organizations,
                     Boolean.TRUE.equals(recursive))).build();
@@ -694,7 +694,7 @@ public class OrganizationManagementService {
     }
 
     private OrganizationsResponse getOrganizationsResponse(Integer limit, String after, String before, String filter,
-                                                           List<BasicOrganization> organizations, boolean recursive)
+                                                           List<Organization> organizations, boolean recursive)
             throws OrganizationManagementServerException {
 
         OrganizationsResponse organizationsResponse = new OrganizationsResponse();
@@ -727,7 +727,7 @@ public class OrganizationManagementService {
                 Collections.reverse(organizations);
             }
             if (!isFirstPage) {
-                String encodedString = Base64.getEncoder().encodeToString(organizations.get(0).getCreated()
+                String encodedString = Base64.getEncoder().encodeToString(organizations.get(0).getCreated().toString()
                         .getBytes(StandardCharsets.UTF_8));
                 Link link = new Link();
                 link.setHref(URI.create(
@@ -737,7 +737,7 @@ public class OrganizationManagementService {
             }
             if (!isLastPage) {
                 String encodedString = Base64.getEncoder().encodeToString(organizations.get(organizations.size() - 1)
-                        .getCreated().getBytes(StandardCharsets.UTF_8));
+                        .getCreated().toString().getBytes(StandardCharsets.UTF_8));
                 Link link = new Link();
                 link.setHref(URI.create(
                         OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&after=" + encodedString));
@@ -746,12 +746,16 @@ public class OrganizationManagementService {
             }
 
             List<BasicOrganizationResponse> organizationDTOs = new ArrayList<>();
-            for (BasicOrganization organization : organizations) {
+            for (Organization organization : organizations) {
                 BasicOrganizationResponse organizationDTO = new BasicOrganizationResponse();
                 organizationDTO.setId(organization.getId());
                 organizationDTO.setName(organization.getName());
                 organizationDTO.setStatus(BasicOrganizationResponse.StatusEnum.valueOf(organization.getStatus()));
                 organizationDTO.setRef(buildOrganizationURL(organization.getId()).toString());
+                List<Attribute> attributeList = getOrganizationAttributes(organization);
+                if (!attributeList.isEmpty()) {
+                    organizationDTO.setAttributes(attributeList);
+                }
                 organizationDTOs.add(organizationDTO);
             }
             organizationsResponse.setOrganizations(organizationDTOs);

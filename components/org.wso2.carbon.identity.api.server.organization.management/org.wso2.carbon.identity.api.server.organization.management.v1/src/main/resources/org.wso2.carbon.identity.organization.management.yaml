@@ -60,8 +60,20 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
     get:
-      description:
+      description: |
         This API is used to search and retrieve organizations created for this tenant.
+        
+        Organizations can be filtered by id, name, description, created, lastModified, status, parentId, and meta attributes. 
+              
+        Supported operators: "eq" (equals), "co" (contains), "sw" (starts with), "ew" (ends with), "ge" (greater than or equals), "le" (less than or equals), "gt" (greater than), "lt" (less than)
+        
+        Multiple attributes can be combined using the "and" operator.
+        
+        Examples:
+          - filter=name+eq+ABC Builders
+          - filter=attributes.Country+eq+Sri Lanka
+        
+        <b>Scope(Permission) required:</b> `internal_organization_view`
       summary:
         Retrieve organizations created for this tenant which matches the defined search criteria, if any.
       operationId: organizationsGet
@@ -971,6 +983,10 @@ components:
         ref:
           type: string
           example: 'o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attribute'
     OrganizationResponse:
       type: object
       required:
