@@ -33,6 +33,7 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Disc
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Link;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.MetaAttributesResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryAttributes;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTResponse;
@@ -542,6 +543,33 @@ public class OrganizationManagementService {
         }
     }
 
+    /**
+     * Retrieve organizations' meta attributes.
+     *
+     * @param filter    The filter string.
+     * @param limit     The maximum number of records to be returned.
+     * @param after     The pointer to next page.
+     * @param before    The pointer to previous page.
+     * @param recursive Determines whether recursive search is required.
+     * @return The list of organizations' meta attributes.
+     */
+    public Response getOrganizationsMetaAttributes(String filter, Integer limit, String after, String before,
+                                                   Boolean recursive) {
+
+        try {
+            limit = validateLimit(limit);
+            String sortOrder = StringUtils.isNotBlank(before) ? ASC_SORT_ORDER : DESC_SORT_ORDER;
+            List<String> metaAttributes = getOrganizationManager().getOrganizationsMetaAttributes(limit + 1, after,
+                    before, sortOrder, filter, Boolean.TRUE.equals(recursive));
+            return Response.ok().entity(getMetaAttributesResponse(limit, after, before, filter, metaAttributes,
+                    Boolean.TRUE.equals(recursive))).build();
+        } catch (OrganizationManagementClientException e) {
+            return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
+    }
+
     private Organization getOrganizationFromPostRequest(OrganizationPOSTRequest organizationPOSTRequest) {
 
         String organizationId = generateUniqueID();
@@ -913,6 +941,61 @@ public class OrganizationManagementService {
         organizationMetadata.setDiscoveryAttributes(attributes);
 
         return organizationMetadata;
+    }
+
+    private MetaAttributesResponse getMetaAttributesResponse(Integer limit, String after, String before, String filter,
+                                                             List<String> metaAttributes, boolean recursive)
+            throws OrganizationManagementServerException {
+
+        MetaAttributesResponse metaAttributesResponse = new MetaAttributesResponse();
+
+        if (limit != 0 && CollectionUtils.isNotEmpty(metaAttributes)) {
+            boolean hasMoreItems = metaAttributes.size() > limit;
+            boolean needsReverse = StringUtils.isNotBlank(before);
+            boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
+                    (StringUtils.isNotBlank(before) && !hasMoreItems);
+            boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
+
+            String url = "?limit=" + limit + "&recursive=" + recursive;
+            if (StringUtils.isNotBlank(filter)) {
+                try {
+                    url += "&filter=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
+                } catch (UnsupportedEncodingException e) {
+                    LOG.error("Server encountered an error while building pagination URL for the response.", e);
+                    Error error = OrganizationManagementEndpointUtil.getError(
+                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getCode(),
+                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getMessage(),
+                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getDescription());
+                    throw new OrganizationManagementEndpointException(Response.Status.INTERNAL_SERVER_ERROR, error);
+                }
+            }
+            if (hasMoreItems) {
+                metaAttributes.remove(metaAttributes.size() - 1);
+            }
+            if (needsReverse) {
+                Collections.reverse(metaAttributes);
+            }
+            if (!isFirstPage) {
+                String encodedString = Base64.getEncoder().encodeToString(metaAttributes.get(0)
+                        .getBytes(StandardCharsets.UTF_8));
+                Link link = new Link();
+                link.setHref(URI.create(OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&before="
+                        + encodedString));
+                link.setRel("previous");
+                metaAttributesResponse.addLinksItem(link);
+            }
+            if (!isLastPage) {
+                String encodedString = Base64.getEncoder().encodeToString(metaAttributes.get(metaAttributes.size() - 1)
+                        .getBytes(StandardCharsets.UTF_8));
+                Link link = new Link();
+                link.setHref(URI.create(OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&after="
+                        + encodedString));
+                link.setRel("next");
+                metaAttributesResponse.addLinksItem(link);
+            }
+            metaAttributesResponse.attributes(metaAttributes);
+        }
+        return metaAttributesResponse;
     }
 
     private OrganizationManager getOrganizationManager() {
