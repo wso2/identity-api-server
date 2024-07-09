@@ -89,6 +89,13 @@ public class OrganizationsApiServiceImpl implements OrganizationsApiService {
     }
 
     @Override
+    public Response organizationsMetaAttributesGet(String filter, Integer limit, String after, String before,
+                                                  Boolean recursive) {
+
+        return organizationManagementService.getOrganizationsMetaAttributes(filter, limit, after, before, recursive);
+    }
+
+    @Override
     public Response organizationCheckDiscovery(
             OrganizationDiscoveryCheckPOSTRequest organizationDiscoveryCheckPOSTRequest) {
 
