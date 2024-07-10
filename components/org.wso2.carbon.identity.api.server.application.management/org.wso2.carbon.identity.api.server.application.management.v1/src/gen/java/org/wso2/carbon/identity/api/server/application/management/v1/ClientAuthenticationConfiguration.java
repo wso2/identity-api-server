@@ -68,9 +68,9 @@ public class ClientAuthenticationConfiguration {
     }
 
     /**
-     * Allow reuse of the private key for JWT generation at the token endpoint.
+     * Allow reuse of the private key JWT at the token endpoint.
      *
-     * @param tokenEndpointAllowReusePvtKeyJwt Allow reuse of the private key for JWT generation at the token endpoint.
+     * @param tokenEndpointAllowReusePvtKeyJwt Allow reuse of the private key JWT at the token endpoint.
      * @return ClientAuthenticationConfiguration object.
      **/
     public ClientAuthenticationConfiguration tokenEndpointAllowReusePvtKeyJwt(
