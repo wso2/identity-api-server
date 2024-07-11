@@ -1123,12 +1123,12 @@ components:
           example:
             [
               {
-                "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/meta-attributes?limit=10&filter=key+co+country&next=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+                "href": "/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&after=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
                 "rel": "next",
               },  {
-              "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/meta-attributes?limit=10&filter=key+co+country&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
-              "rel": "previous",
-            }
+                "href": "/o/api/server/v1/organizations/meta-attributes?limit=10&recursive=false&filter=attributes+co+C&before=MjAyMS0xMi0yMSAwNToxODozMS4wMDQzNDg=",
+                "rel": "previous",
+              }
             ]
         attributes:
           type: array
@@ -1273,9 +1273,9 @@ components:
                 "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=50",
                 "rel": "next",
               },  {
-              "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30",
-              "rel": "previous",
-            }
+                "href": "/o/10084a8d-113f-4211-a0d5-efe36b082211/api/server/v1/organizations/discovery?filter=attributes.type+eq+emailDomain&limit=10&offset=30",
+                "rel": "previous",
+              }
             ]
         organizations:
           type: array

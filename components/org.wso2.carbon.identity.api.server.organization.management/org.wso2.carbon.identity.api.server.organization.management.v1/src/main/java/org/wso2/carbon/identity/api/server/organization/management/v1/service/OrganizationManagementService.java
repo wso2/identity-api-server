@@ -25,12 +25,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.organization.management.common.OrganizationManagementServiceHolder;
-import org.wso2.carbon.identity.api.server.organization.management.v1.exceptions.OrganizationManagementEndpointException;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ApplicationSharePOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Attribute;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.BasicOrganizationResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.DiscoveryAttribute;
-import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Link;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.MetaAttributesResponse;
@@ -87,12 +85,20 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.ASC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DESC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DISCOVERY_PATH;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.FILTER_PARAM;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.LIMIT_PARAM;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.META_ATTRIBUTES_PATH;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.NEXT;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.PREVIOUS;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.RECURSIVE_PARAM;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.util.OrganizationManagementEndpointUtil.buildOrganizationURL;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_EMPTY_REQUEST_BODY;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ORGANIZATION_PATH;
+import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.PAGINATION_AFTER;
+import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.PAGINATION_BEFORE;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.generateUniqueID;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.getOrganizationId;
@@ -558,7 +564,7 @@ public class OrganizationManagementService {
 
         try {
             limit = validateLimit(limit);
-            String sortOrder = StringUtils.isNotBlank(before) ? ASC_SORT_ORDER : DESC_SORT_ORDER;
+            String sortOrder = StringUtils.isNotBlank(before) ? DESC_SORT_ORDER : ASC_SORT_ORDER;
             List<String> metaAttributes = getOrganizationManager().getOrganizationsMetaAttributes(limit + 1, after,
                     before, sortOrder, filter, Boolean.TRUE.equals(recursive));
             return Response.ok().entity(getMetaAttributesResponse(limit, after, before, filter, metaAttributes,
@@ -734,17 +740,15 @@ public class OrganizationManagementService {
                     (StringUtils.isNotBlank(before) && !hasMoreItems);
             boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
 
-            String url = "?limit=" + limit + "&recursive=" + recursive;
+            String url = "?" + LIMIT_PARAM + "=" + limit + "&" + RECURSIVE_PARAM + "=" + recursive;
             if (StringUtils.isNotBlank(filter)) {
                 try {
-                    url += "&filter=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
+                    url += "&" + FILTER_PARAM + "=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
-                    LOG.error("Server encountered an error while building pagination URL for the response.", e);
-                    Error error = OrganizationManagementEndpointUtil.getError(
-                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getCode(),
+                    throw new OrganizationManagementServerException(
                             ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getMessage(),
-                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getDescription());
-                    throw new OrganizationManagementEndpointException(Response.Status.INTERNAL_SERVER_ERROR, error);
+                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getDescription(),
+                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getCode(), e);
                 }
             }
 
@@ -759,8 +763,9 @@ public class OrganizationManagementService {
                         .getBytes(StandardCharsets.UTF_8));
                 Link link = new Link();
                 link.setHref(URI.create(
-                        OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&before=" + encodedString));
-                link.setRel("previous");
+                        OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&" + PAGINATION_BEFORE + "="
+                                + encodedString));
+                link.setRel(PREVIOUS);
                 organizationsResponse.addLinksItem(link);
             }
             if (!isLastPage) {
@@ -768,8 +773,9 @@ public class OrganizationManagementService {
                         .getCreated().toString().getBytes(StandardCharsets.UTF_8));
                 Link link = new Link();
                 link.setHref(URI.create(
-                        OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&after=" + encodedString));
-                link.setRel("next");
+                        OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&" + PAGINATION_AFTER + "="
+                                + encodedString));
+                link.setRel(NEXT);
                 organizationsResponse.addLinksItem(link);
             }
 
@@ -956,17 +962,16 @@ public class OrganizationManagementService {
                     (StringUtils.isNotBlank(before) && !hasMoreItems);
             boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
 
-            String url = "?limit=" + limit + "&recursive=" + recursive;
+            String url = PATH_SEPARATOR + META_ATTRIBUTES_PATH + "?" + LIMIT_PARAM + "=" + limit + "&" + RECURSIVE_PARAM
+                    + "=" + recursive;
             if (StringUtils.isNotBlank(filter)) {
                 try {
-                    url += "&filter=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
+                    url += "&" + FILTER_PARAM + "=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
-                    LOG.error("Server encountered an error while building pagination URL for the response.", e);
-                    Error error = OrganizationManagementEndpointUtil.getError(
-                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getCode(),
+                    throw new OrganizationManagementServerException(
                             ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getMessage(),
-                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getDescription());
-                    throw new OrganizationManagementEndpointException(Response.Status.INTERNAL_SERVER_ERROR, error);
+                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getDescription(),
+                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getCode(), e);
                 }
             }
             if (hasMoreItems) {
@@ -979,18 +984,18 @@ public class OrganizationManagementService {
                 String encodedString = Base64.getEncoder().encodeToString(metaAttributes.get(0)
                         .getBytes(StandardCharsets.UTF_8));
                 Link link = new Link();
-                link.setHref(URI.create(OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&before="
-                        + encodedString));
-                link.setRel("previous");
+                link.setHref(URI.create(OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&"
+                        + PAGINATION_BEFORE + "=" + encodedString));
+                link.setRel(PREVIOUS);
                 metaAttributesResponse.addLinksItem(link);
             }
             if (!isLastPage) {
                 String encodedString = Base64.getEncoder().encodeToString(metaAttributes.get(metaAttributes.size() - 1)
                         .getBytes(StandardCharsets.UTF_8));
                 Link link = new Link();
-                link.setHref(URI.create(OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&after="
-                        + encodedString));
-                link.setRel("next");
+                link.setHref(URI.create(OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&"
+                        + PAGINATION_AFTER + "=" + encodedString));
+                link.setRel(NEXT);
                 metaAttributesResponse.addLinksItem(link);
             }
             metaAttributesResponse.attributes(metaAttributes);
