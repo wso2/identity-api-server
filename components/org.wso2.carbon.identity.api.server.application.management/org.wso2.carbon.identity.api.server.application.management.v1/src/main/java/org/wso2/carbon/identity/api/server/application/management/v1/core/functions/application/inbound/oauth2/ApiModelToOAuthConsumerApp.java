@@ -178,8 +178,6 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
                 .orElse(new String[0]);
     }
 
-
-
     private void updatePkceConfigurations(OAuthConsumerAppDTO consumerAppDTO, OAuth2PKCEConfiguration pkce) {
 
         if (pkce != null) {

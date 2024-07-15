@@ -29,7 +29,11 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
+<<<<<<< HEAD
     <version>1.2.220-SNAPSHOT</version>
+=======
+    <version>1.2.203</version>
+>>>>>>> d156c21fe (Add jwt access token claims handler support)
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -41,7 +45,7 @@
         <developerConnection>scm:git:https://github.com/wso2/identity-api-server.git
         </developerConnection>
         <connection>scm:git:https://github.com/wso2/identity-api-server.git</connection>
-        <tag>HEAD</tag>
+        <tag>v1.2.203</tag>
     </scm>
 
 
@@ -234,12 +238,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.identity.framework</groupId>
-                <artifactId>org.wso2.carbon.identity.action.management</artifactId>
-                <version>${carbon.identity.framework.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
                 <version>${spring-web.version}</version>
@@ -409,12 +407,6 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.api.resource.common</artifactId>
-                <version>${project.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.action.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -815,7 +807,7 @@
         <carbon.kernel.version>4.9.17</carbon.kernel.version>
         <carbon.multitenancy.version>4.9.10</carbon.multitenancy.version>
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
-        <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.5.15</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
+        <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.4.21</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
         <org.wso2.carbon.logging.service.version>4.10.7</org.wso2.carbon.logging.service.version>
         <org.wso2.carbon.event.publisher.version>5.2.15</org.wso2.carbon.event.publisher.version>
         <identity.branding.preference.management.version>1.1.16</identity.branding.preference.management.version>
@@ -827,13 +819,13 @@
         <identity.verification.version>1.0.3</identity.verification.version>
 
         <!-- Organization management core Version -->
-        <org.wso2.carbon.identity.organization.management.core.version>1.1.12
+        <org.wso2.carbon.identity.organization.management.core.version>1.1.10
         </org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>1.4.42
+        <org.wso2.carbon.identity.organization.management.version>1.4.10
         </org.wso2.carbon.identity.organization.management.version>
 
         <!-- Unit test versions -->
@@ -874,7 +866,6 @@
         <module>components/org.wso2.carbon.identity.api.server.api.resource</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.configs</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.selfservice</module>
-        <module>components/org.wso2.carbon.identity.api.server.action.management</module>
     </modules>
 
 </project>
