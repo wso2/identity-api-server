@@ -3642,6 +3642,10 @@ components:
           type: boolean
           description: "If enabled, both access token and the token binding needs to be present for a successful API
           invocation."
+        jwtAccessTokenClaims:
+          type: array
+          items:
+            type: string
     RefreshTokenConfiguration:
       type: object
       properties:

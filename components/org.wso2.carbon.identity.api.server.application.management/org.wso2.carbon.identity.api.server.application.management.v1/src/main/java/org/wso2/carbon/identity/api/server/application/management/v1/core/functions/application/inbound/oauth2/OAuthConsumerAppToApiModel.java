@@ -106,7 +106,14 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .bindingType(oAuthConsumerAppDTO.getTokenBindingType())
                 .revokeTokensWhenIDPSessionTerminated(oAuthConsumerAppDTO
                         .isTokenRevocationWithIDPSessionTerminationEnabled())
-                .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled());
+                .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled())
+                .jwtAccessTokenClaims(getJwtAccessTokenClaims(oAuthConsumerAppDTO));
+    }
+
+    private List<String> getJwtAccessTokenClaims(OAuthConsumerAppDTO oauthAppDTO) {
+
+        return oauthAppDTO.getJwtAccessTokenClaims() != null ?
+                Arrays.asList(oauthAppDTO.getJwtAccessTokenClaims()) : Collections.emptyList();
     }
 
     private RefreshTokenConfiguration buildRefreshTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
