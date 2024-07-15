@@ -33,74 +33,20 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class AuthenticationType  {
+public class AuthenticationTypeProperties  {
   
-
-@XmlType(name="TypeEnum")
-@XmlEnum(String.class)
-public enum TypeEnum {
-
-    @XmlEnumValue("NONE") NONE(String.valueOf("NONE")), @XmlEnumValue("BEARER") BEARER(String.valueOf("BEARER")), @XmlEnumValue("API_KEY") API_KEY(String.valueOf("API_KEY")), @XmlEnumValue("BASIC") BASIC(String.valueOf("BASIC"));
-
-
-    private String value;
-
-    TypeEnum(String v) {
-        value = v;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static TypeEnum fromValue(String value) {
-        for (TypeEnum b : TypeEnum.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-}
-
-    private TypeEnum type;
     private Map<String, Object> properties = null;
 
 
     /**
     **/
-    public AuthenticationType type(TypeEnum type) {
-
-        this.type = type;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "BASIC", required = true, value = "")
-    @JsonProperty("type")
-    @Valid
-    @NotNull(message = "Property type cannot be null.")
-
-    public TypeEnum getType() {
-        return type;
-    }
-    public void setType(TypeEnum type) {
-        this.type = type;
-    }
-
-    /**
-    **/
-    public AuthenticationType properties(Map<String, Object> properties) {
+    public AuthenticationTypeProperties properties(Map<String, Object> properties) {
 
         this.properties = properties;
         return this;
     }
     
-    @ApiModelProperty(example = "{\"username\":\"auth_username\",\"password\":\"auth_password\"}", value = "")
+    @ApiModelProperty(example = "{\"username\":\"auth_username\",\"password\":\"auth_username\"}", value = "")
     @JsonProperty("properties")
     @Valid
     public Map<String, Object> getProperties() {
@@ -111,7 +57,7 @@ public enum TypeEnum {
     }
 
 
-    public AuthenticationType putPropertiesItem(String key, Object propertiesItem) {
+    public AuthenticationTypeProperties putPropertiesItem(String key, Object propertiesItem) {
         if (this.properties == null) {
             this.properties = new HashMap<String, Object>();
         }
@@ -130,23 +76,21 @@ public enum TypeEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AuthenticationType authenticationType = (AuthenticationType) o;
-        return Objects.equals(this.type, authenticationType.type) &&
-            Objects.equals(this.properties, authenticationType.properties);
+        AuthenticationTypeProperties authenticationTypeProperties = (AuthenticationTypeProperties) o;
+        return Objects.equals(this.properties, authenticationTypeProperties.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, properties);
+        return Objects.hash(properties);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class AuthenticationType {\n");
+        sb.append("class AuthenticationTypeProperties {\n");
         
-        sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();

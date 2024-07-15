@@ -22,9 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import javax.validation.constraints.*;
 
 
@@ -33,7 +30,7 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class AuthenticationType  {
+public class AuthenticationTypeResponse  {
   
 
 @XmlType(name="TypeEnum")
@@ -69,12 +66,10 @@ public enum TypeEnum {
 }
 
     private TypeEnum type;
-    private Map<String, Object> properties = null;
-
 
     /**
     **/
-    public AuthenticationType type(TypeEnum type) {
+    public AuthenticationTypeResponse type(TypeEnum type) {
 
         this.type = type;
         return this;
@@ -92,34 +87,7 @@ public enum TypeEnum {
         this.type = type;
     }
 
-    /**
-    **/
-    public AuthenticationType properties(Map<String, Object> properties) {
 
-        this.properties = properties;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "{\"username\":\"auth_username\",\"password\":\"auth_password\"}", value = "")
-    @JsonProperty("properties")
-    @Valid
-    public Map<String, Object> getProperties() {
-        return properties;
-    }
-    public void setProperties(Map<String, Object> properties) {
-        this.properties = properties;
-    }
-
-
-    public AuthenticationType putPropertiesItem(String key, Object propertiesItem) {
-        if (this.properties == null) {
-            this.properties = new HashMap<String, Object>();
-        }
-        this.properties.put(key, propertiesItem);
-        return this;
-    }
-
-    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -130,24 +98,22 @@ public enum TypeEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AuthenticationType authenticationType = (AuthenticationType) o;
-        return Objects.equals(this.type, authenticationType.type) &&
-            Objects.equals(this.properties, authenticationType.properties);
+        AuthenticationTypeResponse authenticationTypeResponse = (AuthenticationTypeResponse) o;
+        return Objects.equals(this.type, authenticationTypeResponse.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, properties);
+        return Objects.hash(type);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class AuthenticationType {\n");
+        sb.append("class AuthenticationTypeResponse {\n");
         
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
-        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();
     }

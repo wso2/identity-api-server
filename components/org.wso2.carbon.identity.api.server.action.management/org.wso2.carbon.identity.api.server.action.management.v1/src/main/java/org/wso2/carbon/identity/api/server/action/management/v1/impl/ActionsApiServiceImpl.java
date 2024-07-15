@@ -21,7 +21,9 @@ package org.wso2.carbon.identity.api.server.action.management.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
+import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeProperties;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.action.management.v1.core.ServerActionManagementService;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -56,9 +58,9 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     }
 
     @Override
-    public Response updateAction(String actionType, String actionId, ActionModel actionModel) {
+    public Response updateAction(String actionType, String actionId, ActionUpdateModel actionUpdateModel) {
 
-        return Response.ok().entity(serverActionManagementService.updateAction(actionType, actionId, actionModel))
+        return Response.ok().entity(serverActionManagementService.updateAction(actionType, actionId, actionUpdateModel))
                 .build();
     }
 
@@ -85,5 +87,13 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     public Response getActionTypes() {
 
         return Response.ok().entity(serverActionManagementService.getActionTypes()).build();
+    }
+
+    @Override
+    public Response updateActionEndpointAuthentication(String actionType, String actionId, String authType,
+                                                       AuthenticationTypeProperties authenticationTypeProperties) {
+
+        return Response.ok().entity(serverActionManagementService.updateActionEndpointAuthentication(actionType,
+                actionId, authType, authenticationTypeProperties)).build();
     }
 }
