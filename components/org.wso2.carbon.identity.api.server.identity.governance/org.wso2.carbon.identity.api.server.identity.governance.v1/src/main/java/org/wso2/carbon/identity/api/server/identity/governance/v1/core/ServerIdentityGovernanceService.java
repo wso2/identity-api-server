@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -42,6 +42,7 @@ import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.governance.bean.ConnectorConfig;
+import org.wso2.carbon.identity.governance.exceptions.general.IdentityGovernanceClientException;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -297,7 +298,9 @@ public class ServerIdentityGovernanceService {
                 configurationDetails.put(propertyReqDTO.getName(), propertyReqDTO.getValue());
             }
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
-
+        } catch (IdentityGovernanceClientException e) {
+            throw handleBadRequestError(GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_CONNECTOR_CONFIGURATION,
+                    e.getMessage());
         } catch (IdentityGovernanceException e) {
             GovernanceConstants.ErrorMessage errorEnum =
                     GovernanceConstants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONNECTOR_PROPERTY;
@@ -508,4 +511,5 @@ public class ServerIdentityGovernanceService {
 
         return new APIError(status, errorResponse);
     }
+
 }

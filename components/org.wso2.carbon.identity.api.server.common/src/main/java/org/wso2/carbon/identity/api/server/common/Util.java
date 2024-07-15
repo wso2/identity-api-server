@@ -18,8 +18,6 @@ package org.wso2.carbon.identity.api.server.common;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.MDC;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.recovery.ChallengeQuestionManager;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -36,17 +34,6 @@ public class Util {
     private static final String PAGE_LINK_REL_PREVIOUS = "previous";
     private static final String PAGINATION_LINK_FORMAT = Constants.V1_API_PATH_COMPONENT
             + "%s?offset=%d&limit=%d";
-
-    /**
-     * Get ChallengeQuestionManager osgi service
-     *
-     * @return ChallengeQuestionManager
-     */
-    @Deprecated
-    public static ChallengeQuestionManager getChallengeQuestionManager() {
-        return (ChallengeQuestionManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                .getOSGiService(ChallengeQuestionManager.class, null);
-    }
 
     /**
      * Get correlation id of current thread
