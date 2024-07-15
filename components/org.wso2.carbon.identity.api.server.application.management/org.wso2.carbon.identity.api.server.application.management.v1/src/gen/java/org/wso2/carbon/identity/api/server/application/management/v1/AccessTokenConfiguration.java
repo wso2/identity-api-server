@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 
 
@@ -38,6 +40,8 @@ public class AccessTokenConfiguration  {
     private String bindingType = "None";
     private Boolean revokeTokensWhenIDPSessionTerminated;
     private Boolean validateTokenBinding;
+    private List<String> jwtAccessTokenClaims = null;
+
 
     /**
     **/
@@ -150,7 +154,33 @@ public class AccessTokenConfiguration  {
         this.validateTokenBinding = validateTokenBinding;
     }
 
+    /**
+    **/
+    public AccessTokenConfiguration jwtAccessTokenClaims(List<String> jwtAccessTokenClaims) {
 
+        this.jwtAccessTokenClaims = jwtAccessTokenClaims;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("jwtAccessTokenClaims")
+    @Valid
+    public List<String> getJwtAccessTokenClaims() {
+        return jwtAccessTokenClaims;
+    }
+    public void setJwtAccessTokenClaims(List<String> jwtAccessTokenClaims) {
+        this.jwtAccessTokenClaims = jwtAccessTokenClaims;
+    }
+
+    public AccessTokenConfiguration addJwtAccessTokenClaimsItem(String jwtAccessTokenClaimsItem) {
+        if (this.jwtAccessTokenClaims == null) {
+            this.jwtAccessTokenClaims = new ArrayList<>();
+        }
+        this.jwtAccessTokenClaims.add(jwtAccessTokenClaimsItem);
+        return this;
+    }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -167,12 +197,13 @@ public class AccessTokenConfiguration  {
             Objects.equals(this.applicationAccessTokenExpiryInSeconds, accessTokenConfiguration.applicationAccessTokenExpiryInSeconds) &&
             Objects.equals(this.bindingType, accessTokenConfiguration.bindingType) &&
             Objects.equals(this.revokeTokensWhenIDPSessionTerminated, accessTokenConfiguration.revokeTokensWhenIDPSessionTerminated) &&
-            Objects.equals(this.validateTokenBinding, accessTokenConfiguration.validateTokenBinding);
+            Objects.equals(this.validateTokenBinding, accessTokenConfiguration.validateTokenBinding) &&
+            Objects.equals(this.jwtAccessTokenClaims, accessTokenConfiguration.jwtAccessTokenClaims);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding);
+        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding, jwtAccessTokenClaims);
     }
 
     @Override
@@ -187,6 +218,7 @@ public class AccessTokenConfiguration  {
         sb.append("    bindingType: ").append(toIndentedString(bindingType)).append("\n");
         sb.append("    revokeTokensWhenIDPSessionTerminated: ").append(toIndentedString(revokeTokensWhenIDPSessionTerminated)).append("\n");
         sb.append("    validateTokenBinding: ").append(toIndentedString(validateTokenBinding)).append("\n");
+        sb.append("    jwtAccessTokenClaims: ").append(toIndentedString(jwtAccessTokenClaims)).append("\n");
         sb.append("}");
         return sb.toString();
     }
