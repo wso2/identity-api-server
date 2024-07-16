@@ -84,10 +84,10 @@ paths:
           required: true
           schema:
             enum:
-              - PreIssueAccessToken
-              - PreUpdatePassword
-              - PreUpdateProfile
-              - PreRegistration
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
       requestBody:
         content:
           application/json:
@@ -148,10 +148,10 @@ paths:
           required: true
           schema:
             enum:
-              - PreIssueAccessToken
-              - PreUpdatePassword
-              - PreUpdateProfile
-              - PreRegistration
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
       responses:
         '200':
           description: OK
@@ -206,10 +206,10 @@ paths:
           required: true
           schema:
             enum:
-              - PreIssueAccessToken
-              - PreUpdatePassword
-              - PreUpdateProfile
-              - PreRegistration
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
         - name: actionId
           in: path
           description: Id of the Action.
@@ -270,10 +270,10 @@ paths:
           required: true
           schema:
             enum:
-              - PreIssueAccessToken
-              - PreUpdatePassword
-              - PreUpdateProfile
-              - PreRegistration
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
         - name: actionId
           in: path
           description: Id of the Action.
@@ -324,10 +324,10 @@ paths:
           required: true
           schema:
             enum:
-              - PreIssueAccessToken
-              - PreUpdatePassword
-              - PreUpdateProfile
-              - PreRegistration
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
         - name: actionId
           in: path
           description: Id of the Action.
@@ -382,10 +382,10 @@ paths:
           required: true
           schema:
             enum:
-              - PreIssueAccessToken
-              - PreUpdatePassword
-              - PreUpdateProfile
-              - PreRegistration
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
         - name: actionId
           in: path
           description: Id of the Action.
@@ -440,10 +440,10 @@ paths:
           required: true
           schema:
             enum:
-              - PreIssueAccessToken
-              - PreUpdatePassword
-              - PreUpdateProfile
-              - PreRegistration
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
         - name: actionId
           in: path
           description: Id of the Action.

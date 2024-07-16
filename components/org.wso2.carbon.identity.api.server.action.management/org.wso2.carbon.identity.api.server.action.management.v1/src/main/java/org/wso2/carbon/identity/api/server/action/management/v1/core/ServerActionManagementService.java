@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.CarbonContext;
@@ -44,6 +45,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_EMPTY_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTH_TYPE;
 
@@ -251,13 +253,20 @@ public class ServerActionManagementService {
         List<AuthProperty> authProperties = new ArrayList<>();
         for (AuthType.AuthenticationType type: AuthType.AuthenticationType.values()) {
             if (type.getType().equals(authType)) {
-                for (AuthProperty property: type.getProperties()) {
+                for (AuthType.AuthenticationType.AuthenticationProperty property: type.getProperties()) {
                     if (authPropertiesMap == null || !authPropertiesMap.containsKey(property.getName())) {
                         throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
                                 ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES);
                     }
-                    property.setValue(authPropertiesMap.get(property.getName()).toString());
-                    authProperties.add(property);
+                    String propValue = (String) authPropertiesMap.get(property.getName());
+                    if (StringUtils.isEmpty(propValue)) {
+                        throw ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                                ERROR_EMPTY_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES);
+                    }
+                    authProperties.add(new AuthProperty.AuthPropertyBuilder()
+                            .name(property.getName())
+                            .value(propValue)
+                            .isConfidential(property.getIsConfidential()).build());
                 }
                 if (authPropertiesMap.size() > type.getProperties().size()) {
                     if (LOG.isDebugEnabled()) {
