@@ -74,6 +74,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -727,7 +728,8 @@ public class OrganizationManagementService {
                 Collections.reverse(organizations);
             }
             if (!isFirstPage) {
-                String encodedString = Base64.getEncoder().encodeToString(organizations.get(0).getCreated().toString()
+                Timestamp createdTimestamp = Timestamp.from(organizations.get(0).getCreated());
+                String encodedString = Base64.getEncoder().encodeToString(createdTimestamp.toString()
                         .getBytes(StandardCharsets.UTF_8));
                 Link link = new Link();
                 link.setHref(URI.create(
@@ -736,8 +738,9 @@ public class OrganizationManagementService {
                 organizationsResponse.addLinksItem(link);
             }
             if (!isLastPage) {
-                String encodedString = Base64.getEncoder().encodeToString(organizations.get(organizations.size() - 1)
-                        .getCreated().toString().getBytes(StandardCharsets.UTF_8));
+                Timestamp createdTimestamp = Timestamp.from(organizations.get(organizations.size() - 1).getCreated());
+                String encodedString = Base64.getEncoder().encodeToString(createdTimestamp.toString()
+                        .getBytes(StandardCharsets.UTF_8));
                 Link link = new Link();
                 link.setHref(URI.create(
                         OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&after=" + encodedString));
