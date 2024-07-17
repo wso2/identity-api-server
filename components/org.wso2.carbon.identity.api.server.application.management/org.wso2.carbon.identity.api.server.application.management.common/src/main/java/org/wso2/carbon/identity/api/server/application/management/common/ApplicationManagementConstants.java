@@ -57,6 +57,8 @@ public class ApplicationManagementConstants {
     public static final String RBAC = "RBAC";
     public static final String NO_POLICY = "NO POLICY";
     public static final String SELECT_OPTION = "Select Option";
+    public static final String TOKEN_EP_ALLOW_REUSE_PVT_KEY_JWT_DEFAULT_VALUE = "OAuth.OpenIDConnect." +
+            "TokenEndpointAllowReusePrivateKeyJWT";
     public static final String TOKEN_EP_SIGNATURE_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +
             "SupportedTokenEndpointSigningAlgorithms.SupportedTokenEndpointSigningAlgorithm";
     public static final String ID_TOKEN_SIGNATURE_ALGORITHMS_SUPPORTED = "OAuth.OpenIDConnect." +

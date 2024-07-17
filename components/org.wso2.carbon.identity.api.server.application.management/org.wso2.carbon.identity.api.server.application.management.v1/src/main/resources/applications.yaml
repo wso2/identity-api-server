@@ -3729,6 +3729,9 @@ components:
         tokenEndpointAuthMethod:
           type: string
           example: 'client_secret_basic'
+        tokenEndpointAllowReusePvtKeyJwt:
+          type: boolean
+          example: false
         tokenEndpointAuthSigningAlg:
           type: string
           example: 'PS256'
@@ -3995,6 +3998,9 @@ components:
           $ref: '#/components/schemas/MetadataProperty'
         tokenEndpointAuthMethod:
           $ref: '#/components/schemas/ClientAuthenticationMethodMetadata'
+        tokenEndpointAllowReusePvtKeyJwt:
+          type: boolean
+          default: false
         tokenEndpointSignatureAlgorithm:
           $ref: '#/components/schemas/MetadataProperty'
         idTokenSignatureAlgorithm:

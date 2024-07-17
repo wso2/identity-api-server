@@ -174,6 +174,7 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         return new ClientAuthenticationConfiguration()
                 .tokenEndpointAuthMethod(appDTO.getTokenEndpointAuthMethod())
                 .tokenEndpointAuthSigningAlg(appDTO.getTokenEndpointAuthSignatureAlgorithm())
+                .tokenEndpointAllowReusePvtKeyJwt(appDTO.isTokenEndpointAllowReusePvtKeyJwt())
                 .tlsClientAuthSubjectDn(appDTO.getTlsClientAuthSubjectDN());
     }
 

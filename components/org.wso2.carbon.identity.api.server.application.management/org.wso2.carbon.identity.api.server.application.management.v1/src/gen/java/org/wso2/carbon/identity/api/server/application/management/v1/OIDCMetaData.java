@@ -48,6 +48,7 @@ public class OIDCMetaData  {
     private ClientAuthenticationMethodMetadata tokenEndpointAuthMethod;
     private MetadataProperty tokenEndpointSignatureAlgorithm;
     private MetadataProperty idTokenSignatureAlgorithm;
+    private Boolean tokenEndpointAllowReusePvtKeyJwt;
     private MetadataProperty requestObjectSignatureAlgorithm;
     private MetadataProperty requestObjectEncryptionAlgorithm;
     private MetadataProperty requestObjectEncryptionMethod;
@@ -271,6 +272,31 @@ public class OIDCMetaData  {
     }
 
     /**
+     * Allow reuse of the private key JWT at the token endpoint.
+     *
+     * @param tokenEndpointAllowReusePvtKeyJwt Allow reuse of the private key JWT at the token endpoint.
+     * @return OIDCMetaData object.
+     **/
+    public OIDCMetaData tokenEndpointAllowReusePvtKeyJwt(Boolean tokenEndpointAllowReusePvtKeyJwt) {
+
+        this.tokenEndpointAllowReusePvtKeyJwt = tokenEndpointAllowReusePvtKeyJwt;
+        return this;
+    }
+
+    @ApiModelProperty(example = "false", value = "")
+    @JsonProperty("tokenEndpointAllowReusePvtKeyJwt")
+    @Valid
+    public Boolean getTokenEndpointAllowReusePvtKeyJwt() {
+
+        return tokenEndpointAllowReusePvtKeyJwt;
+    }
+
+    public void setTokenEndpointAllowReusePvtKeyJwt(Boolean tokenEndpointAllowReusePvtKeyJwt) {
+
+        this.tokenEndpointAllowReusePvtKeyJwt = tokenEndpointAllowReusePvtKeyJwt;
+    }
+
+    /**
      **/
     public OIDCMetaData idTokenSignatureAlgorithm(MetadataProperty idTokenSignatureAlgorithm) {
 
@@ -402,6 +428,7 @@ public class OIDCMetaData  {
             Objects.equals(this.accessTokenBindingType, oiDCMetaData.accessTokenBindingType) &&
             Objects.equals(this.tokenEndpointAuthMethod, oiDCMetaData.tokenEndpointAuthMethod) &&
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.tokenEndpointSignatureAlgorithm) &&
+            Objects.equals(this.tokenEndpointAllowReusePvtKeyJwt, oiDCMetaData.tokenEndpointAllowReusePvtKeyJwt) &&
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.idTokenSignatureAlgorithm) &&
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.requestObjectSignatureAlgorithm) &&
             Objects.equals(this.tokenEndpointSignatureAlgorithm, oiDCMetaData.requestObjectEncryptionAlgorithm) &&
@@ -433,6 +460,8 @@ public class OIDCMetaData  {
         sb.append("    accessTokenBindingType: ").append(toIndentedString(accessTokenBindingType)).append("\n");
         sb.append("    tokenEndpointAuthMethod: ").append(toIndentedString(tokenEndpointAuthMethod)).append("\n");
         sb.append("    tokenEndpointSignatureAlgorithm: ").append(toIndentedString(tokenEndpointSignatureAlgorithm)).append("\n");
+        sb.append("    tokenEndpointAllowReusePvtKeyJwt: ").append(toIndentedString(tokenEndpointAllowReusePvtKeyJwt))
+                .append("\n");
         sb.append("    idTokenSignatureAlgorithm: ").append(toIndentedString(idTokenSignatureAlgorithm)).append("\n");
         sb.append("    requestObjectSignatureAlgorithm: ").append(toIndentedString(requestObjectSignatureAlgorithm)).append("\n");
         sb.append("    requestObjectEncryptionAlgorithm: ").append(toIndentedString(requestObjectEncryptionAlgorithm)).append("\n");

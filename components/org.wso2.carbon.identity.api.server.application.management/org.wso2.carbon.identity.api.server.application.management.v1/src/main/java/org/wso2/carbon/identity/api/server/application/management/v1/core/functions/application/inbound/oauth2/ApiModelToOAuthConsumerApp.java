@@ -249,6 +249,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         if (clientAuthentication != null) {
             appDTO.setTokenEndpointAuthMethod(clientAuthentication.getTokenEndpointAuthMethod());
             appDTO.setTokenEndpointAuthSignatureAlgorithm(clientAuthentication.getTokenEndpointAuthSigningAlg());
+            appDTO.setTokenEndpointAllowReusePvtKeyJwt(clientAuthentication.isTokenEndpointAllowReusePvtKeyJwt());
             appDTO.setTlsClientAuthSubjectDN(clientAuthentication.getTlsClientAuthSubjectDn());
         }
     }
