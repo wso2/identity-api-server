@@ -808,14 +808,14 @@
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.8.19</identity.event.handler.version>
-        <identity.inbound.oauth2.version>7.0.114</identity.inbound.oauth2.version>
+        <identity.inbound.oauth2.version>7.0.120</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.41</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
         <carbon.kernel.version>4.9.17</carbon.kernel.version>
         <carbon.multitenancy.version>4.9.10</carbon.multitenancy.version>
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
-        <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.5.13</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
+        <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.5.15</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
         <org.wso2.carbon.logging.service.version>4.10.7</org.wso2.carbon.logging.service.version>
         <org.wso2.carbon.event.publisher.version>5.2.15</org.wso2.carbon.event.publisher.version>
         <identity.branding.preference.management.version>1.1.13</identity.branding.preference.management.version>
