@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.action.management.v1.Endpoint;
+import org.wso2.carbon.identity.api.server.action.management.v1.EndpointResponse;
 import javax.validation.constraints.*;
 
 
@@ -104,7 +104,7 @@ public enum StatusEnum {
 }
 
     private StatusEnum status;
-    private Endpoint endpoint;
+    private EndpointResponse endpoint;
 
     /**
     **/
@@ -198,7 +198,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public ActionResponse endpoint(Endpoint endpoint) {
+    public ActionResponse endpoint(EndpointResponse endpoint) {
 
         this.endpoint = endpoint;
         return this;
@@ -207,10 +207,10 @@ public enum StatusEnum {
     @ApiModelProperty(value = "")
     @JsonProperty("endpoint")
     @Valid
-    public Endpoint getEndpoint() {
+    public EndpointResponse getEndpoint() {
         return endpoint;
     }
-    public void setEndpoint(Endpoint endpoint) {
+    public void setEndpoint(EndpointResponse endpoint) {
         this.endpoint = endpoint;
     }
 
