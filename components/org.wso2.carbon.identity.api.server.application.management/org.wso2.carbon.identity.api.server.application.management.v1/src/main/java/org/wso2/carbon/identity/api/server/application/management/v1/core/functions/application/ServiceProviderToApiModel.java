@@ -129,6 +129,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .issuer(getInboundKey(application, "samlsso"))
                     .realm(getInboundKey(application, "passivests"))
                     .templateId(application.getTemplateId())
+                    .templateVersion(application.getTemplateVersion())
                     .isManagementApp(application.isManagementApp())
                     .applicationEnabled(application.isApplicationEnabled())
                     .associatedRoles(buildAssociatedRoles(application))

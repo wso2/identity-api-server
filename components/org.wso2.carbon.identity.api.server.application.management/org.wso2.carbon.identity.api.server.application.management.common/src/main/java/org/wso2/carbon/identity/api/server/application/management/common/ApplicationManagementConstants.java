@@ -51,6 +51,7 @@ public class ApplicationManagementConstants {
     public static final String ADVANCED_CONFIGURATIONS = "advancedConfigurations";
     public static final String APPLICATION_ENABLED = "applicationEnabled";
     public static final String TEMPLATE_ID = "templateId";
+    public static final String TEMPLATE_VERSION = "templateVersion";
     public static final String NAME = "name";
     public static final String CLIENT_ID = "clientId";
     public static final String ISSUER = "issuer";

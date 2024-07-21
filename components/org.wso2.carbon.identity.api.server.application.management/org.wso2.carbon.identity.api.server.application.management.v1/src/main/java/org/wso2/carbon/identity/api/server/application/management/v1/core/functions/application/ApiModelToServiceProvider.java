@@ -48,6 +48,7 @@ public class ApiModelToServiceProvider implements ModelToDTO<ApplicationModel, A
         application.setImageUrl(applicationModel.getImageUrl());
         application.setAccessUrl(applicationModel.getAccessUrl());
         application.setTemplateId(applicationModel.getTemplateId());
+        application.setTemplateVersion(applicationModel.getTemplateVersion());
         setIfNotNull(applicationModel.getIsManagementApp(), application::setManagementApp);
         setIfNotNull(applicationModel.getIsB2BSelfServiceApp(), application::setB2BSelfServiceApp);
         setIfNotNull(applicationModel.getApplicationEnabled(), application::setApplicationEnabled);

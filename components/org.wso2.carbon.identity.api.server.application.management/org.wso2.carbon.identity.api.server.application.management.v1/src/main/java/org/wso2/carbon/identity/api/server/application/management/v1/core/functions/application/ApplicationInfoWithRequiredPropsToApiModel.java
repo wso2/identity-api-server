@@ -57,6 +57,7 @@ public class ApplicationInfoWithRequiredPropsToApiModel implements Function<Appl
                 .realm(applicationResponseModel.getRealm())
                 .advancedConfigurations(getAdvancedConfigurations(applicationResponseModel))
                 .templateId(applicationResponseModel.getTemplateId())
+                .templateVersion(applicationResponseModel.getTemplateVersion())
                 .self(getApplicationLocation(applicationResponseModel.getId()))
                 .applicationEnabled(applicationResponseModel.getApplicationEnabled())
                 .associatedRoles(excludeAssociatedRoles(applicationResponseModel.getAssociatedRoles()));
