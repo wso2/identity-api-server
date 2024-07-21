@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.action.management.v1.EndpointUpdateModel;
 import javax.validation.constraints.*;
 
 
@@ -34,7 +35,7 @@ public class ActionUpdateModel  {
   
     private String name;
     private String description;
-    private String endpointUri;
+    private EndpointUpdateModel endpoint;
 
     /**
     **/
@@ -46,7 +47,7 @@ public class ActionUpdateModel  {
     
     @ApiModelProperty(example = "Access Token Pre Issue", value = "")
     @JsonProperty("name")
-    @Valid
+    @Valid @Size(min=1,max=255)
     public String getName() {
         return name;
     }
@@ -64,7 +65,7 @@ public class ActionUpdateModel  {
     
     @ApiModelProperty(example = "This is the configuration of pre-action for issuing access token.", value = "")
     @JsonProperty("description")
-    @Valid
+    @Valid @Size(max=255)
     public String getDescription() {
         return description;
     }
@@ -74,20 +75,20 @@ public class ActionUpdateModel  {
 
     /**
     **/
-    public ActionUpdateModel endpointUri(String endpointUri) {
+    public ActionUpdateModel endpoint(EndpointUpdateModel endpoint) {
 
-        this.endpointUri = endpointUri;
+        this.endpoint = endpoint;
         return this;
     }
     
-    @ApiModelProperty(example = "https://abcd.com/token", value = "")
-    @JsonProperty("endpointUri")
+    @ApiModelProperty(value = "")
+    @JsonProperty("endpoint")
     @Valid
-    public String getEndpointUri() {
-        return endpointUri;
+    public EndpointUpdateModel getEndpoint() {
+        return endpoint;
     }
-    public void setEndpointUri(String endpointUri) {
-        this.endpointUri = endpointUri;
+    public void setEndpoint(EndpointUpdateModel endpoint) {
+        this.endpoint = endpoint;
     }
 
 
@@ -104,12 +105,12 @@ public class ActionUpdateModel  {
         ActionUpdateModel actionUpdateModel = (ActionUpdateModel) o;
         return Objects.equals(this.name, actionUpdateModel.name) &&
             Objects.equals(this.description, actionUpdateModel.description) &&
-            Objects.equals(this.endpointUri, actionUpdateModel.endpointUri);
+            Objects.equals(this.endpoint, actionUpdateModel.endpoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, endpointUri);
+        return Objects.hash(name, description, endpoint);
     }
 
     @Override
@@ -120,7 +121,7 @@ public class ActionUpdateModel  {
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
-        sb.append("    endpointUri: ").append(toIndentedString(endpointUri)).append("\n");
+        sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("}");
         return sb.toString();
     }
