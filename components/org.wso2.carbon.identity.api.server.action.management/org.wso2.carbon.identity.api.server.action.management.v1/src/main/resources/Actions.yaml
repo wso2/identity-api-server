@@ -189,7 +189,7 @@ paths:
                 $ref: '#/components/schemas/Error'
 
   /actions/{actionType}/{actionId}:
-    put:
+    patch:
       tags:
         - Actions
       summary: |

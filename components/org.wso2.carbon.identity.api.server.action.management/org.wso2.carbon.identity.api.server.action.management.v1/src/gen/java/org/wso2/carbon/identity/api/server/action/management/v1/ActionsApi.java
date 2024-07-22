@@ -196,7 +196,7 @@ public class ActionsApi  {
     }
 
     @Valid
-    @PUT
+    @PATCH
     @Path("/{actionType}/{actionId}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
