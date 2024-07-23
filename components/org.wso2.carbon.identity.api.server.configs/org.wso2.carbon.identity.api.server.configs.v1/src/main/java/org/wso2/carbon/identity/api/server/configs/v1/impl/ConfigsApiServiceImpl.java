@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
+import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthPassiveSTSConfig;
 import org.wso2.carbon.identity.api.server.configs.v1.model.InboundAuthSAML2Config;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTKeyValidatorPatch;
@@ -67,6 +68,12 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     @Override
     public Response getHomeRealmIdentifiers() {
         return Response.ok().entity(configManagementService.getHomeRealmIdentifiers()).build();
+    }
+
+    @Override
+    public Response getImpersonationConfiguration() {
+
+        return Response.ok().entity(configManagementService.getImpersonationConfiguration()).build();
     }
 
     @Override
@@ -168,6 +175,13 @@ public class ConfigsApiServiceImpl implements ConfigsApiService {
     public Response patchConfigs(List<Patch> patch) {
 
         configManagementService.patchConfigs(patch);
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response patchImpersonationConfiguration(List<ImpersonationPatch> impersonationPatch) {
+
+        configManagementService.patchImpersonationConfiguration(impersonationPatch);
         return Response.ok().build();
     }
 

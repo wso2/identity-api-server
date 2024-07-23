@@ -76,6 +76,7 @@ public class ApplicationEmailTemplatesService {
 
         try {
             String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
+            templateId = I18nEmailUtil.normalizeLocaleFormat(templateId);
             EmailTemplate internalEmailTemplate = EmailTemplatesServiceHolder.getEmailTemplateManager().
                     getEmailTemplate(templateTypeDisplayName, templateId,
                             getTenantDomainFromContext(), applicationUuid);

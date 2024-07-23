@@ -18,6 +18,7 @@ package org.wso2.carbon.identity.api.server.application.management.v1.core.funct
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AccessTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.HybridFlowConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenEncryptionConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OAuth2PKCEConfiguration;
@@ -28,6 +29,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RefreshToke
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestObjectEncryptionConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.SubjectTokenConfiguration;
 import org.wso2.carbon.identity.oauth.dto.OAuthConsumerAppDTO;
 
 import java.util.ArrayList;
@@ -53,6 +55,7 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .callbackURLs(getCallbackUrls(oauthAppDTO))
                 .allowedOrigins(getAllowedOrigins(oauthAppDTO))
                 .pkce(buildPKCEConfiguration(oauthAppDTO))
+                .hybridFlow(buildHybridFlowConfiguration(oauthAppDTO))
                 .accessToken(buildTokenConfiguration(oauthAppDTO))
                 .refreshToken(buildRefreshTokenConfiguration(oauthAppDTO))
                 .idToken(buildIdTokenConfiguration(oauthAppDTO))
@@ -63,7 +66,8 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .requestObject(buildRequestObjectConfiguration(oauthAppDTO))
                 .pushAuthorizationRequest(buildPARAuthenticationConfiguration(oauthAppDTO))
                 .subject(buildSubjectConfiguration(oauthAppDTO))
-                .isFAPIApplication(oauthAppDTO.isFapiConformanceEnabled());
+                .isFAPIApplication(oauthAppDTO.isFapiConformanceEnabled())
+                .subjectToken(buildSubjectTokenConfiguration(oauthAppDTO));
     }
 
     private List<String> getScopeValidators(OAuthConsumerAppDTO oauthAppDTO) {
@@ -84,6 +88,13 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         return new OAuth2PKCEConfiguration()
                 .mandatory(oAuthConsumerAppDTO.getPkceMandatory())
                 .supportPlainTransformAlgorithm(oAuthConsumerAppDTO.getPkceSupportPlain());
+    }
+
+    private HybridFlowConfiguration buildHybridFlowConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+
+        return new HybridFlowConfiguration()
+                .enable(oAuthConsumerAppDTO.isHybridFlowEnabled())
+                .responseType(oAuthConsumerAppDTO.getHybridFlowResponseType());
     }
 
     private AccessTokenConfiguration buildTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
@@ -163,6 +174,7 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         return new ClientAuthenticationConfiguration()
                 .tokenEndpointAuthMethod(appDTO.getTokenEndpointAuthMethod())
                 .tokenEndpointAuthSigningAlg(appDTO.getTokenEndpointAuthSignatureAlgorithm())
+                .tokenEndpointAllowReusePvtKeyJwt(appDTO.isTokenEndpointAllowReusePvtKeyJwt())
                 .tlsClientAuthSubjectDn(appDTO.getTlsClientAuthSubjectDN());
     }
 
@@ -200,5 +212,12 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         return new SubjectConfiguration()
                 .subjectType(oAuthConsumerAppDTO.getSubjectType())
                 .sectorIdentifierUri(oAuthConsumerAppDTO.getSectorIdentifierURI());
+    }
+
+    private SubjectTokenConfiguration buildSubjectTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
+
+        return new SubjectTokenConfiguration()
+                .enable(oAuthConsumerAppDTO.isSubjectTokenEnabled())
+                .applicationSubjectTokenExpiryInSeconds(oAuthConsumerAppDTO.getSubjectTokenExpiryTime());
     }
 }

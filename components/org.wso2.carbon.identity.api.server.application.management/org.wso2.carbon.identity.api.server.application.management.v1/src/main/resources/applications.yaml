@@ -2696,9 +2696,9 @@ components:
       required: false
       description: |
         Specifies the required parameters in the response.
-        Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', 'issuer', and 'associatedRoles.allowedAudience' attributes.
+        Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', 'issuer', 'applicationEnabled' and 'associatedRoles.allowedAudience' attributes.
 
-        /applications?attributes=advancedConfigurations,templateId,clientId,associatedRoles.allowedAudience
+        /applications?attributes=advancedConfigurations,templateId,clientId,applicationEnabled,associatedRoles.allowedAudience
       schema:
         type: string
     exportSecretsQueryParam:
@@ -2833,6 +2833,9 @@ components:
         associatedRoles:
           type: object
           $ref: '#/components/schemas/AssociatedRolesConfig'
+        applicationEnabled:
+          type: boolean
+          example: true
     ApplicationModel:
       type: object
       required:
@@ -3121,6 +3124,8 @@ components:
               type: string
               description: Decides the apple app id which denotes {apple-teamId}.{bundleId}.
               example: "APPLETEAMID.com.wso2.mobile.sample"
+        trustedAppConfiguration:
+          $ref: '#/components/schemas/TrustedAppConfiguration'
         additionalSpProperties:
           $ref: '#/components/schemas/AdditionalProperties'
     AdditionalProperties:
@@ -3142,6 +3147,33 @@ components:
         displayName:
           type: string
           example: "Internal Application"
+    TrustedAppConfiguration:
+      type: object
+      description: Decides the trusted app configurations for the application.
+      properties:
+        isFIDOTrustedApp:
+          type: boolean
+          description: Decides whether the application is a FIDO trusted app.
+          example: false
+        isConsentGranted:
+          type: boolean
+          description: Decides whether consent is granted for the trusted app.
+          example: false
+        androidPackageName:
+          type: string
+          description: Decides the android package name for the application.
+          example: "com.wso2.mobile.sample"
+        androidThumbprints:
+          type: array
+          items:
+            type: string
+            example:
+              - "18:94:0A:DE:63:77:B6:84:43:1E:85:8F:03:CF:8A:14:87:9C:DE:DF:EA:7A:25:53:CD:53:5A:AF:C3:54:A5:56"
+          description: Decides the android thumbprints for the application.
+        appleAppId:
+          type: string
+          description: Decides the apple app id for the application.
+          example: "APPLETEAMID.com.org.mobile.sample"
     Certificate:
       type: object
       properties:
@@ -3559,8 +3591,12 @@ components:
           $ref: '#/components/schemas/OAuth2PKCEConfiguration'
         accessToken:
           $ref: '#/components/schemas/AccessTokenConfiguration'
+        hybridFlow:
+          $ref: '#/components/schemas/HybridFlowConfiguration'
         refreshToken:
           $ref: '#/components/schemas/RefreshTokenConfiguration'
+        subjectToken:
+          $ref: '#/components/schemas/SubjectTokenConfiguration'
         idToken:
           $ref: '#/components/schemas/IdTokenConfiguration'
         logout:
@@ -3598,6 +3634,15 @@ components:
         supportPlainTransformAlgorithm:
           type: boolean
           example: true
+    HybridFlowConfiguration:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: true
+        responseType:
+          type: string
+          example: code id_token
     AccessTokenConfiguration:
       type: object
       properties:
@@ -3637,6 +3682,15 @@ components:
           description: Decides whether the refresh token needs to be renewed during refresh grant flow.
           type: boolean
           example: true
+    SubjectTokenConfiguration:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          description: "If enabled, subject token can be issued for token exchange grant type."
+        applicationSubjectTokenExpiryInSeconds:
+          type: integer
+          example: 3600
     IdTokenConfiguration:
       type: object
       properties:
@@ -3675,6 +3729,9 @@ components:
         tokenEndpointAuthMethod:
           type: string
           example: 'client_secret_basic'
+        tokenEndpointAllowReusePvtKeyJwt:
+          type: boolean
+          example: false
         tokenEndpointAuthSigningAlg:
           type: string
           example: 'PS256'
@@ -3941,6 +3998,9 @@ components:
           $ref: '#/components/schemas/MetadataProperty'
         tokenEndpointAuthMethod:
           $ref: '#/components/schemas/ClientAuthenticationMethodMetadata'
+        tokenEndpointAllowReusePvtKeyJwt:
+          type: boolean
+          default: false
         tokenEndpointSignatureAlgorithm:
           $ref: '#/components/schemas/MetadataProperty'
         idTokenSignatureAlgorithm:
