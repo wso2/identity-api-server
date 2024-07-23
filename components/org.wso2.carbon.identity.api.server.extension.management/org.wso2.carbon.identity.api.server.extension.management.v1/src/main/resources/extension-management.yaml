@@ -310,6 +310,10 @@ components:
         id:
           type: string
           example: 'd7c8549f-32af-4f53-9013-f66f1a6c67bf'
+        version:
+          type: string
+          description: The version of the current extension resource.
+          example: 'v1.0.0'
         name:
           type: string
           example: 'google-oidc'
@@ -344,6 +348,10 @@ components:
         id:
           type: string
           example: 'd7c8549f-32af-4f53-9013-f66f1a6c67bf'
+        version:
+          type: string
+          description: The version of the current extension resource.
+          example: 'v1.0.0'
         name:
           type: string
           example: 'google-oidc'

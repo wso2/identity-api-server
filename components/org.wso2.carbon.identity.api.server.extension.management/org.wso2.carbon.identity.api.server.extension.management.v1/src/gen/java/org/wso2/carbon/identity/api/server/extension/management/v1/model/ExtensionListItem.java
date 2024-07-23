@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -36,6 +36,7 @@ import javax.xml.bind.annotation.*;
 public class ExtensionListItem  {
   
     private String id;
+    private String version;
     private String name;
     private String description;
     private String image;
@@ -64,6 +65,25 @@ public class ExtensionListItem  {
     }
     public void setId(String id) {
         this.id = id;
+    }
+
+    /**
+    * The version of the current extension resource.
+    **/
+    public ExtensionListItem version(String version) {
+
+        this.version = version;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "v1.0.0", value = "The version of the current extension resource.")
+    @JsonProperty("version")
+    @Valid
+    public String getVersion() {
+        return version;
+    }
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     /**
@@ -257,6 +277,7 @@ public class ExtensionListItem  {
         }
         ExtensionListItem extensionListItem = (ExtensionListItem) o;
         return Objects.equals(this.id, extensionListItem.id) &&
+            Objects.equals(this.version, extensionListItem.version) &&
             Objects.equals(this.name, extensionListItem.name) &&
             Objects.equals(this.description, extensionListItem.description) &&
             Objects.equals(this.image, extensionListItem.image) &&
@@ -270,7 +291,7 @@ public class ExtensionListItem  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, displayOrder, tags, customAttributes, category, type, self);
+        return Objects.hash(id, version, name, description, image, displayOrder, tags, customAttributes, category, type, self);
     }
 
     @Override
@@ -280,6 +301,7 @@ public class ExtensionListItem  {
         sb.append("class ExtensionListItem {\n");
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");

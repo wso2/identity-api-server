@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.*;
 public class ExtensionResponseModel  {
   
     private String id;
+    private String version;
     private String name;
     private String displayName;
     private String description;
@@ -61,6 +62,25 @@ public class ExtensionResponseModel  {
     }
     public void setId(String id) {
         this.id = id;
+    }
+
+    /**
+    * The version of the current extension resource.
+    **/
+    public ExtensionResponseModel version(String version) {
+
+        this.version = version;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "v1.0.0", value = "The version of the current extension resource.")
+    @JsonProperty("version")
+    @Valid
+    public String getVersion() {
+        return version;
+    }
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     /**
@@ -228,6 +248,7 @@ public class ExtensionResponseModel  {
         }
         ExtensionResponseModel extensionResponseModel = (ExtensionResponseModel) o;
         return Objects.equals(this.id, extensionResponseModel.id) &&
+            Objects.equals(this.version, extensionResponseModel.version) &&
             Objects.equals(this.name, extensionResponseModel.name) &&
             Objects.equals(this.displayName, extensionResponseModel.displayName) &&
             Objects.equals(this.description, extensionResponseModel.description) &&
@@ -240,7 +261,7 @@ public class ExtensionResponseModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, description, image, displayOrder, tags, category, type);
+        return Objects.hash(id, version, name, displayName, description, image, displayOrder, tags, category, type);
     }
 
     @Override
@@ -250,6 +271,7 @@ public class ExtensionResponseModel  {
         sb.append("class ExtensionResponseModel {\n");
         
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
