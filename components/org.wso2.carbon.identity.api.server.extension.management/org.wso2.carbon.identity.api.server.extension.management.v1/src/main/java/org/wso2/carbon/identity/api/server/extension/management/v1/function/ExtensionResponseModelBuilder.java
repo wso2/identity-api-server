@@ -33,6 +33,7 @@ public class ExtensionResponseModelBuilder implements Function<ExtensionInfo, Ex
 
         ExtensionResponseModel responseModel = new ExtensionResponseModel();
         responseModel.setId(extensionInfo.getId());
+        responseModel.setVersion(extensionInfo.getVersion());
         responseModel.setName(extensionInfo.getName());
         responseModel.setDescription(extensionInfo.getDescription());
         responseModel.setImage(extensionInfo.getImage());

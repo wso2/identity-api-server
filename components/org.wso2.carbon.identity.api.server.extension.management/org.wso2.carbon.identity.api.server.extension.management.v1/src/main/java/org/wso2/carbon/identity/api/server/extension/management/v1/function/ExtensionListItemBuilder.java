@@ -38,6 +38,7 @@ public class ExtensionListItemBuilder implements Function<ExtensionInfo, Extensi
 
         ExtensionListItem extensionListItem = new ExtensionListItem();
         extensionListItem.setId(extensionInfo.getId());
+        extensionListItem.setVersion(extensionInfo.getVersion());
         extensionListItem.setName(extensionInfo.getName());
         extensionListItem.setDescription(extensionInfo.getDescription());
         extensionListItem.setImage(extensionInfo.getImage());
