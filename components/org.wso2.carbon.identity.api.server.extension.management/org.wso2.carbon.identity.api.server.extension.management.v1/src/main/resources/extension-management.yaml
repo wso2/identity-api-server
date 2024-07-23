@@ -7,10 +7,12 @@ externalDocs:
   description: Find out more about extension management service
   url: http://swagger.io
 servers:
-  - url: 'https://{serverUrl}/api/server/v1'
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
-      serverUrl:
-        default: "https://localhost:9443/t/carbon.super/api/server/v1"
+      tenant-domain:
+        default: "carbon.super"
+      server-url:
+        default: "localhost:9443"
 tags:
   - name: Browse
     description: Browse the extensions
