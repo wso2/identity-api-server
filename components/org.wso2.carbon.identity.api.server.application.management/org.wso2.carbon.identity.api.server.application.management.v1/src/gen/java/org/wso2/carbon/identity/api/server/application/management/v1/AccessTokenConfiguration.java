@@ -22,8 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.JWTAccessTokenAttributesConfiguration;
 import javax.validation.constraints.*;
 
 
@@ -40,8 +39,7 @@ public class AccessTokenConfiguration  {
     private String bindingType = "None";
     private Boolean revokeTokensWhenIDPSessionTerminated;
     private Boolean validateTokenBinding;
-    private List<String> jwtAccessTokenClaims = null;
-
+    private JWTAccessTokenAttributesConfiguration jwtAccessTokenAttributesConfiguration;
 
     /**
     **/
@@ -156,31 +154,23 @@ public class AccessTokenConfiguration  {
 
     /**
     **/
-    public AccessTokenConfiguration jwtAccessTokenClaims(List<String> jwtAccessTokenClaims) {
+    public AccessTokenConfiguration jwtAccessTokenAttributesConfiguration(JWTAccessTokenAttributesConfiguration jwtAccessTokenAttributesConfiguration) {
 
-        this.jwtAccessTokenClaims = jwtAccessTokenClaims;
+        this.jwtAccessTokenAttributesConfiguration = jwtAccessTokenAttributesConfiguration;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("jwtAccessTokenClaims")
+    @JsonProperty("jwtAccessTokenAttributesConfiguration")
     @Valid
-    public List<String> getJwtAccessTokenClaims() {
-        return jwtAccessTokenClaims;
+    public JWTAccessTokenAttributesConfiguration getJwtAccessTokenAttributesConfiguration() {
+        return jwtAccessTokenAttributesConfiguration;
     }
-    public void setJwtAccessTokenClaims(List<String> jwtAccessTokenClaims) {
-        this.jwtAccessTokenClaims = jwtAccessTokenClaims;
-    }
-
-    public AccessTokenConfiguration addJwtAccessTokenClaimsItem(String jwtAccessTokenClaimsItem) {
-        if (this.jwtAccessTokenClaims == null) {
-            this.jwtAccessTokenClaims = new ArrayList<>();
-        }
-        this.jwtAccessTokenClaims.add(jwtAccessTokenClaimsItem);
-        return this;
+    public void setJwtAccessTokenAttributesConfiguration(JWTAccessTokenAttributesConfiguration jwtAccessTokenAttributesConfiguration) {
+        this.jwtAccessTokenAttributesConfiguration = jwtAccessTokenAttributesConfiguration;
     }
 
-    
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -198,12 +188,12 @@ public class AccessTokenConfiguration  {
             Objects.equals(this.bindingType, accessTokenConfiguration.bindingType) &&
             Objects.equals(this.revokeTokensWhenIDPSessionTerminated, accessTokenConfiguration.revokeTokensWhenIDPSessionTerminated) &&
             Objects.equals(this.validateTokenBinding, accessTokenConfiguration.validateTokenBinding) &&
-            Objects.equals(this.jwtAccessTokenClaims, accessTokenConfiguration.jwtAccessTokenClaims);
+            Objects.equals(this.jwtAccessTokenAttributesConfiguration, accessTokenConfiguration.jwtAccessTokenAttributesConfiguration);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding, jwtAccessTokenClaims);
+        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding, jwtAccessTokenAttributesConfiguration);
     }
 
     @Override
@@ -218,7 +208,7 @@ public class AccessTokenConfiguration  {
         sb.append("    bindingType: ").append(toIndentedString(bindingType)).append("\n");
         sb.append("    revokeTokensWhenIDPSessionTerminated: ").append(toIndentedString(revokeTokensWhenIDPSessionTerminated)).append("\n");
         sb.append("    validateTokenBinding: ").append(toIndentedString(validateTokenBinding)).append("\n");
-        sb.append("    jwtAccessTokenClaims: ").append(toIndentedString(jwtAccessTokenClaims)).append("\n");
+        sb.append("    jwtAccessTokenAttributesConfiguration: ").append(toIndentedString(jwtAccessTokenAttributesConfiguration)).append("\n");
         sb.append("}");
         return sb.toString();
     }
