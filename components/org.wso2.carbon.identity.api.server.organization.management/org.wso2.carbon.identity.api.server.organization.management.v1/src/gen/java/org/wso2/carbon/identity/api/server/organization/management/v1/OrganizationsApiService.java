@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Appl
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.MetaAttributesResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryAttributes;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTResponse;
@@ -63,6 +64,8 @@ public interface OrganizationsApiService {
       public Response organizationsDiscoveryGet(String filter, Integer offset, Integer limit);
 
       public Response organizationsGet(String filter, Integer limit, String after, String before, Boolean recursive);
+
+      public Response organizationsMetaAttributesGet(String filter, Integer limit, String after, String before, Boolean recursive);
 
       public Response organizationsOrganizationIdDelete(String organizationId);
 

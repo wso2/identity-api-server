@@ -42,6 +42,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.RequestedCl
 import org.wso2.carbon.identity.api.server.application.management.v1.Role;
 import org.wso2.carbon.identity.api.server.application.management.v1.RoleConfig;
 import org.wso2.carbon.identity.api.server.application.management.v1.SubjectConfig;
+import org.wso2.carbon.identity.api.server.application.management.v1.TrustedAppConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundAuthConfigToApiModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.provisioning.BuildProvisioningConfiguration;
@@ -58,6 +59,7 @@ import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticato
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.ServiceProviderProperty;
+import org.wso2.carbon.identity.application.common.model.SpTrustedAppMetadata;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
 import org.wso2.carbon.identity.application.mgt.ApplicationMgtUtil;
@@ -458,6 +460,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .fragment(isFragmentApp(serviceProvider))
                 .enableAPIBasedAuthentication(serviceProvider.isAPIBasedAuthenticationEnabled())
                 .attestationMetaData(getAttestationMetaData(serviceProvider))
+                .trustedAppConfiguration(getTrustedAppConfiguration(serviceProvider))
                 .additionalSpProperties(getSpProperties(serviceProvider));
     }
 
@@ -489,6 +492,28 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                         .getAndroidAttestationServiceCredentials()));
     }
 
+    /**
+     * Retrieves the trusted app configuration for an application's advanced configuration based on the provided
+     * service provider.
+     *
+     * @param serviceProvider The service provider for which trusted app configuration is required.
+     * @return An instance of TrustedAppConfiguration containing trusted app configurations of the application.
+     */
+    private TrustedAppConfiguration getTrustedAppConfiguration(ServiceProvider serviceProvider) {
+
+        SpTrustedAppMetadata trustedAppMetadata = serviceProvider.getTrustedAppMetadata();
+        if (trustedAppMetadata == null) {
+            return null;
+        }
+        String[] thumbprints = trustedAppMetadata.getAndroidThumbprints();
+
+        return new TrustedAppConfiguration()
+                .isFIDOTrustedApp(trustedAppMetadata.getIsFidoTrusted())
+                .androidPackageName(trustedAppMetadata.getAndroidPackageName())
+                .androidThumbprints(thumbprints != null ? Arrays.asList(thumbprints) : null)
+                .appleAppId(trustedAppMetadata.getAppleAppId())
+                .isConsentGranted(trustedAppMetadata.getIsConsentGranted());
+    }
 
     private List<AdditionalSpProperty> getSpProperties(ServiceProvider serviceProvider) {
 

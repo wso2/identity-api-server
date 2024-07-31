@@ -20,10 +20,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
+import org.wso2.carbon.identity.api.server.application.management.v1.TrustedAppConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.application.common.model.ClientAttestationMetaData;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.SpTrustedAppMetadata;
 
 import java.util.List;
 
@@ -76,6 +78,7 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
                 }
                 serviceProvider.setClientAttestationMetaData(clientAttestationMetaData);
             }
+            handleTrustedAppConfigurations(advancedConfigurations.getTrustedAppConfiguration(), serviceProvider);
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
         }
     }
@@ -120,6 +123,31 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
         if (!CollectionUtils.isEmpty(spAdditionalProperties)) {
             throw buildBadRequestError(ADDITIONAL_SP_PROP_NOT_SUPPORTED.getCode(),
                     ADDITIONAL_SP_PROP_NOT_SUPPORTED.getDescription());
+        }
+    }
+
+    /**
+     * Handles the trusted app configurations from the API model and sets them to the Service Provider object.
+     *
+     * @param trustedAppConfiguration The trusted app configuration of the API model.
+     * @param serviceProvider         The service provider to update.
+     */
+    private void handleTrustedAppConfigurations(TrustedAppConfiguration trustedAppConfiguration,
+                                                ServiceProvider serviceProvider) {
+
+        if (trustedAppConfiguration != null) {
+            SpTrustedAppMetadata trustedAppMetadata = new SpTrustedAppMetadata();
+            List<String> thumbprints = trustedAppConfiguration.getAndroidThumbprints();
+
+            setIfNotNull(trustedAppConfiguration.getAndroidPackageName(), trustedAppMetadata::setAndroidPackageName);
+            setIfNotNull(thumbprints != null ? thumbprints.toArray(new String[0]) : null,
+                    trustedAppMetadata::setAndroidThumbprints);
+            setIfNotNull(trustedAppConfiguration.getAppleAppId(), trustedAppMetadata::setAppleAppId);
+            setIfNotNull(trustedAppConfiguration.getIsFIDOTrustedApp(), trustedAppMetadata::setIsFidoTrusted);
+            setIfNotNull(trustedAppConfiguration.getIsConsentGranted(), trustedAppMetadata::setIsConsentGranted);
+            serviceProvider.setTrustedAppMetadata(trustedAppMetadata);
+        } else {
+            serviceProvider.setTrustedAppMetadata(null);
         }
     }
 }

@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Appl
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.MetaAttributesResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryAttributes;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTResponse;
@@ -244,9 +245,33 @@ public class OrganizationsApi  {
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
     })
-    public Response organizationsGet(    @Valid@ApiParam(value = "Condition to filter the retrieval of records.")  @QueryParam("filter") String filter,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to be returned. (Should be greater than 0)")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Points to the next range of data to be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Points to the previous range of data that can be retrieved.")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Determines whether a recursive search should happen.", defaultValue="false") @DefaultValue("false")  @QueryParam("recursive") Boolean recursive) {
+    public Response organizationsGet(    @Valid@ApiParam(value = "Condition to filter the retrieval of records.")  @QueryParam("filter") String filter,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to be returned. (Should be greater than 0)")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Points to the next range of data to be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Points to the previous range of data that can be retrieved.")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Determines whether a recursive search should happen. If set to true, will include organizations in all levels of the hierarchy; If set to false, includes only organizations in the next level of the hierarchy. ", defaultValue="false") @DefaultValue("false")  @QueryParam("recursive") Boolean recursive) {
 
         return delegate.organizationsGet(filter,  limit,  after,  before,  recursive );
+    }
+
+    @Valid
+    @GET
+    @Path("/meta-attributes")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get meta attributes of organizations with filter capabilities.", notes = "This API facilitates the retrieval of organization meta attributes which matches the defined search criteria, if any.  Supported operators: \"eq\"(equals), \"co\"(contains), \"sw\"(starts with), \"ew\"(ends with), \"ge\"(greater than or equals), \"le\"(less than or equals), \"gt\"(greater than), \"lt\"(less than)  Multiple filters can be combined using the \"and\" operator.  Example: filter=attributes+eq+Country  <b>Scope(Permission) required:</b> `internal_organization_view` ", response = MetaAttributesResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Organization Meta Attributes", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = MetaAttributesResponse.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class),
+        @ApiResponse(code = 501, message = "Not Implemented.", response = Error.class)
+    })
+    public Response organizationsMetaAttributesGet(    @Valid@ApiParam(value = "Condition to filter the retrieval of records.")  @QueryParam("filter") String filter,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to be returned. (Should be greater than 0)")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Points to the next range of data to be returned.")  @QueryParam("after") String after,     @Valid@ApiParam(value = "Points to the previous range of data that can be retrieved.")  @QueryParam("before") String before,     @Valid@ApiParam(value = "Determines whether a recursive search should happen. If set to true, will include organizations in all levels of the hierarchy; If set to false, includes only organizations in the next level of the hierarchy. ", defaultValue="false") @DefaultValue("false")  @QueryParam("recursive") Boolean recursive) {
+
+        return delegate.organizationsMetaAttributesGet(filter,  limit,  after,  before,  recursive );
     }
 
     @Valid

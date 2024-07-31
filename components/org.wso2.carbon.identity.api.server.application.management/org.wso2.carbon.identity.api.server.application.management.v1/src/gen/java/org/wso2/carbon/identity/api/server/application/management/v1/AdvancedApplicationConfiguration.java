@@ -27,6 +27,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfigurationAttestationMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
+import org.wso2.carbon.identity.api.server.application.management.v1.TrustedAppConfiguration;
 import javax.validation.constraints.*;
 
 
@@ -47,6 +48,7 @@ public class AdvancedApplicationConfiguration  {
     private Boolean fragment;
     private Boolean enableAPIBasedAuthentication;
     private AdvancedApplicationConfigurationAttestationMetaData attestationMetaData;
+    private TrustedAppConfiguration trustedAppConfiguration;
     private List<AdditionalSpProperty> additionalSpProperties = null;
     private Boolean useExternalConsentPage;
 
@@ -259,6 +261,24 @@ public class AdvancedApplicationConfiguration  {
 
     /**
     **/
+    public AdvancedApplicationConfiguration trustedAppConfiguration(TrustedAppConfiguration trustedAppConfiguration) {
+
+        this.trustedAppConfiguration = trustedAppConfiguration;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("trustedAppConfiguration")
+    @Valid
+    public TrustedAppConfiguration getTrustedAppConfiguration() {
+        return trustedAppConfiguration;
+    }
+    public void setTrustedAppConfiguration(TrustedAppConfiguration trustedAppConfiguration) {
+        this.trustedAppConfiguration = trustedAppConfiguration;
+    }
+
+    /**
+    **/
     public AdvancedApplicationConfiguration additionalSpProperties(List<AdditionalSpProperty> additionalSpProperties) {
 
         this.additionalSpProperties = additionalSpProperties;
@@ -306,12 +326,13 @@ public class AdvancedApplicationConfiguration  {
             Objects.equals(this.fragment, advancedApplicationConfiguration.fragment) &&
             Objects.equals(this.enableAPIBasedAuthentication, advancedApplicationConfiguration.enableAPIBasedAuthentication) &&
             Objects.equals(this.attestationMetaData, advancedApplicationConfiguration.attestationMetaData) &&
+            Objects.equals(this.trustedAppConfiguration, advancedApplicationConfiguration.trustedAppConfiguration) &&
             Objects.equals(this.additionalSpProperties, advancedApplicationConfiguration.additionalSpProperties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, useExternalConsentPage, returnAuthenticatedIdpList, enableAuthorization, fragment, enableAPIBasedAuthentication, attestationMetaData, additionalSpProperties);
+        return Objects.hash(saas, discoverableByEndUsers, certificate, skipLoginConsent, skipLogoutConsent, useExternalConsentPage, returnAuthenticatedIdpList, enableAuthorization, fragment, enableAPIBasedAuthentication, attestationMetaData, trustedAppConfiguration, additionalSpProperties);
     }
 
     @Override
@@ -331,6 +352,7 @@ public class AdvancedApplicationConfiguration  {
         sb.append("    fragment: ").append(toIndentedString(fragment)).append("\n");
         sb.append("    enableAPIBasedAuthentication: ").append(toIndentedString(enableAPIBasedAuthentication)).append("\n");
         sb.append("    attestationMetaData: ").append(toIndentedString(attestationMetaData)).append("\n");
+        sb.append("    trustedAppConfiguration: ").append(toIndentedString(trustedAppConfiguration)).append("\n");
         sb.append("    additionalSpProperties: ").append(toIndentedString(additionalSpProperties)).append("\n");
         sb.append("}");
         return sb.toString();

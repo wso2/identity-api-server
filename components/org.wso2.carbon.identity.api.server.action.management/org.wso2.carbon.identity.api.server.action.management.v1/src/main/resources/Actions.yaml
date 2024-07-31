@@ -1,0 +1,741 @@
+openapi: 3.0.0
+info:
+  description: >
+    This document specifies an **Action Management RESTful API** for **WSO2
+    Identity Server**.
+  version: 1.0.0
+  title: WSO2 Identity Server - Action Management Rest API
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/identity-server/'
+    email: architecture@wso2.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+security:
+  - OAuth2: []
+  - BasicAuth: []
+paths:
+  /actions/types:
+    get:
+      tags:
+        - Actions
+      operationId: getActionTypes
+      summary: |
+        Detailed summary of the Action Types
+      description: |
+        This API provides the capability to retrieve the detailed summary of the action types.<br>
+          <b>Scope required:</b> <br>
+              * internal_action_mgt_view
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionTypesResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /actions/{actionType}:
+    post:
+      tags:
+        - Actions
+      summary: |
+        Add action
+      operationId: createAction
+      description: >
+        This API provides the capability to store the action information
+        that is provided by users.<br>
+          <b>Scope required:</b> <br>
+              * internal_action_mgt_create
+      parameters:
+        - name: actionType
+          in: path
+          description: Name of the Action Type.
+          required: true
+          schema:
+            enum:
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionModel'
+        description: This represents the action to be created.
+        required: true
+      responses:
+        '201':
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags:
+        - Actions
+      operationId: getActionsByActionType
+      summary: |
+        List action
+      description: |
+        This API provides the capability to retrieve the action by action type.<br>
+          <b>Scope required:</b> <br>
+              * internal_action_mgt_view
+      parameters:
+        - name: actionType
+          in: path
+          description: Name of the Action Type.
+          required: true
+          schema:
+            enum:
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionResponseList'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /actions/{actionType}/{actionId}:
+    patch:
+      tags:
+        - Actions
+      summary: |
+        Update Action information by given Id.
+      operationId: updateAction
+      description: |
+        This API provides the capability to update Action information by given Id. <br>
+          <b>Scope required:</b> <br>
+              * internal_action_mgt_update
+      parameters:
+        - name: actionType
+          in: path
+          description: Name of the Action Type.
+          required: true
+          schema:
+            enum:
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
+        - name: actionId
+          in: path
+          description: Id of the Action.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionUpdateModel'
+        description: This represents the action information to be updated.
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Actions
+      summary: |
+        Delete action by action type and action id.
+      operationId: deleteAction
+      description: |
+        This API provides the capability to delete an action by action type. <br>
+          <b>Scope required:</b> <br>
+              * internal_action_mgt_delete
+      parameters:
+        - name: actionType
+          in: path
+          description: Name of the Action Type.
+          required: true
+          schema:
+            enum:
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
+        - name: actionId
+          in: path
+          description: Id of the Action.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully Deleted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /actions/{actionType}/{actionId}/activate:
+    post:
+      tags:
+        - Actions
+      summary: |
+        Activates the action by given Id.
+      operationId: activateAction
+      description: |
+        This API provides the capability to activate an action by action Id. <br>
+          <b>Scope required:</b> <br>
+              * internal_action_mgt_update
+      parameters:
+        - name: actionType
+          in: path
+          description: Name of the Action Type.
+          required: true
+          schema:
+            enum:
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
+        - name: actionId
+          in: path
+          description: Id of the Action.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionBasicResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /actions/{actionType}/{actionId}/deactivate:
+    post:
+      tags:
+        - Actions
+      summary: |
+        Deactivates the action by given Id.
+      operationId: deactivateAction
+      description: |
+        This API provides the capability to deactivate an action by action Id. <br>
+          <b>Scope required:</b> <br>
+              * internal_action_mgt_update
+      parameters:
+        - name: actionType
+          in: path
+          description: Name of the Action Type.
+          required: true
+          schema:
+            enum:
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
+        - name: actionId
+          in: path
+          description: Id of the Action.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionBasicResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /actions/{actionType}/{actionId}/{authType}:
+    put:
+      tags:
+        - Actions
+      summary: |
+        Update Action endpoint authentication information by given Id.
+      operationId: updateActionEndpointAuthentication
+      description: |
+        This API provides the capability to update Action endpoint authentication information by given Id. <br>
+          <b>Scope required:</b> <br>
+              * internal_action_mgt_update
+      parameters:
+        - name: actionType
+          in: path
+          description: Name of the Action Type.
+          required: true
+          schema:
+            enum:
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
+        - name: actionId
+          in: path
+          description: Id of the Action.
+          required: true
+          schema:
+            type: string
+        - name: authType
+          in: path
+          description: Authentication Type of the Action Endpoint.
+          required: true
+          schema:
+            enum:
+              - none
+              - basic
+              - apiKey
+              - bearer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationTypeProperties'
+        description: This represents the action endpoint authentication to be updated.
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          tokenUrl: 'http://localhost:9763/oauth2/token'
+          scopes: {}
+
+  schemas:
+    ActionModel:
+      type: object
+      required:
+        - name
+        - endpoint
+      properties:
+        name:
+          type: string
+          example: Access Token Pre Issue
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          example: This is the configuration of pre-action for issuing access token.
+          maxLength: 255
+        endpoint:
+          $ref: '#/components/schemas/Endpoint'
+
+    Endpoint:
+      type: object
+      required:
+        - uri
+        - authentication
+      properties:
+        uri:
+          type: string
+          example: https://abc.com/token
+          pattern: '^https?://.+'
+        authentication:
+          $ref: '#/components/schemas/AuthenticationType'
+
+    EndpointResponse:
+      type: object
+      required:
+        - uri
+        - authentication
+      properties:
+        uri:
+          type: string
+          example: https://abc.com/token
+          pattern: '^https?://.+'
+        authentication:
+          $ref: '#/components/schemas/AuthenticationTypeResponse'
+
+    ActionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '24f64d17-9824-4e28-8413-de45728d8e84'
+        type:
+          type: string
+          enum:
+            - PRE_ISSUE_ACCESS_TOKEN
+            - PRE_UPDATE_PASSWORD
+            - PRE_UPDATE_PROFILE
+            - PRE_REGISTRATION
+        name:
+          type: string
+          example: Access Token Pre Issue
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          example: This is the configuration of pre-action for issuing access token.
+          maxLength: 255
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+        endpoint:
+          $ref: '#/components/schemas/EndpointResponse'
+
+    ActionBasicResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '24f64d17-9824-4e28-8413-de45728d8e84'
+        type:
+          type: string
+          enum:
+            - PRE_ISSUE_ACCESS_TOKEN
+            - PRE_UPDATE_PASSWORD
+            - PRE_UPDATE_PROFILE
+            - PRE_REGISTRATION
+        name:
+          type: string
+          example: Access Token Pre Issue
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          example: This is the configuration of pre-action for issuing access token.
+          maxLength: 255
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+
+    ActionResponseList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ActionResponse'
+
+    ActionTypesResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/ActionTypesResponseItem'
+
+    ActionTypesResponseItem:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - PRE_ISSUE_ACCESS_TOKEN
+            - PRE_UPDATE_PASSWORD
+            - PRE_UPDATE_PROFILE
+            - PRE_REGISTRATION
+        displayName:
+          type: string
+          example: "Pre Issue Access Token."
+        description:
+          type: string
+          example: "Extension point configuration for Pre Issue Access Token."
+        count:
+          type: integer
+          example: 2
+        self:
+          type: string
+          example: "/t/wso2.com/api/server/v1/actions/preIssueAccessToken"
+
+    AuthenticationType:
+      type: object
+      required:
+        - type
+        - properties
+      properties:
+        type:
+          type: string
+          enum:
+            - NONE
+            - BEARER
+            - API_KEY
+            - BASIC
+          example: BASIC
+        properties:
+          type: object
+          additionalProperties: true
+          example:
+            username: "auth_username"
+            password: "auth_password"
+
+    AuthenticationTypeProperties:
+      type: object
+      properties:
+        properties:
+          type: object
+          additionalProperties: true
+          example:
+            username: "auth_username"
+            password: "auth_password"
+
+    AuthenticationTypeResponse:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - NONE
+            - BEARER
+            - API_KEY
+            - BASIC
+          example: BASIC
+
+    ActionUpdateModel:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Access Token Pre Issue
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          example: This is the configuration of pre-action for issuing access token.
+          maxLength: 255
+        endpoint:
+          $ref: '#/components/schemas/EndpointUpdateModel'
+
+    EndpointUpdateModel:
+      type: object
+      properties:
+        uri:
+          type: string
+          example: https://abc.com/token
+          pattern: '^https?://.+'
+        authentication:
+          $ref: '#/components/schemas/AuthenticationType'
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: AAA-00000
+        message:
+          type: string
+          example: Some error message.
+        description:
+          type: string
+          example: Some error description.
+        traceId:
+          type: string
+          example: e0fbcfeb-3617-43c4-8dd0-7b7d38e13047
+
+servers:
+  - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
+    variables:
+      tenant-domain:
+        default: "carbon.super"
+      server-url:
+        default: "localhost:9443"
