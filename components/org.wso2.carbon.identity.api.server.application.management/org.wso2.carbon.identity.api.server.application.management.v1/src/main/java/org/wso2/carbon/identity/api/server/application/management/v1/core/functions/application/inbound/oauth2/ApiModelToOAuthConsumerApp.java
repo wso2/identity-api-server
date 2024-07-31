@@ -23,6 +23,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AccessToken
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.HybridFlowConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.JWTAccessTokenAttributesConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OAuth2PKCEConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCLogoutConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
@@ -167,18 +168,26 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             } else {
                 consumerAppDTO.setTokenBindingValidationEnabled(false);
             }
-            if (accessToken.getJwtAccessTokenClaims() != null) {
-                consumerAppDTO.setJwtAccessTokenClaims(getJwtAccessTokenClaims(accessToken));
+            if (accessToken.getJwtAccessTokenAttributesConfiguration() != null) {
+                consumerAppDTO.setJwtAccessTokenClaims(getJwtAccessTokenClaims(accessToken
+                        .getJwtAccessTokenAttributesConfiguration()));
+                if (accessToken.getJwtAccessTokenAttributesConfiguration().getEnable() != null) {
+                    consumerAppDTO.setJwtAccessTokenClaimsEnabled(accessToken.getJwtAccessTokenAttributesConfiguration()
+                            .getEnable());
+                }
             }
         }
     }
 
-    private String[] getJwtAccessTokenClaims(AccessTokenConfiguration accessToken) {
+    private String[] getJwtAccessTokenClaims(JWTAccessTokenAttributesConfiguration
+                                                     jwtAccessTokenAttributesConfiguration) {
 
-        return Optional.ofNullable(accessToken.getJwtAccessTokenClaims())
+        return Optional.ofNullable(jwtAccessTokenAttributesConfiguration.getAttributes())
                 .map(claims -> claims.toArray(new String[0]))
                 .orElse(new String[0]);
     }
+
+
 
     private void updatePkceConfigurations(OAuthConsumerAppDTO consumerAppDTO, OAuth2PKCEConfiguration pkce) {
 

@@ -21,6 +21,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthe
 import org.wso2.carbon.identity.api.server.application.management.v1.HybridFlowConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.IdTokenEncryptionConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.JWTAccessTokenAttributesConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OAuth2PKCEConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCLogoutConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
@@ -107,13 +108,18 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .revokeTokensWhenIDPSessionTerminated(oAuthConsumerAppDTO
                         .isTokenRevocationWithIDPSessionTerminationEnabled())
                 .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled())
-                .jwtAccessTokenClaims(getJwtAccessTokenClaims(oAuthConsumerAppDTO));
+                .jwtAccessTokenAttributesConfiguration(getJwtAccessTokenAttributesConfiguration(oAuthConsumerAppDTO));
     }
 
-    private List<String> getJwtAccessTokenClaims(OAuthConsumerAppDTO oauthAppDTO) {
-
-        return oauthAppDTO.getJwtAccessTokenClaims() != null ?
+    private JWTAccessTokenAttributesConfiguration getJwtAccessTokenAttributesConfiguration(OAuthConsumerAppDTO
+                                                                                                   oauthAppDTO) {
+        JWTAccessTokenAttributesConfiguration jwtAccessTokenAttributesConfiguration =
+                new JWTAccessTokenAttributesConfiguration();
+        List<String> claims = oauthAppDTO.getJwtAccessTokenClaims() != null ?
                 Arrays.asList(oauthAppDTO.getJwtAccessTokenClaims()) : Collections.emptyList();
+        jwtAccessTokenAttributesConfiguration.setAttributes(claims);
+        jwtAccessTokenAttributesConfiguration.setEnable(oauthAppDTO.isJwtAccessTokenClaimsEnabled());
+        return jwtAccessTokenAttributesConfiguration;
     }
 
     private RefreshTokenConfiguration buildRefreshTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
