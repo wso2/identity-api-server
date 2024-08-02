@@ -115,10 +115,10 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                                                                                                    oauthAppDTO) {
         JWTAccessTokenAttributesConfiguration jwtAccessTokenAttributesConfiguration =
                 new JWTAccessTokenAttributesConfiguration();
-        List<String> claims = oauthAppDTO.getJwtAccessTokenClaims() != null ?
-                Arrays.asList(oauthAppDTO.getJwtAccessTokenClaims()) : Collections.emptyList();
+        List<String> claims = oauthAppDTO.getJwtAccessTokenOIDCClaims() != null ?
+                Arrays.asList(oauthAppDTO.getJwtAccessTokenOIDCClaims()) : Collections.emptyList();
         jwtAccessTokenAttributesConfiguration.setAttributes(claims);
-        jwtAccessTokenAttributesConfiguration.setEnable(oauthAppDTO.isJwtAccessTokenClaimsEnabled());
+        jwtAccessTokenAttributesConfiguration.setEnable(oauthAppDTO.isJwtAccessTokenOIDCClaimsSeparationEnabled());
         return jwtAccessTokenAttributesConfiguration;
     }
 
