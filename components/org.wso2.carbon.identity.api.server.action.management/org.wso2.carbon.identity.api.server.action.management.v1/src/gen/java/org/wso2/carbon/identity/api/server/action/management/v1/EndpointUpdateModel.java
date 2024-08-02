@@ -22,9 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationType;
 import javax.validation.constraints.*;
 
 
@@ -33,39 +31,48 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class AuthenticationTypeProperties  {
+public class EndpointUpdateModel  {
   
-    private Map<String, Object> properties = null;
-
+    private String uri;
+    private AuthenticationType authentication;
 
     /**
     **/
-    public AuthenticationTypeProperties properties(Map<String, Object> properties) {
+    public EndpointUpdateModel uri(String uri) {
 
-        this.properties = properties;
+        this.uri = uri;
         return this;
     }
     
-    @ApiModelProperty(example = "{\"username\":\"auth_username\",\"password\":\"auth_password\"}", value = "")
-    @JsonProperty("properties")
+    @ApiModelProperty(example = "https://abc.com/token", value = "")
+    @JsonProperty("uri")
+    @Valid @Pattern(regexp="^https?://.+")
+    public String getUri() {
+        return uri;
+    }
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    /**
+    **/
+    public EndpointUpdateModel authentication(AuthenticationType authentication) {
+
+        this.authentication = authentication;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("authentication")
     @Valid
-    public Map<String, Object> getProperties() {
-        return properties;
+    public AuthenticationType getAuthentication() {
+        return authentication;
     }
-    public void setProperties(Map<String, Object> properties) {
-        this.properties = properties;
-    }
-
-
-    public AuthenticationTypeProperties putPropertiesItem(String key, Object propertiesItem) {
-        if (this.properties == null) {
-            this.properties = new HashMap<String, Object>();
-        }
-        this.properties.put(key, propertiesItem);
-        return this;
+    public void setAuthentication(AuthenticationType authentication) {
+        this.authentication = authentication;
     }
 
-    
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -76,22 +83,24 @@ public class AuthenticationTypeProperties  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AuthenticationTypeProperties authenticationTypeProperties = (AuthenticationTypeProperties) o;
-        return Objects.equals(this.properties, authenticationTypeProperties.properties);
+        EndpointUpdateModel endpointUpdateModel = (EndpointUpdateModel) o;
+        return Objects.equals(this.uri, endpointUpdateModel.uri) &&
+            Objects.equals(this.authentication, endpointUpdateModel.authentication);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(properties);
+        return Objects.hash(uri, authentication);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class AuthenticationTypeProperties {\n");
+        sb.append("class EndpointUpdateModel {\n");
         
-        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+        sb.append("    uri: ").append(toIndentedString(uri)).append("\n");
+        sb.append("    authentication: ").append(toIndentedString(authentication)).append("\n");
         sb.append("}");
         return sb.toString();
     }

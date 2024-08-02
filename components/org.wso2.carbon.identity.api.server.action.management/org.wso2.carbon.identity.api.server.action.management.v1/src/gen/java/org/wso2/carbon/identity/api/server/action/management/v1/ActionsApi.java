@@ -67,7 +67,7 @@ public class ActionsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response activateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="PreIssueAccessToken, PreUpdatePassword, PreUpdateProfile, PreRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId) {
+    public Response activateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId) {
 
         return delegate.activateAction(actionType,  actionId );
     }
@@ -92,7 +92,7 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="PreIssueAccessToken, PreUpdatePassword, PreUpdateProfile, PreRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the action to be created." ,required=true) @Valid ActionModel actionModel) {
+    public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the action to be created." ,required=true) @Valid ActionModel actionModel) {
 
         return delegate.createAction(actionType,  actionModel );
     }
@@ -116,7 +116,7 @@ public class ActionsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response deactivateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="PreIssueAccessToken, PreUpdatePassword, PreUpdateProfile, PreRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId) {
+    public Response deactivateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId) {
 
         return delegate.deactivateAction(actionType,  actionId );
     }
@@ -140,7 +140,7 @@ public class ActionsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response deleteAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="PreIssueAccessToken, PreUpdatePassword, PreUpdateProfile, PreRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId) {
+    public Response deleteAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId) {
 
         return delegate.deleteAction(actionType,  actionId );
     }
@@ -190,7 +190,7 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getActionsByActionType(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="PreIssueAccessToken, PreUpdatePassword, PreUpdateProfile, PreRegistration") @PathParam("actionType") String actionType) {
+    public Response getActionsByActionType(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType) {
 
         return delegate.getActionsByActionType(actionType );
     }
@@ -214,7 +214,7 @@ public class ActionsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="PreIssueAccessToken, PreUpdatePassword, PreUpdateProfile, PreRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action information to be updated." ,required=true) @Valid ActionUpdateModel actionUpdateModel) {
+    public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action information to be updated." ,required=true) @Valid ActionUpdateModel actionUpdateModel) {
 
         return delegate.updateAction(actionType,  actionId,  actionUpdateModel );
     }
@@ -238,7 +238,7 @@ public class ActionsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateActionEndpointAuthentication(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="PreIssueAccessToken, PreUpdatePassword, PreUpdateProfile, PreRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "Authentication Type of the Action Endpoint.",required=true, allowableValues="none, basic, apiKey, bearer") @PathParam("authType") String authType, @ApiParam(value = "This represents the action endpoint authentication to be updated." ,required=true) @Valid AuthenticationTypeProperties authenticationTypeProperties) {
+    public Response updateActionEndpointAuthentication(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "Authentication Type of the Action Endpoint.",required=true, allowableValues="none, basic, apiKey, bearer") @PathParam("authType") String authType, @ApiParam(value = "This represents the action endpoint authentication to be updated." ,required=true) @Valid AuthenticationTypeProperties authenticationTypeProperties) {
 
         return delegate.updateActionEndpointAuthentication(actionType,  actionId,  authType,  authenticationTypeProperties );
     }
