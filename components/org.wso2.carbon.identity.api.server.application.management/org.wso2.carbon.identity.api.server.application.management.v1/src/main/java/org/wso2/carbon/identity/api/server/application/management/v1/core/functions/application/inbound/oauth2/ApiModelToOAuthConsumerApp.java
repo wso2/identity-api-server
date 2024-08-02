@@ -169,11 +169,11 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
                 consumerAppDTO.setTokenBindingValidationEnabled(false);
             }
             if (accessToken.getJwtAccessTokenAttributesConfiguration() != null) {
-                consumerAppDTO.setJwtAccessTokenClaims(getJwtAccessTokenClaims(accessToken
+                consumerAppDTO.setJwtAccessTokenOIDCClaims(getJwtAccessTokenClaims(accessToken
                         .getJwtAccessTokenAttributesConfiguration()));
                 if (accessToken.getJwtAccessTokenAttributesConfiguration().getEnable() != null) {
-                    consumerAppDTO.setJwtAccessTokenClaimsEnabled(accessToken.getJwtAccessTokenAttributesConfiguration()
-                            .getEnable());
+                    consumerAppDTO.setJwtAccessTokenOIDCClaimsSeparationEnabled(
+                            accessToken.getJwtAccessTokenAttributesConfiguration().getEnable());
                 }
             }
         }
