@@ -1,10 +1,10 @@
 # identity-api-server
 
-|  Branch | Build Status | Travis CI Status |
-| :------------ |:------------- |:-------------
-| master      | [![Build Status](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fwso2.org%2Fjenkins%2Fjob%2Fplatform-builds%2Fjob%2Fidentity-api-server%2F)](https://wso2.org/jenkins/job/platform-builds/job/identity-api-server/) | [![Travis CI Status](https://travis-ci.org/wso2/identity-api-server.svg?branch=master)](https://travis-ci.org/wso2/identity-api-server?branch=master)|
+|  Branch | Build Status | 
+| :------------ |:------------- |
+| master      | [![Build Status](https://wso2.org/jenkins/job/platform-builds/job/identity-api-server/badge/icon)](https://wso2.org/jenkins/job/platform-builds/job/identity-api-server/) |
 
-This repository contains modules related to the server related REST apis. It can be compiled using JDK 8, JDK 11 or JDK 17.
+This repository contains modules related to the WSO2 Identity Server REST API. It can be compiled using JDK 8, JDK 11 or JDK 17.
 
 ### Plugin to Generate the API Stubs
 
