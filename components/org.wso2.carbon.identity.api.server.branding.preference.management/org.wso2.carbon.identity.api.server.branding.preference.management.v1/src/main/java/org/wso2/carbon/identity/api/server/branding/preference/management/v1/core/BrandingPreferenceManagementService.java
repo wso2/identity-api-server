@@ -133,8 +133,7 @@ public class BrandingPreferenceManagementService {
                 if (log.isDebugEnabled()) {
                     log.debug("Can not find a branding preferences to delete for tenant: " + tenantDomain, e);
                 }
-                throw handleException(Response.Status.NOT_FOUND, ERROR_CODE_BRANDING_PREFERENCE_NOT_EXISTS,
-                        tenantDomain);
+                return;
             }
             throw handleBrandingPreferenceMgtException(e, ERROR_CODE_ERROR_DELETING_BRANDING_PREFERENCE, tenantDomain);
         }
