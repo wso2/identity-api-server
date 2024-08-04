@@ -4,7 +4,7 @@
 | :------------ |:------------- |
 | master      | [![Build Status](https://wso2.org/jenkins/job/platform-builds/job/identity-api-server/badge/icon)](https://wso2.org/jenkins/job/platform-builds/job/identity-api-server/) |
 
-This repository contains modules related to the WSO2 Identity Server REST API. It can be compiled using JDK 8, JDK 11 or JDK 17.
+This repository contains modules related to the server related REST apis. It can be compiled using JDK 8, JDK 11 or JDK 17.
 
 ### Plugin to Generate the API Stubs
 
