@@ -2696,9 +2696,9 @@ components:
       required: false
       description: |
         Specifies the required parameters in the response.
-        Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', 'issuer', 'applicationEnabled' and 'associatedRoles.allowedAudience' attributes.
+        Currently supports for only 'advancedConfigurations', 'templateId', 'templateVersion', 'clientId', 'issuer', 'applicationEnabled' and 'associatedRoles.allowedAudience' attributes.
 
-        /applications?attributes=advancedConfigurations,templateId,clientId,applicationEnabled,associatedRoles.allowedAudience
+        /applications?attributes=advancedConfigurations,templateId,templateVersion,clientId,applicationEnabled,associatedRoles.allowedAudience
       schema:
         type: string
     exportSecretsQueryParam:
@@ -2830,6 +2830,10 @@ components:
         templateId:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
+        templateVersion:
+          type: string
+          example: "v1.0.0"
+          description: Version of the template used to create the application.
         associatedRoles:
           type: object
           $ref: '#/components/schemas/AssociatedRolesConfig'
@@ -2863,6 +2867,10 @@ components:
         templateId:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
+        templateVersion:
+          type: string
+          example: "v1.0.0"
+          description: Version of the template used to create the application.
         isManagementApp:
           default: false
           type: boolean
@@ -2926,6 +2934,10 @@ components:
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
+        templateVersion:
+          type: string
+          example: "v1.0.0"
+          description: Version of the template used to create the application.
         isManagementApp:
           type: boolean
           example: false
@@ -2978,6 +2990,10 @@ components:
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
+        templateVersion:
+          type: string
+          example: "v1.0.0"
+          description: Version of the template used to create the application.
         applicationEnabled:
           type: boolean
           example: true

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -42,6 +42,7 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
         setIfNotNull(applicationPatchModel.getImageUrl(), serviceProvider::setImageUrl);
         setIfNotNull(applicationPatchModel.getAccessUrl(), serviceProvider::setAccessUrl);
         setIfNotNull(applicationPatchModel.getTemplateId(), serviceProvider::setTemplateId);
+        setIfNotNull(applicationPatchModel.getTemplateVersion(), serviceProvider::setTemplateVersion);
         setIfNotNull(applicationPatchModel.getApplicationEnabled(), serviceProvider::setApplicationEnabled);
 
         patchAssociatedRolesConfigurations(serviceProvider, applicationPatchModel.getAssociatedRoles());

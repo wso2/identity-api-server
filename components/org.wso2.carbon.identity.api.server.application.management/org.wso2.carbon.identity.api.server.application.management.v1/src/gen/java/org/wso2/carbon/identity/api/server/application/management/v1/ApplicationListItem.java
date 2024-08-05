@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -79,6 +79,7 @@ public enum AccessEnum {
     private String self;
     private AdvancedApplicationConfiguration advancedConfigurations;
     private String templateId;
+    private String templateVersion;
     private AssociatedRolesConfig associatedRoles;
     private Boolean applicationEnabled;
 
@@ -299,6 +300,25 @@ public enum AccessEnum {
     }
 
     /**
+    * Version of the template used to create the application.
+    **/
+    public ApplicationListItem templateVersion(String templateVersion) {
+
+        this.templateVersion = templateVersion;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "v1.0.0", value = "Version of the template used to create the application.")
+    @JsonProperty("templateVersion")
+    @Valid
+    public String getTemplateVersion() {
+        return templateVersion;
+    }
+    public void setTemplateVersion(String templateVersion) {
+        this.templateVersion = templateVersion;
+    }
+
+    /**
     **/
     public ApplicationListItem associatedRoles(AssociatedRolesConfig associatedRoles) {
 
@@ -358,13 +378,14 @@ public enum AccessEnum {
             Objects.equals(this.self, applicationListItem.self) &&
             Objects.equals(this.advancedConfigurations, applicationListItem.advancedConfigurations) &&
             Objects.equals(this.templateId, applicationListItem.templateId) &&
+            Objects.equals(this.templateVersion, applicationListItem.templateVersion) &&
             Objects.equals(this.associatedRoles, applicationListItem.associatedRoles) &&
             Objects.equals(this.applicationEnabled, applicationListItem.applicationEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, associatedRoles, applicationEnabled);
+        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, applicationEnabled);
     }
 
     @Override
@@ -385,6 +406,7 @@ public enum AccessEnum {
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("    advancedConfigurations: ").append(toIndentedString(advancedConfigurations)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
+        sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("}");

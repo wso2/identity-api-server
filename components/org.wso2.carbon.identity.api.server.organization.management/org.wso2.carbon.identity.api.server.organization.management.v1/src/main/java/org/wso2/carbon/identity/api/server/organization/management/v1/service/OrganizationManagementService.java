@@ -25,14 +25,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.organization.management.common.OrganizationManagementServiceHolder;
-import org.wso2.carbon.identity.api.server.organization.management.v1.exceptions.OrganizationManagementEndpointException;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ApplicationSharePOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Attribute;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.BasicOrganizationResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.DiscoveryAttribute;
-import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Link;
+import org.wso2.carbon.identity.api.server.organization.management.v1.model.MetaAttributesResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryAttributes;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationDiscoveryCheckPOSTResponse;
@@ -87,12 +86,20 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.ASC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DESC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DISCOVERY_PATH;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.FILTER_PARAM;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.LIMIT_PARAM;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.META_ATTRIBUTES_PATH;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.NEXT;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.PREVIOUS;
+import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.RECURSIVE_PARAM;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.util.OrganizationManagementEndpointUtil.buildOrganizationURL;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_PAGINATION_PARAMETER_NEGATIVE_LIMIT;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_EMPTY_REQUEST_BODY;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_SHARE_APPLICATION_REQUEST_BODY;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ORGANIZATION_PATH;
+import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.PAGINATION_AFTER;
+import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.PAGINATION_BEFORE;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.generateUniqueID;
 import static org.wso2.carbon.identity.organization.management.service.util.Utils.getOrganizationId;
@@ -543,6 +550,33 @@ public class OrganizationManagementService {
         }
     }
 
+    /**
+     * Retrieve organizations' meta attributes.
+     *
+     * @param filter    The filter string.
+     * @param limit     The maximum number of records to be returned.
+     * @param after     The pointer to next page.
+     * @param before    The pointer to previous page.
+     * @param recursive Determines whether recursive search is required.
+     * @return The list of organizations' meta attributes.
+     */
+    public Response getOrganizationsMetaAttributes(String filter, Integer limit, String after, String before,
+                                                   Boolean recursive) {
+
+        try {
+            limit = validateLimit(limit);
+            String sortOrder = StringUtils.isNotBlank(before) ? DESC_SORT_ORDER : ASC_SORT_ORDER;
+            List<String> metaAttributes = getOrganizationManager().getOrganizationsMetaAttributes(limit + 1, after,
+                    before, sortOrder, filter, Boolean.TRUE.equals(recursive));
+            return Response.ok().entity(getMetaAttributesResponse(limit, after, before, filter, metaAttributes,
+                    Boolean.TRUE.equals(recursive))).build();
+        } catch (OrganizationManagementClientException e) {
+            return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
+        } catch (OrganizationManagementException e) {
+            return OrganizationManagementEndpointUtil.handleServerErrorResponse(e, LOG);
+        }
+    }
+
     private Organization getOrganizationFromPostRequest(OrganizationPOSTRequest organizationPOSTRequest) {
 
         String organizationId = generateUniqueID();
@@ -707,17 +741,15 @@ public class OrganizationManagementService {
                     (StringUtils.isNotBlank(before) && !hasMoreItems);
             boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
 
-            String url = "?limit=" + limit + "&recursive=" + recursive;
+            String url = "?" + LIMIT_PARAM + "=" + limit + "&" + RECURSIVE_PARAM + "=" + recursive;
             if (StringUtils.isNotBlank(filter)) {
                 try {
-                    url += "&filter=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
+                    url += "&" + FILTER_PARAM + "=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException e) {
-                    LOG.error("Server encountered an error while building pagination URL for the response.", e);
-                    Error error = OrganizationManagementEndpointUtil.getError(
-                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getCode(),
+                    throw new OrganizationManagementServerException(
                             ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getMessage(),
-                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getDescription());
-                    throw new OrganizationManagementEndpointException(Response.Status.INTERNAL_SERVER_ERROR, error);
+                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getDescription(),
+                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getCode(), e);
                 }
             }
 
@@ -733,8 +765,9 @@ public class OrganizationManagementService {
                         .getBytes(StandardCharsets.UTF_8));
                 Link link = new Link();
                 link.setHref(URI.create(
-                        OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&before=" + encodedString));
-                link.setRel("previous");
+                        OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&" + PAGINATION_BEFORE + "="
+                                + encodedString));
+                link.setRel(PREVIOUS);
                 organizationsResponse.addLinksItem(link);
             }
             if (!isLastPage) {
@@ -743,8 +776,9 @@ public class OrganizationManagementService {
                         .getBytes(StandardCharsets.UTF_8));
                 Link link = new Link();
                 link.setHref(URI.create(
-                        OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&after=" + encodedString));
-                link.setRel("next");
+                        OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&" + PAGINATION_AFTER + "="
+                                + encodedString));
+                link.setRel(NEXT);
                 organizationsResponse.addLinksItem(link);
             }
 
@@ -916,6 +950,60 @@ public class OrganizationManagementService {
         organizationMetadata.setDiscoveryAttributes(attributes);
 
         return organizationMetadata;
+    }
+
+    private MetaAttributesResponse getMetaAttributesResponse(Integer limit, String after, String before, String filter,
+                                                             List<String> metaAttributes, boolean recursive)
+            throws OrganizationManagementServerException {
+
+        MetaAttributesResponse metaAttributesResponse = new MetaAttributesResponse();
+
+        if (limit != 0 && CollectionUtils.isNotEmpty(metaAttributes)) {
+            boolean hasMoreItems = metaAttributes.size() > limit;
+            boolean needsReverse = StringUtils.isNotBlank(before);
+            boolean isFirstPage = (StringUtils.isBlank(before) && StringUtils.isBlank(after)) ||
+                    (StringUtils.isNotBlank(before) && !hasMoreItems);
+            boolean isLastPage = !hasMoreItems && (StringUtils.isNotBlank(after) || StringUtils.isBlank(before));
+
+            String url = PATH_SEPARATOR + META_ATTRIBUTES_PATH + "?" + LIMIT_PARAM + "=" + limit + "&" + RECURSIVE_PARAM
+                    + "=" + recursive;
+            if (StringUtils.isNotBlank(filter)) {
+                try {
+                    url += "&" + FILTER_PARAM + "=" + URLEncoder.encode(filter, StandardCharsets.UTF_8.name());
+                } catch (UnsupportedEncodingException e) {
+                    throw new OrganizationManagementServerException(
+                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getMessage(),
+                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getDescription(),
+                            ERROR_CODE_ERROR_BUILDING_PAGINATED_RESPONSE_URL.getCode(), e);
+                }
+            }
+            if (hasMoreItems) {
+                metaAttributes.remove(metaAttributes.size() - 1);
+            }
+            if (needsReverse) {
+                Collections.reverse(metaAttributes);
+            }
+            if (!isFirstPage) {
+                String encodedString = Base64.getEncoder().encodeToString(metaAttributes.get(0)
+                        .getBytes(StandardCharsets.UTF_8));
+                Link link = new Link();
+                link.setHref(URI.create(OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&"
+                        + PAGINATION_BEFORE + "=" + encodedString));
+                link.setRel(PREVIOUS);
+                metaAttributesResponse.addLinksItem(link);
+            }
+            if (!isLastPage) {
+                String encodedString = Base64.getEncoder().encodeToString(metaAttributes.get(metaAttributes.size() - 1)
+                        .getBytes(StandardCharsets.UTF_8));
+                Link link = new Link();
+                link.setHref(URI.create(OrganizationManagementEndpointUtil.buildURIForPagination(url) + "&"
+                        + PAGINATION_AFTER + "=" + encodedString));
+                link.setRel(NEXT);
+                metaAttributesResponse.addLinksItem(link);
+            }
+            metaAttributesResponse.attributes(metaAttributes);
+        }
+        return metaAttributesResponse;
     }
 
     private OrganizationManager getOrganizationManager() {

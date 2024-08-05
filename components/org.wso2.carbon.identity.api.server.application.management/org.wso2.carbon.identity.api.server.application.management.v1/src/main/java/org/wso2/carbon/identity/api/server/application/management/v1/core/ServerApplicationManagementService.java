@@ -187,6 +187,7 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ISSUER;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.NAME;
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_ID;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.TEMPLATE_VERSION;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildBadRequestError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.Utils.buildNotImplementedError;
 import static org.wso2.carbon.identity.api.server.application.management.v1.core.functions.application.inbound.InboundFunctions.getInboundAuthKey;
@@ -241,6 +242,7 @@ public class ServerApplicationManagementService {
         SUPPORTED_REQUIRED_ATTRIBUTES.add(ADVANCED_CONFIGURATIONS);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(CLIENT_ID);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(TEMPLATE_ID);
+        SUPPORTED_REQUIRED_ATTRIBUTES.add(TEMPLATE_VERSION);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(ISSUER);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(APPLICATION_ENABLED);
         SUPPORTED_REQUIRED_ATTRIBUTES.add(IdentityApplicationConstants.ALLOWED_ROLE_AUDIENCE_REQUEST_ATTRIBUTE_NAME);
@@ -1183,6 +1185,7 @@ public class ServerApplicationManagementService {
                     && applicationPatchModel.getImageUrl() == null
                     && applicationPatchModel.getAccessUrl() == null
                     && applicationPatchModel.getTemplateId() == null
+                    && applicationPatchModel.getTemplateVersion() == null
                     && applicationPatchModel.getClaimConfiguration() == null
                     && applicationPatchModel.getAdvancedConfigurations() == null
                     && applicationPatchModel.getProvisioningConfigurations() == null;
@@ -1708,6 +1711,9 @@ public class ServerApplicationManagementService {
                     new ServiceProviderToApiModel().apply(serviceProvider);
             if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(TEMPLATE_ID))) {
                 applicationResponseModel.templateId(null);
+            }
+            if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(TEMPLATE_VERSION))) {
+                applicationResponseModel.templateVersion(null);
             }
             if (requiredAttributes.stream().noneMatch(attribute -> attribute.equals(ADVANCED_CONFIGURATIONS))) {
                 applicationResponseModel.advancedConfigurations(null);

@@ -87,16 +87,8 @@ public class ServerActionManagementService {
     public ActionResponse updateAction(String actionType, String actionId, ActionUpdateModel actionUpdateModel) {
 
         try {
-            Action updatingAction = new Action.ActionRequestBuilder()
-                    .name(actionUpdateModel.getName())
-                    .description(actionUpdateModel.getDescription())
-                    .endpoint(new EndpointConfig.EndpointConfigBuilder()
-                            .uri(actionUpdateModel.getEndpointUri())
-                            .build())
-                    .build();
-
             return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
-                    .updateAction(actionType, actionId, updatingAction,
+                    .updateAction(actionType, actionId, buildUpdatingAction(actionUpdateModel),
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
@@ -239,6 +231,40 @@ public class ServerActionManagementService {
                         .build());
 
         return actionRequestBuilder.build();
+    }
+
+    /**
+     * Build Action from the ActionUpdateModel.
+     *
+     * @param actionUpdateModel ActionUpdateModel.
+     * @return Action.
+     */
+    private Action buildUpdatingAction(ActionUpdateModel actionUpdateModel) {
+
+        EndpointConfig endpointConfig = null;
+        if (actionUpdateModel.getEndpoint() != null) {
+
+            AuthType authentication = null;
+            if (actionUpdateModel.getEndpoint().getAuthentication() != null) {
+                authentication = new AuthType.AuthTypeBuilder()
+                        .type(AuthType.AuthenticationType.valueOf(actionUpdateModel.getEndpoint().getAuthentication()
+                                .getType().toString()))
+                        .properties(getActionEndpointAuthProperties(
+                                actionUpdateModel.getEndpoint().getAuthentication().getType().name(),
+                                actionUpdateModel.getEndpoint().getAuthentication().getProperties()))
+                        .build();
+            }
+            endpointConfig = new EndpointConfig.EndpointConfigBuilder()
+                    .uri(actionUpdateModel.getEndpoint().getUri())
+                    .authentication(authentication)
+                    .build();
+        }
+
+        return new Action.ActionRequestBuilder()
+                .name(actionUpdateModel.getName())
+                .description(actionUpdateModel.getDescription())
+                .endpoint(endpointConfig)
+                .build();
     }
 
     /**

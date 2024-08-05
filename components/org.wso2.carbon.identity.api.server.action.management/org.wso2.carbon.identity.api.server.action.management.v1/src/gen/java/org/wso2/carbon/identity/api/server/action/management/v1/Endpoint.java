@@ -48,7 +48,7 @@ public class Endpoint  {
     @JsonProperty("uri")
     @Valid
     @NotNull(message = "Property uri cannot be null.")
-
+    @Pattern(regexp="^https?://.+")
     public String getUri() {
         return uri;
     }

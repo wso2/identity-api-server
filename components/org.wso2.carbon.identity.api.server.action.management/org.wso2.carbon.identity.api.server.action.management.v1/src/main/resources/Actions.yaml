@@ -520,9 +520,12 @@ components:
         name:
           type: string
           example: Access Token Pre Issue
+          minLength: 1
+          maxLength: 255
         description:
           type: string
           example: This is the configuration of pre-action for issuing access token.
+          maxLength: 255
         endpoint:
           $ref: '#/components/schemas/Endpoint'
 
@@ -535,6 +538,7 @@ components:
         uri:
           type: string
           example: https://abc.com/token
+          pattern: '^https?://.+'
         authentication:
           $ref: '#/components/schemas/AuthenticationType'
 
@@ -547,6 +551,7 @@ components:
         uri:
           type: string
           example: https://abc.com/token
+          pattern: '^https?://.+'
         authentication:
           $ref: '#/components/schemas/AuthenticationTypeResponse'
 
@@ -563,14 +568,15 @@ components:
             - PRE_UPDATE_PASSWORD
             - PRE_UPDATE_PROFILE
             - PRE_REGISTRATION
-            - POST_LOGIN
-            - PRE_LOGIN
         name:
           type: string
           example: Access Token Pre Issue
+          minLength: 1
+          maxLength: 255
         description:
           type: string
           example: This is the configuration of pre-action for issuing access token.
+          maxLength: 255
         status:
           type: string
           enum:
@@ -592,14 +598,15 @@ components:
             - PRE_UPDATE_PASSWORD
             - PRE_UPDATE_PROFILE
             - PRE_REGISTRATION
-            - POST_LOGIN
-            - PRE_LOGIN
         name:
           type: string
           example: Access Token Pre Issue
+          minLength: 1
+          maxLength: 255
         description:
           type: string
           example: This is the configuration of pre-action for issuing access token.
+          maxLength: 255
         status:
           type: string
           enum:
@@ -626,8 +633,6 @@ components:
             - PRE_UPDATE_PASSWORD
             - PRE_UPDATE_PROFILE
             - PRE_REGISTRATION
-            - POST_LOGIN
-            - PRE_LOGIN
         displayName:
           type: string
           example: "Pre Issue Access Token."
@@ -645,6 +650,7 @@ components:
       type: object
       required:
         - type
+        - properties
       properties:
         type:
           type: string
@@ -691,12 +697,24 @@ components:
         name:
           type: string
           example: Access Token Pre Issue
+          minLength: 1
+          maxLength: 255
         description:
           type: string
           example: This is the configuration of pre-action for issuing access token.
-        endpointUri:
+          maxLength: 255
+        endpoint:
+          $ref: '#/components/schemas/EndpointUpdateModel'
+
+    EndpointUpdateModel:
+      type: object
+      properties:
+        uri:
           type: string
-          example: https://abcd.com/token
+          example: https://abc.com/token
+          pattern: '^https?://.+'
+        authentication:
+          $ref: '#/components/schemas/AuthenticationType'
 
     Error:
       type: object
