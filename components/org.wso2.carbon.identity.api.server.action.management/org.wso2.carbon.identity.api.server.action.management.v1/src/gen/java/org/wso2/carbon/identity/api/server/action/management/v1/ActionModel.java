@@ -49,7 +49,7 @@ public class ActionModel  {
     @JsonProperty("name")
     @Valid
     @NotNull(message = "Property name cannot be null.")
-
+    @Size(min=1,max=255)
     public String getName() {
         return name;
     }
@@ -67,7 +67,7 @@ public class ActionModel  {
     
     @ApiModelProperty(example = "This is the configuration of pre-action for issuing access token.", value = "")
     @JsonProperty("description")
-    @Valid
+    @Valid @Size(max=255)
     public String getDescription() {
         return description;
     }

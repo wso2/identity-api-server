@@ -39,7 +39,7 @@ public class ActionResponse  {
 @XmlEnum(String.class)
 public enum TypeEnum {
 
-    @XmlEnumValue("PRE_ISSUE_ACCESS_TOKEN") PRE_ISSUE_ACCESS_TOKEN(String.valueOf("PRE_ISSUE_ACCESS_TOKEN")), @XmlEnumValue("PRE_UPDATE_PASSWORD") PRE_UPDATE_PASSWORD(String.valueOf("PRE_UPDATE_PASSWORD")), @XmlEnumValue("PRE_UPDATE_PROFILE") PRE_UPDATE_PROFILE(String.valueOf("PRE_UPDATE_PROFILE")), @XmlEnumValue("PRE_REGISTRATION") PRE_REGISTRATION(String.valueOf("PRE_REGISTRATION")), @XmlEnumValue("POST_LOGIN") POST_LOGIN(String.valueOf("POST_LOGIN")), @XmlEnumValue("PRE_LOGIN") PRE_LOGIN(String.valueOf("PRE_LOGIN"));
+    @XmlEnumValue("PRE_ISSUE_ACCESS_TOKEN") PRE_ISSUE_ACCESS_TOKEN(String.valueOf("PRE_ISSUE_ACCESS_TOKEN")), @XmlEnumValue("PRE_UPDATE_PASSWORD") PRE_UPDATE_PASSWORD(String.valueOf("PRE_UPDATE_PASSWORD")), @XmlEnumValue("PRE_UPDATE_PROFILE") PRE_UPDATE_PROFILE(String.valueOf("PRE_UPDATE_PROFILE")), @XmlEnumValue("PRE_REGISTRATION") PRE_REGISTRATION(String.valueOf("PRE_REGISTRATION"));
 
 
     private String value;
@@ -152,7 +152,7 @@ public enum StatusEnum {
     
     @ApiModelProperty(example = "Access Token Pre Issue", value = "")
     @JsonProperty("name")
-    @Valid
+    @Valid @Size(min=1,max=255)
     public String getName() {
         return name;
     }
@@ -170,7 +170,7 @@ public enum StatusEnum {
     
     @ApiModelProperty(example = "This is the configuration of pre-action for issuing access token.", value = "")
     @JsonProperty("description")
-    @Valid
+    @Valid @Size(max=255)
     public String getDescription() {
         return description;
     }
