@@ -22,7 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.wso2.carbon.identity.api.server.application.management.v1.JWTAccessTokenAttributesConfiguration;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 
 
@@ -39,7 +40,9 @@ public class AccessTokenConfiguration  {
     private String bindingType = "None";
     private Boolean revokeTokensWhenIDPSessionTerminated;
     private Boolean validateTokenBinding;
-    private JWTAccessTokenAttributesConfiguration jwtAccessTokenAttributesConfiguration;
+    private List<String> accessTokenAttributes = null;
+
+    private Boolean accessTokenAttributesEnabled;
 
     /**
     **/
@@ -154,20 +157,47 @@ public class AccessTokenConfiguration  {
 
     /**
     **/
-    public AccessTokenConfiguration jwtAccessTokenAttributesConfiguration(JWTAccessTokenAttributesConfiguration jwtAccessTokenAttributesConfiguration) {
+    public AccessTokenConfiguration accessTokenAttributes(List<String> accessTokenAttributes) {
 
-        this.jwtAccessTokenAttributesConfiguration = jwtAccessTokenAttributesConfiguration;
+        this.accessTokenAttributes = accessTokenAttributes;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("jwtAccessTokenAttributesConfiguration")
+    @JsonProperty("accessTokenAttributes")
     @Valid
-    public JWTAccessTokenAttributesConfiguration getJwtAccessTokenAttributesConfiguration() {
-        return jwtAccessTokenAttributesConfiguration;
+    public List<String> getAccessTokenAttributes() {
+        return accessTokenAttributes;
     }
-    public void setJwtAccessTokenAttributesConfiguration(JWTAccessTokenAttributesConfiguration jwtAccessTokenAttributesConfiguration) {
-        this.jwtAccessTokenAttributesConfiguration = jwtAccessTokenAttributesConfiguration;
+    public void setAccessTokenAttributes(List<String> accessTokenAttributes) {
+        this.accessTokenAttributes = accessTokenAttributes;
+    }
+
+    public AccessTokenConfiguration addAccessTokenAttributesItem(String accessTokenAttributesItem) {
+        if (this.accessTokenAttributes == null) {
+            this.accessTokenAttributes = new ArrayList<>();
+        }
+        this.accessTokenAttributes.add(accessTokenAttributesItem);
+        return this;
+    }
+
+        /**
+    * If enabled, the access token attributes will be included in the access token.
+    **/
+    public AccessTokenConfiguration accessTokenAttributesEnabled(Boolean accessTokenAttributesEnabled) {
+
+        this.accessTokenAttributesEnabled = accessTokenAttributesEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "If enabled, the access token attributes will be included in the access token.")
+    @JsonProperty("accessTokenAttributesEnabled")
+    @Valid
+    public Boolean getAccessTokenAttributesEnabled() {
+        return accessTokenAttributesEnabled;
+    }
+    public void setAccessTokenAttributesEnabled(Boolean accessTokenAttributesEnabled) {
+        this.accessTokenAttributesEnabled = accessTokenAttributesEnabled;
     }
 
 
@@ -188,12 +218,13 @@ public class AccessTokenConfiguration  {
             Objects.equals(this.bindingType, accessTokenConfiguration.bindingType) &&
             Objects.equals(this.revokeTokensWhenIDPSessionTerminated, accessTokenConfiguration.revokeTokensWhenIDPSessionTerminated) &&
             Objects.equals(this.validateTokenBinding, accessTokenConfiguration.validateTokenBinding) &&
-            Objects.equals(this.jwtAccessTokenAttributesConfiguration, accessTokenConfiguration.jwtAccessTokenAttributesConfiguration);
+            Objects.equals(this.accessTokenAttributes, accessTokenConfiguration.accessTokenAttributes) &&
+            Objects.equals(this.accessTokenAttributesEnabled, accessTokenConfiguration.accessTokenAttributesEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding, jwtAccessTokenAttributesConfiguration);
+        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding, accessTokenAttributes, accessTokenAttributesEnabled);
     }
 
     @Override
@@ -208,7 +239,8 @@ public class AccessTokenConfiguration  {
         sb.append("    bindingType: ").append(toIndentedString(bindingType)).append("\n");
         sb.append("    revokeTokensWhenIDPSessionTerminated: ").append(toIndentedString(revokeTokensWhenIDPSessionTerminated)).append("\n");
         sb.append("    validateTokenBinding: ").append(toIndentedString(validateTokenBinding)).append("\n");
-        sb.append("    jwtAccessTokenAttributesConfiguration: ").append(toIndentedString(jwtAccessTokenAttributesConfiguration)).append("\n");
+        sb.append("    accessTokenAttributes: ").append(toIndentedString(accessTokenAttributes)).append("\n");
+        sb.append("    accessTokenAttributesEnabled: ").append(toIndentedString(accessTokenAttributesEnabled)).append("\n");
         sb.append("}");
         return sb.toString();
     }
