@@ -3687,8 +3687,13 @@ components:
           type: boolean
           description: "If enabled, both access token and the token binding needs to be present for a successful API
           invocation."
-        jwtAccessTokenAttributesConfiguration:
-          $ref: '#/components/schemas/JWTAccessTokenAttributesConfiguration'
+        accessTokenAttributes:
+          type: array
+          items:
+            type: string
+        accessTokenAttributesEnabled:
+          type: boolean
+          description: "If enabled, the access token attributes will be included in the access token."
     RefreshTokenConfiguration:
       type: object
       properties:
@@ -4322,16 +4327,6 @@ components:
         ref:
           type: string
           example: '/t/wso2.com/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
-    JWTAccessTokenAttributesConfiguration:
-      type: object
-      properties:
-        enable:
-          type: boolean
-          example: true
-        attributes:
-          type: array
-          items:
-            type: string
 
     Error:
       type: object
