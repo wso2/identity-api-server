@@ -191,6 +191,21 @@ public class BrandingPreferenceManagementService {
      */
     public BrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale) {
 
+        return resolveBrandingPreference(type, name, locale, false);
+    }
+
+    /**
+     * Retrieve the resolved branding preferences.
+     *
+     * @param type                Resource Type.
+     * @param name                Name.
+     * @param locale              Language preference.
+     * @param restrictToPublished Whether to resolve using only published branding preferences.
+     * @return The resolved branding preference resource. If not exists return the default preferences.
+     */
+    public BrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale,
+                                                             boolean restrictToPublished) {
+
         /*
          Currently this API provides the support to only configure organization wise & application wise
          branding preference for 'en-US' locale.
@@ -202,11 +217,11 @@ public class BrandingPreferenceManagementService {
             if (APPLICATION_TYPE.equals(type)) {
                 // Get application specific branding preference.
                 responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                        resolveBrandingPreference(APPLICATION_TYPE, name, DEFAULT_LOCALE);
+                        resolveBrandingPreference(APPLICATION_TYPE, name, DEFAULT_LOCALE, restrictToPublished);
             } else {
                 // Get default branding preference.
                 responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                        resolveBrandingPreference(ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
+                        resolveBrandingPreference(ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE, restrictToPublished);
             }
 
             return buildBrandingResponseFromResponseDTO(responseDTO);

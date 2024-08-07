@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -203,15 +203,15 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
     }
 
     @Override
-    public Response resolveBrandingPreference(String type, String name, String locale) {
+    public Response resolveBrandingPreference(String type, String name, String locale, Boolean restrictToPublished) {
 
         if (type != null) {
             if (!(ORGANIZATION_TYPE.equals(type) || APPLICATION_TYPE.equals(type) || CUSTOM_TYPE.equals(type))) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         }
-        return Response.ok()
-                .entity(brandingPreferenceManagementService.resolveBrandingPreference(type, name, locale)).build();
+        return Response.ok().entity(brandingPreferenceManagementService
+                .resolveBrandingPreference(type, name, locale, restrictToPublished)).build();
     }
 
     @Override

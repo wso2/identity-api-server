@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -44,7 +44,7 @@ public interface BrandingPreferenceApiService {
 
       public Response getCustomText(String type, String name, String locale, String screen);
 
-      public Response resolveBrandingPreference(String type, String name, String locale);
+      public Response resolveBrandingPreference(String type, String name, String locale, Boolean restrictToPublished);
 
       public Response resolveCustomText(String type, String name, String locale, String screen);
 
