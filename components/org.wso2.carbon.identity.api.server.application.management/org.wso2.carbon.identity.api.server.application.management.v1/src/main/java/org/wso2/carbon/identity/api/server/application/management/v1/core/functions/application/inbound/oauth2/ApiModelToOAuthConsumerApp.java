@@ -167,7 +167,15 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             } else {
                 consumerAppDTO.setTokenBindingValidationEnabled(false);
             }
+            consumerAppDTO.setAccessTokenClaims(getAccessTokenClaims(accessToken));
+            consumerAppDTO.setAccessTokenClaimsSeparationEnabled(accessToken.getAccessTokenAttributesEnabled());
         }
+    }
+
+    private String[] getAccessTokenClaims(AccessTokenConfiguration accessToken) {
+
+        return Optional.ofNullable(accessToken.getAccessTokenAttributes()).map(claims -> claims.toArray(new String[0]))
+                .orElse(new String[0]);
     }
 
     private void updatePkceConfigurations(OAuthConsumerAppDTO consumerAppDTO, OAuth2PKCEConfiguration pkce) {
