@@ -41,6 +41,7 @@ public class AccessTokenConfiguration  {
     private Boolean revokeTokensWhenIDPSessionTerminated;
     private Boolean validateTokenBinding;
     private List<String> accessTokenAttributes = null;
+
     private Boolean accessTokenAttributesEnabled;
 
     /**
@@ -198,6 +199,8 @@ public class AccessTokenConfiguration  {
     public void setAccessTokenAttributesEnabled(Boolean accessTokenAttributesEnabled) {
         this.accessTokenAttributesEnabled = accessTokenAttributesEnabled;
     }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
