@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -206,9 +206,9 @@ public class BrandingPreferenceApi  {
         @ApiResponse(code = 404, message = "Requested resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
     })
-    public Response resolveBrandingPreference(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.")  @QueryParam("locale") String locale) {
+    public Response resolveBrandingPreference(    @Valid@ApiParam(value = "Type to filter the retrieval of customizations.", allowableValues="ORG, APP, CUSTOM")  @QueryParam("type") String type,     @Valid@ApiParam(value = "Tenant/Application name to filter the retrieval of customizations.")  @QueryParam("name") String name,     @Valid@ApiParam(value = "Locale to filter the retrieval of customizations.")  @QueryParam("locale") String locale,     @Valid@ApiParam(value = "Specifies whether to use only published branding preferences for resolving. If set to true, branding preference will be resolved only using published branding preferences. If set to false, branding preference will be resolved using both published and unpublished branding preferences. ", defaultValue="false") @DefaultValue("false")  @QueryParam("restrictToPublished") Boolean restrictToPublished) {
 
-        return delegate.resolveBrandingPreference(type,  name,  locale );
+        return delegate.resolveBrandingPreference(type,  name,  locale,  restrictToPublished );
     }
 
     @Valid
