@@ -19,12 +19,27 @@
 package org.wso2.carbon.identity.api.server.api.resource.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
 import java.util.List;
+
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceListResponse;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
+import org.wso2.carbon.identity.api.server.api.resource.v1.Error;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourcesApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
+
+import javax.validation.constraints.*;
 
 @Path("/api-resources")
 @Api(description = "The api-resources API")

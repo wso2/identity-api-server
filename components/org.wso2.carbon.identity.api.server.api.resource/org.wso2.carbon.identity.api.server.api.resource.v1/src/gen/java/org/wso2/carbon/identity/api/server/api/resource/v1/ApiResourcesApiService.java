@@ -18,7 +18,20 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1;
 
+import org.wso2.carbon.identity.api.server.api.resource.v1.*;
+import org.wso2.carbon.identity.api.server.api.resource.v1.*;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceListResponse;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
+import org.wso2.carbon.identity.api.server.api.resource.v1.Error;
+import java.util.List;
+import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
 import javax.ws.rs.core.Response;
 
 
