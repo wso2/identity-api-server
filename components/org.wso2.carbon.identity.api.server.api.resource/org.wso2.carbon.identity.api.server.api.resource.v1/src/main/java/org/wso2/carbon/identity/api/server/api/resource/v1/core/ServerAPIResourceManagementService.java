@@ -35,6 +35,7 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.PaginationLink;
 import org.wso2.carbon.identity.api.server.api.resource.v1.Property;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.ScopePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.server.api.resource.v1.util.APIResourceMgtEndpointUtil;
@@ -343,6 +344,55 @@ public class ServerAPIResourceManagementService {
             handleSystemAPI(apiResource);
             APIResourceManagementServiceHolder.getApiResourceManager().deleteAPIScopeByScopeName(apiResourceId,
                     scopeName, tenantDomain);
+        } catch (APIResourceMgtException e) {
+            throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
+        }
+    }
+
+    /**
+     * Patch scopes by the scope name.
+     *
+     * @param apiResourceId     API Resource ID.
+     * @param scopeName         Scope Name.
+     * @param scopePatchModel   Parameters to be updated.
+     */
+    public void patchScopeByScopeName(String apiResourceId, String scopeName, ScopePatchModel scopePatchModel) {
+
+        try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Updating scope with ID: " + scopeName + " of API Resource ID: " + apiResourceId);
+            }
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
+            APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
+                    .getAPIResourceById(apiResourceId, tenantDomain);
+            if (apiResource == null) {
+                throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
+                        APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_API_RESOURCE_NOT_FOUND, apiResourceId);
+            }
+
+            Scope scopeWithMetadata = APIResourceManagementServiceHolder.getApiResourceManager()
+                    .getScopeByName(scopeName, tenantDomain);
+            if (scopeWithMetadata == null) {
+                throw APIResourceMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
+                        APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_INVALID_SCOPE_NAME);
+            }
+            String displayName = scopePatchModel.getDisplayName() == null ? scopeWithMetadata.getDisplayName() :
+                    scopePatchModel.getDisplayName();
+            String description = scopePatchModel.getDescription() == null ? scopeWithMetadata.getDescription() :
+                    scopePatchModel.getDescription();
+
+            handleSystemAPI(apiResource);
+            Scope.ScopeBuilder scopeBuilder = new Scope.ScopeBuilder()
+                    .id(scopeWithMetadata.getId())
+                    .name(scopeName)
+                    .displayName(displayName)
+                    .description(description)
+                    .apiID(scopeWithMetadata.getApiID())
+                    .orgID(scopeWithMetadata.getOrgID());
+            Scope scopeForUpdate = scopeBuilder.build();
+            APIResourceManagementServiceHolder.getApiResourceManager().updateScopeMetadata(scopeForUpdate, apiResource,
+                    tenantDomain);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }

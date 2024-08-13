@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,20 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1;
 
-import org.wso2.carbon.identity.api.server.api.resource.v1.*;
-import org.wso2.carbon.identity.api.server.api.resource.v1.*;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationModel;
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceListResponse;
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel;
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
-import org.wso2.carbon.identity.api.server.api.resource.v1.Error;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
-import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
 import javax.ws.rs.core.Response;
 
 
@@ -50,6 +37,8 @@ public interface ApiResourcesApiService {
       public Response apiResourcesApiResourceIdScopesPut(String apiResourceId, List<ScopeCreationModel> scopeCreationModel);
 
       public Response apiResourcesApiResourceIdScopesScopeNameDelete(String apiResourceId, String scopeName);
+
+      public Response apiResourcesApiResourceIdScopesScopeNamePatch(String apiResourceId, String scopeName, ScopePatchModel scopePatchModel);
 
       public Response getAPIResources(String before, String after, String filter, Integer limit, String attributes);
 }

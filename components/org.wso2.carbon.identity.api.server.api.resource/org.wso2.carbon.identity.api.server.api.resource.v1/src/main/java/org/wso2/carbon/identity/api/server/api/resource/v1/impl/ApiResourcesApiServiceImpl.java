@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -24,6 +24,7 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourcesApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.ScopePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceManagementService;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -92,6 +93,14 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     public Response apiResourcesApiResourceIdScopesScopeNameDelete(String apiResourceId, String scopeName) {
 
         serverAPIResourceManagementService.deleteScopeByScopeName(apiResourceId, scopeName);
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response apiResourcesApiResourceIdScopesScopeNamePatch(String apiResourceId, String scopeName,
+                                                                  ScopePatchModel scopePatchModel) {
+
+        serverAPIResourceManagementService.patchScopeByScopeName(apiResourceId, scopeName, scopePatchModel);
         return Response.noContent().build();
     }
 

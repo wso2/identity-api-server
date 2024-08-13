@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,27 +19,12 @@
 package org.wso2.carbon.identity.api.server.api.resource.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
 import java.util.List;
-
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationModel;
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceListResponse;
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel;
-import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
-import org.wso2.carbon.identity.api.server.api.resource.v1.Error;
-import java.util.List;
-import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
-import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
-import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourcesApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
 
 @Path("/api-resources")
 @Api(description = "The api-resources API")
@@ -211,6 +196,31 @@ public class ApiResourcesApi  {
     public Response apiResourcesApiResourceIdScopesScopeNameDelete(@ApiParam(value = "ID of the API Resource.",required=true) @PathParam("apiResourceId") String apiResourceId, @ApiParam(value = "Name of the Scope.",required=true) @PathParam("scopeName") String scopeName) {
 
         return delegate.apiResourcesApiResourceIdScopesScopeNameDelete(apiResourceId,  scopeName );
+    }
+
+    @Valid
+    @PATCH
+    @Path("/{apiResourceId}/scopes/{scopeName}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch scope specified by the name", notes = "Patch scope specified by the name. Patch operation only supports \"name\", \"displayName\" and \"description\" fields at the moment. <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/update <br> <b>Scope required:</b> <br>   * internal_api_resource_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags = { "API Resource Scopes", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Not Content", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response apiResourcesApiResourceIdScopesScopeNamePatch(@ApiParam(value = "ID of the API Resource.", required = true) @PathParam("apiResourceId") String apiResourceId, @ApiParam(value = "Name of the Scope.", required = true) @PathParam("scopeName") String scopeName, @ApiParam(value = "This represents the scopes to be patched." , required = true) @Valid
+    ScopePatchModel scopePatchModel) {
+
+        return delegate.apiResourcesApiResourceIdScopesScopeNamePatch(apiResourceId,  scopeName, scopePatchModel);
     }
 
     @Valid
