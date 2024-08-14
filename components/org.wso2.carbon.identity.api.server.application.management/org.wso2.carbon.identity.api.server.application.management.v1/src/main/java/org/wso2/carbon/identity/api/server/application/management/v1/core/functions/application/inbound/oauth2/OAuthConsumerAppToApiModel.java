@@ -59,6 +59,9 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .accessToken(buildTokenConfiguration(oauthAppDTO))
                 .refreshToken(buildRefreshTokenConfiguration(oauthAppDTO))
                 .idToken(buildIdTokenConfiguration(oauthAppDTO))
+                .useClientIdAsSubClaimForAppTokens(oauthAppDTO.isUseClientIdAsSubClaimForAppTokens())
+                .omitUsernameInIntrospectionRespForAppTokens(
+                        oauthAppDTO.isOmitUsernameInIntrospectionRespForAppTokens())
                 .logout(buildLogoutConfiguration(oauthAppDTO))
                 .scopeValidators(getScopeValidators(oauthAppDTO))
                 .validateRequestObjectSignature(oauthAppDTO.isRequestObjectSignatureValidationEnabled())

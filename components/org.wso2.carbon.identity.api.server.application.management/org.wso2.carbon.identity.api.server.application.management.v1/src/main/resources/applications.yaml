@@ -3603,6 +3603,12 @@ components:
             Enabling this option will allow the client to authenticate without a
             client secret.
           example: false
+        useClientIdAsSubClaimForAppTokens:
+          type: boolean
+          description: If enabled, client_id will be sent as the sub claim value for app tokens.
+        omitUsernameInIntrospectionRespForAppTokens:
+          type: boolean
+          description: If enabled, username will not be sent in the introspection response for app tokens.
         pkce:
           $ref: '#/components/schemas/OAuth2PKCEConfiguration'
         accessToken:
