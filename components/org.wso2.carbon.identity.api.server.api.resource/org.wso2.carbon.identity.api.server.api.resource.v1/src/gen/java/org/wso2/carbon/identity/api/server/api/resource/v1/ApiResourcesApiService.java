@@ -51,5 +51,7 @@ public interface ApiResourcesApiService {
 
       public Response apiResourcesApiResourceIdScopesScopeNameDelete(String apiResourceId, String scopeName);
 
+      public Response apiResourcesApiResourceIdScopesScopeNamePatch(String apiResourceId, String scopeName, ScopePatchModel scopePatchModel);
+
       public Response getAPIResources(String before, String after, String filter, Integer limit, String attributes);
 }
