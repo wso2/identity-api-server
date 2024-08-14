@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -218,7 +218,7 @@ public class ApiResourcesApi  {
     @Path("/{apiResourceId}/scopes/{scopeName}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Patch scope specified by the name", notes = "Patch scope specified by the name. Patch operation only supports \"name\", \"displayName\" and \"description\" fields at the moment. <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/update <br> <b>Scope required:</b> <br>   * internal_api_resource_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Patch scope specified by the name", notes = "Patch scope specified by the name. Patch operation only supports \"displayName\" and \"description\" fields at the moment. <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/update <br> <b>Scope required:</b> <br>   * internal_api_resource_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
