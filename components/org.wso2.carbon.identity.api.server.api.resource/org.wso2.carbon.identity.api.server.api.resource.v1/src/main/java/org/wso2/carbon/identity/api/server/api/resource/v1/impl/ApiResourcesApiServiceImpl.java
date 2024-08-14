@@ -99,7 +99,7 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     @Override
     public Response apiResourcesApiResourceIdScopesScopeNamePatch(String apiResourceId, String scopeName,
                                                                   ScopePatchModel scopePatchModel) {
-
+        //test comment for PR builder
         serverAPIResourceManagementService.patchScopeMetadataByScopeName(apiResourceId, scopeName, scopePatchModel);
         return Response.noContent().build();
     }
