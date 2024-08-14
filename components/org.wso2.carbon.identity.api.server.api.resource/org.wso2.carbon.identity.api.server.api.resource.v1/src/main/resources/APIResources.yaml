@@ -338,7 +338,7 @@ paths:
         - API Resource Scopes
       summary: Patch scope specified by the name
       description: >
-        Patch scope specified by the name. Patch operation only supports "name", "displayName" and "description" fields at the moment.
+        Patch scope specified by the name. Patch operation only supports "displayName" and "description" fields at the moment.
         <b>Permission required:</b> <br>
           * /permission/admin/manage/identity/apiresourcemgt/update <br>
         <b>Scope required:</b> <br>
