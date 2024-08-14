@@ -100,7 +100,7 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     public Response apiResourcesApiResourceIdScopesScopeNamePatch(String apiResourceId, String scopeName,
                                                                   ScopePatchModel scopePatchModel) {
 
-        serverAPIResourceManagementService.patchScopeByScopeName(apiResourceId, scopeName, scopePatchModel);
+        serverAPIResourceManagementService.patchScopeMetadataByScopeName(apiResourceId, scopeName, scopePatchModel);
         return Response.noContent().build();
     }
 

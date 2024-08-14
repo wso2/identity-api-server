@@ -350,17 +350,17 @@ public class ServerAPIResourceManagementService {
     }
 
     /**
-     * Patch scopes by the scope name.
+     * Patch scope metadata by the scope name.
      *
      * @param apiResourceId     API Resource ID.
      * @param scopeName         Scope Name.
      * @param scopePatchModel   Parameters to be updated.
      */
-    public void patchScopeByScopeName(String apiResourceId, String scopeName, ScopePatchModel scopePatchModel) {
+    public void patchScopeMetadataByScopeName(String apiResourceId, String scopeName, ScopePatchModel scopePatchModel) {
 
         try {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Updating scope with ID: " + scopeName + " of API Resource ID: " + apiResourceId);
+                LOG.debug("Updating scope with name: " + scopeName + " of API Resource ID: " + apiResourceId);
             }
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
