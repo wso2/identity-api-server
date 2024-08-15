@@ -88,6 +88,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - authentication
       requestBody:
         content:
           application/json:
@@ -152,6 +153,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - authentication
       responses:
         '200':
           description: OK
@@ -210,6 +212,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - authentication
         - name: actionId
           in: path
           description: Id of the Action.
@@ -274,6 +277,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - authentication
         - name: actionId
           in: path
           description: Id of the Action.
@@ -328,6 +332,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - authentication
         - name: actionId
           in: path
           description: Id of the Action.
@@ -386,6 +391,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - authentication
         - name: actionId
           in: path
           description: Id of the Action.
@@ -444,6 +450,7 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
+              - authentication
         - name: actionId
           in: path
           description: Id of the Action.
@@ -511,6 +518,14 @@ components:
           scopes: {}
 
   schemas:
+    ActionType:
+      type: string
+      enum:
+        - PRE_ISSUE_ACCESS_TOKEN
+        - PRE_UPDATE_PASSWORD
+        - PRE_UPDATE_PROFILE
+        - PRE_REGISTRATION
+        - AUTHENTICATION
     ActionModel:
       type: object
       required:
@@ -562,12 +577,7 @@ components:
           type: string
           example: '24f64d17-9824-4e28-8413-de45728d8e84'
         type:
-          type: string
-          enum:
-            - PRE_ISSUE_ACCESS_TOKEN
-            - PRE_UPDATE_PASSWORD
-            - PRE_UPDATE_PROFILE
-            - PRE_REGISTRATION
+          $ref: '#/components/schemas/ActionType'
         name:
           type: string
           example: Access Token Pre Issue
@@ -592,12 +602,7 @@ components:
           type: string
           example: '24f64d17-9824-4e28-8413-de45728d8e84'
         type:
-          type: string
-          enum:
-            - PRE_ISSUE_ACCESS_TOKEN
-            - PRE_UPDATE_PASSWORD
-            - PRE_UPDATE_PROFILE
-            - PRE_REGISTRATION
+          $ref: '#/components/schemas/ActionType'
         name:
           type: string
           example: Access Token Pre Issue
@@ -627,12 +632,7 @@ components:
       type: object
       properties:
         type:
-          type: string
-          enum:
-            - PRE_ISSUE_ACCESS_TOKEN
-            - PRE_UPDATE_PASSWORD
-            - PRE_UPDATE_PROFILE
-            - PRE_REGISTRATION
+          $ref: '#/components/schemas/ActionType'
         displayName:
           type: string
           example: "Pre Issue Access Token."

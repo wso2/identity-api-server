@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.api.server.action.management.common.ActionManage
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionType;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeProperties;
@@ -140,7 +141,7 @@ public class ServerActionManagementService {
             for (Action.ActionTypes actionType : Action.ActionTypes.values()) {
 
                 actionTypesResponseItems.add(new ActionTypesResponseItem()
-                        .type(ActionTypesResponseItem.TypeEnum.valueOf(actionType.getActionType()))
+                        .type(ActionType.valueOf(actionType.getActionType()))
                         .displayName(actionType.getDisplayName())
                         .description(actionType.getDescription())
                         .count(actionsCountPerType.getOrDefault(actionType.getActionType(), 0))
@@ -181,7 +182,7 @@ public class ServerActionManagementService {
 
         return new ActionResponse()
                 .id(action.getId())
-                .type(ActionResponse.TypeEnum.valueOf(action.getType().toString()))
+                .type(ActionType.valueOf(action.getType().toString()))
                 .name(action.getName())
                 .description(action.getDescription())
                 .status(ActionResponse.StatusEnum.valueOf(action.getStatus().toString()))
@@ -202,7 +203,7 @@ public class ServerActionManagementService {
 
         return new ActionBasicResponse()
                 .id(activatedAction.getId())
-                .type(ActionBasicResponse.TypeEnum.valueOf(activatedAction.getType().toString()))
+                .type(ActionType.valueOf(activatedAction.getType().toString()))
                 .name(activatedAction.getName())
                 .description(activatedAction.getDescription())
                 .status(ActionBasicResponse.StatusEnum.valueOf(activatedAction.getStatus().toString()));
