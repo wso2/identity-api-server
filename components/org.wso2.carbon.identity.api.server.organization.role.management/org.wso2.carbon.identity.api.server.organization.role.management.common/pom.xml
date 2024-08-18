@@ -45,5 +45,10 @@
             <artifactId>org.wso2.carbon.identity.organization.management.service</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco.version}</version>
+        </dependency>
     </dependencies>
 </project>
