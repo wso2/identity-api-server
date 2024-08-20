@@ -29,15 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-<<<<<<< HEAD
-<<<<<<< HEAD
     <version>1.2.220-SNAPSHOT</version>
-=======
-    <version>1.2.203</version>
->>>>>>> d156c21fe (Add jwt access token claims handler support)
-=======
-    <version>1.2.213-SNAPSHOT</version>
->>>>>>> 47271acba (fix pom)
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
