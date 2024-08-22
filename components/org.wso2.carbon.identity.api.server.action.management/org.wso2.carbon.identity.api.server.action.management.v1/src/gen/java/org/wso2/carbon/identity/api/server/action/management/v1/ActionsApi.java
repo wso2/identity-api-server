@@ -190,9 +190,9 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getActionsByActionId(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, authentication") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId) {
+    public Response getActionByActionId(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration, authentication") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId) {
 
-        return delegate.getActionsByActionId(actionType,  actionId );
+        return delegate.getActionByActionId(actionType,  actionId );
     }
 
     @Valid

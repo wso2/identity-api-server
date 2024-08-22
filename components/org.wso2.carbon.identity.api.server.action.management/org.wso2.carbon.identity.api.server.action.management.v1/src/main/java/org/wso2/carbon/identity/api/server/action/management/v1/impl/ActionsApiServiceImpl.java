@@ -58,7 +58,7 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     }
 
     @Override
-    public Response getActionsByActionId(String actionType, String actionId) {
+    public Response getActionByActionId(String actionType, String actionId) {
 
         return Response.ok().entity(serverActionManagementService.getActionByActionId(actionType, actionId)).build();
     }

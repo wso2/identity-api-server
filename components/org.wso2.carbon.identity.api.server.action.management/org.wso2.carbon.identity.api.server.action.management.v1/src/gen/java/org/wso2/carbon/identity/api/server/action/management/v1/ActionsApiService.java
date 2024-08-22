@@ -46,7 +46,7 @@ public interface ActionsApiService {
 
       public Response getActionTypes();
 
-      public Response getActionsByActionId(String actionType, String actionId);
+      public Response getActionByActionId(String actionType, String actionId);
 
       public Response getActionsByActionType(String actionType);
 
