@@ -37,6 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
@@ -116,6 +117,9 @@ public class SchemaConfigParser {
             addToSchemaMap.ifPresent(stringListMap -> stringListMap.forEach((key, values) -> {
                 if (defaultSchemaMap.containsKey(key)) {
                     defaultSchemaMap.get(key).addAll(values);
+                    List<String> uniqueAttributes = defaultSchemaMap.get(key).stream()
+                            .distinct().collect(Collectors.toList());
+                    defaultSchemaMap.put(key, uniqueAttributes);
                 } else {
                     if (log.isDebugEnabled()) {
                         log.debug("Invalid configuration. Schema ID: " + key + " not available in '" +
