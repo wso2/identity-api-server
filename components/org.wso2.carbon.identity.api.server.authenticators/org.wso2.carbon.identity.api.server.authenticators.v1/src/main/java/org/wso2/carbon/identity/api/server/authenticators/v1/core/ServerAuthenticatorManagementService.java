@@ -418,7 +418,7 @@ public class ServerAuthenticatorManagementService {
             authenticator.setDisplayName(identityProvider.getIdentityProviderName());
         }
         authenticator.setIsEnabled(identityProvider.isEnable());
-        authenticator.setType(Authenticator.TypeEnum.FEDERATED);
+        authenticator.setType(authenticator.getType());
         authenticator.setImage(identityProvider.getImageUrl());
         authenticator.setDescription(identityProvider.getIdentityProviderDescription());
         if (CollectionUtils.isNotEmpty(configTagsListDistinct)) {
@@ -511,7 +511,7 @@ public class ServerAuthenticatorManagementService {
         authenticator.setName(config.getName());
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setIsEnabled(config.isEnabled());
-        authenticator.setType(Authenticator.TypeEnum.LOCAL);
+        authenticator.setType(authenticator.getType());
         String[] tags = config.getTags();
         if (ArrayUtils.isNotEmpty(tags)) {
             authenticator.setTags(Arrays.asList(tags));

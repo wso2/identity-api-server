@@ -771,11 +771,7 @@ public class ServerConfigManagementService {
         authenticator.setName(config.getName());
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setIsEnabled(config.isEnabled());
-        if (config instanceof RequestPathAuthenticatorConfig) {
-            authenticator.setType(Authenticator.TypeEnum.REQUEST_PATH);
-        } else {
-            authenticator.setType(Authenticator.TypeEnum.LOCAL);
-        }
+        authenticator.setType(authenticator.getType());
         String[] tags = config.getTags();
         if (ArrayUtils.isNotEmpty(tags)) {
             authenticator.setTags(Arrays.asList(tags));

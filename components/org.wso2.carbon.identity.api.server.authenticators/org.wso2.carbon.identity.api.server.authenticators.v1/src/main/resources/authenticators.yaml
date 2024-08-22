@@ -207,6 +207,8 @@ components:
           enum:
             - LOCAL
             - FEDERATED
+            - CUSTOM
+            - REQUEST_PATH
         image:
           type: string
           example: basic-authenticator-logo-url
