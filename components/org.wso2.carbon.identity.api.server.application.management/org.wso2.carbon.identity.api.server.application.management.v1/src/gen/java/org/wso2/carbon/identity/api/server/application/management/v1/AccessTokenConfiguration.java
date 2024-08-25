@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.constraints.*;
 
 
@@ -38,6 +40,9 @@ public class AccessTokenConfiguration  {
     private String bindingType = "None";
     private Boolean revokeTokensWhenIDPSessionTerminated;
     private Boolean validateTokenBinding;
+    private List<String> accessTokenAttributes = null;
+
+    private Boolean accessTokenAttributesEnabled;
 
     /**
     **/
@@ -150,6 +155,51 @@ public class AccessTokenConfiguration  {
         this.validateTokenBinding = validateTokenBinding;
     }
 
+    /**
+    **/
+    public AccessTokenConfiguration accessTokenAttributes(List<String> accessTokenAttributes) {
+
+        this.accessTokenAttributes = accessTokenAttributes;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("accessTokenAttributes")
+    @Valid
+    public List<String> getAccessTokenAttributes() {
+        return accessTokenAttributes;
+    }
+    public void setAccessTokenAttributes(List<String> accessTokenAttributes) {
+        this.accessTokenAttributes = accessTokenAttributes;
+    }
+
+    public AccessTokenConfiguration addAccessTokenAttributesItem(String accessTokenAttributesItem) {
+        if (this.accessTokenAttributes == null) {
+            this.accessTokenAttributes = new ArrayList<>();
+        }
+        this.accessTokenAttributes.add(accessTokenAttributesItem);
+        return this;
+    }
+
+        /**
+    * If enabled, the access token attributes will be included in the access token.
+    **/
+    public AccessTokenConfiguration accessTokenAttributesEnabled(Boolean accessTokenAttributesEnabled) {
+
+        this.accessTokenAttributesEnabled = accessTokenAttributesEnabled;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "If enabled, the access token attributes will be included in the access token.")
+    @JsonProperty("accessTokenAttributesEnabled")
+    @Valid
+    public Boolean getAccessTokenAttributesEnabled() {
+        return accessTokenAttributesEnabled;
+    }
+    public void setAccessTokenAttributesEnabled(Boolean accessTokenAttributesEnabled) {
+        this.accessTokenAttributesEnabled = accessTokenAttributesEnabled;
+    }
+
 
 
     @Override
@@ -167,12 +217,14 @@ public class AccessTokenConfiguration  {
             Objects.equals(this.applicationAccessTokenExpiryInSeconds, accessTokenConfiguration.applicationAccessTokenExpiryInSeconds) &&
             Objects.equals(this.bindingType, accessTokenConfiguration.bindingType) &&
             Objects.equals(this.revokeTokensWhenIDPSessionTerminated, accessTokenConfiguration.revokeTokensWhenIDPSessionTerminated) &&
-            Objects.equals(this.validateTokenBinding, accessTokenConfiguration.validateTokenBinding);
+            Objects.equals(this.validateTokenBinding, accessTokenConfiguration.validateTokenBinding) &&
+            Objects.equals(this.accessTokenAttributes, accessTokenConfiguration.accessTokenAttributes) &&
+            Objects.equals(this.accessTokenAttributesEnabled, accessTokenConfiguration.accessTokenAttributesEnabled);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding);
+        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding, accessTokenAttributes, accessTokenAttributesEnabled);
     }
 
     @Override
@@ -187,6 +239,8 @@ public class AccessTokenConfiguration  {
         sb.append("    bindingType: ").append(toIndentedString(bindingType)).append("\n");
         sb.append("    revokeTokensWhenIDPSessionTerminated: ").append(toIndentedString(revokeTokensWhenIDPSessionTerminated)).append("\n");
         sb.append("    validateTokenBinding: ").append(toIndentedString(validateTokenBinding)).append("\n");
+        sb.append("    accessTokenAttributes: ").append(toIndentedString(accessTokenAttributes)).append("\n");
+        sb.append("    accessTokenAttributesEnabled: ").append(toIndentedString(accessTokenAttributesEnabled)).append("\n");
         sb.append("}");
         return sb.toString();
     }
