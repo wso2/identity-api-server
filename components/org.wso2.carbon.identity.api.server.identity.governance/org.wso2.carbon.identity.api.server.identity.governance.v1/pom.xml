@@ -156,6 +156,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.identity.governance</groupId>
+            <artifactId>org.wso2.carbon.identity.password.expiry</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.carbon.identity.server.api</groupId>
             <artifactId>org.wso2.carbon.identity.api.server.common</artifactId>
             <scope>provided</scope>
