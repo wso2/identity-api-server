@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import javax.validation.constraints.*;
 
@@ -40,6 +41,8 @@ public class APIResourcePatchModel  {
     private List<ScopeCreationModel> addedScopes = null;
 
     private List<String> removedScopes = null;
+
+    private List<AuthorizationDetailsTypesGetModel> authorizationDetailsTypes = null;
 
 
     /**
@@ -131,6 +134,32 @@ public class APIResourcePatchModel  {
         return this;
     }
 
+        /**
+    **/
+    public APIResourcePatchModel authorizationDetailsTypes(List<AuthorizationDetailsTypesGetModel> authorizationDetailsTypes) {
+
+        this.authorizationDetailsTypes = authorizationDetailsTypes;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("authorizationDetailsTypes")
+    @Valid
+    public List<AuthorizationDetailsTypesGetModel> getAuthorizationDetailsTypes() {
+        return authorizationDetailsTypes;
+    }
+    public void setAuthorizationDetailsTypes(List<AuthorizationDetailsTypesGetModel> authorizationDetailsTypes) {
+        this.authorizationDetailsTypes = authorizationDetailsTypes;
+    }
+
+    public APIResourcePatchModel addAuthorizationDetailsTypesItem(AuthorizationDetailsTypesGetModel authorizationDetailsTypesItem) {
+        if (this.authorizationDetailsTypes == null) {
+            this.authorizationDetailsTypes = new ArrayList<AuthorizationDetailsTypesGetModel>();
+        }
+        this.authorizationDetailsTypes.add(authorizationDetailsTypesItem);
+        return this;
+    }
+
     
 
     @Override
@@ -146,12 +175,13 @@ public class APIResourcePatchModel  {
         return Objects.equals(this.name, apIResourcePatchModel.name) &&
             Objects.equals(this.description, apIResourcePatchModel.description) &&
             Objects.equals(this.addedScopes, apIResourcePatchModel.addedScopes) &&
-            Objects.equals(this.removedScopes, apIResourcePatchModel.removedScopes);
+            Objects.equals(this.removedScopes, apIResourcePatchModel.removedScopes) &&
+            Objects.equals(this.authorizationDetailsTypes, apIResourcePatchModel.authorizationDetailsTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, addedScopes, removedScopes);
+        return Objects.hash(name, description, addedScopes, removedScopes, authorizationDetailsTypes);
     }
 
     @Override
@@ -164,6 +194,7 @@ public class APIResourcePatchModel  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    addedScopes: ").append(toIndentedString(addedScopes)).append("\n");
         sb.append("    removedScopes: ").append(toIndentedString(removedScopes)).append("\n");
+        sb.append("    authorizationDetailsTypes: ").append(toIndentedString(authorizationDetailsTypes)).append("\n");
         sb.append("}");
         return sb.toString();
     }

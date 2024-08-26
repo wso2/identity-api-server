@@ -95,6 +95,7 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.api.resource.mgt</artifactId>
+            <version>7.3.75-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -118,6 +119,7 @@
         <dependency>
             <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.identity.application.common</artifactId>
+            <version>7.3.75-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -54,4 +54,16 @@ public interface ApiResourcesApiService {
       public Response apiResourcesApiResourceIdScopesScopeNamePatch(String apiResourceId, String scopeName, ScopePatchModel scopePatchModel);
 
       public Response getAPIResources(String before, String after, String filter, Integer limit, String attributes);
+
+      public Response addsAuthorizationDetailsTypes(String apiResourceId, List<AuthorizationDetailsTypesPatchModel> authorizationDetailsTypesPatchModel);
+
+      public Response deleteAnAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType);
+
+      public Response getAnAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType);
+
+      public Response getAuthorizationDetailsType(String apiResourceId);
+
+      public Response isAuthorizationDetailsTypeExists(String apiResourceId, String authorizationDetailsType);
+
+      public Response updateAnAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType, AuthorizationDetailsTypesPatchModel authorizationDetailsTypesPatchModel);
 }

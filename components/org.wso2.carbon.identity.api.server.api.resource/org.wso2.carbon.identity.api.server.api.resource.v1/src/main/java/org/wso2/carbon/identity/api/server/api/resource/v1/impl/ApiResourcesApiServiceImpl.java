@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -23,9 +23,11 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceCreationMo
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourcesApiService;
+import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesPatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
+import org.wso2.carbon.identity.api.server.api.resource.v1.core.AuthorizationDetailsTypeManagementService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceManagementService;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
@@ -43,6 +45,9 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
 
     @Autowired
     ServerAPIResourceManagementService serverAPIResourceManagementService;
+
+    @Autowired
+    AuthorizationDetailsTypeManagementService authorizationDetailsTypeManagementService;
 
     @Override
     public Response addAPIResource(APIResourceCreationModel apIResourceCreationModel) {
@@ -109,5 +114,50 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
 
         return Response.ok().entity(serverAPIResourceManagementService.getAPIResources(before, after, filter, limit,
                 attributes)).build();
+    }
+
+    @Override
+    public Response addsAuthorizationDetailsTypes(String apiResourceId,
+                                                  List<AuthorizationDetailsTypesPatchModel> typesPatchModel) {
+
+        authorizationDetailsTypeManagementService.addAuthorizationDetailsTypes(apiResourceId, typesPatchModel);
+        return Response.accepted().build();
+    }
+
+    @Override
+    public Response deleteAnAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType) {
+
+        authorizationDetailsTypeManagementService.deleteAuthorizationDetailsType(apiResourceId, authorizationDetailsType);
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response getAnAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType) {
+
+        return Response.ok().entity(authorizationDetailsTypeManagementService
+                .getAuthorizationDetailsType(apiResourceId, authorizationDetailsType)).build();
+    }
+
+    @Override
+    public Response getAuthorizationDetailsType(String apiResourceId) {
+
+        return Response.ok()
+                .entity(authorizationDetailsTypeManagementService.getAuthorizationDetailsTypes(apiResourceId)).build();
+    }
+
+    @Override
+    public Response isAuthorizationDetailsTypeExists(String apiResourceId, String authorizationDetailsType) {
+
+        return Response.ok().entity(authorizationDetailsTypeManagementService
+                .isAuthorizationDetailsTypeExists(apiResourceId, authorizationDetailsType)).build();
+    }
+
+    @Override
+    public Response updateAnAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType,
+                                                     AuthorizationDetailsTypesPatchModel typesPatchModel) {
+
+        authorizationDetailsTypeManagementService
+                .updateAuthorizationDetailsTypes(apiResourceId, authorizationDetailsType, typesPatchModel);
+        return Response.accepted().build();
     }
 }
