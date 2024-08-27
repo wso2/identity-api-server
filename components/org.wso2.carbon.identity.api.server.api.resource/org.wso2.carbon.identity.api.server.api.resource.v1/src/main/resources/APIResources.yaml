@@ -457,7 +457,7 @@ paths:
         <b>Scope required:</b>  
           * internal_api_resource_view
       summary: Lists all registered authorization details types
-      operationId: getAuthorizationDetailsType
+      operationId: getAuthorizationDetailsTypes
       parameters:
         - $ref: '#/components/parameters/apiResourceId'
       responses:
@@ -499,7 +499,7 @@ paths:
         <b>Scope required:</b>  
           * internal_api_resource_update
       summary: Adds new authorization details types to the API resource
-      operationId: addsAuthorizationDetailsTypes
+      operationId: addAuthorizationDetailsTypes
       parameters:
         - $ref: '#/components/parameters/apiResourceId'
       requestBody:
@@ -508,7 +508,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/AuthorizationDetailsTypesPatchModel"
+                $ref: "#/components/schemas/AuthorizationDetailsTypesCreationModel"
       responses:
         204:
           description: No Content
@@ -544,7 +544,7 @@ paths:
         <b>Scope required:</b>  
           * internal_api_resource_view
       summary: Returns a registered authorization details type by type
-      operationId: getAnAuthorizationDetailsType
+      operationId: getAuthorizationDetailsType
       parameters:
         - $ref: '#/components/parameters/apiResourceId'
         - $ref: '#/components/parameters/authorizationDetailsType'
@@ -629,7 +629,7 @@ paths:
         <b>Scope required:</b>  
           * internal_api_resource_update
       summary: Updates a registered authorization details type by type
-      operationId: updateAnAuthorizationDetailsType
+      operationId: updateAuthorizationDetailsType
       parameters:
         - $ref: '#/components/parameters/apiResourceId'
         - $ref: '#/components/parameters/authorizationDetailsType'
@@ -639,12 +639,8 @@ paths:
             schema:
               $ref: "#/components/schemas/AuthorizationDetailsTypesPatchModel"
       responses:
-        200:
-          description: Successfully updated an authorization details type by type
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthorizationDetailsTypesGetModel"
+        204:
+          description: No Content
         401:
           description: Unauthorized request
           content:
@@ -675,7 +671,7 @@ paths:
         <b>Scope required:</b>  
           * internal_api_resource_delete
       summary: Deletes a registered authorization details type by type
-      operationId: deleteAnAuthorizationDetailsType
+      operationId: deleteAuthorizationDetailsType
       parameters:
         - $ref: '#/components/parameters/apiResourceId'
         - $ref: '#/components/parameters/authorizationDetailsType'

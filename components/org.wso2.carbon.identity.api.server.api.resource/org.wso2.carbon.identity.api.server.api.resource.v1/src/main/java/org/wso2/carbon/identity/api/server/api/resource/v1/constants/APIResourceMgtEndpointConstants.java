@@ -103,7 +103,7 @@ public class APIResourceMgtEndpointConstants {
                 "Unable to find the API resource collection with the id: %s in the tenant domain."),
         ERROR_CODE_AUTHORIZATION_DETAILS_TYPE_NOT_FOUND("60015",
                 "Unable to find the authorization details type.",
-                "Unable to find the authorization details types for the resource id: %s in the tenant domain."),
+                "Authorization details types for resource id '%s' could not be found in the tenant domain."),
 
         // Server errors.
         ERROR_CODE_ADD_API_RESOURCE("65001", "Error while adding api resource.", "Server encountered an error while " +

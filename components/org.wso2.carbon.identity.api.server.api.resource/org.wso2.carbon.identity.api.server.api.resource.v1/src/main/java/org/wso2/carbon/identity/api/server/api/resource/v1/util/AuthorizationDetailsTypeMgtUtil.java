@@ -20,6 +20,7 @@ public class AuthorizationDetailsTypeMgtUtil {
             final AuthorizationDetailsType authorizationDetailsType) {
 
         return new AuthorizationDetailsTypesGetModel()
+                .id(authorizationDetailsType.getId())
                 .name(authorizationDetailsType.getName())
                 .description(authorizationDetailsType.getDescription())
                 .type(authorizationDetailsType.getType())
@@ -36,43 +37,34 @@ public class AuthorizationDetailsTypeMgtUtil {
     }
 
     public static List<AuthorizationDetailsType> toAuthorizationDetailsTypesList(
-            final List<AuthorizationDetailsTypesCreationModel> typesCreationModels) {
+            final List<AuthorizationDetailsTypesCreationModel> creationModels) {
 
-        return CollectionUtils.isEmpty(typesCreationModels) ? Collections.emptyList() :
-                typesCreationModels.stream()
+        return CollectionUtils.isEmpty(creationModels) ? Collections.emptyList() :
+                creationModels.stream()
                         .map(AuthorizationDetailsTypeMgtUtil::toAuthorizationDetailsType)
                         .collect(Collectors.toList());
     }
 
     public static AuthorizationDetailsType toAuthorizationDetailsType(
-            final AuthorizationDetailsTypesCreationModel typesCreationModel) {
+            final AuthorizationDetailsTypesCreationModel creationModel) {
 
         final AuthorizationDetailsType authorizationDetailsType = new AuthorizationDetailsType();
-        authorizationDetailsType.setType(typesCreationModel.getType());
-        authorizationDetailsType.setName(typesCreationModel.getName());
-        authorizationDetailsType.setDescription(typesCreationModel.getDescription());
-        authorizationDetailsType.setSchema(new JSONObject(typesCreationModel.getSchema()).toString());
+        authorizationDetailsType.setType(creationModel.getType());
+        authorizationDetailsType.setName(creationModel.getName());
+        authorizationDetailsType.setDescription(creationModel.getDescription());
+        authorizationDetailsType.setSchema(new JSONObject(creationModel.getSchema()).toString());
 
         return authorizationDetailsType;
     }
 
-    public static List<AuthorizationDetailsType> toAuthorizationDetailsTypesList(
-            final List<AuthorizationDetailsTypesPatchModel> typesPatchModels) {
-
-        return CollectionUtils.isEmpty(typesPatchModels) ? Collections.emptyList() :
-                typesPatchModels.stream()
-                        .map(AuthorizationDetailsTypeMgtUtil::toAuthorizationDetailsType)
-                        .collect(Collectors.toList());
-    }
-
-    public static AuthorizationDetailsType toAuthorizationDetailsType(final String type,
-            final AuthorizationDetailsTypesPatchModel typesPatchModel) {
+    public static AuthorizationDetailsType toAuthorizationDetailsType(
+            String type, AuthorizationDetailsTypesPatchModel patchModel) {
 
         final AuthorizationDetailsType authorizationDetailsType = new AuthorizationDetailsType();
         authorizationDetailsType.setType(type);
-        authorizationDetailsType.setName(typesPatchModel.getName());
-        authorizationDetailsType.setDescription(typesPatchModel.getDescription());
-        authorizationDetailsType.setSchema(new JSONObject(typesPatchModel.getSchema()).toString());
+        authorizationDetailsType.setName(patchModel.getName());
+        authorizationDetailsType.setDescription(patchModel.getDescription());
+        authorizationDetailsType.setSchema(new JSONObject(patchModel.getSchema()).toString());
 
         return authorizationDetailsType;
     }

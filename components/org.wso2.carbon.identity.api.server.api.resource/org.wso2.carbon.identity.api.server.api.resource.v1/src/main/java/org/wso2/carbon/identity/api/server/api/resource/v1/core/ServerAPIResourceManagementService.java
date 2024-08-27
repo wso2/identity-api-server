@@ -60,6 +60,8 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.ASC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.DESC_SORT_ORDER;
+import static org.wso2.carbon.identity.api.server.api.resource.v1.util.AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsGetModelsList;
+import static org.wso2.carbon.identity.api.server.api.resource.v1.util.AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsTypesList;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 
 /**
@@ -431,6 +433,8 @@ public class ServerAPIResourceManagementService {
                 .scopes(apiResource.getScopes().stream().map(this::buildScopeGetResponse)
                         .collect(Collectors.toList()))
                 .requiresAuthorization(apiResource.isAuthorizationRequired())
+                .authorizationDetailsTypes(
+                        toAuthorizationDetailsGetModelsList(apiResource.getAuthorizationDetailsTypes()))
                 .properties(apiResource.getProperties().stream().map(this::buildAPIResourceProperty)
                         .collect(Collectors.toList()));
     }
@@ -480,6 +484,8 @@ public class ServerAPIResourceManagementService {
                 .scopes(createScopes(apIResourceCreationModel.getScopes()))
                 .requiresAuthorization(apIResourceCreationModel.getRequiresAuthorization() != null ?
                         apIResourceCreationModel.getRequiresAuthorization() : true)
+                .authorizationDetailsTypes(
+                        toAuthorizationDetailsTypesList(apIResourceCreationModel.getAuthorizationDetailsTypes()))
                 .type(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE);
         return apiResourceBuilder.build();
     }

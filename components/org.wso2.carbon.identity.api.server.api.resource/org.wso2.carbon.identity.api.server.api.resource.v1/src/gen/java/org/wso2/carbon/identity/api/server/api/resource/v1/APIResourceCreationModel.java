@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesGetModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import javax.validation.constraints.*;
 
@@ -42,7 +42,7 @@ public class APIResourceCreationModel  {
     private Boolean requiresAuthorization;
     private List<ScopeCreationModel> scopes = null;
 
-    private List<AuthorizationDetailsTypesGetModel> authorizationDetailsTypes = null;
+    private List<AuthorizationDetailsTypesCreationModel> authorizationDetailsTypes = null;
 
 
     /**
@@ -149,7 +149,7 @@ public class APIResourceCreationModel  {
 
         /**
     **/
-    public APIResourceCreationModel authorizationDetailsTypes(List<AuthorizationDetailsTypesGetModel> authorizationDetailsTypes) {
+    public APIResourceCreationModel authorizationDetailsTypes(List<AuthorizationDetailsTypesCreationModel> authorizationDetailsTypes) {
 
         this.authorizationDetailsTypes = authorizationDetailsTypes;
         return this;
@@ -158,16 +158,16 @@ public class APIResourceCreationModel  {
     @ApiModelProperty(value = "")
     @JsonProperty("authorizationDetailsTypes")
     @Valid
-    public List<AuthorizationDetailsTypesGetModel> getAuthorizationDetailsTypes() {
+    public List<AuthorizationDetailsTypesCreationModel> getAuthorizationDetailsTypes() {
         return authorizationDetailsTypes;
     }
-    public void setAuthorizationDetailsTypes(List<AuthorizationDetailsTypesGetModel> authorizationDetailsTypes) {
+    public void setAuthorizationDetailsTypes(List<AuthorizationDetailsTypesCreationModel> authorizationDetailsTypes) {
         this.authorizationDetailsTypes = authorizationDetailsTypes;
     }
 
-    public APIResourceCreationModel addAuthorizationDetailsTypesItem(AuthorizationDetailsTypesGetModel authorizationDetailsTypesItem) {
+    public APIResourceCreationModel addAuthorizationDetailsTypesItem(AuthorizationDetailsTypesCreationModel authorizationDetailsTypesItem) {
         if (this.authorizationDetailsTypes == null) {
-            this.authorizationDetailsTypes = new ArrayList<AuthorizationDetailsTypesGetModel>();
+            this.authorizationDetailsTypes = new ArrayList<AuthorizationDetailsTypesCreationModel>();
         }
         this.authorizationDetailsTypes.add(authorizationDetailsTypesItem);
         return this;
