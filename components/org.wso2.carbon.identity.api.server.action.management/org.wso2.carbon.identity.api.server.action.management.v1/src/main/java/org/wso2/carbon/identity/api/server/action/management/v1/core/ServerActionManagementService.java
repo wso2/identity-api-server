@@ -85,6 +85,17 @@ public class ServerActionManagementService {
         }
     }
 
+    public ActionResponse getActionByActionId(String actionType, String actionId) {
+
+        try {
+            return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
+                    .getActionByActionId(actionType, actionId,
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
+        } catch (ActionMgtException e) {
+            throw ActionMgtEndpointUtil.handleActionMgtException(e);
+        }
+    }
+
     public ActionResponse updateAction(String actionType, String actionId, ActionUpdateModel actionUpdateModel) {
 
         try {
