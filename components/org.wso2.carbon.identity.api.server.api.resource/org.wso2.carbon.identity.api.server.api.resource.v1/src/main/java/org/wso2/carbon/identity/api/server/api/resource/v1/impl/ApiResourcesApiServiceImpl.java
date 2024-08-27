@@ -37,6 +37,7 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 
 /**
@@ -48,7 +49,7 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     ServerAPIResourceManagementService serverAPIResourceManagementService;
 
     @Autowired
-    AuthorizationDetailsTypeManagementService authorizationDetailsTypeManagementService;
+    AuthorizationDetailsTypeManagementService typeMgtService;
 
     @Override
     public Response addAPIResource(APIResourceCreationModel apIResourceCreationModel) {
@@ -121,44 +122,43 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     public Response addAuthorizationDetailsTypes(String apiResourceId,
                                                  List<AuthorizationDetailsTypesCreationModel> typesCreationModel) {
 
-        authorizationDetailsTypeManagementService.addAuthorizationDetailsTypes(apiResourceId, typesCreationModel);
+        typeMgtService.addAuthorizationDetailsTypes(apiResourceId, typesCreationModel);
         return Response.noContent().build();
     }
 
     @Override
     public Response deleteAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType) {
 
-        authorizationDetailsTypeManagementService
-                .deleteAuthorizationDetailsType(apiResourceId, authorizationDetailsType);
+        typeMgtService.deleteAuthorizationDetailsType(apiResourceId, authorizationDetailsType);
         return Response.noContent().build();
     }
 
     @Override
     public Response getAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType) {
 
-        return Response.ok().entity(authorizationDetailsTypeManagementService
-                .getAuthorizationDetailsType(apiResourceId, authorizationDetailsType)).build();
+        return Response.ok()
+                .entity(typeMgtService.getAuthorizationDetailsType(apiResourceId, authorizationDetailsType)).build();
     }
 
     @Override
     public Response getAuthorizationDetailsTypes(String apiResourceId) {
 
-        return Response.ok()
-                .entity(authorizationDetailsTypeManagementService.getAuthorizationDetailsTypes(apiResourceId)).build();
+        return Response.ok().entity(typeMgtService.getAuthorizationDetailsTypes(apiResourceId)).build();
     }
 
     @Override
     public Response isAuthorizationDetailsTypeExists(String apiResourceId, String authorizationDetailsType) {
 
-        return Response.ok().entity(authorizationDetailsTypeManagementService
-                .isAuthorizationDetailsTypeExists(apiResourceId, authorizationDetailsType)).build();
+        return typeMgtService.isAuthorizationDetailsTypeExists(apiResourceId, authorizationDetailsType)
+                ? Response.ok().build()
+                : Response.status(NOT_FOUND).build();
     }
 
     @Override
     public Response updateAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType,
                                                    AuthorizationDetailsTypesPatchModel typesPatchModel) {
-        authorizationDetailsTypeManagementService
-                .updateAuthorizationDetailsTypes(apiResourceId, authorizationDetailsType, typesPatchModel);
+
+        typeMgtService.updateAuthorizationDetailsTypes(apiResourceId, authorizationDetailsType, typesPatchModel);
         return Response.noContent().build();
     }
 }

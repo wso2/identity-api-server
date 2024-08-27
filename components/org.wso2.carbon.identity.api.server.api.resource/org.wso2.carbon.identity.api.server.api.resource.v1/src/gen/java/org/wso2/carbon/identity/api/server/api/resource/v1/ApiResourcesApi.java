@@ -32,7 +32,6 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsT
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesPatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.Error;
-import org.wso2.carbon.identity.api.server.api.resource.v1.InlineResponse200;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
@@ -357,14 +356,14 @@ public class ApiResourcesApi  {
     @Path("/{apiResourceId}/authorization-details-types/{authorizationDetailsType}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Checks an authorization details type existence by type", notes = "This API is used to check a registered authorization details type's existence using a given type.  <b>Permission required:</b>     * /permission/admin/manage/identity/apiresourcemgt/view    <b>Scope required:</b>     * internal_api_resource_view ", response = InlineResponse200.class, authorizations = {
+    @ApiOperation(value = "Checks an authorization details type existence by type", notes = "This API is used to check a registered authorization details type's existence using a given type.  <b>Permission required:</b>     * /permission/admin/manage/identity/apiresourcemgt/view    <b>Scope required:</b>     * internal_api_resource_view ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "API Resource Authorization Details Types", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Provided authorization details type exists", response = InlineResponse200.class),
+        @ApiResponse(code = 200, message = "Provided authorization details type exists", response = Void.class),
         @ApiResponse(code = 401, message = "Unauthorized request", response = Error.class),
         @ApiResponse(code = 404, message = "Requested resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Encountered a server error", response = Error.class)
@@ -379,7 +378,7 @@ public class ApiResourcesApi  {
     @Path("/{apiResourceId}/authorization-details-types/{authorizationDetailsType}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Updates a registered authorization details type by type", notes = "This API is used to update a registered authorization details type by a given type.  <b>Permission required:</b>     * /permission/admin/manage/identity/apiresourcemgt/update    <b>Scope required:</b>     * internal_api_resource_update ", response = AuthorizationDetailsTypesGetModel.class, authorizations = {
+    @ApiOperation(value = "Updates a registered authorization details type by type", notes = "This API is used to update a registered authorization details type by a given type.  <b>Permission required:</b>     * /permission/admin/manage/identity/apiresourcemgt/update    <b>Scope required:</b>     * internal_api_resource_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

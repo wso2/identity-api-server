@@ -250,6 +250,13 @@ public class ServerAPIResourceManagementService {
             APIResource apiResource = apiResourceBuilder.build();
             APIResourceManagementServiceHolder.getApiResourceManager().updateAPIResource(apiResource, addedScopes,
                     removedScopeNames, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            // Replacing Authorization Details Types
+            APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager()
+                    .replaceAuthorizationDetailsTypes(apiResourceID,
+                            apiResourcePatchModel.getRemovedAuthorizationDetailsTypes(),
+                            toAuthorizationDetailsTypesList(apiResourcePatchModel.getAddedAuthorizationDetailsTypes()),
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain()
+                    );
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }

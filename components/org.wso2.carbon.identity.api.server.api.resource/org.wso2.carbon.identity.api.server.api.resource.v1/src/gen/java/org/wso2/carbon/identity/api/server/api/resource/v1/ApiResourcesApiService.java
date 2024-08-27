@@ -32,7 +32,6 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsT
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesPatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.Error;
-import org.wso2.carbon.identity.api.server.api.resource.v1.InlineResponse200;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;

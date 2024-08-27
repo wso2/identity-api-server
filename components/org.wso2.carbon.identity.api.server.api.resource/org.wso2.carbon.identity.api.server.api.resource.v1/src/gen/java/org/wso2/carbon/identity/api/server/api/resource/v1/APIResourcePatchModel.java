@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesGetModel;
+import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import javax.validation.constraints.*;
 
@@ -42,7 +42,9 @@ public class APIResourcePatchModel  {
 
     private List<String> removedScopes = null;
 
-    private List<AuthorizationDetailsTypesGetModel> authorizationDetailsTypes = null;
+    private List<AuthorizationDetailsTypesCreationModel> addedAuthorizationDetailsTypes = null;
+
+    private List<String> removedAuthorizationDetailsTypes = null;
 
 
     /**
@@ -136,27 +138,53 @@ public class APIResourcePatchModel  {
 
         /**
     **/
-    public APIResourcePatchModel authorizationDetailsTypes(List<AuthorizationDetailsTypesGetModel> authorizationDetailsTypes) {
+    public APIResourcePatchModel addedAuthorizationDetailsTypes(List<AuthorizationDetailsTypesCreationModel> addedAuthorizationDetailsTypes) {
 
-        this.authorizationDetailsTypes = authorizationDetailsTypes;
+        this.addedAuthorizationDetailsTypes = addedAuthorizationDetailsTypes;
         return this;
     }
     
     @ApiModelProperty(value = "")
-    @JsonProperty("authorizationDetailsTypes")
+    @JsonProperty("addedAuthorizationDetailsTypes")
     @Valid
-    public List<AuthorizationDetailsTypesGetModel> getAuthorizationDetailsTypes() {
-        return authorizationDetailsTypes;
+    public List<AuthorizationDetailsTypesCreationModel> getAddedAuthorizationDetailsTypes() {
+        return addedAuthorizationDetailsTypes;
     }
-    public void setAuthorizationDetailsTypes(List<AuthorizationDetailsTypesGetModel> authorizationDetailsTypes) {
-        this.authorizationDetailsTypes = authorizationDetailsTypes;
+    public void setAddedAuthorizationDetailsTypes(List<AuthorizationDetailsTypesCreationModel> addedAuthorizationDetailsTypes) {
+        this.addedAuthorizationDetailsTypes = addedAuthorizationDetailsTypes;
     }
 
-    public APIResourcePatchModel addAuthorizationDetailsTypesItem(AuthorizationDetailsTypesGetModel authorizationDetailsTypesItem) {
-        if (this.authorizationDetailsTypes == null) {
-            this.authorizationDetailsTypes = new ArrayList<AuthorizationDetailsTypesGetModel>();
+    public APIResourcePatchModel addAddedAuthorizationDetailsTypesItem(AuthorizationDetailsTypesCreationModel addedAuthorizationDetailsTypesItem) {
+        if (this.addedAuthorizationDetailsTypes == null) {
+            this.addedAuthorizationDetailsTypes = new ArrayList<AuthorizationDetailsTypesCreationModel>();
         }
-        this.authorizationDetailsTypes.add(authorizationDetailsTypesItem);
+        this.addedAuthorizationDetailsTypes.add(addedAuthorizationDetailsTypesItem);
+        return this;
+    }
+
+        /**
+    **/
+    public APIResourcePatchModel removedAuthorizationDetailsTypes(List<String> removedAuthorizationDetailsTypes) {
+
+        this.removedAuthorizationDetailsTypes = removedAuthorizationDetailsTypes;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("removedAuthorizationDetailsTypes")
+    @Valid
+    public List<String> getRemovedAuthorizationDetailsTypes() {
+        return removedAuthorizationDetailsTypes;
+    }
+    public void setRemovedAuthorizationDetailsTypes(List<String> removedAuthorizationDetailsTypes) {
+        this.removedAuthorizationDetailsTypes = removedAuthorizationDetailsTypes;
+    }
+
+    public APIResourcePatchModel addRemovedAuthorizationDetailsTypesItem(String removedAuthorizationDetailsTypesItem) {
+        if (this.removedAuthorizationDetailsTypes == null) {
+            this.removedAuthorizationDetailsTypes = new ArrayList<String>();
+        }
+        this.removedAuthorizationDetailsTypes.add(removedAuthorizationDetailsTypesItem);
         return this;
     }
 
@@ -176,12 +204,13 @@ public class APIResourcePatchModel  {
             Objects.equals(this.description, apIResourcePatchModel.description) &&
             Objects.equals(this.addedScopes, apIResourcePatchModel.addedScopes) &&
             Objects.equals(this.removedScopes, apIResourcePatchModel.removedScopes) &&
-            Objects.equals(this.authorizationDetailsTypes, apIResourcePatchModel.authorizationDetailsTypes);
+            Objects.equals(this.addedAuthorizationDetailsTypes, apIResourcePatchModel.addedAuthorizationDetailsTypes) &&
+            Objects.equals(this.removedAuthorizationDetailsTypes, apIResourcePatchModel.removedAuthorizationDetailsTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, addedScopes, removedScopes, authorizationDetailsTypes);
+        return Objects.hash(name, description, addedScopes, removedScopes, addedAuthorizationDetailsTypes, removedAuthorizationDetailsTypes);
     }
 
     @Override
@@ -194,7 +223,8 @@ public class APIResourcePatchModel  {
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    addedScopes: ").append(toIndentedString(addedScopes)).append("\n");
         sb.append("    removedScopes: ").append(toIndentedString(removedScopes)).append("\n");
-        sb.append("    authorizationDetailsTypes: ").append(toIndentedString(authorizationDetailsTypes)).append("\n");
+        sb.append("    addedAuthorizationDetailsTypes: ").append(toIndentedString(addedAuthorizationDetailsTypes)).append("\n");
+        sb.append("    removedAuthorizationDetailsTypes: ").append(toIndentedString(removedAuthorizationDetailsTypes)).append("\n");
         sb.append("}");
         return sb.toString();
     }

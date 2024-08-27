@@ -592,13 +592,6 @@ paths:
       responses:
         200:
           description: Provided authorization details type exists
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  exists:
-                    type: boolean
         401:
           description: Unauthorized request
           content:
@@ -1042,7 +1035,7 @@ components:
         authorizationDetailsTypes:
           type: array
           items:
-            $ref: '#/components/schemas/AuthorizationDetailsTypesGetModel'
+            $ref: '#/components/schemas/AuthorizationDetailsTypesCreationModel'
 
     APIResourcePatchModel:
       type: object
@@ -1062,10 +1055,14 @@ components:
           items:
             type: string
           description: This field is not supported yet.
-        authorizationDetailsTypes:
+        addedAuthorizationDetailsTypes:
           type: array
           items:
-            $ref: '#/components/schemas/AuthorizationDetailsTypesGetModel'
+            $ref: '#/components/schemas/AuthorizationDetailsTypesCreationModel'
+        removedAuthorizationDetailsTypes:
+          type: array
+          items:
+            type: string
 
     PaginationLink:
       type: object

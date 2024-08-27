@@ -18,18 +18,20 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
-import org.wso2.carbon.identity.api.server.api.resource.v1.*;
-import org.wso2.carbon.identity.api.server.api.resource.v1.*;
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesApiService;
+import org.wso2.carbon.identity.api.server.api.resource.v1.core.AuthorizationDetailsTypeManagementService;
 
 import javax.ws.rs.core.Response;
 
 public class AuthorizationDetailsTypesApiServiceImpl implements AuthorizationDetailsTypesApiService {
 
+    @Autowired
+    AuthorizationDetailsTypeManagementService typeMgtService;
+
     @Override
     public Response authorizationDetailsTypesGet(String filter) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        return Response.ok().entity(typeMgtService.getAllAuthorizationDetailsTypes(filter)).build();
     }
 }
