@@ -3697,9 +3697,6 @@ components:
           type: array
           items:
             type: string
-        accessTokenAttributesEnabled:
-          type: boolean
-          description: "If enabled, the access token attributes will be included in the access token."
     RefreshTokenConfiguration:
       type: object
       properties:
