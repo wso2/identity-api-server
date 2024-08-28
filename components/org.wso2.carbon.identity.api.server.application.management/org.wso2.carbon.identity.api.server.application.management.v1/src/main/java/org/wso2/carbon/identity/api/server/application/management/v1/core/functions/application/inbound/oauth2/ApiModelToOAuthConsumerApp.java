@@ -69,10 +69,6 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
         consumerAppDTO.setBypassClientCredentials(oidcModel.getPublicClient());
         consumerAppDTO.setRequestObjectSignatureValidationEnabled(oidcModel.getValidateRequestObjectSignature());
 
-        consumerAppDTO.setUseClientIdAsSubClaimForAppTokens(oidcModel.getUseClientIdAsSubClaimForAppTokens());
-        consumerAppDTO.setOmitUsernameInIntrospectionRespForAppTokens(
-                oidcModel.getOmitUsernameInIntrospectionRespForAppTokens());
-
         updateAllowedOrigins(consumerAppDTO, oidcModel.getAllowedOrigins());
         updatePkceConfigurations(consumerAppDTO, oidcModel.getPkce());
         updateHybridFlowConfigurations(consumerAppDTO, oidcModel.getHybridFlow());
