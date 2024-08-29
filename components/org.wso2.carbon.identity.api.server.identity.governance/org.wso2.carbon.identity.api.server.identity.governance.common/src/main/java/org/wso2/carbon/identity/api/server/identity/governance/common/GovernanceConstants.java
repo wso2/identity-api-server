@@ -69,7 +69,9 @@ public class GovernanceConstants {
         ERROR_CODE_UNSUPPORTED_PROPERTY_NAME("50012", "Unsupported property is requested.",
                 "The property %s is not supported by this API."),
         ERROR_CODE_INVALID_CONNECTOR_CONFIGURATION("50013", "Connector update failed.",
-                "Unable to update the identity governance connector. %s");
+                "Unable to update the identity governance connector %s."),
+        ERROR_CODE_INVALID_PASSWORD_EXPIRY_RULE("50014", "Connector update failed.",
+                "Password expiry rule: %s is invalid.");
 
         private final String code;
         private final String message;
