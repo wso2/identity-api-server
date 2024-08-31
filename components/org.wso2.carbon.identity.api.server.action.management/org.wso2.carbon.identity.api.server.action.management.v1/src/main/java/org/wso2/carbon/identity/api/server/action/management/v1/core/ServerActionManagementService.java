@@ -49,6 +49,7 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_EMPTY_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTH_TYPE;
+import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID;
 
 /**
  * Server Action Management Service.
@@ -88,6 +89,13 @@ public class ServerActionManagementService {
     public ActionResponse getActionByActionId(String actionType, String actionId) {
 
         try {
+            Action action = ActionManagementServiceHolder.getActionManagementService()
+                    .getActionByActionId(actionType, actionId,
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            if (action == null) {
+                throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_FOUND,
+                        ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID);
+            }
             return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
                     .getActionByActionId(actionType, actionId,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));

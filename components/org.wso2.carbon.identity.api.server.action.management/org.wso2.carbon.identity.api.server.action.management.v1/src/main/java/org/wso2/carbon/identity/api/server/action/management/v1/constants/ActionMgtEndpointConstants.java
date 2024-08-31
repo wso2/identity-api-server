@@ -44,7 +44,10 @@ public class ActionMgtEndpointConstants {
                 "Invalid authentication type used for path parameter."),
         ERROR_EMPTY_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES("60003",
                 "Unable to perform the operation.",
-                "Authentication property values cannot be empty.");
+                "Authentication property values cannot be empty."),
+        ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID("60004",
+                "Action is not found.",
+                "No action is found for given action id and action type");
 
         private final String code;
         private final String message;
