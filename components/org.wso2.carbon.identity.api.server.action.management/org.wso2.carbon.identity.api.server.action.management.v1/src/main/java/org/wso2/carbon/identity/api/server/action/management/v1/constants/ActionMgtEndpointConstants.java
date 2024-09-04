@@ -47,7 +47,12 @@ public class ActionMgtEndpointConstants {
                 "Authentication property values cannot be empty."),
         ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID("60004",
                 "Action is not found.",
-                "No action is found for given action id and action type");
+                "No action is found for given action id and action type"),
+
+        // Server errors.
+        ERROR_NOT_IMPLEMENTED_ACTION_TYPE("65001",
+                "Unable to perform the operation.",
+                "The requested action type is not currently supported by the server.");
 
         private final String code;
         private final String message;
