@@ -59,6 +59,9 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .accessToken(buildTokenConfiguration(oauthAppDTO))
                 .refreshToken(buildRefreshTokenConfiguration(oauthAppDTO))
                 .idToken(buildIdTokenConfiguration(oauthAppDTO))
+                .useClientIdAsSubClaimForAppTokens(oauthAppDTO.isUseClientIdAsSubClaimForAppTokens())
+                .omitUsernameInIntrospectionRespForAppTokens(
+                        oauthAppDTO.isOmitUsernameInIntrospectionRespForAppTokens())
                 .logout(buildLogoutConfiguration(oauthAppDTO))
                 .scopeValidators(getScopeValidators(oauthAppDTO))
                 .validateRequestObjectSignature(oauthAppDTO.isRequestObjectSignatureValidationEnabled())
@@ -106,7 +109,15 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .bindingType(oAuthConsumerAppDTO.getTokenBindingType())
                 .revokeTokensWhenIDPSessionTerminated(oAuthConsumerAppDTO
                         .isTokenRevocationWithIDPSessionTerminationEnabled())
-                .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled());
+                .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled())
+                .accessTokenAttributes(getAccessTokenAttributes(oAuthConsumerAppDTO))
+                .accessTokenAttributesEnabled(oAuthConsumerAppDTO.isAccessTokenClaimsSeparationEnabled());
+    }
+
+    private List<String> getAccessTokenAttributes(OAuthConsumerAppDTO oauthAppDTO) {
+
+        return oauthAppDTO.getAccessTokenClaims() != null ?
+                Arrays.asList(oauthAppDTO.getAccessTokenClaims()) : Collections.emptyList();
     }
 
     private RefreshTokenConfiguration buildRefreshTokenConfiguration(OAuthConsumerAppDTO oAuthConsumerAppDTO) {
@@ -174,6 +185,7 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
         return new ClientAuthenticationConfiguration()
                 .tokenEndpointAuthMethod(appDTO.getTokenEndpointAuthMethod())
                 .tokenEndpointAuthSigningAlg(appDTO.getTokenEndpointAuthSignatureAlgorithm())
+                .tokenEndpointAllowReusePvtKeyJwt(appDTO.isTokenEndpointAllowReusePvtKeyJwt())
                 .tlsClientAuthSubjectDn(appDTO.getTlsClientAuthSubjectDN());
     }
 

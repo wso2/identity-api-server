@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -43,6 +43,7 @@ public class ApplicationPatchModel  {
     private String accessUrl;
     private String logoutReturnUrl;
     private String templateId;
+    private String templateVersion;
     private Boolean applicationEnabled;
     private AssociatedRolesConfig associatedRoles;
     private ClaimConfiguration claimConfiguration;
@@ -156,6 +157,25 @@ public class ApplicationPatchModel  {
     }
     public void setTemplateId(String templateId) {
         this.templateId = templateId;
+    }
+
+    /**
+    * Version of the template used to create the application.
+    **/
+    public ApplicationPatchModel templateVersion(String templateVersion) {
+
+        this.templateVersion = templateVersion;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "v1.0.0", value = "Version of the template used to create the application.")
+    @JsonProperty("templateVersion")
+    @Valid
+    public String getTemplateVersion() {
+        return templateVersion;
+    }
+    public void setTemplateVersion(String templateVersion) {
+        this.templateVersion = templateVersion;
     }
 
     /**
@@ -285,6 +305,7 @@ public class ApplicationPatchModel  {
             Objects.equals(this.accessUrl, applicationPatchModel.accessUrl) &&
             Objects.equals(this.logoutReturnUrl, applicationPatchModel.logoutReturnUrl) &&
             Objects.equals(this.templateId, applicationPatchModel.templateId) &&
+            Objects.equals(this.templateVersion, applicationPatchModel.templateVersion) &&
             Objects.equals(this.applicationEnabled, applicationPatchModel.applicationEnabled) &&
             Objects.equals(this.associatedRoles, applicationPatchModel.associatedRoles) &&
             Objects.equals(this.claimConfiguration, applicationPatchModel.claimConfiguration) &&
@@ -295,7 +316,7 @@ public class ApplicationPatchModel  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
+        return Objects.hash(name, description, imageUrl, accessUrl, logoutReturnUrl, templateId, templateVersion, applicationEnabled, associatedRoles, claimConfiguration, authenticationSequence, advancedConfigurations, provisioningConfigurations);
     }
 
     @Override
@@ -310,6 +331,7 @@ public class ApplicationPatchModel  {
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    logoutReturnUrl: ").append(toIndentedString(logoutReturnUrl)).append("\n");
         sb.append("    templateId: ").append(toIndentedString(templateId)).append("\n");
+        sb.append("    templateVersion: ").append(toIndentedString(templateVersion)).append("\n");
         sb.append("    applicationEnabled: ").append(toIndentedString(applicationEnabled)).append("\n");
         sb.append("    associatedRoles: ").append(toIndentedString(associatedRoles)).append("\n");
         sb.append("    claimConfiguration: ").append(toIndentedString(claimConfiguration)).append("\n");

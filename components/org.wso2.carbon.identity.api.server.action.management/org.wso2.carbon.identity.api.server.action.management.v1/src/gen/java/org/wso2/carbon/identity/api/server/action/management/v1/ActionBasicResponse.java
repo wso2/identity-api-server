@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.identity.api.server.action.management.v1.ActionType;
 import javax.validation.constraints.*;
 
 
@@ -33,40 +34,7 @@ import javax.xml.bind.annotation.*;
 public class ActionBasicResponse  {
   
     private String id;
-
-@XmlType(name="TypeEnum")
-@XmlEnum(String.class)
-public enum TypeEnum {
-
-    @XmlEnumValue("PRE_ISSUE_ACCESS_TOKEN") PRE_ISSUE_ACCESS_TOKEN(String.valueOf("PRE_ISSUE_ACCESS_TOKEN")), @XmlEnumValue("PRE_UPDATE_PASSWORD") PRE_UPDATE_PASSWORD(String.valueOf("PRE_UPDATE_PASSWORD")), @XmlEnumValue("PRE_UPDATE_PROFILE") PRE_UPDATE_PROFILE(String.valueOf("PRE_UPDATE_PROFILE")), @XmlEnumValue("PRE_REGISTRATION") PRE_REGISTRATION(String.valueOf("PRE_REGISTRATION")), @XmlEnumValue("POST_LOGIN") POST_LOGIN(String.valueOf("POST_LOGIN")), @XmlEnumValue("PRE_LOGIN") PRE_LOGIN(String.valueOf("PRE_LOGIN"));
-
-
-    private String value;
-
-    TypeEnum(String v) {
-        value = v;
-    }
-
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
-
-    public static TypeEnum fromValue(String value) {
-        for (TypeEnum b : TypeEnum.values()) {
-            if (b.value.equals(value)) {
-                return b;
-            }
-        }
-        throw new IllegalArgumentException("Unexpected value '" + value + "'");
-    }
-}
-
-    private TypeEnum type;
+    private ActionType type;
     private String name;
     private String description;
 
@@ -124,7 +92,7 @@ public enum StatusEnum {
 
     /**
     **/
-    public ActionBasicResponse type(TypeEnum type) {
+    public ActionBasicResponse type(ActionType type) {
 
         this.type = type;
         return this;
@@ -133,10 +101,10 @@ public enum StatusEnum {
     @ApiModelProperty(value = "")
     @JsonProperty("type")
     @Valid
-    public TypeEnum getType() {
+    public ActionType getType() {
         return type;
     }
-    public void setType(TypeEnum type) {
+    public void setType(ActionType type) {
         this.type = type;
     }
 
@@ -150,7 +118,7 @@ public enum StatusEnum {
     
     @ApiModelProperty(example = "Access Token Pre Issue", value = "")
     @JsonProperty("name")
-    @Valid
+    @Valid @Size(min=1,max=255)
     public String getName() {
         return name;
     }
@@ -168,7 +136,7 @@ public enum StatusEnum {
     
     @ApiModelProperty(example = "This is the configuration of pre-action for issuing access token.", value = "")
     @JsonProperty("description")
-    @Valid
+    @Valid @Size(max=255)
     public String getDescription() {
         return description;
     }

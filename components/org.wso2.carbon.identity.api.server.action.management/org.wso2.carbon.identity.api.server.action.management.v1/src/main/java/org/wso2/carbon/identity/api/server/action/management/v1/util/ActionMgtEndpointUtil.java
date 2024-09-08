@@ -23,22 +23,16 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.action.management.exception.ActionMgtClientException;
 import org.wso2.carbon.identity.action.management.exception.ActionMgtException;
 import org.wso2.carbon.identity.action.management.model.Action;
-import org.wso2.carbon.identity.action.management.model.AuthType;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.common.Constants;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.action.management.constant.ActionMgtConstants.ErrorMessages.ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ID;
+import static org.wso2.carbon.identity.action.management.constant.ActionMgtConstants.ErrorMessages.ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ACTION_TYPE_AND_ID;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ACTION_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.PATH_CONSTANT;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
 
@@ -50,33 +44,6 @@ public class ActionMgtEndpointUtil {
     private static final Log LOG = LogFactory.getLog(ActionMgtEndpointUtil.class);
     private static final String ACTION_TYPE_LINK_FORMAT = Constants.V1_API_PATH_COMPONENT + ACTION_PATH_COMPONENT
             + PATH_CONSTANT;
-
-    public static void validateActionEndpointAuthProperties(ActionModel actionModel) {
-
-        String authnType = actionModel.getEndpoint().getAuthentication().getType().toString();
-        Map<String, Object> authnProperties = actionModel.getEndpoint().getAuthentication().getProperties();
-        Map<String, Object> validatedAuthnProperties = new HashMap<>();
-
-        for (AuthType.AuthenticationType type: AuthType.AuthenticationType.values()) {
-            if (type.getType().equals(authnType)) {
-                for (String property: type.getProperties()) {
-                    if (authnProperties == null || authnProperties.get(property) == null) {
-                        throw handleException(Response.Status.BAD_REQUEST,
-                                ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES);
-                    }
-                    validatedAuthnProperties.put(property, authnProperties.get(property));
-                }
-                if (authnProperties.size() > type.getProperties().length) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Removing the given unnecessary properties from the Action Endpoint " +
-                                "authentication properties of Authentication Type: " + authnType);
-                    }
-                    actionModel.getEndpoint().getAuthentication().setProperties(validatedAuthnProperties);
-                }
-                return;
-            }
-        }
-    }
 
     public static String buildURIForActionType(String actionType) {
 
@@ -110,7 +77,7 @@ public class ActionMgtEndpointUtil {
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
         if (e instanceof ActionMgtClientException) {
             LOG.debug(e.getMessage(), e);
-            if (ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ID.getCode().equals(e.getErrorCode())) {
+            if (ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ACTION_TYPE_AND_ID.getCode().equals(e.getErrorCode())) {
                 status = Response.Status.NOT_FOUND;
             } else {
                 status = Response.Status.BAD_REQUEST;

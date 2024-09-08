@@ -2696,9 +2696,9 @@ components:
       required: false
       description: |
         Specifies the required parameters in the response.
-        Currently supports for only 'advancedConfigurations', 'templateId', 'clientId', 'issuer', 'applicationEnabled' and 'associatedRoles.allowedAudience' attributes.
+        Currently supports for only 'advancedConfigurations', 'templateId', 'templateVersion', 'clientId', 'issuer', 'applicationEnabled' and 'associatedRoles.allowedAudience' attributes.
 
-        /applications?attributes=advancedConfigurations,templateId,clientId,applicationEnabled,associatedRoles.allowedAudience
+        /applications?attributes=advancedConfigurations,templateId,templateVersion,clientId,applicationEnabled,associatedRoles.allowedAudience
       schema:
         type: string
     exportSecretsQueryParam:
@@ -2830,6 +2830,10 @@ components:
         templateId:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
+        templateVersion:
+          type: string
+          example: "v1.0.0"
+          description: Version of the template used to create the application.
         associatedRoles:
           type: object
           $ref: '#/components/schemas/AssociatedRolesConfig'
@@ -2863,6 +2867,10 @@ components:
         templateId:
           type: string
           example: "980b8tester24c64a8a09a0d80abf8c337bd2555"
+        templateVersion:
+          type: string
+          example: "v1.0.0"
+          description: Version of the template used to create the application.
         isManagementApp:
           default: false
           type: boolean
@@ -2926,6 +2934,10 @@ components:
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
+        templateVersion:
+          type: string
+          example: "v1.0.0"
+          description: Version of the template used to create the application.
         isManagementApp:
           type: boolean
           example: false
@@ -2978,6 +2990,10 @@ components:
         templateId:
           type: string
           example: "adwefi2429asdfdf94444rraf44"
+        templateVersion:
+          type: string
+          example: "v1.0.0"
+          description: Version of the template used to create the application.
         applicationEnabled:
           type: boolean
           example: true
@@ -3587,6 +3603,12 @@ components:
             Enabling this option will allow the client to authenticate without a
             client secret.
           example: false
+        useClientIdAsSubClaimForAppTokens:
+          type: boolean
+          description: If enabled, client_id will be sent as the sub claim value for app tokens.
+        omitUsernameInIntrospectionRespForAppTokens:
+          type: boolean
+          description: If enabled, username will not be sent in the introspection response for app tokens.
         pkce:
           $ref: '#/components/schemas/OAuth2PKCEConfiguration'
         accessToken:
@@ -3671,6 +3693,13 @@ components:
           type: boolean
           description: "If enabled, both access token and the token binding needs to be present for a successful API
           invocation."
+        accessTokenAttributes:
+          type: array
+          items:
+            type: string
+        accessTokenAttributesEnabled:
+          type: boolean
+          description: "If enabled, the access token attributes will be included in the access token."
     RefreshTokenConfiguration:
       type: object
       properties:
@@ -3729,6 +3758,9 @@ components:
         tokenEndpointAuthMethod:
           type: string
           example: 'client_secret_basic'
+        tokenEndpointAllowReusePvtKeyJwt:
+          type: boolean
+          example: false
         tokenEndpointAuthSigningAlg:
           type: string
           example: 'PS256'
@@ -3995,6 +4027,9 @@ components:
           $ref: '#/components/schemas/MetadataProperty'
         tokenEndpointAuthMethod:
           $ref: '#/components/schemas/ClientAuthenticationMethodMetadata'
+        tokenEndpointAllowReusePvtKeyJwt:
+          type: boolean
+          default: false
         tokenEndpointSignatureAlgorithm:
           $ref: '#/components/schemas/MetadataProperty'
         idTokenSignatureAlgorithm:

@@ -214,6 +214,31 @@ public class ApiResourcesApi  {
     }
 
     @Valid
+    @PATCH
+    @Path("/{apiResourceId}/scopes/{scopeName}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Patch scope specified by the name", notes = "Patch scope specified by the name. Patch operation only supports \"displayName\" and \"description\" fields at the moment. <b>Permission required:</b> <br>   * /permission/admin/manage/identity/apiresourcemgt/update <br> <b>Scope required:</b> <br>   * internal_api_resource_update ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags = { "API Resource Scopes", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Not Content", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response apiResourcesApiResourceIdScopesScopeNamePatch(@ApiParam(value = "ID of the API Resource.", required = true) @PathParam("apiResourceId") String apiResourceId, @ApiParam(value = "Name of the Scope.", required = true) @PathParam("scopeName") String scopeName, @ApiParam(value = "This represents the scopes to be patched." , required = true) @Valid
+    ScopePatchModel scopePatchModel) {
+
+        return delegate.apiResourcesApiResourceIdScopesScopeNamePatch(apiResourceId,  scopeName, scopePatchModel);
+    }
+
+    @Valid
     @GET
     
     

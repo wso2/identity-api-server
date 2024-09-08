@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -191,6 +191,21 @@ public class BrandingPreferenceManagementService {
      */
     public BrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale) {
 
+        return resolveBrandingPreference(type, name, locale, false);
+    }
+
+    /**
+     * Retrieve the resolved branding preferences.
+     *
+     * @param type                Resource Type.
+     * @param name                Name.
+     * @param locale              Language preference.
+     * @param restrictToPublished Whether to resolve using only published branding preferences.
+     * @return The resolved branding preference resource. If not exists return the default preferences.
+     */
+    public BrandingPreferenceModel resolveBrandingPreference(String type, String name, String locale,
+                                                             boolean restrictToPublished) {
+
         /*
          Currently this API provides the support to only configure organization wise & application wise
          branding preference for 'en-US' locale.
@@ -202,11 +217,11 @@ public class BrandingPreferenceManagementService {
             if (APPLICATION_TYPE.equals(type)) {
                 // Get application specific branding preference.
                 responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                        resolveApplicationBrandingPreference(name, DEFAULT_LOCALE);
+                        resolveBrandingPreference(APPLICATION_TYPE, name, DEFAULT_LOCALE, restrictToPublished);
             } else {
                 // Get default branding preference.
                 responseDTO = BrandingPreferenceServiceHolder.getBrandingPreferenceManager().
-                        resolveBrandingPreference(ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE);
+                        resolveBrandingPreference(ORGANIZATION_TYPE, tenantDomain, DEFAULT_LOCALE, restrictToPublished);
             }
 
             return buildBrandingResponseFromResponseDTO(responseDTO);

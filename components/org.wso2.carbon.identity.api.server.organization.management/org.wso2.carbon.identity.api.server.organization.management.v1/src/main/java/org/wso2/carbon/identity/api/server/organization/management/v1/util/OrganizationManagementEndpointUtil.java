@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -31,6 +31,7 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForBody;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
+import static org.wso2.carbon.identity.api.server.common.Util.getCorrelation;
 import static org.wso2.carbon.identity.api.server.organization.management.v1.constants.OrganizationManagementEndpointConstants.DISCOVERY_PATH;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_APPLICATION;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_INVALID_ORGANIZATION;
@@ -116,6 +117,7 @@ public class OrganizationManagementEndpointUtil {
         error.setCode(errorCode);
         error.setMessage(errorMessage);
         error.setDescription(errorDescription);
+        error.setTraceId(getCorrelation());
         return error;
     }
 

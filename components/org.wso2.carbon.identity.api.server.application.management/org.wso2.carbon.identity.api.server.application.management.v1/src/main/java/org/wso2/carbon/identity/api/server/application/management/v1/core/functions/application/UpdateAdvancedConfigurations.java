@@ -146,8 +146,6 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             setIfNotNull(trustedAppConfiguration.getIsFIDOTrustedApp(), trustedAppMetadata::setIsFidoTrusted);
             setIfNotNull(trustedAppConfiguration.getIsConsentGranted(), trustedAppMetadata::setIsConsentGranted);
             serviceProvider.setTrustedAppMetadata(trustedAppMetadata);
-        } else {
-            serviceProvider.setTrustedAppMetadata(null);
         }
     }
 }

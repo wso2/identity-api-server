@@ -88,6 +88,8 @@ public enum StateEnum {
     private RefreshTokenConfiguration refreshToken;
     private SubjectTokenConfiguration subjectToken;
     private IdTokenConfiguration idToken;
+    private Boolean useClientIdAsSubClaimForAppTokens;
+    private Boolean omitUsernameInIntrospectionRespForAppTokens;
     private OIDCLogoutConfiguration logout;
     private Boolean validateRequestObjectSignature = false;
     private List<String> scopeValidators = null;
@@ -359,6 +361,45 @@ public enum StateEnum {
     }
 
     /**
+     * If enabled, client_id will be sent as the subject claim value for app tokens.
+     */
+    public OpenIDConnectConfiguration useClientIdAsSubClaimForAppTokens(Boolean useClientIdAsSubClaimForAppTokens) {
+
+        this.useClientIdAsSubClaimForAppTokens = useClientIdAsSubClaimForAppTokens;
+        return this;
+    }
+
+    @ApiModelProperty("If enable, client_id will be sent as the sub claim value for app tokens.")
+    @JsonProperty("useClientIdAsSubClaimForAppTokens")
+    @Valid
+    public Boolean getUseClientIdAsSubClaimForAppTokens() {
+        return useClientIdAsSubClaimForAppTokens;
+    }
+    public void setUseClientIdAsSubClaimForAppTokens(Boolean useClientIdAsSubClaimForAppTokens) {
+        this.useClientIdAsSubClaimForAppTokens = useClientIdAsSubClaimForAppTokens;
+    }
+
+    /**
+     * If enabled, username will not be sent in the introspection response for app tokens.
+     */
+    public OpenIDConnectConfiguration omitUsernameInIntrospectionRespForAppTokens(
+            Boolean omitUsernameInIntrospectionRespForAppTokens) {
+
+        this.omitUsernameInIntrospectionRespForAppTokens = omitUsernameInIntrospectionRespForAppTokens;
+        return this;
+    }
+
+    @ApiModelProperty("If enabled, username will not be sent in the introspection response for app tokens.")
+    @JsonProperty("omitUsernameInIntrospectionRespForAppTokens")
+    @Valid
+    public Boolean getOmitUsernameInIntrospectionRespForAppTokens() {
+        return omitUsernameInIntrospectionRespForAppTokens;
+    }
+    public void setOmitUsernameInIntrospectionRespForAppTokens(Boolean omitUsernameInIntrospectionRespForAppTokens) {
+        this.omitUsernameInIntrospectionRespForAppTokens = omitUsernameInIntrospectionRespForAppTokens;
+    }
+
+    /**
     **/
     public OpenIDConnectConfiguration logout(OIDCLogoutConfiguration logout) {
 
@@ -552,6 +593,10 @@ public enum StateEnum {
             Objects.equals(this.refreshToken, openIDConnectConfiguration.refreshToken) &&
             Objects.equals(this.subjectToken, openIDConnectConfiguration.subjectToken) &&
             Objects.equals(this.idToken, openIDConnectConfiguration.idToken) &&
+            Objects.equals(this.useClientIdAsSubClaimForAppTokens,
+                    openIDConnectConfiguration.useClientIdAsSubClaimForAppTokens) &&
+            Objects.equals(this.omitUsernameInIntrospectionRespForAppTokens,
+                    openIDConnectConfiguration.omitUsernameInIntrospectionRespForAppTokens) &&
             Objects.equals(this.logout, openIDConnectConfiguration.logout) &&
             Objects.equals(this.validateRequestObjectSignature, openIDConnectConfiguration.validateRequestObjectSignature) &&
             Objects.equals(this.scopeValidators, openIDConnectConfiguration.scopeValidators) &&
@@ -566,7 +611,7 @@ public enum StateEnum {
     @Override
     public int hashCode() {
 
-        return Objects.hash(clientId, clientSecret, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, hybridFlow, accessToken, refreshToken, subjectToken, idToken, logout, validateRequestObjectSignature, scopeValidators, clientAuthentication, requestObject, pushAuthorizationRequest, subject, isFAPIApplication, fapiMetadata);
+        return Objects.hash(clientId, clientSecret, state, grantTypes, callbackURLs, allowedOrigins, publicClient, pkce, hybridFlow, accessToken, refreshToken, subjectToken, idToken, useClientIdAsSubClaimForAppTokens, omitUsernameInIntrospectionRespForAppTokens, logout, validateRequestObjectSignature, scopeValidators, clientAuthentication, requestObject, pushAuthorizationRequest, subject, isFAPIApplication, fapiMetadata);
     }
 
     @Override
@@ -588,6 +633,8 @@ public enum StateEnum {
         sb.append("    refreshToken: ").append(toIndentedString(refreshToken)).append("\n");
         sb.append("    subjectToken: ").append(toIndentedString(subjectToken)).append("\n");
         sb.append("    idToken: ").append(toIndentedString(idToken)).append("\n");
+        sb.append("    useClientIdAsSubClaimForAppTokens: ").append(toIndentedString(useClientIdAsSubClaimForAppTokens)).append("\n");
+        sb.append("    omitUsernameInIntrospectionRespForAppTokens: ").append(toIndentedString(omitUsernameInIntrospectionRespForAppTokens)).append("\n");
         sb.append("    logout: ").append(toIndentedString(logout)).append("\n");
         sb.append("    validateRequestObjectSignature: ").append(toIndentedString(validateRequestObjectSignature)).append("\n");
         sb.append("    scopeValidators: ").append(toIndentedString(scopeValidators)).append("\n");

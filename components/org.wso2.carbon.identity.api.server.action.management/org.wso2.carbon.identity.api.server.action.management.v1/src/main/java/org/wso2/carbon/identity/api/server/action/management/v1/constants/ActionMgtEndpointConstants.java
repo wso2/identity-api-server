@@ -38,7 +38,21 @@ public class ActionMgtEndpointConstants {
         // Client errors.
         ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES("60001",
                 "Unable to perform the operation.",
-                "Required authentication properties are not provided or invalid.");
+                "Required authentication properties are not provided or invalid."),
+        ERROR_INVALID_ACTION_ENDPOINT_AUTH_TYPE("60002",
+                "Invalid Authentication Type for Action Endpoint.",
+                "Invalid authentication type used for path parameter."),
+        ERROR_EMPTY_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES("60003",
+                "Unable to perform the operation.",
+                "Authentication property values cannot be empty."),
+        ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID("60004",
+                "Action is not found.",
+                "No action is found for given action id and action type"),
+
+        // Server errors.
+        ERROR_NOT_IMPLEMENTED_ACTION_TYPE("65001",
+                "Unable to perform the operation.",
+                "The requested action type is not currently supported by the server.");
 
         private final String code;
         private final String message;
