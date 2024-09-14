@@ -2783,6 +2783,11 @@ components:
         name:
           type: string
           example: SAML2Authenticator
+        definedBy:
+          type: string
+          enum:
+            - SYSTEM
+            - USER
         tags:
           type: array
           items:
@@ -2804,6 +2809,11 @@ components:
         displayName:
           type: string
           example: 'SAML2 Web SSO Configuration'
+        definedBy:
+          type: string
+          enum:
+            - SYSTEM
+            - USER
         tags:
           type: array
           items:
@@ -2849,6 +2859,11 @@ components:
           type: boolean
           default: false
           example: true
+        definedBy:
+          type: string
+          enum:
+            - SYSTEM
+            - USER
         isDefault:
           type: boolean
           default: false
@@ -2908,6 +2923,11 @@ components:
           type: boolean
           default: false
           example: true
+        definedBy:
+          type: string
+          enum:
+            - SYSTEM
+            - USER
         tags:
           type: array
           items:

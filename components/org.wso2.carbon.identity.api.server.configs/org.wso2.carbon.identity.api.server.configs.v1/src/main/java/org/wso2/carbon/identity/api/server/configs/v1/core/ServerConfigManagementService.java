@@ -770,6 +770,7 @@ public class ServerConfigManagementService {
         authenticator.setId(base64URLEncode(config.getName()));
         authenticator.setName(config.getName());
         authenticator.setDisplayName(config.getDisplayName());
+        authenticator.setDefinedBy(Authenticator.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
         authenticator.setIsEnabled(config.isEnabled());
         if (config instanceof RequestPathAuthenticatorConfig) {
             authenticator.setType(Authenticator.TypeEnum.REQUEST_PATH);

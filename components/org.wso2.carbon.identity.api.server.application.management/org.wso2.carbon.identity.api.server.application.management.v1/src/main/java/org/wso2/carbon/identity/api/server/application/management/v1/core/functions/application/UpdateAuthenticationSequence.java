@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticato
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.script.AuthenticationScriptConfig;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
+import org.wso2.carbon.identity.base.IdentityConstants;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -160,11 +161,13 @@ public class UpdateAuthenticationSequence implements UpdateFunction<ServiceProvi
                 LocalAuthenticatorConfig localAuthOption = new LocalAuthenticatorConfig();
                 localAuthOption.setEnabled(true);
                 localAuthOption.setName(option.getAuthenticator());
+                localAuthOption.setDefinedByType(IdentityConstants.DefinedByType.SYSTEM);
                 localAuthOptions.add(localAuthOption);
             } else {
                 FederatedAuthenticatorConfig federatedAuthConfig = new FederatedAuthenticatorConfig();
                 federatedAuthConfig.setEnabled(true);
                 federatedAuthConfig.setName(option.getAuthenticator());
+                federatedAuthConfig.setDefinedByType(IdentityConstants.DefinedByType.SYSTEM);
 
                 IdentityProvider federatedIdp = new IdentityProvider();
                 federatedIdp.setIdentityProviderName(option.getIdp());

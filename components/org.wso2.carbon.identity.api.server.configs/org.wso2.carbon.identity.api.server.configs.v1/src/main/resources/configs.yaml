@@ -1217,6 +1217,11 @@ components:
         isEnabled:
           type: boolean
           default: true
+        definedBy:
+          type: string
+          enum:
+            - SYSTEM
+            - USER
         type:
           type: string
           enum:
