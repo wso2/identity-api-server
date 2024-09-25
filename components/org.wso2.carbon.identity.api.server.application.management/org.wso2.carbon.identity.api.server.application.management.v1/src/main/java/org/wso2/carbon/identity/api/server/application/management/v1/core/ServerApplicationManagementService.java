@@ -252,7 +252,8 @@ public class ServerApplicationManagementService {
     private ServerApplicationMetadataService applicationMetadataService;
 
     public ApplicationListResponse getAllApplications(Integer limit, Integer offset, String filter, String sortOrder,
-                                                      String sortBy, String requiredAttributes) {
+                                                      String sortBy, String requiredAttributes,
+                                                      Boolean excludeSystemApps) {
 
         handleNotImplementedCapabilities(sortOrder, sortBy);
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -279,9 +280,39 @@ public class ServerApplicationManagementService {
             int totalResults = getApplicationManagementService()
                     .getCountOfApplications(tenantDomain, username, filter);
 
-            ApplicationBasicInfo[] filteredAppList = getApplicationManagementService()
-                    .getApplicationBasicInfo(tenantDomain, username, filter, offset, limit);
-            int resultsInCurrentPage = filteredAppList.length;
+            List<ApplicationBasicInfo> filteredAppList = new ArrayList<>();
+            int currentOffset = offset;
+            int remainingLimit = limit;
+
+            while (filteredAppList.size() < limit && currentOffset < totalResults) {
+                ApplicationBasicInfo[] batch = getApplicationManagementService()
+                        .getApplicationBasicInfo(tenantDomain, username, filter, currentOffset, remainingLimit);
+
+                if (batch.length == 0) {
+                    break;
+                }
+
+                for (ApplicationBasicInfo app : batch) {
+                    if (Boolean.TRUE.equals(excludeSystemApps) &&
+                            (CONSOLE_APP.equals(app.getApplicationName()) ||
+                                    MY_ACCOUNT_APP.equals(app.getApplicationName()))) {
+                        continue;
+                    }
+                    filteredAppList.add(app);
+                    if (filteredAppList.size() == limit) {
+                        break;
+                    }
+                }
+
+                currentOffset += batch.length;
+                remainingLimit = limit - filteredAppList.size();
+            }
+
+            int resultsInCurrentPage = filteredAppList.size();
+            
+            if (Boolean.TRUE.equals(excludeSystemApps)) {
+                totalResults = totalResults - 2; // Subtract 2 for CONSOLE_APP and MY_ACCOUNT_APP
+            }
 
             List<String> requestedAttributeList = new ArrayList<>();
             if (StringUtils.isNotEmpty(requiredAttributes)) {
@@ -299,7 +330,8 @@ public class ServerApplicationManagementService {
             }
 
             if (CollectionUtils.isNotEmpty(requestedAttributeList)) {
-                List<ServiceProvider> serviceProviderList = getSpWithRequiredAttributes(filteredAppList,
+                List<ServiceProvider> serviceProviderList = getSpWithRequiredAttributes(
+                        filteredAppList.toArray(new ApplicationBasicInfo[0]),
                         requestedAttributeList);
 
                 return new ApplicationListResponse()
@@ -318,7 +350,7 @@ public class ServerApplicationManagementService {
                         .totalResults(totalResults)
                         .startIndex(offset + 1)
                         .count(resultsInCurrentPage)
-                        .applications(getApplicationListItems(filteredAppList))
+                        .applications(getApplicationListItems(filteredAppList.toArray(new ApplicationBasicInfo[0])))
                         .links(Util.buildPaginationLinks(limit, offset, totalResults,
                                         APPLICATION_MANAGEMENT_PATH_COMPONENT, requiredAttributes, filter)
                                 .entrySet()

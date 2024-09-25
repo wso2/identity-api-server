@@ -69,10 +69,10 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Override
     public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
-                                       String requiredAttributes) {
+                                       String requiredAttributes, Boolean excludeSystemApps) {
 
         ApplicationListResponse listResponse = applicationManagementService
-                .getAllApplications(limit, offset, filter, sortOrder, sortBy, requiredAttributes);
+                .getAllApplications(limit, offset, filter, sortOrder, sortBy, requiredAttributes, excludeSystemApps);
         return Response.ok().entity(listResponse).build();
     }
 

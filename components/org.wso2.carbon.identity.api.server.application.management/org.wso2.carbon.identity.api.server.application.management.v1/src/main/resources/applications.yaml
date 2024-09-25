@@ -38,6 +38,7 @@ paths:
         - $ref: '#/components/parameters/sortOrderQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
         - $ref: '#/components/parameters/attributesQueryParam'
+        - $ref: '#/components/parameters/excludeSystemAppsQueryParam'
       responses:
         '200':
           description: OK
@@ -2701,6 +2702,15 @@ components:
         /applications?attributes=advancedConfigurations,templateId,templateVersion,clientId,applicationEnabled,associatedRoles.allowedAudience
       schema:
         type: string
+    excludeSystemAppsQueryParam:
+      in: query
+      name: excludeSystemApps
+      required: false
+      description: |
+        Specifies whether to exclude system applications when exporting applications.
+      schema:
+        type: boolean
+        default: false
     exportSecretsQueryParam:
       in: query
       name: exportSecrets
