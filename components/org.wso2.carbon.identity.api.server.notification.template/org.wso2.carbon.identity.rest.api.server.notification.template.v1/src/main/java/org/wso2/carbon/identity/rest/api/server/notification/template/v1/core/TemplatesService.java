@@ -38,7 +38,7 @@ import static org.wso2.carbon.identity.api.server.notification.template.common.C
 /**
  * Service class for application email templates.
  */
-public class ApplicationTemplatesService {
+public class TemplatesService {
 
     /**
      * Adds a new organization email template to the given template type. Template ID should not exist in the system.
@@ -267,6 +267,60 @@ public class ApplicationTemplatesService {
                 throw Util.handleError(Constants.ErrorMessage.ERROR_TEMPLATE_NOT_FOUND);
             } else {
                 return Util.buildSMSTemplateWithID(internalEmailTemplate);
+            }
+        } catch (NotificationTemplateManagerException e) {
+            throw Util.handleNotificationTemplateManagerException(e,
+                    Constants.ErrorMessage.ERROR_ERROR_RETRIEVING_TEMPLATE);
+        }
+    }
+
+    /**
+     * Retrieves the default email template of the given template type and locale.
+     *
+     * @param templateTypeId  Template type ID.
+     * @param templateId      Template ID.
+     * @return Default email template.
+     */
+    public EmailTemplateWithID getSystemEmailTemplate(String templateTypeId, String templateId) {
+
+        try {
+            String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
+            NotificationTemplate internalTemplate = TemplatesServiceHolder.getNotificationTemplateManager().
+                    getSystemNotificationTemplate(Constants.NOTIFICATION_CHANNEL_EMAIL,
+                            templateTypeDisplayName, templateId);
+            // NotificationTemplateManager sends the default template if no matching template found.
+            // We need to check for the locale specifically.
+            if (!internalTemplate.getLocale().equals(templateId)) {
+                throw Util.handleError(Constants.ErrorMessage.ERROR_TEMPLATE_NOT_FOUND);
+            } else {
+                return Util.buildEmailTemplateWithID(internalTemplate);
+            }
+        } catch (NotificationTemplateManagerException e) {
+            throw Util.handleNotificationTemplateManagerException(e,
+                    Constants.ErrorMessage.ERROR_ERROR_RETRIEVING_TEMPLATE);
+        }
+    }
+
+    /**
+     * Retrieves the default SMS template of the given template type and locale.
+     *
+     * @param templateTypeId  Template type ID.
+     * @param templateId      Template ID.
+     * @return Default SMS template.
+     */
+    public SMSTemplateWithID getSystemSmsTemplate(String templateTypeId, String templateId) {
+
+        try {
+            String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
+            NotificationTemplate internalTemplate = TemplatesServiceHolder.getNotificationTemplateManager().
+                    getSystemNotificationTemplate(Constants.NOTIFICATION_CHANNEL_SMS,
+                            templateTypeDisplayName, templateId);
+            // NotificationTemplateManager sends the default template if no matching template found.
+            // We need to check for the locale specifically.
+            if (!internalTemplate.getLocale().equals(templateId)) {
+                throw Util.handleError(Constants.ErrorMessage.ERROR_TEMPLATE_NOT_FOUND);
+            } else {
+                return Util.buildSMSTemplateWithID(internalTemplate);
             }
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,

@@ -22,8 +22,8 @@ package org.wso2.carbon.identity.rest.api.server.notification.template.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.NotificationApiService;
-import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.ApplicationTemplatesService;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplateTypeService;
+import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplatesService;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.EmailTemplate;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.EmailTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SMSTemplate;
@@ -54,7 +54,7 @@ import static org.wso2.carbon.identity.api.server.notification.template.common.C
 public class NotificationApiServiceImpl implements NotificationApiService {
 
     @Autowired
-    private ApplicationTemplatesService applicationTemplatesService;
+    private TemplatesService templatesService;
     @Autowired
     private TemplateTypeService templateTypeService;
 
@@ -62,7 +62,7 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     public Response addAppEmailTemplate(String templateTypeId, String appUuid,
                                         EmailTemplateWithID emailTemplateWithID) {
 
-        SimpleTemplate simpleEmailTemplate = applicationTemplatesService.addEmailTemplate(templateTypeId,
+        SimpleTemplate simpleEmailTemplate = templatesService.addEmailTemplate(templateTypeId,
                 emailTemplateWithID, appUuid);
         URI headerLocation = buildURIForHeader(V1_API_PATH_COMPONENT + NOTIFICATION_TEMPLATES_API_PATH
                         + NOTIFICATION_TEMPLATES_API_BASE_PATH_EMAIL + TEMPLATE_TYPES_PATH + PATH_SEPARATOR
@@ -74,7 +74,7 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response addAppSMSTemplate(String templateTypeId, String appUuid, SMSTemplateWithID smSTemplateWithID) {
 
-        SimpleTemplate simpleSMSTemplate = applicationTemplatesService.addSMSTemplate(templateTypeId,
+        SimpleTemplate simpleSMSTemplate = templatesService.addSMSTemplate(templateTypeId,
                 smSTemplateWithID, appUuid);
         URI headerLocation = buildURIForHeader(V1_API_PATH_COMPONENT + NOTIFICATION_TEMPLATES_API_PATH
                 + NOTIFICATION_TEMPLATES_API_BASE_PATH_SMS + TEMPLATE_TYPES_PATH + PATH_SEPARATOR
@@ -98,7 +98,7 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response addOrgEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID) {
 
-        SimpleTemplate simpleEmailTemplate = applicationTemplatesService.addEmailTemplate(templateTypeId,
+        SimpleTemplate simpleEmailTemplate = templatesService.addEmailTemplate(templateTypeId,
                 emailTemplateWithID);
         URI headerLocation = buildURIForHeader(
                 V1_API_PATH_COMPONENT + NOTIFICATION_TEMPLATES_API_PATH
@@ -110,7 +110,7 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response addOrgSMSTemplate(String templateTypeId, SMSTemplateWithID smSTemplateWithID) {
 
-        SimpleTemplate simpleSMSTemplate = applicationTemplatesService.addSMSTemplate(templateTypeId,
+        SimpleTemplate simpleSMSTemplate = templatesService.addSMSTemplate(templateTypeId,
                 smSTemplateWithID);
         URI headerLocation = buildURIForHeader(
                 V1_API_PATH_COMPONENT + NOTIFICATION_TEMPLATES_API_PATH
@@ -134,14 +134,14 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response deleteAppEmailTemplate(String templateTypeId, String appUuid, String locale) {
 
-        applicationTemplatesService.deleteEmailTemplate(templateTypeId, locale, appUuid);
+        templatesService.deleteEmailTemplate(templateTypeId, locale, appUuid);
         return Response.noContent().build();
     }
 
     @Override
     public Response deleteAppSMSTemplate(String templateTypeId, String appUuid, String locale) {
 
-        applicationTemplatesService.deleteSMSTemplate(templateTypeId, locale, appUuid);
+        templatesService.deleteSMSTemplate(templateTypeId, locale, appUuid);
         return Response.noContent().build();
     }
 
@@ -155,14 +155,14 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response deleteOrgEmailTemplate(String templateTypeId, String locale) {
 
-        applicationTemplatesService.deleteEmailTemplate(templateTypeId, locale);
+        templatesService.deleteEmailTemplate(templateTypeId, locale);
         return Response.noContent().build();
     }
 
     @Override
     public Response deleteOrgSMSTemplate(String templateTypeId, String locale) {
 
-        applicationTemplatesService.deleteSMSTemplate(templateTypeId, locale);
+        templatesService.deleteSMSTemplate(templateTypeId, locale);
         return Response.noContent().build();
     }
 
@@ -190,14 +190,14 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response getAppEmailTemplate(String templateTypeId, String appUuid, String locale) {
 
-        return Response.ok().entity(applicationTemplatesService.getEmailTemplate(templateTypeId, locale, appUuid))
+        return Response.ok().entity(templatesService.getEmailTemplate(templateTypeId, locale, appUuid))
                 .build();
     }
 
     @Override
     public Response getAppSMSTemplate(String templateTypeId, String appUuid, String locale) {
 
-        return Response.ok().entity(applicationTemplatesService.getSMSTemplate(templateTypeId, locale, appUuid))
+        return Response.ok().entity(templatesService.getSMSTemplate(templateTypeId, locale, appUuid))
                 .build();
     }
 
@@ -205,14 +205,14 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     public Response getAppTemplatesListOfEmailTemplateType(String templateTypeId, String appUuid) {
 
         return Response.ok().entity(
-                applicationTemplatesService.getTemplatesListOfEmailTemplateType(templateTypeId, appUuid)).build();
+                templatesService.getTemplatesListOfEmailTemplateType(templateTypeId, appUuid)).build();
     }
 
     @Override
     public Response getAppTemplatesListOfSMSTemplateType(String templateTypeId, String appUuid) {
 
         return Response.ok().entity(
-                applicationTemplatesService.getTemplatesListOfSMSTemplateType(templateTypeId, appUuid)).build();
+                templatesService.getTemplatesListOfSMSTemplateType(templateTypeId, appUuid)).build();
     }
 
     @Override
@@ -225,26 +225,26 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response getOrgEmailTemplate(String templateTypeId, String locale) {
 
-        return Response.ok().entity(applicationTemplatesService.getEmailTemplate(templateTypeId, locale)).build();
+        return Response.ok().entity(templatesService.getEmailTemplate(templateTypeId, locale)).build();
     }
 
     @Override
     public Response getOrgSMSTemplate(String templateTypeId, String locale) {
 
-        return Response.ok().entity(applicationTemplatesService.getSMSTemplate(templateTypeId, locale)).build();
+        return Response.ok().entity(templatesService.getSMSTemplate(templateTypeId, locale)).build();
     }
 
     @Override
     public Response getOrgTemplatesListOfEmailTemplateType(String templateTypeId) {
 
-        return Response.ok().entity(applicationTemplatesService.getTemplatesListOfEmailTemplateType(templateTypeId))
+        return Response.ok().entity(templatesService.getTemplatesListOfEmailTemplateType(templateTypeId))
                 .build();
     }
 
     @Override
     public Response getOrgTemplatesListOfSMSTemplateType(String templateTypeId) {
 
-        return Response.ok().entity(applicationTemplatesService.getTemplatesListOfSMSTemplateType(templateTypeId))
+        return Response.ok().entity(templatesService.getTemplatesListOfSMSTemplateType(templateTypeId))
                 .build();
     }
 
@@ -256,10 +256,22 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
+    public Response getDefaultEmailTemplate(String templateTypeId, String locale) {
+
+        return Response.ok().entity(templatesService.getSystemEmailTemplate(templateTypeId, locale)).build();
+    }
+
+    @Override
+    public Response getDefaultSMSTemplate(String templateTypeId, String locale) {
+
+        return Response.ok().entity(templatesService.getSystemSmsTemplate(templateTypeId, locale)).build();
+    }
+
+    @Override
     public Response updateAppEmailTemplate(String templateTypeId, String appUuid, String locale,
                                            EmailTemplate emailTemplate) {
 
-        applicationTemplatesService.updateEmailTemplate(templateTypeId, locale, emailTemplate, appUuid);
+        templatesService.updateEmailTemplate(templateTypeId, locale, emailTemplate, appUuid);
         return Response.ok().build();
     }
 
@@ -267,7 +279,7 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     public Response updateAppSMSTemplate(String templateTypeId, String appUuid, String locale,
                                          SMSTemplate smsTemplate) {
 
-        applicationTemplatesService.updateSMSTemplate(templateTypeId, locale, smsTemplate, appUuid);
+        templatesService.updateSMSTemplate(templateTypeId, locale, smsTemplate, appUuid);
         return Response.ok().build();
     }
 
@@ -275,14 +287,14 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     public Response updateOrgEmailTemplate(String templateTypeId, String locale,
                                            EmailTemplate emailTemplate) {
 
-        applicationTemplatesService.updateEmailTemplate(templateTypeId, locale, emailTemplate);
+        templatesService.updateEmailTemplate(templateTypeId, locale, emailTemplate);
         return Response.ok().build();
     }
 
     @Override
     public Response updateOrgSMSTemplate(String templateTypeId, String locale, SMSTemplate smsTemplate) {
 
-        applicationTemplatesService.updateSMSTemplate(templateTypeId, locale, smsTemplate);
+        templatesService.updateSMSTemplate(templateTypeId, locale, smsTemplate);
         return Response.ok().build();
     }
 }

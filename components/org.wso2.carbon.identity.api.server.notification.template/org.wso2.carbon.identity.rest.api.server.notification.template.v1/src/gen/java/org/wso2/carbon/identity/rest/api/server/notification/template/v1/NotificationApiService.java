@@ -73,6 +73,10 @@ public interface NotificationApiService {
 
       public Response getAppTemplatesListOfSMSTemplateType(String templateTypeId, String appUuid);
 
+      public Response getDefaultEmailTemplate(String templateTypeId, String locale);
+
+      public Response getDefaultSMSTemplate(String templateTypeId, String locale);
+
       public Response getEmailTemplateType(String templateTypeId);
 
       public Response getOrgEmailTemplate(String templateTypeId, String locale);

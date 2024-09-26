@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.notification.template.common;
 
+import org.wso2.carbon.email.mgt.constants.TemplateMgtConstants;
+
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response.Status;
@@ -42,8 +44,8 @@ public class Constants {
     public static final String APP_TEMPLATES_PATH =  "/app-templates";
     public static final String ORG_TEMPLATES_PATH = "/org-templates";
     public static final String PATH_SEPARATOR = "/";
-    public static final String NOTIFICATION_CHANNEL_EMAIL = "email";
-    public static final String NOTIFICATION_CHANNEL_SMS = "sms";
+    public static final String NOTIFICATION_CHANNEL_EMAIL = "EMAIL";
+    public static final String NOTIFICATION_CHANNEL_SMS = "SMS";
 
     // ERROR MESSAGES
     private static final Map<String, ErrorMessage> NTM_ERROR_CODE_MAP = new HashMap<>();
@@ -94,7 +96,10 @@ public class Constants {
                 "Server encountered an error while deleting the email template."),
         ERROR_ERROR_DELETING_SMS_TEMPLATE("60010", Status.INTERNAL_SERVER_ERROR,
                 "Unable to delete the SMS template.",
-                "Server encountered an error while deleting the SMS template.");
+                "Server encountered an error while deleting the SMS template."),
+        ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED("60011", Status.FORBIDDEN,
+                "System resource deletion not allowed.",
+                "System resources are not eligible for deletion.");
 
         private final String message;
         private final Status httpStatus;
@@ -143,6 +148,8 @@ public class Constants {
         NTM_ERROR_CODE_MAP.put(TEMPLATE_NOT_FOUND, ErrorMessage.ERROR_TEMPLATE_NOT_FOUND);
         NTM_ERROR_CODE_MAP.put(ERROR_ADDING_TEMPLATE, ErrorMessage.ERROR_ERROR_ADDING_TEMPLATE);
         NTM_ERROR_CODE_MAP.put(ERROR_UPDATING_TEMPLATE, ErrorMessage.ERROR_ERROR_UPDATING_TEMPLATE);
+        NTM_ERROR_CODE_MAP.put(TemplateMgtConstants.ErrorCodes.ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED,
+                ErrorMessage.ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED);
     }
 
     public static ErrorMessage getNTMMappedErrorMessage(String errorCode) {
