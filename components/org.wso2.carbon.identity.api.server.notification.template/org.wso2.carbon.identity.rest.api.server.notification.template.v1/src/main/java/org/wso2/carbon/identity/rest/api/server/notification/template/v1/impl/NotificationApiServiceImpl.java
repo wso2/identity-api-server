@@ -132,6 +132,18 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
+    public Response deleteAllOrgEmailTemplates(String templateTypeId) {
+
+        return Response.ok().entity("magic!").build();
+    }
+
+    @Override
+    public Response deleteAllOrgSMSTemplates(String templateTypeId) {
+
+        return Response.ok().entity("magic!").build();
+    }
+
+    @Override
     public Response deleteAppEmailTemplate(String templateTypeId, String appUuid, String locale) {
 
         templatesService.deleteEmailTemplate(templateTypeId, locale, appUuid);
@@ -139,10 +151,22 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
+    public Response deleteAppEmailTemplates(String templateTypeId) {
+
+        return Response.ok().entity("magic!").build();
+    }
+
+    @Override
     public Response deleteAppSMSTemplate(String templateTypeId, String appUuid, String locale) {
 
         templatesService.deleteSMSTemplate(templateTypeId, locale, appUuid);
         return Response.noContent().build();
+    }
+
+    @Override
+    public Response deleteAppSMSTemplates(String templateTypeId, String appUuid, String locale) {
+
+        return Response.ok().entity("magic!").build();
     }
 
     @Override
@@ -256,36 +280,45 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
-    public Response getDefaultEmailTemplate(String templateTypeId, String locale) {
+    public Response getSystemEmailTemplate(String templateTypeId, String locale) {
 
         return Response.ok().entity(templatesService.getSystemEmailTemplate(templateTypeId, locale)).build();
     }
 
     @Override
-    public Response getDefaultSMSTemplate(String templateTypeId, String locale) {
+    public Response getSystemSMSTemplate(String templateTypeId, String locale) {
 
         return Response.ok().entity(templatesService.getSystemSmsTemplate(templateTypeId, locale)).build();
     }
 
     @Override
-    public Response updateAppEmailTemplate(String templateTypeId, String appUuid, String locale,
-                                           EmailTemplate emailTemplate) {
+    public Response getSystemTemplatesListOfEmailTemplateType(String templateTypeId) {
+
+        return Response.ok().entity("magic!").build();
+    }
+
+    @Override
+    public Response getSystemTemplatesListOfSMSTemplateType(String templateTypeId) {
+
+        return Response.ok().entity("magic!").build();
+    }
+
+    @Override
+    public Response updateAppEmailTemplate(String templateTypeId, String appUuid, String locale, EmailTemplate emailTemplate) {
 
         templatesService.updateEmailTemplate(templateTypeId, locale, emailTemplate, appUuid);
         return Response.ok().build();
     }
 
     @Override
-    public Response updateAppSMSTemplate(String templateTypeId, String appUuid, String locale,
-                                         SMSTemplate smsTemplate) {
+    public Response updateAppSMSTemplate(String templateTypeId, String appUuid, String locale, SMSTemplate smsTemplate) {
 
         templatesService.updateSMSTemplate(templateTypeId, locale, smsTemplate, appUuid);
         return Response.ok().build();
     }
 
     @Override
-    public Response updateOrgEmailTemplate(String templateTypeId, String locale,
-                                           EmailTemplate emailTemplate) {
+    public Response updateOrgEmailTemplate(String templateTypeId, String locale, EmailTemplate emailTemplate) {
 
         templatesService.updateEmailTemplate(templateTypeId, locale, emailTemplate);
         return Response.ok().build();

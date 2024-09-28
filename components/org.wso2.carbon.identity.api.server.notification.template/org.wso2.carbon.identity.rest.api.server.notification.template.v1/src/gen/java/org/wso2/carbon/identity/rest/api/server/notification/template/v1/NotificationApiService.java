@@ -49,9 +49,17 @@ public interface NotificationApiService {
 
       public Response addSMSTemplateType(TemplateTypeOverview templateTypeOverview);
 
+      public Response deleteAllOrgEmailTemplates(String templateTypeId);
+
+      public Response deleteAllOrgSMSTemplates(String templateTypeId);
+
       public Response deleteAppEmailTemplate(String templateTypeId, String appUuid, String locale);
 
+      public Response deleteAppEmailTemplates(String templateTypeId);
+
       public Response deleteAppSMSTemplate(String templateTypeId, String appUuid, String locale);
+
+      public Response deleteAppSMSTemplates(String templateTypeId, String appUuid, String locale);
 
       public Response deleteEmailTemplateType(String templateTypeId);
 
@@ -73,10 +81,6 @@ public interface NotificationApiService {
 
       public Response getAppTemplatesListOfSMSTemplateType(String templateTypeId, String appUuid);
 
-      public Response getDefaultEmailTemplate(String templateTypeId, String locale);
-
-      public Response getDefaultSMSTemplate(String templateTypeId, String locale);
-
       public Response getEmailTemplateType(String templateTypeId);
 
       public Response getOrgEmailTemplate(String templateTypeId, String locale);
@@ -88,6 +92,14 @@ public interface NotificationApiService {
       public Response getOrgTemplatesListOfSMSTemplateType(String templateTypeId);
 
       public Response getSMSTemplateType(String templateTypeId);
+
+      public Response getSystemEmailTemplate(String templateTypeId, String locale);
+
+      public Response getSystemSMSTemplate(String templateTypeId, String locale);
+
+      public Response getSystemTemplatesListOfEmailTemplateType(String templateTypeId);
+
+      public Response getSystemTemplatesListOfSMSTemplateType(String templateTypeId);
 
       public Response updateAppEmailTemplate(String templateTypeId, String appUuid, String locale, EmailTemplate emailTemplate);
 

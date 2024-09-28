@@ -3,8 +3,8 @@ info:
   title: "WSO2 Identity Server - Notification Template API"
   version: 1.0.0
   description: >-
-    This is the RESTful API for managing notification templates inWSO2 Identity
-    Server. This API allows adding, retrieving, replacing, and removing email
+    This is the RESTful API for managing notification templates in the WSO2 Identity
+    Server. This API allows adding, retrieving, replacing, and removing notification
     templates and template types.
 tags:
   - name: Email Template Types
@@ -19,6 +19,8 @@ tags:
     description: An SMS template of a specific type and a language.
   - name: Application SMS Templates
     description: An application email template of a specific type and a language.
+  - name: System Templates
+    description: A system default template of a specific type and a language.
 security:
   - OAuth2: []
   - BasicAuth: []
@@ -34,7 +36,7 @@ paths:
 
         <br>
         <b>Scope required:</b>
-        <br>* internal_notification_email_mgt_view
+        <br>* internal_email_mgt_view
       responses:
         '200':
           description: Search results matching the given criteria.
@@ -64,7 +66,7 @@ paths:
         * Attribute _**displayName**_ of the template type should be unique. <br>
 
         <b>Scope required:</b> 
-        <br>* internal_notification_email_mgt_create
+        <br>* internal_email_mgt_create
       requestBody:
         content:
           application/json:
@@ -103,7 +105,7 @@ paths:
         Retrieves the email template type in the system identified by the template-type-id. <br>
         
         <b>Scope required:</b><br>
-        * internal_notification_email_mgt_view<br>
+        * internal_email_mgt_view<br>
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       responses:
@@ -133,7 +135,7 @@ paths:
         from the system. <br>
 
         <b>Scope required:</b><br>
-        * internal_notification_email_mgt_delete
+        * internal_email_mgt_delete
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       responses:
@@ -153,13 +155,13 @@ paths:
     get:
       tags:
         - Email Templates
-      summary: Retrieves the list of organization email templates in the template type id.
+      summary: Retrieves the list of organization email templates under the provided template type.
       operationId: getOrgTemplatesListOfEmailTemplateType
       description: |
-        Retrieves the list of organization email templates in the template type id. <br>
+        Retrieves the list of organization email templates under the provided template type. <br>
 
           <b>Scope required:</b><br>
-          * internal_notification_email_mgt_view<br>
+          * internal_email_mgt_view<br>
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       responses:
@@ -170,7 +172,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EmailTemplateWithID'
+                  $ref: '#/components/schemas/SimpleTemplate'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -191,7 +193,7 @@ paths:
         respective email template type. <br>
 
         <b>Scope required:</b> <br>
-        * internal_notification_email_mgt_create
+        * internal_email_mgt_create
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       requestBody:
@@ -224,17 +226,68 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - Email Templates
+      summary: Removes all org email templates.
+      operationId: deleteAllOrgEmailTemplates
+      description: |
+        Removes all existing organization email templates from the system. <br>
+
+        <b>Scope required:</b><br>
+        * internal_email_mgt_delete
+      parameters:
+        - $ref: '#/components/parameters/templateTypeIdPathParam'
+      responses:
+        '204':
+          $ref: '#/components/responses/Deleted'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  '/notification/email/template-types/{template-type-id}/app-templates':
+    delete:
+      tags:
+        - Application Email Templates
+      summary: Removes all application email templates for the organization.
+      operationId: deleteAppEmailTemplates
+      description: |
+        Removes all application email templates defined for all applications of the organization. <br>
+
+          <b>Scope required:</b><br>
+          * internal_template_mgt_delete
+      parameters:
+        - $ref: '#/components/parameters/templateTypeIdPathParam'
+      responses:
+        '204':
+          $ref: '#/components/responses/Deleted'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
   '/notification/email/template-types/{template-type-id}/app-templates/{app-uuid}':
     get:
       tags:
         - Application Email Templates
-      summary: Retrieves the list of application email templates in the template type id.
+      summary: Retrieves the list of application email templates under the provided template type.
       operationId: getAppTemplatesListOfEmailTemplateType
       description: |
-        Retrieves the list of application email templates in the template type id. <br>
+        Retrieves the list of application email templates under the provided template type. <br>
         
           <b>Scope required:</b><br>
-          * internal_notification_email_mgt_view<br>
+          * internal_email_mgt_view<br>
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/appUuidPathParam'
@@ -246,7 +299,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/EmailTemplateWithID'
+                  $ref: '#/components/schemas/SimpleTemplate'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -267,7 +320,7 @@ paths:
         respective email template type. <br>
         
         <b>Scope required:</b> <br>
-        * internal_notification_email_mgt_create
+        * internal_email_mgt_create
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/appUuidPathParam'
@@ -311,7 +364,7 @@ paths:
         Retrieves the email template that matches to the template-type-id and the locale. <br>
 
         <b>Scope required:</b><br>
-          * internal_notification_email_mgt_view
+          * internal_email_mgt_view
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/localePathParam'
@@ -341,7 +394,7 @@ paths:
         Replaces the email template identified by the template-type-id and the locale. <br>
 
           <b>Scope required:</b><br>
-          * internal_notification_email_mgt_update
+          * internal_email_mgt_update
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/localePathParam'
@@ -373,7 +426,7 @@ paths:
         Removes an email template identified by the template-type-id and the locale. <br>
 
           <b>Scope required:</b><br>
-        * internal_notification_email_mgt_delete
+        * internal_email_mgt_delete
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/localePathParam'
@@ -390,17 +443,49 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
+  '/notification/email/template-types/{template-type-id}/system-templates':
+    get:
+      tags:
+        - System Templates
+      summary: Retrieves the system email templates of template type.
+      operationId: getSystemTemplatesListOfEmailTemplateType
+      description: |
+        Retrieves the list of system default email templates under the provided template type. <br>
+
+          <b>Scope required:</b><br>
+          * internal_email_mgt_view<br>
+      parameters:
+        - $ref: '#/components/parameters/templateTypeIdPathParam'
+      responses:
+        '200':
+          description: Search results matching the given criteria.
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SimpleTemplate'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
   '/notification/email/template-types/{template-type-id}/system-templates/{locale}':
     get:
       tags:
-        - Email Templates
+        - System Templates
       summary: Retrieves the default email template for given type and locale.
-      operationId: getDefaultEmailTemplate
+      operationId: getSystemEmailTemplate
       description: |
         Retrieves the default email template that matches to the template-type-id and the locale. <br>
 
         <b>Scope required:</b><br>
-          * internal_notification_email_mgt_view
+          * internal_email_mgt_view
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/localePathParam'
@@ -431,7 +516,7 @@ paths:
         Retrieves the application email template that matches to the template-type-id and the locale. <br>
 
         <b>Scope required:</b><br>
-          * internal_notification_email_mgt_view
+          * internal_email_mgt_view
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/appUuidPathParam'
@@ -462,7 +547,7 @@ paths:
         Replaces the application email template identified by the template-type-id and the locale. <br>
 
           <b>Scope required:</b><br>
-          * internal_notification_email_mgt_update
+          * internal_email_mgt_update
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/appUuidPathParam'
@@ -489,13 +574,13 @@ paths:
     delete:
       tags:
         - Application Email Templates
-      summary: Removes an email template.
+      summary: Removes an application email template.
       operationId: deleteAppEmailTemplate
       description: |
-        Removes an email template identified by the template-type-id and the locale. <br>
+        Removes an applicationemail template identified by the template-type-id and the locale. <br>
 
           <b>Scope required:</b><br>
-        * internal_notification_email_mgt_delete
+        * internal_email_mgt_delete
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/appUuidPathParam'
@@ -523,7 +608,7 @@ paths:
         Retrieves all the SMS template types in the system. <br>
 
         <b>Scope required:</b><br>
-        * internal_notification_sms_mgt_view
+        * internal_template_mgt_view
       responses:
         '200':
           description: Search results matching the given criteria.
@@ -553,7 +638,7 @@ paths:
         * Attribute _**displayName**_ of the template type should be unique. <br>
 
         <b>Scope required:</b><br>
-        * internal_notification_sms_mgt_create
+        * internal_template_mgt_create
       requestBody:
         content:
           application/json:
@@ -592,7 +677,7 @@ paths:
         Retrieves the SMS template type in the system identified by the template-type-id. <br>
         
         <b>Scope required:</b><br>
-        * internal_notification_sms_mgt_view<br>
+        * internal_template_mgt_view<br>
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       responses:
@@ -622,9 +707,37 @@ paths:
         from the system. <br>
 
         <b>Scope required:</b><br>
-        * internal_notification_sms_mgt_delete
+        * internal_template_mgt_delete
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
+      responses:
+        '204':
+          $ref: '#/components/responses/Deleted'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  '/notification/sms/template-types/{template-type-id}/app-templates':
+    delete:
+      tags:
+        - Application SMS Templates
+      summary: Removes all application SMS templates for the organization.
+      operationId: deleteAppSMSTemplates
+      description: |
+        Removes all application SMS templates defined for all applications of the organization. <br>
+
+          <b>Scope required:</b><br>
+          * internal_template_mgt_delete
+      parameters:
+        - $ref: '#/components/parameters/templateTypeIdPathParam'
+        - $ref: '#/components/parameters/appUuidPathParam'
+        - $ref: '#/components/parameters/localePathParam'
       responses:
         '204':
           $ref: '#/components/responses/Deleted'
@@ -642,13 +755,13 @@ paths:
     get:
       tags:
         - Application SMS Templates
-      summary: Retrieves the list of application SMS templates in the template type id.
+      summary: Retrieves the list of application SMS templates under the provided template type.
       operationId: getAppTemplatesListOfSMSTemplateType
       description: |
-        Retrieves the list of application SMS templates in the template type id. <br>
+        Retrieves the list of application SMS templates under the provided template type. <br>
 
           <b>Scope required:</b><br>
-          * internal_notification_sms_mgt_view<br>
+          * internal_template_mgt_view<br>
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/appUuidPathParam'
@@ -660,7 +773,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SMSTemplateWithID'
+                  $ref: '#/components/schemas/SimpleTemplate'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -681,7 +794,7 @@ paths:
         respective SMS template type. <br>
 
         <b>Scope required:</b><br>
-        * internal_notification_sms_mgt_create
+        * internal_template_mgt_create
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/appUuidPathParam'
@@ -725,7 +838,7 @@ paths:
         Retrieves the application SMS template that matches to the template-type-id and the locale. <br>
 
         <b>Scope required:</b><br>
-          * internal_notification_sms_mgt_view
+          * internal_template_mgt_view
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/appUuidPathParam'
@@ -756,7 +869,7 @@ paths:
         Replaces the application SMS template identified by the template-type-id and the locale. <br>
 
           <b>Scope required:</b><br>
-          * internal_notification_sms_mgt_update
+          * internal_template_mgt_update
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/appUuidPathParam'
@@ -766,7 +879,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SMSTemplate'
-        description: Email templates for the template type.
+        description: Application SMS template for the template type and locale.
       responses:
         '200':
           $ref: '#/components/responses/Updated'
@@ -789,7 +902,7 @@ paths:
         Removes an SMS template identified by the template-type-id and the locale. <br>
 
           <b>Scope required:</b><br>
-          * internal_notification_sms_mgt_delete
+          * internal_template_mgt_delete
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/appUuidPathParam'
@@ -811,13 +924,13 @@ paths:
     get:
       tags:
         - SMS Templates
-      summary: Retrieves the list of organization SMS templates in the template type id.
+      summary: Retrieves the list of organization SMS templates under the provided template type.
       operationId: getOrgTemplatesListOfSMSTemplateType
       description: |
-        Retrieves the list of organization SMS templates in the template type id. <br>
+        Retrieves the list of organization SMS templates under the provided templalte type. <br>
 
           <b>Scope required:</b><br>
-          * internal_notification_sms_mgt_view<br>
+          * internal_template_mgt_view<br>
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       responses:
@@ -828,7 +941,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/SMSTemplateWithID'
+                  $ref: '#/components/schemas/SimpleTemplate'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -849,7 +962,7 @@ paths:
         respective SMS template type. <br>
 
         <b>Scope required:</b><br>
-        * internal_notification_sms_mgt_create
+        * internal_template_mgt_create
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       requestBody:
@@ -882,6 +995,31 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/ServerError'
+    delete:
+      tags:
+        - SMS Templates
+      summary: Removes all org SMS templates.
+      operationId: deleteAllOrgSMSTemplates
+      description: |
+        Removes all existing organization SMS templates from the system. <br>
+
+        <b>Scope required:</b><br>
+        * internal_template_mgt_delete
+      parameters:
+        - $ref: '#/components/parameters/templateTypeIdPathParam'
+      responses:
+        '204':
+          $ref: '#/components/responses/Deleted'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
   '/notification/sms/template-types/{template-type-id}/org-templates/{locale}':
     get:
       tags:
@@ -892,7 +1030,7 @@ paths:
         Retrieves the SMS template that matches to the template-type-id and the locale. <br>
 
         <b>Scope required:</b><br>
-          * internal_notification_sms_mgt_view
+          * internal_template_mgt_view
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/localePathParam'
@@ -922,7 +1060,7 @@ paths:
         Replaces the organization SMS template identified by the template-type-id and the locale. <br>
 
           <b>Scope required:</b><br>
-          * internal_notification_sms_mgt_update
+          * internal_template_mgt_update
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/localePathParam'
@@ -954,7 +1092,7 @@ paths:
         Removes an organization SMS template identified by the template-type-id and the locale. <br>
 
           <b>Scope required:</b><br>
-          * internal_notification_sms_mgt_delete
+          * internal_template_mgt_delete
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/localePathParam'
@@ -971,17 +1109,49 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
+  '/notification/sms/template-types/{template-type-id}/system-templates':
+    get:
+      tags:
+        - System Templates
+      summary: Retrieves the list of system SMS templates with the template type id.
+      operationId: getSystemTemplatesListOfSMSTemplateType
+      description: |
+        Retrieves the list of system default SMS templates under the provided template type. <br>
+
+          <b>Scope required:</b><br>
+          * internal_template_mgt_view<br>
+      parameters:
+        - $ref: '#/components/parameters/templateTypeIdPathParam'
+      responses:
+        '200':
+          description: Search results matching the given criteria.
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SimpleTemplate'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
   '/notification/sms/template-types/{template-type-id}/system-templates/{locale}':
     get:
       tags:
-        - SMS Templates
+        - System Templates
       summary: Retrieves the default organization SMS template.
-      operationId: getDefaultSMSTemplate
+      operationId: getSystemSMSTemplate
       description: |
         Retrieves the default SMS template that matches to the template-type-id and the locale. <br>
 
         <b>Scope required:</b><br>
-          * internal_notification_sms_mgt_view
+          * internal_template_mgt_view
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
         - $ref: '#/components/parameters/localePathParam'
@@ -1030,47 +1200,6 @@ components:
       name: app-uuid
       required: true
       description: Application UUID.
-      schema:
-        type: string
-    offsetQueryParam:
-      in: query
-      name: offset
-      description: >-
-        Number of records to skip for pagination. _<b>This option is not yet
-        supported.<b>_
-      schema:
-        type: integer
-        format: int32
-        minimum: 0
-    limitQueryParam:
-      in: query
-      name: limit
-      description: >-
-        Maximum number of records to return. _<b>This option is not yet
-        supported.<b>_
-      schema:
-        type: integer
-        format: int32
-        minimum: 0
-    sortOrderQueryParam:
-      in: query
-      name: sortOrder
-      required: false
-      description: >-
-        Define the order in which the retrieved records should be sorted. _<b>This
-        option is not yet supported.<b>_
-      schema:
-        type: string
-        enum:
-          - asc
-          - desc
-    sortByQueryParam:
-      in: query
-      name: sortBy
-      required: false
-      description: >-
-        Attribute by which the retrieved records should be sorted. _<b>This
-        option is not yet supported.<b>_
       schema:
         type: string
   responses:
