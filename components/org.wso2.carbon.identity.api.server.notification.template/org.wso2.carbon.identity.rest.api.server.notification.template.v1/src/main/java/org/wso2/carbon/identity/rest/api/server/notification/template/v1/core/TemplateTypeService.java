@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.core;
 
-import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
 import org.wso2.carbon.identity.api.server.notification.template.common.TemplatesServiceHolder;
 import org.wso2.carbon.identity.governance.exceptions.notiification.NotificationTemplateManagerException;
@@ -103,12 +102,7 @@ public class TemplateTypeService {
     public void deleteNotificationTemplateType(String notificationChannel, String templateId) {
 
         String templateTypeDisplayName;
-        try {
-            templateTypeDisplayName = Util.decodeTemplateTypeId(templateId);
-        } catch (APIError e) {
-            // Ignoring the delete operation and return 204 response code, since the resource does not exist.
-            return;
-        }
+        templateTypeDisplayName = Util.decodeTemplateTypeId(templateId);
         try {
             boolean isTemplateTypeExists =
                     TemplatesServiceHolder.getNotificationTemplateManager().isNotificationTemplateTypeExists(
