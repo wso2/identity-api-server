@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.branding.preference.management.common;
 
 import org.wso2.carbon.identity.branding.preference.management.core.BrandingPreferenceManager;
+import org.wso2.carbon.identity.branding.preference.management.core.ai.BrandingAIPreferenceManager;
 
 /**
  * Service holder class for branding preference management.
@@ -26,6 +27,7 @@ import org.wso2.carbon.identity.branding.preference.management.core.BrandingPref
 public class BrandingPreferenceServiceHolder {
 
     private static BrandingPreferenceManager brandingPreferenceManager;
+    private static BrandingAIPreferenceManager brandingPreferenceAiManager;
 
     /**
      * Get BrandingPreferenceManager OSGi service.
@@ -45,5 +47,25 @@ public class BrandingPreferenceServiceHolder {
     public static void setBrandingPreferenceManager(BrandingPreferenceManager brandingPreferenceManager) {
 
         BrandingPreferenceServiceHolder.brandingPreferenceManager = brandingPreferenceManager;
+    }
+
+    /**
+     * Get AIBrandingPreferenceManager OSGi service.
+     *
+     * @return AI Branding Preference Manager.
+     */
+    public static BrandingAIPreferenceManager getBrandingPreferenceAiManager() {
+
+        return brandingPreferenceAiManager;
+    }
+
+    /**
+     * Set AIBrandingPreferenceManager OSGi service.
+     *
+     * @param brandingPreferenceAIManager AI Branding Preference Manager.
+     */
+    public static void setBrandingPreferenceAiManager(BrandingAIPreferenceManager brandingPreferenceAIManager) {
+
+        BrandingPreferenceServiceHolder.brandingPreferenceAiManager = brandingPreferenceAIManager;
     }
 }
