@@ -21,7 +21,12 @@ package org.wso2.carbon.identity.api.server.branding.preference.management.v1.im
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingAIPreferenceManagementService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingPreferenceManagementService;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationRequestModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResponseModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResultModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationStatusModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -32,6 +37,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.branding.preference.management.common.BrandingPreferenceManagementConstants.APPLICATION_TYPE;
@@ -52,6 +58,9 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
 
     @Autowired
     private BrandingPreferenceManagementService brandingPreferenceManagementService;
+
+    @Autowired
+    private BrandingAIPreferenceManagementService brandingAIPreferenceManagementService;
 
     //TODO: Improve API to manage application level & language level theming resources in addition to the tenant level.
 
@@ -182,6 +191,31 @@ public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiSe
         }
         return Response.ok()
                 .entity(brandingPreferenceManagementService.getBrandingPreference(type, name, locale)).build();
+    }
+
+    @Override
+    public Response generateBrandingPreference(BrandingGenerationRequestModel brandingGenerationModel) {
+
+        BrandingGenerationResponseModel response = brandingAIPreferenceManagementService.generateBrandingPreference(
+                brandingGenerationModel);
+        return Response.accepted().entity(response).build();
+
+    }
+
+    @Override
+    public Response getBrandingGenerationResult(String operationId) {
+
+        BrandingGenerationResultModel response = brandingAIPreferenceManagementService
+                .getBrandingPreferenceGenerationResult(operationId);
+        return Response.ok().entity(response).build();
+    }
+
+    @Override
+    public Response getBrandingGenerationStatus(String operationId) {
+
+        BrandingGenerationStatusModel response = brandingAIPreferenceManagementService
+                .getBrandingPreferenceGenerationStatus(operationId);
+        return Response.ok().entity(response).build();
     }
 
     @Override
