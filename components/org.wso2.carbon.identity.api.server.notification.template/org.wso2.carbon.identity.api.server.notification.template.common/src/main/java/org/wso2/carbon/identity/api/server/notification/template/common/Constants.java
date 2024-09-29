@@ -43,9 +43,13 @@ public class Constants {
     public static final String TEMPLATE_TYPES_PATH = "/template-types";
     public static final String APP_TEMPLATES_PATH =  "/app-templates";
     public static final String ORG_TEMPLATES_PATH = "/org-templates";
+    public static final String SYSTEM_TEMPLATES_PATH = "/system-templates";
     public static final String PATH_SEPARATOR = "/";
     public static final String NOTIFICATION_CHANNEL_EMAIL = "EMAIL";
     public static final String NOTIFICATION_CHANNEL_SMS = "SMS";
+    public static final String NOTIFICATION_TEMPLATE_OWNER_APP = "APP";
+    public static final String NOTIFICATION_TEMPLATE_OWNER_ORG = "ORG";
+    public static final String NOTIFICATION_TEMPLATE_OWNER_SYSTEM = "SYSTEM";
 
     // ERROR MESSAGES
     private static final Map<String, ErrorMessage> NTM_ERROR_CODE_MAP = new HashMap<>();
@@ -99,7 +103,10 @@ public class Constants {
                 "Server encountered an error while deleting the SMS template."),
         ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED("60011", Status.FORBIDDEN,
                 "System resource deletion not allowed.",
-                "System resources are not eligible for deletion.");
+                "System resources are not eligible for deletion."),
+        ERROR_ERROR_RETRIEVING_TEMPLATES("60012", Status.INTERNAL_SERVER_ERROR,
+                "Unable to retrieve templates.",
+                "Server encountered an error while retrieving templates.");
 
         private final String message;
         private final Status httpStatus;

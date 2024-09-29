@@ -32,6 +32,7 @@ import org.wso2.carbon.identity.governance.exceptions.notiification.Notification
 import org.wso2.carbon.identity.governance.model.NotificationTemplate;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.EmailTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SMSTemplateWithID;
+import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SimpleTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,11 +42,14 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
+import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.APP_TEMPLATES_PATH;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.NOTIFICATION_CHANNEL_EMAIL;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.NOTIFICATION_TEMPLATES_API_BASE_PATH_EMAIL;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.NOTIFICATION_TEMPLATES_API_BASE_PATH_SMS;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.NOTIFICATION_TEMPLATES_API_PATH;
+import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.ORG_TEMPLATES_PATH;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.PATH_SEPARATOR;
+import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.SYSTEM_TEMPLATES_PATH;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.TEMPLATE_TYPES_PATH;
 
 /**
@@ -58,46 +62,31 @@ public class Util {
     private static final String ERROR_CODE_DELIMITER = "-";
 
     /**
-     * Converts a list of EmailTemplate objects to a list of NotificationTemplate objects.
+     * Builds a list of SimpleTemplate objects using the provided NotificationTemplate list.
      *
-     * @param emailTemplates List of EmailTemplate objects.
-     * @return List of EmailTemplateWithID objects.
+     * @param templates           NotificationTemplate list.
+     * @param applicationUuid     Application UUID.
+     * @param templateOwner       Template owner.
+     * @param notificationChannel Notification channel.
+     * @return List of SimpleTemplate objects.
      */
-    public static List<EmailTemplateWithID> buildEmailTemplateWithIDList(List<NotificationTemplate> emailTemplates) {
+    public static List<SimpleTemplate> buildSimpleTemplateList(List<NotificationTemplate> templates,
+                                           String applicationUuid, String templateOwner, String notificationChannel) {
 
-        List<EmailTemplateWithID> emailTemplateWithIDs = new ArrayList<>();
-        if (emailTemplates != null) {
-            for (NotificationTemplate emailTemplate : emailTemplates) {
-                EmailTemplateWithID emailTemplateWithID = new EmailTemplateWithID();
-                emailTemplateWithID.setLocale(emailTemplate.getLocale());
-                emailTemplateWithID.setContentType(emailTemplate.getContentType());
-                emailTemplateWithID.setSubject(emailTemplate.getSubject());
-                emailTemplateWithID.setBody(emailTemplate.getBody());
-                emailTemplateWithID.setFooter(emailTemplate.getFooter());
-                emailTemplateWithIDs.add(emailTemplateWithID);
+        List<SimpleTemplate> simpleTemplates = new ArrayList<>();
+        if (templates != null) {
+            for (NotificationTemplate template : templates) {
+                SimpleTemplate simpleTemplate = new SimpleTemplate();
+                String templateTypeId = base64URLEncode(template.getType());
+                String templateTypeLocation =
+                        getTemplateTypeLocation(templateTypeId, notificationChannel);
+                simpleTemplate.setSelf(getTemplateLocation(templateTypeLocation, applicationUuid,
+                        template.getLocale(), templateOwner));
+                simpleTemplate.setLocale(template.getLocale());
+                simpleTemplates.add(simpleTemplate);
             }
         }
-        return emailTemplateWithIDs;
-    }
-
-    /**
-     * Converts a list of SMSTemplate objects to a list of SMSTemplateWithID objects.
-     *
-     * @param smsTemplates List of SMSTemplate objects.
-     * @return List of SMSTemplateWithID objects.
-     */
-    public static List<SMSTemplateWithID> buildSMSTemplateWithIDList(List<NotificationTemplate> smsTemplates) {
-
-        List<SMSTemplateWithID> smsTemplateWithIDs = new ArrayList<>();
-        if (smsTemplates != null) {
-            for (NotificationTemplate smsTemplate : smsTemplates) {
-                SMSTemplateWithID emailTemplateWithID = new SMSTemplateWithID();
-                emailTemplateWithID.setLocale(smsTemplate.getLocale());
-                emailTemplateWithID.setBody(smsTemplate.getBody());
-                smsTemplateWithIDs.add(emailTemplateWithID);
-            }
-        }
-        return smsTemplateWithIDs;
+        return simpleTemplates;
     }
 
     /**
@@ -202,6 +191,7 @@ public class Util {
 
     /**
      * Builds NotificationTemplate object using SMSTemplateWithID object.
+     *
      * @param templateTypeId    Template type ID.
      * @param smsTemplateWithID SMSTemplateWithID Object.
      * @return NotificationTemplate object built using provided values.
@@ -222,6 +212,7 @@ public class Util {
 
     /**
      * Builds NotificationTemplate object using EmailTemplateWithID object.
+     *
      * @param templateTypeId      Template type ID.
      * @param emailTemplateWithID EmailTemplateWithID Object.
      * @return NotificationTemplate object built using provided values.
@@ -268,14 +259,14 @@ public class Util {
      * Builds the location of the template type.
      *
      * @param templateTypeId Template type ID.
-     * @param templateType   Notification channel type.
+     * @param notificationChannel   Notification channel type.
      * @return Location of the template.
      */
-    public static String getTemplateTypeLocation(String templateTypeId, String templateType) {
+    public static String getTemplateTypeLocation(String templateTypeId, String notificationChannel) {
 
         String templateTypePath;
         // Only EMAIL and SMS are passed as the type. So, no need to check for other types.
-        if (templateType.equals(NOTIFICATION_CHANNEL_EMAIL)) {
+        if (NOTIFICATION_CHANNEL_EMAIL.equals(notificationChannel)) {
             templateTypePath = NOTIFICATION_TEMPLATES_API_BASE_PATH_EMAIL;
         } else {
             templateTypePath = NOTIFICATION_TEMPLATES_API_BASE_PATH_SMS;
@@ -319,6 +310,31 @@ public class Util {
         smsTemplateWithID.setLocale(locale);
         smsTemplateWithID.setBody(smsTemplate.getBody());
         return smsTemplateWithID;
+    }
+
+
+    /**
+     * Generates self url for application templates.
+     *
+     * @param templateTypeLocation   Template type ID.
+     * @param applicationUuid        Application UUID.
+     * @param locale                 Locale.
+     * @return                       SimpleTemplate object.
+     */
+    public static String getTemplateLocation(String templateTypeLocation, String applicationUuid, String locale,
+                                             String templateOwner) {
+
+        switch (templateOwner) {
+            case Constants.NOTIFICATION_TEMPLATE_OWNER_APP:
+                return templateTypeLocation + APP_TEMPLATES_PATH + PATH_SEPARATOR + applicationUuid
+                        + PATH_SEPARATOR + locale;
+            case Constants.NOTIFICATION_TEMPLATE_OWNER_ORG:
+                return templateTypeLocation + ORG_TEMPLATES_PATH + PATH_SEPARATOR + locale;
+            case Constants.NOTIFICATION_TEMPLATE_OWNER_SYSTEM:
+                return templateTypeLocation + SYSTEM_TEMPLATES_PATH + PATH_SEPARATOR + locale;
+            default:
+                return null;
+        }
     }
 
     private static ErrorResponse.Builder getErrorBuilder(Constants.ErrorMessage errorMsg) {

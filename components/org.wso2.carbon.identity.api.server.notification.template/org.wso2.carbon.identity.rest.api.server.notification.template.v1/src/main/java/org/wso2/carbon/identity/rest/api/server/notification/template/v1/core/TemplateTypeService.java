@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
-import static org.wso2.carbon.identity.rest.api.server.notification.template.v1.util.Util.getTemplateTypeLocation;
 
 /**
  * Service class for the template types.
@@ -55,7 +54,7 @@ public class TemplateTypeService {
             response.setDisplayName(templateTypeDisplayName);
             String templateTypeId = Util.resolveTemplateIdFromDisplayName(templateTypeDisplayName);
             response.setId(templateTypeId);
-            response.setSelf(getTemplateTypeLocation(templateTypeId, notificationChannel));
+            response.setSelf(Util.getTemplateTypeLocation(templateTypeId, notificationChannel));
             return response;
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
@@ -82,7 +81,7 @@ public class TemplateTypeService {
                     String templateTypeId = Util.resolveTemplateIdFromDisplayName(emailTemplateType);
                     templateTypeWithID.setId(templateTypeId);
                     templateTypeWithID.setSelf(
-                            getTemplateTypeLocation(templateTypeId, notificationChannel));
+                            Util.getTemplateTypeLocation(templateTypeId, notificationChannel));
                     templateTypeWithIDs.add(templateTypeWithID);
                 }
             }
@@ -138,7 +137,7 @@ public class TemplateTypeService {
                 TemplateTypeWithID templateTypeWithID = new TemplateTypeWithID();
                 templateTypeWithID.setDisplayName(templateTypeDisplayName);
                 templateTypeWithID.setId(templateTypeId);
-                templateTypeWithID.setSelf(getTemplateTypeLocation(templateTypeId, notificationChannel));
+                templateTypeWithID.setSelf(Util.getTemplateTypeLocation(templateTypeId, notificationChannel));
                 return templateTypeWithID;
             } else {
                 throw Util.handleError(Constants.ErrorMessage.ERROR_TEMPLATE_TYPE_NOT_FOUND);

@@ -132,6 +132,20 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
+    public Response deleteAllAppEmailTemplates(String templateTypeId) {
+
+        // do some magic!
+        return Response.ok().entity("magic!").build();
+    }
+
+    @Override
+    public Response deleteAllAppSMSTemplates(String templateTypeId, String appUuid, String locale) {
+
+        // do some magic!
+        return Response.ok().entity("magic!").build();
+    }
+
+    @Override
     public Response deleteAllOrgEmailTemplates(String templateTypeId) {
 
         return Response.ok().entity("magic!").build();
@@ -151,22 +165,10 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
-    public Response deleteAppEmailTemplates(String templateTypeId) {
-
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
     public Response deleteAppSMSTemplate(String templateTypeId, String appUuid, String locale) {
 
         templatesService.deleteSMSTemplate(templateTypeId, locale, appUuid);
         return Response.noContent().build();
-    }
-
-    @Override
-    public Response deleteAppSMSTemplates(String templateTypeId, String appUuid, String locale) {
-
-        return Response.ok().entity("magic!").build();
     }
 
     @Override
@@ -198,6 +200,22 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
+    public Response getAllAppTemplatesOfEmailTemplateType(String templateTypeId, String appUuid) {
+
+        return Response.ok().entity(
+                templatesService.getAllTemplatesOfTemplateType(templateTypeId, appUuid,
+                        Constants.NOTIFICATION_CHANNEL_EMAIL)).build();
+    }
+
+    @Override
+    public Response getAllAppTemplatesOfSMSTemplateType(String templateTypeId, String appUuid) {
+
+        return Response.ok().entity(
+                templatesService.getAllTemplatesOfTemplateType(templateTypeId, appUuid,
+                        Constants.NOTIFICATION_CHANNEL_SMS)).build();
+    }
+
+    @Override
     public Response getAllEmailTemplateTypes() {
 
         return Response.ok().entity(templateTypeService
@@ -205,10 +223,38 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
+    public Response getAllOrgTemplatesOfEmailTemplateType(String templateTypeId) {
+
+        return Response.ok().entity(templatesService.getAllTemplatesOfTemplateType(templateTypeId,
+                        Constants.NOTIFICATION_CHANNEL_EMAIL)).build();
+    }
+
+    @Override
+    public Response getAllOrgTemplatesOfSMSTemplateType(String templateTypeId) {
+
+        return Response.ok().entity(templatesService.getAllTemplatesOfTemplateType(templateTypeId,
+                        Constants.NOTIFICATION_CHANNEL_SMS)).build();
+    }
+
+    @Override
     public Response getAllSMSTemplateTypes() {
 
         return Response.ok().entity(templateTypeService
                 .getAllNotificationTemplateTypes(Constants.NOTIFICATION_CHANNEL_SMS)).build();
+    }
+
+    @Override
+    public Response getAllSystemTemplatesOfEmailTemplateType(String templateTypeId) {
+
+        return Response.ok().entity(templatesService
+                .getAllSystemTemplatesOfTemplateType(templateTypeId, Constants.NOTIFICATION_CHANNEL_EMAIL)).build();
+    }
+
+    @Override
+    public Response getAllSystemTemplatesOfSMSTemplateType(String templateTypeId) {
+
+        return Response.ok().entity(templatesService
+                .getAllSystemTemplatesOfTemplateType(templateTypeId, Constants.NOTIFICATION_CHANNEL_SMS)).build();
     }
 
     @Override
@@ -223,20 +269,6 @@ public class NotificationApiServiceImpl implements NotificationApiService {
 
         return Response.ok().entity(templatesService.getSMSTemplate(templateTypeId, locale, appUuid))
                 .build();
-    }
-
-    @Override
-    public Response getAppTemplatesListOfEmailTemplateType(String templateTypeId, String appUuid) {
-
-        return Response.ok().entity(
-                templatesService.getTemplatesListOfEmailTemplateType(templateTypeId, appUuid)).build();
-    }
-
-    @Override
-    public Response getAppTemplatesListOfSMSTemplateType(String templateTypeId, String appUuid) {
-
-        return Response.ok().entity(
-                templatesService.getTemplatesListOfSMSTemplateType(templateTypeId, appUuid)).build();
     }
 
     @Override
@@ -259,20 +291,6 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
-    public Response getOrgTemplatesListOfEmailTemplateType(String templateTypeId) {
-
-        return Response.ok().entity(templatesService.getTemplatesListOfEmailTemplateType(templateTypeId))
-                .build();
-    }
-
-    @Override
-    public Response getOrgTemplatesListOfSMSTemplateType(String templateTypeId) {
-
-        return Response.ok().entity(templatesService.getTemplatesListOfSMSTemplateType(templateTypeId))
-                .build();
-    }
-
-    @Override
     public Response getSMSTemplateType(String templateTypeId) {
 
         return Response.ok().entity(templateTypeService.getNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_SMS,
@@ -292,26 +310,16 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
-    public Response getSystemTemplatesListOfEmailTemplateType(String templateTypeId) {
-
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response getSystemTemplatesListOfSMSTemplateType(String templateTypeId) {
-
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response updateAppEmailTemplate(String templateTypeId, String appUuid, String locale, EmailTemplate emailTemplate) {
+    public Response updateAppEmailTemplate(String templateTypeId, String appUuid, String locale,
+                                           EmailTemplate emailTemplate) {
 
         templatesService.updateEmailTemplate(templateTypeId, locale, emailTemplate, appUuid);
         return Response.ok().build();
     }
 
     @Override
-    public Response updateAppSMSTemplate(String templateTypeId, String appUuid, String locale, SMSTemplate smsTemplate) {
+    public Response updateAppSMSTemplate(String templateTypeId, String appUuid, String locale,
+                                         SMSTemplate smsTemplate) {
 
         templatesService.updateSMSTemplate(templateTypeId, locale, smsTemplate, appUuid);
         return Response.ok().build();

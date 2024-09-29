@@ -156,7 +156,7 @@ paths:
       tags:
         - Email Templates
       summary: Retrieves the list of organization email templates under the provided template type.
-      operationId: getOrgTemplatesListOfEmailTemplateType
+      operationId: getAllOrgTemplatesOfEmailTemplateType
       description: |
         Retrieves the list of organization email templates under the provided template type. <br>
 
@@ -256,7 +256,7 @@ paths:
       tags:
         - Application Email Templates
       summary: Removes all application email templates for the organization.
-      operationId: deleteAppEmailTemplates
+      operationId: deleteAllAppEmailTemplates
       description: |
         Removes all application email templates defined for all applications of the organization. <br>
 
@@ -282,7 +282,7 @@ paths:
       tags:
         - Application Email Templates
       summary: Retrieves the list of application email templates under the provided template type.
-      operationId: getAppTemplatesListOfEmailTemplateType
+      operationId: getAllAppTemplatesOfEmailTemplateType
       description: |
         Retrieves the list of application email templates under the provided template type. <br>
         
@@ -448,7 +448,7 @@ paths:
       tags:
         - System Templates
       summary: Retrieves the system email templates of template type.
-      operationId: getSystemTemplatesListOfEmailTemplateType
+      operationId: getAllSystemTemplatesOfEmailTemplateType
       description: |
         Retrieves the list of system default email templates under the provided template type. <br>
 
@@ -728,7 +728,7 @@ paths:
       tags:
         - Application SMS Templates
       summary: Removes all application SMS templates for the organization.
-      operationId: deleteAppSMSTemplates
+      operationId: deleteAllAppSMSTemplates
       description: |
         Removes all application SMS templates defined for all applications of the organization. <br>
 
@@ -756,7 +756,7 @@ paths:
       tags:
         - Application SMS Templates
       summary: Retrieves the list of application SMS templates under the provided template type.
-      operationId: getAppTemplatesListOfSMSTemplateType
+      operationId: getAllAppTemplatesOfSMSTemplateType
       description: |
         Retrieves the list of application SMS templates under the provided template type. <br>
 
@@ -925,7 +925,7 @@ paths:
       tags:
         - SMS Templates
       summary: Retrieves the list of organization SMS templates under the provided template type.
-      operationId: getOrgTemplatesListOfSMSTemplateType
+      operationId: getAllOrgTemplatesOfSMSTemplateType
       description: |
         Retrieves the list of organization SMS templates under the provided templalte type. <br>
 
@@ -1114,7 +1114,7 @@ paths:
       tags:
         - System Templates
       summary: Retrieves the list of system SMS templates with the template type id.
-      operationId: getSystemTemplatesListOfSMSTemplateType
+      operationId: getAllSystemTemplatesOfSMSTemplateType
       description: |
         Retrieves the list of system default SMS templates under the provided template type. <br>
 

@@ -199,6 +199,54 @@ public class NotificationApi  {
 
     @Valid
     @DELETE
+    @Path("/email/template-types/{template-type-id}/app-templates")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Removes all application email templates for the organization.", notes = "Removes all application email templates defined for all applications of the organization. <br>    <b>Scope required:</b><br>   * internal_template_mgt_delete ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Email Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response deleteAllAppEmailTemplates(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
+
+        return delegate.deleteAllAppEmailTemplates(templateTypeId );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/sms/template-types/{template-type-id}/app-templates")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Removes all application SMS templates for the organization.", notes = "Removes all application SMS templates defined for all applications of the organization. <br>    <b>Scope required:</b><br>   * internal_template_mgt_delete ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application SMS Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response deleteAllAppSMSTemplates(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale) {
+
+        return delegate.deleteAllAppSMSTemplates(templateTypeId,  appUuid,  locale );
+    }
+
+    @Valid
+    @DELETE
     @Path("/email/template-types/{template-type-id}/org-templates")
     
     @Produces({ "application/json" })
@@ -271,30 +319,6 @@ public class NotificationApi  {
 
     @Valid
     @DELETE
-    @Path("/email/template-types/{template-type-id}/app-templates")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Removes all application email templates for the organization.", notes = "Removes all application email templates defined for all applications of the organization. <br>    <b>Scope required:</b><br>   * internal_template_mgt_delete ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Application Email Templates", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response deleteAppEmailTemplates(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
-
-        return delegate.deleteAppEmailTemplates(templateTypeId );
-    }
-
-    @Valid
-    @DELETE
     @Path("/sms/template-types/{template-type-id}/app-templates/{app-uuid}/{locale}")
     
     @Produces({ "application/json" })
@@ -315,30 +339,6 @@ public class NotificationApi  {
     public Response deleteAppSMSTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale) {
 
         return delegate.deleteAppSMSTemplate(templateTypeId,  appUuid,  locale );
-    }
-
-    @Valid
-    @DELETE
-    @Path("/sms/template-types/{template-type-id}/app-templates")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Removes all application SMS templates for the organization.", notes = "Removes all application SMS templates defined for all applications of the organization. <br>    <b>Scope required:</b><br>   * internal_template_mgt_delete ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Application SMS Templates", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response deleteAppSMSTemplates(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale) {
-
-        return delegate.deleteAppSMSTemplates(templateTypeId,  appUuid,  locale );
     }
 
     @Valid
@@ -439,6 +439,54 @@ public class NotificationApi  {
 
     @Valid
     @GET
+    @Path("/email/template-types/{template-type-id}/app-templates/{app-uuid}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieves the list of application email templates under the provided template type.", notes = "Retrieves the list of application email templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_email_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application Email Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleTemplate.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response getAllAppTemplatesOfEmailTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid) {
+
+        return delegate.getAllAppTemplatesOfEmailTemplateType(templateTypeId,  appUuid );
+    }
+
+    @Valid
+    @GET
+    @Path("/sms/template-types/{template-type-id}/app-templates/{app-uuid}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieves the list of application SMS templates under the provided template type.", notes = "Retrieves the list of application SMS templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_template_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Application SMS Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleTemplate.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response getAllAppTemplatesOfSMSTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid) {
+
+        return delegate.getAllAppTemplatesOfSMSTemplateType(templateTypeId,  appUuid );
+    }
+
+    @Valid
+    @GET
     @Path("/email/template-types")
     
     @Produces({ "application/json" })
@@ -462,6 +510,54 @@ public class NotificationApi  {
 
     @Valid
     @GET
+    @Path("/email/template-types/{template-type-id}/org-templates")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieves the list of organization email templates under the provided template type.", notes = "Retrieves the list of organization email templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_email_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Email Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleTemplate.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response getAllOrgTemplatesOfEmailTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
+
+        return delegate.getAllOrgTemplatesOfEmailTemplateType(templateTypeId );
+    }
+
+    @Valid
+    @GET
+    @Path("/sms/template-types/{template-type-id}/org-templates")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieves the list of organization SMS templates under the provided template type.", notes = "Retrieves the list of organization SMS templates under the provided templalte type. <br>    <b>Scope required:</b><br>   * internal_template_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "SMS Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleTemplate.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response getAllOrgTemplatesOfSMSTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
+
+        return delegate.getAllOrgTemplatesOfSMSTemplateType(templateTypeId );
+    }
+
+    @Valid
+    @GET
     @Path("/sms/template-types")
     
     @Produces({ "application/json" })
@@ -481,6 +577,54 @@ public class NotificationApi  {
     public Response getAllSMSTemplateTypes() {
 
         return delegate.getAllSMSTemplateTypes();
+    }
+
+    @Valid
+    @GET
+    @Path("/email/template-types/{template-type-id}/system-templates")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieves the system email templates of template type.", notes = "Retrieves the list of system default email templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_email_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "System Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleTemplate.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response getAllSystemTemplatesOfEmailTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
+
+        return delegate.getAllSystemTemplatesOfEmailTemplateType(templateTypeId );
+    }
+
+    @Valid
+    @GET
+    @Path("/sms/template-types/{template-type-id}/system-templates")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Retrieves the list of system SMS templates with the template type id.", notes = "Retrieves the list of system default SMS templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_template_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "System Templates", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleTemplate.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response getAllSystemTemplatesOfSMSTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
+
+        return delegate.getAllSystemTemplatesOfSMSTemplateType(templateTypeId );
     }
 
     @Valid
@@ -529,54 +673,6 @@ public class NotificationApi  {
     public Response getAppSMSTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale) {
 
         return delegate.getAppSMSTemplate(templateTypeId,  appUuid,  locale );
-    }
-
-    @Valid
-    @GET
-    @Path("/email/template-types/{template-type-id}/app-templates/{app-uuid}")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the list of application email templates under the provided template type.", notes = "Retrieves the list of application email templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_email_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Application Email Templates", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleTemplate.class, responseContainer = "List"),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response getAppTemplatesListOfEmailTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid) {
-
-        return delegate.getAppTemplatesListOfEmailTemplateType(templateTypeId,  appUuid );
-    }
-
-    @Valid
-    @GET
-    @Path("/sms/template-types/{template-type-id}/app-templates/{app-uuid}")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the list of application SMS templates under the provided template type.", notes = "Retrieves the list of application SMS templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_template_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Application SMS Templates", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleTemplate.class, responseContainer = "List"),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response getAppTemplatesListOfSMSTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid) {
-
-        return delegate.getAppTemplatesListOfSMSTemplateType(templateTypeId,  appUuid );
     }
 
     @Valid
@@ -653,54 +749,6 @@ public class NotificationApi  {
 
     @Valid
     @GET
-    @Path("/email/template-types/{template-type-id}/org-templates")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the list of organization email templates under the provided template type.", notes = "Retrieves the list of organization email templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_email_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Email Templates", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleTemplate.class, responseContainer = "List"),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response getOrgTemplatesListOfEmailTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
-
-        return delegate.getOrgTemplatesListOfEmailTemplateType(templateTypeId );
-    }
-
-    @Valid
-    @GET
-    @Path("/sms/template-types/{template-type-id}/org-templates")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the list of organization SMS templates under the provided template type.", notes = "Retrieves the list of organization SMS templates under the provided templalte type. <br>    <b>Scope required:</b><br>   * internal_template_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "SMS Templates", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleTemplate.class, responseContainer = "List"),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response getOrgTemplatesListOfSMSTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
-
-        return delegate.getOrgTemplatesListOfSMSTemplateType(templateTypeId );
-    }
-
-    @Valid
-    @GET
     @Path("/sms/template-types/{template-type-id}")
     
     @Produces({ "application/json" })
@@ -769,54 +817,6 @@ public class NotificationApi  {
     public Response getSystemSMSTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale) {
 
         return delegate.getSystemSMSTemplate(templateTypeId,  locale );
-    }
-
-    @Valid
-    @GET
-    @Path("/email/template-types/{template-type-id}/system-templates")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the system email templates of template type.", notes = "Retrieves the list of system default email templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_email_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "System Templates", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleTemplate.class, responseContainer = "List"),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response getSystemTemplatesListOfEmailTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
-
-        return delegate.getSystemTemplatesListOfEmailTemplateType(templateTypeId );
-    }
-
-    @Valid
-    @GET
-    @Path("/sms/template-types/{template-type-id}/system-templates")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the list of system SMS templates with the template type id.", notes = "Retrieves the list of system default SMS templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_template_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "System Templates", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Search results matching the given criteria.", response = SimpleTemplate.class, responseContainer = "List"),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response getSystemTemplatesListOfSMSTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
-
-        return delegate.getSystemTemplatesListOfSMSTemplateType(templateTypeId );
     }
 
     @Valid

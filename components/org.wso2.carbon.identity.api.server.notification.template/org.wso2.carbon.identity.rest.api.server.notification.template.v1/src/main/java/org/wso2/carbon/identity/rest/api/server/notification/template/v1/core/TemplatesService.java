@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
 import org.wso2.carbon.identity.api.server.notification.template.common.TemplatesServiceHolder;
 import org.wso2.carbon.identity.governance.exceptions.notiification.NotificationTemplateManagerException;
@@ -32,8 +33,6 @@ import org.wso2.carbon.identity.rest.api.server.notification.template.v1.util.Ut
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
-import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.APP_TEMPLATES_PATH;
-import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.PATH_SEPARATOR;
 
 /**
  * Service class for application email templates.
@@ -49,10 +48,7 @@ public class TemplatesService {
      */
     public SimpleTemplate addEmailTemplate(String templateTypeId, EmailTemplateWithID emailTemplateWithID) {
 
-        SimpleTemplate simpleTemplate = addEmailTemplate(templateTypeId, emailTemplateWithID, null);
-        simpleTemplate.setSelf(getOrgTemplateLocation(templateTypeId, emailTemplateWithID.getLocale(),
-                Constants.NOTIFICATION_CHANNEL_EMAIL));
-        return simpleTemplate;
+        return addEmailTemplate(templateTypeId, emailTemplateWithID, null);
     }
 
     /**
@@ -72,10 +68,15 @@ public class TemplatesService {
             TemplatesServiceHolder.getNotificationTemplateManager().addNotificationTemplate(notificationTemplate,
                     getTenantDomainFromContext(), applicationUuid);
 
-            // Create and send the location of the created object as the response.
+            String templateOwner = StringUtils.isNotBlank(applicationUuid) ? Constants.NOTIFICATION_TEMPLATE_OWNER_APP :
+                    Constants.NOTIFICATION_TEMPLATE_OWNER_ORG;
+            String templateTypeLocation = Util.getTemplateTypeLocation(templateTypeId,
+                    Constants.NOTIFICATION_CHANNEL_EMAIL);
+            String templateLocation = Util.getTemplateLocation(templateTypeLocation, applicationUuid,
+                    emailTemplateWithID.getLocale(), templateOwner);
+
             SimpleTemplate simpleEmailTemplate = new SimpleTemplate();
-            simpleEmailTemplate.setSelf(getApplicationTemplateLocation(templateTypeId, applicationUuid,
-                    notificationTemplate.getLocale(), Constants.NOTIFICATION_CHANNEL_EMAIL));
+            simpleEmailTemplate.setSelf(templateLocation);
             simpleEmailTemplate.setLocale(notificationTemplate.getLocale());
             return simpleEmailTemplate;
         } catch (NotificationTemplateManagerException e) {
@@ -93,10 +94,7 @@ public class TemplatesService {
      */
     public SimpleTemplate addSMSTemplate(String templateTypeId, SMSTemplateWithID smsTemplateWithID) {
 
-        SimpleTemplate simpleTemplate = addSMSTemplate(templateTypeId, smsTemplateWithID, null);
-        simpleTemplate.setSelf(getOrgTemplateLocation(templateTypeId, smsTemplateWithID.getLocale(),
-                Constants.NOTIFICATION_CHANNEL_SMS));
-        return simpleTemplate;
+        return addSMSTemplate(templateTypeId, smsTemplateWithID, null);
     }
 
     /**
@@ -116,12 +114,17 @@ public class TemplatesService {
             TemplatesServiceHolder.getNotificationTemplateManager().addNotificationTemplate(notificationTemplate,
                     getTenantDomainFromContext(), applicationUuid);
 
-            // Create and send the location of the created object as the response.
-            SimpleTemplate simpleEmailTemplate = new SimpleTemplate();
-            simpleEmailTemplate.setSelf(getApplicationTemplateLocation(templateTypeId, applicationUuid,
-                    notificationTemplate.getLocale(), Constants.NOTIFICATION_CHANNEL_SMS));
-            simpleEmailTemplate.setLocale(notificationTemplate.getLocale());
-            return simpleEmailTemplate;
+            String templateOwner = StringUtils.isNotBlank(applicationUuid) ? Constants.NOTIFICATION_TEMPLATE_OWNER_APP :
+                    Constants.NOTIFICATION_TEMPLATE_OWNER_ORG;
+            String templateTypeLocation = Util.getTemplateTypeLocation(templateTypeId,
+                    Constants.NOTIFICATION_CHANNEL_SMS);
+            String templateLocation = Util.getTemplateLocation(templateTypeLocation, applicationUuid,
+                    smsTemplateWithID.getLocale(), templateOwner);
+
+            SimpleTemplate simpleSMSTemplate = new SimpleTemplate();
+            simpleSMSTemplate.setSelf(templateLocation);
+            simpleSMSTemplate.setLocale(notificationTemplate.getLocale());
+            return simpleSMSTemplate;
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
                     Constants.ErrorMessage.ERROR_ERROR_ADDING_TEMPLATE);
@@ -134,9 +137,9 @@ public class TemplatesService {
      * @param templateTypeId Template type ID.
      * @return List of email templates.
      */
-    public List<EmailTemplateWithID> getTemplatesListOfEmailTemplateType(String templateTypeId) {
+    public List<SimpleTemplate> getAllTemplatesOfTemplateType(String templateTypeId, String notificationChannel) {
 
-        return getTemplatesListOfEmailTemplateType(templateTypeId, null);
+        return getAllTemplatesOfTemplateType(templateTypeId, null, notificationChannel);
     }
 
     /**
@@ -146,51 +149,41 @@ public class TemplatesService {
      * @param applicationUuid Application UUID.
      * @return List of email templates.
      */
-    public List<EmailTemplateWithID> getTemplatesListOfEmailTemplateType(String templateTypeId,
-                                                                         String applicationUuid) {
+    public List<SimpleTemplate> getAllTemplatesOfTemplateType(String templateTypeId, String applicationUuid,
+                                                              String notificationChannel) {
 
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
         try {
-            List<NotificationTemplate> emailTemplates = TemplatesServiceHolder.getNotificationTemplateManager()
-                    .getNotificationTemplatesOfType(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeDisplayName,
+            List<NotificationTemplate> templates = TemplatesServiceHolder.getNotificationTemplateManager()
+                    .getNotificationTemplatesOfType(notificationChannel, templateTypeDisplayName,
                             getTenantDomainFromContext(), applicationUuid);
-            return Util.buildEmailTemplateWithIDList(emailTemplates);
+            String templateOwner = StringUtils.isNotBlank(applicationUuid) ? Constants.NOTIFICATION_TEMPLATE_OWNER_APP :
+                    Constants.NOTIFICATION_TEMPLATE_OWNER_ORG;
+            return Util.buildSimpleTemplateList(templates, applicationUuid, templateOwner, notificationChannel);
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
-                    Constants.ErrorMessage.ERROR_ERROR_RETRIEVING_TEMPLATE_TYPE);
+                    Constants.ErrorMessage.ERROR_ERROR_RETRIEVING_TEMPLATES);
         }
     }
 
     /**
-     * Retrieves the list of organization SMS templates of the given template type.
+     * Retrieves the list of application email templates of the given template type.
      *
      * @param templateTypeId  Template type ID.
-     * @return List of SMS templates.
+     * @param notificationChannel Notification channel.
+     * @return List of email templates.
      */
-    public List<SMSTemplateWithID> getTemplatesListOfSMSTemplateType(String templateTypeId) {
-
-        return getTemplatesListOfSMSTemplateType(templateTypeId, null);
-    }
-
-    /**
-     * Retrieves the list of application SMS templates of the given template type.
-     *
-     * @param templateTypeId  Template type ID.
-     * @param applicationUuid Application UUID.
-     * @return List of SMS templates.
-     */
-    public List<SMSTemplateWithID> getTemplatesListOfSMSTemplateType(String templateTypeId,
-                                                                         String applicationUuid) {
+    public List<SimpleTemplate> getAllSystemTemplatesOfTemplateType(String templateTypeId, String notificationChannel) {
 
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
         try {
-            List<NotificationTemplate> smsTemplates = TemplatesServiceHolder.getNotificationTemplateManager()
-                    .getNotificationTemplatesOfType(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeDisplayName,
-                            getTenantDomainFromContext(), applicationUuid);
-            return Util.buildSMSTemplateWithIDList(smsTemplates);
+            List<NotificationTemplate> templates = TemplatesServiceHolder.getNotificationTemplateManager()
+                    .getAllSystemNotificationTemplatesOfType(notificationChannel, templateTypeDisplayName);
+            return Util.buildSimpleTemplateList(templates, null,
+                    Constants.NOTIFICATION_TEMPLATE_OWNER_SYSTEM, notificationChannel);
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
-                    Constants.ErrorMessage.ERROR_ERROR_RETRIEVING_TEMPLATE_TYPE);
+                    Constants.ErrorMessage.ERROR_ERROR_RETRIEVING_TEMPLATES);
         }
     }
 
@@ -476,19 +469,5 @@ public class TemplatesService {
             throw Util.handleNotificationTemplateManagerException(e,
                     Constants.ErrorMessage.ERROR_ERROR_DELETING_SMS_TEMPLATE);
         }
-    }
-
-    private String getApplicationTemplateLocation(String templateTypeId, String applicationUuid, String locale,
-                                                  String notificationType) {
-
-        String templateLocation = Util.getTemplateTypeLocation(templateTypeId, notificationType);
-        return templateLocation + APP_TEMPLATES_PATH + PATH_SEPARATOR + applicationUuid
-                + PATH_SEPARATOR + locale;
-    }
-
-    private String getOrgTemplateLocation(String templateTypeId, String templateId, String type) {
-
-        String templateLocation = Util.getTemplateTypeLocation(templateTypeId, type);
-        return templateLocation + Constants.ORG_TEMPLATES_PATH + Constants.PATH_SEPARATOR + templateId;
     }
 }
