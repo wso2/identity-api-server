@@ -363,10 +363,10 @@ components:
         id:
           type: string
           example: 123e4567-e89b-12d3-a456-556642440000
-        Type:
+        type:
           type: string
           example: ONFIDO
-        Name:
+        name:
           type: string
           example: ONFIDO
         description:
@@ -386,10 +386,10 @@ components:
     IdVProviderRequest:
       type: object
       properties:
-        Type:
+        type:
           type: string
           example: ONFIDO
-        Name:
+        name:
           type: string
           example: ONFIDO
         description:
@@ -407,8 +407,8 @@ components:
           items:
             $ref: '#/components/schemas/ConfigProperty'
       required:
-        - Type
-        - Name
+        - type
+        - name
         - isEnabled
     ConfigProperty:
       type: object
