@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -53,11 +53,9 @@ public class IdVProviderRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "ONFIDO", required = true, value = "")
-    @JsonProperty("Type")
+    @ApiModelProperty(example = "ONFIDO", value = "")
+    @JsonProperty("type")
     @Valid
-    @NotNull(message = "Property type cannot be null.")
-
     public String getType() {
         return type;
     }
@@ -73,11 +71,9 @@ public class IdVProviderRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "ONFIDO", required = true, value = "")
-    @JsonProperty("Name")
+    @ApiModelProperty(example = "ONFIDO", value = "")
+    @JsonProperty("name")
     @Valid
-    @NotNull(message = "Property name cannot be null.")
-
     public String getName() {
         return name;
     }
