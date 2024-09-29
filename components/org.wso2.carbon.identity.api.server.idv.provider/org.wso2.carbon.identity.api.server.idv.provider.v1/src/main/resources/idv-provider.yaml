@@ -407,8 +407,8 @@ components:
           items:
             $ref: '#/components/schemas/ConfigProperty'
       required:
-        - Type
-        - Name
+        - type
+        - name
         - isEnabled
     ConfigProperty:
       type: object
