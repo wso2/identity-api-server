@@ -53,9 +53,11 @@ public class IdVProviderRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "ONFIDO", value = "")
+    @ApiModelProperty(example = "ONFIDO", required = true, value = "")
     @JsonProperty("type")
     @Valid
+    @NotNull(message = "Property type cannot be null.")
+
     public String getType() {
         return type;
     }
@@ -71,9 +73,11 @@ public class IdVProviderRequest  {
         return this;
     }
     
-    @ApiModelProperty(example = "ONFIDO", value = "")
+    @ApiModelProperty(example = "ONFIDO", required = true, value = "")
     @JsonProperty("name")
     @Valid
+    @NotNull(message = "Property name cannot be null.")
+
     public String getName() {
         return name;
     }
