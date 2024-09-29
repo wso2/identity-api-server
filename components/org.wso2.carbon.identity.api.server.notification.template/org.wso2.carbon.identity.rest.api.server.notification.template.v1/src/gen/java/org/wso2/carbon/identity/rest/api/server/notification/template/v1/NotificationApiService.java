@@ -49,14 +49,6 @@ public interface NotificationApiService {
 
       public Response addSMSTemplateType(TemplateTypeOverview templateTypeOverview);
 
-      public Response deleteAllAppEmailTemplates(String templateTypeId);
-
-      public Response deleteAllAppSMSTemplates(String templateTypeId, String appUuid, String locale);
-
-      public Response deleteAllOrgEmailTemplates(String templateTypeId);
-
-      public Response deleteAllOrgSMSTemplates(String templateTypeId);
-
       public Response deleteAppEmailTemplate(String templateTypeId, String appUuid, String locale);
 
       public Response deleteAppSMSTemplate(String templateTypeId, String appUuid, String locale);

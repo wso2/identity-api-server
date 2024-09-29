@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.impl;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
+import org.wso2.carbon.identity.governance.exceptions.notiification.NotificationTemplateManagerException;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.NotificationApiService;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplateTypeService;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplatesService;
@@ -31,10 +31,12 @@ import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.S
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SimpleTemplate;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.TemplateTypeOverview;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.TemplateTypeWithID;
+import org.wso2.carbon.identity.rest.api.server.notification.template.v1.util.Util;
 
 import java.net.URI;
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.APP_TEMPLATES_PATH;
@@ -132,32 +134,6 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
-    public Response deleteAllAppEmailTemplates(String templateTypeId) {
-
-        // do some magic!
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response deleteAllAppSMSTemplates(String templateTypeId, String appUuid, String locale) {
-
-        // do some magic!
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response deleteAllOrgEmailTemplates(String templateTypeId) {
-
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
-    public Response deleteAllOrgSMSTemplates(String templateTypeId) {
-
-        return Response.ok().entity("magic!").build();
-    }
-
-    @Override
     public Response deleteAppEmailTemplate(String templateTypeId, String appUuid, String locale) {
 
         templatesService.deleteEmailTemplate(templateTypeId, locale, appUuid);
@@ -174,7 +150,17 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response deleteEmailTemplateType(String templateTypeId) {
 
-        templateTypeService.deleteNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeId);
+        try {
+            templateTypeService.deleteNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeId);
+        } catch (NotificationTemplateManagerException e) {
+            String partiallyDeletedErrorCode = Constants.NOTIFICATION_TEMPLATES_ERROR_CODE_PREFIX
+                    + ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED;
+            if (partiallyDeletedErrorCode.equals(e.getErrorCode())) {
+                return Response.ok().build();
+            }
+            throw Util.handleNotificationTemplateManagerException(e,
+                    Constants.ErrorMessage.ERROR_ERROR_DELETING_TEMPLATE_TYPE);
+        }
         return Response.noContent().build();
     }
 
@@ -195,7 +181,17 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response deleteSMSTemplateType(String templateTypeId) {
 
-        templateTypeService.deleteNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeId);
+        try {
+            templateTypeService.deleteNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeId);
+        } catch (NotificationTemplateManagerException e) {
+            String partiallyDeletedErrorCode = Constants.NOTIFICATION_TEMPLATES_ERROR_CODE_PREFIX
+                    + ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED;
+            if (partiallyDeletedErrorCode.equals(e.getErrorCode())) {
+                return Response.ok().build();
+            }
+            throw Util.handleNotificationTemplateManagerException(e,
+                    Constants.ErrorMessage.ERROR_ERROR_DELETING_TEMPLATE_TYPE);
+        }
         return Response.noContent().build();
     }
 

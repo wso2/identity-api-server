@@ -18,14 +18,11 @@
 
 package org.wso2.carbon.identity.api.server.notification.template.common;
 
-import org.wso2.carbon.email.mgt.constants.TemplateMgtConstants;
-
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.ERROR_ADDING_TEMPLATE;
-import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.ERROR_UPDATING_TEMPLATE;
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.TEMPLATE_ALREADY_EXISTS;
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.TEMPLATE_NOT_FOUND;
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.TEMPLATE_TYPE_ALREADY_EXISTS;
@@ -101,9 +98,6 @@ public class Constants {
         ERROR_ERROR_DELETING_SMS_TEMPLATE("60010", Status.INTERNAL_SERVER_ERROR,
                 "Unable to delete the SMS template.",
                 "Server encountered an error while deleting the SMS template."),
-        ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED("60011", Status.FORBIDDEN,
-                "System resource deletion not allowed.",
-                "System resources are not eligible for deletion."),
         ERROR_ERROR_RETRIEVING_TEMPLATES("60012", Status.INTERNAL_SERVER_ERROR,
                 "Unable to retrieve templates.",
                 "Server encountered an error while retrieving templates.");
@@ -154,9 +148,6 @@ public class Constants {
         NTM_ERROR_CODE_MAP.put(TEMPLATE_ALREADY_EXISTS, ErrorMessage.ERROR_TEMPLATE_ALREADY_EXISTS);
         NTM_ERROR_CODE_MAP.put(TEMPLATE_NOT_FOUND, ErrorMessage.ERROR_TEMPLATE_NOT_FOUND);
         NTM_ERROR_CODE_MAP.put(ERROR_ADDING_TEMPLATE, ErrorMessage.ERROR_ERROR_ADDING_TEMPLATE);
-        NTM_ERROR_CODE_MAP.put(ERROR_UPDATING_TEMPLATE, ErrorMessage.ERROR_ERROR_UPDATING_TEMPLATE);
-        NTM_ERROR_CODE_MAP.put(TemplateMgtConstants.ErrorCodes.ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED,
-                ErrorMessage.ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED);
     }
 
     public static ErrorMessage getNTMMappedErrorMessage(String errorCode) {

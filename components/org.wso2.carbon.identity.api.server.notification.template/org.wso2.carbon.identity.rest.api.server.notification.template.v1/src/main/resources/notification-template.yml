@@ -131,14 +131,20 @@ paths:
       summary: Removes an email template type.
       operationId: deleteEmailTemplateType
       description: |
-        Removes an existing email template type with all its email templates
+        Removes an existing email template type with all its user defined email templates
         from the system. <br>
+        **System template types are not eligible for deletion.**
+        Attempt to delete a system template type will result
+        in a partial deletion of only the user defined templates.
+        Template type will not be deleted.<br>
 
         <b>Scope required:</b><br>
         * internal_email_mgt_delete
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       responses:
+        '200':
+          description: 'Partial Deletion.'
         '204':
           $ref: '#/components/responses/Deleted'
         '400':
@@ -224,57 +230,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
-    delete:
-      tags:
-        - Email Templates
-      summary: Removes all org email templates.
-      operationId: deleteAllOrgEmailTemplates
-      description: |
-        Removes all existing organization email templates from the system. <br>
-
-        <b>Scope required:</b><br>
-        * internal_email_mgt_delete
-      parameters:
-        - $ref: '#/components/parameters/templateTypeIdPathParam'
-      responses:
-        '204':
-          $ref: '#/components/responses/Deleted'
-        '400':
-          $ref: '#/components/responses/InvalidInput'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-  '/notification/email/template-types/{template-type-id}/app-templates':
-    delete:
-      tags:
-        - Application Email Templates
-      summary: Removes all application email templates for the organization.
-      operationId: deleteAllAppEmailTemplates
-      description: |
-        Removes all application email templates defined for all applications of the organization. <br>
-
-          <b>Scope required:</b><br>
-          * internal_template_mgt_delete
-      parameters:
-        - $ref: '#/components/parameters/templateTypeIdPathParam'
-      responses:
-        '204':
-          $ref: '#/components/responses/Deleted'
-        '400':
-          $ref: '#/components/responses/InvalidInput'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
   '/notification/email/template-types/{template-type-id}/app-templates/{app-uuid}':
@@ -703,42 +658,20 @@ paths:
       summary: Removes an SMS template type.
       operationId: deleteSMSTemplateType
       description: |
-        Removes an existing SMS template type with all its SMS templates
+        Removes an existing SMS template type with all its user defined SMS templates
         from the system. <br>
+        **System template types are not eligible for deletion.**
+        Attempt to delete a system template type will result
+        in a partial deletion of only the user defined templates.
+        Template type will not be deleted.<br>
 
         <b>Scope required:</b><br>
         * internal_template_mgt_delete
       parameters:
         - $ref: '#/components/parameters/templateTypeIdPathParam'
       responses:
-        '204':
-          $ref: '#/components/responses/Deleted'
-        '400':
-          $ref: '#/components/responses/InvalidInput'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
-  '/notification/sms/template-types/{template-type-id}/app-templates':
-    delete:
-      tags:
-        - Application SMS Templates
-      summary: Removes all application SMS templates for the organization.
-      operationId: deleteAllAppSMSTemplates
-      description: |
-        Removes all application SMS templates defined for all applications of the organization. <br>
-
-          <b>Scope required:</b><br>
-          * internal_template_mgt_delete
-      parameters:
-        - $ref: '#/components/parameters/templateTypeIdPathParam'
-        - $ref: '#/components/parameters/appUuidPathParam'
-        - $ref: '#/components/parameters/localePathParam'
-      responses:
+        '200':
+          description: 'Partial Deletion.'
         '204':
           $ref: '#/components/responses/Deleted'
         '400':
@@ -993,31 +926,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/ServerError'
-    delete:
-      tags:
-        - SMS Templates
-      summary: Removes all org SMS templates.
-      operationId: deleteAllOrgSMSTemplates
-      description: |
-        Removes all existing organization SMS templates from the system. <br>
-
-        <b>Scope required:</b><br>
-        * internal_template_mgt_delete
-      parameters:
-        - $ref: '#/components/parameters/templateTypeIdPathParam'
-      responses:
-        '204':
-          $ref: '#/components/responses/Deleted'
-        '400':
-          $ref: '#/components/responses/InvalidInput'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
   '/notification/sms/template-types/{template-type-id}/org-templates/{locale}':
@@ -1349,7 +1257,6 @@ components:
           type: string
           example: /t/{tenant-domain}/api/server/v1/notification/sms/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg/templates/en_US
           description: Location of the created/updated resource.
-
     Error:
       type: object
       required:

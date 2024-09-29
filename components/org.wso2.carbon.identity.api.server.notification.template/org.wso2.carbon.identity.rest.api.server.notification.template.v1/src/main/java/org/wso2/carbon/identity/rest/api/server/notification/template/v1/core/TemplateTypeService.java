@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
 import org.wso2.carbon.identity.api.server.notification.template.common.TemplatesServiceHolder;
 import org.wso2.carbon.identity.governance.exceptions.notiification.NotificationTemplateManagerException;
@@ -28,6 +29,8 @@ import org.wso2.carbon.identity.rest.api.server.notification.template.v1.util.Ut
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes
+        .ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 
 /**
@@ -98,7 +101,8 @@ public class TemplateTypeService {
      * @param notificationChannel Notification channel (Eg: sms, email).
      * @param templateId ID of the template type.
      */
-    public void deleteNotificationTemplateType(String notificationChannel, String templateId) {
+    public void deleteNotificationTemplateType(String notificationChannel, String templateId)
+            throws NotificationTemplateManagerException {
 
         String templateTypeDisplayName;
         templateTypeDisplayName = Util.decodeTemplateTypeId(templateId);
@@ -113,6 +117,13 @@ public class TemplateTypeService {
                 throw Util.handleError(Constants.ErrorMessage.ERROR_TEMPLATE_TYPE_NOT_FOUND);
             }
         } catch (NotificationTemplateManagerException e) {
+            String errorCode = StringUtils.EMPTY;
+            if (StringUtils.isNotBlank(e.getErrorCode()) && e.getErrorCode().split("-").length > 1) {
+                errorCode = e.getErrorCode().split("-")[1];
+            }
+            if (ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED.equals(errorCode)) {
+                throw e;
+            }
             throw Util.handleNotificationTemplateManagerException(e,
                     Constants.ErrorMessage.ERROR_ERROR_DELETING_TEMPLATE_TYPE);
         }
