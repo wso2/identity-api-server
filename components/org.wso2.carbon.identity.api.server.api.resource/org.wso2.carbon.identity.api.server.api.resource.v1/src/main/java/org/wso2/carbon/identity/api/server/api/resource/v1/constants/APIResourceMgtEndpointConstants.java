@@ -104,7 +104,9 @@ public class APIResourceMgtEndpointConstants {
         ERROR_CODE_AUTHORIZATION_DETAILS_TYPE_NOT_FOUND("60015",
                 "Unable to find the authorization details type.",
                 "Authorization details types for resource id '%s' could not be found in the tenant domain."),
-
+        ERROR_CODE_INVALID_AUTHORIZATION_DETAILS_SCHEMA("60016",
+                "Authorization details schema contains errors.",
+                "The provided input schema does not comply with the 2020-12 JSON Schema specification: %s"),
         // Server errors.
         ERROR_CODE_ADD_API_RESOURCE("65001", "Error while adding api resource.", "Server encountered an error while " +
                 "adding the api resource."),

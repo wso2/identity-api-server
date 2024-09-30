@@ -54,6 +54,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtoco
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPICreationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAuthorizationDetailsTypes;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedScope;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticator;
 import org.wso2.carbon.identity.api.server.application.management.v1.ConfiguredAuthenticatorsModal;
@@ -95,6 +96,7 @@ import org.wso2.carbon.identity.application.common.IdentityApplicationManagement
 import org.wso2.carbon.identity.application.common.model.APIResource;
 import org.wso2.carbon.identity.application.common.model.ApplicationBasicInfo;
 import org.wso2.carbon.identity.application.common.model.AuthenticationStep;
+import org.wso2.carbon.identity.application.common.model.AuthorizationDetailsType;
 import org.wso2.carbon.identity.application.common.model.AuthorizedAPI;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
@@ -159,8 +161,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -1428,6 +1433,8 @@ public class ServerApplicationManagementService {
                 throw buildClientError(ErrorMessage.API_RESOURCE_NOT_FOUND, authorizedAPIId, tenantDomain);
             }
             validateAPIResourceScopes(apiResource, authorizedAPICreationModel.getScopes());
+            this.validateAPIResourceAuthorizationDetailsTypes(apiResource,
+                    authorizedAPICreationModel.getAuthorizationDetailsTypes());
 
             // Validate policy identifier.
             String policyIdentifier = validatePolicy(authorizedAPICreationModel.getPolicyIdentifier());
@@ -1446,6 +1453,7 @@ public class ServerApplicationManagementService {
                             .policyId(policyIdentifier)
                             .scopes(authorizedAPICreationModel.getScopes().stream().map(
                                     scope -> new Scope.ScopeBuilder().name(scope).build()).collect(Collectors.toList()))
+                            .authorizationDetailsTypes(toAuthorizationDetailsTypes(authorizedAPICreationModel))
                             .build(), tenantDomain);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error adding authorized API with id: " + authorizedAPICreationModel.getId() +
@@ -1489,9 +1497,20 @@ public class ServerApplicationManagementService {
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
             // Validate added scopes and removed scopes sent in the authorized API patch model.
-            List<String> addedScopes = authorizedAPIPatchModel.getAddedScopes();
-            List<String> removedScopes = authorizedAPIPatchModel.getRemovedScopes();
+            List<String> addedScopes = Optional.ofNullable(authorizedAPIPatchModel.getAddedScopes())
+                    .orElse(Collections.emptyList());
+            List<String> removedScopes = Optional.ofNullable(authorizedAPIPatchModel.getRemovedScopes())
+                    .orElse(Collections.emptyList());
             addedScopes.removeAll(removedScopes);
+
+            // Validate added and removed authorization details types
+            List<String> addedAuthorizationDetailsTypes =
+                    Optional.ofNullable(authorizedAPIPatchModel.getAddedAuthorizationDetailsTypes())
+                            .orElse(Collections.emptyList());
+            List<String> removedAuthorizationDetailsTypes =
+                    Optional.ofNullable(authorizedAPIPatchModel.getRemovedAuthorizationDetailsTypes())
+                            .orElse(Collections.emptyList());
+            addedAuthorizationDetailsTypes.removeAll(removedAuthorizationDetailsTypes);
 
             // Validate authorized API patch model.
             APIResource apiResource = ApplicationManagementServiceHolder.getApiResourceManager()
@@ -1500,6 +1519,7 @@ public class ServerApplicationManagementService {
                 throw buildClientError(ErrorMessage.API_RESOURCE_NOT_FOUND, apiId, tenantDomain);
             }
             validateAPIResourceScopes(apiResource, addedScopes);
+            validateAPIResourceAuthorizationDetailsTypes(apiResource, addedAuthorizationDetailsTypes);
 
             // Remove already authorized scopes from the added scopes list.
             AuthorizedAPI currentAuthorizedAPI = getAuthorizedAPIManagementService().getAuthorizedAPI(applicationId,
@@ -1511,9 +1531,15 @@ public class ServerApplicationManagementService {
                 addedScopes.removeIf(scopeName -> currentAuthorizedAPI.getScopes().stream().anyMatch(scope ->
                         scope.getName().equals(scopeName)));
             }
+            if (CollectionUtils.isNotEmpty(currentAuthorizedAPI.getAuthorizationDetailsTypes())) {
+
+                Set<String> currentTypes = currentAuthorizedAPI.getAuthorizationDetailsTypes().stream()
+                        .map(AuthorizationDetailsType::getType).collect(Collectors.toSet());
+                addedAuthorizationDetailsTypes.removeIf(currentTypes::contains);
+            }
 
             getAuthorizedAPIManagementService().patchAuthorizedAPI(applicationId, apiId, addedScopes, removedScopes,
-                    tenantDomain);
+                    addedAuthorizationDetailsTypes, removedAuthorizationDetailsTypes, tenantDomain);
         } catch (APIResourceMgtException e) {
             String msg = "Error while fetching API resource with id: " + apiId;
             throw Utils.buildServerError(msg, e);
@@ -1546,6 +1572,9 @@ public class ServerApplicationManagementService {
                         .displayName(authorizedAPI.getAPIName())
                         .policyId(authorizedAPI.getPolicyId())
                         .type(authorizedAPI.getType())
+                        .authorizedAuthorizationDetailsTypes(
+                                toAuthorizedAuthorizationDetailsTypes(authorizedAPI.getAuthorizationDetailsTypes())
+                        )
                         .authorizedScopes(createAuthorizedScope(authorizedAPI.getScopes())));
             }
             return authorizedAPIResponses;
@@ -2061,5 +2090,52 @@ public class ServerApplicationManagementService {
                 !StringUtils.equals(newAppName, oldAppName)) {
             throw buildClientError(BLOCK_RENAME_APP_NAME_TO_RESERVED_APP_NAME, newAppName);
         }
+    }
+
+    private void validateAPIResourceAuthorizationDetailsTypes(APIResource apiResource, List<String> requestedTypes) {
+
+        if (apiResource == null || CollectionUtils.isEmpty(apiResource.getAuthorizationDetailsTypes())) {
+            return;
+        }
+        final Set<String> existingTypes = apiResource.getAuthorizationDetailsTypes().stream()
+                .map(AuthorizationDetailsType::getType)
+                .collect(Collectors.toSet());
+
+        for (String requestedType : requestedTypes) {
+            if (!existingTypes.contains(requestedType)) {
+                throw buildClientError(ErrorMessage.AUTHORIZATION_DETAILS_TYPES_NOT_FOUND, apiResource.getId(),
+                        CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            }
+        }
+    }
+
+    private List<AuthorizationDetailsType> toAuthorizationDetailsTypes(AuthorizedAPICreationModel creationModel) {
+
+        return creationModel.getAuthorizationDetailsTypes().stream()
+                .map(type -> new AuthorizationDetailsType.AuthorizationDetailsTypesBuilder().type(type).build())
+                .collect(Collectors.toList());
+    }
+
+    private AuthorizedAuthorizationDetailsTypes toAuthorizedAuthorizationDetailsType(
+            AuthorizationDetailsType authorizationDetailsType) {
+
+        if (authorizationDetailsType == null) {
+            return null;
+        }
+
+        return new AuthorizedAuthorizationDetailsTypes().id(authorizationDetailsType.getId())
+                .type(authorizationDetailsType.getType()).name(authorizationDetailsType.getName());
+    }
+
+    private List<AuthorizedAuthorizationDetailsTypes> toAuthorizedAuthorizationDetailsTypes(
+            List<AuthorizationDetailsType> authorizationDetailsTypes) {
+
+        if (CollectionUtils.isEmpty(authorizationDetailsTypes)) {
+            return Collections.emptyList();
+        }
+
+        return authorizationDetailsTypes.stream()
+                .map(this::toAuthorizedAuthorizationDetailsType)
+                .collect(Collectors.toList());
     }
 }

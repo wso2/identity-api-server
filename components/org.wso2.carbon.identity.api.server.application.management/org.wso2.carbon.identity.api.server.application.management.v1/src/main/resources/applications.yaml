@@ -4234,6 +4234,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AuthorizedScope'
+        authorizedAuthorizationDetailsTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthorizedAuthorizationDetailsTypes'
 
     AuthorizedScope:
       type: object
@@ -4247,6 +4251,27 @@ components:
         displayName:
           type: string
           example: Read Bookings
+
+    AuthorizedAuthorizationDetailsTypes:
+      type: object
+      required:
+        - type
+        - name
+      properties:
+        id:
+          type: string
+          example: a9403470-dd11-46b4-8db9-aaa31f1d4423
+          description: an unique id of the registered authorization details type
+        type:
+          type: string
+          example: payment_initiation
+          description: an unique type of the authorization details type
+        name:
+          type: string
+          minLength: 3
+          maxLength: 255
+          description: display name of the authorization details type
+          example: Payment Initiation
 
     AuthorizedAPICreationModel:
       type: object
@@ -4262,6 +4287,11 @@ components:
           items:
             type: string
             example: bookings:read
+        authorizationDetailsTypes:
+          type: array
+          items:
+            type: string
+            example: payment_initiation
 
     AuthorizedAPIPatchModel:
       type: object
@@ -4276,6 +4306,16 @@ components:
           items:
             type: string
             example: bookings:view
+        addedAuthorizationDetailsTypes:
+          type: array
+          items:
+            type: string
+            example: payment_initiation
+        removedAuthorizationDetailsTypes:
+          type: array
+          items:
+            type: string
+            example: account_information
 
     ApplicationSharePOSTRequest:
       type: object
