@@ -88,7 +88,7 @@ public interface ApplicationsApiService {
 
       public Response getAllApplicationTemplates(Integer limit, Integer offset, SearchContext searchContext);
 
-      public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String attributes);
+      public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy, String attributes, Boolean excludeSystemApps);
 
       public Response getApplication(String applicationId);
 
