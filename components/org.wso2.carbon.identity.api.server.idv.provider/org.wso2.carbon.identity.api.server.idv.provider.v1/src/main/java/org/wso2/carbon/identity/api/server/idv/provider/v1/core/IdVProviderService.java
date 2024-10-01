@@ -154,15 +154,27 @@ public class IdVProviderService {
      */
     public IdVProviderListResponse getIdVProviders(Integer limit, Integer offset) {
 
+        return getIdVProviders(limit, offset, null);
+    }
+
+    /**
+     * Get all identity verification providers with filtering.
+     *
+     * @param limit  Limit per page.
+     * @param offset Offset value.
+     * @return Identity verification providers.
+     */
+    public IdVProviderListResponse getIdVProviders(Integer limit, Integer offset, String filter) {
+
         int tenantId = getTenantId();
         try {
             IdVProviderManager idVProviderManager = IdentityVerificationServiceHolder.getIdVProviderManager();
-            int totalResults = idVProviderManager.getCountOfIdVProviders(tenantId);
+            int totalResults = idVProviderManager.getCountOfIdVProviders(tenantId, filter);
 
             IdVProviderListResponse idVProviderListResponse = new IdVProviderListResponse();
 
             if (totalResults > 0) {
-                List<IdVProvider> idVProviders = idVProviderManager.getIdVProviders(limit, offset, tenantId);
+                List<IdVProvider> idVProviders = idVProviderManager.getIdVProviders(limit, offset, filter, tenantId);
 
                 if (CollectionUtils.isNotEmpty(idVProviders)) {
                     List<IdVProviderResponse> idVProvidersList = new ArrayList<>();
