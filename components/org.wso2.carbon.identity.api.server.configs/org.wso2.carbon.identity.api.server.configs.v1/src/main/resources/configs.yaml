@@ -1187,6 +1187,17 @@ components:
           type: boolean
           default: true
           example: true
+        definedBy:
+          type: string
+          enum:
+            - SYSTEM
+            - USER
+        authenticationType:
+          type: string
+          enum:
+            - IDENTIFICATION
+            - VERIFICATION_ONLY
+            - REQUEST_PATH
         type:
           type: string
           enum:
@@ -1222,6 +1233,12 @@ components:
           enum:
             - SYSTEM
             - USER
+        authenticationType:
+          type: string
+          enum:
+            - IDENTIFICATION
+            - VERIFICATION_ONLY
+            - REQUEST_PATH
         type:
           type: string
           enum:

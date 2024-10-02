@@ -2788,6 +2788,12 @@ components:
           enum:
             - SYSTEM
             - USER
+        authenticationType:
+          type: string
+          enum:
+            - IDENTIFICATION
+            - VERIFICATION_ONLY
+            - REQUEST_PATH
         tags:
           type: array
           items:
@@ -2814,6 +2820,12 @@ components:
           enum:
             - SYSTEM
             - USER
+        authenticationType:
+          type: string
+          enum:
+            - IDENTIFICATION
+            - VERIFICATION_ONLY
+            - REQUEST_PATH
         tags:
           type: array
           items:
@@ -2864,6 +2876,12 @@ components:
           enum:
             - SYSTEM
             - USER
+        authenticationType:
+          type: string
+          enum:
+            - IDENTIFICATION
+            - VERIFICATION_ONLY
+            - REQUEST_PATH
         isDefault:
           type: boolean
           default: false
@@ -2896,6 +2914,17 @@ components:
           type: boolean
           default: false
           example: false
+        definedBy:
+          type: string
+          enum:
+            - SYSTEM
+            - USER
+        authenticationType:
+          type: string
+          enum:
+            - IDENTIFICATION
+            - VERIFICATION_ONLY
+            - REQUEST_PATH
         properties:
           type: array
           items:
@@ -2928,6 +2957,12 @@ components:
           enum:
             - SYSTEM
             - USER
+        authenticationType:
+          type: string
+          enum:
+            - IDENTIFICATION
+            - VERIFICATION_ONLY
+            - REQUEST_PATH
         tags:
           type: array
           items:

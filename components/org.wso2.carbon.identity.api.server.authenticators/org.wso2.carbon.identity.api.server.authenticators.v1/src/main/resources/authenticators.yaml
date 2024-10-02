@@ -207,6 +207,12 @@ components:
           enum:
             - SYSTEM
             - USER
+        authenticationType:
+          type: string
+          enum:
+            - IDENTIFICATION
+            - VERIFICATION_ONLY
+            - REQUEST_PATH
         type:
           type: string
           enum:

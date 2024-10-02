@@ -68,6 +68,40 @@ public enum DefinedByEnum {
 }
 
     private DefinedByEnum definedBy;
+
+@XmlType(name="AuthenticationTypeEnum")
+@XmlEnum(String.class)
+public enum AuthenticationTypeEnum {
+
+    @XmlEnumValue("IDENTIFICATION") IDENTIFICATION(String.valueOf("IDENTIFICATION")), @XmlEnumValue("VERIFICATION_ONLY") VERIFICATION_ONLY(String.valueOf("VERIFICATION_ONLY")), @XmlEnumValue("REQUEST_PATH") REQUEST_PATH(String.valueOf("REQUEST_PATH"));
+
+
+    private String value;
+
+    AuthenticationTypeEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static AuthenticationTypeEnum fromValue(String value) {
+        for (AuthenticationTypeEnum b : AuthenticationTypeEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private AuthenticationTypeEnum authenticationType;
     private List<String> tags = null;
 
     private String self;
@@ -124,6 +158,24 @@ public enum DefinedByEnum {
     }
     public void setDefinedBy(DefinedByEnum definedBy) {
         this.definedBy = definedBy;
+    }
+
+    /**
+    **/
+    public MetaFederatedAuthenticatorListItem authenticationType(AuthenticationTypeEnum authenticationType) {
+
+        this.authenticationType = authenticationType;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("authenticationType")
+    @Valid
+    public AuthenticationTypeEnum getAuthenticationType() {
+        return authenticationType;
+    }
+    public void setAuthenticationType(AuthenticationTypeEnum authenticationType) {
+        this.authenticationType = authenticationType;
     }
 
     /**
@@ -185,13 +237,14 @@ public enum DefinedByEnum {
         return Objects.equals(this.authenticatorId, metaFederatedAuthenticatorListItem.authenticatorId) &&
             Objects.equals(this.name, metaFederatedAuthenticatorListItem.name) &&
             Objects.equals(this.definedBy, metaFederatedAuthenticatorListItem.definedBy) &&
+            Objects.equals(this.authenticationType, metaFederatedAuthenticatorListItem.authenticationType) &&
             Objects.equals(this.tags, metaFederatedAuthenticatorListItem.tags) &&
             Objects.equals(this.self, metaFederatedAuthenticatorListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, definedBy, tags, self);
+        return Objects.hash(authenticatorId, name, definedBy, authenticationType, tags, self);
     }
 
     @Override
@@ -203,6 +256,7 @@ public enum DefinedByEnum {
         sb.append("    authenticatorId: ").append(toIndentedString(authenticatorId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
+        sb.append("    authenticationType: ").append(toIndentedString(authenticationType)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");

@@ -37,6 +37,74 @@ public class AuthenticatorListItem  {
     private String displayName;
     private Boolean isEnabled = true;
 
+@XmlType(name="DefinedByEnum")
+@XmlEnum(String.class)
+public enum DefinedByEnum {
+
+    @XmlEnumValue("SYSTEM") SYSTEM(String.valueOf("SYSTEM")), @XmlEnumValue("USER") USER(String.valueOf("USER"));
+
+
+    private String value;
+
+    DefinedByEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static DefinedByEnum fromValue(String value) {
+        for (DefinedByEnum b : DefinedByEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private DefinedByEnum definedBy;
+
+@XmlType(name="AuthenticationTypeEnum")
+@XmlEnum(String.class)
+public enum AuthenticationTypeEnum {
+
+    @XmlEnumValue("IDENTIFICATION") IDENTIFICATION(String.valueOf("IDENTIFICATION")), @XmlEnumValue("VERIFICATION_ONLY") VERIFICATION_ONLY(String.valueOf("VERIFICATION_ONLY")), @XmlEnumValue("REQUEST_PATH") REQUEST_PATH(String.valueOf("REQUEST_PATH"));
+
+
+    private String value;
+
+    AuthenticationTypeEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static AuthenticationTypeEnum fromValue(String value) {
+        for (AuthenticationTypeEnum b : AuthenticationTypeEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private AuthenticationTypeEnum authenticationType;
+
 @XmlType(name="TypeEnum")
 @XmlEnum(String.class)
 public enum TypeEnum {
@@ -148,6 +216,42 @@ public enum TypeEnum {
 
     /**
     **/
+    public AuthenticatorListItem definedBy(DefinedByEnum definedBy) {
+
+        this.definedBy = definedBy;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("definedBy")
+    @Valid
+    public DefinedByEnum getDefinedBy() {
+        return definedBy;
+    }
+    public void setDefinedBy(DefinedByEnum definedBy) {
+        this.definedBy = definedBy;
+    }
+
+    /**
+    **/
+    public AuthenticatorListItem authenticationType(AuthenticationTypeEnum authenticationType) {
+
+        this.authenticationType = authenticationType;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("authenticationType")
+    @Valid
+    public AuthenticationTypeEnum getAuthenticationType() {
+        return authenticationType;
+    }
+    public void setAuthenticationType(AuthenticationTypeEnum authenticationType) {
+        this.authenticationType = authenticationType;
+    }
+
+    /**
+    **/
     public AuthenticatorListItem type(TypeEnum type) {
 
         this.type = type;
@@ -224,6 +328,8 @@ public enum TypeEnum {
             Objects.equals(this.name, authenticatorListItem.name) &&
             Objects.equals(this.displayName, authenticatorListItem.displayName) &&
             Objects.equals(this.isEnabled, authenticatorListItem.isEnabled) &&
+            Objects.equals(this.definedBy, authenticatorListItem.definedBy) &&
+            Objects.equals(this.authenticationType, authenticatorListItem.authenticationType) &&
             Objects.equals(this.type, authenticatorListItem.type) &&
             Objects.equals(this.tags, authenticatorListItem.tags) &&
             Objects.equals(this.self, authenticatorListItem.self);
@@ -231,7 +337,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, type, tags, self);
+        return Objects.hash(id, name, displayName, isEnabled, definedBy, authenticationType, type, tags, self);
     }
 
     @Override
@@ -244,6 +350,8 @@ public enum TypeEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
+        sb.append("    authenticationType: ").append(toIndentedString(authenticationType)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");

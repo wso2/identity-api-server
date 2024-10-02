@@ -41,7 +41,7 @@ import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorC
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
-import org.wso2.carbon.identity.base.IdentityConstants;
+import org.wso2.carbon.identity.base.AuthenticatorPropertiesConstant.DefinedByType;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
@@ -418,12 +418,13 @@ public class ServerAuthenticatorManagementService {
         } else {
             authenticator.setDisplayName(identityProvider.getIdentityProviderName());
         }
+        authenticator.setAuthenticationType(Authenticator.AuthenticationTypeEnum.IDENTIFICATION);
         authenticator.setIsEnabled(identityProvider.isEnable());
         authenticator.setType(Authenticator.TypeEnum.FEDERATED);
         authenticator.setImage(identityProvider.getImageUrl());
         authenticator.setDescription(identityProvider.getIdentityProviderDescription());
         if (identityProvider.getFederatedAuthenticatorConfigs().length == 1) {
-            IdentityConstants.DefinedByType definedByType =
+            DefinedByType definedByType =
                     identityProvider.getFederatedAuthenticatorConfigs()[0].getDefinedByType();
             authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(definedByType.toString()));
         } else {
@@ -521,6 +522,8 @@ public class ServerAuthenticatorManagementService {
         authenticator.setIsEnabled(config.isEnabled());
         authenticator.setType(Authenticator.TypeEnum.LOCAL);
         authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
+        authenticator.setAuthenticationType(
+                Authenticator.AuthenticationTypeEnum.valueOf(config.getAuthenticationType().toString()));
         String[] tags = config.getTags();
         if (ArrayUtils.isNotEmpty(tags)) {
             authenticator.setTags(Arrays.asList(tags));
