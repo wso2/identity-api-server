@@ -21,7 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.identity.api.server.permission.management.v1.impl.PermissionManagementApiServiceImpl;
 import org.wso2.carbon.identity.api.server.permission.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.permission.management.v1.model.Permission;
 
@@ -36,8 +36,11 @@ import javax.ws.rs.core.Response;
 
 public class PermissionManagementApi  {
 
-    @Autowired
-    private PermissionManagementApiService delegate;
+    private final PermissionManagementApiService delegate;
+
+    public PermissionManagementApi() {
+        this.delegate = new PermissionManagementApiServiceImpl();
+    }
 
     @Valid
     @GET

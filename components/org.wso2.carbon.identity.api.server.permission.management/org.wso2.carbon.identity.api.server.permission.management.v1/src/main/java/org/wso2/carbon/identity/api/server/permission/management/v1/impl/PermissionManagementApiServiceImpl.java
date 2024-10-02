@@ -16,7 +16,6 @@
 
 package org.wso2.carbon.identity.api.server.permission.management.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.permission.management.v1.PermissionManagementApiService;
 import org.wso2.carbon.identity.api.server.permission.management.v1.core.PermissionManagementService;
 
@@ -27,8 +26,11 @@ import javax.ws.rs.core.Response;
  */
 public class PermissionManagementApiServiceImpl implements PermissionManagementApiService {
 
-    @Autowired
-    private PermissionManagementService permissionManagementService;
+    private final PermissionManagementService permissionManagementService;
+
+    public PermissionManagementApiServiceImpl() {
+        this.permissionManagementService = new PermissionManagementService();
+    }
 
     @Override
     public Response permissionManagementPermissionsGet() {

@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.permission.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.user.mgt.RolePermissionManagementService;
 
 /**
@@ -22,26 +23,16 @@ import org.wso2.carbon.user.mgt.RolePermissionManagementService;
  */
 public class RolePermissionManagementServiceDataHolder {
 
-    private static RolePermissionManagementService rolePermissionManagementService;
+    private RolePermissionManagementServiceDataHolder() {}
 
-    /**
-     * Get Role Permission Management Service.
-     *
-     * @return RolePermissionManagementService.
-     */
+    private static class ServiceHolder {
+        static final RolePermissionManagementService INSTANCE =
+                (RolePermissionManagementService) PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext()
+                        .getOSGiService(RolePermissionManagementService.class, null);
+    }
+
     public static RolePermissionManagementService getRolePermissionManagementService() {
-        return rolePermissionManagementService;
+        return ServiceHolder.INSTANCE;
     }
-
-    /**
-     * Set RolePermissionManagementService.
-     *
-     * @param rolePermissionManagementService RolePermissionManagementService.
-     */
-    public static void setRolePermissionManagementService(RolePermissionManagementService
-                                                                  rolePermissionManagementService) {
-        RolePermissionManagementServiceDataHolder.rolePermissionManagementService =
-                rolePermissionManagementService;
-    }
-
 }
