@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2024, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.oidc.scope.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
 
 /**
@@ -22,15 +23,16 @@ import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
  */
 public class OIDCScopeManagementServiceHolder {
 
-    private static OAuthAdminServiceImpl oauthAdminService;
+    private OIDCScopeManagementServiceHolder () {}
 
-    public static OAuthAdminServiceImpl getOAuthAdminService() {
-
-        return oauthAdminService;
+    private static class ServiceHolder {
+        static final OAuthAdminServiceImpl SERVICE =
+                (OAuthAdminServiceImpl) PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext()
+                        .getOSGiService(OAuthAdminServiceImpl.class, null);
     }
 
-    public static void setOauthAdminService(OAuthAdminServiceImpl oauthAdminService) {
-
-        OIDCScopeManagementServiceHolder.oauthAdminService = oauthAdminService;
+    public static OAuthAdminServiceImpl getOAuthAdminService() {
+        return ServiceHolder.SERVICE;
     }
 }

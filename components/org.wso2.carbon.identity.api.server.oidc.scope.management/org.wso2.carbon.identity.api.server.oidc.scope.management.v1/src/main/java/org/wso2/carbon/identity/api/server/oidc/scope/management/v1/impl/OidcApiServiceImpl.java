@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2024, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,11 @@ import javax.ws.rs.core.Response;
  */
 public class OidcApiServiceImpl implements OidcApiService {
 
-    OidcScopeManagementService oidcScopeManagementService = new OidcScopeManagementService();
+    private final OidcScopeManagementService oidcScopeManagementService;
+
+    public OidcApiServiceImpl() {
+        this.oidcScopeManagementService = new OidcScopeManagementService();
+    }
 
     @Override
     public Response addScope(Scope scope) {

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2019-2024, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.impl.OidcApiServiceImpl;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ErrorResponse;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
@@ -38,8 +39,11 @@ import javax.validation.constraints.*;
 
 public class OidcApi  {
 
-    @Autowired
-    private OidcApiService delegate;
+    private final OidcApiService delegate;
+
+    public OidcApi() {
+        this.delegate = new OidcApiServiceImpl();
+    }
 
     @Valid
     @POST
