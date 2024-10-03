@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2024, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ public class RolePermissionManagementServiceDataHolder {
     private RolePermissionManagementServiceDataHolder() {}
 
     private static class ServiceHolder {
-        static final RolePermissionManagementService INSTANCE =
+        static final RolePermissionManagementService SERVICE =
                 (RolePermissionManagementService) PrivilegedCarbonContext
                         .getThreadLocalCarbonContext()
                         .getOSGiService(RolePermissionManagementService.class, null);
     }
 
     public static RolePermissionManagementService getRolePermissionManagementService() {
-        return ServiceHolder.INSTANCE;
+        return ServiceHolder.SERVICE;
     }
 }
