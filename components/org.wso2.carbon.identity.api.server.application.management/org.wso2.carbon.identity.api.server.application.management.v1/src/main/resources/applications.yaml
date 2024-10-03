@@ -2616,6 +2616,119 @@ paths:
                 $ref: '#/components/schemas/Error'
       tags:
         - Organization Application Sharing
+  /applications/loginflow/generate:
+    post:
+      tags:
+        - LoginFlow
+      summary: Initiate login flow generation
+      description: >
+        This API provides the capability to initiate the generation of a login flow.
+        <br>
+        <b>Permission required:</b>
+        * /permission/admin/manage/identity/applicationmgt/update
+        <br>
+        <b>Scope required:</b>
+        * internal_application_mgt_update
+      operationId: generateLoginFlow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginFlowGenerateRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginFlowGenerateResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /applications/loginflow/status/{operation_id}:
+    get:
+      tags:
+        - LoginFlow
+      summary: Get the status of the login flow generation process
+      operationId: getLoginFlowStatus
+      parameters:
+        - name: operation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginFlowStatusResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /applications/loginflow/result/{operation_id}:
+    get:
+      tags:
+        - LoginFlow
+      summary: Get the final login flow result
+      operationId: getLoginFlowResult
+      parameters:
+        - name: operation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginFlowResultResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   parameters:
@@ -4345,6 +4458,62 @@ components:
         ref:
           type: string
           example: '/t/wso2.com/api/server/v1/organizations/b4526d91-a8bf-43d2-8b14-c548cf73065b'
+    LoginFlowGenerateRequest:
+      type: object
+      properties:
+        available_authenticators:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: object
+              additionalProperties: true
+        user_claims:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        user_query:
+          type: string
+
+    LoginFlowGenerateResponse:
+      type: object
+      properties:
+        operation_id:
+          type: string
+
+    StatusEnum:
+      type: string
+      enum:
+        - IN_PROGRESS
+        - COMPLETED
+        - FAILED
+      x-enum-varnames:
+        - IN_PROGRESS
+        - COMPLETED
+        - FAILED
+
+    LoginFlowStatusResponse:
+      type: object
+      properties:
+        operation_id:
+          type: string
+        status:
+          type: object
+          description: A generic object representing the status
+
+    LoginFlowResultResponse:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        data:
+          type: object
+          description: |
+            The payload of the response, which varies based on the operation status.
+            - For IN_PROGRESS status, an empty JSON object is returned.
+            - For COMPLETED status, the authentication sequence is returned.
+            - For FAILED status, an error message is returned.
 
     Error:
       type: object

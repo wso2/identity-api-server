@@ -44,6 +44,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.CustomInbou
 import org.wso2.carbon.identity.api.server.application.management.v1.Error;
 import java.io.File;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowResultResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowStatusResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.OIDCMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
@@ -411,6 +415,30 @@ public class ApplicationsApi  {
     }
 
     @Valid
+    @POST
+    @Path("/loginflow/generate")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Initiate login flow generation", notes = "This API provides the capability to initiate the generation of a login flow. <br> <b>Permission required:</b> * /permission/admin/manage/identity/applicationmgt/update <br> <b>Scope required:</b> * internal_application_mgt_update ", response = LoginFlowGenerateResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "LoginFlow", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 202, message = "Accepted", response = LoginFlowGenerateResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response generateLoginFlow(@ApiParam(value = "" ,required=true) @Valid LoginFlowGenerateRequest loginFlowGenerateRequest) {
+
+        return delegate.generateLoginFlow(loginFlowGenerateRequest );
+    }
+
+    @Valid
     @GET
     @Path("/meta/adaptive-auth-templates")
     
@@ -722,6 +750,48 @@ public class ApplicationsApi  {
     public Response getInboundSAMLConfiguration(@ApiParam(value = "ID of the application.",required=true) @PathParam("applicationId") String applicationId) {
 
         return delegate.getInboundSAMLConfiguration(applicationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/loginflow/result/{operation_id}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get the final login flow result", notes = "", response = LoginFlowResultResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "LoginFlow", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = LoginFlowResultResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class)
+    })
+    public Response getLoginFlowResult(@ApiParam(value = "",required=true) @PathParam("operation_id") String operationId) {
+
+        return delegate.getLoginFlowResult(operationId );
+    }
+
+    @Valid
+    @GET
+    @Path("/loginflow/status/{operation_id}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Get the status of the login flow generation process", notes = "", response = LoginFlowStatusResponse.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "LoginFlow", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK", response = LoginFlowStatusResponse.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Error.class)
+    })
+    public Response getLoginFlowStatus(@ApiParam(value = "",required=true) @PathParam("operation_id") String operationId) {
+
+        return delegate.getLoginFlowStatus(operationId );
     }
 
     @Valid

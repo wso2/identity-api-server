@@ -33,6 +33,10 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedA
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAPIPatchModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.CustomInboundProtocolConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowResultResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowStatusResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.OpenIDConnectConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.PassiveStsConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
@@ -40,6 +44,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.ResidentApp
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2Configuration;
 import org.wso2.carbon.identity.api.server.application.management.v1.SAML2ServiceProvider;
 import org.wso2.carbon.identity.api.server.application.management.v1.WSTrustConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.core.LoginFlowAIService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationSharingService;
@@ -66,6 +71,9 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
 
     @Autowired
     private ServerApplicationSharingService applicationSharingService;
+    
+    @Autowired
+    private LoginFlowAIService loginFlowAIService;
 
     @Deprecated
     @Override
@@ -188,6 +196,21 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     }
 
     @Override
+    public Response getLoginFlowResult(String operationId) {
+
+        LoginFlowResultResponse loginFlowAIGenerationResult = loginFlowAIService.getLoginFlowAIGenerationResult(
+                operationId);
+        return Response.ok(loginFlowAIGenerationResult).build();
+    }
+
+    @Override
+    public Response getLoginFlowStatus(String operationId) {
+
+        LoginFlowStatusResponse loginFlowAIStatus = loginFlowAIService.getLoginFlowAIStatus(operationId);
+        return Response.ok(loginFlowAIStatus).build();
+    }
+
+    @Override
     public Response getPassiveStsConfiguration(String applicationId) {
 
         PassiveStsConfiguration passiveStsApp = applicationManagementService.getPassiveStsConfiguration(applicationId);
@@ -269,6 +292,14 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                 .header(HttpHeaders.EXPIRES, "0")
                 .entity(transferResource.getResource().getByteArray())
                 .build();
+    }
+
+    @Override
+    public Response generateLoginFlow(LoginFlowGenerateRequest loginFlowGenerateRequest) {
+
+        LoginFlowGenerateResponse loginFlowGenerateResponse = loginFlowAIService.generateAuthenticationSequence(
+                loginFlowGenerateRequest);
+        return Response.accepted(loginFlowGenerateResponse).build();
     }
 
     @Override
