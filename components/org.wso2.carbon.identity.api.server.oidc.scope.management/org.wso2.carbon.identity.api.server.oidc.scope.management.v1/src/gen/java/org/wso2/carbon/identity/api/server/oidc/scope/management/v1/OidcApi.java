@@ -16,16 +16,10 @@
 
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.impl.OidcApiServiceImpl;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ErrorResponse;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
-import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.OidcApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
