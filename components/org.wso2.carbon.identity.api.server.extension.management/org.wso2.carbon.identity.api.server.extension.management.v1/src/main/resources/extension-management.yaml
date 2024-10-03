@@ -389,13 +389,9 @@ components:
 
     TemplateResponseModel:
       type: object
-      additionalProperties:
-        type: string
 
     MetadataResponseModel:
       type: object
-      additionalProperties:
-        type: string
 
     Error:
       type: object
