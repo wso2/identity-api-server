@@ -5,10 +5,10 @@ import org.wso2.carbon.identity.api.server.permission.management.v1.impl.Permiss
 
 public class PermissionManagementApiServiceFactory {
 
-   private final static PermissionManagementApiService service = new PermissionManagementApiServiceImpl();
+   private final static PermissionManagementApiService SERVICE = new PermissionManagementApiServiceImpl();
 
    public static PermissionManagementApiService getPermissionManagementApi()
    {
-      return service;
+      return SERVICE;
    }
 }

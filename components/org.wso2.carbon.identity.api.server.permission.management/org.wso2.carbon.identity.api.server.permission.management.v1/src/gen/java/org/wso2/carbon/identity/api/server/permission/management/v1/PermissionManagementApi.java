@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.wso2.carbon.identity.api.server.permission.management.v1.factories.PermissionManagementApiServiceFactory;
 import org.wso2.carbon.identity.api.server.permission.management.v1.impl.PermissionManagementApiServiceImpl;
 import org.wso2.carbon.identity.api.server.permission.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.permission.management.v1.model.Permission;
@@ -39,7 +40,7 @@ public class PermissionManagementApi  {
     private final PermissionManagementApiService delegate;
 
     public PermissionManagementApi() {
-        this.delegate = new PermissionManagementApiServiceImpl();
+        this.delegate = PermissionManagementApiServiceFactory.getPermissionManagementApi();
     }
 
     @Valid

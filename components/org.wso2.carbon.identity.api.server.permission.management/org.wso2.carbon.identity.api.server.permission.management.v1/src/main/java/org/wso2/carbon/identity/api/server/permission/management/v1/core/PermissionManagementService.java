@@ -23,7 +23,6 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.permission.management.common.Constant;
-import org.wso2.carbon.identity.api.server.permission.management.common.RolePermissionManagementServiceDataHolder;
 import org.wso2.carbon.identity.api.server.permission.management.v1.model.Permission;
 import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import org.wso2.carbon.user.mgt.RolePermissionException;
@@ -36,7 +35,12 @@ import javax.ws.rs.core.Response;
  */
 public class PermissionManagementService {
 
+    private final RolePermissionManagementService rolePermissionManagementService;
     private static final Log LOG = LogFactory.getLog(PermissionManagementService.class);
+
+    public PermissionManagementService(RolePermissionManagementService rolePermissionManagementService) {
+        this.rolePermissionManagementService = rolePermissionManagementService;
+    }
 
     /**
      * Get all permissions array.
@@ -47,8 +51,6 @@ public class PermissionManagementService {
 
         try {
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            RolePermissionManagementService rolePermissionManagementService =
-                    RolePermissionManagementServiceDataHolder.getRolePermissionManagementService();
             return getPermissionObjects(rolePermissionManagementService.getAllPermissions(IdentityTenantUtil
                     .getTenantId(tenantDomain)));
         } catch (RolePermissionException e) {

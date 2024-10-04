@@ -18,6 +18,7 @@ package org.wso2.carbon.identity.api.server.permission.management.v1.impl;
 
 import org.wso2.carbon.identity.api.server.permission.management.v1.PermissionManagementApiService;
 import org.wso2.carbon.identity.api.server.permission.management.v1.core.PermissionManagementService;
+import org.wso2.carbon.identity.api.server.permission.management.v1.factories.PermissionManagementServiceFactory;
 
 import javax.ws.rs.core.Response;
 
@@ -29,7 +30,11 @@ public class PermissionManagementApiServiceImpl implements PermissionManagementA
     private final PermissionManagementService permissionManagementService;
 
     public PermissionManagementApiServiceImpl() {
-        this.permissionManagementService = new PermissionManagementService();
+        try {
+            this.permissionManagementService = PermissionManagementServiceFactory.getPermissionManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating PermissionManagementService.", e);
+        }
     }
 
     @Override
