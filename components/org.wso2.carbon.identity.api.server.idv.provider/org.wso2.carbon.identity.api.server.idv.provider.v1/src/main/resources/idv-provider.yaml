@@ -383,6 +383,9 @@ components:
         description:
           type: string
           example: identity verification provider
+        image:
+          type: string
+          example: "onfido-logo-url"
         isEnabled:
           type: boolean
           example: true
@@ -406,6 +409,9 @@ components:
         description:
           type: string
           example: identity verification provider
+        image:
+          type: string
+          example: "onfido-logo-url"
         isEnabled:
           type: boolean
           example: true
