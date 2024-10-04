@@ -94,6 +94,7 @@ import org.wso2.carbon.identity.application.common.model.ProvisioningConnectorCo
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.SubProperty;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
+import org.wso2.carbon.identity.base.AuthenticatorPropertiesConstant.DefinedByType;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
 import org.wso2.carbon.identity.claim.metadata.mgt.model.LocalClaim;
 import org.wso2.carbon.identity.configuration.mgt.core.model.ResourceSearchBean;
@@ -1771,6 +1772,16 @@ public class ServerIdpManagementService {
                 authConfig.setName(base64URLDecode(authenticator.getAuthenticatorId()));
                 authConfig.setDisplayName(getDisplayNameOfAuthenticator(authConfig.getName()));
                 authConfig.setEnabled(authenticator.getIsEnabled());
+                /* Resolve definedBy type: If there is authenticator by same name and its type is system: SYSTEM.
+                 If not: USER. */
+                FederatedAuthenticatorConfig authenticatorConfig = ApplicationAuthenticatorService.getInstance()
+                        .getFederatedAuthenticatorByName(authenticator.getAuthenticatorId());
+                if (authenticatorConfig != null &&
+                        DefinedByType.SYSTEM.equals(authenticatorConfig.getDefinedByType())) {
+                    authConfig.setDefinedByType(DefinedByType.SYSTEM);
+                } else {
+                    authConfig.setDefinedByType(DefinedByType.USER);
+                }
                 List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> authProperties =
                         authenticator.getProperties();
                 if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authConfig.getName())) {
@@ -2456,6 +2467,8 @@ public class ServerIdpManagementService {
             fedAuthListItem.setAuthenticatorId(base64URLEncode(fedAuthConfig.getName()));
             fedAuthListItem.setName(fedAuthConfig.getName());
             fedAuthListItem.setIsEnabled(fedAuthConfig.isEnabled());
+            fedAuthListItem.setDefinedBy(FederatedAuthenticatorListItem.DefinedByEnum.valueOf(
+                    fedAuthConfig.getDefinedByType().toString()));
             FederatedAuthenticatorConfig federatedAuthenticatorConfig =
                     ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
                             fedAuthConfig.getName());
@@ -2838,6 +2851,15 @@ public class ServerIdpManagementService {
         authConfig.setName(authenticatorName);
         authConfig.setDisplayName(getDisplayNameOfAuthenticator(authenticatorName));
         authConfig.setEnabled(authenticator.getIsEnabled());
+        // Resolve definedBy type: If there is authenticator by same name and its type is system: SYSTEM. If not: USER.
+        FederatedAuthenticatorConfig authenticatorConfig = ApplicationAuthenticatorService.getInstance()
+                .getFederatedAuthenticatorByName(authenticatorName);
+        if (authenticatorConfig != null &&
+                DefinedByType.SYSTEM.equals(authenticatorConfig.getDefinedByType())) {
+            authConfig.setDefinedByType(DefinedByType.SYSTEM);
+        } else {
+            authConfig.setDefinedByType(DefinedByType.USER);
+        }
         List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> authProperties = authenticator.getProperties();
         if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authenticatorName)) {
             validateSamlMetadata(authProperties);
@@ -3030,6 +3052,8 @@ public class ServerIdpManagementService {
             federatedAuthenticator.setName(config.getName());
             federatedAuthenticator.setIsEnabled(config.isEnabled());
             federatedAuthenticator.setIsDefault(isDefaultAuthenticator);
+            federatedAuthenticator.setDefinedBy(FederatedAuthenticator.DefinedByEnum.valueOf(
+                    config.getDefinedByType().toString()));
             FederatedAuthenticatorConfig federatedAuthenticatorConfig =
                     ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
                             config.getName());
