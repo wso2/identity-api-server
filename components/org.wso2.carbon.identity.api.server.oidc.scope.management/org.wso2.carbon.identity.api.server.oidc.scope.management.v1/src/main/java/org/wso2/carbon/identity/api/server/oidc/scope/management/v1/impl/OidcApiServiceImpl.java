@@ -21,6 +21,7 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.common.OidcScopeConstants;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.OidcApiService;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.core.OidcScopeManagementService;
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.factories.OidcScopeManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
 
@@ -36,7 +37,11 @@ public class OidcApiServiceImpl implements OidcApiService {
     private final OidcScopeManagementService oidcScopeManagementService;
 
     public OidcApiServiceImpl() {
-        this.oidcScopeManagementService = new OidcScopeManagementService();
+        try {
+            this.oidcScopeManagementService = OidcScopeManagementServiceFactory.getPermissionManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating OidcScopeManagementService.", e);
+        }
     }
 
     @Override

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.oidc.scope.management.common.OIDCScopeManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.common.OidcScopeConstants;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
@@ -39,7 +39,12 @@ import javax.ws.rs.core.Response;
  */
 public class OidcScopeManagementService {
 
+    private final OAuthAdminServiceImpl oauthAdminService;
     private static final Log LOG = LogFactory.getLog(OidcScopeManagementService.class);
+
+    public OidcScopeManagementService(OAuthAdminServiceImpl oauthAdminService) {
+        this.oauthAdminService = oauthAdminService;
+    }
 
     /**
      * Add an OIDC scope.
@@ -54,7 +59,6 @@ public class OidcScopeManagementService {
             String[] claimArray = claimList.toArray(new String[claimList.size()]);
             ScopeDTO scopeDTO = new ScopeDTO(scopeObject.getName(), scopeObject.getDisplayName(),
                     scopeObject.getDescription(), claimArray);
-            OAuthAdminServiceImpl oauthAdminService = OIDCScopeManagementServiceHolder.getOAuthAdminService();
             oauthAdminService.addScope(scopeDTO);
             return scopeDTO.getName();
         } catch (IdentityOAuthAdminException e) {
@@ -70,7 +74,6 @@ public class OidcScopeManagementService {
     public void deleteScope(String id) {
 
         try {
-            OAuthAdminServiceImpl oauthAdminService = OIDCScopeManagementServiceHolder.getOAuthAdminService();
             oauthAdminService.deleteScope(id);
         } catch (IdentityOAuthClientException e) {
             if (LOG.isDebugEnabled()) {
@@ -90,7 +93,6 @@ public class OidcScopeManagementService {
     public Scope getScope(String id) {
 
         try {
-            OAuthAdminServiceImpl oauthAdminService = OIDCScopeManagementServiceHolder.getOAuthAdminService();
             ScopeDTO scopeDTO = oauthAdminService.getScope(id);
             return convertScopeDTOObjectToScope(scopeDTO);
         } catch (IdentityOAuthAdminException e) {
@@ -106,7 +108,6 @@ public class OidcScopeManagementService {
     public List<Scope> getScopes() {
 
         try {
-            OAuthAdminServiceImpl oauthAdminService = OIDCScopeManagementServiceHolder.getOAuthAdminService();
             ScopeDTO[] scopes = oauthAdminService.getScopes();
             return buildScopeList(scopes);
         } catch (IdentityOAuthAdminException e) {
@@ -128,7 +129,6 @@ public class OidcScopeManagementService {
             String[] claimArray = claimList.toArray(new String[claimList.size()]);
             ScopeDTO scopeDTO = new ScopeDTO(id, scopeUpdateObject.getDisplayName(),
                     scopeUpdateObject.getDescription(), claimArray);
-            OAuthAdminServiceImpl oauthAdminService = OIDCScopeManagementServiceHolder.getOAuthAdminService();
             oauthAdminService.updateScope(scopeDTO);
         } catch (IdentityOAuthAdminException e) {
             throw handleException(e, "Server encountered an error while updating OIDC scope: " + id);

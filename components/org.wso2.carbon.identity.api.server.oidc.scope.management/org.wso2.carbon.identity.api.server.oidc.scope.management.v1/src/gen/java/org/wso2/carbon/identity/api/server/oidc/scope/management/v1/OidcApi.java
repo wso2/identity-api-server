@@ -16,7 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1;
 
-import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.impl.OidcApiServiceImpl;
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.factories.OidcApiServiceFactory;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ErrorResponse;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
@@ -26,8 +26,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
 
-import javax.validation.constraints.*;
-
 @Path("/oidc")
 @Api(description = "The oidc API")
 
@@ -36,7 +34,7 @@ public class OidcApi  {
     private final OidcApiService delegate;
 
     public OidcApi() {
-        this.delegate = new OidcApiServiceImpl();
+        this.delegate = OidcApiServiceFactory.getOidcApi();
     }
 
     @Valid
