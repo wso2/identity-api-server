@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -91,7 +91,13 @@ public class BrandingPreferenceManagementConstants {
                 "Server encountered an error while deleting custom text configurations for organization: %s"),
         ERROR_CODE_ERROR_UPDATING_CUSTOM_TEXT_PREFERENCE("65008",
                 "Unable to update custom text preference configurations.",
-                "Error while updating custom text preference configurations for organization: %s.");
+                "Error while updating custom text preference configurations for organization: %s."),
+        ERROR_CODE_ERROR_GETTING_BRANDING_RESULT_STATUS("65009",
+                "Error while getting branding preference generation result status.",
+                "Error while retrieving branding preference generation result status for operation."),
+        ERROR_CODE_ERROR_GETTING_BRANDING_RESULT("65010",
+                "Error while getting branding preference generation result.",
+                "Error while retrieving branding preference generation result for operation.");
 
 
         private final String code;

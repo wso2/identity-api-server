@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -24,6 +24,10 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationRequestModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResponseModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationResultModel;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingGenerationStatusModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.Error;
@@ -39,6 +43,12 @@ public interface BrandingPreferenceApiService {
       public Response deleteBrandingPreference(String type, String name, String locale);
 
       public Response deleteCustomText(String type, String name, String locale, String screen);
+
+      public Response generateBrandingPreference(BrandingGenerationRequestModel brandingGenerationRequestModel);
+
+      public Response getBrandingGenerationResult(String operationId);
+
+      public Response getBrandingGenerationStatus(String operationId);
 
       public Response getBrandingPreference(String type, String name, String locale);
 
