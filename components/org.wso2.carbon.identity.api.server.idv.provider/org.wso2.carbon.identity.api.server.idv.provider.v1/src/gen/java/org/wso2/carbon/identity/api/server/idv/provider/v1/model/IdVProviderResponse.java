@@ -40,6 +40,7 @@ public class IdVProviderResponse  {
     private String type;
     private String name;
     private String description;
+    private String image;
     private Boolean isEnabled;
     private List<VerificationClaim> claims = null;
 
@@ -116,6 +117,24 @@ public class IdVProviderResponse  {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+    **/
+    public IdVProviderResponse image(String image) {
+
+        this.image = image;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "onfido-logo-url", value = "")
+    @JsonProperty("image")
+    @Valid
+    public String getImage() {
+        return image;
+    }
+    public void setImage(String image) {
+        this.image = image;
     }
 
     /**
@@ -204,6 +223,7 @@ public class IdVProviderResponse  {
             Objects.equals(this.type, idVProviderResponse.type) &&
             Objects.equals(this.name, idVProviderResponse.name) &&
             Objects.equals(this.description, idVProviderResponse.description) &&
+            Objects.equals(this.image, idVProviderResponse.image) &&
             Objects.equals(this.isEnabled, idVProviderResponse.isEnabled) &&
             Objects.equals(this.claims, idVProviderResponse.claims) &&
             Objects.equals(this.configProperties, idVProviderResponse.configProperties);
@@ -211,7 +231,7 @@ public class IdVProviderResponse  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, description, isEnabled, claims, configProperties);
+        return Objects.hash(id, type, name, description, image, isEnabled, claims, configProperties);
     }
 
     @Override
@@ -224,6 +244,7 @@ public class IdVProviderResponse  {
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    claims: ").append(toIndentedString(claims)).append("\n");
         sb.append("    configProperties: ").append(toIndentedString(configProperties)).append("\n");

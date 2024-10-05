@@ -64,9 +64,9 @@ public class IdvProvidersApiServiceImpl implements IdvProvidersApiService {
     }
 
     @Override
-    public Response getIdVProviders(Integer limit, Integer offset) {
+    public Response getIdVProviders(Integer limit, Integer offset, String filter) {
 
-        IdVProviderListResponse idVProviderListResponse = idVProviderService.getIdVProviders(limit, offset);
+        IdVProviderListResponse idVProviderListResponse = idVProviderService.getIdVProviders(limit, offset, filter);
         return Response.ok().entity(idVProviderListResponse).build();
     }
 
