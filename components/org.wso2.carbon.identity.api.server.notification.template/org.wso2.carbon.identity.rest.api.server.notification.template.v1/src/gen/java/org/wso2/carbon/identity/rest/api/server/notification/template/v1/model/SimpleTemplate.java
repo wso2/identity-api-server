@@ -65,7 +65,7 @@ public class SimpleTemplate  {
         return this;
     }
     
-    @ApiModelProperty(example = "/t/{tenant-domain}/api/server/v1/notification/sms/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg/templates/en_US", required = true, value = "Location of the created/updated resource.")
+    @ApiModelProperty(example = "/t/{tenant-domain}/api/server/v1/notification/{{email|sms}}/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg/{{org|app|system}}templates/en_US", required = true, value = "Location of the created/updated resource.")
     @JsonProperty("self")
     @Valid
     @NotNull(message = "Property self cannot be null.")

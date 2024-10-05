@@ -100,7 +100,10 @@ public class Constants {
                 "Server encountered an error while deleting the SMS template."),
         ERROR_ERROR_RETRIEVING_TEMPLATES("60012", Status.INTERNAL_SERVER_ERROR,
                 "Unable to retrieve templates.",
-                "Server encountered an error while retrieving templates.");
+                "Server encountered an error while retrieving templates."),
+        ERROR_ERROR_RESETTING_TEMPLATE_TYPE("60005", Status.INTERNAL_SERVER_ERROR,
+                "Unable to reset the template type.",
+                "Server encountered an error while deleting the templates of the template type.");
 
         private final String message;
         private final Status httpStatus;

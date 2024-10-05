@@ -20,7 +20,6 @@ package org.wso2.carbon.identity.rest.api.server.notification.template.v1.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
-import org.wso2.carbon.identity.governance.exceptions.notiification.NotificationTemplateManagerException;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.NotificationApiService;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplateTypeService;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplatesService;
@@ -31,15 +30,15 @@ import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.S
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SimpleTemplate;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.TemplateTypeOverview;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.TemplateTypeWithID;
-import org.wso2.carbon.identity.rest.api.server.notification.template.v1.util.Util;
 
 import java.net.URI;
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.APP_TEMPLATES_PATH;
+import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.NOTIFICATION_CHANNEL_EMAIL;
+import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.NOTIFICATION_CHANNEL_SMS;
 import static org.wso2.carbon.identity.api.server.notification.template.common.
         Constants.NOTIFICATION_TEMPLATES_API_BASE_PATH_EMAIL;
 import static org.wso2.carbon.identity.api.server.notification.template.common.
@@ -150,17 +149,7 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response deleteEmailTemplateType(String templateTypeId) {
 
-        try {
-            templateTypeService.deleteNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeId);
-        } catch (NotificationTemplateManagerException e) {
-            String partiallyDeletedErrorCode = Constants.NOTIFICATION_TEMPLATES_ERROR_CODE_PREFIX
-                    + ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED;
-            if (partiallyDeletedErrorCode.equals(e.getErrorCode())) {
-                return Response.ok().build();
-            }
-            throw Util.handleNotificationTemplateManagerException(e,
-                    Constants.ErrorMessage.ERROR_ERROR_DELETING_TEMPLATE_TYPE);
-        }
+        templateTypeService.deleteNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeId);
         return Response.noContent().build();
     }
 
@@ -181,17 +170,7 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     @Override
     public Response deleteSMSTemplateType(String templateTypeId) {
 
-        try {
-            templateTypeService.deleteNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeId);
-        } catch (NotificationTemplateManagerException e) {
-            String partiallyDeletedErrorCode = Constants.NOTIFICATION_TEMPLATES_ERROR_CODE_PREFIX
-                    + ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED;
-            if (partiallyDeletedErrorCode.equals(e.getErrorCode())) {
-                return Response.ok().build();
-            }
-            throw Util.handleNotificationTemplateManagerException(e,
-                    Constants.ErrorMessage.ERROR_ERROR_DELETING_TEMPLATE_TYPE);
-        }
+        templateTypeService.deleteNotificationTemplateType(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeId);
         return Response.noContent().build();
     }
 
@@ -303,6 +282,20 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     public Response getSystemSMSTemplate(String templateTypeId, String locale) {
 
         return Response.ok().entity(templatesService.getSystemSmsTemplate(templateTypeId, locale)).build();
+    }
+
+    @Override
+    public Response resetEmailTemplateType(String templateTypeId) {
+
+        templateTypeService.resetTemplateType(NOTIFICATION_CHANNEL_EMAIL, templateTypeId);
+        return Response.noContent().build();
+    }
+
+    @Override
+    public Response resetSMSTemplateType(String templateTypeId) {
+
+        templateTypeService.resetTemplateType(NOTIFICATION_CHANNEL_SMS, templateTypeId);
+        return Response.noContent().build();
     }
 
     @Override

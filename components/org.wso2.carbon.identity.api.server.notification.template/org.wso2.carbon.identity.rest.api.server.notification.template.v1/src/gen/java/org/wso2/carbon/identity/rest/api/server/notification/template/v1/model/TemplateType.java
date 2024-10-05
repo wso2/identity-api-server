@@ -36,7 +36,7 @@ public class TemplateType  {
     private String self;
 
     /**
-    * Display name of the email template type.
+    * Display name of the template type.
     **/
     public TemplateType displayName(String displayName) {
 
@@ -44,7 +44,7 @@ public class TemplateType  {
         return this;
     }
     
-    @ApiModelProperty(example = "Account Confirmation", required = true, value = "Display name of the email template type.")
+    @ApiModelProperty(example = "Account Confirmation", required = true, value = "Display name of the template type.")
     @JsonProperty("displayName")
     @Valid
     @NotNull(message = "Property displayName cannot be null.")
@@ -65,7 +65,7 @@ public class TemplateType  {
         return this;
     }
     
-    @ApiModelProperty(example = "/t/{tenant-domain}/api/server/v1/notification/email/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg", required = true, value = "Location of the created/updated resource.")
+    @ApiModelProperty(example = "/t/{tenant-domain}/api/server/v1/notification/{{email|sms}}/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg", required = true, value = "Location of the created/updated resource.")
     @JsonProperty("self")
     @Valid
     @NotNull(message = "Property self cannot be null.")

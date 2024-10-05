@@ -93,6 +93,10 @@ public interface NotificationApiService {
 
       public Response getSystemSMSTemplate(String templateTypeId, String locale);
 
+      public Response resetEmailTemplateType(String templateTypeId);
+
+      public Response resetSMSTemplateType(String templateTypeId);
+
       public Response updateAppEmailTemplate(String templateTypeId, String appUuid, String locale, EmailTemplate emailTemplate);
 
       public Response updateAppSMSTemplate(String templateTypeId, String appUuid, String locale, SMSTemplate smSTemplate);

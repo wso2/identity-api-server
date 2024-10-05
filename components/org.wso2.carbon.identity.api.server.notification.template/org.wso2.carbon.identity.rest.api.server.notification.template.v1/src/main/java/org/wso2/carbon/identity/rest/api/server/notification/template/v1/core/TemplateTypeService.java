@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.core;
 
-import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
 import org.wso2.carbon.identity.api.server.notification.template.common.TemplatesServiceHolder;
 import org.wso2.carbon.identity.governance.exceptions.notiification.NotificationTemplateManagerException;
@@ -29,8 +28,6 @@ import org.wso2.carbon.identity.rest.api.server.notification.template.v1.util.Ut
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes
-        .ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
 
 /**
@@ -99,13 +96,12 @@ public class TemplateTypeService {
      * Delete a notification template type from the tenant.
      *
      * @param notificationChannel Notification channel (Eg: sms, email).
-     * @param templateId ID of the template type.
+     * @param templateTypeId      ID of the template type.
      */
-    public void deleteNotificationTemplateType(String notificationChannel, String templateId)
-            throws NotificationTemplateManagerException {
+    public void deleteNotificationTemplateType(String notificationChannel, String templateTypeId) {
 
         String templateTypeDisplayName;
-        templateTypeDisplayName = Util.decodeTemplateTypeId(templateId);
+        templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
         try {
             boolean isTemplateTypeExists =
                     TemplatesServiceHolder.getNotificationTemplateManager().isNotificationTemplateTypeExists(
@@ -117,15 +113,35 @@ public class TemplateTypeService {
                 throw Util.handleError(Constants.ErrorMessage.ERROR_TEMPLATE_TYPE_NOT_FOUND);
             }
         } catch (NotificationTemplateManagerException e) {
-            String errorCode = StringUtils.EMPTY;
-            if (StringUtils.isNotBlank(e.getErrorCode()) && e.getErrorCode().split("-").length > 1) {
-                errorCode = e.getErrorCode().split("-")[1];
-            }
-            if (ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED.equals(errorCode)) {
-                throw e;
-            }
             throw Util.handleNotificationTemplateManagerException(e,
                     Constants.ErrorMessage.ERROR_ERROR_DELETING_TEMPLATE_TYPE);
+        }
+    }
+
+    /**
+     * Reset a specific template type. Deletes all org and app templates under the type.
+     *
+     * @param notificationChannel Notification channel (Eg: sms, email).
+     * @param templateTypeId      ID of the template type.
+     */
+    public void resetTemplateType(String notificationChannel, String templateTypeId) {
+
+        String templateTypeDisplayName;
+        templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
+        try {
+            boolean isTemplateTypeExists =
+                    TemplatesServiceHolder.getNotificationTemplateManager().isNotificationTemplateTypeExists(
+                            notificationChannel, templateTypeDisplayName, getTenantDomainFromContext());
+            if (isTemplateTypeExists) {
+                TemplatesServiceHolder.getNotificationTemplateManager().deleteCustomizedNotificationTemplates(
+                        notificationChannel, templateTypeDisplayName, getTenantDomainFromContext()
+                );
+            } else {
+                throw Util.handleError(Constants.ErrorMessage.ERROR_TEMPLATE_TYPE_NOT_FOUND);
+            }
+        } catch (NotificationTemplateManagerException e) {
+            throw Util.handleNotificationTemplateManagerException(e,
+                    Constants.ErrorMessage.ERROR_ERROR_RESETTING_TEMPLATE_TYPE);
         }
     }
 

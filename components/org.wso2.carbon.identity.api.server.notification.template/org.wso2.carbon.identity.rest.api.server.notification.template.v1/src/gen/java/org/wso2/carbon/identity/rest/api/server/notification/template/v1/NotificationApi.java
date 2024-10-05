@@ -54,7 +54,7 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}/app-templates/{app-uuid}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Adds a new application email template to an existing email template type.", notes = "Another application email template with the same locale should not already exist in the respective email template type. <br>  <b>Scope required:</b> <br> * internal_email_mgt_create ", response = SimpleTemplate.class, authorizations = {
+    @ApiOperation(value = "Adds a new application email template to an existing email template type.", notes = "Another application email template with the same locale should not already exist in the respective email template type. <br>  <b>Scope required:</b> <br> * internal_email_mgt_create / internal_template_mgt_update ", response = SimpleTemplate.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -104,7 +104,7 @@ public class NotificationApi  {
     @Path("/email/template-types")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Adds a new email template type.", notes = "Adds a new email template type to the system. An email template type can have any number of  organization or application email templates. <br>  * Attribute _**displayName**_ of the template type should be unique. <br>  <b>Scope required:</b>  <br>* internal_email_mgt_create ", response = TemplateTypeWithID.class, authorizations = {
+    @ApiOperation(value = "Adds a new email template type.", notes = "Adds a new email template type to the system. An email template type can have any number of  organization or application email templates. <br>  * Attribute _**displayName**_ of the template type should be unique. <br>  <b>Scope required:</b>  <br>* internal_email_mgt_create / internal_template_mgt_update ", response = TemplateTypeWithID.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -128,7 +128,7 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}/org-templates")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Adds a new email template to an existing email template type.", notes = "Another email template with the same locale should not already exist in the respective email template type. <br>  <b>Scope required:</b> <br> * internal_email_mgt_create ", response = SimpleTemplate.class, authorizations = {
+    @ApiOperation(value = "Adds a new organization email template to an existing email template type.", notes = "Another organization email template with the same locale should not already exist in the respective email template type. <br>  <b>Scope required:</b> <br> * internal_email_mgt_create / internal_template_mgt_update ", response = SimpleTemplate.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -153,7 +153,7 @@ public class NotificationApi  {
     @Path("/sms/template-types/{template-type-id}/org-templates")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Adds a new organization SMS template to an existing SMS template type.", notes = "Another SMS organization template with the same locale should not already exist in the respective SMS template type. <br>  <b>Scope required:</b><br> * internal_template_mgt_create ", response = SimpleTemplate.class, authorizations = {
+    @ApiOperation(value = "Adds a new organization SMS template to an existing SMS template type.", notes = "Another organization SMS template with the same locale should not already exist in the respective SMS template type. <br>  <b>Scope required:</b><br> * internal_template_mgt_create ", response = SimpleTemplate.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -178,7 +178,7 @@ public class NotificationApi  {
     @Path("/sms/template-types")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Adds a new SMS template type.", notes = "Adds a new SMS template type to the system. An SMS template type can have any number of  organization or application SMS templates. <br>  * Attribute _**displayName**_ of the template type should be unique. <br>  <b>Scope required:</b><br> * internal_template_mgt_create ", response = TemplateTypeWithID.class, authorizations = {
+    @ApiOperation(value = "Adds a new SMS template type.", notes = "Adds a new SMS template type to the system. A SMS template type can have any number of  organization or application SMS templates. <br>  * Attribute _**displayName**_ of the template type should be unique. <br>  <b>Scope required:</b><br> * internal_template_mgt_create ", response = TemplateTypeWithID.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -202,7 +202,7 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}/app-templates/{app-uuid}/{locale}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Removes an application email template.", notes = "Removes an applicationemail template identified by the template-type-id and the locale. <br>    <b>Scope required:</b><br> * internal_email_mgt_delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Removes an application email template.", notes = "Removes an application email template identified by the template-type-id and the locale. <br>    <b>Scope required:</b><br> * internal_email_mgt_delete / internal_template_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -226,7 +226,7 @@ public class NotificationApi  {
     @Path("/sms/template-types/{template-type-id}/app-templates/{app-uuid}/{locale}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Removes an SMS template.", notes = "Removes an SMS template identified by the template-type-id and the locale. <br>    <b>Scope required:</b><br>   * internal_template_mgt_delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Removes a SMS template.", notes = "Removes a SMS template identified by the template-type-id and the locale. <br>    <b>Scope required:</b><br>   * internal_template_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -250,14 +250,13 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Removes an email template type.", notes = "Removes an existing email template type with all its user defined email templates from the system. <br> **System template types are not eligible for deletion.** Attempt to delete a system template type will result in a partial deletion of only the user defined templates. Template type will not be deleted.<br>  <b>Scope required:</b><br> * internal_email_mgt_delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Removes an email template type.", notes = "Removes an existing email template type with all its email templates from the system. <br> **Note : System resources are not eligible for deletion.** <br> Attempt to delete a system resource will result in a 403 Forbidden error. <br>  <b>Scope required:</b><br> * internal_email_mgt_delete / internal_template_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Email Template Types", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Partial Deletion.", response = Void.class),
         @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
@@ -275,7 +274,7 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}/org-templates/{locale}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Removes an email template.", notes = "Removes an email template identified by the template-type-id and the locale. <br>    <b>Scope required:</b><br> * internal_email_mgt_delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Removes an organization email template.", notes = "Removes an organization email template identified by the template-type-id and the locale. <br>    <b>Scope required:</b><br> * internal_email_mgt_delete / internal_template_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -323,14 +322,13 @@ public class NotificationApi  {
     @Path("/sms/template-types/{template-type-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Removes an SMS template type.", notes = "Removes an existing SMS template type with all its user defined SMS templates from the system. <br> **System template types are not eligible for deletion.** Attempt to delete a system template type will result in a partial deletion of only the user defined templates. Template type will not be deleted.<br>  <b>Scope required:</b><br> * internal_template_mgt_delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Removes a SMS template type.", notes = "Removes an existing SMS template type with all its SMS templates from the system. <br> **Note : System resources are not eligible for deletion.** <br> Attempt to delete a system resource will result in a 403 Forbidden error. <br>  <b>Scope required:</b><br> * internal_template_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "SMS Template Types", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Partial Deletion.", response = Void.class),
         @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
@@ -348,7 +346,7 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}/app-templates/{app-uuid}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the list of application email templates under the provided template type.", notes = "Retrieves the list of application email templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_email_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieves the list of application email templates under the provided template type.", notes = "Retrieves the list of application email templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_email_mgt_view / internal_template_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -396,7 +394,7 @@ public class NotificationApi  {
     @Path("/email/template-types")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves all the email template types.", notes = "Retrieves all the email template types in the system. <br>  <br> <b>Scope required:</b> <br>* internal_email_mgt_view ", response = TemplateTypeWithID.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieves all the email template types.", notes = "Retrieves all the email template types in the system. <br>  <br> <b>Scope required:</b> <br>* internal_email_mgt_view / internal_template_mgt_view ", response = TemplateTypeWithID.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -419,7 +417,7 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}/org-templates")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the list of organization email templates under the provided template type.", notes = "Retrieves the list of organization email templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_email_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieves the list of organization email templates under the provided template type.", notes = "Retrieves the list of organization email templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_email_mgt_view / internal_template_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -467,7 +465,7 @@ public class NotificationApi  {
     @Path("/sms/template-types")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves all the sms template types.", notes = "Retrieves all the SMS template types in the system. <br>  <b>Scope required:</b><br> * internal_template_mgt_view ", response = TemplateTypeWithID.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieves all the SMS template types.", notes = "Retrieves all the SMS template types in the system. <br>  <b>Scope required:</b><br> * internal_template_mgt_view ", response = TemplateTypeWithID.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -490,7 +488,7 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}/system-templates")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the system email templates of template type.", notes = "Retrieves the list of system default email templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_email_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "Retrieves the system email templates of template type.", notes = "Retrieves the list of system default email templates under the provided template type. <br>    <b>Scope required:</b><br>   * internal_email_mgt_view / internal_template_mgt_view<br> ", response = SimpleTemplate.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -538,7 +536,7 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}/app-templates/{app-uuid}/{locale}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves a single email template of application.", notes = "Retrieves the application email template that matches to the template-type-id and the locale. <br>  <b>Scope required:</b><br>   * internal_email_mgt_view ", response = EmailTemplateWithID.class, authorizations = {
+    @ApiOperation(value = "Retrieves a single email template of application.", notes = "Retrieves the application email template that matches to the template-type-id and the locale. <br>  <b>Scope required:</b><br>   * internal_email_mgt_view / internal_template_mgt_view ", response = EmailTemplateWithID.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -586,7 +584,7 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the email template type corresponding to the template type id.", notes = "Retrieves the email template type in the system identified by the template-type-id. <br>  <b>Scope required:</b><br> * internal_email_mgt_view<br> ", response = TemplateTypeWithID.class, authorizations = {
+    @ApiOperation(value = "Retrieves the email template type corresponding to the template type id.", notes = "Retrieves the email template type in the system identified by the template-type-id. <br>  <b>Scope required:</b><br> * internal_email_mgt_view / internal_template_mgt_view<br> ", response = TemplateTypeWithID.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -610,7 +608,7 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}/org-templates/{locale}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves a single email template.", notes = "Retrieves the email template that matches to the template-type-id and the locale. <br>  <b>Scope required:</b><br>   * internal_email_mgt_view ", response = EmailTemplateWithID.class, authorizations = {
+    @ApiOperation(value = "Retrieves a single organization email template.", notes = "Retrieves the organization email template that matches to the template-type-id and the locale. <br>  <b>Scope required:</b><br>   * internal_email_mgt_view / internal_template_mgt_view ", response = EmailTemplateWithID.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -634,7 +632,7 @@ public class NotificationApi  {
     @Path("/sms/template-types/{template-type-id}/org-templates/{locale}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves a single organization SMS template.", notes = "Retrieves the SMS template that matches to the template-type-id and the locale. <br>  <b>Scope required:</b><br>   * internal_template_mgt_view ", response = SMSTemplateWithID.class, authorizations = {
+    @ApiOperation(value = "Retrieves a single organization SMS template.", notes = "Retrieves the organization SMS template that matches to the template-type-id and the locale. <br>  <b>Scope required:</b><br>   * internal_template_mgt_view ", response = SMSTemplateWithID.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -682,7 +680,7 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}/system-templates/{locale}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the default email template for given type and locale.", notes = "Retrieves the default email template that matches to the template-type-id and the locale. <br>  <b>Scope required:</b><br>   * internal_email_mgt_view ", response = EmailTemplateWithID.class, authorizations = {
+    @ApiOperation(value = "Retrieves the default email template for given type and locale.", notes = "Retrieves the system default email template that matches the template-type-id and the locale. <br>  <b>Scope required:</b><br>   * internal_email_mgt_view / internal_template_mgt_view ", response = EmailTemplateWithID.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -706,7 +704,7 @@ public class NotificationApi  {
     @Path("/sms/template-types/{template-type-id}/system-templates/{locale}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Retrieves the default organization SMS template.", notes = "Retrieves the default SMS template that matches to the template-type-id and the locale. <br>  <b>Scope required:</b><br>   * internal_template_mgt_view ", response = SMSTemplateWithID.class, authorizations = {
+    @ApiOperation(value = "Retrieves the default organization SMS template.", notes = "Retrieves the system default SMS template that matches to the template-type-id and the locale. <br>  <b>Scope required:</b><br>   * internal_template_mgt_view ", response = SMSTemplateWithID.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -726,11 +724,57 @@ public class NotificationApi  {
     }
 
     @Valid
+    @DELETE
+    @Path("/email/template-types/{template-type-id}/reset")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Resets an email template type.", notes = "Resets an existing email template type by deleting all its **user defined** email templates from the system. <br>  <b>Scope required:</b><br> * internal_email_mgt_delete / internal_template_mgt_delete ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Email Template Types", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response resetEmailTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
+
+        return delegate.resetEmailTemplateType(templateTypeId );
+    }
+
+    @Valid
+    @DELETE
+    @Path("/sms/template-types/{template-type-id}/reset")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Resets a SMS template type.", notes = "Resets an existing SMS template type by deleting all its **user defined** SMS templates from the system. <br>  <b>Scope required:</b><br> * internal_template_mgt_delete ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "SMS Template Types", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
+        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
+        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
+        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
+    })
+    public Response resetSMSTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
+
+        return delegate.resetSMSTemplateType(templateTypeId );
+    }
+
+    @Valid
     @PUT
     @Path("/email/template-types/{template-type-id}/app-templates/{app-uuid}/{locale}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Replaces an existing application email template.", notes = "Replaces the application email template identified by the template-type-id and the locale. <br>    <b>Scope required:</b><br>   * internal_email_mgt_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Replaces an existing application email template.", notes = "Replaces the application email template identified by the template-type-id and the locale. <br>    <b>Scope required:</b><br>   * internal_email_mgt_update / internal_template_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -778,7 +822,7 @@ public class NotificationApi  {
     @Path("/email/template-types/{template-type-id}/org-templates/{locale}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Replaces an existing email template.", notes = "Replaces the email template identified by the template-type-id and the locale. <br>    <b>Scope required:</b><br>   * internal_email_mgt_update ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Replaces an existing organization email template.", notes = "Replaces the organization email template identified by the template-type-id and the locale. <br>    <b>Scope required:</b><br>   * internal_email_mgt_update / internal_template_mgt_update ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -792,7 +836,7 @@ public class NotificationApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response updateOrgEmailTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale, @ApiParam(value = "Email templates for the template type." ) @Valid EmailTemplate emailTemplate) {
+    public Response updateOrgEmailTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale, @ApiParam(value = "Updated email template for the template type." ) @Valid EmailTemplate emailTemplate) {
 
         return delegate.updateOrgEmailTemplate(templateTypeId,  locale,  emailTemplate );
     }
@@ -816,7 +860,7 @@ public class NotificationApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response updateOrgSMSTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale, @ApiParam(value = "SMS templates for the template type." ) @Valid SMSTemplate smSTemplate) {
+    public Response updateOrgSMSTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale, @ApiParam(value = "Updated SMS template for the template type." ) @Valid SMSTemplate smSTemplate) {
 
         return delegate.updateOrgSMSTemplate(templateTypeId,  locale,  smSTemplate );
     }
