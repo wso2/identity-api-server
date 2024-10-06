@@ -1,0 +1,235 @@
+/*
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.wso2.carbon.identity.api.server.application.management.v1.core;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateRequest;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowGenerateResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowResultResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.LoginFlowStatusResponse;
+import org.wso2.carbon.identity.api.server.application.management.v1.StatusEnum;
+import org.wso2.carbon.identity.api.server.common.error.APIError;
+import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.application.mgt.ai.LoginFlowAIClientException;
+import org.wso2.carbon.identity.application.mgt.ai.LoginFlowAIServerException;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT;
+import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS;
+
+/**
+ * Service class for login flow AI related operations.
+ */
+public class LoginFlowAIService {
+
+    private static final Log log = LogFactory.getLog(LoginFlowAIService.class);
+
+    /**
+     * Generate authentication sequence.
+     *
+     * @param loginFlowGenerateRequest LoginFlowGenerateRequest.
+     * @return LoginFlowGenerateResponse.
+     */
+    public LoginFlowGenerateResponse generateAuthenticationSequence(LoginFlowGenerateRequest loginFlowGenerateRequest) {
+
+        try {
+            List<Map<String, Object>> userClaims = loginFlowGenerateRequest.getUserClaims();
+            JSONArray userClaimsJsonArray = new JSONArray();
+            for (Map<String, Object> userClaim : userClaims) {
+                userClaimsJsonArray.put(new JSONObject()
+                        .put("claimURI", userClaim.get("claimURI"))
+                        .put("description", userClaim.get("description")));
+            }
+
+            JSONObject availableAuthenticators = new JSONObject();
+            Map<String, List<Map<String, Object>>> authenticators = loginFlowGenerateRequest
+                    .getAvailableAuthenticators();
+            for (Map.Entry<String, List<Map<String, Object>>> entry : authenticators.entrySet()) {
+                String authenticatorType = entry.getKey();
+                List<Map<String, Object>> authenticatorList = entry.getValue();
+
+                JSONArray authenticatorsJsonArray = new JSONArray();
+                for (Map<String, Object> authenticator : authenticatorList) {
+                    authenticatorsJsonArray.put(new JSONObject()
+                            .put("name", authenticator.get("name"))
+                            .put("idp", authenticator.get("idp"))
+                            .put("description", authenticator.get("description")));
+                }
+                availableAuthenticators.put(authenticatorType, authenticatorsJsonArray);
+            }
+
+            String operationId = ApplicationManagementServiceHolder.getLoginFlowAIManagementService()
+                    .generateAuthenticationSequence(loginFlowGenerateRequest.getUserQuery(), userClaimsJsonArray,
+                            availableAuthenticators);
+            LoginFlowGenerateResponse response = new LoginFlowGenerateResponse();
+            response.setOperationId(operationId);
+            return response;
+        } catch (LoginFlowAIServerException e) {
+            throw handleServerException(e);
+        } catch (LoginFlowAIClientException e) {
+            throw handleClientException(e);
+        }
+    }
+
+    /**
+     * Get login flow AI generation result.
+     *
+     * @param operationId Operation ID of the login flow AI generation.
+     * @return LoginFlowResultResponse.
+     */
+    public LoginFlowResultResponse getLoginFlowAIGenerationResult(String operationId) {
+
+        try {
+            Object generationResult = ApplicationManagementServiceHolder.getLoginFlowAIManagementService()
+                    .getAuthenticationSequenceGenerationResult(operationId);
+            LoginFlowResultResponse response = new LoginFlowResultResponse();
+            Map<String, Object> generationResultMap = (Map<String, Object>) generationResult;
+            response.setStatus(getStatusFromResult(generationResultMap));
+            if (!((Map<?, ?>) generationResult).containsKey("data")) {
+                throw new LoginFlowAIServerException(ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS.getMessage(),
+                        ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT_STATUS.getCode());
+            }
+            Map<String, Object> dataMap = (Map<String, Object>) generationResultMap.get("data");
+            response.setData(dataMap);
+            return response;
+        } catch (LoginFlowAIServerException e) {
+            throw handleServerException(e);
+        } catch (LoginFlowAIClientException e) {
+            throw handleClientException(e);
+        }
+    }
+
+    /**
+     * Get login flow AI generation status.
+     *
+     * @param operationId Operation ID of the login flow AI generation.
+     * @return LoginFlowStatusResponse.
+     */
+    public LoginFlowStatusResponse getLoginFlowAIStatus(String operationId) {
+
+        try {
+            Object generationStatus = ApplicationManagementServiceHolder.getLoginFlowAIManagementService()
+                    .getAuthenticationSequenceGenerationStatus(operationId);
+            LoginFlowStatusResponse response = new LoginFlowStatusResponse();
+            response.setOperationId(operationId);
+
+            response.status(convertObjectToMap(generationStatus));
+            return response;
+        } catch (LoginFlowAIServerException e) {
+            throw handleServerException(e);
+        } catch (LoginFlowAIClientException e) {
+            throw handleClientException(e);
+        }
+    }
+
+    private StatusEnum getStatusFromResult(Map<String, Object> resultMap)
+            throws LoginFlowAIServerException {
+
+        if (resultMap.containsKey("status")) {
+            String status = (String) resultMap.get("status");
+            if ("IN_PROGRESS".equals(status)) {
+                return StatusEnum.IN_PROGRESS;
+            } else if ("COMPLETED".equals(status)) {
+                return StatusEnum.COMPLETED;
+            } else if ("FAILED".equals(status)) {
+                return StatusEnum.FAILED;
+            }
+        }
+        throw new LoginFlowAIServerException(ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT.getMessage(),
+                ERROR_CODE_ERROR_GETTING_LOGINFLOW_AI_RESULT.getCode());
+    }
+
+    private APIError handleClientException(LoginFlowAIClientException error) {
+
+        ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
+                .withCode(error.getErrorCode())
+                .withMessage(error.getMessage());
+        if (error.getLoginFlowAIResponse() != null) {
+            Response.Status status = Response.Status.fromStatusCode(error.getLoginFlowAIResponse().getStatusCode());
+            errorResponseBuilder.withDescription(error.getLoginFlowAIResponse().getResponseBody());
+            return new APIError(status, errorResponseBuilder.build());
+        }
+        return new APIError(Response.Status.BAD_REQUEST, errorResponseBuilder.build());
+    }
+
+    private APIError handleServerException(LoginFlowAIServerException error) {
+
+        ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
+                .withCode(error.getErrorCode())
+                .withMessage(error.getMessage());
+        if (error.getBrandingAIResponse() != null) {
+            Response.Status status = Response.Status.fromStatusCode(error.getBrandingAIResponse().getStatusCode());
+            errorResponseBuilder.withDescription(error.getBrandingAIResponse().getResponseBody());
+            return new APIError(status, errorResponseBuilder.build());
+        }
+        return new APIError(Response.Status.INTERNAL_SERVER_ERROR, errorResponseBuilder.build());
+    }
+
+    private static Map<String, Object> convertObjectToMap(Object object) {
+
+        if (object instanceof Map) {
+            Map<String, Object> map = new HashMap<>();
+            for (Map.Entry<String, Object> entry : ((Map<String, Object>) object).entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+
+                if (value == null) {
+                    map.put(key, "");
+                } else if (value instanceof Map) {
+                    map.put(key, convertObjectToMap(value));
+                } else if (value instanceof List) {
+                    map.put(key, convertListToArray((List<?>) value));
+                } else {
+                    map.put(key, value);
+                }
+            }
+            return map;
+        }
+        log.warn("Object is not an instance of Map. Returning an empty map.");
+        return new HashMap<>();
+    }
+
+    private static Object[] convertListToArray(List<?> list) {
+
+        Object[] array = new Object[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            Object value = list.get(i);
+            if (value == null) {
+                array[i] = "";
+            } else if (value instanceof Map) {
+                array[i] = convertObjectToMap(value);
+            } else if (value instanceof List) {
+                array[i] = convertListToArray((List<?>) value);
+            } else {
+                array[i] = value;
+            }
+        }
+        return array;
+    }
+}
+
