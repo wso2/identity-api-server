@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+* Copyright (c) 2019-2024, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,30 +16,26 @@
 
 package org.wso2.carbon.identity.api.server.oidc.scope.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-
+import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.factories.OidcApiServiceFactory;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ErrorResponse;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.Scope;
 import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.model.ScopeUpdateRequest;
-import org.wso2.carbon.identity.api.server.oidc.scope.management.v1.OidcApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
 
-import javax.validation.constraints.*;
-
 @Path("/oidc")
 @Api(description = "The oidc API")
 
 public class OidcApi  {
 
-    @Autowired
-    private OidcApiService delegate;
+    private final OidcApiService delegate;
+
+    public OidcApi() {
+        this.delegate = OidcApiServiceFactory.getOidcApi();
+    }
 
     @Valid
     @POST
