@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.identity.api.server.api.resource.v1.factories.MetaApiServiceFactory;
 
 import javax.validation.Valid;
 import javax.ws.rs.GET;
@@ -39,8 +39,11 @@ import javax.ws.rs.core.Response;
 
 public class MetaApi  {
 
-    @Autowired
-    private MetaApiService delegate;
+    private final MetaApiService delegate;
+
+    public MetaApi() {
+        this.delegate = MetaApiServiceFactory.getMetaApi();
+    }
 
     @Valid
     @GET

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.resource.collection.mgt.APIResourceCollectionManager;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
@@ -27,9 +28,28 @@ import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
  */
 public class APIResourceManagementServiceHolder {
 
-    private static APIResourceManager apiResourceManager;
-    private static APIResourceCollectionManager apiResourceCollectionManager;
-    private static OAuthAdminServiceImpl oAuthAdminServiceImpl;
+    private APIResourceManagementServiceHolder() {}
+
+    private static class APIResourceManagerHolder {
+
+        static final APIResourceManager SERVICE = (APIResourceManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext()
+                .getOSGiService(APIResourceManager.class, null);
+    }
+
+    private static class APIResourceCollectionManagerHolder {
+
+        static final APIResourceCollectionManager SERVICE = (APIResourceCollectionManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext()
+                .getOSGiService(APIResourceCollectionManager.class, null);
+    }
+
+    private static class OAuthAdminServiceImplHolder {
+
+        static final OAuthAdminServiceImpl SERVICE = (OAuthAdminServiceImpl) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext()
+                .getOSGiService(OAuthAdminServiceImpl.class, null);
+    }
 
     /**
      * Get APIResourceManager osgi service.
@@ -38,17 +58,7 @@ public class APIResourceManagementServiceHolder {
      */
     public static APIResourceManager getApiResourceManager() {
 
-        return apiResourceManager;
-    }
-
-    /**
-     * Set APIResourceManager osgi service.
-     *
-     * @param apiResourceManager APIResourceManager.
-     */
-    public static void setApiResourceManager(APIResourceManager apiResourceManager) {
-
-        APIResourceManagementServiceHolder.apiResourceManager = apiResourceManager;
+        return APIResourceManagerHolder.SERVICE;
     }
 
     /**
@@ -58,17 +68,7 @@ public class APIResourceManagementServiceHolder {
      */
     public static APIResourceCollectionManager getApiResourceCollectionManager() {
 
-        return apiResourceCollectionManager;
-    }
-
-    /**
-     * Set APIResourceCollectionManager osgi service.
-     *
-     * @param apiResourceCollectionManager APIResourceCollectionManager.
-     */
-    public static void setApiResourceCollectionManager(APIResourceCollectionManager apiResourceCollectionManager) {
-
-        APIResourceManagementServiceHolder.apiResourceCollectionManager = apiResourceCollectionManager;
+        return APIResourceCollectionManagerHolder.SERVICE;
     }
 
     /**
@@ -78,16 +78,6 @@ public class APIResourceManagementServiceHolder {
      */
     public static OAuthAdminServiceImpl getOAuthAdminServiceImpl() {
 
-        return oAuthAdminServiceImpl;
-    }
-
-    /**
-     * Set OAuthAdminServiceImpl instance.
-     *
-     * @param oAuthAdminServiceImpl OAuthAdminServiceImpl instance.
-     */
-    public static void setOAuthAdminServiceImpl(OAuthAdminServiceImpl oAuthAdminServiceImpl) {
-
-        APIResourceManagementServiceHolder.oAuthAdminServiceImpl = oAuthAdminServiceImpl;
+        return OAuthAdminServiceImplHolder.SERVICE;
     }
 }
