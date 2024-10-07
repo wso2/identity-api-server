@@ -167,11 +167,7 @@ public class ApiModelToOAuthConsumerApp implements ApiModelToOAuthConsumerAppFun
             } else {
                 consumerAppDTO.setTokenBindingValidationEnabled(false);
             }
-
             consumerAppDTO.setAccessTokenClaims(getAccessTokenClaims(accessToken));
-            if (accessToken.getAccessTokenAttributesEnabled() != null) {
-                consumerAppDTO.setAccessTokenClaimsSeparationEnabled(accessToken.getAccessTokenAttributesEnabled());
-            }
         }
     }
 
