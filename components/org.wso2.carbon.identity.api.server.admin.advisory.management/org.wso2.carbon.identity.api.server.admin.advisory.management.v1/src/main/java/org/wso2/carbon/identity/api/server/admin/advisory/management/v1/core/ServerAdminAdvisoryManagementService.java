@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -26,7 +26,6 @@ import org.wso2.carbon.admin.advisory.mgt.dto.AdminAdvisoryBannerDTO;
 import org.wso2.carbon.admin.advisory.mgt.exception.AdminAdvisoryMgtException;
 import org.wso2.carbon.admin.advisory.mgt.service.AdminAdvisoryManagementService;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.common.AdminAdvisoryConstants;
-import org.wso2.carbon.identity.api.server.admin.advisory.management.common.AdminAdvisoryManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.model.AdminAdvisoryConfig;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
@@ -38,7 +37,12 @@ import javax.ws.rs.core.Response;
  */
 public class ServerAdminAdvisoryManagementService {
 
+    private final AdminAdvisoryManagementService adminAdvisoryManagementService;
     private static final Log LOG = LogFactory.getLog(ServerAdminAdvisoryManagementService.class);
+
+    public ServerAdminAdvisoryManagementService(AdminAdvisoryManagementService adminAdvisoryManagementService) {
+        this.adminAdvisoryManagementService = adminAdvisoryManagementService;
+    }
 
     /**
      * Get admin advisory configuration.
@@ -48,8 +52,6 @@ public class ServerAdminAdvisoryManagementService {
     public AdminAdvisoryConfig getAdminAdvisoryConfig() {
 
         try {
-            AdminAdvisoryManagementService adminAdvisoryManagementService = AdminAdvisoryManagementServiceHolder
-                    .getAdminAdvisoryManagementService();
             AdminAdvisoryBannerDTO adminAdvisoryBannerDTO = adminAdvisoryManagementService.getAdminAdvisoryConfig();
 
             return buildAdminAdvisoryConfigResponse(adminAdvisoryBannerDTO);
@@ -70,8 +72,6 @@ public class ServerAdminAdvisoryManagementService {
     public void saveAdminAdvisoryConfig(AdminAdvisoryConfig adminAdvisoryConfig) {
 
         try {
-            AdminAdvisoryManagementService adminAdvisoryManagementService = AdminAdvisoryManagementServiceHolder
-                    .getAdminAdvisoryManagementService();
             AdminAdvisoryBannerDTO modifiedAdminAdvisoryBannerDTO = createModifiedAdminAdvisoryBannerDTO(
                     adminAdvisoryManagementService.getAdminAdvisoryConfig(), adminAdvisoryConfig);
 

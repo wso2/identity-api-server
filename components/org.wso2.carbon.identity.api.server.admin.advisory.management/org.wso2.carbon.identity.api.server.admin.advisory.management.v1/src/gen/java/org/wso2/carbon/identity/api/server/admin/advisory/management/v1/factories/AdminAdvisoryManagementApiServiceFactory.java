@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -26,10 +26,15 @@ import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.impl.Adm
  */
 public class AdminAdvisoryManagementApiServiceFactory {
 
-   private static final AdminAdvisoryManagementApiService service = new AdminAdvisoryManagementApiServiceImpl();
+   private static final AdminAdvisoryManagementApiService SERVICE = new AdminAdvisoryManagementApiServiceImpl();
 
+   /**
+    * Get admin advisory management service.
+    *
+    * @return AdminAdvisoryManagementApiService
+    */
    public static AdminAdvisoryManagementApiService getAdminAdvisoryManagementApi() {
-      return service;
+      return SERVICE;
    }
 
    private AdminAdvisoryManagementApiServiceFactory() {
