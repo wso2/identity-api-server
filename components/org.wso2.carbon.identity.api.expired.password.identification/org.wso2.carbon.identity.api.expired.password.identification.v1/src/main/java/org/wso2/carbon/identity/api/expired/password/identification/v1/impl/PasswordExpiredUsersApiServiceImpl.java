@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,10 +18,10 @@
 
 package org.wso2.carbon.identity.api.expired.password.identification.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.expired.password.identification.common.ContextLoader;
 import org.wso2.carbon.identity.api.expired.password.identification.v1.PasswordExpiredUsersApiService;
 import org.wso2.carbon.identity.api.expired.password.identification.v1.core.PasswordExpiredUsersManagementApiService;
+import org.wso2.carbon.identity.api.expired.password.identification.v1.factories.PasswordExpiredUsersManagementApiServiceFactory;
 
 import javax.ws.rs.core.Response;
 
@@ -30,8 +30,16 @@ import javax.ws.rs.core.Response;
  */
 public class PasswordExpiredUsersApiServiceImpl implements PasswordExpiredUsersApiService {
 
-    @Autowired
-    private PasswordExpiredUsersManagementApiService passwordExpiredUsersManagementApiService;
+    private final PasswordExpiredUsersManagementApiService passwordExpiredUsersManagementApiService;
+
+    public PasswordExpiredUsersApiServiceImpl() {
+        try {
+            this.passwordExpiredUsersManagementApiService = PasswordExpiredUsersManagementApiServiceFactory
+                    .getExpiredPasswordIdentificationService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating password expired users management service.", e);
+        }
+    }
 
     @Override
     public Response getPasswordExpiredUsers(String expiredAfter, String excludeAfter) {

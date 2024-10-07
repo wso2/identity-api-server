@@ -23,10 +23,10 @@ import org.wso2.carbon.identity.api.expired.password.identification.v1.impl.Pass
 
 public class PasswordExpiredUsersApiServiceFactory {
 
-   private final static PasswordExpiredUsersApiService service = new PasswordExpiredUsersApiServiceImpl();
+   private final static PasswordExpiredUsersApiService SERVICE = new PasswordExpiredUsersApiServiceImpl();
 
    public static PasswordExpiredUsersApiService getPasswordExpiredUsersApi()
    {
-      return service;
+      return SERVICE;
    }
 }

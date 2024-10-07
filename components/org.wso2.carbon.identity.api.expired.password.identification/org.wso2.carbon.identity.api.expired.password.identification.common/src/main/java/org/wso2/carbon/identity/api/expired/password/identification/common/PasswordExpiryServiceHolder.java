@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.expired.password.identification.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.password.expiry.services.ExpiredPasswordIdentificationService;
 
 /**
@@ -25,7 +26,14 @@ import org.wso2.carbon.identity.password.expiry.services.ExpiredPasswordIdentifi
  */
 public class PasswordExpiryServiceHolder {
 
-    private static ExpiredPasswordIdentificationService expiredPasswordIdentificationService;
+    private PasswordExpiryServiceHolder() {}
+
+    private static class ServiceHolder {
+        static final ExpiredPasswordIdentificationService SERVICE =
+                (ExpiredPasswordIdentificationService) PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext()
+                        .getOSGiService(ExpiredPasswordIdentificationService.class, null);
+    }
 
     /**
      * Get ExpiredPasswordIdentificationService OSGi service.
@@ -33,18 +41,6 @@ public class PasswordExpiryServiceHolder {
      * @return ExpiredPassword identification Service.
      */
     public static ExpiredPasswordIdentificationService getExpiredPasswordIdentificationService() {
-
-        return expiredPasswordIdentificationService;
-    }
-
-    /**
-     * Set ExpiredPasswordIdentificationService OSGi service.
-     *
-     * @param expiredPasswordIdentificationService ExpiredPassword identification Service.
-     */
-    public static void setExpiredPasswordIdentificationService(
-            ExpiredPasswordIdentificationService expiredPasswordIdentificationService) {
-
-        PasswordExpiryServiceHolder.expiredPasswordIdentificationService = expiredPasswordIdentificationService;
+        return ServiceHolder.SERVICE;
     }
 }
