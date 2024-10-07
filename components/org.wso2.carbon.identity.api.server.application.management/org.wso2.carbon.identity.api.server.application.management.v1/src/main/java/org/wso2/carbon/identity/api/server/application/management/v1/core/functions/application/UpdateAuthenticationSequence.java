@@ -32,7 +32,7 @@ import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticato
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
 import org.wso2.carbon.identity.application.common.model.script.AuthenticationScriptConfig;
 import org.wso2.carbon.identity.application.mgt.ApplicationConstants;
-import org.wso2.carbon.identity.base.AuthenticatorPropertiesConstant.DefinedByType;
+import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
 
 import java.util.ArrayList;
 import java.util.Collections;
