@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage;
-import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdaptiveAuthTemplates;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthProtocolMetadata;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClientAuthenticationMethod;
@@ -41,6 +40,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.core.functi
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.mgt.AbstractInboundAuthenticatorConfig;
+import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
@@ -51,6 +51,7 @@ import org.wso2.carbon.identity.oauth2.model.ClientAuthenticationMethodModel;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.identity.sso.saml.SAMLSSOConfigServiceImpl;
 import org.wso2.carbon.security.SecurityConfigException;
+import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -73,6 +74,22 @@ import static org.wso2.carbon.identity.api.server.application.management.common.
  */
 public class ServerApplicationMetadataService {
 
+    private final ApplicationManagementService applicationManagementService;
+    private final SAMLSSOConfigServiceImpl samlSSOConfigService;
+    private final OAuthAdminServiceImpl oAuthAdminService;
+    private final STSAdminServiceInterface sTSAdminServiceInterface;
+
+    public ServerApplicationMetadataService(ApplicationManagementService applicationManagementService,
+                                            SAMLSSOConfigServiceImpl samlSSOConfigService,
+                                            OAuthAdminServiceImpl oAuthAdminService,
+                                            STSAdminServiceInterface sTSAdminServiceInterface) {
+        this.applicationManagementService = applicationManagementService;
+        this.samlSSOConfigService = samlSSOConfigService;
+        this.oAuthAdminService = oAuthAdminService;
+        this.sTSAdminServiceInterface = sTSAdminServiceInterface;
+    }
+
+
     private static final Log LOG = LogFactory.getLog(ServerApplicationMetadataService.class);
 
     /**
@@ -87,9 +104,8 @@ public class ServerApplicationMetadataService {
         List<AuthProtocolMetadata> authProtocolMetadataList = new ArrayList<>();
 
         // Add custom inbound protocols
-        Map<String, AbstractInboundAuthenticatorConfig> allCustomAuthenticators =
-                ApplicationManagementServiceHolder.getApplicationManagementService()
-                        .getAllInboundAuthenticatorConfig();
+        Map<String, AbstractInboundAuthenticatorConfig> allCustomAuthenticators = applicationManagementService
+                .getAllInboundAuthenticatorConfig();
 
         for (Map.Entry<String, AbstractInboundAuthenticatorConfig> entry : allCustomAuthenticators
                 .entrySet()) {
@@ -120,8 +136,6 @@ public class ServerApplicationMetadataService {
     public SAMLMetaData getSAMLMetadata() {
 
         SAMLMetaData samlMetaData = new SAMLMetaData();
-        SAMLSSOConfigServiceImpl samlSSOConfigService = ApplicationManagementServiceHolder.getSamlssoConfigService();
-
         samlMetaData.setDefaultNameIdFormat(DEFAULT_NAME_ID_FORMAT);
 
         try {
@@ -159,7 +173,6 @@ public class ServerApplicationMetadataService {
     public OIDCMetaData getOIDCMetadata() {
 
         OIDCMetaData oidcMetaData = new OIDCMetaData();
-        OAuthAdminServiceImpl oAuthAdminService = ApplicationManagementServiceHolder.getOAuthAdminService();
 
         List<ClientAuthenticationMethod> supportedClientAuthMethods = new ArrayList<>();
         // 'Select Option' is added to the api until the clearable UI dropdown is implemented
@@ -297,11 +310,10 @@ public class ServerApplicationMetadataService {
         WSTrustMetaData wsTrustMetaData = new WSTrustMetaData();
         try {
             // Check if WS-Trust is deployed.
-            if (ApplicationManagementServiceHolder.getStsAdminService() != null) {
+            if (sTSAdminServiceInterface != null) {
                 wsTrustMetaData.setCertificateAlias(new MetadataProperty()
                         .defaultValue(null)
-                        .options(Arrays.asList(ApplicationManagementServiceHolder.getStsAdminService()
-                                .getCertAliasOfPrimaryKeyStore())));
+                        .options(Arrays.asList(sTSAdminServiceInterface.getCertAliasOfPrimaryKeyStore())));
             } else {
                 throw new SecurityConfigException(ERROR_WS_TRUST_METADATA_SERVICE_NOT_FOUND.getDescription());
             }
@@ -325,8 +337,7 @@ public class ServerApplicationMetadataService {
     public CustomInboundProtocolMetaData getCustomProtocolMetadata(String inboundProtocolName) {
 
         String protocolName = URLDecoder.decode(inboundProtocolName);
-        Map<String, AbstractInboundAuthenticatorConfig> allCustomAuthenticators =
-                ApplicationManagementServiceHolder.getApplicationManagementService()
+        Map<String, AbstractInboundAuthenticatorConfig> allCustomAuthenticators = applicationManagementService
                         .getAllInboundAuthenticatorConfig();
 
         // Loop through all custom inbound protocols and match the name.
@@ -389,8 +400,7 @@ public class ServerApplicationMetadataService {
     public AdaptiveAuthTemplates getAdaptiveAuthTemplates() {
 
         AdaptiveAuthTemplates adaptiveAuthTemplates = new AdaptiveAuthTemplates();
-        adaptiveAuthTemplates.setTemplatesJSON(ApplicationManagementServiceHolder.getApplicationManagementService()
-                .getAuthenticationTemplatesJSON());
+        adaptiveAuthTemplates.setTemplatesJSON(applicationManagementService.getAuthenticationTemplatesJSON());
         return adaptiveAuthTemplates;
     }
 
