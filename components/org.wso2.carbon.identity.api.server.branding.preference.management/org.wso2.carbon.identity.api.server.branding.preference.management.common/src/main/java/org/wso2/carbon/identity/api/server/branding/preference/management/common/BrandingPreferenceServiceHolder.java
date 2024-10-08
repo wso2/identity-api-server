@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.com).
+ * Copyright (c) 2021-2024, WSO2 Inc. (http://www.wso2.com).
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.branding.preference.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.branding.preference.management.core.BrandingPreferenceManager;
 
 /**
@@ -25,7 +26,11 @@ import org.wso2.carbon.identity.branding.preference.management.core.BrandingPref
  */
 public class BrandingPreferenceServiceHolder {
 
-    private static BrandingPreferenceManager brandingPreferenceManager;
+    private static class BrandingPreferenceManagerHolder {
+        static final BrandingPreferenceManager SERVICE = (BrandingPreferenceManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext()
+                .getOSGiService(BrandingPreferenceManager.class, null);
+    }
 
     /**
      * Get BrandingPreferenceManager OSGi service.
@@ -34,16 +39,6 @@ public class BrandingPreferenceServiceHolder {
      */
     public static BrandingPreferenceManager getBrandingPreferenceManager() {
 
-        return brandingPreferenceManager;
-    }
-
-    /**
-     * Set BrandingPreferenceManager OSGi service.
-     *
-     * @param brandingPreferenceManager Branding Preference Manager.
-     */
-    public static void setBrandingPreferenceManager(BrandingPreferenceManager brandingPreferenceManager) {
-
-        BrandingPreferenceServiceHolder.brandingPreferenceManager = brandingPreferenceManager;
+        return BrandingPreferenceManagerHolder.SERVICE;
     }
 }

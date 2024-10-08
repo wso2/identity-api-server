@@ -18,16 +18,15 @@
 
 package org.wso2.carbon.identity.api.server.branding.preference.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingPreferenceApiServiceFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.Error;
-import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -41,8 +40,11 @@ import javax.validation.constraints.*;
 
 public class BrandingPreferenceApi  {
 
-    @Autowired
-    private BrandingPreferenceApiService delegate;
+    private final BrandingPreferenceApiService delegate;
+
+    public BrandingPreferenceApi() {
+        this.delegate = BrandingPreferenceApiServiceFactory.getBrandingPreferenceApi();
+    }
 
     @Valid
     @POST

@@ -19,9 +19,9 @@
 package org.wso2.carbon.identity.api.server.branding.preference.management.v1.impl;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.BrandingPreferenceApiService;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.core.BrandingPreferenceManagementService;
+import org.wso2.carbon.identity.api.server.branding.preference.management.v1.factories.BrandingPreferenceManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.BrandingPreferenceModel;
 import org.wso2.carbon.identity.api.server.branding.preference.management.v1.model.CustomTextModel;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -50,10 +50,18 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
  */
 public class BrandingPreferenceApiServiceImpl implements BrandingPreferenceApiService {
 
-    @Autowired
-    private BrandingPreferenceManagementService brandingPreferenceManagementService;
+    private final BrandingPreferenceManagementService brandingPreferenceManagementService;
 
     //TODO: Improve API to manage application level & language level theming resources in addition to the tenant level.
+
+    public BrandingPreferenceApiServiceImpl() {
+        try {
+            brandingPreferenceManagementService = BrandingPreferenceManagementServiceFactory
+                    .getBrandingPreferenceManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating the branding preference service.", e);
+        }
+    }
 
     @Override
     public Response addBrandingPreference(BrandingPreferenceModel brandingPreferenceModel) {
