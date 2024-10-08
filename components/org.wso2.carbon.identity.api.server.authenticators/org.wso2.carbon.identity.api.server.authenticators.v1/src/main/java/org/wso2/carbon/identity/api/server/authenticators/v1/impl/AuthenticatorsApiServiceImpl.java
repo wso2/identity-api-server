@@ -16,9 +16,9 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.authenticators.v1.AuthenticatorsApiService;
 import org.wso2.carbon.identity.api.server.authenticators.v1.core.ServerAuthenticatorManagementService;
+import org.wso2.carbon.identity.api.server.authenticators.v1.factories.ServerAuthenticatorManagementServiceFactory;
 
 import javax.ws.rs.core.Response;
 
@@ -27,8 +27,16 @@ import javax.ws.rs.core.Response;
  */
 public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
 
-    @Autowired
-    private ServerAuthenticatorManagementService authenticatorManagementService;
+    private final ServerAuthenticatorManagementService authenticatorManagementService;
+
+    public AuthenticatorsApiServiceImpl() {
+        try {
+            authenticatorManagementService = ServerAuthenticatorManagementServiceFactory
+                    .getServerAuthenticatorManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating the authenticator management services.", e);
+        }
+    }
 
     @Override
     public Response authenticatorsGet(String filter, Integer limit, Integer offset) {
