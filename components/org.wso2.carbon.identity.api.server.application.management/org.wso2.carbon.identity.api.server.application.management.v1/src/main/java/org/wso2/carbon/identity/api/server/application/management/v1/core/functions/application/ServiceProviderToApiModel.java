@@ -115,6 +115,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .id(application.getApplicationResourceId())
                     .name(application.getApplicationName())
                     .description(application.getDescription())
+                    .applicationVersion(application.getApplicationVersion())
                     .provisioningConfigurations(buildProvisioningConfiguration(application))
                     .access(ApplicationResponseModel.AccessEnum.READ);
         } else {
@@ -122,6 +123,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                     .id(application.getApplicationResourceId())
                     .name(application.getApplicationName())
                     .description(application.getDescription())
+                    .applicationVersion(application.getApplicationVersion())
                     .imageUrl(application.getImageUrl())
                     .accessUrl(application.getAccessUrl())
                     .logoutReturnUrl(getLogoutReturnUrl(application))
