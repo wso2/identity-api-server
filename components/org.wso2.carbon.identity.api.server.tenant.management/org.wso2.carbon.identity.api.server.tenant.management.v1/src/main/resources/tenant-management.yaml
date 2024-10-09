@@ -311,6 +311,76 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
+  '/tenants/{tenant-id}/owners/{owner-id}':
+    get:
+      tags:
+        - Tenants
+      summary: Retrieve tenant owner.
+      operationId: getOwner
+      description: |
+        Retrieve the tenant owner identified by the provided tenant id and owner id.
+
+        <b>Permission required:</b>
+        * /permission/protected/manage/monitor/tenants/list
+
+        <b>scope required:</b>
+        * internal_list_tenants
+      parameters:
+        - $ref: '#/components/parameters/tenantIdPathParam'
+        - $ref: '#/components/parameters/ownerIdPathParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/OwnerInfoResponse'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    put:
+      tags:
+        - Tenants
+      summary: Update tenant owner.
+      operationId: updateOwner
+      description: |
+        This API provides the capability to update the tenant owner.
+
+        <b>Permission required:</b>
+        * /permission/protected/manage/modify/tenants
+
+        <b>scope required:</b>
+        * internal_modify_tenants
+      parameters:
+        - $ref: '#/components/parameters/tenantIdPathParam'
+        - $ref: '#/components/parameters/ownerIdPathParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OwnerPutModel'
+        description: This represents the tenant owner to be updated.
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/Updated'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
   '/tenants/{tenant-id}/metadata':
       delete:
         tags:
@@ -365,6 +435,13 @@ components:
       description: tenant id
       schema:
         type: string
+    ownerIdPathParam:
+      in: path
+      name: owner-id
+      required: true
+      description: owner id
+      schema:
+          type: string
     tenantDomainPathParam:
       in: path
       name: tenant-domain
@@ -633,6 +710,62 @@ components:
           type: string
           example: inline-password
           description: If the provisioning method is inline-password then a valid password should be sent in the request body, if the provisioning method is invite-via-email then password doesn't need to be send through request body, instead an emai link will be sent to the given email address to set the password.
+        additionalClaims:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdditionalClaims'
+
+    OwnerPutModel:
+      type: object
+      required:
+        - email
+        - firstname
+        - lastname
+      properties:
+        email:
+          type: string
+          example: kim@wso2.com
+          description: Email address of the owner.
+        password:
+          type: string
+          example: kim123
+          description: Password of the owner.
+        firstname:
+          type: string
+          example: kim
+          description: First name of the owner.
+        lastname:
+          type: string
+          example: kim
+          description: Last name of the owner.
+        additionalClaims:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdditionalClaims'
+
+    OwnerInfoResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "4875-jhgr-454hb"
+          description: id of the tenant owner.
+        username:
+          type: string
+          example: kim
+          description: Username for the tenant owner.
+        email:
+          type: string
+          example: kim@wso2.com
+          description: Email address of the owner.
+        firstname:
+          type: string
+          example: kim
+          description: First name of the owner.
+        lastname:
+          type: string
+          example: kim
+          description: Last name of the owner.
         additionalClaims:
           type: array
           items:

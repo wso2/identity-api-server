@@ -28,6 +28,8 @@ import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Additional
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.ChannelVerifiedTenantModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.LifeCycleStatus;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Link;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerIdResponse;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerPutModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerResponse;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantListItem;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantModel;
@@ -180,13 +182,13 @@ public class ServerTenantManagementService {
      * Get owners of a tenant which is identified by tenant unique id.
      *
      * @param tenantUniqueID tenant unique identifier.
-     * @return List<OwnerResponse>.
+     * @return List<OwnerIdResponse>.
      */
-    public List<OwnerResponse> getOwners(String tenantUniqueID) {
+    public List<OwnerIdResponse> getOwners(String tenantUniqueID) {
 
         try {
             User user = TenantManagementServiceHolder.getTenantMgtService().getOwner(tenantUniqueID);
-            return createOwnerResponse(user);
+            return createOwnerIdResponse(user);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_RETRIEVING_TENANT, tenantUniqueID);
@@ -231,14 +233,14 @@ public class ServerTenantManagementService {
         return tenantUniqueID;
     }
 
-    private List<OwnerResponse> createOwnerResponse(User user) {
+    private List<OwnerIdResponse> createOwnerIdResponse(User user) {
 
-        List<OwnerResponse> ownerResponseList = new ArrayList<>();
-        OwnerResponse ownerResponse = new OwnerResponse();
-        ownerResponse.setId(user.getUserID());
-        ownerResponse.setUsername(user.getUsername());
-        ownerResponseList.add(ownerResponse);
-        return ownerResponseList;
+        List<OwnerIdResponse> ownerIdResponseList = new ArrayList<>();
+        OwnerIdResponse ownerIdResponse = new OwnerIdResponse();
+        ownerIdResponse.setId(user.getUserID());
+        ownerIdResponse.setUsername(user.getUsername());
+        ownerIdResponseList.add(ownerIdResponse);
+        return ownerIdResponseList;
     }
 
     private TenantResponseModel createTenantResponse(Tenant tenant) {
@@ -248,7 +250,7 @@ public class ServerTenantManagementService {
         tenantResponseModel.setDomain(tenant.getDomain());
         tenantResponseModel.setId(tenant.getTenantUniqueID());
         tenantResponseModel.setLifecycleStatus(getLifeCycleStatus(tenant.isActive()));
-        tenantResponseModel.setOwners(getOwnerResponses(tenant));
+        tenantResponseModel.setOwners(getOwnerIdResponses(tenant));
         return tenantResponseModel;
     }
 
@@ -323,7 +325,7 @@ public class ServerTenantManagementService {
             listItem.setCreatedDate(getISOFormatDate(tenant.getCreatedDate()));
             listItem.setDomain(tenant.getDomain());
             listItem.setId(tenant.getTenantUniqueID());
-            listItem.setOwners(getOwnerResponses(tenant));
+            listItem.setOwners(getOwnerIdResponses(tenant));
 
             tenantListItems.add(listItem);
         }
@@ -337,14 +339,14 @@ public class ServerTenantManagementService {
         return lifeCycleStatus;
     }
 
-    private List<OwnerResponse> getOwnerResponses(Tenant tenant) {
+    private List<OwnerIdResponse> getOwnerIdResponses(Tenant tenant) {
 
-        List<OwnerResponse> ownerResponseList = new ArrayList<>();
-        OwnerResponse ownerResponse = new OwnerResponse();
-        ownerResponse.setUsername(tenant.getAdminName());
-        ownerResponse.setId(tenant.getAdminUserId());
-        ownerResponseList.add(ownerResponse);
-        return ownerResponseList;
+        List<OwnerIdResponse> ownerIdResponseList = new ArrayList<>();
+        OwnerIdResponse ownerIdResponse = new OwnerIdResponse();
+        ownerIdResponse.setUsername(tenant.getAdminName());
+        ownerIdResponse.setId(tenant.getAdminUserId());
+        ownerIdResponseList.add(ownerIdResponse);
+        return ownerIdResponseList;
     }
 
     private List<Link> createLinks(String url, int limit, int offset, int total, String filter) {
