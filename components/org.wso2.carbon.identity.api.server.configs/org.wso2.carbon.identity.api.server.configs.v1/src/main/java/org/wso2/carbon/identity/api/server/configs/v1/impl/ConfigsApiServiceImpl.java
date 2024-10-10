@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.configs.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.configs.v1.ConfigsApiService;
 import org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService;
+import org.wso2.carbon.identity.api.server.configs.v1.factories.ServerConfigManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRPatch;
 import org.wso2.carbon.identity.api.server.configs.v1.model.ImpersonationPatch;
@@ -43,9 +43,15 @@ import javax.ws.rs.core.Response;
  */
 public class ConfigsApiServiceImpl implements ConfigsApiService {
 
-    @Autowired
-    private ServerConfigManagementService configManagementService;
+    private final ServerConfigManagementService configManagementService;
 
+    public ConfigsApiServiceImpl() {
+        try {
+            configManagementService = ServerConfigManagementServiceFactory.getServerConfigManagementService();
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while initiating server config management services.", e);
+        }
+    }
 
     @Override
     public Response getAuthenticator(String authenticatorId) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.configs.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.configs.v1.factories.ConfigsApiServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.configs.v1.model.CORSConfig;
@@ -59,8 +59,11 @@ import javax.validation.constraints.*;
 
 public class ConfigsApi  {
 
-    @Autowired
-    private ConfigsApiService delegate;
+    private final ConfigsApiService delegate;
+
+    public ConfigsApi() {
+        this.delegate = ConfigsApiServiceFactory.getConfigsApi();
+    }
 
     @Valid
     @GET
