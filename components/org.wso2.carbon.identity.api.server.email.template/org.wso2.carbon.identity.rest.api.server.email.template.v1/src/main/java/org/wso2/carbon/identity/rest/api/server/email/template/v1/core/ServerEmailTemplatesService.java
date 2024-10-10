@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.email.mgt.EmailTemplateManager;
 import org.wso2.carbon.email.mgt.constants.I18nMgtConstants;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtClientException;
 import org.wso2.carbon.email.mgt.exceptions.I18nEmailMgtException;
@@ -32,7 +33,6 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.email.template.common.Constants;
-import org.wso2.carbon.identity.api.server.email.template.common.EmailTemplatesServiceHolder;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateType;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateTypeWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v1.model.EmailTemplateTypeWithoutTemplates;
@@ -62,7 +62,12 @@ import static org.wso2.carbon.identity.api.server.email.template.common.Constant
  */
 public class ServerEmailTemplatesService {
 
+    private final EmailTemplateManager emailTemplateManager;
     private static final Log log = LogFactory.getLog(ServerEmailTemplatesService.class);
+
+    public ServerEmailTemplatesService(EmailTemplateManager emailTemplateManager) {
+        this.emailTemplateManager = emailTemplateManager;
+    }
 
     /**
      * Return all email template types in the system with limited information of the templates inside.
@@ -83,7 +88,7 @@ public class ServerEmailTemplatesService {
         try {
             List<String> requestedAttributeList = null;
             List<EmailTemplate> allTemplates = null;
-            List<String> availableTemplateTypes = EmailTemplatesServiceHolder.getEmailTemplateManager()
+            List<String> availableTemplateTypes = emailTemplateManager
                     .getAvailableTemplateTypes(getTenantDomainFromContext());
             if (StringUtils.isNotBlank(requiredAttributes)) {
                 requestedAttributeList = new ArrayList<>(Arrays.asList(requiredAttributes.split(",")));
@@ -95,8 +100,7 @@ public class ServerEmailTemplatesService {
                         throw handleError(Constants.ErrorMessage.ERROR_ATTRIBUTE_NOT_SUPPORTED);
                     }
                 }
-                allTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager()
-                        .getAllEmailTemplates(getTenantDomainFromContext());
+                allTemplates = emailTemplateManager.getAllEmailTemplates(getTenantDomainFromContext());
             }
 
             return buildEmailTemplateTypeWithoutTemplatesList(availableTemplateTypes, allTemplates,
@@ -124,8 +128,8 @@ public class ServerEmailTemplatesService {
         String decodedTemplateTypeId = decodeTemplateTypeId(templateTypeId);
 
         try {
-            List<EmailTemplate> internalEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
-                    getEmailTemplateType(decodedTemplateTypeId, getTenantDomainFromContext());
+            List<EmailTemplate> internalEmailTemplates = emailTemplateManager
+                    .getEmailTemplateType(decodedTemplateTypeId, getTenantDomainFromContext());
             return buildEmailTemplateTypeWithID(internalEmailTemplates, templateTypeId);
         } catch (I18nEmailMgtException e) {
             if (StringUtils.equals(I18nMgtConstants.ErrorCodes.EMAIL_TEMPLATE_TYPE_NOT_FOUND, e.getErrorCode())) {
@@ -153,8 +157,8 @@ public class ServerEmailTemplatesService {
 
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
-            List<EmailTemplate> internalEmailTemplates = EmailTemplatesServiceHolder.getEmailTemplateManager().
-                    getEmailTemplateType(templateTypeDisplayName, getTenantDomainFromContext());
+            List<EmailTemplate> internalEmailTemplates = emailTemplateManager
+                    .getEmailTemplateType(templateTypeDisplayName, getTenantDomainFromContext());
             return buildSimpleEmailTemplatesList(internalEmailTemplates, templateTypeId);
         } catch (I18nEmailMgtException e) {
             if (StringUtils.equals(I18nMgtConstants.ErrorCodes.EMAIL_TEMPLATE_TYPE_NOT_FOUND, e.getErrorCode())) {
@@ -183,8 +187,8 @@ public class ServerEmailTemplatesService {
         try {
             String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
             templateId = I18nEmailUtil.normalizeLocaleFormat(templateId);
-            EmailTemplate internalEmailTemplate = EmailTemplatesServiceHolder.getEmailTemplateManager().
-                    getEmailTemplate(templateTypeDisplayName, templateId, getTenantDomainFromContext());
+            EmailTemplate internalEmailTemplate = emailTemplateManager.getEmailTemplate(templateTypeDisplayName,
+                    templateId, getTenantDomainFromContext());
             // EmailTemplateManager sends the default template if no matching template found. We need to check for
             // the locale specifically.
             if (!internalEmailTemplate.getLocale().equals(templateId)) {
@@ -210,8 +214,7 @@ public class ServerEmailTemplatesService {
         String templateTypeDisplayName = emailTemplateType.getDisplayName();
         try {
             // Add email template type without templates, first.
-            EmailTemplatesServiceHolder.getEmailTemplateManager().addEmailTemplateType(templateTypeDisplayName,
-                    getTenantDomainFromContext());
+            emailTemplateManager.addEmailTemplateType(templateTypeDisplayName, getTenantDomainFromContext());
 
             // Add email templates if present, to the template type.
             if (!emailTemplateType.getTemplates().isEmpty()) {
@@ -244,9 +247,8 @@ public class ServerEmailTemplatesService {
 
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
-            boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager()
-                    .isEmailTemplateExists(templateTypeDisplayName, emailTemplateWithID.getId(),
-                            getTenantDomainFromContext());
+            boolean isTemplateExists = emailTemplateManager.isEmailTemplateExists(templateTypeDisplayName,
+                    emailTemplateWithID.getId(), getTenantDomainFromContext());
             if (!isTemplateExists) {
                 // Email template is new, hence add to the system.
                 addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplateWithID);
@@ -279,12 +281,10 @@ public class ServerEmailTemplatesService {
             return;
         }
         try {
-            boolean isTemplateTypeExists =
-                    EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateTypeExists(
-                            templateTypeDisplayName, getTenantDomainFromContext());
+            boolean isTemplateTypeExists = emailTemplateManager.isEmailTemplateTypeExists(templateTypeDisplayName,
+                    getTenantDomainFromContext());
             if (isTemplateTypeExists) {
-                EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplateType(templateTypeDisplayName,
-                        getTenantDomainFromContext());
+                emailTemplateManager.deleteEmailTemplateType(templateTypeDisplayName, getTenantDomainFromContext());
             }
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_DELETING_EMAIL_TEMPLATE_TYPE);
@@ -307,11 +307,11 @@ public class ServerEmailTemplatesService {
             return;
         }
         try {
-            boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateExists(
-                    templateTypeDisplayName, templateId, getTenantDomainFromContext());
+            boolean isTemplateExists = emailTemplateManager.isEmailTemplateExists(templateTypeDisplayName, templateId,
+                    getTenantDomainFromContext());
             if (isTemplateExists) {
-                EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplate(templateTypeDisplayName,
-                        templateId, getTenantDomainFromContext());
+                emailTemplateManager.deleteEmailTemplate(templateTypeDisplayName, templateId,
+                        getTenantDomainFromContext());
             }
         } catch (I18nEmailMgtException e) {
             throw handleI18nEmailMgtException(e, Constants.ErrorMessage.ERROR_DELETING_EMAIL_TEMPLATE);
@@ -330,8 +330,8 @@ public class ServerEmailTemplatesService {
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
             // Check whether the email template exists, first.
-            boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateExists(
-                    templateTypeDisplayName, templateId, getTenantDomainFromContext());
+            boolean isTemplateExists = emailTemplateManager.isEmailTemplateExists(templateTypeDisplayName, templateId,
+                    getTenantDomainFromContext());
             if (isTemplateExists) {
                 addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplateWithID);
             } else {
@@ -353,8 +353,8 @@ public class ServerEmailTemplatesService {
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
             // Check whether the email template type exists.
-            boolean isTemplateTypeExists = EmailTemplatesServiceHolder.getEmailTemplateManager().
-                    isEmailTemplateTypeExists(templateTypeDisplayName, getTenantDomainFromContext());
+            boolean isTemplateTypeExists = emailTemplateManager.isEmailTemplateTypeExists(templateTypeDisplayName,
+                    getTenantDomainFromContext());
             if (isTemplateTypeExists) {
                 // Delete all existing templates in the template type
                 EmailTemplateTypeWithID templateType = getEmailTemplateType(templateTypeId, null, null, null, null);
@@ -387,8 +387,7 @@ public class ServerEmailTemplatesService {
         internalEmailTemplate.setBody(emailTemplateWithID.getBody());
         internalEmailTemplate.setFooter(emailTemplateWithID.getFooter());
 
-        EmailTemplatesServiceHolder.getEmailTemplateManager().addEmailTemplate(internalEmailTemplate,
-                getTenantDomainFromContext());
+        emailTemplateManager.addEmailTemplate(internalEmailTemplate, getTenantDomainFromContext());
     }
 
     /**
