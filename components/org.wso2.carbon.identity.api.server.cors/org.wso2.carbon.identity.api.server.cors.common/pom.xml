@@ -34,11 +34,6 @@
             <artifactId>org.wso2.carbon.identity.cors.mgt.core</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <build>
