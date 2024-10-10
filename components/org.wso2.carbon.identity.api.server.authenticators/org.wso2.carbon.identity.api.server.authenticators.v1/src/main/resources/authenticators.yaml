@@ -202,6 +202,11 @@ components:
         isEnabled:
           type: boolean
           example: true
+        definedBy:
+          type: string
+          enum:
+            - SYSTEM
+            - USER
         type:
           type: string
           enum:

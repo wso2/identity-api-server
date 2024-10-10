@@ -35,6 +35,40 @@ public class FederatedAuthenticatorListItem  {
     private String authenticatorId;
     private String name;
     private Boolean isEnabled = false;
+
+@XmlType(name="DefinedByEnum")
+@XmlEnum(String.class)
+public enum DefinedByEnum {
+
+    @XmlEnumValue("SYSTEM") SYSTEM(String.valueOf("SYSTEM")), @XmlEnumValue("USER") USER(String.valueOf("USER"));
+
+
+    private String value;
+
+    DefinedByEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static DefinedByEnum fromValue(String value) {
+        for (DefinedByEnum b : DefinedByEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private DefinedByEnum definedBy;
     private List<String> tags = null;
 
     private String self;
@@ -91,6 +125,24 @@ public class FederatedAuthenticatorListItem  {
     }
     public void setIsEnabled(Boolean isEnabled) {
         this.isEnabled = isEnabled;
+    }
+
+    /**
+    **/
+    public FederatedAuthenticatorListItem definedBy(DefinedByEnum definedBy) {
+
+        this.definedBy = definedBy;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("definedBy")
+    @Valid
+    public DefinedByEnum getDefinedBy() {
+        return definedBy;
+    }
+    public void setDefinedBy(DefinedByEnum definedBy) {
+        this.definedBy = definedBy;
     }
 
     /**
@@ -152,13 +204,14 @@ public class FederatedAuthenticatorListItem  {
         return Objects.equals(this.authenticatorId, federatedAuthenticatorListItem.authenticatorId) &&
             Objects.equals(this.name, federatedAuthenticatorListItem.name) &&
             Objects.equals(this.isEnabled, federatedAuthenticatorListItem.isEnabled) &&
+            Objects.equals(this.definedBy, federatedAuthenticatorListItem.definedBy) &&
             Objects.equals(this.tags, federatedAuthenticatorListItem.tags) &&
             Objects.equals(this.self, federatedAuthenticatorListItem.self);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, isEnabled, tags, self);
+        return Objects.hash(authenticatorId, name, isEnabled, definedBy, tags, self);
     }
 
     @Override
@@ -170,6 +223,7 @@ public class FederatedAuthenticatorListItem  {
         sb.append("    authenticatorId: ").append(toIndentedString(authenticatorId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
         sb.append("}");

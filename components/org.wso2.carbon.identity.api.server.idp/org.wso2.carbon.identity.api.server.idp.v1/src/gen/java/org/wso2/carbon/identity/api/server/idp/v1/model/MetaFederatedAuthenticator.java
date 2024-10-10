@@ -36,6 +36,40 @@ public class MetaFederatedAuthenticator  {
     private String authenticatorId;
     private String name;
     private String displayName;
+
+@XmlType(name="DefinedByEnum")
+@XmlEnum(String.class)
+public enum DefinedByEnum {
+
+    @XmlEnumValue("SYSTEM") SYSTEM(String.valueOf("SYSTEM")), @XmlEnumValue("USER") USER(String.valueOf("USER"));
+
+
+    private String value;
+
+    DefinedByEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static DefinedByEnum fromValue(String value) {
+        for (DefinedByEnum b : DefinedByEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private DefinedByEnum definedBy;
     private List<String> tags = null;
 
     private List<MetaProperty> properties = null;
@@ -93,6 +127,24 @@ public class MetaFederatedAuthenticator  {
     }
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    /**
+    **/
+    public MetaFederatedAuthenticator definedBy(DefinedByEnum definedBy) {
+
+        this.definedBy = definedBy;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("definedBy")
+    @Valid
+    public DefinedByEnum getDefinedBy() {
+        return definedBy;
+    }
+    public void setDefinedBy(DefinedByEnum definedBy) {
+        this.definedBy = definedBy;
     }
 
     /**
@@ -162,13 +214,14 @@ public class MetaFederatedAuthenticator  {
         return Objects.equals(this.authenticatorId, metaFederatedAuthenticator.authenticatorId) &&
             Objects.equals(this.name, metaFederatedAuthenticator.name) &&
             Objects.equals(this.displayName, metaFederatedAuthenticator.displayName) &&
+            Objects.equals(this.definedBy, metaFederatedAuthenticator.definedBy) &&
             Objects.equals(this.tags, metaFederatedAuthenticator.tags) &&
             Objects.equals(this.properties, metaFederatedAuthenticator.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, displayName, tags, properties);
+        return Objects.hash(authenticatorId, name, displayName, definedBy, tags, properties);
     }
 
     @Override
@@ -180,6 +233,7 @@ public class MetaFederatedAuthenticator  {
         sb.append("    authenticatorId: ").append(toIndentedString(authenticatorId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+        sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");

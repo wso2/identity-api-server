@@ -704,6 +704,8 @@ public class ServerConfigManagementService {
                 authenticatorListItem.setDisplayName(config.getDisplayName());
                 authenticatorListItem.setIsEnabled(config.isEnabled());
                 authenticatorListItem.setType(AuthenticatorListItem.TypeEnum.LOCAL);
+                authenticatorListItem.setDefinedBy(
+                        AuthenticatorListItem.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
                 String[] tags = config.getTags();
                 if (ArrayUtils.isNotEmpty(tags)) {
                     authenticatorListItem.setTags(Arrays.asList(tags));
@@ -722,6 +724,7 @@ public class ServerConfigManagementService {
                 authenticatorListItem.setDisplayName(config.getDisplayName());
                 authenticatorListItem.setIsEnabled(config.isEnabled());
                 authenticatorListItem.setType(AuthenticatorListItem.TypeEnum.REQUEST_PATH);
+                authenticatorListItem.setDefinedBy(AuthenticatorListItem.DefinedByEnum.SYSTEM);
                 String[] tags = config.getTags();
                 if (ArrayUtils.isNotEmpty(tags)) {
                     authenticatorListItem.setTags(Arrays.asList(tags));
@@ -771,6 +774,7 @@ public class ServerConfigManagementService {
         authenticator.setName(config.getName());
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setIsEnabled(config.isEnabled());
+        authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
         if (config instanceof RequestPathAuthenticatorConfig) {
             authenticator.setType(Authenticator.TypeEnum.REQUEST_PATH);
         } else {

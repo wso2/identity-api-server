@@ -1187,6 +1187,11 @@ components:
           type: boolean
           default: true
           example: true
+        definedBy:
+          type: string
+          enum:
+            - SYSTEM
+            - USER
         type:
           type: string
           enum:
@@ -1217,6 +1222,11 @@ components:
         isEnabled:
           type: boolean
           default: true
+        definedBy:
+          type: string
+          enum:
+            - SYSTEM
+            - USER
         type:
           type: string
           enum:
