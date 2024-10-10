@@ -28,7 +28,7 @@ import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Additional
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.ChannelVerifiedTenantModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.LifeCycleStatus;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Link;
-import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerIdResponse;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerInfoResponse;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerPutModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerResponse;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantListItem;
@@ -44,8 +44,11 @@ import org.wso2.carbon.stratos.common.constants.TenantConstants;
 import org.wso2.carbon.stratos.common.exception.TenantManagementClientException;
 import org.wso2.carbon.stratos.common.exception.TenantManagementServerException;
 import org.wso2.carbon.stratos.common.exception.TenantMgtException;
+import org.wso2.carbon.stratos.common.util.ClaimsMgtUtil;
 import org.wso2.carbon.tenant.mgt.services.TenantMgtService;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.common.User;
+import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tenant.Tenant;
 import org.wso2.carbon.user.core.tenant.TenantSearchResult;
 
@@ -182,16 +185,42 @@ public class ServerTenantManagementService {
      * Get owners of a tenant which is identified by tenant unique id.
      *
      * @param tenantUniqueID tenant unique identifier.
-     * @return List<OwnerIdResponse>.
+     * @return List<OwnerResponse>.
      */
-    public List<OwnerIdResponse> getOwners(String tenantUniqueID) {
+    public List<OwnerResponse> getOwners(String tenantUniqueID) {
 
         try {
             User user = TenantManagementServiceHolder.getTenantMgtService().getOwner(tenantUniqueID);
-            return createOwnerIdResponse(user);
+            return createOwnerResponse(user);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_RETRIEVING_TENANT, tenantUniqueID);
+        }
+    }
+
+    public OwnerInfoResponse getOwner(String tenantUniqueID, String ownerID) {
+
+        try {
+            Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
+            if (tenant.getAdminUserId() == null || !tenant.getAdminUserId().equals(ownerID)) {
+                throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
+                        ERROR_CODE_OWNER_NOT_FOUND, ownerID);
+            }
+            return createOwnerInfoResponse(tenant);
+        } catch (TenantMgtException e) {
+            throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_RETRIEVING_OWNER, ownerID);
+        }
+    }
+
+    public void updateOwner(String tenantUniqueID, String ownerID, OwnerPutModel ownerPutModel) {
+
+        try {
+            Tenant tenant = createTenantInfoBean(tenantUniqueID, ownerID, ownerPutModel);
+            TenantManagementServiceHolder.getTenantMgtService().updateOwner(tenant);
+        } catch (TenantMgtException e) {
+            throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_UPDATING_OWNER, ownerID);
         }
     }
 
@@ -233,14 +262,61 @@ public class ServerTenantManagementService {
         return tenantUniqueID;
     }
 
-    private List<OwnerIdResponse> createOwnerIdResponse(User user) {
+    private List<OwnerResponse> createOwnerResponse(User user) {
 
-        List<OwnerIdResponse> ownerIdResponseList = new ArrayList<>();
-        OwnerIdResponse ownerIdResponse = new OwnerIdResponse();
-        ownerIdResponse.setId(user.getUserID());
-        ownerIdResponse.setUsername(user.getUsername());
-        ownerIdResponseList.add(ownerIdResponse);
-        return ownerIdResponseList;
+        List<OwnerResponse> ownerResponseList = new ArrayList<>();
+        OwnerResponse ownerResponse = new OwnerResponse();
+        ownerResponse.setId(user.getUserID());
+        ownerResponse.setUsername(user.getUsername());
+        ownerResponseList.add(ownerResponse);
+        return ownerResponseList;
+    }
+
+    private Tenant createTenantInfoBean(String tenantUniqueID, String ownerID, OwnerPutModel ownerPutModel)
+            throws TenantMgtException {
+
+        Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
+        if (tenant.getAdminUserId() == null || !tenant.getAdminUserId().equals(ownerID)) {
+            throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_OWNER_NOT_FOUND, ownerID);
+        }
+        if (StringUtils.isNotBlank(ownerPutModel.getFirstname())) {
+            tenant.setAdminFirstName(ownerPutModel.getFirstname());
+        }
+        if (StringUtils.isNotBlank(ownerPutModel.getLastname())) {
+            tenant.setAdminLastName(ownerPutModel.getLastname());
+        }
+        if (StringUtils.isNotBlank(ownerPutModel.getEmail())) {
+            tenant.setEmail(ownerPutModel.getEmail());
+        }
+        tenant.setAdminPassword(ownerPutModel.getPassword());
+        List<AdditionalClaims> additionalClaimsList = ownerPutModel.getAdditionalClaims();
+        if (CollectionUtils.isNotEmpty(additionalClaimsList)) {
+            tenant.setClaimsMap(createClaimsMapping(additionalClaimsList));
+        }
+        return tenant;
+    }
+
+    private OwnerInfoResponse createOwnerInfoResponse(Tenant tenant) throws TenantMgtException {
+
+        RealmService realmService = TenantManagementServiceHolder.getRealmService();
+        OwnerInfoResponse ownerInfoResponse = new OwnerInfoResponse();
+        ownerInfoResponse.setId(tenant.getAdminUserId());
+        ownerInfoResponse.setUsername(tenant.getAdminName());
+        ownerInfoResponse.setEmail(tenant.getEmail());
+        try {
+            ownerInfoResponse.setFirstname(ClaimsMgtUtil.getFirstNamefromUserStoreManager(
+                    realmService, tenant.getId()));
+            ownerInfoResponse.setLastname(ClaimsMgtUtil.getLastNamefromUserStoreManager(
+                    realmService, tenant.getId()));
+            return ownerInfoResponse;
+        } catch (UserStoreException e) {
+            if (e.getMessage().startsWith(TenantManagementConstants.NON_EXISTING_USER_CODE)) {
+                throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
+                        ERROR_CODE_OWNER_NOT_FOUND, tenant.getAdminUserId());
+            }
+            throw new TenantMgtException(e.getMessage());
+        }
     }
 
     private TenantResponseModel createTenantResponse(Tenant tenant) {
@@ -250,7 +326,7 @@ public class ServerTenantManagementService {
         tenantResponseModel.setDomain(tenant.getDomain());
         tenantResponseModel.setId(tenant.getTenantUniqueID());
         tenantResponseModel.setLifecycleStatus(getLifeCycleStatus(tenant.isActive()));
-        tenantResponseModel.setOwners(getOwnerIdResponses(tenant));
+        tenantResponseModel.setOwners(getOwnerResponses(tenant));
         return tenantResponseModel;
     }
 
@@ -325,7 +401,7 @@ public class ServerTenantManagementService {
             listItem.setCreatedDate(getISOFormatDate(tenant.getCreatedDate()));
             listItem.setDomain(tenant.getDomain());
             listItem.setId(tenant.getTenantUniqueID());
-            listItem.setOwners(getOwnerIdResponses(tenant));
+            listItem.setOwners(getOwnerResponses(tenant));
 
             tenantListItems.add(listItem);
         }
@@ -339,14 +415,14 @@ public class ServerTenantManagementService {
         return lifeCycleStatus;
     }
 
-    private List<OwnerIdResponse> getOwnerIdResponses(Tenant tenant) {
+    private List<OwnerResponse> getOwnerResponses(Tenant tenant) {
 
-        List<OwnerIdResponse> ownerIdResponseList = new ArrayList<>();
-        OwnerIdResponse ownerIdResponse = new OwnerIdResponse();
-        ownerIdResponse.setUsername(tenant.getAdminName());
-        ownerIdResponse.setId(tenant.getAdminUserId());
-        ownerIdResponseList.add(ownerIdResponse);
-        return ownerIdResponseList;
+        List<OwnerResponse> ownerResponseList = new ArrayList<>();
+        OwnerResponse ownerResponse = new OwnerResponse();
+        ownerResponse.setUsername(tenant.getAdminName());
+        ownerResponse.setId(tenant.getAdminUserId());
+        ownerResponseList.add(ownerResponse);
+        return ownerResponseList;
     }
 
     private List<Link> createLinks(String url, int limit, int offset, int total, String filter) {
