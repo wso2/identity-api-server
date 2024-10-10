@@ -181,6 +181,9 @@ public class Util {
 
     private static int calculateOffsetForPreviousLink(int offset, int limit, int total) {
 
+        if (offset >= total && limit == 0) {
+            return offset;
+        }
         int newOffset = (offset - limit);
         if (newOffset < total) {
             return newOffset;
