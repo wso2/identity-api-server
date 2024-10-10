@@ -100,7 +100,7 @@ public class ExtensionMgtUtils {
      */
     public static void validateExtensionType(String extensionType) {
 
-        if (!ArrayUtils.contains(ExtensionManagementServiceHolder.getInstance().getExtensionManager()
+        if (!ArrayUtils.contains(ExtensionManagementServiceHolder.getExtensionManager()
                 .getExtensionTypes(), extensionType)) {
             throw handleClientException(Response.Status.BAD_REQUEST, ExtensionMgtConstants.ErrorMessage
                     .ERROR_CODE_INVALID_EXTENSION_TYPE, extensionType);
