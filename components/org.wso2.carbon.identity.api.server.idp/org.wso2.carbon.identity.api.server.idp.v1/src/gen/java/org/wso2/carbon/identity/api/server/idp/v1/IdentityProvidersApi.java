@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -19,12 +19,12 @@
 package org.wso2.carbon.identity.api.server.idp.v1;
 
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.idp.v1.factories.IdentityProvidersApiServiceFactory;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
@@ -53,7 +53,6 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.OutboundProvisioningRequ
 import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ProvisioningResponse;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Roles;
-import org.wso2.carbon.identity.api.server.idp.v1.IdentityProvidersApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -68,8 +67,11 @@ import javax.validation.constraints.*;
 
 public class IdentityProvidersApi  {
 
-    @Autowired
-    private IdentityProvidersApiService delegate;
+    private final IdentityProvidersApiService delegate;
+
+    public IdentityProvidersApi() {
+        this.delegate = IdentityProvidersApiServiceFactory.getIdentityProvidersApi();
+    }
 
     @Valid
     @POST

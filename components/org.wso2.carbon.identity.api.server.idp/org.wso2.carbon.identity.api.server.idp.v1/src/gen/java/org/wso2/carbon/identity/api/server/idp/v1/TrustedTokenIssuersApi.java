@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,17 +18,15 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.idp.v1.factories.TrustedTokenIssuersApiServiceFactory;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Error;
 import org.wso2.carbon.identity.api.server.idp.v1.model.IdentityProviderListResponse;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Patch;
 import org.wso2.carbon.identity.api.server.idp.v1.model.TrustedTokenIssuerPOSTRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.TrustedTokenIssuerResponse;
-import org.wso2.carbon.identity.api.server.idp.v1.TrustedTokenIssuersApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -41,8 +39,11 @@ import org.wso2.carbon.identity.api.server.idp.v1.model.Error;
 
 public class TrustedTokenIssuersApi  {
 
-    @Autowired
-    private TrustedTokenIssuersApiService delegate;
+    private final TrustedTokenIssuersApiService delegate;
+
+    public TrustedTokenIssuersApi() {
+        this.delegate = TrustedTokenIssuersApiServiceFactory.getTrustedTokenIssuersApi();
+    }
 
     @Valid
     @POST
