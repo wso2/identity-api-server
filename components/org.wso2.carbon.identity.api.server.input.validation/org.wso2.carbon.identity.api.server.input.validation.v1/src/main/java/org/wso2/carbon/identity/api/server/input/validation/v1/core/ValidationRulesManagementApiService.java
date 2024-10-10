@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.org).
+ * Copyright (c) 2022-2024, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.api.server.input.validation.v1.core;
@@ -22,7 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.input.validation.common.InputValidationServiceHolder;
 import org.wso2.carbon.identity.api.server.input.validation.common.util.ValidationManagementConstants;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.MappingModel;
 import org.wso2.carbon.identity.api.server.input.validation.v1.models.RuleModel;
@@ -39,6 +40,7 @@ import org.wso2.carbon.identity.input.validation.mgt.model.Validator;
 import org.wso2.carbon.identity.input.validation.mgt.model.ValidatorConfiguration;
 import org.wso2.carbon.identity.input.validation.mgt.model.validators.AbstractRegExValidator;
 import org.wso2.carbon.identity.input.validation.mgt.model.validators.AbstractRulesValidator;
+import org.wso2.carbon.identity.input.validation.mgt.services.InputValidationManagementService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +68,12 @@ import static org.wso2.carbon.identity.input.validation.mgt.utils.Constants.SUPP
  */
 public class ValidationRulesManagementApiService {
 
+    private final InputValidationManagementService inputValidationManagementService;
     private static final Log LOGGER = LogFactory.getLog(ValidationRulesManagementApiService.class);
+
+    public ValidationRulesManagementApiService(InputValidationManagementService inputValidationManagementService) {
+        this.inputValidationManagementService = inputValidationManagementService;
+    }
 
     /**
      * Method to get input validation configuration.
@@ -77,7 +84,7 @@ public class ValidationRulesManagementApiService {
     public List<ValidationConfigModel> getValidationConfiguration(String tenantDomain) {
 
         try {
-            List<ValidationConfiguration> configurations = InputValidationServiceHolder.getInputValidationMgtService()
+            List<ValidationConfiguration> configurations = inputValidationManagementService
                     .getInputValidationConfiguration(tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
@@ -95,7 +102,7 @@ public class ValidationRulesManagementApiService {
 
         try {
             isFieldSupported(field);
-            ValidationConfiguration configuration = InputValidationServiceHolder.getInputValidationMgtService()
+            ValidationConfiguration configuration = inputValidationManagementService
                     .getInputValidationConfigurationForField(tenantDomain, field);
             return buildResponse(configuration);
         } catch (InputValidationMgtException e) {
@@ -115,7 +122,7 @@ public class ValidationRulesManagementApiService {
         try {
             List<ValidationConfiguration> requestDTO = buildRequestDTOFromValidationRequest(validationConfigModel);
             validateProperties(requestDTO, tenantDomain);
-            List<ValidationConfiguration> configurations = InputValidationServiceHolder.getInputValidationMgtService()
+            List<ValidationConfiguration> configurations = inputValidationManagementService
                     .updateInputValidationConfiguration(requestDTO, tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
@@ -139,7 +146,7 @@ public class ValidationRulesManagementApiService {
             configModels.add(validationConfigModel);
             List<ValidationConfiguration> requestDTO = buildRequestDTOFromValidationRequest(configModels);
             validateProperties(requestDTO, tenantDomain);
-            ValidationConfiguration configurations = InputValidationServiceHolder.getInputValidationMgtService()
+            ValidationConfiguration configurations = inputValidationManagementService
                     .updateValidationConfiguration(requestDTO.get(0), tenantDomain);
             return buildResponse(configurations);
         } catch (InputValidationMgtException e) {
@@ -156,8 +163,7 @@ public class ValidationRulesManagementApiService {
 
         List<ValidatorConfiguration> validators;
         try {
-            validators = InputValidationServiceHolder.getInputValidationMgtService()
-                    .getValidatorConfigurations(tenantDomain);
+            validators = inputValidationManagementService.getValidatorConfigurations(tenantDomain);
             return buildValidatorResponse(validators);
         } catch (InputValidationMgtException e) {
             if (ERROR_CODE_INPUT_VALIDATION_NOT_EXISTS.getCode().contains(e.getErrorCode())) {
@@ -361,8 +367,7 @@ public class ValidationRulesManagementApiService {
     private void validateProperties(String field, boolean isRules, List<RulesConfiguration> rules, String tenantDomain)
             throws InputValidationMgtClientException {
 
-        Map<String, Validator> allValidators = InputValidationServiceHolder.getInputValidationMgtService()
-                .getValidators(tenantDomain);
+        Map<String, Validator> allValidators = inputValidationManagementService.getValidators(tenantDomain);
         ValidationContext context;
         for (RulesConfiguration rule: rules) {
             Validator validator = allValidators.get(rule.getValidatorName());
@@ -386,7 +391,7 @@ public class ValidationRulesManagementApiService {
         }
 
         // Validate provided validation is allowed for the field.
-        for (FieldValidationConfigurationHandler handler: InputValidationServiceHolder.getInputValidationMgtService()
+        for (FieldValidationConfigurationHandler handler: inputValidationManagementService
                 .getFieldValidationConfigurationHandlers().values()) {
             if (handler.canHandle(field)) {
                 handler.validateValidationConfiguration(rules);
