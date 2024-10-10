@@ -37,6 +37,7 @@ public class ApplicationListItem  {
     private String id;
     private String name;
     private String description;
+    private String applicationVersion;
     private String image;
     private String accessUrl;
     private String clientId;
@@ -135,6 +136,24 @@ public enum AccessEnum {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     **/
+    public ApplicationListItem applicationVersion(String applicationVersion) {
+
+        this.applicationVersion = applicationVersion;
+        return this;
+    }
+
+    @ApiModelProperty(example = "This is the application version.", value = "")
+    @JsonProperty("applicationVersion")
+    @Valid
+    public String getApplicationVersion() {
+        return applicationVersion;
+    }
+    public void setApplicationVersion(String applicationVersion) {
+        this.applicationVersion = applicationVersion;
     }
 
     /**
@@ -369,6 +388,7 @@ public enum AccessEnum {
         return Objects.equals(this.id, applicationListItem.id) &&
             Objects.equals(this.name, applicationListItem.name) &&
             Objects.equals(this.description, applicationListItem.description) &&
+            Objects.equals(this.applicationVersion, applicationListItem.applicationVersion) &&
             Objects.equals(this.image, applicationListItem.image) &&
             Objects.equals(this.accessUrl, applicationListItem.accessUrl) &&
             Objects.equals(this.clientId, applicationListItem.clientId) &&
@@ -385,7 +405,7 @@ public enum AccessEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, applicationEnabled);
+        return Objects.hash(id, name, description, applicationVersion, image, accessUrl, clientId, issuer, realm, access, self, advancedConfigurations, templateId, templateVersion, associatedRoles, applicationEnabled);
     }
 
     @Override
@@ -397,6 +417,7 @@ public enum AccessEnum {
         sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
+        sb.append("    applicationVersion: ").append(toIndentedString(applicationVersion)).append("\n");
         sb.append("    image: ").append(toIndentedString(image)).append("\n");
         sb.append("    accessUrl: ").append(toIndentedString(accessUrl)).append("\n");
         sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");

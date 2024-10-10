@@ -39,6 +39,7 @@ public class UpdateServiceProvider implements UpdateFunction<ServiceProvider, Ap
 
         setIfNotNull(applicationPatchModel.getName(), serviceProvider::setApplicationName);
         setIfNotNull(applicationPatchModel.getDescription(), serviceProvider::setDescription);
+        setIfNotNull(applicationPatchModel.getApplicationVersion(), serviceProvider::setApplicationVersion);
         setIfNotNull(applicationPatchModel.getImageUrl(), serviceProvider::setImageUrl);
         setIfNotNull(applicationPatchModel.getAccessUrl(), serviceProvider::setAccessUrl);
         setIfNotNull(applicationPatchModel.getTemplateId(), serviceProvider::setTemplateId);
