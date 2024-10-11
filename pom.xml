@@ -813,7 +813,7 @@
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
         <carbon.kernel.version>4.9.17</carbon.kernel.version>
-        <carbon.multitenancy.version>4.9.10</carbon.multitenancy.version>
+        <carbon.multitenancy.version>4.11.25-SNAPSHOT</carbon.multitenancy.version>
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
         <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.5.15</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
         <org.wso2.carbon.logging.service.version>4.10.11</org.wso2.carbon.logging.service.version>

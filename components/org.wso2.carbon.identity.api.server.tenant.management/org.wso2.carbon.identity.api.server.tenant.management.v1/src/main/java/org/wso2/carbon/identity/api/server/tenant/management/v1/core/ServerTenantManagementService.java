@@ -67,8 +67,10 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_TENANT_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.TENANT_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_EXISTING_DOMAIN;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_INVALID_EMAIL;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_MISSING_REQUIRED_PARAMETER;
 
@@ -293,6 +295,9 @@ public class ServerTenantManagementService {
         List<AdditionalClaims> additionalClaimsList = ownerPutModel.getAdditionalClaims();
         if (CollectionUtils.isNotEmpty(additionalClaimsList)) {
             tenant.setClaimsMap(createClaimsMapping(additionalClaimsList));
+        } else {
+            // Avoid updating the claims map if the request does not contain any additional claims.
+            tenant.setClaimsMap(new HashMap<>());
         }
         return tenant;
     }
@@ -508,13 +513,20 @@ public class ServerTenantManagementService {
             if (ERROR_CODE_RESOURCE_LIMIT_REACHED.equals(e.getErrorCode())) {
                 return handleResourceLimitReached();
             }
+            if (ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED.getCode().equals(e.getErrorCode())) {
+                return handleResourcePartiallyCreated(e);
+            }
             errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
-            status = Response.Status.BAD_REQUEST;
+            if (ERROR_CODE_EXISTING_DOMAIN.getCode().equals(e.getErrorCode())) {
+                status = Response.Status.CONFLICT;
+            } else {
+                status = Response.Status.BAD_REQUEST;
+            }
         } else if (e instanceof TenantManagementServerException) {
             errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
             if (e.getErrorCode() != null) {
@@ -537,6 +549,14 @@ public class ServerTenantManagementService {
 
         Response.Status status = Response.Status.FORBIDDEN;
         return new APIError(status, errorResponse);
+    }
+
+    private APIError handleResourcePartiallyCreated(TenantMgtException e) {
+
+        String errorMessage = e.getCause().getMessage();
+        ErrorResponse errorResponse = getErrorBuilder(ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED, errorMessage)
+                .build(log, errorMessage);
+        return new APIError(Response.Status.PARTIAL_CONTENT, errorResponse);
     }
 
     /**
