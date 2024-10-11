@@ -31,7 +31,7 @@ public interface TenantsApiService {
 
       public Response deleteTenantMetadata(String tenantId);
 
-      public Response getOwner(String tenantId, String ownerId);
+      public Response getOwner(String tenantId, String ownerId, String additionalClaims);
 
       public Response getOwners(String tenantId);
 

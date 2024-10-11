@@ -200,7 +200,7 @@ public class ServerTenantManagementService {
         }
     }
 
-    public OwnerInfoResponse getOwner(String tenantUniqueID, String ownerID) {
+    public OwnerInfoResponse getOwner(String tenantUniqueID, String ownerID, String additionalClaims) {
 
         try {
             Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
@@ -208,7 +208,8 @@ public class ServerTenantManagementService {
                 throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
                         ERROR_CODE_OWNER_NOT_FOUND, ownerID);
             }
-            return createOwnerInfoResponse(tenant);
+            String[] claimsList = StringUtils.split(additionalClaims, ",");
+            return createOwnerInfoResponse(tenant, claimsList);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_RETRIEVING_OWNER, ownerID);
@@ -302,19 +303,19 @@ public class ServerTenantManagementService {
         return tenant;
     }
 
-    private OwnerInfoResponse createOwnerInfoResponse(Tenant tenant) throws TenantMgtException {
+    private OwnerInfoResponse createOwnerInfoResponse(Tenant tenant, String[] claimsList) throws TenantMgtException {
 
         RealmService realmService = TenantManagementServiceHolder.getRealmService();
         OwnerInfoResponse ownerInfoResponse = new OwnerInfoResponse();
         ownerInfoResponse.setId(tenant.getAdminUserId());
         ownerInfoResponse.setUsername(tenant.getAdminName());
         ownerInfoResponse.setEmail(tenant.getEmail());
+
         try {
             ownerInfoResponse.setFirstname(ClaimsMgtUtil.getFirstNamefromUserStoreManager(
                     realmService, tenant.getId()));
             ownerInfoResponse.setLastname(ClaimsMgtUtil.getLastNamefromUserStoreManager(
                     realmService, tenant.getId()));
-            return ownerInfoResponse;
         } catch (UserStoreException e) {
             if (e.getMessage().startsWith(TenantManagementConstants.NON_EXISTING_USER_CODE)) {
                 throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
@@ -322,6 +323,22 @@ public class ServerTenantManagementService {
             }
             throw new TenantMgtException(e.getMessage());
         }
+
+        if (claimsList != null) {
+            for (String claim : claimsList) {
+                try {
+                    String claimValue = ClaimsMgtUtil.getClaimfromUserStoreManager(realmService, tenant.getId(), claim);
+                    if (StringUtils.isNotBlank(claimValue)) {
+                        ownerInfoResponse.addAdditionalClaimsItem(new AdditionalClaims().claim(claim).value(claimValue));
+                    }
+                } catch (org.wso2.carbon.user.core.UserStoreException e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Error while retrieving claim: " + claim + " for tenant: " + tenant.getId(), e);
+                    }
+                }
+            }
+        }
+        return ownerInfoResponse;
     }
 
     private TenantResponseModel createTenantResponse(Tenant tenant) {

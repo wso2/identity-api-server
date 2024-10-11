@@ -55,9 +55,9 @@ public class TenantsApiServiceImpl implements TenantsApiService {
     }
 
     @Override
-    public Response getOwner(String tenantId, String ownerId) {
+    public Response getOwner(String tenantId, String ownerId, String additionalClaims) {
 
-        return Response.ok().entity(tenantManagementService.getOwner(tenantId, ownerId)).build();
+        return Response.ok().entity(tenantManagementService.getOwner(tenantId, ownerId, additionalClaims)).build();
     }
 
     @Override

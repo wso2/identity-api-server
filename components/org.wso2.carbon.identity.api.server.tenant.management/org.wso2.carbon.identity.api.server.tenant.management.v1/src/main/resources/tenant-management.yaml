@@ -330,6 +330,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/tenantIdPathParam'
         - $ref: '#/components/parameters/ownerIdPathParam'
+        - $ref: '#/components/parameters/additionalClaimsQueryParam'
       responses:
         '200':
           description: OK
@@ -502,6 +503,15 @@ components:
         option is not yet supported.<b>_
       schema:
         type: string
+    additionalClaimsQueryParam:
+      in: query
+      name: additionalClaims
+      required: false
+      description: >-
+        Define set of additional user claims (as comma separated) to be returned.
+      schema:
+        type: string
+        example: http://wso2.org/claims/telephone
   responses:
     NotFound:
       description: The specified resource is not found

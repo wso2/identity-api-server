@@ -124,9 +124,9 @@ public class TenantsApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response getOwner(@ApiParam(value = "tenant id",required=true) @PathParam("tenant-id") String tenantId, @ApiParam(value = "owner id",required=true) @PathParam("owner-id") String ownerId) {
+    public Response getOwner(@ApiParam(value = "tenant id",required=true) @PathParam("tenant-id") String tenantId, @ApiParam(value = "owner id",required=true) @PathParam("owner-id") String ownerId,     @Valid@ApiParam(value = "Define set of additional user claims (as comma separated) to be returned.")  @QueryParam("additionalClaims") String additionalClaims) {
 
-        return delegate.getOwner(tenantId,  ownerId );
+        return delegate.getOwner(tenantId,  ownerId,  additionalClaims );
     }
 
     @Valid
