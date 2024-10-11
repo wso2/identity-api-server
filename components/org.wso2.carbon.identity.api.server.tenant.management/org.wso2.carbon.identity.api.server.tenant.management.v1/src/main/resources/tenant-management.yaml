@@ -85,6 +85,8 @@ paths:
               description: Location of the newly created tenant
               schema:
                 type: string
+        '206':
+          $ref: '#/components/responses/PartialContent'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -371,6 +373,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/Updated'
+        '206':
+          $ref: '#/components/responses/PartialContent'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -513,6 +517,12 @@ components:
       description: Requested Resource Exists
     ServerError:
       description: Internal Server Error
+      content:
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error'
+    PartialContent:
+      description: Partial Content
       content:
         'application/json':
           schema:

@@ -69,6 +69,7 @@ public class TenantsApi  {
     }, tags={ "Tenants", })
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Item Created", response = Void.class),
+        @ApiResponse(code = 206, message = "Partial Content", response = Error.class),
         @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
@@ -261,6 +262,7 @@ public class TenantsApi  {
     }, tags={ "Tenants", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful", response = Void.class),
+        @ApiResponse(code = 206, message = "Partial Content", response = Error.class),
         @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
