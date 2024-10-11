@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.api.server.keystore.management.v1.core;
@@ -26,6 +28,7 @@ import org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreCo
 import org.wso2.carbon.identity.api.server.keystore.management.v1.model.CertificateResponse;
 import org.wso2.carbon.security.keystore.KeyStoreManagementException;
 import org.wso2.carbon.security.keystore.KeyStoreManagementServerException;
+import org.wso2.carbon.security.keystore.KeyStoreManagementService;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,14 +57,18 @@ import static org.wso2.carbon.identity.api.server.keystore.management.common.Key
 import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.ErrorMessage.ERROR_CODE_INVALID_ALIAS;
 import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.KEYSTORES_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreConstants.PATH_SEPERATOR;
-import static org.wso2.carbon.identity.api.server.keystore.management.common.KeyStoreManagamentDataHolder.getKeyStoreManager;
 
 /**
  * Keystore service APIs are processed in this class.
  */
 public class KeyStoreService {
 
+    private final KeyStoreManagementService keyStoreManagementService;
     private static final Log LOG = LogFactory.getLog(KeyStoreService.class);
+
+    public KeyStoreService(KeyStoreManagementService keyStoreManagementService) {
+        this.keyStoreManagementService = keyStoreManagementService;
+    }
 
     /**
      * Retrieves the list of certificates from the keystore.
@@ -74,7 +81,7 @@ public class KeyStoreService {
         List<String> aliasList;
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            aliasList = getKeyStoreManager().getKeyStoreCertificateAliases(tenantDomain, filter);
+            aliasList = keyStoreManagementService.getKeyStoreCertificateAliases(tenantDomain, filter);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Unable to list certificates from keystore.");
         }
@@ -93,7 +100,7 @@ public class KeyStoreService {
         X509Certificate certificate;
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            certificate = getKeyStoreManager().getKeyStoreCertificate(tenantDomain, alias);
+            certificate = keyStoreManagementService.getKeyStoreCertificate(tenantDomain, alias);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Unable to retrieve the certificate with alias: " + alias + " from keystore");
         }
@@ -115,7 +122,7 @@ public class KeyStoreService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            getKeyStoreManager().addCertificate(tenantDomain, alias, certificate);
+            keyStoreManagementService.addCertificate(tenantDomain, alias, certificate);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Unable to upload the certificate with alias: " + alias + " to the keystore.");
         }
@@ -133,7 +140,7 @@ public class KeyStoreService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            getKeyStoreManager().deleteCertificate(tenantDomain, alias);
+            keyStoreManagementService.deleteCertificate(tenantDomain, alias);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Unable to remove the certificate with alias: " + alias + " from the keystore.");
         }
@@ -150,7 +157,7 @@ public class KeyStoreService {
         List<String> aliasList;
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            aliasList = getKeyStoreManager().getClientCertificateAliases(tenantDomain, filter);
+            aliasList = keyStoreManagementService.getClientCertificateAliases(tenantDomain, filter);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Unable to retrieve the list of certificates from client truststore.");
         }
@@ -169,7 +176,7 @@ public class KeyStoreService {
         X509Certificate certificate;
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            certificate = getKeyStoreManager().getClientCertificate(tenantDomain, alias);
+            certificate = keyStoreManagementService.getClientCertificate(tenantDomain, alias);
         } catch (KeyStoreManagementException e) {
             throw handleException(e,
                     "Unable to retrieve the certificate with alias: " + alias + " from client truststore.");
@@ -193,7 +200,7 @@ public class KeyStoreService {
         Map<String, X509Certificate> certificateData;
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            certificateData = getKeyStoreManager().getPublicCertificate(tenantDomain);
+            certificateData = keyStoreManagementService.getPublicCertificate(tenantDomain);
         } catch (KeyStoreManagementException e) {
             throw handleException(e, "Unable to retrieve the public certificate from from keystore.");
         }

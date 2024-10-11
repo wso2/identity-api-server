@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.identity.api.server.keystore.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.security.keystore.KeyStoreManagementService;
 
 /**
@@ -22,13 +23,19 @@ import org.wso2.carbon.security.keystore.KeyStoreManagementService;
  */
 public class KeyStoreManagamentDataHolder {
 
-    private static KeyStoreManagementService keyStoreManager;
+    public KeyStoreManagamentDataHolder() {}
 
-    public static KeyStoreManagementService getKeyStoreManager() {
-        return keyStoreManager;
+    private static class KeyStoreManagementServiceHolder {
+        static final KeyStoreManagementService SERVICE = (KeyStoreManagementService) PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext().getOSGiService(KeyStoreManagementService.class, null);
     }
 
-    public static void setKeyStoreManager(KeyStoreManagementService keyStoreManager) {
-        KeyStoreManagamentDataHolder.keyStoreManager = keyStoreManager;
+    /**
+     * Get KeyStoreManagementService OSGi service.
+     *
+     * @return KeyStoreManagementService.
+     */
+    public static KeyStoreManagementService getKeyStoreManager() {
+        return KeyStoreManagementServiceHolder.SERVICE;
     }
 }
