@@ -422,7 +422,11 @@ public class ServerAuthenticatorManagementService {
         authenticator.setType(Authenticator.TypeEnum.FEDERATED);
         authenticator.setImage(identityProvider.getImageUrl());
         authenticator.setDescription(identityProvider.getIdentityProviderDescription());
-        // Only older existing IDP has multiple federated authenticator,
+
+        /* For the /authenticators APIs, per IDP have an item in the response payload, not per federated authenticator
+         within the IDP. If an IDP has more than one federated authenticator, it is considered as an existing older
+         authenticator and should always be classified as a SYSTEM type. Otherwise, it can be classified as either
+         SYSTEM or USER, depending on the 'definedBy' type of the federated authenticator. */
         if (identityProvider.getFederatedAuthenticatorConfigs().length == 1) {
             DefinedByType definedByType =
                     identityProvider.getFederatedAuthenticatorConfigs()[0].getDefinedByType();
@@ -430,6 +434,7 @@ public class ServerAuthenticatorManagementService {
         } else {
             authenticator.definedBy(Authenticator.DefinedByEnum.SYSTEM);
         }
+
         if (CollectionUtils.isNotEmpty(configTagsListDistinct)) {
             authenticator.setTags(configTagsListDistinct);
         }
