@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.organization.configs.v1.factories;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.OrganizationConfigsApiService;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.impl.OrganizationConfigsApiServiceImpl;
 
+/**
+ * Factory class for OrganizationConfigsApiService.
+ */
 public class OrganizationConfigsApiServiceFactory {
 
-   private final static OrganizationConfigsApiService service = new OrganizationConfigsApiServiceImpl();
+   private final static OrganizationConfigsApiService SERVICE = new OrganizationConfigsApiServiceImpl();
 
+   /**
+    * Get OrganizationConfigsApiService.
+    *
+    * @return OrganizationConfigsApiService.
+    */
    public static OrganizationConfigsApiService getOrganizationConfigsApi()
    {
-      return service;
+      return SERVICE;
    }
 }
