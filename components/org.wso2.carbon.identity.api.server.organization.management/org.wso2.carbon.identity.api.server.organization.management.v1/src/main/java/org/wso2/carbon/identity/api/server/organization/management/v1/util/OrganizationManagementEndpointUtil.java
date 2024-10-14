@@ -175,8 +175,8 @@ public class OrganizationManagementEndpointUtil {
 
     public static String buildURIForPagination(String paginationURL) {
 
-        return buildURIForBody(V1_API_PATH_COMPONENT + PATH_SEPARATOR + ORGANIZATION_PATH + paginationURL)
-                .toString();
+        return buildURIForBody(PATH_SEPARATOR + V1_API_PATH_COMPONENT + PATH_SEPARATOR 
+                + ORGANIZATION_PATH + paginationURL).toString();
     }
 
 }
