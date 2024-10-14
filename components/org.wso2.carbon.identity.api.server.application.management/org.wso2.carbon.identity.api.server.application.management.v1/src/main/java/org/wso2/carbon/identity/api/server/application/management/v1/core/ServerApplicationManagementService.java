@@ -251,6 +251,7 @@ public class ServerApplicationManagementService {
     @Autowired
     private ServerApplicationMetadataService applicationMetadataService;
 
+    @Deprecated
     public ApplicationListResponse getAllApplications(Integer limit, Integer offset, String filter, String sortOrder,
                                                       String sortBy, String requiredAttributes) {
 
