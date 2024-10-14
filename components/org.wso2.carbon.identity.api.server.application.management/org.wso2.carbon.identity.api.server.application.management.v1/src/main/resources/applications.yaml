@@ -2812,6 +2812,9 @@ components:
         description:
           type: string
           example: Application representing user portal
+        applicationVersion:
+          type: string
+          example: "v1.0.0"
         image:
           type: string
           example: 'https://example.com/logo/my-logo.png'
@@ -2924,6 +2927,9 @@ components:
         description:
           type: string
           example: This is the configuration for Pickup application.
+        applicationVersion:
+          type: string
+          example: "v1.0.0"
         imageUrl:
           type: string
           example: 'https://example.com/logo/my-logo.png'
@@ -2989,6 +2995,9 @@ components:
         description:
           type: string
           example: This is the configuration for Pickup application.
+        applicationVersion:
+          type: string
+          example: "v1.0.0"
         imageUrl:
           type: string
           example: 'https://example.com/logo/my-logo.png'
