@@ -205,13 +205,13 @@ public class ServerTenantManagementService {
             Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
             if (tenant.getAdminUserId() == null || !tenant.getAdminUserId().equals(ownerID)) {
                 throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
-                        ERROR_CODE_OWNER_NOT_FOUND, ownerID);
+                        ERROR_CODE_OWNER_NOT_FOUND, tenantUniqueID);
             }
             String[] claimsList = StringUtils.split(additionalClaims, ",");
             return createOwnerInfoResponse(tenant, claimsList);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
-                    ERROR_CODE_ERROR_RETRIEVING_OWNER, ownerID);
+                    ERROR_CODE_ERROR_RETRIEVING_OWNER, tenantUniqueID);
         }
     }
 
@@ -222,7 +222,7 @@ public class ServerTenantManagementService {
             TenantManagementServiceHolder.getTenantMgtService().updateOwner(tenant);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
-                    ERROR_CODE_ERROR_UPDATING_OWNER, ownerID);
+                    ERROR_CODE_ERROR_UPDATING_OWNER, tenantUniqueID);
         }
     }
 
@@ -280,7 +280,7 @@ public class ServerTenantManagementService {
         Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
         if (tenant.getAdminUserId() == null || !tenant.getAdminUserId().equals(ownerID)) {
             throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
-                    ERROR_CODE_OWNER_NOT_FOUND, ownerID);
+                    ERROR_CODE_OWNER_NOT_FOUND, tenantUniqueID);
         }
         if (StringUtils.isNotBlank(ownerPutModel.getFirstname())) {
             tenant.setAdminFirstName(ownerPutModel.getFirstname());
@@ -318,7 +318,7 @@ public class ServerTenantManagementService {
         } catch (UserStoreException e) {
             if (e.getMessage().startsWith(TenantManagementConstants.NON_EXISTING_USER_CODE)) {
                 throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
-                        ERROR_CODE_OWNER_NOT_FOUND, tenant.getAdminUserId());
+                        ERROR_CODE_OWNER_NOT_FOUND, tenant.getTenantUniqueID());
             }
             throw new TenantMgtException(e.getMessage());
         }

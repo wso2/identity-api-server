@@ -48,7 +48,7 @@ public class TenantManagementConstants {
                 "Maximum number of allowed tenants have been reached."),
         ERROR_CODE_OWNER_NOT_FOUND("TM-60020",
                 "Unable to retrieve the tenant owner.",
-                "Tenant owner cannot be found for the provided id: %s."),
+                "Tenant owner cannot be found for the provided tenant id: %s."),
         ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED("TM-60021",
                 "Tenant creation / update was completed with errors.",
                 "Tenant creation / update was completed with error: %s"),
@@ -73,11 +73,11 @@ public class TenantManagementConstants {
                                                         "Unable to check availability of domain.",
                 "Server encountered an error while checking for tenant domain"),
         ERROR_CODE_DELETE_TENANT_METADATA("TM-65008", "Error while deleting the tenant metadata.",
-                "Server encountered an error while deleting the tenant metadata identified by %s ."),
+                "Server encountered an error while deleting the tenant metadata identified by %s."),
         ERROR_CODE_ERROR_RETRIEVING_OWNER("TM-65009", "Error while retrieving the owner.",
-                "Server encountered an error while retrieving the owner identified by %s ."),
+                "Server encountered an error while retrieving the owner identified by tenant id %s."),
         ERROR_CODE_ERROR_UPDATING_OWNER("TM-65010", "Error while updating the owner.",
-                "Server encountered an error while updating the owner identified by %s .");
+                "Server encountered an error while updating the owner identified by tenant id %s.");
 
         private final String code;
         private final String message;
