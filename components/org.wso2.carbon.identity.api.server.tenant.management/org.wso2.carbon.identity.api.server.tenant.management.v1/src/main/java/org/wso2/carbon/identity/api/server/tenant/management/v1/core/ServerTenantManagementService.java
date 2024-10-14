@@ -70,7 +70,6 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_TENANT_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.TENANT_MANAGEMENT_PATH_COMPONENT;
-import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_EXISTING_DOMAIN;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_INVALID_EMAIL;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_MISSING_REQUIRED_PARAMETER;
 
@@ -540,11 +539,7 @@ public class ServerTenantManagementService {
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getMessage());
-            if (ERROR_CODE_EXISTING_DOMAIN.getCode().equals(e.getErrorCode())) {
-                status = Response.Status.CONFLICT;
-            } else {
-                status = Response.Status.BAD_REQUEST;
-            }
+            status = Response.Status.BAD_REQUEST;
         } else if (e instanceof TenantManagementServerException) {
             errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
             if (e.getErrorCode() != null) {
