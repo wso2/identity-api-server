@@ -145,6 +145,9 @@ public class Util {
 
         Map<String, String> links = new HashMap<>();
 
+        if (limit == 0) {
+            return links;
+        }
         StringBuilder otherParams = new StringBuilder();
         if (!StringUtils.isEmpty(requiredAttributes)) {
             otherParams.append("&attributes=").append(requiredAttributes);
