@@ -17,13 +17,13 @@
 package org.wso2.carbon.identity.api.server.script.library.v1.impl;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.script.library.common.Constants;
 import org.wso2.carbon.identity.api.server.script.library.v1.ScriptLibrariesApiService;
 import org.wso2.carbon.identity.api.server.script.library.v1.core.ServerScriptLibrariesService;
+import org.wso2.carbon.identity.api.server.script.library.v1.factories.ServerScriptLibrariesServiceFactory;
 import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibraryListResponse;
 import org.wso2.carbon.identity.api.server.script.library.v1.model.ScriptLibraryResponse;
 
@@ -44,8 +44,15 @@ import static org.wso2.carbon.identity.api.server.script.library.common.Constant
  */
 public class ScriptLibrariesApiServiceImpl implements ScriptLibrariesApiService {
 
-    @Autowired
-    private ServerScriptLibrariesService serverScriptLibrariesService;
+    private final ServerScriptLibrariesService serverScriptLibrariesService;
+
+    public ScriptLibrariesApiServiceImpl() {
+        try {
+            this.serverScriptLibrariesService = ServerScriptLibrariesServiceFactory.getServerScriptLibrariesService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating ServerScriptLibrariesService.", e);
+        }
+    }
 
     @Override
     public Response addScriptLibrary(String name, InputStream contentInputStream, Attachment contentDetail,
