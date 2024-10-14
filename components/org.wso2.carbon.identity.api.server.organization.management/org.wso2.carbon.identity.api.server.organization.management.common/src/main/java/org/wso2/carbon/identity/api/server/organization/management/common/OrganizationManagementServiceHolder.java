@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.organization.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.discovery.service.OrganizationDiscoveryManager;
 import org.wso2.carbon.identity.organization.management.application.OrgApplicationManager;
 import org.wso2.carbon.identity.organization.management.service.OrganizationManager;
@@ -27,19 +28,21 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationMana
  */
 public class OrganizationManagementServiceHolder {
 
-    private static OrganizationManagementServiceHolder instance = new OrganizationManagementServiceHolder();
+    private OrganizationManagementServiceHolder() {}
 
-    private OrgApplicationManager orgApplicationManager;
-    private OrganizationManager organizationManager;
-    private OrganizationDiscoveryManager organizationDiscoveryManager;
-
-    private OrganizationManagementServiceHolder() {
-
+    private static class OrgApplicationManagerHolder {
+        static final OrgApplicationManager SERVICE = (OrgApplicationManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(OrgApplicationManager.class, null);
     }
 
-    public static OrganizationManagementServiceHolder getInstance() {
+    private static class OrganizationManagerHolder {
+        static final OrganizationManager SERVICE = (OrganizationManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(OrganizationManager.class, null);
+    }
 
-        return instance;
+    private static class OrganizationDiscoveryManagerHolder {
+        static final OrganizationDiscoveryManager SERVICE = (OrganizationDiscoveryManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(OrganizationDiscoveryManager.class, null);
     }
 
     /**
@@ -47,19 +50,9 @@ public class OrganizationManagementServiceHolder {
      *
      * @return OrgApplicationManager.
      */
-    public OrgApplicationManager getOrgApplicationManager() {
+    public static OrgApplicationManager getOrgApplicationManager() {
 
-        return OrganizationManagementServiceHolder.getInstance().orgApplicationManager;
-    }
-
-    /**
-     * Set OrgApplicationManager OSGi service.
-     *
-     * @param orgApplicationManager OrgApplicationManager.
-     */
-    public void setOrgApplicationManager(OrgApplicationManager orgApplicationManager) {
-
-        OrganizationManagementServiceHolder.getInstance().orgApplicationManager = orgApplicationManager;
+        return OrgApplicationManagerHolder.SERVICE;
     }
 
     /**
@@ -67,19 +60,9 @@ public class OrganizationManagementServiceHolder {
      *
      * @return OrganizationManager.
      */
-    public OrganizationManager getOrganizationManager() {
+    public static OrganizationManager getOrganizationManager() {
 
-        return OrganizationManagementServiceHolder.getInstance().organizationManager;
-    }
-
-    /**
-     * Set OrganizationManager OSGi service.
-     *
-     * @param organizationManager OrganizationManager.
-     */
-    public void setOrganizationManager(OrganizationManager organizationManager) {
-
-        OrganizationManagementServiceHolder.getInstance().organizationManager = organizationManager;
+        return OrganizationManagerHolder.SERVICE;
     }
 
     /**
@@ -87,18 +70,8 @@ public class OrganizationManagementServiceHolder {
      *
      * @return OrganizationDiscoveryManager.
      */
-    public OrganizationDiscoveryManager getOrganizationDiscoveryManager() {
+    public static OrganizationDiscoveryManager getOrganizationDiscoveryManager() {
 
-        return OrganizationManagementServiceHolder.getInstance().organizationDiscoveryManager;
-    }
-
-    /**
-     * Set OrganizationDiscoveryManager OSGi service.
-     *
-     * @param organizationDiscoveryManager OrganizationDiscoveryManager.
-     */
-    public void setOrganizationDiscoveryManager(OrganizationDiscoveryManager organizationDiscoveryManager) {
-
-        OrganizationManagementServiceHolder.getInstance().organizationDiscoveryManager = organizationDiscoveryManager;
+        return OrganizationDiscoveryManagerHolder.SERVICE;
     }
 }
