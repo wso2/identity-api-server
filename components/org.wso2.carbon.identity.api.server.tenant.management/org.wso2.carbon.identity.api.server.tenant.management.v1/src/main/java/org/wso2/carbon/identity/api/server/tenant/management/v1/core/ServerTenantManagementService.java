@@ -329,7 +329,8 @@ public class ServerTenantManagementService {
                 try {
                     String claimValue = ClaimsMgtUtil.getClaimfromUserStoreManager(realmService, tenant.getId(), claim);
                     if (StringUtils.isNotBlank(claimValue)) {
-                        ownerInfoResponse.addAdditionalClaimsItem(new AdditionalClaims().claim(claim).value(claimValue));
+                        ownerInfoResponse.addAdditionalClaimsItem(
+                                new AdditionalClaims().claim(claim).value(claimValue));
                     }
                 } catch (org.wso2.carbon.user.core.UserStoreException e) {
                     if (log.isDebugEnabled()) {
