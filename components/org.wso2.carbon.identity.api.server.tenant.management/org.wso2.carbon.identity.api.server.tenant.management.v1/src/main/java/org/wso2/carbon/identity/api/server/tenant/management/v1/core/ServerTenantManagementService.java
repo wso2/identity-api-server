@@ -203,10 +203,8 @@ public class ServerTenantManagementService {
 
         try {
             Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
-            if (tenant.getAdminUserId() == null || !tenant.getAdminUserId().equals(ownerID)) {
-                throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
-                        ERROR_CODE_OWNER_NOT_FOUND, tenantUniqueID);
-            }
+            validateTenantOwnerId(tenant, ownerID);
+
             String[] claimsList = StringUtils.split(additionalClaims, ",");
             return createOwnerInfoResponse(tenant, claimsList);
         } catch (TenantMgtException e) {
@@ -218,7 +216,11 @@ public class ServerTenantManagementService {
     public void updateOwner(String tenantUniqueID, String ownerID, OwnerPutModel ownerPutModel) {
 
         try {
-            Tenant tenant = createTenantInfoBean(tenantUniqueID, ownerID, ownerPutModel);
+            Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
+            validateTenantOwnerId(tenant, ownerID);
+
+            createTenantInfoBean(tenant, ownerPutModel);
+
             TenantManagementServiceHolder.getTenantMgtService().updateOwner(tenant);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
@@ -274,14 +276,8 @@ public class ServerTenantManagementService {
         return ownerResponseList;
     }
 
-    private Tenant createTenantInfoBean(String tenantUniqueID, String ownerID, OwnerPutModel ownerPutModel)
-            throws TenantMgtException {
+    private void createTenantInfoBean(Tenant tenant, OwnerPutModel ownerPutModel) {
 
-        Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
-        if (tenant.getAdminUserId() == null || !tenant.getAdminUserId().equals(ownerID)) {
-            throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
-                    ERROR_CODE_OWNER_NOT_FOUND, tenantUniqueID);
-        }
         if (StringUtils.isNotBlank(ownerPutModel.getFirstname())) {
             tenant.setAdminFirstName(ownerPutModel.getFirstname());
         }
@@ -299,7 +295,14 @@ public class ServerTenantManagementService {
             // Avoid updating the claims map if the request does not contain any additional claims.
             tenant.setClaimsMap(new HashMap<>());
         }
-        return tenant;
+    }
+
+    private void validateTenantOwnerId(Tenant tenant, String ownerID) {
+
+        if (tenant.getAdminUserId() == null || !tenant.getAdminUserId().equals(ownerID)) {
+            throw handleException(Response.Status.BAD_REQUEST, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_OWNER_NOT_FOUND, tenant.getTenantUniqueID());
+        }
     }
 
     private OwnerInfoResponse createOwnerInfoResponse(Tenant tenant, String[] claimsList) throws TenantMgtException {
