@@ -40,7 +40,7 @@ public class ServerAuthenticatorManagementServiceFactory {
         }
 
         if (idpManager == null) {
-            throw new IllegalStateException("IdpManager is not available from OSGi context.");
+            throw new IllegalStateException("IdpManager service is not available from OSGi context.");
         }
 
         SERVICE = new ServerAuthenticatorManagementService(applicationManagementService, idpManager);
@@ -52,6 +52,7 @@ public class ServerAuthenticatorManagementServiceFactory {
      * @return ServerAuthenticatorManagementService
      */
     public static ServerAuthenticatorManagementService getServerAuthenticatorManagementService() {
+
         return SERVICE;
     }
 }

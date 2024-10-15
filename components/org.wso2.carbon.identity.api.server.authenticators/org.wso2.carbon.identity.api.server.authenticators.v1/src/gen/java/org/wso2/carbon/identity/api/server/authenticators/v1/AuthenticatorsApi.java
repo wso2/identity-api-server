@@ -44,6 +44,7 @@ public class AuthenticatorsApi  {
     private final AuthenticatorsApiService delegate;
 
     public AuthenticatorsApi() {
+
         this.delegate = AuthenticatorsApiServiceFactory.getAuthenticatorsApi();
     }
 
