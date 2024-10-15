@@ -71,6 +71,7 @@ public class ServerIdentityGovernanceService {
     private static final Log LOG = LogFactory.getLog(ServerIdentityGovernanceService.class);
 
     public ServerIdentityGovernanceService(IdentityGovernanceService identityGovernanceService) {
+
         this.identityGovernanceService = identityGovernanceService;
     }
 

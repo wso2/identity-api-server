@@ -44,6 +44,7 @@ public class IdentityGovernanceApi  {
     private final IdentityGovernanceApiService delegate;
 
     public IdentityGovernanceApi() {
+
         this.delegate = IdentityGovernanceApiServiceFactory.getIdentityGovernanceApi();
     }
 
