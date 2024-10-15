@@ -46,6 +46,7 @@ public class SecretManagementServiceFactory {
      * @return SecretManagementService.
      */
     public static SecretManagementService getSecretManagementService() {
+
         return SERVICE;
     }
 }

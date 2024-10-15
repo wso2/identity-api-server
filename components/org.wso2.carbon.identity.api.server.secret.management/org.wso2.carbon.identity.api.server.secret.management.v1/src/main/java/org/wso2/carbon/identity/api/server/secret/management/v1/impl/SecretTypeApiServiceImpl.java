@@ -72,7 +72,7 @@ public class SecretTypeApiServiceImpl implements SecretTypeApiService {
     @Override
     public Response updateSecretType(String name, SecretTypeUpdateRequest secretTypeUpdateRequest) {
 
-        return Response.ok()
-                .entity(secretTypeManagementService.updateTypeSecret(name, secretTypeUpdateRequest)).build();
+        return Response.ok().entity(secretTypeManagementService
+                .updateTypeSecret(name, secretTypeUpdateRequest)).build();
     }
 }
