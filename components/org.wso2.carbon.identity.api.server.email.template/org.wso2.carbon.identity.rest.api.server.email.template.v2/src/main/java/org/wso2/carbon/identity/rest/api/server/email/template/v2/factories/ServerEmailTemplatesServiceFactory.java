@@ -45,6 +45,7 @@ public class ServerEmailTemplatesServiceFactory {
      * @return ServerEmailTemplatesService.
      */
     public static ServerEmailTemplatesService getServerEmailTemplatesService() {
+
         return SERVICE;
     }
 

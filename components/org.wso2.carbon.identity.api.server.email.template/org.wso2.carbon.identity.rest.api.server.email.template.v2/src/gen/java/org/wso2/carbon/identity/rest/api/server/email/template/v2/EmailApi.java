@@ -47,6 +47,7 @@ public class EmailApi  {
     private final EmailApiService delegate;
 
     public EmailApi() {
+
         this.delegate = EmailApiServiceFactory.getEmailApi();
     }
 

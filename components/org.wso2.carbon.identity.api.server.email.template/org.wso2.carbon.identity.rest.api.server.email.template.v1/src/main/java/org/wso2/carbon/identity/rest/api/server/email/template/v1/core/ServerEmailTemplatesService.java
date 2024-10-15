@@ -66,6 +66,7 @@ public class ServerEmailTemplatesService {
     private static final Log log = LogFactory.getLog(ServerEmailTemplatesService.class);
 
     public ServerEmailTemplatesService(EmailTemplateManager emailTemplateManager) {
+
         this.emailTemplateManager = emailTemplateManager;
     }
 

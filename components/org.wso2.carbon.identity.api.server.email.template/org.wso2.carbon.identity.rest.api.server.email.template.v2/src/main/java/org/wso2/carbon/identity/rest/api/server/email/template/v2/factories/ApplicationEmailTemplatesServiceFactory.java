@@ -45,6 +45,7 @@ public class ApplicationEmailTemplatesServiceFactory {
      * @return ApplicationEmailTemplatesService.
      */
     public static ApplicationEmailTemplatesService getApplicationEmailTemplatesService() {
+
         return SERVICE;
     }
 

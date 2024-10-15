@@ -58,6 +58,7 @@ public class ApplicationEmailTemplatesService {
     private static final Log log = LogFactory.getLog(ApplicationEmailTemplatesService.class);
 
     public ApplicationEmailTemplatesService(EmailTemplateManager emailTemplateManager) {
+
         this.emailTemplateManager = emailTemplateManager;
     }
 
