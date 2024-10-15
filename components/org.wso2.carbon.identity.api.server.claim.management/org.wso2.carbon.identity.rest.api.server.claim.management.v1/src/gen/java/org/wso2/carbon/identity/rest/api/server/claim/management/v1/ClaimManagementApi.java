@@ -49,6 +49,7 @@ public class ClaimManagementApi  {
     private final ClaimManagementApiService delegate;
 
     public ClaimManagementApi() {
+
         this.delegate = ClaimManagementApiServiceFactory.getClaimManagementApi();
     }
 

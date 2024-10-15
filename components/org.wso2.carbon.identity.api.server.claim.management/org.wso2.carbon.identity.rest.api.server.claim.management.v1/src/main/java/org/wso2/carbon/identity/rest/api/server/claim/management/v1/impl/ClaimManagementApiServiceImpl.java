@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.rest.api.server.claim.management.v1.impl;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.http.HttpHeaders;
 import org.wso2.carbon.identity.api.server.common.FileContent;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.ClaimManagementApiService;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.core.ServerClaimManagementService;
@@ -184,9 +185,9 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
                 .type(fileContent.getFileType())
                 .header("Content-Disposition", "attachment; filename=\""
                         + fileContent.getFileName() + "\"")
-                .header("Cache-Control", "no-cache, no-store, must-revalidate")
-                .header("Pragma", "no-cache")
-                .header("Expires", "0")
+                .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+                .header(HttpHeaders.PRAGMA, "no-cache")
+                .header(HttpHeaders.EXPIRES, "0")
                 .entity(fileContent.getContent().getBytes(StandardCharsets.UTF_8))
                 .build();
     }
