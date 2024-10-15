@@ -29,27 +29,22 @@ import org.wso2.carbon.user.core.service.RealmService;
  */
 public class ServerUserStoreServiceFactory {
 
-    private static final ServerUserStoreService SERVICE;
+    private ServerUserStoreServiceFactory() {
 
-    static {
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getUserStoreConfigService();
-        RealmService realmService = UserStoreConfigServiceHolder.getRealmService();
-        ClaimMetadataManagementService claimMetadataManagementService = UserStoreConfigServiceHolder
-                .getClaimMetadataManagementService();
+    }
 
-        if (userStoreConfigService == null) {
-            throw new IllegalStateException("UserStoreConfigService is not available from OSGi context.");
-        }
+    private static class ServerUserStoreServiceHolder {
 
-        if (realmService == null) {
-            throw new IllegalStateException("RealmService is not available from OSGi context.");
-        }
+        private static final ServerUserStoreService SERVICE = createServiceInstance();
+    }
 
-        if (claimMetadataManagementService == null) {
-            throw new IllegalStateException("ClaimMetadataManagementService is not available from OSGi context.");
-        }
+    private static ServerUserStoreService createServiceInstance() {
 
-        SERVICE = new ServerUserStoreService(userStoreConfigService, realmService, claimMetadataManagementService);
+        UserStoreConfigService userStoreConfigService = getUserStoreConfigService();
+        RealmService realmService = getRealmService();
+        ClaimMetadataManagementService claimMetadataManagementService = getClaimMetadataManagementService();
+
+        return new ServerUserStoreService(userStoreConfigService, realmService, claimMetadataManagementService);
     }
 
     /**
@@ -59,7 +54,36 @@ public class ServerUserStoreServiceFactory {
      */
     public static ServerUserStoreService getServerUserStoreService() {
 
-        return SERVICE;
+        return ServerUserStoreServiceHolder.SERVICE;
     }
 
+    private static UserStoreConfigService getUserStoreConfigService() {
+
+        UserStoreConfigService service = UserStoreConfigServiceHolder.getUserStoreConfigService();
+        if (service == null) {
+            throw new IllegalStateException("UserStoreConfigService is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static RealmService getRealmService() {
+
+        RealmService service = UserStoreConfigServiceHolder.getRealmService();
+        if (service == null) {
+            throw new IllegalStateException("RealmService is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static ClaimMetadataManagementService getClaimMetadataManagementService() {
+
+        ClaimMetadataManagementService service = UserStoreConfigServiceHolder.getClaimMetadataManagementService();
+        if (service == null) {
+            throw new IllegalStateException("ClaimMetadataManagementService is not available from OSGi context.");
+        }
+
+        return service;
+    }
 }

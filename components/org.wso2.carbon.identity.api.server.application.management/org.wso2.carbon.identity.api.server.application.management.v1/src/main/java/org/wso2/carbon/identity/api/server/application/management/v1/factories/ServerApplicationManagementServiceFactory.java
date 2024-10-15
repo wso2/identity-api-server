@@ -29,28 +29,22 @@ import org.wso2.carbon.identity.template.mgt.TemplateManager;
  */
 public class ServerApplicationManagementServiceFactory {
 
-    private  static final ServerApplicationManagementService SERVICE;
+    private ServerApplicationManagementServiceFactory() {
 
-    static {
-        ApplicationManagementService applicationManagementService = ApplicationManagementServiceHolder
-                .getApplicationManagementService();
-        AuthorizedAPIManagementService authorizedAPIManagementService = ApplicationManagementServiceHolder
-                .getAuthorizedAPIManagementService();
-        TemplateManager templateManager = ApplicationManagementServiceHolder.getTemplateManager();
+    }
 
-        if (applicationManagementService == null) {
-            throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
-        }
+    private static class ServerApplicationManagementServiceHolder {
 
-        if (authorizedAPIManagementService == null) {
-            throw new IllegalStateException("AuthorizedAPIManagementService is not available from OSGi context.");
-        }
+        private static final ServerApplicationManagementService SERVICE = createServiceInstance();
+    }
 
-        if (templateManager == null) {
-            throw new IllegalStateException("TemplateManager is not available from OSGi context.");
-        }
+    private static ServerApplicationManagementService createServiceInstance() {
 
-        SERVICE = new ServerApplicationManagementService(applicationManagementService, authorizedAPIManagementService,
+        ApplicationManagementService applicationManagementService = getApplicationManagementService();
+        AuthorizedAPIManagementService authorizedAPIManagementService = getAuthorizedAPIManagementService();
+        TemplateManager templateManager = getTemplateManager();
+
+        return new ServerApplicationManagementService(applicationManagementService, authorizedAPIManagementService,
                 templateManager);
     }
 
@@ -61,6 +55,36 @@ public class ServerApplicationManagementServiceFactory {
      */
     public static ServerApplicationManagementService getServerApplicationManagementService() {
 
-        return SERVICE;
+        return ServerApplicationManagementServiceHolder.SERVICE;
+    }
+
+    private static ApplicationManagementService getApplicationManagementService() {
+
+        ApplicationManagementService service = ApplicationManagementServiceHolder.getApplicationManagementService();
+        if (service == null) {
+            throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static AuthorizedAPIManagementService getAuthorizedAPIManagementService() {
+
+        AuthorizedAPIManagementService service = ApplicationManagementServiceHolder.getAuthorizedAPIManagementService();
+        if (service == null) {
+            throw new IllegalStateException("AuthorizedAPIManagementService is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static TemplateManager getTemplateManager() {
+
+        TemplateManager service = ApplicationManagementServiceHolder.getTemplateManager();
+        if (service == null) {
+            throw new IllegalStateException("TemplateManager is not available from OSGi context.");
+        }
+
+        return service;
     }
 }
