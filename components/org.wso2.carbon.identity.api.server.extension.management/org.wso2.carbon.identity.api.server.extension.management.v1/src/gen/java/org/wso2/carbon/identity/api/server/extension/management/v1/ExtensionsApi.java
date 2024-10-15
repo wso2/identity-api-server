@@ -45,6 +45,7 @@ public class ExtensionsApi  {
     private final ExtensionsApiService delegate;
 
     public ExtensionsApi() {
+
         this.delegate = ExtensionsApiServiceFactory.getExtensionsApi();
     }
 
