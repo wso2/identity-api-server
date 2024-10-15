@@ -46,7 +46,7 @@ public class OrganizationConfigsServiceFactory {
      * @return OrganizationConfigsService.
      */
     public static OrganizationConfigsService getOrganizationConfigsService() {
+
         return SERVICE;
     }
-
 }

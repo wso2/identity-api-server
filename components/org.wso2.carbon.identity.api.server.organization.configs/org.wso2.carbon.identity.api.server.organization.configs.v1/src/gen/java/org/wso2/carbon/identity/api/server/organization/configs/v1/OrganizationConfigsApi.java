@@ -42,6 +42,7 @@ public class OrganizationConfigsApi  {
     private final OrganizationConfigsApiService delegate;
 
     public OrganizationConfigsApi() {
+
         this.delegate = OrganizationConfigsApiServiceFactory.getOrganizationConfigsApi();
     }
 

@@ -47,6 +47,7 @@ public class OrganizationConfigsService {
     private static final Log LOG = LogFactory.getLog(OrganizationConfigsService.class);
 
     public OrganizationConfigsService(OrganizationConfigManager organizationConfigManager) {
+
         this.organizationConfigManager = organizationConfigManager;
     }
 
