@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.api.server.userstore.v1.core;
@@ -34,7 +36,6 @@ import org.wso2.carbon.identity.api.server.common.FileContent;
 import org.wso2.carbon.identity.api.server.common.Util;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConfigServiceHolder;
 import org.wso2.carbon.identity.api.server.userstore.common.UserStoreConstants;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.functions.userstore.AttributeMappingsToApiModel;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.AddUserStorePropertiesRes;
@@ -121,6 +122,12 @@ import static org.wso2.carbon.identity.core.util.IdentityUtil.isValidFileName;
  */
 public class ServerUserStoreService {
 
+    private final UserStoreConfigService userStoreConfigService;
+
+    private final RealmService realmService;
+
+    private final ClaimMetadataManagementService claimMetadataManagementService;
+
     private static final Log LOG = LogFactory.getLog(ServerUserStoreService.class);
 
     private static final String DUMMY_MESSAGE_ID = "DUMMY-MESSAGE-ID";
@@ -137,6 +144,14 @@ public class ServerUserStoreService {
             }
         }
         return false;
+    }
+
+    public ServerUserStoreService(UserStoreConfigService userStoreConfigService, RealmService realmService,
+                                  ClaimMetadataManagementService claimMetadataManagementService) {
+
+        this.userStoreConfigService = userStoreConfigService;
+        this.realmService = realmService;
+        this.claimMetadataManagementService = claimMetadataManagementService;
     }
 
     /**
@@ -163,8 +178,6 @@ public class ServerUserStoreService {
                 validateClaimMappings(tenantDomain, localClaimList);
             }
 
-            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
-                    .getUserStoreConfigService();
             UserStoreDTO userStoreDTO = createUserStoreDTO(userStoreReq);
             userStoreConfigService.addUserStore(userStoreDTO);
 
@@ -188,8 +201,6 @@ public class ServerUserStoreService {
     public void deleteUserStore(String userstoreDomainId) {
 
         try {
-            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
-                    getUserStoreConfigService();
             userStoreConfigService.deleteUserStore(base64URLDecodeId(userstoreDomainId));
         } catch (IdentityUserStoreClientException e) {
             if (LOG.isDebugEnabled()) {
@@ -211,8 +222,6 @@ public class ServerUserStoreService {
      */
     public UserStoreResponse editUserStore(String domainId, UserStoreReq userStoreReq) {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
-                getUserStoreConfigService();
         /*
         domainName and typeName are not allowed to edit. iF domain name wanted to update then use
         userStoreConfigService.updateUserStoreByDomainName(base64URLDecodeId(domainId),
@@ -354,8 +363,6 @@ public class ServerUserStoreService {
      */
     public List<AvailableUserStoreClassesRes> getAvailableUserStoreTypes() {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
-                getUserStoreConfigService();
         Set<String> classNames;
         try {
             classNames = userStoreConfigService.getAvailableUserStoreClasses();
@@ -401,8 +408,6 @@ public class ServerUserStoreService {
 
         handleNotImplementedBehaviour(limit, offset, filter, sort);
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
-                .getUserStoreConfigService();
         try {
             UserStoreDTO[] userStoreDTOS = userStoreConfigService.getUserStores();
             return buildUserStoreListResponse(userStoreDTOS, requiredAttributes);
@@ -421,7 +426,6 @@ public class ServerUserStoreService {
      */
     public UserStoreConfigurationsRes getPrimaryUserStore() {
 
-        RealmService realmService = UserStoreConfigServiceHolder.getInstance().getRealmService();
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         RealmConfiguration realmConfiguration;
         try {
@@ -481,8 +485,6 @@ public class ServerUserStoreService {
      */
     public UserStoreConfigurationsRes getUserStoreByDomainId(String domainId) {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
-                .getUserStoreConfigService();
         List<AddUserStorePropertiesRes> propertiesTobeAdd = new ArrayList<>();
         try {
             UserStoreDTO userStoreDTO = userStoreConfigService.getUserStore(base64URLDecodeId(domainId));
@@ -534,8 +536,6 @@ public class ServerUserStoreService {
 
     public MetaUserStoreType getUserStoreManagerProperties(String typeId) {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
-                .getUserStoreConfigService();
         Set<String> classNames;
         try {
             classNames = userStoreConfigService.getAvailableUserStoreClasses();
@@ -561,8 +561,6 @@ public class ServerUserStoreService {
      */
     public ConnectionEstablishedResponse testRDBMSConnection(RDBMSConnectionReq rdBMSConnectionReq) {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
-                .getUserStoreConfigService();
         ConnectionEstablishedResponse connectionEstablishedResponse = new ConnectionEstablishedResponse();
         boolean isConnectionEstablished;
         connectionEstablishedResponse.setConnection(false);
@@ -666,8 +664,6 @@ public class ServerUserStoreService {
      */
     private UserStoreResponse performPatchReplace(UserStoreDTO userStoreDTO) {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
-                .getUserStoreConfigService();
         try {
             userStoreConfigService.updateUserStore(userStoreDTO, false);
             return buildResponseForPatchReplace(userStoreDTO, userStoreDTO.getProperties());
@@ -687,8 +683,6 @@ public class ServerUserStoreService {
      */
     private List<ClaimAttributeMapping> getClaimAttributeMappings(String tenantDomain, String userstoreDomainName) {
 
-        ClaimMetadataManagementService claimMetadataManagementService = UserStoreConfigServiceHolder.getInstance()
-                .getClaimMetadataManagementService();
         List<ClaimAttributeMapping> claimAttributeMappingList = new ArrayList<>();
         try {
             List<LocalClaim> localClaimList = claimMetadataManagementService.getLocalClaims(tenantDomain);
@@ -709,8 +703,6 @@ public class ServerUserStoreService {
 
     private UserStoreDTO buildUserStoreForPatch(String domainId, List<PatchDocument> patchDocuments) {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
-                .getUserStoreConfigService();
         UserStoreDTO userStoreDTO;
         try {
             userStoreDTO = userStoreConfigService.getUserStore(base64URLDecodeId(domainId));
@@ -801,8 +793,6 @@ public class ServerUserStoreService {
      */
     private void updateClaimMappings(String userstoreDomain, String tenantDomain, List<LocalClaim> localClaimList) {
 
-        ClaimMetadataManagementService claimMetadataManagementService = UserStoreConfigServiceHolder.getInstance()
-                .getClaimMetadataManagementService();
         try {
             claimMetadataManagementService.validateClaimAttributeMapping(localClaimList, tenantDomain);
             claimMetadataManagementService.updateLocalClaimMappings(localClaimList, tenantDomain, userstoreDomain);
@@ -820,8 +810,6 @@ public class ServerUserStoreService {
      */
     private void validateClaimMappings(String tenantDomain, List<LocalClaim> localClaimList) {
 
-        ClaimMetadataManagementService claimMetadataManagementService = UserStoreConfigServiceHolder.getInstance()
-                .getClaimMetadataManagementService();
         try {
             claimMetadataManagementService.validateClaimAttributeMapping(localClaimList, tenantDomain);
         } catch (ClaimMetadataException e) {
@@ -1457,8 +1445,6 @@ public class ServerUserStoreService {
                     ERROR_CODE_INVALID_INPUT);
         }
         try {
-            UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance()
-                    .getUserStoreConfigService();
             classNames = userStoreConfigService.getAvailableUserStoreClasses();
             if (CollectionUtils.isEmpty(classNames) || !classNames.contains(userStoreName)) {
                 throw handleException(Response.Status.NOT_FOUND, UserStoreConstants.ErrorMessage.
@@ -1494,8 +1480,6 @@ public class ServerUserStoreService {
     private List<UserStoreAttribute> getAttributeMappings(String userStoreName,
                                                           boolean includeIdentityClaimMappings) {
 
-        UserStoreConfigService userStoreConfigService = UserStoreConfigServiceHolder.getInstance().
-                getUserStoreConfigService();
         try {
             UserStoreAttributeMappings userStoreAttributeMappings = userStoreConfigService.
                     getUserStoreAttributeMappings();
