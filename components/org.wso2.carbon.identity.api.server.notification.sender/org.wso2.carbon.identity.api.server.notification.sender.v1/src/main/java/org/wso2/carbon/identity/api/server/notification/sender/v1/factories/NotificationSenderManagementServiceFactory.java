@@ -46,6 +46,7 @@ public class NotificationSenderManagementServiceFactory {
      * @return NotificationSenderManagementService service
      */
     public static NotificationSenderManagementService getNotificationSenderManagementService() {
+
         return SERVICE;
     }
 

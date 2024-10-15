@@ -47,6 +47,7 @@ public class NotificationSendersApi  {
     private final NotificationSendersApiService delegate;
 
     public NotificationSendersApi() {
+
         this.delegate = NotificationSendersApiServiceFactory.getNotificationSendersApi();
     }
 
