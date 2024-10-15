@@ -28,14 +28,19 @@ public class RolePermissionManagementServiceDataHolder {
 
     private RolePermissionManagementServiceDataHolder() {}
 
-    private static class ServiceHolder {
-        static final RolePermissionManagementService SERVICE =
-                (RolePermissionManagementService) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext()
-                        .getOSGiService(RolePermissionManagementService.class, null);
+    private static class RolePermissionManagementServiceHolder {
+
+        static final RolePermissionManagementService SERVICE = (RolePermissionManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RolePermissionManagementService.class, null);
     }
 
+    /**
+     * Get RolePermissionManagementService osgi service.
+     *
+     * @return RolePermissionManagementService
+     */
     public static RolePermissionManagementService getRolePermissionManagementService() {
-        return ServiceHolder.SERVICE;
+
+        return RolePermissionManagementServiceHolder.SERVICE;
     }
 }

@@ -41,6 +41,7 @@ public class PermissionManagementService {
     private static final Log LOG = LogFactory.getLog(PermissionManagementService.class);
 
     public PermissionManagementService(RolePermissionManagementService rolePermissionManagementService) {
+
         this.rolePermissionManagementService = rolePermissionManagementService;
     }
 

@@ -46,6 +46,7 @@ public class PermissionManagementServiceFactory {
      * @return PermissionManagementService
      */
     public static PermissionManagementService getPermissionManagementService() {
+
         return SERVICE;
     }
 }

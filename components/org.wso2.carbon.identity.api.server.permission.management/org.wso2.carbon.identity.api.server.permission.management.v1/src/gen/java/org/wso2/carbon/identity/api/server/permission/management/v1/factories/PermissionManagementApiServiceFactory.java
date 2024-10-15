@@ -21,10 +21,18 @@ package org.wso2.carbon.identity.api.server.permission.management.v1.factories;
 import org.wso2.carbon.identity.api.server.permission.management.v1.PermissionManagementApiService;
 import org.wso2.carbon.identity.api.server.permission.management.v1.impl.PermissionManagementApiServiceImpl;
 
+/**
+ * Factory class for PermissionManagementApiService.
+ */
 public class PermissionManagementApiServiceFactory {
 
    private final static PermissionManagementApiService SERVICE = new PermissionManagementApiServiceImpl();
 
+   /**
+    * Get PermissionManagementApiService.
+    *
+    * @return PermissionManagementApiService
+    */
    public static PermissionManagementApiService getPermissionManagementApi()
    {
       return SERVICE;

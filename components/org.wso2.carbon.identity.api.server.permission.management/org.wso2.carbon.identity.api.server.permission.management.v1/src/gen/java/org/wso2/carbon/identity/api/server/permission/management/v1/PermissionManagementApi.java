@@ -42,6 +42,7 @@ public class PermissionManagementApi  {
     private final PermissionManagementApiService delegate;
 
     public PermissionManagementApi() {
+
         this.delegate = PermissionManagementApiServiceFactory.getPermissionManagementApi();
     }
 
