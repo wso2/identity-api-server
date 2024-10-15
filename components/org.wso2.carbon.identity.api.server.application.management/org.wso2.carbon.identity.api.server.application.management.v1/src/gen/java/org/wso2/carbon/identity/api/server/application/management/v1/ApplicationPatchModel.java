@@ -39,6 +39,7 @@ public class ApplicationPatchModel  {
   
     private String name;
     private String description;
+    private String applicationVersion;
     private String imageUrl;
     private String accessUrl;
     private String logoutReturnUrl;
@@ -85,6 +86,24 @@ public class ApplicationPatchModel  {
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     **/
+    public ApplicationPatchModel applicationVersion(String applicationVersion) {
+
+        this.applicationVersion = applicationVersion;
+        return this;
+    }
+
+    @ApiModelProperty(example = "This is the application version.", value = "")
+    @JsonProperty("applicationVersion")
+    @Valid
+    public String getApplicationVersion() {
+        return applicationVersion;
+    }
+    public void setApplicationVersion(String applicationVersion) {
+        this.applicationVersion = applicationVersion;
     }
 
     /**
