@@ -34,6 +34,7 @@ public class AdminAdvisoryManagementApiServiceFactory {
     * @return AdminAdvisoryManagementApiService
     */
    public static AdminAdvisoryManagementApiService getAdminAdvisoryManagementApi() {
+
       return SERVICE;
    }
 

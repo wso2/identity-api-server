@@ -41,6 +41,7 @@ public class ServerAdminAdvisoryManagementService {
     private static final Log LOG = LogFactory.getLog(ServerAdminAdvisoryManagementService.class);
 
     public ServerAdminAdvisoryManagementService(AdminAdvisoryManagementService adminAdvisoryManagementService) {
+
         this.adminAdvisoryManagementService = adminAdvisoryManagementService;
     }
 

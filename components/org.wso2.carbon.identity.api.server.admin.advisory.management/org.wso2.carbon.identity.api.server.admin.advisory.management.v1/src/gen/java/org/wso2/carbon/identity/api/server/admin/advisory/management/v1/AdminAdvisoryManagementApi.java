@@ -47,6 +47,7 @@ public class AdminAdvisoryManagementApi  {
     private final AdminAdvisoryManagementApiService delegate;
 
     public AdminAdvisoryManagementApi() {
+
         this.delegate = AdminAdvisoryManagementApiServiceFactory.getAdminAdvisoryManagementApi();
     }
 
