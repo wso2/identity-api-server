@@ -59,6 +59,7 @@ public class ServerIdpManagementServiceFactory {
      * @return ServerIdpManagementService
      */
     public static ServerIdpManagementService getServerIdpManagementService() {
+
         return SERVICE;
     }
 }

@@ -42,6 +42,7 @@ public class TrustedTokenIssuersApi  {
     private final TrustedTokenIssuersApiService delegate;
 
     public TrustedTokenIssuersApi() {
+
         this.delegate = TrustedTokenIssuersApiServiceFactory.getTrustedTokenIssuersApi();
     }
 

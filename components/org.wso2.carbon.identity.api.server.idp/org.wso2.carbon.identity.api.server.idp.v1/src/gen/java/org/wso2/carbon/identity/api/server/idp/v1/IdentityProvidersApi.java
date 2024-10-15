@@ -70,6 +70,7 @@ public class IdentityProvidersApi  {
     private final IdentityProvidersApiService delegate;
 
     public IdentityProvidersApi() {
+
         this.delegate = IdentityProvidersApiServiceFactory.getIdentityProvidersApi();
     }
 
