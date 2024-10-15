@@ -30,51 +30,51 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class SimpleTemplate  {
+public class SimpleTemplateTypeID  {
   
-    private String locale;
-    private String self;
+    private String templateTypeId;
+    private String channel;
 
     /**
-    * Locale of the template.
+    * Unique ID of the template type.
     **/
-    public SimpleTemplate locale(String locale) {
+    public SimpleTemplateTypeID templateTypeId(String templateTypeId) {
 
-        this.locale = locale;
+        this.templateTypeId = templateTypeId;
         return this;
     }
     
-    @ApiModelProperty(example = "en_US", required = true, value = "Locale of the template.")
-    @JsonProperty("locale")
+    @ApiModelProperty(example = "YWNjb3VudGNvbmZpcm1hdGlvbg", required = true, value = "Unique ID of the template type.")
+    @JsonProperty("templateTypeId")
     @Valid
-    @NotNull(message = "Property locale cannot be null.")
+    @NotNull(message = "Property templateTypeId cannot be null.")
 
-    public String getLocale() {
-        return locale;
+    public String getTemplateTypeId() {
+        return templateTypeId;
     }
-    public void setLocale(String locale) {
-        this.locale = locale;
+    public void setTemplateTypeId(String templateTypeId) {
+        this.templateTypeId = templateTypeId;
     }
 
     /**
-    * Location of the created/updated resource. resource.
+    * Notification channel of the template type (SMS or EMAIL).
     **/
-    public SimpleTemplate self(String self) {
+    public SimpleTemplateTypeID channel(String channel) {
 
-        this.self = self;
+        this.channel = channel;
         return this;
     }
     
-    @ApiModelProperty(example = "/t/{tenant-domain}/api/server/v1/notification/{{email|sms}}/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg/{{org|app|system}}templates/en_US", required = true, value = "Location of the created/updated resource. resource.")
-    @JsonProperty("self")
+    @ApiModelProperty(example = "EMAIL", required = true, value = "Notification channel of the template type (SMS or EMAIL).")
+    @JsonProperty("channel")
     @Valid
-    @NotNull(message = "Property self cannot be null.")
+    @NotNull(message = "Property channel cannot be null.")
 
-    public String getSelf() {
-        return self;
+    public String getChannel() {
+        return channel;
     }
-    public void setSelf(String self) {
-        this.self = self;
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
 
@@ -88,24 +88,24 @@ public class SimpleTemplate  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SimpleTemplate simpleTemplate = (SimpleTemplate) o;
-        return Objects.equals(this.locale, simpleTemplate.locale) &&
-            Objects.equals(this.self, simpleTemplate.self);
+        SimpleTemplateTypeID simpleTemplateTypeID = (SimpleTemplateTypeID) o;
+        return Objects.equals(this.templateTypeId, simpleTemplateTypeID.templateTypeId) &&
+            Objects.equals(this.channel, simpleTemplateTypeID.channel);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(locale, self);
+        return Objects.hash(templateTypeId, channel);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class SimpleTemplate {\n");
+        sb.append("class SimpleTemplateTypeID {\n");
         
-        sb.append("    locale: ").append(toIndentedString(locale)).append("\n");
-        sb.append("    self: ").append(toIndentedString(self)).append("\n");
+        sb.append("    templateTypeId: ").append(toIndentedString(templateTypeId)).append("\n");
+        sb.append("    channel: ").append(toIndentedString(channel)).append("\n");
         sb.append("}");
         return sb.toString();
     }

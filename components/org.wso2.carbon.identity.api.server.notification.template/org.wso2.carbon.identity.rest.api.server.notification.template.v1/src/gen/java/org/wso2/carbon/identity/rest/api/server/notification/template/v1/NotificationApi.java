@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.E
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SMSTemplate;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SMSTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SimpleTemplate;
+import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SimpleTemplateTypeID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.TemplateTypeOverview;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.TemplateTypeWithID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.NotificationApiService;
@@ -209,7 +210,7 @@ public class NotificationApi  {
         })
     }, tags={ "Application Email Templates", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
+        @ApiResponse(code = 204, message = "Item/s Deleted.", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
@@ -233,7 +234,7 @@ public class NotificationApi  {
         })
     }, tags={ "Application SMS Templates", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
+        @ApiResponse(code = 204, message = "Item/s Deleted.", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
@@ -257,7 +258,7 @@ public class NotificationApi  {
         })
     }, tags={ "Email Template Types", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
+        @ApiResponse(code = 204, message = "Item/s Deleted.", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
@@ -281,7 +282,7 @@ public class NotificationApi  {
         })
     }, tags={ "Email Templates", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
+        @ApiResponse(code = 204, message = "Item/s Deleted.", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
@@ -305,7 +306,7 @@ public class NotificationApi  {
         })
     }, tags={ "SMS Templates", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
+        @ApiResponse(code = 204, message = "Item/s Deleted.", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
@@ -329,7 +330,7 @@ public class NotificationApi  {
         })
     }, tags={ "SMS Template Types", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
+        @ApiResponse(code = 204, message = "Item/s Deleted.", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden.", response = Void.class),
@@ -724,49 +725,26 @@ public class NotificationApi  {
     }
 
     @Valid
-    @DELETE
-    @Path("/email/template-types/{template-type-id}/reset")
-    
+    @POST
+    @Path("/reset-template-type")
+    @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Resets an email template type.", notes = "Resets an existing email template type by deleting all its **user defined** email templates from the system. <br>  <b>Scope required:</b><br> * internal_email_mgt_delete / internal_template_mgt_delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Resets an template type.", notes = "Resets an existing template type by deleting all its **user defined** templates from the system. <br>  <b>Scope required:</b><br> * internal_template_mgt_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Email Template Types", })
+    }, tags={ "Functions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
+        @ApiResponse(code = 204, message = "Item/s Deleted.", response = Void.class),
         @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response resetEmailTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
+    public Response resetTemplateType(@ApiParam(value = "" ) @Valid SimpleTemplateTypeID simpleTemplateTypeID) {
 
-        return delegate.resetEmailTemplateType(templateTypeId );
-    }
-
-    @Valid
-    @DELETE
-    @Path("/sms/template-types/{template-type-id}/reset")
-    
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Resets a SMS template type.", notes = "Resets an existing SMS template type by deleting all its **user defined** SMS templates from the system. <br>  <b>Scope required:</b><br> * internal_template_mgt_delete ", response = Void.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "SMS Template Types", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Item Deleted.", response = Void.class),
-        @ApiResponse(code = 400, message = "Invalid input request.", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized.", response = Void.class),
-        @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
-    })
-    public Response resetSMSTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
-
-        return delegate.resetSMSTemplateType(templateTypeId );
+        return delegate.resetTemplateType(simpleTemplateTypeID );
     }
 
     @Valid

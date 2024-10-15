@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.ERROR_ADDING_TEMPLATE;
+import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.ERROR_RESOLVING_MAIN_APPLICATION;
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.TEMPLATE_ALREADY_EXISTS;
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.TEMPLATE_NOT_FOUND;
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.TEMPLATE_TYPE_ALREADY_EXISTS;
@@ -101,9 +102,15 @@ public class Constants {
         ERROR_ERROR_RETRIEVING_TEMPLATES("60012", Status.INTERNAL_SERVER_ERROR,
                 "Unable to retrieve templates.",
                 "Server encountered an error while retrieving templates."),
-        ERROR_ERROR_RESETTING_TEMPLATE_TYPE("60005", Status.INTERNAL_SERVER_ERROR,
+        ERROR_ERROR_RESETTING_TEMPLATE_TYPE("60013", Status.INTERNAL_SERVER_ERROR,
                 "Unable to reset the template type.",
-                "Server encountered an error while deleting the templates of the template type.");
+                "Server encountered an error while deleting the templates of the template type."),
+        ERROR_ERROR_RESOLVING_MAIN_APPLICATION("60014", Status.INTERNAL_SERVER_ERROR,
+                "Unable to resolve the main application.",
+                "Server encountered an error while resolving the main application."),
+        ERROR_ERROR_INVALID_NOTIFICATION_CHANNEL("60015", Status.BAD_REQUEST,
+                "Invalid notification channel.",
+                "Notification channel can only be either 'EMAIL' or 'SMS'.");
 
         private final String message;
         private final Status httpStatus;
@@ -151,6 +158,7 @@ public class Constants {
         NTM_ERROR_CODE_MAP.put(TEMPLATE_ALREADY_EXISTS, ErrorMessage.ERROR_TEMPLATE_ALREADY_EXISTS);
         NTM_ERROR_CODE_MAP.put(TEMPLATE_NOT_FOUND, ErrorMessage.ERROR_TEMPLATE_NOT_FOUND);
         NTM_ERROR_CODE_MAP.put(ERROR_ADDING_TEMPLATE, ErrorMessage.ERROR_ERROR_ADDING_TEMPLATE);
+        NTM_ERROR_CODE_MAP.put(ERROR_RESOLVING_MAIN_APPLICATION, ErrorMessage.ERROR_ERROR_RESOLVING_MAIN_APPLICATION);
     }
 
     public static ErrorMessage getNTMMappedErrorMessage(String errorCode) {

@@ -153,20 +153,23 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-  '/notification/email/template-types/{template-type-id}/reset':
-    delete:
+  '/notification/reset-template-type':
+    post:
       tags:
-        - Email Template Types
-      summary: Resets an email template type.
-      operationId: resetEmailTemplateType
+        - Functions
+      summary: Resets an template type.
+      operationId: resetTemplateType
       description: |
-        Resets an existing email template type by deleting all its **user defined** email templates
+        Resets an existing template type by deleting all its **user defined** templates
         from the system. <br>
 
         <b>Scope required:</b><br>
-        * internal_email_mgt_delete / internal_template_mgt_delete
-      parameters:
-        - $ref: '#/components/parameters/templateTypeIdPathParam'
+        * internal_template_mgt_delete
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimpleTemplateTypeID'
       responses:
         '204':
           $ref: '#/components/responses/Deleted'
@@ -701,32 +704,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-
-  '/notification/sms/template-types/{template-type-id}/reset':
-    delete:
-      tags:
-        - SMS Template Types
-      summary: Resets a SMS template type.
-      operationId: resetSMSTemplateType
-      description: |
-        Resets an existing SMS template type by deleting all its **user defined** SMS templates
-        from the system. <br>
-
-        <b>Scope required:</b><br>
-        * internal_template_mgt_delete
-      parameters:
-        - $ref: '#/components/parameters/templateTypeIdPathParam'
-      responses:
-        '204':
-          $ref: '#/components/responses/Deleted'
-        '400':
-          $ref: '#/components/responses/InvalidInput'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/ServerError'
   '/notification/sms/template-types/{template-type-id}/app-templates/{app-uuid}':
     get:
       tags:
@@ -1186,7 +1163,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
     Deleted:
-      description: Item Deleted.
+      description: Item/s Deleted.
     Updated:
       description: Item Updated.
   securitySchemes:
@@ -1302,7 +1279,21 @@ components:
         self:
           type: string
           example: /t/{tenant-domain}/api/server/v1/notification/{{email|sms}}/template-types/YWNjb3VudGNvbmZpcm1hdGlvbg/{{org|app|system}}templates/en_US
-          description: Location of the created/updated resource.
+          description: Location of the created/updated resource. resource.
+    SimpleTemplateTypeID:
+      type: object
+      required:
+        - templateTypeId
+        - channel
+      properties:
+        templateTypeId:
+          type: string
+          example: YWNjb3VudGNvbmZpcm1hdGlvbg
+          description: Unique ID of the template type.
+        channel:
+          type: string
+          example: EMAIL
+          description: Notification channel of the template type (SMS or EMAIL).
     Error:
       type: object
       required:

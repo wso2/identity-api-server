@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenantDomainFromContext;
+import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.NOTIFICATION_CHANNEL_EMAIL;
 
 /**
  * Service class for the template types.
@@ -126,6 +127,13 @@ public class TemplateTypeService {
      */
     public void resetTemplateType(String notificationChannel, String templateTypeId) {
 
+        if (NOTIFICATION_CHANNEL_EMAIL.equalsIgnoreCase(notificationChannel)) {
+            notificationChannel = NOTIFICATION_CHANNEL_EMAIL;
+        } else if (Constants.NOTIFICATION_CHANNEL_SMS.equalsIgnoreCase(notificationChannel)) {
+            notificationChannel = Constants.NOTIFICATION_CHANNEL_SMS;
+        } else {
+            throw Util.handleError(Constants.ErrorMessage.ERROR_ERROR_INVALID_NOTIFICATION_CHANNEL);
+        }
         String templateTypeDisplayName;
         templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
         try {

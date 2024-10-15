@@ -30,6 +30,7 @@ import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.E
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SMSTemplate;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SMSTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SimpleTemplate;
+import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SimpleTemplateTypeID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.TemplateTypeOverview;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.TemplateTypeWithID;
 import javax.ws.rs.core.Response;
@@ -93,9 +94,7 @@ public interface NotificationApiService {
 
       public Response getSystemSMSTemplate(String templateTypeId, String locale);
 
-      public Response resetEmailTemplateType(String templateTypeId);
-
-      public Response resetSMSTemplateType(String templateTypeId);
+      public Response resetTemplateType(SimpleTemplateTypeID simpleTemplateTypeID);
 
       public Response updateAppEmailTemplate(String templateTypeId, String appUuid, String locale, EmailTemplate emailTemplate);
 

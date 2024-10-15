@@ -28,6 +28,7 @@ import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.E
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SMSTemplate;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SMSTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SimpleTemplate;
+import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SimpleTemplateTypeID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.TemplateTypeOverview;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.TemplateTypeWithID;
 
@@ -37,8 +38,6 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
 import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.APP_TEMPLATES_PATH;
-import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.NOTIFICATION_CHANNEL_EMAIL;
-import static org.wso2.carbon.identity.api.server.notification.template.common.Constants.NOTIFICATION_CHANNEL_SMS;
 import static org.wso2.carbon.identity.api.server.notification.template.common.
         Constants.NOTIFICATION_TEMPLATES_API_BASE_PATH_EMAIL;
 import static org.wso2.carbon.identity.api.server.notification.template.common.
@@ -285,16 +284,10 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
-    public Response resetEmailTemplateType(String templateTypeId) {
+    public Response resetTemplateType(SimpleTemplateTypeID simpleTemplateTypeID) {
 
-        templateTypeService.resetTemplateType(NOTIFICATION_CHANNEL_EMAIL, templateTypeId);
-        return Response.noContent().build();
-    }
-
-    @Override
-    public Response resetSMSTemplateType(String templateTypeId) {
-
-        templateTypeService.resetTemplateType(NOTIFICATION_CHANNEL_SMS, templateTypeId);
+        templateTypeService.resetTemplateType(simpleTemplateTypeID.getChannel(),
+                simpleTemplateTypeID.getTemplateTypeId());
         return Response.noContent().build();
     }
 
@@ -308,9 +301,9 @@ public class NotificationApiServiceImpl implements NotificationApiService {
 
     @Override
     public Response updateAppSMSTemplate(String templateTypeId, String appUuid, String locale,
-                                         SMSTemplate smsTemplate) {
+                                         SMSTemplate smSTemplate) {
 
-        templatesService.updateSMSTemplate(templateTypeId, locale, smsTemplate, appUuid);
+        templatesService.updateSMSTemplate(templateTypeId, locale, smSTemplate, appUuid);
         return Response.ok().build();
     }
 
@@ -322,9 +315,9 @@ public class NotificationApiServiceImpl implements NotificationApiService {
     }
 
     @Override
-    public Response updateOrgSMSTemplate(String templateTypeId, String locale, SMSTemplate smsTemplate) {
+    public Response updateOrgSMSTemplate(String templateTypeId, String locale, SMSTemplate smSTemplate) {
 
-        templatesService.updateSMSTemplate(templateTypeId, locale, smsTemplate);
+        templatesService.updateSMSTemplate(templateTypeId, locale, smSTemplate);
         return Response.ok().build();
     }
 }
