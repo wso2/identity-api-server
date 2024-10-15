@@ -30,7 +30,7 @@ public class RemoteFetchServiceHolder {
 
     private static class RemoteFetchConfigurationServiceHolder {
         static final RemoteFetchConfigurationService SERVICE = (RemoteFetchConfigurationService) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext().getOSGiService(RemoteFetchConfigurationService.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(RemoteFetchConfigurationService.class, null);
     }
 
     /**

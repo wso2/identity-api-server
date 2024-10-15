@@ -83,6 +83,7 @@ public class ServerRemoteFetchConfigManagementService {
     private static final Log log = LogFactory.getLog(ServerRemoteFetchConfigManagementService.class);
 
     public ServerRemoteFetchConfigManagementService(RemoteFetchConfigurationService remoteFetchConfigurationService) {
+
         this.remoteFetchConfigurationService = remoteFetchConfigurationService;
     }
 

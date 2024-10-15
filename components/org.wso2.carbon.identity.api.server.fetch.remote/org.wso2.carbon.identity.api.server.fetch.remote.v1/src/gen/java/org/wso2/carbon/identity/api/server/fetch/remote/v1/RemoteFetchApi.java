@@ -47,6 +47,7 @@ public class RemoteFetchApi  {
     private final RemoteFetchApiService delegate;
 
     public RemoteFetchApi() {
+
         this.delegate = RemoteFetchApiServiceFactory.getRemoteFetchApi();
     }
 

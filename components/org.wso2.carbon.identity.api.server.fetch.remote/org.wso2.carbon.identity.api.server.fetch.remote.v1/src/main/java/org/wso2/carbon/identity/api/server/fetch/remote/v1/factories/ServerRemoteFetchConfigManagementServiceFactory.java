@@ -46,6 +46,7 @@ public class ServerRemoteFetchConfigManagementServiceFactory {
      * @return RemoteFetchConfigurationService
      */
     public static ServerRemoteFetchConfigManagementService getServerRemoteFetchConfigManagementService() {
+
         return SERVICE;
     }
 }
