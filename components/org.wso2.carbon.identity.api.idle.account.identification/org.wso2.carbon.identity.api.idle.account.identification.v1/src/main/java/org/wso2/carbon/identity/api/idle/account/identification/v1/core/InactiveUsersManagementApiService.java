@@ -54,6 +54,7 @@ public class InactiveUsersManagementApiService {
     private static final Log LOG = LogFactory.getLog(InactiveUsersManagementApiService.class);
 
     public InactiveUsersManagementApiService(IdleAccountIdentificationService idleAccountIdentificationService) {
+
         this.idleAccountIdentificationService = idleAccountIdentificationService;
     }
 

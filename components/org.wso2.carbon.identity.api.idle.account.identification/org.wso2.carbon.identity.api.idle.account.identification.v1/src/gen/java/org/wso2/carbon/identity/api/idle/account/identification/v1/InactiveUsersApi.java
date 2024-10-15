@@ -36,6 +36,7 @@ public class InactiveUsersApi  {
     private final InactiveUsersApiService delegate;
 
     public InactiveUsersApi() {
+
         this.delegate = InactiveUsersApiServiceFactory.getInactiveUsersApi();
     }
 

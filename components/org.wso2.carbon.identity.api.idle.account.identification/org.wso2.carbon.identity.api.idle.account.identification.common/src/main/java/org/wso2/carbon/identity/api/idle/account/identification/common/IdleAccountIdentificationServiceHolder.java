@@ -28,7 +28,7 @@ public class IdleAccountIdentificationServiceHolder {
 
     private IdleAccountIdentificationServiceHolder() {}
 
-    private static class ServiceHolder {
+    private static class IdleAccountServiceHolder {
         static final IdleAccountIdentificationService SERVICE =
                 (IdleAccountIdentificationService) PrivilegedCarbonContext
                         .getThreadLocalCarbonContext()
@@ -41,6 +41,7 @@ public class IdleAccountIdentificationServiceHolder {
      * @return Idle account identification Service.
      */
     public static IdleAccountIdentificationService getIdleAccountIdentificationService() {
-        return ServiceHolder.SERVICE;
+
+        return IdleAccountServiceHolder.SERVICE;
     }
 }

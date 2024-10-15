@@ -46,6 +46,7 @@ public class InactiveUsersManagementApiServiceFactory {
      * @return InactiveUsersManagementApiService
      */
     public static InactiveUsersManagementApiService getInactiveUsersManagementApiService() {
+
         return SERVICE;
     }
 }

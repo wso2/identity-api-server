@@ -21,10 +21,18 @@ package org.wso2.carbon.identity.api.idle.account.identification.v1.factories;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.InactiveUsersApiService;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.impl.InactiveUsersApiServiceImpl;
 
+/**
+ * Factory class for InactiveUsersApiService.
+ */
 public class InactiveUsersApiServiceFactory {
 
     private final static InactiveUsersApiService SERVICE = new InactiveUsersApiServiceImpl();
 
+    /**
+     * Get InactiveUsersApiService.
+     *
+     * @return InactiveUsersApiService.
+     */
     public static InactiveUsersApiService getInactiveUsersApi()
     {
         return SERVICE;
