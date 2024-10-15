@@ -74,6 +74,7 @@ public class BrandingPreferenceManagementService {
     private static final Log log = LogFactory.getLog(BrandingPreferenceManagementService.class);
 
     public BrandingPreferenceManagementService(BrandingPreferenceManager brandingPreferenceManager) {
+
         this.brandingPreferenceManager = brandingPreferenceManager;
     }
 

@@ -46,6 +46,7 @@ public class BrandingPreferenceManagementServiceFactory {
      * @return BrandingPreferenceManagementService
      */
     public static BrandingPreferenceManagementService getBrandingPreferenceManagementService() {
+
         return SERVICE;
     }
 }

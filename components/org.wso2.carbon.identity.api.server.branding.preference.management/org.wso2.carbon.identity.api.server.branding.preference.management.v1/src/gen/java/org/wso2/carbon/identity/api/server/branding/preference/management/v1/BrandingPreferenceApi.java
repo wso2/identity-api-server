@@ -43,6 +43,7 @@ public class BrandingPreferenceApi  {
     private final BrandingPreferenceApiService delegate;
 
     public BrandingPreferenceApi() {
+
         this.delegate = BrandingPreferenceApiServiceFactory.getBrandingPreferenceApi();
     }
 
