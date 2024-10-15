@@ -42,6 +42,7 @@ public class MetaApi  {
     private final MetaApiService delegate;
 
     public MetaApi() {
+
         this.delegate = MetaApiServiceFactory.getMetaApi();
     }
 

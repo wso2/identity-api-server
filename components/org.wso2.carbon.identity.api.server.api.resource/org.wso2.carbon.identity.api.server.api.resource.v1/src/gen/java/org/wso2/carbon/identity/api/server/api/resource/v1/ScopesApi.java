@@ -43,6 +43,7 @@ public class ScopesApi  {
     private final ScopesApiService delegate;
 
     public ScopesApi() {
+
         this.delegate = ScopesApiServiceFactory.getScopesApi();
     }
 

@@ -49,6 +49,7 @@ public class ApiResourcesApi  {
     private final ApiResourcesApiService delegate;
 
     public ApiResourcesApi() {
+
         this.delegate = ApiResourcesApiServiceFactory.getApiResourcesApi();
     }
 

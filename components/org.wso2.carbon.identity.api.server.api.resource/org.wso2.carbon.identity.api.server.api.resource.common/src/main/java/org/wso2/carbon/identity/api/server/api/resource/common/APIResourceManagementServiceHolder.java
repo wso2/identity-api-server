@@ -33,22 +33,19 @@ public class APIResourceManagementServiceHolder {
     private static class APIResourceManagerHolder {
 
         static final APIResourceManager SERVICE = (APIResourceManager) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(APIResourceManager.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(APIResourceManager.class, null);
     }
 
     private static class APIResourceCollectionManagerHolder {
 
         static final APIResourceCollectionManager SERVICE = (APIResourceCollectionManager) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(APIResourceCollectionManager.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(APIResourceCollectionManager.class, null);
     }
 
     private static class OAuthAdminServiceImplHolder {
 
         static final OAuthAdminServiceImpl SERVICE = (OAuthAdminServiceImpl) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(OAuthAdminServiceImpl.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(OAuthAdminServiceImpl.class, null);
     }
 
     /**

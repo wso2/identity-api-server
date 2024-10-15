@@ -57,6 +57,7 @@ public class ServerAPIResourceCollectionManagementService {
     private final APIResourceCollectionManager apiResourceCollectionManager;
 
     public ServerAPIResourceCollectionManagementService(APIResourceCollectionManager apiResourceCollectionManager) {
+
         this.apiResourceCollectionManager = apiResourceCollectionManager;
     }
 
