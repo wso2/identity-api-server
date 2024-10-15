@@ -1,18 +1,21 @@
 /*
- * Copyright (c) 2019-2024, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 package org.wso2.carbon.identity.api.server.application.management.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -33,72 +36,63 @@ import org.wso2.carbon.user.core.service.RealmService;
  */
 public class ApplicationManagementServiceHolder {
 
-    private ApplicationManagementServiceHolder() {}
+    private ApplicationManagementServiceHolder() {
+
+    }
 
     private static class ApplicationServiceHolder {
         static final ApplicationManagementService SERVICE = (ApplicationManagementService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(ApplicationManagementService.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(ApplicationManagementService.class, null);
     }
 
     private static class OAuthAdminServiceImplHolder {
         static final OAuthAdminServiceImpl SERVICE = (OAuthAdminServiceImpl) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(OAuthAdminServiceImpl.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(OAuthAdminServiceImpl.class, null);
     }
 
     private static class STSAdminServiceInterfaceHolder {
         static final STSAdminServiceInterface SERVICE = (STSAdminServiceInterface) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(STSAdminServiceInterface.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(STSAdminServiceInterface.class, null);
     }
 
     private static class SAMLSSOConfigServiceImplHolder {
         static final SAMLSSOConfigServiceImpl SERVICE = (SAMLSSOConfigServiceImpl) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(SAMLSSOConfigServiceImpl.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(SAMLSSOConfigServiceImpl.class, null);
     }
 
     private static class OAuthServerConfigurationHolder {
         static final OAuthServerConfiguration SERVICE = (OAuthServerConfiguration) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(OAuthServerConfiguration.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(OAuthServerConfiguration.class, null);
     }
 
     private static class TemplateManagerHolder {
         static final TemplateManager SERVICE = (TemplateManager) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(TemplateManager.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(TemplateManager.class, null);
     }
 
     private static class CORSManagementServiceHolder {
         static final CORSManagementService SERVICE = (CORSManagementService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(CORSManagementService.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(CORSManagementService.class, null);
     }
 
     private static class RealmServiceHolder {
         static final RealmService SERVICE = (RealmService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(RealmService.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
     }
 
     private static class APIResourceManagerHolder {
         static final APIResourceManager SERVICE = (APIResourceManager) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(APIResourceManager.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(APIResourceManager.class, null);
     }
 
     private static class AuthorizedAPIManagementServiceHolder {
         static final AuthorizedAPIManagementService SERVICE = (AuthorizedAPIManagementService) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(AuthorizedAPIManagementService.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(AuthorizedAPIManagementService.class, null);
     }
 
     private static class OrgApplicationManagerHolder {
         static final OrgApplicationManager SERVICE = (OrgApplicationManager) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext()
-                .getOSGiService(OrgApplicationManager.class, null);
+                .getThreadLocalCarbonContext().getOSGiService(OrgApplicationManager.class, null);
     }
 
     /**

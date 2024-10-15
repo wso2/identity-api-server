@@ -65,7 +65,7 @@ public class ServerApplicationMetadataServiceFactory {
      * @return ServerAPIResourceManagementService.
      */
     public static ServerApplicationMetadataService getServerApplicationMetadataService() {
+
         return SERVICE;
     }
-
 }

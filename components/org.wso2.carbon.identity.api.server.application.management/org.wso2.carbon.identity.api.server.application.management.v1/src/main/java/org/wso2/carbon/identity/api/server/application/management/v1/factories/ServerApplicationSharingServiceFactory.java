@@ -46,7 +46,7 @@ public class ServerApplicationSharingServiceFactory {
      * @return ServerAPIResourceManagementService.
      */
     public static ServerApplicationSharingService getServerApplicationSharingService() {
+
         return SERVICE;
     }
-
 }

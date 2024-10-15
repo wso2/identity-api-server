@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -83,6 +83,7 @@ public class ServerApplicationMetadataService {
                                             SAMLSSOConfigServiceImpl samlSSOConfigService,
                                             OAuthAdminServiceImpl oAuthAdminService,
                                             STSAdminServiceInterface sTSAdminServiceInterface) {
+
         this.applicationManagementService = applicationManagementService;
         this.samlSSOConfigService = samlSSOConfigService;
         this.oAuthAdminService = oAuthAdminService;

@@ -54,6 +54,7 @@ public class ServerApplicationSharingService {
     private final OrgApplicationManager orgApplicationManager;
 
     public ServerApplicationSharingService(OrgApplicationManager orgApplicationManager) {
+
         this.orgApplicationManager = orgApplicationManager;
     }
 

@@ -60,6 +60,7 @@ public class ServerApplicationManagementServiceFactory {
      * @return ServerAPIResourceManagementService.
      */
     public static ServerApplicationManagementService getServerApplicationManagementService() {
+
         return SERVICE;
     }
 }

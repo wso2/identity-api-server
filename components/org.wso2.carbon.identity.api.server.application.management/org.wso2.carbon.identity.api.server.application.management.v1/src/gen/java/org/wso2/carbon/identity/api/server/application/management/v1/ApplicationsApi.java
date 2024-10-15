@@ -74,6 +74,7 @@ public class ApplicationsApi  {
     private final ApplicationsApiService delegate;
 
     public ApplicationsApi() {
+
         this.delegate = ApplicationsApiServiceFactory.getApplicationsApi();
     }
 
