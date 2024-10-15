@@ -60,6 +60,7 @@ public class OrganizationsApi  {
     private final OrganizationsApiService delegate;
 
     public OrganizationsApi() {
+
         this.delegate = OrganizationsApiServiceFactory.getOrganizationsApi();
     }
 

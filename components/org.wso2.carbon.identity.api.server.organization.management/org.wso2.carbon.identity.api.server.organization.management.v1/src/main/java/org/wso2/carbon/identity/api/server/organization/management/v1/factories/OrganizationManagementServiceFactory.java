@@ -60,6 +60,7 @@ public class OrganizationManagementServiceFactory {
      * @return OrganizationManagementService.
      */
     public static OrganizationManagementService getOrganizationManagementService() {
+
         return SERVICE;
     }
 }
