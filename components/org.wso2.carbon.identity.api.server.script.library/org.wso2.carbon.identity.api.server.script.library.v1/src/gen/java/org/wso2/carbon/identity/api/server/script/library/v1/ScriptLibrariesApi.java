@@ -47,6 +47,7 @@ public class ScriptLibrariesApi {
     private final ScriptLibrariesApiService delegate;
 
     public ScriptLibrariesApi() {
+
         this.delegate = ScriptLibrariesApiServiceFactory.getScriptLibrariesApi();
     }
 
