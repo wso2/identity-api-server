@@ -44,6 +44,7 @@ public class CorsApi  {
     private final CorsApiService delegate;
 
     public CorsApi() {
+
         this.delegate = CorsApiServiceFactory.getCorsApi();
     }
 

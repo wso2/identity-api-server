@@ -52,6 +52,7 @@ public class CORSService {
     private static final Log log = LogFactory.getLog(CORSService.class);
 
     public CORSService(CORSManagementService corsManagementService) {
+
         this.corsManagementService = corsManagementService;
     }
 

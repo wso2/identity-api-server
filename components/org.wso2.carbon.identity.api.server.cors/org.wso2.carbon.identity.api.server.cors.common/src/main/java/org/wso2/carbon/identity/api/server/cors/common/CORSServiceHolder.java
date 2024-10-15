@@ -29,10 +29,8 @@ public class CORSServiceHolder {
     private CORSServiceHolder() {}
 
     private static class CORSManagementServiceHolder {
-        static final CORSManagementService SERVICE =
-                (CORSManagementService) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext()
-                        .getOSGiService(CORSManagementService.class, null);
+        static final CORSManagementService SERVICE = (CORSManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(CORSManagementService.class, null);
     }
 
     /**
