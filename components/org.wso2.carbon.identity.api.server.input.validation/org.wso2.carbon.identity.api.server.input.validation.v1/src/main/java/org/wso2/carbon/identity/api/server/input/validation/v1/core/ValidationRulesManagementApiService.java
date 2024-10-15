@@ -72,6 +72,7 @@ public class ValidationRulesManagementApiService {
     private static final Log LOGGER = LogFactory.getLog(ValidationRulesManagementApiService.class);
 
     public ValidationRulesManagementApiService(InputValidationManagementService inputValidationManagementService) {
+
         this.inputValidationManagementService = inputValidationManagementService;
     }
 
