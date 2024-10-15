@@ -56,6 +56,7 @@ public class PasswordExpiredUsersManagementApiService {
 
     public PasswordExpiredUsersManagementApiService(
             ExpiredPasswordIdentificationService expiredPasswordIdentificationService) {
+
         this.expiredPasswordIdentificationService = expiredPasswordIdentificationService;
     }
 

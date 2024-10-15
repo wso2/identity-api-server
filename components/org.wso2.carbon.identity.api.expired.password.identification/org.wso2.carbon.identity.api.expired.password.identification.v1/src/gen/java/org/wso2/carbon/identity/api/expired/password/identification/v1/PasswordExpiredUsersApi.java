@@ -38,6 +38,7 @@ public class PasswordExpiredUsersApi  {
     private final PasswordExpiredUsersApiService delegate;
 
     public PasswordExpiredUsersApi() {
+
         this.delegate = PasswordExpiredUsersApiServiceFactory.getPasswordExpiredUsersApi();
     }
 

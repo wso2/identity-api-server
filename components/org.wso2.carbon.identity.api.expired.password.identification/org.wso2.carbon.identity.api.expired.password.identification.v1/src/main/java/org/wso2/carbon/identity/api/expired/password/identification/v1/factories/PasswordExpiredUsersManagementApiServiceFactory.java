@@ -46,6 +46,7 @@ public class PasswordExpiredUsersManagementApiServiceFactory {
      * @return PasswordExpiredUsersManagementApiService service.
      */
     public static PasswordExpiredUsersManagementApiService getExpiredPasswordIdentificationService() {
+
         return SERVICE;
     }
 }

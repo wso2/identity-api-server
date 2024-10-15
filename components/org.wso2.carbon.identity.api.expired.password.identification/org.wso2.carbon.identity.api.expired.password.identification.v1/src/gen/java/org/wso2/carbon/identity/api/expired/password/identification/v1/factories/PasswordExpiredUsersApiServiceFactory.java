@@ -21,10 +21,18 @@ package org.wso2.carbon.identity.api.expired.password.identification.v1.factorie
 import org.wso2.carbon.identity.api.expired.password.identification.v1.PasswordExpiredUsersApiService;
 import org.wso2.carbon.identity.api.expired.password.identification.v1.impl.PasswordExpiredUsersApiServiceImpl;
 
+/**
+ * Factory class for PasswordExpiredUsersApiService.
+ */
 public class PasswordExpiredUsersApiServiceFactory {
 
    private final static PasswordExpiredUsersApiService SERVICE = new PasswordExpiredUsersApiServiceImpl();
 
+   /**
+    * Get PasswordExpiredUsersApiService.
+    *
+    * @return PasswordExpiredUsersApiService.
+    */
    public static PasswordExpiredUsersApiService getPasswordExpiredUsersApi()
    {
       return SERVICE;
