@@ -66,6 +66,7 @@ public class GuestApiServiceCore {
     private final InvitationCoreService invitationCoreService;
 
     public GuestApiServiceCore(InvitationCoreService invitationCoreService) {
+
         this.invitationCoreService = invitationCoreService;
     }
 

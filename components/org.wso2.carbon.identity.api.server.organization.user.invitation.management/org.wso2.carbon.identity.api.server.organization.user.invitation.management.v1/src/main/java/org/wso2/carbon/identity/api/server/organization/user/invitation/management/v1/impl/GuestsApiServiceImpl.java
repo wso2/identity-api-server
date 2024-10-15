@@ -43,7 +43,7 @@ public class GuestsApiServiceImpl implements GuestsApiService {
         try {
             this.guestApiServiceCore = GuestApiServiceCoreFactory.getGuestApiServiceCore();
         } catch (IllegalStateException e) {
-            throw new RuntimeException("Error occurred while initiating application management services.", e);
+            throw new RuntimeException("Error occurred while initiating user invitation management services.", e);
         }
     }
 
