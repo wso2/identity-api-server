@@ -44,6 +44,7 @@ public class IdvProvidersApi  {
     private final IdvProvidersApiService delegate;
 
     public IdvProvidersApi() {
+
         this.delegate = IdvProvidersApiServiceFactory.getIdvProvidersApi();
     }
 

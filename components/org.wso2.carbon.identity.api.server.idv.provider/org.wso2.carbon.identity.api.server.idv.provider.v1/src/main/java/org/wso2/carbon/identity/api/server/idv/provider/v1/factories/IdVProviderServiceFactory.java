@@ -45,6 +45,7 @@ public class IdVProviderServiceFactory {
      * @return IdVProviderService
      */
     public static IdVProviderService getIdVProviderService() {
+
         return SERVICE;
     }
 }

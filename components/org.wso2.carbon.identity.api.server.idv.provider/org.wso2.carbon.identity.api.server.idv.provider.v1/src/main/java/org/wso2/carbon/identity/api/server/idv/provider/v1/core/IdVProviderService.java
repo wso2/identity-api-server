@@ -60,6 +60,7 @@ public class IdVProviderService {
     private static final Log log = LogFactory.getLog(IdVProviderService.class);
 
     public IdVProviderService(IdVProviderManager idvProviderManager) {
+
         this.idvProviderManager = idvProviderManager;
     }
 
