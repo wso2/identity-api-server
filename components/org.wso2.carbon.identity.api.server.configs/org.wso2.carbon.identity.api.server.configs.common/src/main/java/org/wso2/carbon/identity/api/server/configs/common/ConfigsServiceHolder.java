@@ -35,51 +35,38 @@ public class ConfigsServiceHolder {
     private ConfigsServiceHolder() {}
 
     private static class ApplicationManagementServiceHolder {
-        static final ApplicationManagementService SERVICE =
-                (ApplicationManagementService) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext()
-                        .getOSGiService(ApplicationManagementService.class, null);
+        static final ApplicationManagementService SERVICE = (ApplicationManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ApplicationManagementService.class, null);
     }
 
     private static class IdentityProviderManagerHolder {
-        static final IdentityProviderManager SERVICE =
-                (IdentityProviderManager) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext()
-                        .getOSGiService(IdentityProviderManager.class, null);
+        static final IdentityProviderManager SERVICE = (IdentityProviderManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(IdentityProviderManager.class, null);
     }
 
     private static class CORSManagementServiceHolder {
-        static final CORSManagementService SERVICE =
-                (CORSManagementService) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext()
-                        .getOSGiService(CORSManagementService.class, null);
+        static final CORSManagementService SERVICE = (CORSManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(CORSManagementService.class, null);
     }
 
     private static class RemoteLoggingConfigServiceHolder {
-        static final RemoteLoggingConfigService SERVICE =
-                (RemoteLoggingConfigService) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext()
-                        .getOSGiService(RemoteLoggingConfigService.class, null);
+        static final RemoteLoggingConfigService SERVICE = (RemoteLoggingConfigService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(RemoteLoggingConfigService.class, null);
     }
 
     private static class ImpersonationConfigMgtServiceHolder {
-        static final ImpersonationConfigMgtService SERVICE =
-                (ImpersonationConfigMgtService) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext()
-                        .getOSGiService(ImpersonationConfigMgtService.class, null);
+        static final ImpersonationConfigMgtService SERVICE = (ImpersonationConfigMgtService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ImpersonationConfigMgtService.class, null);
     }
 
     private static class DCRConfigurationMgtServiceHolder {
-        static final DCRConfigurationMgtService SERVICE =
-                (DCRConfigurationMgtService) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext()
-                        .getOSGiService(DCRConfigurationMgtService.class, null);
+        static final DCRConfigurationMgtService SERVICE = (DCRConfigurationMgtService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(DCRConfigurationMgtService.class, null);
     }
 
     private static class JWTClientAuthenticatorMgtServiceHolder {
         static final JWTClientAuthenticatorMgtService SERVICE =
-                (JWTClientAuthenticatorMgtService) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext()
+                (JWTClientAuthenticatorMgtService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(JWTClientAuthenticatorMgtService.class, null);
     }
 

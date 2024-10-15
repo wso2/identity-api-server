@@ -62,6 +62,7 @@ public class ConfigsApi  {
     private final ConfigsApiService delegate;
 
     public ConfigsApi() {
+
         this.delegate = ConfigsApiServiceFactory.getConfigsApi();
     }
 
