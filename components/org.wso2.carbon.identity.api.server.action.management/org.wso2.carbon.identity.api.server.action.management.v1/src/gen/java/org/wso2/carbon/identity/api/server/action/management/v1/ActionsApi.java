@@ -32,6 +32,7 @@ public class ActionsApi  {
     private final ActionsApiService delegate;
 
     public ActionsApi() {
+
         this.delegate = ActionsApiServiceFactory.getActionsApi();
     }
 

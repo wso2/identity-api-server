@@ -45,6 +45,7 @@ public class ActionManagementServiceFactory {
      * @return ServerActionManagementService.
      */
     public static ServerActionManagementService getActionManagementService() {
+
         return SERVICE;
     }
 }

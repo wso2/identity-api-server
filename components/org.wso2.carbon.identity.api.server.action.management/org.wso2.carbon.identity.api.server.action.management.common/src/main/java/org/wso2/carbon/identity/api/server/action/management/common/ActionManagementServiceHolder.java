@@ -28,11 +28,9 @@ public class ActionManagementServiceHolder {
 
     private ActionManagementServiceHolder() {}
 
-    private static class ServiceHolder {
-        static final ActionManagementService SERVICE =
-                (ActionManagementService) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext()
-                        .getOSGiService(ActionManagementService.class, null);
+    private static class ActionServiceHolder {
+        static final ActionManagementService SERVICE = (ActionManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ActionManagementService.class, null);
     }
 
     /**
@@ -41,6 +39,7 @@ public class ActionManagementServiceHolder {
      * @return ActionManagementService.
      */
     public static ActionManagementService getActionManagementService() {
-        return ServiceHolder.SERVICE;
+
+        return ActionServiceHolder.SERVICE;
     }
 }

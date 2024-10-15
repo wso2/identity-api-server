@@ -63,6 +63,7 @@ public class ServerActionManagementService {
     private static final Set<String> NOT_IMPLEMENTED_ACTION_TYPES = new HashSet<>();
 
     public ServerActionManagementService(ActionManagementService actionManagementService) {
+
         this.actionManagementService = actionManagementService;
     }
 
