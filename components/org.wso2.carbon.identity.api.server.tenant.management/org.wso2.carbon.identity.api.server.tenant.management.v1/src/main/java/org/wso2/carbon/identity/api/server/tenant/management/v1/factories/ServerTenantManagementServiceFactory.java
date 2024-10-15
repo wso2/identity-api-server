@@ -45,6 +45,7 @@ public class ServerTenantManagementServiceFactory {
      * @return ServerTenantManagementService
      */
     public static ServerTenantManagementService getServerTenantManagementService() {
+
         return SERVICE;
     }
 }
