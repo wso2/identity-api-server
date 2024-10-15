@@ -45,6 +45,7 @@ public class KeyStoreServiceFactory {
      * @return KeyStoreService service.
      */
     public static KeyStoreService getKeyStoreService() {
+
         return SERVICE;
     }
 }
