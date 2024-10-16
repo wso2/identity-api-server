@@ -29,29 +29,23 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationMana
  */
 public class OrganizationManagementServiceFactory {
 
-    private static final OrganizationManagementService SERVICE;
+    private OrganizationManagementServiceFactory() {
 
-    static {
-        OrgApplicationManager orgApplicationManager = OrganizationManagementServiceHolder.getOrgApplicationManager();
-        OrganizationManager organizationManager = OrganizationManagementServiceHolder.getOrganizationManager();
-        OrganizationDiscoveryManager organizationDiscoveryManager = OrganizationManagementServiceHolder
-                .getOrganizationDiscoveryManager();
+    }
 
-        if (orgApplicationManager == null) {
-            throw new IllegalStateException("OrgApplicationManager service is not available from OSGi context.");
-        }
+    private static class OrganizationServiceHolder {
 
-        if (organizationManager == null) {
-            throw new IllegalStateException("OrganizationManager service is not available from OSGi context.");
-        }
+        private static final OrganizationManagementService SERVICE = createServiceInstance();
+    }
 
-        if (organizationDiscoveryManager == null) {
-            throw new IllegalStateException("OrganizationDiscoveryManager service is not available from OSGi context.");
-        }
+    private static OrganizationManagementService createServiceInstance() {
 
-        SERVICE = new OrganizationManagementService(orgApplicationManager,
-                organizationManager, organizationDiscoveryManager);
+        OrgApplicationManager orgApplicationManager = getOrgApplicationManagerService();
+        OrganizationManager organizationManager = getOrganizationManagerService();
+        OrganizationDiscoveryManager organizationDiscoveryManager = getOrganizationDiscoveryManagerService();
 
+        return new OrganizationManagementService(orgApplicationManager, organizationManager,
+                organizationDiscoveryManager);
     }
 
     /**
@@ -61,6 +55,36 @@ public class OrganizationManagementServiceFactory {
      */
     public static OrganizationManagementService getOrganizationManagementService() {
 
-        return SERVICE;
+        return OrganizationServiceHolder.SERVICE;
+    }
+
+    private static OrgApplicationManager getOrgApplicationManagerService() {
+
+        OrgApplicationManager service = OrganizationManagementServiceHolder.getOrgApplicationManager();
+        if (service == null) {
+            throw new IllegalStateException("OrgApplicationManager is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static OrganizationManager getOrganizationManagerService() {
+
+        OrganizationManager service = OrganizationManagementServiceHolder.getOrganizationManager();
+        if (service == null) {
+            throw new IllegalStateException("OrganizationManager is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static OrganizationDiscoveryManager getOrganizationDiscoveryManagerService() {
+
+        OrganizationDiscoveryManager service = OrganizationManagementServiceHolder.getOrganizationDiscoveryManager();
+        if (service == null) {
+            throw new IllegalStateException("OrganizationDiscoveryManager is not available from OSGi context.");
+        }
+
+        return service;
     }
 }
