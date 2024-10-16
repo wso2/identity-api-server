@@ -29,28 +29,22 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManager;
  */
 public class ServerIdpManagementServiceFactory {
 
-    private static final ServerIdpManagementService SERVICE;
+    private ServerIdpManagementServiceFactory() {
 
-    static {
-        IdentityProviderManager identityProviderManager = IdentityProviderServiceHolder.getIdentityProviderManager();
-        ClaimMetadataManagementService claimMetadataManagementService = IdentityProviderServiceHolder
-                .getClaimMetadataManagementService();
-        TemplateManager templateManager = IdentityProviderServiceHolder.getTemplateManager();
+    }
 
-        if (identityProviderManager == null) {
-            throw new IllegalStateException("IdentityProviderManager is not available from OSGi context.");
-        }
+    private static class ServerIdpManagementServiceHolder {
 
-        if (claimMetadataManagementService == null) {
-            throw new IllegalStateException("ClaimMetadataManagementService is not available from OSGi context.");
-        }
+        private static final ServerIdpManagementService SERVICE = createServiceInstance();
+    }
 
-        if (templateManager == null) {
-            throw new IllegalStateException("TemplateManager is not available from OSGi context.");
-        }
+    private static ServerIdpManagementService createServiceInstance() {
 
-        SERVICE = new ServerIdpManagementService(identityProviderManager, templateManager,
-                claimMetadataManagementService);
+        IdentityProviderManager identityProviderManager = getIdentityProviderManager();
+        ClaimMetadataManagementService claimMetadataManagementService = getClaimMetadataManagementService();
+        TemplateManager templateManager = getTemplateManager();
+
+        return new ServerIdpManagementService(identityProviderManager, templateManager, claimMetadataManagementService);
     }
 
     /**
@@ -60,6 +54,36 @@ public class ServerIdpManagementServiceFactory {
      */
     public static ServerIdpManagementService getServerIdpManagementService() {
 
-        return SERVICE;
+        return ServerIdpManagementServiceHolder.SERVICE;
+    }
+
+    private static IdentityProviderManager getIdentityProviderManager() {
+
+        IdentityProviderManager service = IdentityProviderServiceHolder.getIdentityProviderManager();
+        if (service == null) {
+            throw new IllegalStateException("IdentityProviderManager is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static ClaimMetadataManagementService getClaimMetadataManagementService() {
+
+        ClaimMetadataManagementService service = IdentityProviderServiceHolder.getClaimMetadataManagementService();
+        if (service == null) {
+            throw new IllegalStateException("ClaimMetadataManagementService is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static TemplateManager getTemplateManager() {
+
+        TemplateManager service = IdentityProviderServiceHolder.getTemplateManager();
+        if (service == null) {
+            throw new IllegalStateException("TemplateManager is not available from OSGi context.");
+        }
+
+        return service;
     }
 }
