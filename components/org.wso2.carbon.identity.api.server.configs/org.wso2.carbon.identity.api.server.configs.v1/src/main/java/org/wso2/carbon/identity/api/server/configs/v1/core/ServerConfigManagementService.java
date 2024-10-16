@@ -94,7 +94,7 @@ import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClie
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
-import org.wso2.carbon.idp.mgt.IdentityProviderManager;
+import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
 import org.wso2.carbon.logging.service.data.RemoteServerLoggerData;
 import org.wso2.carbon.user.api.UserRealm;
@@ -129,7 +129,7 @@ import static org.wso2.carbon.identity.api.server.configs.common.Constants.PATH_
 public class ServerConfigManagementService {
 
     private final ApplicationManagementService applicationManagementService;
-    private final IdentityProviderManager identityProviderManager;
+    private final IdpManager idpManager;
     private final CORSManagementService corsManagementService;
     private final RemoteLoggingConfigService remoteLoggingConfigService;
     private final ImpersonationConfigMgtService impersonationConfigMgtService;
@@ -139,7 +139,7 @@ public class ServerConfigManagementService {
     private static final Log log = LogFactory.getLog(ServerConfigManagementService.class);
 
     public ServerConfigManagementService(ApplicationManagementService applicationManagementService,
-                                         IdentityProviderManager identityProviderManager,
+                                         IdpManager idpManager,
                                          CORSManagementService corsManagementService,
                                          RemoteLoggingConfigService remoteLoggingConfigService,
                                          ImpersonationConfigMgtService impersonationConfigMgtService,
@@ -147,7 +147,7 @@ public class ServerConfigManagementService {
                                          JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService) {
 
         this.applicationManagementService = applicationManagementService;
-        this.identityProviderManager = identityProviderManager;
+        this.idpManager = idpManager;
         this.corsManagementService = corsManagementService;
         this.remoteLoggingConfigService = remoteLoggingConfigService;
         this.impersonationConfigMgtService = impersonationConfigMgtService;
@@ -276,8 +276,7 @@ public class ServerConfigManagementService {
     public void patchConfigs(List<Patch> patchRequest) {
 
         try {
-            IdentityProvider residentIdP = identityProviderManager.getResidentIdP(ContextLoader
-                            .getTenantDomainFromContext());
+            IdentityProvider residentIdP = idpManager.getResidentIdP(ContextLoader.getTenantDomainFromContext());
             // Resident Identity Provider can be null only due to an internal server error.
             if (residentIdP == null) {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR, Constants.ErrorMessage
@@ -287,7 +286,7 @@ public class ServerConfigManagementService {
             processPatchRequest(patchRequest, idpToUpdate);
             // To avoid updating non-existing authenticators in DB layer.
             idpToUpdate.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[0]);
-            identityProviderManager.updateResidentIdP(idpToUpdate, ContextLoader.getTenantDomainFromContext());
+            idpManager.updateResidentIdP(idpToUpdate, ContextLoader.getTenantDomainFromContext());
 
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_UPDATING_CONFIGS, null);
@@ -935,7 +934,7 @@ public class ServerConfigManagementService {
 
         IdentityProvider residentIdP;
         try {
-            residentIdP = identityProviderManager.getResidentIdP(ContextLoader.getTenantDomainFromContext());
+            residentIdP = idpManager.getResidentIdP(ContextLoader.getTenantDomainFromContext());
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_CONFIGS, null);
         }
@@ -1448,7 +1447,7 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         InboundAuthSAML2Config inboundAuthConfig = new InboundAuthSAML2Config();
         try {
-            IdentityProvider residentIdp = identityProviderManager.getResidentIdP(tenantDomain);
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
             if (residentIdp != null) {
                 FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
                         .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
@@ -1516,7 +1515,7 @@ public class ServerConfigManagementService {
         validateSAMLAuthConfigUpdate(authConfigToUpdate);
 
         try {
-            IdentityProvider residentIdp = identityProviderManager.getResidentIdP(tenantDomain);
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
             if (residentIdp != null) {
                 FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
                         .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
@@ -1537,7 +1536,7 @@ public class ServerConfigManagementService {
                         authConfigToUpdate);
                 federatedAuthConfig.setProperties(updatedIdpProperties);
                 residentIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
-                identityProviderManager.updateResidentIdP(residentIdp, tenantDomain);
+                idpManager.updateResidentIdP(residentIdp, tenantDomain);
             } else {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);
@@ -1606,7 +1605,7 @@ public class ServerConfigManagementService {
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         InboundAuthPassiveSTSConfig inboundAuthConfig = new InboundAuthPassiveSTSConfig();
         try {
-            IdentityProvider residentIdp = identityProviderManager.getResidentIdP(tenantDomain);
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
             if (residentIdp != null) {
                 FederatedAuthenticatorConfig federatedAuthConfig = IdentityApplicationManagementUtil
                         .getFederatedAuthenticator(residentIdp.getFederatedAuthenticatorConfigs(),
@@ -1661,7 +1660,7 @@ public class ServerConfigManagementService {
 
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
         try {
-            IdentityProvider residentIdp = identityProviderManager.getResidentIdP(tenantDomain);
+            IdentityProvider residentIdp = idpManager.getResidentIdP(tenantDomain);
             if (residentIdp != null) {
                 /*
                  Note: SAML 'samlAuthnRequestsSigningEnabled' property is used as the authentication request
@@ -1692,7 +1691,7 @@ public class ServerConfigManagementService {
                     }
                 }
                 residentIdp.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{federatedAuthConfig});
-                identityProviderManager.updateResidentIdP(residentIdp, tenantDomain);
+                idpManager.updateResidentIdP(residentIdp, tenantDomain);
             } else {
                 throw handleException(Response.Status.INTERNAL_SERVER_ERROR,
                         Constants.ErrorMessage.ERROR_CODE_RESIDENT_IDP_NOT_FOUND, tenantDomain);

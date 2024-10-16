@@ -24,7 +24,7 @@ import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
-import org.wso2.carbon.idp.mgt.IdentityProviderManager;
+import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
 
 /**
@@ -39,9 +39,9 @@ public class ConfigsServiceHolder {
                 .getThreadLocalCarbonContext().getOSGiService(ApplicationManagementService.class, null);
     }
 
-    private static class IdentityProviderManagerHolder {
-        static final IdentityProviderManager SERVICE = (IdentityProviderManager) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(IdentityProviderManager.class, null);
+    private static class IdpManagerHolder {
+        static final IdpManager SERVICE = (IdpManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(IdpManager.class, null);
     }
 
     private static class CORSManagementServiceHolder {
@@ -85,9 +85,9 @@ public class ConfigsServiceHolder {
      *
      * @return IdentityProviderManager
      */
-    public static IdentityProviderManager getIdentityProviderManager() {
+    public static IdpManager getIdpManager() {
 
-        return IdentityProviderManagerHolder.SERVICE;
+        return IdpManagerHolder.SERVICE;
     }
 
     /**

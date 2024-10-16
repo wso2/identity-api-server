@@ -25,7 +25,7 @@ import org.wso2.carbon.identity.cors.mgt.core.CORSManagementService;
 import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth2.impersonation.services.ImpersonationConfigMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
-import org.wso2.carbon.idp.mgt.IdentityProviderManager;
+import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
 
 /**
@@ -45,14 +45,14 @@ public class ServerConfigManagementServiceFactory {
     private static ServerConfigManagementService createServiceInstance() {
 
         ApplicationManagementService applicationManagementService = getApplicationManagementService();
-        IdentityProviderManager identityProviderManager = getIdentityProviderManager();
+        IdpManager idpManager = getIdpManager();
         CORSManagementService corsManagementService = getCorsManagementService();
         RemoteLoggingConfigService remoteLoggingConfigService = getRemoteLoggingConfigService();
         ImpersonationConfigMgtService impersonationConfigMgtService = getImpersonationConfigMgtService();
         JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService = getJWTClientAuthenticatorMgtService();
         DCRConfigurationMgtService dcrConfigurationMgtService = getDcrConfigurationMgtService();
 
-        return new ServerConfigManagementService(applicationManagementService, identityProviderManager,
+        return new ServerConfigManagementService(applicationManagementService, idpManager,
                 corsManagementService, remoteLoggingConfigService, impersonationConfigMgtService,
                 dcrConfigurationMgtService, jwtClientAuthenticatorMgtService);
     }
@@ -77,9 +77,9 @@ public class ServerConfigManagementServiceFactory {
         return service;
     }
 
-    private static IdentityProviderManager getIdentityProviderManager() {
+    private static IdpManager getIdpManager() {
 
-        IdentityProviderManager service = ConfigsServiceHolder.getIdentityProviderManager();
+        IdpManager service = ConfigsServiceHolder.getIdpManager();
         if (service == null) {
             throw new IllegalStateException("IdentityProviderManager is not available from OSGi context.");
         }
