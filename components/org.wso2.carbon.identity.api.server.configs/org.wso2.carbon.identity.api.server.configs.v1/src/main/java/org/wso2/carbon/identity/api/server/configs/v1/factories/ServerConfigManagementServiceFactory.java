@@ -33,54 +33,28 @@ import org.wso2.carbon.logging.service.RemoteLoggingConfigService;
  */
 public class ServerConfigManagementServiceFactory {
 
-    private static final ServerConfigManagementService SERVICE;
+    private ServerConfigManagementServiceFactory() {
 
-    static {
-        ApplicationManagementService applicationManagementService = ConfigsServiceHolder
-                .getApplicationManagementService();
-        IdentityProviderManager identityProviderManager = ConfigsServiceHolder.getIdentityProviderManager();
-        CORSManagementService corsManagementService = ConfigsServiceHolder.getCorsManagementService();
-        RemoteLoggingConfigService remoteLoggingConfigService = ConfigsServiceHolder.getRemoteLoggingConfigService();
-        ImpersonationConfigMgtService impersonationConfigMgtService = ConfigsServiceHolder
-                .getImpersonationConfigMgtService();
-        JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService = ConfigsServiceHolder
-                .getJWTClientAuthenticatorMgtService();
-        DCRConfigurationMgtService dcrConfigurationMgtService = ConfigsServiceHolder.getDcrConfigurationMgtService();
+    }
 
-        if (applicationManagementService == null) {
-            throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
-        }
+    private static class ServerConfigManagementServiceHolder {
 
-        if (identityProviderManager == null) {
-            throw new IllegalStateException("IdentityProviderManager is not available from OSGi context.");
-        }
+        private static final ServerConfigManagementService SERVICE = createServiceInstance();
+    }
 
-        if (corsManagementService == null) {
-            throw new IllegalStateException("CORSManagementService is not available from OSGi context.");
-        }
+    private static ServerConfigManagementService createServiceInstance() {
 
-        if (remoteLoggingConfigService == null) {
-            throw new IllegalStateException("RemoteLoggingConfigService is not available from OSGi context.");
-        }
+        ApplicationManagementService applicationManagementService = getApplicationManagementService();
+        IdentityProviderManager identityProviderManager = getIdentityProviderManager();
+        CORSManagementService corsManagementService = getCorsManagementService();
+        RemoteLoggingConfigService remoteLoggingConfigService = getRemoteLoggingConfigService();
+        ImpersonationConfigMgtService impersonationConfigMgtService = getImpersonationConfigMgtService();
+        JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService = getJWTClientAuthenticatorMgtService();
+        DCRConfigurationMgtService dcrConfigurationMgtService = getDcrConfigurationMgtService();
 
-        if (impersonationConfigMgtService == null) {
-            throw new IllegalStateException("ImpersonationConfigMgtService is not available from OSGi context.");
-        }
-
-        if (jwtClientAuthenticatorMgtService == null) {
-            throw new IllegalStateException("JWTClientAuthenticatorMgtService is not available from OSGi context.");
-        }
-
-        if (dcrConfigurationMgtService == null) {
-            throw new IllegalStateException("DCRConfigurationMgtService is not available from OSGi context.");
-        }
-
-        SERVICE = new ServerConfigManagementService(applicationManagementService, identityProviderManager,
-                corsManagementService,
-                remoteLoggingConfigService,
-                impersonationConfigMgtService,
-                dcrConfigurationMgtService,
-                jwtClientAuthenticatorMgtService);
+        return new ServerConfigManagementService(applicationManagementService, identityProviderManager,
+                corsManagementService, remoteLoggingConfigService, impersonationConfigMgtService,
+                dcrConfigurationMgtService, jwtClientAuthenticatorMgtService);
     }
 
     /**
@@ -90,6 +64,76 @@ public class ServerConfigManagementServiceFactory {
      */
     public static ServerConfigManagementService getServerConfigManagementService() {
 
-        return SERVICE;
+        return ServerConfigManagementServiceHolder.SERVICE;
+    }
+
+    private static ApplicationManagementService getApplicationManagementService() {
+
+        ApplicationManagementService service = ConfigsServiceHolder.getApplicationManagementService();
+        if (service == null) {
+            throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static IdentityProviderManager getIdentityProviderManager() {
+
+        IdentityProviderManager service = ConfigsServiceHolder.getIdentityProviderManager();
+        if (service == null) {
+            throw new IllegalStateException("IdentityProviderManager is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static CORSManagementService getCorsManagementService() {
+
+        CORSManagementService service = ConfigsServiceHolder.getCorsManagementService();
+        if (service == null) {
+            throw new IllegalStateException("CORSManagementService is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static RemoteLoggingConfigService getRemoteLoggingConfigService() {
+
+        RemoteLoggingConfigService service = ConfigsServiceHolder.getRemoteLoggingConfigService();
+        if (service == null) {
+            throw new IllegalStateException("RemoteLoggingConfigService is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static ImpersonationConfigMgtService getImpersonationConfigMgtService() {
+
+        ImpersonationConfigMgtService service = ConfigsServiceHolder.getImpersonationConfigMgtService();
+        if (service == null) {
+            throw new IllegalStateException("ImpersonationConfigMgtService is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static JWTClientAuthenticatorMgtService getJWTClientAuthenticatorMgtService() {
+
+        JWTClientAuthenticatorMgtService service = ConfigsServiceHolder.getJWTClientAuthenticatorMgtService();
+        if (service == null) {
+            throw new IllegalStateException("JWTClientAuthenticatorMgtService is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static DCRConfigurationMgtService getDcrConfigurationMgtService() {
+
+        DCRConfigurationMgtService service = ConfigsServiceHolder.getDcrConfigurationMgtService();
+        if (service == null) {
+            throw new IllegalStateException("DCRConfigurationMgtService is not available from OSGi context.");
+        }
+
+        return service;
     }
 }
