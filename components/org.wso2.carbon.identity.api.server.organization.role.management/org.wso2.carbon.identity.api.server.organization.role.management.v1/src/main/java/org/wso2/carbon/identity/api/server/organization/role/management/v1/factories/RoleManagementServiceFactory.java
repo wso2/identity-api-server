@@ -28,23 +28,22 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationUser
  */
 public class RoleManagementServiceFactory {
 
-    private static final RoleManagementService SERVICE;
+    private RoleManagementServiceFactory() {
 
-    static {
-        RoleManager roleManager = OrganizationRoleManagementServiceHolder.getRoleManager();
+    }
+
+    private static class RoleManagementServiceHolder {
+
+        private static final RoleManagementService SERVICE = createServiceInstance();
+    }
+
+    private static RoleManagementService createServiceInstance() {
+
+        RoleManager roleManager = getRoleManagerService();
         OrganizationUserResidentResolverService organizationUserResidentResolverService =
-                OrganizationRoleManagementServiceHolder.getOrganizationUserResidentResolverService();
+                getOrganizationUserResidentResolverService();
 
-        if (roleManager == null) {
-            throw new IllegalStateException("RoleManager service is not available from OSGi context.");
-        }
-
-        if (organizationUserResidentResolverService == null) {
-            throw new IllegalStateException("OrganizationUserResidentResolverService is not available " +
-                    "from OSGi context.");
-        }
-
-        SERVICE = new RoleManagementService(roleManager, organizationUserResidentResolverService);
+        return new RoleManagementService(roleManager, organizationUserResidentResolverService);
     }
 
     /**
@@ -54,6 +53,28 @@ public class RoleManagementServiceFactory {
      */
     public static RoleManagementService getRoleManagementService() {
 
-        return SERVICE;
+        return RoleManagementServiceHolder.SERVICE;
+    }
+
+    private static RoleManager getRoleManagerService() {
+
+        RoleManager service = OrganizationRoleManagementServiceHolder.getRoleManager();
+        if (service == null) {
+            throw new IllegalStateException("RoleManager service is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static OrganizationUserResidentResolverService getOrganizationUserResidentResolverService() {
+
+        OrganizationUserResidentResolverService service = OrganizationRoleManagementServiceHolder
+                .getOrganizationUserResidentResolverService();
+        if (service == null) {
+            throw new IllegalStateException("OrganizationUserResidentResolverService is not available " +
+                    "from OSGi context.");
+        }
+
+        return service;
     }
 }
