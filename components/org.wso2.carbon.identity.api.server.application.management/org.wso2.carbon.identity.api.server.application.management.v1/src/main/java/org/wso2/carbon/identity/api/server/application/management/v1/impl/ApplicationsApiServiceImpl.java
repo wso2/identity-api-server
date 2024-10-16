@@ -80,7 +80,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
                                        String requiredAttributes, Boolean excludeSystemPortals) {
 
         ApplicationListResponse listResponse = applicationManagementService.getAllApplications(limit, offset, filter,
-                sortOrder, sortBy, requiredAttributes, Boolean.parseBoolean(String.valueOf(excludeSystemPortals)));
+                sortOrder, sortBy, requiredAttributes, Boolean.TRUE.equals(excludeSystemPortals));
         return Response.ok().entity(listResponse).build();
     }
 
