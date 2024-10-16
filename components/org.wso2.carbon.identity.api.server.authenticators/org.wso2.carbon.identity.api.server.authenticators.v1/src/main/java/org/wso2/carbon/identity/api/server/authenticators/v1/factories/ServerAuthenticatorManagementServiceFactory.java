@@ -28,22 +28,21 @@ import org.wso2.carbon.idp.mgt.IdpManager;
  */
 public class ServerAuthenticatorManagementServiceFactory {
 
-    private static final ServerAuthenticatorManagementService SERVICE;
+    private ServerAuthenticatorManagementServiceFactory() {
 
-    static {
-        ApplicationManagementService applicationManagementService = AuthenticatorsServiceHolder
-                .getApplicationManagementService();
-        IdpManager idpManager = AuthenticatorsServiceHolder.getIdentityProviderManager();
+    }
 
-        if (applicationManagementService == null) {
-            throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
-        }
+    private static class ServerAuthenticatorManagementServiceHolder {
 
-        if (idpManager == null) {
-            throw new IllegalStateException("IdpManager service is not available from OSGi context.");
-        }
+        private static final ServerAuthenticatorManagementService SERVICE = createServiceInstance();
+    }
 
-        SERVICE = new ServerAuthenticatorManagementService(applicationManagementService, idpManager);
+    private static ServerAuthenticatorManagementService createServiceInstance() {
+
+        ApplicationManagementService applicationManagementService = getApplicationManagementService();
+        IdpManager idpManager = getIdpManager();
+
+        return new ServerAuthenticatorManagementService(applicationManagementService, idpManager);
     }
 
     /**
@@ -53,6 +52,26 @@ public class ServerAuthenticatorManagementServiceFactory {
      */
     public static ServerAuthenticatorManagementService getServerAuthenticatorManagementService() {
 
-        return SERVICE;
+        return ServerAuthenticatorManagementServiceHolder.SERVICE;
+    }
+
+    private static ApplicationManagementService getApplicationManagementService() {
+
+        ApplicationManagementService service = AuthenticatorsServiceHolder.getApplicationManagementService();
+        if (service == null) {
+            throw new IllegalStateException("ApplicationManagementService is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static IdpManager getIdpManager() {
+
+        IdpManager service = AuthenticatorsServiceHolder.getIdentityProviderManager();
+        if (service == null) {
+            throw new IllegalStateException("IdpManager service is not available from OSGi context.");
+        }
+
+        return service;
     }
 }
