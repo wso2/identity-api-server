@@ -28,22 +28,21 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.core.ServerC
  */
 public class ServerClaimManagementServiceFactory {
 
-    private static final ServerClaimManagementService SERVICE;
+    private ServerClaimManagementServiceFactory() {
 
-    static {
-        ClaimMetadataManagementService claimMetadataManagementService = ClaimManagementDataHolder
-                .getClaimMetadataManagementService();
-        OrganizationManager organizationManager = ClaimManagementDataHolder.getOrganizationManager();
+    }
 
-        if (claimMetadataManagementService == null) {
-            throw new IllegalStateException("ClaimMetadataManagementService is not available from OSGi context.");
-        }
+    private static class ServerClaimManagementServiceHolder {
 
-        if (organizationManager == null) {
-            throw new IllegalStateException("OrganizationManager is not available from OSGi context.");
-        }
+        private static final ServerClaimManagementService SERVICE = createServiceInstance();
+    }
 
-        SERVICE = new ServerClaimManagementService(claimMetadataManagementService, organizationManager);
+    private static ServerClaimManagementService createServiceInstance() {
+
+        ClaimMetadataManagementService claimMetadataManagementService = getClaimMetadataManagementService();
+        OrganizationManager organizationManager = getOrganizationManager();
+
+        return new ServerClaimManagementService(claimMetadataManagementService, organizationManager);
     }
 
     /**
@@ -53,6 +52,26 @@ public class ServerClaimManagementServiceFactory {
      */
     public static ServerClaimManagementService getServerClaimManagementService() {
 
-        return SERVICE;
+        return ServerClaimManagementServiceHolder.SERVICE;
+    }
+
+    private static ClaimMetadataManagementService getClaimMetadataManagementService() {
+
+        ClaimMetadataManagementService service = ClaimManagementDataHolder.getClaimMetadataManagementService();
+        if (service == null) {
+            throw new IllegalStateException("ClaimMetadataManagementService is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static OrganizationManager getOrganizationManager() {
+
+        OrganizationManager organizationManager = ClaimManagementDataHolder.getOrganizationManager();
+        if (organizationManager == null) {
+            throw new IllegalStateException("OrganizationManager service is not available from OSGi context.");
+        }
+
+        return organizationManager;
     }
 }
