@@ -33,31 +33,47 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class Owner  {
+public class OwnerInfoResponse  {
   
+    private String id;
     private String username;
-    private String password;
     private String email;
     private String firstname;
     private String lastname;
-    private String provisioningMethod;
     private List<AdditionalClaims> additionalClaims = null;
 
 
     /**
+    * id of the tenant owner.
+    **/
+    public OwnerInfoResponse id(String id) {
+
+        this.id = id;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "4875-jhgr-454hb", value = "id of the tenant owner.")
+    @JsonProperty("id")
+    @Valid
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
     * Username for the tenant owner.
     **/
-    public Owner username(String username) {
+    public OwnerInfoResponse username(String username) {
 
         this.username = username;
         return this;
     }
     
-    @ApiModelProperty(example = "kim", required = true, value = "Username for the tenant owner.")
+    @ApiModelProperty(example = "kim", value = "Username for the tenant owner.")
     @JsonProperty("username")
     @Valid
-    @NotNull(message = "Property username cannot be null.")
-
     public String getUsername() {
         return username;
     }
@@ -66,38 +82,17 @@ public class Owner  {
     }
 
     /**
-    * Password of the owner.
-    **/
-    public Owner password(String password) {
-
-        this.password = password;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "kim123", value = "Password of the owner.")
-    @JsonProperty("password")
-    @Valid
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    /**
     * Email address of the owner.
     **/
-    public Owner email(String email) {
+    public OwnerInfoResponse email(String email) {
 
         this.email = email;
         return this;
     }
     
-    @ApiModelProperty(example = "kim@wso2.com", required = true, value = "Email address of the owner.")
+    @ApiModelProperty(example = "kim@wso2.com", value = "Email address of the owner.")
     @JsonProperty("email")
     @Valid
-    @NotNull(message = "Property email cannot be null.")
-
     public String getEmail() {
         return email;
     }
@@ -108,7 +103,7 @@ public class Owner  {
     /**
     * First name of the owner.
     **/
-    public Owner firstname(String firstname) {
+    public OwnerInfoResponse firstname(String firstname) {
 
         this.firstname = firstname;
         return this;
@@ -127,7 +122,7 @@ public class Owner  {
     /**
     * Last name of the owner.
     **/
-    public Owner lastname(String lastname) {
+    public OwnerInfoResponse lastname(String lastname) {
 
         this.lastname = lastname;
         return this;
@@ -144,29 +139,8 @@ public class Owner  {
     }
 
     /**
-    * If the provisioning method is inline-password then a valid password should be sent in the request body, if the provisioning method is invite-via-email then password doesn&#39;t need to be send through request body, instead an emai link will be sent to the given email address to set the password.
     **/
-    public Owner provisioningMethod(String provisioningMethod) {
-
-        this.provisioningMethod = provisioningMethod;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "inline-password", required = true, value = "If the provisioning method is inline-password then a valid password should be sent in the request body, if the provisioning method is invite-via-email then password doesn't need to be send through request body, instead an emai link will be sent to the given email address to set the password.")
-    @JsonProperty("provisioningMethod")
-    @Valid
-    @NotNull(message = "Property provisioningMethod cannot be null.")
-
-    public String getProvisioningMethod() {
-        return provisioningMethod;
-    }
-    public void setProvisioningMethod(String provisioningMethod) {
-        this.provisioningMethod = provisioningMethod;
-    }
-
-    /**
-    **/
-    public Owner additionalClaims(List<AdditionalClaims> additionalClaims) {
+    public OwnerInfoResponse additionalClaims(List<AdditionalClaims> additionalClaims) {
 
         this.additionalClaims = additionalClaims;
         return this;
@@ -182,7 +156,7 @@ public class Owner  {
         this.additionalClaims = additionalClaims;
     }
 
-    public Owner addAdditionalClaimsItem(AdditionalClaims additionalClaimsItem) {
+    public OwnerInfoResponse addAdditionalClaimsItem(AdditionalClaims additionalClaimsItem) {
         if (this.additionalClaims == null) {
             this.additionalClaims = new ArrayList<>();
         }
@@ -201,33 +175,31 @@ public class Owner  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Owner owner = (Owner) o;
-        return Objects.equals(this.username, owner.username) &&
-            Objects.equals(this.password, owner.password) &&
-            Objects.equals(this.email, owner.email) &&
-            Objects.equals(this.firstname, owner.firstname) &&
-            Objects.equals(this.lastname, owner.lastname) &&
-            Objects.equals(this.provisioningMethod, owner.provisioningMethod) &&
-            Objects.equals(this.additionalClaims, owner.additionalClaims);
+        OwnerInfoResponse ownerInfoResponse = (OwnerInfoResponse) o;
+        return Objects.equals(this.id, ownerInfoResponse.id) &&
+            Objects.equals(this.username, ownerInfoResponse.username) &&
+            Objects.equals(this.email, ownerInfoResponse.email) &&
+            Objects.equals(this.firstname, ownerInfoResponse.firstname) &&
+            Objects.equals(this.lastname, ownerInfoResponse.lastname) &&
+            Objects.equals(this.additionalClaims, ownerInfoResponse.additionalClaims);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, password, email, firstname, lastname, provisioningMethod, additionalClaims);
+        return Objects.hash(id, username, email, firstname, lastname, additionalClaims);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class Owner {\n");
+        sb.append("class OwnerInfoResponse {\n");
         
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    username: ").append(toIndentedString(username)).append("\n");
-        sb.append("    password: ").append(toIndentedString(password)).append("\n");
         sb.append("    email: ").append(toIndentedString(email)).append("\n");
         sb.append("    firstname: ").append(toIndentedString(firstname)).append("\n");
         sb.append("    lastname: ").append(toIndentedString(lastname)).append("\n");
-        sb.append("    provisioningMethod: ").append(toIndentedString(provisioningMethod)).append("\n");
         sb.append("    additionalClaims: ").append(toIndentedString(additionalClaims)).append("\n");
         sb.append("}");
         return sb.toString();

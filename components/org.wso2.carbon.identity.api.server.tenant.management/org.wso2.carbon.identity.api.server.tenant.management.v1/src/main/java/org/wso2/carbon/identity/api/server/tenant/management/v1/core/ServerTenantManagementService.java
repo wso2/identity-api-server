@@ -28,6 +28,8 @@ import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Additional
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.ChannelVerifiedTenantModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.LifeCycleStatus;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Link;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerInfoResponse;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerPutModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.OwnerResponse;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantListItem;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.TenantModel;
@@ -42,8 +44,11 @@ import org.wso2.carbon.stratos.common.constants.TenantConstants;
 import org.wso2.carbon.stratos.common.exception.TenantManagementClientException;
 import org.wso2.carbon.stratos.common.exception.TenantManagementServerException;
 import org.wso2.carbon.stratos.common.exception.TenantMgtException;
+import org.wso2.carbon.stratos.common.util.ClaimsMgtUtil;
 import org.wso2.carbon.tenant.mgt.services.TenantMgtService;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.common.User;
+import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.core.tenant.Tenant;
 import org.wso2.carbon.user.core.tenant.TenantSearchResult;
 
@@ -62,6 +67,7 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_TENANT_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.TENANT_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_INVALID_EMAIL;
@@ -193,6 +199,35 @@ public class ServerTenantManagementService {
         }
     }
 
+    public OwnerInfoResponse getOwner(String tenantUniqueID, String ownerID, String additionalClaims) {
+
+        try {
+            Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
+            validateTenantOwnerId(tenant, ownerID);
+
+            String[] claimsList = StringUtils.split(additionalClaims, ",");
+            return createOwnerInfoResponse(tenant, claimsList);
+        } catch (TenantMgtException e) {
+            throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_RETRIEVING_OWNER, tenantUniqueID);
+        }
+    }
+
+    public void updateOwner(String tenantUniqueID, String ownerID, OwnerPutModel ownerPutModel) {
+
+        try {
+            Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
+            validateTenantOwnerId(tenant, ownerID);
+
+            createTenantInfoBean(tenant, ownerPutModel);
+
+            TenantManagementServiceHolder.getTenantMgtService().updateOwner(tenant);
+        } catch (TenantMgtException e) {
+            throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_ERROR_UPDATING_OWNER, tenantUniqueID);
+        }
+    }
+
     /**
      * Delete the metadata of the tenant which is identified by tenant unique id.
      *
@@ -239,6 +274,74 @@ public class ServerTenantManagementService {
         ownerResponse.setUsername(user.getUsername());
         ownerResponseList.add(ownerResponse);
         return ownerResponseList;
+    }
+
+    private void createTenantInfoBean(Tenant tenant, OwnerPutModel ownerPutModel) {
+
+        if (StringUtils.isNotBlank(ownerPutModel.getFirstname())) {
+            tenant.setAdminFirstName(ownerPutModel.getFirstname());
+        }
+        if (StringUtils.isNotBlank(ownerPutModel.getLastname())) {
+            tenant.setAdminLastName(ownerPutModel.getLastname());
+        }
+        if (StringUtils.isNotBlank(ownerPutModel.getEmail())) {
+            tenant.setEmail(ownerPutModel.getEmail());
+        }
+        tenant.setAdminPassword(ownerPutModel.getPassword());
+        List<AdditionalClaims> additionalClaimsList = ownerPutModel.getAdditionalClaims();
+        if (CollectionUtils.isNotEmpty(additionalClaimsList)) {
+            tenant.setClaimsMap(createClaimsMapping(additionalClaimsList));
+        } else {
+            // Avoid updating the claims map if the request does not contain any additional claims.
+            tenant.setClaimsMap(new HashMap<>());
+        }
+    }
+
+    private void validateTenantOwnerId(Tenant tenant, String ownerID) {
+
+        if (tenant.getAdminUserId() == null || !tenant.getAdminUserId().equals(ownerID)) {
+            throw handleException(Response.Status.BAD_REQUEST, TenantManagementConstants.ErrorMessage.
+                    ERROR_CODE_OWNER_NOT_FOUND, tenant.getTenantUniqueID());
+        }
+    }
+
+    private OwnerInfoResponse createOwnerInfoResponse(Tenant tenant, String[] claimsList) throws TenantMgtException {
+
+        RealmService realmService = TenantManagementServiceHolder.getRealmService();
+        OwnerInfoResponse ownerInfoResponse = new OwnerInfoResponse();
+        ownerInfoResponse.setId(tenant.getAdminUserId());
+        ownerInfoResponse.setUsername(tenant.getAdminName());
+        ownerInfoResponse.setEmail(tenant.getEmail());
+
+        try {
+            ownerInfoResponse.setFirstname(ClaimsMgtUtil.getFirstNamefromUserStoreManager(
+                    realmService, tenant.getId()));
+            ownerInfoResponse.setLastname(ClaimsMgtUtil.getLastNamefromUserStoreManager(
+                    realmService, tenant.getId()));
+        } catch (UserStoreException e) {
+            if (e.getMessage().startsWith(TenantManagementConstants.NON_EXISTING_USER_CODE)) {
+                throw handleException(Response.Status.NOT_FOUND, TenantManagementConstants.ErrorMessage.
+                        ERROR_CODE_OWNER_NOT_FOUND, tenant.getTenantUniqueID());
+            }
+            throw new TenantMgtException(e.getMessage());
+        }
+
+        if (claimsList != null) {
+            for (String claim : claimsList) {
+                try {
+                    String claimValue = ClaimsMgtUtil.getClaimfromUserStoreManager(realmService, tenant.getId(), claim);
+                    if (StringUtils.isNotBlank(claimValue)) {
+                        ownerInfoResponse.addAdditionalClaimsItem(
+                                new AdditionalClaims().claim(claim).value(claimValue));
+                    }
+                } catch (org.wso2.carbon.user.core.UserStoreException e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Error while retrieving claim: " + claim + " for tenant: " + tenant.getId(), e);
+                    }
+                }
+            }
+        }
+        return ownerInfoResponse;
     }
 
     private TenantResponseModel createTenantResponse(Tenant tenant) {
@@ -430,6 +533,9 @@ public class ServerTenantManagementService {
             if (ERROR_CODE_RESOURCE_LIMIT_REACHED.equals(e.getErrorCode())) {
                 return handleResourceLimitReached();
             }
+            if (ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED.getCode().equals(e.getErrorCode())) {
+                return handleResourcePartiallyCreated(e);
+            }
             errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
@@ -459,6 +565,14 @@ public class ServerTenantManagementService {
 
         Response.Status status = Response.Status.FORBIDDEN;
         return new APIError(status, errorResponse);
+    }
+
+    private APIError handleResourcePartiallyCreated(TenantMgtException e) {
+
+        String errorMessage = e.getCause().getMessage();
+        ErrorResponse errorResponse = getErrorBuilder(ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED, errorMessage)
+                .build(log, errorMessage);
+        return new APIError(Response.Status.PARTIAL_CONTENT, errorResponse);
     }
 
     /**
