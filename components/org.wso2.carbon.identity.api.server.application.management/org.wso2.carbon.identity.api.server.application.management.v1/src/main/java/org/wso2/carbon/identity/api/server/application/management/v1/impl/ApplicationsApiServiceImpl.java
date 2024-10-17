@@ -72,7 +72,7 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
                                        String requiredAttributes) {
 
-        return getAllApplications(limit, offset, filter, sortOrder, sortBy, requiredAttributes, true);
+        return getAllApplications(limit, offset, filter, sortOrder, sortBy, requiredAttributes, false);
     }
 
     @Override
