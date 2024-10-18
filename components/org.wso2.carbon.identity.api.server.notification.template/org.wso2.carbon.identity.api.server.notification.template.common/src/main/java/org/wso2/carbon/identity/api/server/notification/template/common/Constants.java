@@ -24,6 +24,8 @@ import javax.ws.rs.core.Response.Status;
 
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.ERROR_ADDING_TEMPLATE;
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.ERROR_RESOLVING_MAIN_APPLICATION;
+import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes
+        .ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED;
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.TEMPLATE_ALREADY_EXISTS;
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.TEMPLATE_NOT_FOUND;
 import static org.wso2.carbon.email.mgt.constants.TemplateMgtConstants.ErrorCodes.TEMPLATE_TYPE_ALREADY_EXISTS;
@@ -110,7 +112,10 @@ public class Constants {
                 "Server encountered an error while resolving the main application."),
         ERROR_ERROR_INVALID_NOTIFICATION_CHANNEL("60015", Status.BAD_REQUEST,
                 "Invalid notification channel.",
-                "Notification channel can only be either 'EMAIL' or 'SMS'.");
+                "Notification channel can only be either 'EMAIL' or 'SMS'."),
+        ERROR_ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED("60016", Status.BAD_REQUEST,
+                "System resource deletion not allowed.",
+                "System resources cannot be deleted.");
 
         private final String message;
         private final Status httpStatus;
@@ -159,6 +164,8 @@ public class Constants {
         NTM_ERROR_CODE_MAP.put(TEMPLATE_NOT_FOUND, ErrorMessage.ERROR_TEMPLATE_NOT_FOUND);
         NTM_ERROR_CODE_MAP.put(ERROR_ADDING_TEMPLATE, ErrorMessage.ERROR_ERROR_ADDING_TEMPLATE);
         NTM_ERROR_CODE_MAP.put(ERROR_RESOLVING_MAIN_APPLICATION, ErrorMessage.ERROR_ERROR_RESOLVING_MAIN_APPLICATION);
+        NTM_ERROR_CODE_MAP.put(ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED,
+                ErrorMessage.ERROR_ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED);
     }
 
     public static ErrorMessage getNTMMappedErrorMessage(String errorCode) {
