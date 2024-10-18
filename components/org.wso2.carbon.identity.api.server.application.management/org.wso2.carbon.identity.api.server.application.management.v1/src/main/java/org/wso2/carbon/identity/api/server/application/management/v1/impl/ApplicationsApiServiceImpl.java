@@ -67,12 +67,20 @@ public class ApplicationsApiServiceImpl implements ApplicationsApiService {
     @Autowired
     private ServerApplicationSharingService applicationSharingService;
 
+    @Deprecated
     @Override
     public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
                                        String requiredAttributes) {
 
-        ApplicationListResponse listResponse = applicationManagementService
-                .getAllApplications(limit, offset, filter, sortOrder, sortBy, requiredAttributes);
+        return getAllApplications(limit, offset, filter, sortOrder, sortBy, requiredAttributes, false);
+    }
+
+    @Override
+    public Response getAllApplications(Integer limit, Integer offset, String filter, String sortOrder, String sortBy,
+                                       String requiredAttributes, Boolean excludeSystemPortals) {
+
+        ApplicationListResponse listResponse = applicationManagementService.getAllApplications(limit, offset, filter,
+                sortOrder, sortBy, requiredAttributes, Boolean.TRUE.equals(excludeSystemPortals));
         return Response.ok().entity(listResponse).build();
     }
 
