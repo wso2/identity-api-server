@@ -1770,8 +1770,14 @@ public class ServerIdpManagementService {
                 authConfig.setName(base64URLDecode(authenticator.getAuthenticatorId()));
                 authConfig.setDisplayName(getDisplayNameOfAuthenticator(authConfig.getName()));
                 authConfig.setEnabled(authenticator.getIsEnabled());
+
+                String definedByType = null;
+                if (authenticator.getDefinedBy() != null) {
+                    definedByType = authenticator.getDefinedBy().toString();
+                }
                 authConfig.setDefinedByType(resolveDefinedByType(authConfig.getName(),
-                        authenticator.getDefinedBy().toString(), isNewFederatedAuthenticator));
+                        definedByType, isNewFederatedAuthenticator));
+
                 List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> authProperties =
                         authenticator.getProperties();
                 if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authConfig.getName())) {
@@ -2841,8 +2847,13 @@ public class ServerIdpManagementService {
         authConfig.setName(authenticatorName);
         authConfig.setDisplayName(getDisplayNameOfAuthenticator(authenticatorName));
         authConfig.setEnabled(authenticator.getIsEnabled());
-        authConfig.setDefinedByType(resolveDefinedByType(authenticatorName,
-                authenticator.getDefinedBy().toString(), false));
+
+        String definedByType = null;
+        if (authenticator.getDefinedBy() != null) {
+            definedByType = authenticator.getDefinedBy().toString();
+        }
+        authConfig.setDefinedByType(resolveDefinedByType(authenticatorName, definedByType, false));
+
         List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> authProperties = authenticator.getProperties();
         if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authenticatorName)) {
             validateSamlMetadata(authProperties);
