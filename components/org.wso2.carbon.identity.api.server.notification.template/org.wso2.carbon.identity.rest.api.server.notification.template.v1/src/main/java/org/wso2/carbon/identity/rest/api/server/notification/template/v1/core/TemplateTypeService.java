@@ -141,7 +141,7 @@ public class TemplateTypeService {
                     TemplatesServiceHolder.getNotificationTemplateManager().isNotificationTemplateTypeExists(
                             notificationChannel, templateTypeDisplayName, getTenantDomainFromContext());
             if (isTemplateTypeExists) {
-                TemplatesServiceHolder.getNotificationTemplateManager().deleteCustomizedNotificationTemplates(
+                TemplatesServiceHolder.getNotificationTemplateManager().resetNotificationTemplateType(
                         notificationChannel, templateTypeDisplayName, getTenantDomainFromContext()
                 );
             } else {

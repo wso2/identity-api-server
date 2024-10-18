@@ -133,4 +133,11 @@
             <Bug pattern="IMPROPER_UNICODE" />
         </Match>
     </FindBugsFilter>
+    <FindBugsFilter>
+        <Match>
+            <Class name="org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplateTypeService"/>
+            <Method name="resetTemplateType"/>
+            <Bug pattern="IMPROPER_UNICODE"/>
+        </Match>
+    </FindBugsFilter>
 </FindBugsFilter>
