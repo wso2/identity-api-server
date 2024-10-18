@@ -113,7 +113,7 @@ public class Constants {
         ERROR_ERROR_INVALID_NOTIFICATION_CHANNEL("60015", Status.BAD_REQUEST,
                 "Invalid notification channel.",
                 "Notification channel can only be either 'EMAIL' or 'SMS'."),
-        ERROR_ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED("60016", Status.BAD_REQUEST,
+        ERROR_ERROR_SYSTEM_RESOURCE_DELETION_NOT_ALLOWED("60016", Status.FORBIDDEN,
                 "System resource deletion not allowed.",
                 "System resources cannot be deleted.");
 
