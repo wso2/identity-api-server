@@ -31,8 +31,7 @@ public class IdentityProviderServiceHolder {
     private IdentityProviderServiceHolder() {}
 
     private static class IdentityProviderManagerHolder {
-        static final IdentityProviderManager SERVICE = (IdentityProviderManager) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(IdentityProviderManager.class, null);
+        static final IdentityProviderManager SERVICE = IdentityProviderManager.getInstance();
     }
 
     private static class ClaimMetadataManagementServiceHolder {
