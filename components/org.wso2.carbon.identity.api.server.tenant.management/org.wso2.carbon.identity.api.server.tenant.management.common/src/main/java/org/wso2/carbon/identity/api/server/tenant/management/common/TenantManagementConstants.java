@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2024, WSO2 LLC. (http://www.wso2.com).
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.identity.api.server.tenant.management.common;
 
@@ -31,6 +33,7 @@ public class TenantManagementConstants {
     public static final String PAGINATION_WITH_FILTER_LINK_FORMAT = "?offset=%d&limit=%d&filter=%s";
     public static final String PAGE_LINK_REL_NEXT = "next";
     public static final String PAGE_LINK_REL_PREVIOUS = "previous";
+    public static final String NON_EXISTING_USER_CODE = "30007 - ";
 
     /**
      * Enum for error messages.
@@ -43,6 +46,12 @@ public class TenantManagementConstants {
         ERROR_CODE_TENANT_LIMIT_REACHED("TM-60019",
                 "Unable to create a tenant.",
                 "Maximum number of allowed tenants have been reached."),
+        ERROR_CODE_OWNER_NOT_FOUND("TM-60020",
+                "Unable to retrieve the tenant owner.",
+                "Tenant owner cannot be found for the provided tenant id: %s."),
+        ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED("TM-60021",
+                "Tenant creation / update was completed with errors.",
+                "Tenant creation / update was completed with error: %s"),
         ERROR_CODE_ERROR_LISTING_TENANTS("TM-65001",
                 "Unable to list existing tenants.",
                 "Server encountered an error while listing the tenants."),
@@ -64,7 +73,11 @@ public class TenantManagementConstants {
                                                         "Unable to check availability of domain.",
                 "Server encountered an error while checking for tenant domain"),
         ERROR_CODE_DELETE_TENANT_METADATA("TM-65008", "Error while deleting the tenant metadata.",
-                "Server encountered an error while deleting the tenant metadata identified by %s .");
+                "Server encountered an error while deleting the tenant metadata identified by %s."),
+        ERROR_CODE_ERROR_RETRIEVING_OWNER("TM-65009", "Unable to retrieve the tenant owner.",
+                "Server encountered an error while retrieving the owner identified by tenant id %s."),
+        ERROR_CODE_ERROR_UPDATING_OWNER("TM-65010", "Unable to update the tenant owner.",
+                "Server encountered an error while updating the owner identified by tenant id %s.");
 
         private final String code;
         private final String message;

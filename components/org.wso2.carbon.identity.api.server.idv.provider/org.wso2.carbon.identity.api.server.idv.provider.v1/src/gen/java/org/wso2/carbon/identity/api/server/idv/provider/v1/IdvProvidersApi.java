@@ -50,7 +50,7 @@ public class IdvProvidersApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json", "application/xml",  })
-    @ApiOperation(value = "Add a new identity verification provider. ", notes = "This API provides the capability to add an identity verification provider. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idvpmgt/create <br> <b>Scope required:</b> <br>     * internal_idvp_add ", response = IdVProviderResponse.class, authorizations = {
+    @ApiOperation(value = "Add a new identity verification provider. ", notes = "This API provides the capability to add an identity verification provider. <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idvp/add <br> <b>Scope required:</b> <br>     * internal_idvp_add ", response = IdVProviderResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -74,7 +74,7 @@ public class IdvProvidersApi  {
     @Path("/{idv-provider-id}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "Delete an identity verification provider by using the identity provider's ID. ", notes = "This API provides the capability to delete an identity verification provider by giving its ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idvpmgt/delete <br> <b>Scope required:</b> <br>     * internal_idvp_delete ", response = Void.class, authorizations = {
+    @ApiOperation(value = "Delete an identity verification provider by using the identity provider's ID. ", notes = "This API provides the capability to delete an identity verification provider by giving its ID. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idvp/delete <br> <b>Scope required:</b> <br>     * internal_idvp_delete ", response = Void.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -98,7 +98,7 @@ public class IdvProvidersApi  {
     @Path("/{idv-provider-id}")
     
     @Produces({ "application/json", "application/xml",  })
-    @ApiOperation(value = "Retrieve identity verification provider by identity verification provider's ID ", notes = "This API provides the capability to retrieve the identity verification provider details by using its ID.  <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idvpmgt/view <br> <b>Scope required:</b> <br>     * internal_idvp_view ", response = IdVProviderResponse.class, authorizations = {
+    @ApiOperation(value = "Retrieve identity verification provider by identity verification provider's ID ", notes = "This API provides the capability to retrieve the identity verification provider details by using its ID.  <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idvp/view <br> <b>Scope required:</b> <br>     * internal_idvp_view ", response = IdVProviderResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -122,7 +122,7 @@ public class IdvProvidersApi  {
     
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List identity verification providers. ", notes = "This API provides the capability to retrieve the list of identity verification providers.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idvpmgt/view <br> <b>Scope required:</b> <br>     * internal_idvp_view ", response = IdVProviderListResponse.class, authorizations = {
+    @ApiOperation(value = "List identity verification providers. ", notes = "This API provides the capability to retrieve the list of identity verification providers.<br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idvp/view <br> <b>Scope required:</b> <br>     * internal_idvp_view ", response = IdVProviderListResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
@@ -137,9 +137,9 @@ public class IdvProvidersApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response getIdVProviders(    @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset) {
+    public Response getIdVProviders(    @Valid@ApiParam(value = "Maximum number of records to return. ")  @QueryParam("limit") Integer limit,     @Valid@ApiParam(value = "Number of records to skip for pagination. ")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations and also complex queries with 'and' operations. E.g. /idv-providers?filter=name+sw+onfido+and+isEnabled+eq+true ")  @QueryParam("filter") String filter) {
 
-        return delegate.getIdVProviders(limit,  offset );
+        return delegate.getIdVProviders(limit,  offset,  filter );
     }
 
     @Valid
@@ -147,7 +147,7 @@ public class IdvProvidersApi  {
     @Path("/{idv-provider-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update an identity verification provider. ", notes = "This API provides the capability to update an identity verification provider <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idvpmgt/update <br> <b>Scope required:</b> <br>     * internal_idvp_update ", response = IdVProviderResponse.class, authorizations = {
+    @ApiOperation(value = "Update an identity verification provider. ", notes = "This API provides the capability to update an identity verification provider <br> <b>Permission required:</b> <br>     * /permission/admin/manage/identity/idvp/update <br> <b>Scope required:</b> <br>     * internal_idvp_update ", response = IdVProviderResponse.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             

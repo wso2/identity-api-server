@@ -25,6 +25,13 @@
           class="org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementServiceHolder">
         <property name="tenantMgtService" ref="tenantManagerFactoryBean"/>
     </bean>
+    <bean id="realmServiceHolderBean"
+          class="org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementServiceHolder">
+        <property name="realmService" ref="realmServiceFactoryBean"/>
+    </bean>
+
+    <bean id="realmServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.tenant.management.common.factory.RealmServiceOSGIServiceFactory"/>
     <bean id="tenantManagerFactoryBean"
           class="org.wso2.carbon.identity.api.server.tenant.management.common.factory.TenantMgtOSGIServiceFactory"/>
 </beans>
