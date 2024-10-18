@@ -88,7 +88,6 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
-              - authentication
       requestBody:
         content:
           application/json:
@@ -153,7 +152,6 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
-              - authentication
       responses:
         '200':
           description: OK
@@ -212,7 +210,6 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
-              - authentication
         - name: actionId
           in: path
           description: Id of the Action.
@@ -275,7 +272,6 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
-              - authentication
         - name: actionId
           in: path
           description: Id of the Action.
@@ -340,7 +336,6 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
-              - authentication
         - name: actionId
           in: path
           description: Id of the Action.
@@ -395,7 +390,6 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
-              - authentication
         - name: actionId
           in: path
           description: Id of the Action.
@@ -454,7 +448,6 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
-              - authentication
         - name: actionId
           in: path
           description: Id of the Action.
@@ -513,7 +506,6 @@ paths:
               - preUpdatePassword
               - preUpdateProfile
               - preRegistration
-              - authentication
         - name: actionId
           in: path
           description: Id of the Action.
@@ -588,7 +580,6 @@ components:
         - PRE_UPDATE_PASSWORD
         - PRE_UPDATE_PROFILE
         - PRE_REGISTRATION
-        - AUTHENTICATION
     ActionModel:
       type: object
       required:

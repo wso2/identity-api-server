@@ -50,6 +50,7 @@ import javax.ws.rs.core.Response;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_EMPTY_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTH_TYPE;
+import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_TYPE;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_IMPLEMENTED_ACTION_TYPE;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID;
 
@@ -71,7 +72,7 @@ public class ServerActionManagementService {
     public ActionResponse createAction(String actionType, ActionModel actionModel) {
 
         try {
-            handleNotImplementedActionTypes(actionType);
+            validateActionType(actionType);
             return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
                     .addAction(actionType, buildAction(actionModel),
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
@@ -83,7 +84,7 @@ public class ServerActionManagementService {
     public List<ActionResponse> getActionsByActionType(String actionType) {
 
         try {
-            handleNotImplementedActionTypes(actionType);
+            validateActionType(actionType);
             List<Action> actions = ActionManagementServiceHolder.getActionManagementService()
                     .getActionsByActionType(actionType,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
@@ -101,7 +102,7 @@ public class ServerActionManagementService {
     public ActionResponse getActionByActionId(String actionType, String actionId) {
 
         try {
-            handleNotImplementedActionTypes(actionType);
+            validateActionType(actionType);
             Action action = ActionManagementServiceHolder.getActionManagementService()
                     .getActionByActionId(actionType, actionId,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
@@ -120,7 +121,7 @@ public class ServerActionManagementService {
     public ActionResponse updateAction(String actionType, String actionId, ActionUpdateModel actionUpdateModel) {
 
         try {
-            handleNotImplementedActionTypes(actionType);
+            validateActionType(actionType);
             return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
                     .updateAction(actionType, actionId, buildUpdatingAction(actionUpdateModel),
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
@@ -132,7 +133,7 @@ public class ServerActionManagementService {
     public void deleteAction(String actionType, String actionId) {
 
         try {
-            handleNotImplementedActionTypes(actionType);
+            validateActionType(actionType);
             ActionManagementServiceHolder.getActionManagementService().deleteAction(actionType, actionId,
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         } catch (ActionMgtException e) {
@@ -143,7 +144,7 @@ public class ServerActionManagementService {
     public ActionBasicResponse activateAction(String actionType, String actionId) {
 
         try {
-            handleNotImplementedActionTypes(actionType);
+            validateActionType(actionType);
             return buildActionBasicResponse(ActionManagementServiceHolder.getActionManagementService()
                     .activateAction(actionType, actionId,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
@@ -155,7 +156,7 @@ public class ServerActionManagementService {
     public ActionBasicResponse deactivateAction(String actionType, String actionId) {
 
         try {
-            handleNotImplementedActionTypes(actionType);
+            validateActionType(actionType);
             return buildActionBasicResponse(ActionManagementServiceHolder.getActionManagementService()
                     .deactivateAction(actionType, actionId,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
@@ -174,7 +175,8 @@ public class ServerActionManagementService {
                     .getActionsCountPerType(CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
 
             List<ActionTypesResponseItem> actionTypesResponseItems = new ArrayList<>();
-            for (Action.ActionTypes actionType : Action.ActionTypes.values()) {
+            for (Action.ActionTypes actionType : Action.ActionTypes.filterByCategory(
+                    Action.ActionTypes.Category.PRE_POST)) {
 
                 if (!NOT_IMPLEMENTED_ACTION_TYPES.contains(actionType.getPathParam())) {
                     actionTypesResponseItems.add(new ActionTypesResponseItem()
@@ -196,7 +198,7 @@ public class ServerActionManagementService {
                                                          AuthenticationTypeProperties authenticationTypeProperties) {
 
         try {
-            handleNotImplementedActionTypes(actionType);
+            validateActionType(actionType);
             Authentication authentication = buildAuthentication(getAuthTypeFromPath(authType),
                     authenticationTypeProperties.getProperties());
             return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
@@ -374,14 +376,16 @@ public class ServerActionManagementService {
                         ERROR_INVALID_ACTION_ENDPOINT_AUTH_TYPE));
     }
 
-    /**
-     * Handle not implemented action types.
-     *
-     * @param actionType Action type.
-     */
-    private void handleNotImplementedActionTypes(String actionType) {
+    private void validateActionType(String actionType) {
 
-        if (NOT_IMPLEMENTED_ACTION_TYPES.contains(actionType)) {
+        Action.ActionTypes actionTypeEnum =
+                Arrays.stream(Action.ActionTypes.filterByCategory(Action.ActionTypes.Category.PRE_POST))
+                        .filter(actionTypeObj -> actionTypeObj.getPathParam().equals(actionType))
+                        .findFirst()
+                        .orElseThrow(() -> ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
+                                ERROR_INVALID_ACTION_TYPE));
+
+        if (NOT_IMPLEMENTED_ACTION_TYPES.contains(actionTypeEnum.getPathParam())) {
             throw ActionMgtEndpointUtil.handleException(Response.Status.NOT_IMPLEMENTED,
                     ERROR_NOT_IMPLEMENTED_ACTION_TYPE);
         }
