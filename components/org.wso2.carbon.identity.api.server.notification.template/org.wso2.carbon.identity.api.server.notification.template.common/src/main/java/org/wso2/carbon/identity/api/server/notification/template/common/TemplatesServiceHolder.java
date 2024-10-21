@@ -15,6 +15,7 @@ public class TemplatesServiceHolder {
      * @return TemplateManager
      */
     public static NotificationTemplateManager getNotificationTemplateManager() {
+
         return notificationTemplateManager;
     }
 
@@ -23,6 +24,7 @@ public class TemplatesServiceHolder {
      * @param notificationTemplateManager TemplateManager
      */
     public static void setNotificationTemplateManager(NotificationTemplateManager notificationTemplateManager) {
+
         TemplatesServiceHolder.notificationTemplateManager = notificationTemplateManager;
     }
 }
