@@ -796,18 +796,18 @@
         <cxf-bundle.version>3.5.9</cxf-bundle.version>
         <cxf.extensions.search.version>3.5.9</cxf.extensions.search.version>
         <jackson.version>2.16.1</jackson.version>
-        <spring-web.version>5.3.25</spring-web.version>
+        <spring-web.version>6.1.14</spring-web.version>
         <swagger-jaxrs.version>1.6.2</swagger-jaxrs.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <version.org.wso2.orbit.javax.xml.bind>2.3.1.wso2v1</version.org.wso2.orbit.javax.xml.bind>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
-        <identity.governance.version>1.10.6</identity.governance.version>
-        <carbon.identity.framework.version>7.5.71</carbon.identity.framework.version>
+        <identity.governance.version>1.11.8</identity.governance.version>
+        <carbon.identity.framework.version>7.5.72</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
-        <identity.event.handler.version>1.8.19</identity.event.handler.version>
+        <identity.event.handler.version>1.9.11</identity.event.handler.version>
         <identity.inbound.oauth2.version>7.0.162</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.41</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
@@ -827,14 +827,12 @@
         <identity.verification.version>1.0.12</identity.verification.version>
 
         <!-- Organization management core Version -->
-        <org.wso2.carbon.identity.organization.management.core.version>1.1.12
-        </org.wso2.carbon.identity.organization.management.core.version>
+        <org.wso2.carbon.identity.organization.management.core.version>1.1.16</org.wso2.carbon.identity.organization.management.core.version>
         <org.wso2.carbon.identity.organization.management.core.version.range>[1.0.0, 2.0.0)
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>1.4.42
-        </org.wso2.carbon.identity.organization.management.version>
+        <org.wso2.carbon.identity.organization.management.version>1.4.50</org.wso2.carbon.identity.organization.management.version>
 
         <!-- Unit test versions -->
         <testng.version>6.9.10</testng.version>
