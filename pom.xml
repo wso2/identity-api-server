@@ -796,28 +796,28 @@
         <cxf-bundle.version>3.5.9</cxf-bundle.version>
         <cxf.extensions.search.version>3.5.9</cxf.extensions.search.version>
         <jackson.version>2.16.1</jackson.version>
-        <spring-web.version>5.3.25</spring-web.version>
+        <spring-web.version>6.1.14</spring-web.version>
         <swagger-jaxrs.version>1.6.2</swagger-jaxrs.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <version.org.wso2.orbit.javax.xml.bind>2.3.1.wso2v1</version.org.wso2.orbit.javax.xml.bind>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
         <identity.governance.version>1.11.8</identity.governance.version>
-        <carbon.identity.framework.version>7.5.71</carbon.identity.framework.version>
+        <carbon.identity.framework.version>7.5.72</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
         <identity.event.handler.version>1.9.11</identity.event.handler.version>
-        <identity.inbound.oauth2.version>7.0.162</identity.inbound.oauth2.version>
+        <identity.inbound.oauth2.version>7.0.169</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.41</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
-        <carbon.kernel.version>4.9.17</carbon.kernel.version>
+        <carbon.kernel.version>4.10.23</carbon.kernel.version>
         <carbon.multitenancy.version>4.11.27</carbon.multitenancy.version>
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
         <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.5.15</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
-        <org.wso2.carbon.logging.service.version>4.10.11</org.wso2.carbon.logging.service.version>
-        <org.wso2.carbon.event.publisher.version>5.2.58</org.wso2.carbon.event.publisher.version>
+        <org.wso2.carbon.logging.service.version>4.10.12</org.wso2.carbon.logging.service.version>
+        <org.wso2.carbon.event.publisher.version>5.3.15</org.wso2.carbon.event.publisher.version>
         <identity.branding.preference.management.version>1.1.16</identity.branding.preference.management.version>
         <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
 
@@ -833,8 +833,7 @@
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>1.4.42
-        </org.wso2.carbon.identity.organization.management.version>
+        <org.wso2.carbon.identity.organization.management.version>1.4.50</org.wso2.carbon.identity.organization.management.version>
 
         <!-- Unit test versions -->
         <testng.version>6.9.10</testng.version>
