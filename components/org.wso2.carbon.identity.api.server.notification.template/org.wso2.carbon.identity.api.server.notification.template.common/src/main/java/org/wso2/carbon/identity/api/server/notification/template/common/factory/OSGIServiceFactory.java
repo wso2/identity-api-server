@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.notification.template.common.factory
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.email.mgt.constants.I18nMgtConstants;
 import org.wso2.carbon.identity.governance.service.notification.NotificationTemplateManager;
 
 import java.util.Hashtable;
@@ -42,7 +43,8 @@ public class OSGIServiceFactory extends AbstractFactoryBean<NotificationTemplate
 
         if (this.notificationTemplateManager == null) {
             Hashtable<String, String> serviceProperties = new Hashtable<>();
-            serviceProperties.put("service.name", "NotificationTemplateManager");
+            serviceProperties.put(I18nMgtConstants.SERVICE_PROPERTY_KEY_SERVICE_NAME,
+                    I18nMgtConstants.SERVICE_PROPERTY_VAL_NOTIFICATION_TEMPLATE_MANAGER);
             NotificationTemplateManager taskOperationService = (NotificationTemplateManager) PrivilegedCarbonContext.
                     getThreadLocalCarbonContext().getOSGiService(NotificationTemplateManager.class, serviceProperties);
             if (taskOperationService != null) {

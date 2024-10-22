@@ -415,7 +415,7 @@ public class TemplatesService {
 
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
         try {
-            Util.assertTemplateTypeExistence(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeDisplayName);
+            Util.verifyTemplateTypeExists(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeDisplayName);
             boolean notificationTemplateExists = TemplatesServiceHolder.getNotificationTemplateManager()
                     .isNotificationTemplateExists(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeDisplayName,
                             locale, getTenantDomainFromContext(), applicationUuid);
@@ -454,7 +454,7 @@ public class TemplatesService {
 
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
         try {
-            Util.assertTemplateTypeExistence(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeDisplayName);
+            Util.verifyTemplateTypeExists(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeDisplayName);
             boolean notificationTemplateExists = TemplatesServiceHolder.getNotificationTemplateManager()
                     .isNotificationTemplateExists(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeDisplayName,
                             locale, getTenantDomainFromContext(), applicationUuid);

@@ -124,7 +124,8 @@
 
     <!--
         The following exclusions added because the find bug issue is false positive.
-        while using "toUpperCase", ENGLISH locale is already specified to avoid  non-ASCII characters.
+        while using "toUpperCase" & "equalsIgnoreCase" functions, ENGLISH locale is already specified to avoid
+        non-ASCII characters.
     -->
     <FindBugsFilter>
         <Match>

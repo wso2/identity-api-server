@@ -1103,8 +1103,6 @@ paths:
 
 servers:
   # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/RUSHANNANA/NotificationTemplateAPI/1.0.0
   - url: 'https://localhost:9443/t/{tenant-domain}/api/server/v1'
     variables:
       tenant-domain:

@@ -77,7 +77,7 @@ public class Util {
         if (templates != null) {
             for (NotificationTemplate template : templates) {
                 SimpleTemplate simpleTemplate = new SimpleTemplate();
-                String templateTypeId = base64URLEncode(template.getType());
+                String templateTypeId = base64URLEncode(template.getDisplayName());
                 String templateTypeLocation =
                         getTemplateTypeLocation(templateTypeId, notificationChannel);
                 simpleTemplate.setSelf(getTemplateLocation(templateTypeLocation, applicationUuid,
@@ -226,7 +226,6 @@ public class Util {
         notificationTemplate.setLocale(emailTemplateWithID.getLocale());
         notificationTemplate.setBody(emailTemplateWithID.getBody());
         notificationTemplate.setDisplayName(templateTypeDisplayName);
-        notificationTemplate.setLocale(emailTemplateWithID.getLocale());
         notificationTemplate.setType(I18nEmailUtil.getNormalizedName(templateTypeDisplayName));
         notificationTemplate.setSubject(emailTemplateWithID.getSubject());
         notificationTemplate.setFooter(emailTemplateWithID.getFooter());
@@ -235,12 +234,12 @@ public class Util {
     }
 
     /**
-     * Asserts the existence of the template type.
+     * Verify that the existence of the template type.
      *
      * @param notificationChannel     Notification channel.
      * @param templateTypeDisplayName Template type display name.
      */
-    public static void assertTemplateTypeExistence(String notificationChannel, String templateTypeDisplayName) {
+    public static void verifyTemplateTypeExists(String notificationChannel, String templateTypeDisplayName) {
 
         try {
             boolean isTemplateTypeExists = TemplatesServiceHolder.getNotificationTemplateManager()
