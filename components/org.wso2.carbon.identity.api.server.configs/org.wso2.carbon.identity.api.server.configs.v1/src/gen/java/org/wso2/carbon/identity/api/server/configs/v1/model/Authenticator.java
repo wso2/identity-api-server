@@ -38,6 +38,40 @@ public class Authenticator  {
     private String displayName;
     private Boolean isEnabled = true;
 
+@XmlType(name="DefinedByEnum")
+@XmlEnum(String.class)
+public enum DefinedByEnum {
+
+    @XmlEnumValue("SYSTEM") SYSTEM(String.valueOf("SYSTEM")), @XmlEnumValue("USER") USER(String.valueOf("USER"));
+
+
+    private String value;
+
+    DefinedByEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static DefinedByEnum fromValue(String value) {
+        for (DefinedByEnum b : DefinedByEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private DefinedByEnum definedBy;
+
 @XmlType(name="TypeEnum")
 @XmlEnum(String.class)
 public enum TypeEnum {
@@ -154,6 +188,24 @@ public enum TypeEnum {
 
     /**
     **/
+    public Authenticator definedBy(DefinedByEnum definedBy) {
+
+        this.definedBy = definedBy;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("definedBy")
+    @Valid
+    public DefinedByEnum getDefinedBy() {
+        return definedBy;
+    }
+    public void setDefinedBy(DefinedByEnum definedBy) {
+        this.definedBy = definedBy;
+    }
+
+    /**
+    **/
     public Authenticator type(TypeEnum type) {
 
         this.type = type;
@@ -238,6 +290,7 @@ public enum TypeEnum {
             Objects.equals(this.name, authenticator.name) &&
             Objects.equals(this.displayName, authenticator.displayName) &&
             Objects.equals(this.isEnabled, authenticator.isEnabled) &&
+            Objects.equals(this.definedBy, authenticator.definedBy) &&
             Objects.equals(this.type, authenticator.type) &&
             Objects.equals(this.tags, authenticator.tags) &&
             Objects.equals(this.properties, authenticator.properties);
@@ -245,7 +298,7 @@ public enum TypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, type, tags, properties);
+        return Objects.hash(id, name, displayName, isEnabled, definedBy, type, tags, properties);
     }
 
     @Override
@@ -258,6 +311,7 @@ public enum TypeEnum {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
+        sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");

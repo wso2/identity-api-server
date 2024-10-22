@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.236-SNAPSHOT</version>
+    <version>1.2.241-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -284,12 +284,6 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.email.template.common</artifactId>
-                <scope>provided</scope>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.identity.server.api</groupId>
-                <artifactId>org.wso2.carbon.identity.api.server.notification.template.common</artifactId>
                 <scope>provided</scope>
                 <version>${project.version}</version>
             </dependency>
@@ -808,18 +802,18 @@
         <version.org.wso2.orbit.javax.xml.bind>2.3.1.wso2v1</version.org.wso2.orbit.javax.xml.bind>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
-        <identity.governance.version>1.11.9-SNAPSHOT</identity.governance.version>
-        <carbon.identity.framework.version>7.5.67-SNAPSHOT</carbon.identity.framework.version>
+        <identity.governance.version>1.10.6</identity.governance.version>
+        <carbon.identity.framework.version>7.5.71</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
-        <identity.event.handler.version>1.9.12-SNAPSHOT</identity.event.handler.version>
+        <identity.event.handler.version>1.8.19</identity.event.handler.version>
         <identity.inbound.oauth2.version>7.0.162</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.41</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
         <carbon.kernel.version>4.9.17</carbon.kernel.version>
-        <carbon.multitenancy.version>4.9.10</carbon.multitenancy.version>
+        <carbon.multitenancy.version>4.11.27</carbon.multitenancy.version>
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
         <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.5.15</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
         <org.wso2.carbon.logging.service.version>4.10.11</org.wso2.carbon.logging.service.version>
@@ -865,7 +859,6 @@
         <module>components/org.wso2.carbon.identity.api.server.tenant.management</module>
         <module>components/org.wso2.carbon.identity.api.server.cors</module>
         <module>components/org.wso2.carbon.identity.api.server.notification.sender</module>
-        <module>components/org.wso2.carbon.identity.api.server.notification.template</module>
         <module>components/org.wso2.carbon.identity.api.server.authenticators</module>
         <module>components/org.wso2.carbon.identity.api.server.secret.management</module>
         <module>components/org.wso2.carbon.identity.api.server.branding.preference.management</module>
