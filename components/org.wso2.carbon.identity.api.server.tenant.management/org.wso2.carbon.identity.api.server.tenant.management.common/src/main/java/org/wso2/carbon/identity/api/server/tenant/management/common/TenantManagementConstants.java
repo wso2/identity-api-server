@@ -36,6 +36,25 @@ public class TenantManagementConstants {
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 
     /**
+     * Supported filter attributes.
+     */
+    public static class FilterAttributes {
+
+        public static final String DOMAIN = "domain";
+    }
+
+    /**
+     * Supported filter operations.
+     */
+    public static class FilterOperations {
+
+        public static final String EQ = "eq";
+        public static final String SW = "sw";
+        public static final String EW = "ew";
+        public static final String CO = "co";
+    }
+
+    /**
      * Enum for error messages.
      */
     public enum ErrorMessage {
@@ -52,6 +71,12 @@ public class TenantManagementConstants {
         ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED("TM-60021",
                 "Tenant creation / update was completed with errors.",
                 "Tenant creation / update was completed with error: %s"),
+        ERROR_CODE_INVALID_FILTER_FORMAT("TM-60022", "Invalid format used for filtering.",
+                "Filter needs to be in the format <attribute>+<operation>+<value>."),
+        ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE("TM-60023", "Unsupported filter attribute.",
+                "The filter attribute '%s' is not supported."),
+        ERROR_CODE_UNSUPPORTED_FILTER_OPERATION_FOR_ATTRIBUTE("TM-60024", "Unsupported filter operation.",
+                "Unsupported filter operation for filter attribute '%s'."),
         ERROR_CODE_ERROR_LISTING_TENANTS("TM-65001",
                 "Unable to list existing tenants.",
                 "Server encountered an error while listing the tenants."),

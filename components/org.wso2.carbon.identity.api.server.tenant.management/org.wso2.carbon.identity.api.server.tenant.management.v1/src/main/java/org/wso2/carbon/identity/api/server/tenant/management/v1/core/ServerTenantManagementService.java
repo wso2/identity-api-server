@@ -67,8 +67,16 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_INVALID_FILTER_FORMAT;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_TENANT_LIMIT_REACHED;
+import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE;
+import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_OPERATION_FOR_ATTRIBUTE;
+import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterAttributes.DOMAIN;
+import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.CO;
+import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.EQ;
+import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.EW;
+import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.SW;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.TENANT_MANAGEMENT_PATH_COMPONENT;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_INVALID_EMAIL;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_MISSING_REQUIRED_PARAMETER;
@@ -119,12 +127,12 @@ public class ServerTenantManagementService {
     public TenantsListResponse listTenants(Integer limit, Integer offset, String sortOrder, String sortBy,
                                            String filter) {
 
-        handleNotImplementedCapabilities(filter);
         TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
 
+        String filterFormatted = buildFilter(filter);
         try {
             TenantSearchResult tenantSearchResult = tenantMgtService.listTenants(limit, offset, sortOrder, sortBy,
-                    filter);
+                    filterFormatted);
             return createTenantListResponse(tenantSearchResult);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage
@@ -605,26 +613,6 @@ public class ServerTenantManagementService {
         return message;
     }
 
-    /**
-     * Return Not Implemented error response for tenant List filtering which are not yet supported by the server.
-     *
-     * @param filter Filter string.
-     */
-    private void handleNotImplementedCapabilities(String filter) {
-
-        TenantManagementConstants.ErrorMessage errorEnum = null;
-
-        if (filter != null) {
-            errorEnum = TenantManagementConstants.ErrorMessage.ERROR_CODE_FILTER_NOT_IMPLEMENTED;
-        }
-
-        if (errorEnum != null) {
-            ErrorResponse errorResponse = getErrorBuilder(errorEnum, null).build(log, errorEnum.getDescription());
-            Response.Status status = Response.Status.NOT_IMPLEMENTED;
-            throw new APIError(status, errorResponse);
-        }
-    }
-
     public String addTenant(ChannelVerifiedTenantModel channelVerifiedTenantModel) {
         String resourceId;
         TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
@@ -735,5 +723,48 @@ public class ServerTenantManagementService {
         ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())
                                                    .withZoneSameInstant(ZoneId.of("UTC"));
         return ISO_OFFSET_DATE_TIME.format(zonedDateTime);
+    }
+
+
+    private String buildFilter(String filter) {
+
+        if (StringUtils.isNotBlank(filter)) {
+            String[] filterArgs = filter.split(" ");
+            if (filterArgs.length == 3) {
+
+                String filterAttribute = filterArgs[0];
+
+                if (StringUtils.equalsIgnoreCase(filterAttribute, DOMAIN)) {
+                    String operation = filterArgs[1];
+                    String attributeValue = filterArgs[2];
+                    return generateFilterStringForBackend(operation, attributeValue);
+                } else {
+                    throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE,
+                            filterAttribute);
+                }
+            } else {
+                throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_FILTER_FORMAT, null);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private String generateFilterStringForBackend(String operation, String attributeValue) {
+
+        String formattedFilter = null;
+        if (StringUtils.equalsIgnoreCase(operation, SW)) {
+            formattedFilter = attributeValue + "*";
+        } else if (StringUtils.equalsIgnoreCase(operation, EW)) {
+            formattedFilter = "*" + attributeValue;
+        } else if (StringUtils.equalsIgnoreCase(operation, EQ)) {
+            formattedFilter = attributeValue;
+        } else if (StringUtils.equalsIgnoreCase(operation, CO)) {
+            formattedFilter = "*" + attributeValue + "*";
+        } else {
+            throw handleException(Response.Status.BAD_REQUEST,
+                    ERROR_CODE_UNSUPPORTED_FILTER_OPERATION_FOR_ATTRIBUTE, attributeValue);
+        }
+        return formattedFilter;
     }
 }
