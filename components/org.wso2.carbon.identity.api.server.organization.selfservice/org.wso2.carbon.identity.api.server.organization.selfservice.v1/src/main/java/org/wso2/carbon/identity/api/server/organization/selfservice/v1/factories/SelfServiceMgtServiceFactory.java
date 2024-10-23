@@ -19,12 +19,8 @@
 package org.wso2.carbon.identity.api.server.organization.selfservice.v1.factories;
 
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
-import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.selfservice.common.SelfServiceMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.core.SelfServiceMgtService;
-import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
-import org.wso2.carbon.identity.api.server.userstore.v1.factories.ServerUserStoreServiceFactory;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
@@ -60,11 +56,8 @@ public class SelfServiceMgtServiceFactory {
         APIResourceManager apiResourceManager = getAPIResourceManager();
         AuthorizedAPIManagementService authorizedAPIManagementService = getAuthorizedAPIManagementService();
 
-        ServerApplicationManagementService serverApplicationManagementService = getServerApplicationManagementService();
-        ServerUserStoreService serverUserStoreService = getServerUserStoreService();
-
         return new SelfServiceMgtService(identityGovernanceService, applicationManagementService, apiResourceManager,
-                authorizedAPIManagementService, serverApplicationManagementService, serverUserStoreService);
+                authorizedAPIManagementService);
     }
 
     private static IdentityGovernanceService getIdentityGovernanceService() {
@@ -101,23 +94,5 @@ public class SelfServiceMgtServiceFactory {
             throw new IllegalStateException("AuthorizedAPIManagementService is not available from OSGi context.");
         }
         return service;
-    }
-
-    private static ServerApplicationManagementService getServerApplicationManagementService() {
-
-        try {
-            return ServerApplicationManagementServiceFactory.getServerApplicationManagementService();
-        } catch (IllegalStateException e) {
-            throw new RuntimeException("Error occurred while initiating ServerApplicationManagementService.", e);
-        }
-    }
-
-    private static ServerUserStoreService getServerUserStoreService() {
-
-        try {
-            return ServerUserStoreServiceFactory.getServerUserStoreService();
-        } catch (IllegalStateException e) {
-            throw new RuntimeException("Error occurred while initiating ServerUserStoreService.", e);
-        }
     }
 }

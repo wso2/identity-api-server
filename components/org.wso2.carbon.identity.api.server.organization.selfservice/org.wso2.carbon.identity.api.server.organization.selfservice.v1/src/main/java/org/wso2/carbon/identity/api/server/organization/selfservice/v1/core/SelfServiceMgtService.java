@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
 import org.wso2.carbon.identity.api.resource.mgt.constant.APIResourceManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.exceptions.SelfServiceMgtEndpointException;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyPatchReq;
@@ -38,6 +39,7 @@ import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.Pro
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyRes;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.util.SelfServiceMgtConstants;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
+import org.wso2.carbon.identity.api.server.userstore.v1.factories.ServerUserStoreServiceFactory;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.APIResource;
@@ -65,7 +67,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 
 /**
- * Call internal osgi services to perform self service management related operations.
+ * Call internal osgi services to perform self-service management related operations.
  */
 public class SelfServiceMgtService {
 
@@ -73,24 +75,18 @@ public class SelfServiceMgtService {
     private final ApplicationManagementService applicationManagementService;
     private final APIResourceManager apiResourceManager;
     private final AuthorizedAPIManagementService authorizedAPIManagementService;
-    private final ServerApplicationManagementService serverApplicationManagementService;
-    private final ServerUserStoreService serverUserStoreService;
 
     private static final Log LOG = LogFactory.getLog(SelfServiceMgtService.class);
 
     public SelfServiceMgtService(IdentityGovernanceService identityGovernanceService,
                                  ApplicationManagementService applicationManagementService,
                                  APIResourceManager apiResourceManager,
-                                 AuthorizedAPIManagementService authorizedAPIManagementService,
-                                 ServerApplicationManagementService serverApplicationManagementService,
-                                 ServerUserStoreService serverUserStoreService) {
+                                 AuthorizedAPIManagementService authorizedAPIManagementService) {
 
         this.identityGovernanceService = identityGovernanceService;
         this.applicationManagementService = applicationManagementService;
         this.apiResourceManager = apiResourceManager;
         this.authorizedAPIManagementService = authorizedAPIManagementService;
-        this.serverApplicationManagementService = serverApplicationManagementService;
-        this.serverUserStoreService = serverUserStoreService;
     }
 
     /**
@@ -133,7 +129,7 @@ public class SelfServiceMgtService {
             if (enablePostListener) {
                 doPostConfigurationUpdate(copiedConfigurationDetails);
             }
-        } catch (IdentityGovernanceException e) {
+        } catch (Exception e) {
             LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_UPDATING_SELF_SERVICE_CONFIG.getDescription(), e);
             throw new SelfServiceMgtEndpointException(Response.Status.INTERNAL_SERVER_ERROR,
                     getError(SelfServiceMgtConstants.ErrorMessage.ERROR_UPDATING_SELF_SERVICE_CONFIG.getCode(),
@@ -212,7 +208,7 @@ public class SelfServiceMgtService {
         String userStoreName = getConfigProperty(SelfServiceMgtConstants.LITE_USER_USER_STORE_NAME);
         String domainId = new String(Base64.getEncoder().encode(userStoreName.getBytes(StandardCharsets.UTF_8)),
                 StandardCharsets.UTF_8);
-        serverUserStoreService.deleteUserStore(domainId);
+        getServerUserStoreService().deleteUserStore(domainId);
         updateLiteUserStoreConnectorConfigs(false);
     }
 
@@ -228,7 +224,7 @@ public class SelfServiceMgtService {
             // Convert updated JSON to string and use it in the request body
             String requestBody = objectMapper.writeValueAsString(rootNode);
             UserStoreReq userStoreReq = objectMapper.readValue(requestBody, UserStoreReq.class);
-            serverUserStoreService.addUserStore(userStoreReq);
+            getServerUserStoreService().addUserStore(userStoreReq);
             updateLiteUserStoreConnectorConfigs(true);
         } catch (IOException e) {
             LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_ONBOARDING_LITE_USER_STORE.getDescription(), e);
@@ -289,7 +285,7 @@ public class SelfServiceMgtService {
             ApplicationModel model = objectMapper.readValue(requestBody, ApplicationModel.class);
 
             // Create the application using the Application Management Service.
-            serverApplicationManagementService.createApplication(model, null);
+            getServerApplicationManagementService().createApplication(model, null);
 
             // If legacy authorization runtime is enabled, skip subscribing to APIs.
             if (isLegacyAuthzRuntime()) {
@@ -543,5 +539,33 @@ public class SelfServiceMgtService {
     public static boolean isLegacyAuthzRuntime() {
 
         return CarbonConstants.ENABLE_LEGACY_AUTHZ_RUNTIME;
+    }
+
+    /**
+     * Get ServerApplicationManagementService instance.
+     *
+     * @return ServerApplicationManagementService.
+     */
+    private static ServerApplicationManagementService getServerApplicationManagementService() {
+
+        try {
+            return ServerApplicationManagementServiceFactory.getServerApplicationManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating ServerApplicationManagementService.", e);
+        }
+    }
+
+    /**
+     * Get ServerUserStoreService instance.
+     *
+     * @return ServerUserStoreService.
+     */
+    private static ServerUserStoreService getServerUserStoreService() {
+
+        try {
+            return ServerUserStoreServiceFactory.getServerUserStoreService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating ServerUserStoreService.", e);
+        }
     }
 }

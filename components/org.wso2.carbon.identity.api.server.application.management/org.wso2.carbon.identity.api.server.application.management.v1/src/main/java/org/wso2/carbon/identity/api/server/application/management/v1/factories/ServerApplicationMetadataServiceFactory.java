@@ -18,8 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.application.management.v1.factories;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
-import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationMetadataService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
@@ -30,6 +31,8 @@ import org.wso2.carbon.security.sts.service.STSAdminServiceInterface;
  * Factory class for ServerApplicationMetadataService.
  */
 public class ServerApplicationMetadataServiceFactory {
+
+    private static final Log log = LogFactory.getLog(ServerApplicationMetadataServiceFactory.class);
 
     private ServerApplicationMetadataServiceFactory() {
 
@@ -95,7 +98,7 @@ public class ServerApplicationMetadataServiceFactory {
 
         STSAdminServiceInterface service = ApplicationManagementServiceHolder.getStsAdminService();
         if (service == null) {
-            throw new IllegalStateException("STSAdminServiceInterface is not available from OSGi context.");
+            log.warn("STSAdminServiceInterface is not available from OSGi context.");
         }
 
         return service;

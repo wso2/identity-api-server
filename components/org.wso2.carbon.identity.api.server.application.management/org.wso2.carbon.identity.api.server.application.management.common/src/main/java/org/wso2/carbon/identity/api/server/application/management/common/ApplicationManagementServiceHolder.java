@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.application.management.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
@@ -41,56 +43,97 @@ public class ApplicationManagementServiceHolder {
     }
 
     private static class ApplicationServiceHolder {
+
         static final ApplicationManagementService SERVICE = (ApplicationManagementService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(ApplicationManagementService.class, null);
     }
 
     private static class OAuthAdminServiceImplHolder {
+
         static final OAuthAdminServiceImpl SERVICE = (OAuthAdminServiceImpl) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(OAuthAdminServiceImpl.class, null);
     }
 
     private static class STSAdminServiceInterfaceHolder {
-        static final STSAdminServiceInterface SERVICE = (STSAdminServiceInterface) PrivilegedCarbonContext
-                .getThreadLocalCarbonContext().getOSGiService(STSAdminServiceInterface.class, null);
+
+        private static final Log log = LogFactory.getLog(STSAdminServiceInterfaceHolder.class);
+        static final STSAdminServiceInterface SERVICE = initializeService();
+
+        /**
+         * Initializes the STSAdminServiceInterface from the OSGi context.
+         *
+         * @return STSAdminServiceInterface or null if the service is unavailable.
+         */
+        private static STSAdminServiceInterface initializeService() {
+
+            try {
+                STSAdminServiceInterface service = (STSAdminServiceInterface) PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext().getOSGiService(STSAdminServiceInterface.class, null);
+
+                if (service == null) {
+                    // Log a warning if the service is not available, but don't throw an exception
+                    log.warn("STSAdminServiceInterface is not available from OSGi context. This may occur if " +
+                            "the STS connector is not present.");
+                }
+                return service;
+
+            } catch (NullPointerException e) {
+                // Catch NullPointerException if the context or the service isn't properly set
+                log.warn("NullPointerException occurred while retrieving STSAdminServiceInterface. " +
+                        "Context or service might not be available.");
+                return null;
+            } catch (Exception e) {
+                // Catch any other exceptions and log them
+                log.error("Error occurred while retrieving STSAdminServiceInterface: " + e.getMessage(), e);
+                return null;
+            }
+        }
     }
 
     private static class SAMLSSOConfigServiceImplHolder {
+
         static final SAMLSSOConfigServiceImpl SERVICE = (SAMLSSOConfigServiceImpl) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(SAMLSSOConfigServiceImpl.class, null);
     }
 
     private static class OAuthServerConfigurationHolder {
+
         static final OAuthServerConfiguration SERVICE = (OAuthServerConfiguration) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(OAuthServerConfiguration.class, null);
     }
 
     private static class TemplateManagerHolder {
+
         static final TemplateManager SERVICE = (TemplateManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(TemplateManager.class, null);
     }
 
     private static class CORSManagementServiceHolder {
+
         static final CORSManagementService SERVICE = (CORSManagementService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(CORSManagementService.class, null);
     }
 
     private static class RealmServiceHolder {
+
         static final RealmService SERVICE = (RealmService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(RealmService.class, null);
     }
 
     private static class APIResourceManagerHolder {
+
         static final APIResourceManager SERVICE = (APIResourceManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(APIResourceManager.class, null);
     }
 
     private static class AuthorizedAPIManagementServiceHolder {
+
         static final AuthorizedAPIManagementService SERVICE = (AuthorizedAPIManagementService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(AuthorizedAPIManagementService.class, null);
     }
 
     private static class OrgApplicationManagerHolder {
+
         static final OrgApplicationManager SERVICE = (OrgApplicationManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(OrgApplicationManager.class, null);
     }
