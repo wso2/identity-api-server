@@ -18,17 +18,20 @@
 
 package org.wso2.carbon.identity.api.server.organization.selfservice.v1.core;
 
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.wso2.carbon.base.CarbonBaseConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
 import org.wso2.carbon.identity.api.server.organization.selfservice.common.SelfServiceMgtServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyPatchReq;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyReq;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyRes;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.util.SelfServiceMgtConstants;
 import org.wso2.carbon.identity.application.common.model.Property;
+import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
+import org.wso2.carbon.identity.application.mgt.AuthorizedAPIManagementService;
 import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.governance.bean.ConnectorConfig;
@@ -57,15 +60,32 @@ public class SelfServiceMgtServiceTest {
     private static final String TENANT_DOMAIN = "abc.com";
     private static final int TENANT_ID = 1;
 
-    private SelfServiceMgtService selfServiceMgtService = new SelfServiceMgtService();
-
-    @Mock
     private IdentityGovernanceService identityGovernanceService;
+
+    private SelfServiceMgtService selfServiceMgtService;
+
+    @BeforeMethod
+    public void setUp() {
+
+        identityGovernanceService = mock(IdentityGovernanceService.class);
+        ApplicationManagementService applicationManagementService = mock(ApplicationManagementService.class);
+        APIResourceManager apiResourceManager = mock(APIResourceManager.class);
+        AuthorizedAPIManagementService authorizedAPIManagementService = mock(AuthorizedAPIManagementService.class);
+
+        // Create SelfServiceMgtService with mock dependencies
+        selfServiceMgtService = new SelfServiceMgtService(
+                identityGovernanceService,
+                applicationManagementService,
+                apiResourceManager,
+                authorizedAPIManagementService
+        );
+
+        mockCarbonContext();
+    }
 
     @Test
     public void testGetOrganizationGovernanceConfigs() throws IdentityGovernanceException {
 
-        mockCarbonContext();
         ConnectorConfig mockConnectorConfig = new ConnectorConfig();
         mockConnectorConfig.setName(SelfServiceMgtConstants.SELF_SERVICE_GOVERNANCE_CONNECTOR);
 
@@ -83,14 +103,13 @@ public class SelfServiceMgtServiceTest {
 
         // Add properties to ConnectorConfig
         mockConnectorConfig.setProperties(new Property[]{property1, property2});
-        identityGovernanceService = mock(IdentityGovernanceService.class);
 
         when(identityGovernanceService.getConnectorWithConfigs(TENANT_DOMAIN,
                 SelfServiceMgtConstants.SELF_SERVICE_GOVERNANCE_CONNECTOR))
                 .thenReturn(mockConnectorConfig);
 
         List<PropertyRes> result;
-        try (MockedStatic mocked = mockStatic(SelfServiceMgtServiceHolder.class)) {
+        try (MockedStatic<SelfServiceMgtServiceHolder> mocked = mockStatic(SelfServiceMgtServiceHolder.class)) {
             mocked.when(SelfServiceMgtServiceHolder::getIdentityGovernanceService)
                     .thenReturn(identityGovernanceService);
             result = selfServiceMgtService.getOrganizationGovernanceConfigs();
@@ -112,7 +131,6 @@ public class SelfServiceMgtServiceTest {
     @Test
     public void testUpdateOrganizationGovernanceConfigs() throws IdentityGovernanceException {
 
-        mockCarbonContext();
         PropertyPatchReq mockGovernanceConnector = mock(PropertyPatchReq.class);
         List<PropertyReq> propertyReqs = new ArrayList<>();
 
@@ -131,12 +149,10 @@ public class SelfServiceMgtServiceTest {
         Map<String, String> configurationDetails = new HashMap<>();
         configurationDetails.put(property1.getName(), property1.getValue());
 
-        identityGovernanceService = mock(IdentityGovernanceService.class);
-
         when(identityGovernanceService.getConfiguration(any(String[].class), anyString()))
                 .thenReturn(new Property[]{property2});
 
-        try (MockedStatic mocked = mockStatic(SelfServiceMgtServiceHolder.class)) {
+        try (MockedStatic<SelfServiceMgtServiceHolder> mocked = mockStatic(SelfServiceMgtServiceHolder.class)) {
             mocked.when(SelfServiceMgtServiceHolder::getIdentityGovernanceService)
                     .thenReturn(identityGovernanceService);
             selfServiceMgtService.updateOrganizationGovernanceConfigs(mockGovernanceConnector, false);
