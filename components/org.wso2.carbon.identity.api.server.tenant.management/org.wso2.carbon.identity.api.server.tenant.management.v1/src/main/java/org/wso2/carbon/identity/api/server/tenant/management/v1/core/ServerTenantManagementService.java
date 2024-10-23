@@ -95,6 +95,7 @@ public class ServerTenantManagementService {
     private static final String CODE = "code";
     private static final String PURPOSE = "purpose";
     private static final String ILLEGAL_CHARACTERS_FOR_TENANT_DOMAIN = ".*[^a-z0-9\\._\\-].*";
+    private static final String SPACE_SEPARATOR = " ";
 
     /**
      * Add a tenant.
@@ -731,7 +732,7 @@ public class ServerTenantManagementService {
     private void verifyFilter(String filter) throws TenantMgtException {
 
         if (StringUtils.isNotBlank(filter)) {
-            String[] filterArgs = filter.split(" ");
+            String[] filterArgs = filter.split(SPACE_SEPARATOR);
             if (filterArgs.length != 3) {
                 throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_FILTER_FORMAT, null);
             }
