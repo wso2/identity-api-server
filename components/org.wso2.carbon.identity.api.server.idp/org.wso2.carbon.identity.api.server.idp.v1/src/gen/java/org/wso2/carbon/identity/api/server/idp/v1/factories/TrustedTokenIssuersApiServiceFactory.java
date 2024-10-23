@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.idp.v1.factories;
 import org.wso2.carbon.identity.api.server.idp.v1.TrustedTokenIssuersApiService;
 import org.wso2.carbon.identity.api.server.idp.v1.impl.TrustedTokenIssuersApiServiceImpl;
 
+/**
+ * Factory class for Trusted Token Issuers API.
+ */
 public class TrustedTokenIssuersApiServiceFactory {
 
-   private final static TrustedTokenIssuersApiService service = new TrustedTokenIssuersApiServiceImpl();
+   private final static TrustedTokenIssuersApiService SERVICE = new TrustedTokenIssuersApiServiceImpl();
 
+   /**
+    * Get Trusted Token Issuers API Service.
+    *
+    * @return TrustedTokenIssuersApiService
+    */
    public static TrustedTokenIssuersApiService getTrustedTokenIssuersApi()
    {
-      return service;
+      return SERVICE;
    }
 }
