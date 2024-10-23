@@ -43,6 +43,8 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/TenantsListResponse'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -51,12 +53,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
     post:
       tags:
         - Tenants
