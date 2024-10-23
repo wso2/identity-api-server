@@ -45,6 +45,7 @@ import org.wso2.carbon.stratos.common.exception.TenantManagementClientException;
 import org.wso2.carbon.stratos.common.exception.TenantManagementServerException;
 import org.wso2.carbon.stratos.common.exception.TenantMgtException;
 import org.wso2.carbon.stratos.common.util.ClaimsMgtUtil;
+import org.wso2.carbon.tenant.mgt.services.TenantMgtImpl;
 import org.wso2.carbon.tenant.mgt.services.TenantMgtService;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.common.User;
@@ -72,7 +73,6 @@ import static org.wso2.carbon.identity.api.server.tenant.management.common.Tenan
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_TENANT_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_OPERATION_FOR_ATTRIBUTE;
-import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterAttributes.DOMAIN;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.CO;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.EQ;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.EW;
@@ -129,10 +129,10 @@ public class ServerTenantManagementService {
 
         TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
 
-        String filterFormatted = buildFilter(filter);
+        verifyFilter(filter);
         try {
             TenantSearchResult tenantSearchResult = tenantMgtService.listTenants(limit, offset, sortOrder, sortBy,
-                    filterFormatted);
+                    filter);
             return createTenantListResponse(tenantSearchResult);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage
@@ -726,45 +726,30 @@ public class ServerTenantManagementService {
     }
 
 
-    private String buildFilter(String filter) {
+    private void verifyFilter(String filter) {
 
         if (StringUtils.isNotBlank(filter)) {
             String[] filterArgs = filter.split(" ");
-            if (filterArgs.length == 3) {
-
-                String filterAttribute = filterArgs[0];
-
-                if (StringUtils.equalsIgnoreCase(filterAttribute, DOMAIN)) {
-                    String operation = filterArgs[1];
-                    String attributeValue = filterArgs[2];
-                    return generateFilterStringForBackend(operation, attributeValue);
-                } else {
-                    throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE,
-                            filterAttribute);
-                }
-            } else {
+            if (filterArgs.length != 3) {
                 throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_FILTER_FORMAT, null);
             }
-        } else {
-            return null;
-        }
-    }
 
-    private String generateFilterStringForBackend(String operation, String attributeValue) {
+            String filterAttribute = filterArgs[0];
+            String operation = filterArgs[1];
+            String attributeValue = filterArgs[2];
 
-        String formattedFilter = null;
-        if (StringUtils.equalsIgnoreCase(operation, SW)) {
-            formattedFilter = attributeValue + "*";
-        } else if (StringUtils.equalsIgnoreCase(operation, EW)) {
-            formattedFilter = "*" + attributeValue;
-        } else if (StringUtils.equalsIgnoreCase(operation, EQ)) {
-            formattedFilter = attributeValue;
-        } else if (StringUtils.equalsIgnoreCase(operation, CO)) {
-            formattedFilter = "*" + attributeValue + "*";
-        } else {
-            throw handleException(Response.Status.BAD_REQUEST,
-                    ERROR_CODE_UNSUPPORTED_FILTER_OPERATION_FOR_ATTRIBUTE, attributeValue);
+            if (StringUtils.equalsIgnoreCase(filterAttribute, TenantMgtImpl.DOMAIN_NAME)) {
+                if (!StringUtils.equalsIgnoreCase(operation, SW) && !StringUtils.equalsIgnoreCase(operation, EW)
+                        && !StringUtils.equalsIgnoreCase(operation, EQ)
+                        && !StringUtils.equalsIgnoreCase(operation, CO)) {
+                    throw handleException(Response.Status.BAD_REQUEST,
+                            ERROR_CODE_UNSUPPORTED_FILTER_OPERATION_FOR_ATTRIBUTE, attributeValue);
+                }
+            } else {
+                throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE,
+                        filterAttribute);
+            }
+
         }
-        return formattedFilter;
     }
 }

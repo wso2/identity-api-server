@@ -36,14 +36,6 @@ public class TenantManagementConstants {
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 
     /**
-     * Supported filter attributes.
-     */
-    public static class FilterAttributes {
-
-        public static final String DOMAIN = "domain";
-    }
-
-    /**
      * Supported filter operations.
      */
     public static class FilterOperations {

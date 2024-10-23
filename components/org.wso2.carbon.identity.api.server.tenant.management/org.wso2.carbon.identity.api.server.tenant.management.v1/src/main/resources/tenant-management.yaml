@@ -498,7 +498,7 @@ components:
       required: false
       description: >
         Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations.
-        E.g. /tenants?filter=domain+sw+wso2.
+        E.g. /tenants?filter=domainName+sw+wso2.
       schema:
         type: string
     additionalClaimsQueryParam:
