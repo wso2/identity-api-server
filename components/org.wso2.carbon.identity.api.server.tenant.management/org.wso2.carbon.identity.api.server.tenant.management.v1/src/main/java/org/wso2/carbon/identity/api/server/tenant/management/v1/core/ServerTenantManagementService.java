@@ -78,6 +78,7 @@ import static org.wso2.carbon.identity.api.server.tenant.management.common.Tenan
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.EW;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.SW;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.TENANT_MANAGEMENT_PATH_COMPONENT;
+import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_ILLEGAL_CHARACTERS_IN_DOMAIN;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_INVALID_EMAIL;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_MISSING_REQUIRED_PARAMETER;
 
@@ -93,6 +94,7 @@ public class ServerTenantManagementService {
     private static final String INLINE_PASSWORD = "inline-password";
     private static final String CODE = "code";
     private static final String PURPOSE = "purpose";
+    private static final String ILLEGAL_CHARACTERS_FOR_TENANT_DOMAIN = ".*[^a-z0-9\\._\\-].*";
 
     /**
      * Add a tenant.
@@ -129,8 +131,8 @@ public class ServerTenantManagementService {
 
         TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
 
-        verifyFilter(filter);
         try {
+            verifyFilter(filter);
             TenantSearchResult tenantSearchResult = tenantMgtService.listTenants(limit, offset, sortOrder, sortBy,
                     filter);
             return createTenantListResponse(tenantSearchResult);
@@ -726,7 +728,7 @@ public class ServerTenantManagementService {
     }
 
 
-    private void verifyFilter(String filter) {
+    private void verifyFilter(String filter) throws TenantMgtException {
 
         if (StringUtils.isNotBlank(filter)) {
             String[] filterArgs = filter.split(" ");
@@ -739,6 +741,11 @@ public class ServerTenantManagementService {
             String attributeValue = filterArgs[2];
 
             if (StringUtils.equalsIgnoreCase(filterAttribute, TenantMgtImpl.DOMAIN_NAME)) {
+                // Check tenant domain contains any illegal characters.
+                if (attributeValue.matches(ILLEGAL_CHARACTERS_FOR_TENANT_DOMAIN)) {
+                    throw new TenantManagementClientException(ERROR_CODE_ILLEGAL_CHARACTERS_IN_DOMAIN.getCode(),
+                            String.format(ERROR_CODE_ILLEGAL_CHARACTERS_IN_DOMAIN.getMessage(), attributeValue));
+                }
                 if (!StringUtils.equalsIgnoreCase(operation, SW) && !StringUtils.equalsIgnoreCase(operation, EW)
                         && !StringUtils.equalsIgnoreCase(operation, EQ)
                         && !StringUtils.equalsIgnoreCase(operation, CO)) {
