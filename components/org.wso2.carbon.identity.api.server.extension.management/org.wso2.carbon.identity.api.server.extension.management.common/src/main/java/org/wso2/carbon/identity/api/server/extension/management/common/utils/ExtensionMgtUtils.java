@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -100,7 +100,7 @@ public class ExtensionMgtUtils {
      */
     public static void validateExtensionType(String extensionType) {
 
-        if (!ArrayUtils.contains(ExtensionManagementServiceHolder.getInstance().getExtensionManager()
+        if (!ArrayUtils.contains(ExtensionManagementServiceHolder.getExtensionManager()
                 .getExtensionTypes(), extensionType)) {
             throw handleClientException(Response.Status.BAD_REQUEST, ExtensionMgtConstants.ErrorMessage
                     .ERROR_CODE_INVALID_EXTENSION_TYPE, extensionType);
