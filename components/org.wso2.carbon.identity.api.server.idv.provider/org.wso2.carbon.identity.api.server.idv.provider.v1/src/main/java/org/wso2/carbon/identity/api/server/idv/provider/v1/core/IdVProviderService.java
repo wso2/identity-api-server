@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.identity.api.server.idv.provider.v1.core;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -32,7 +33,6 @@ import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.idv.provider.common.Constants;
-import org.wso2.carbon.identity.api.server.idv.provider.common.IdentityVerificationServiceHolder;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.model.ConfigProperty;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.model.IdVProviderListResponse;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.model.IdVProviderRequest;
@@ -56,7 +56,13 @@ import javax.ws.rs.core.Response;
  */
 public class IdVProviderService {
 
+    private final IdVProviderManager idvProviderManager;
     private static final Log log = LogFactory.getLog(IdVProviderService.class);
+
+    public IdVProviderService(IdVProviderManager idvProviderManager) {
+
+        this.idvProviderManager = idvProviderManager;
+    }
 
     /**
      * Add an identity verification provider.
@@ -69,8 +75,7 @@ public class IdVProviderService {
         IdVProvider idVProvider;
         int tenantId = getTenantId();
         try {
-            idVProvider = IdentityVerificationServiceHolder.getIdVProviderManager().
-                    addIdVProvider(createIdVProvider(idVProviderRequest), tenantId);
+            idVProvider = idvProviderManager.addIdVProvider(createIdVProvider(idVProviderRequest), tenantId);
         } catch (IdVProviderMgtException e) {
             if (IdVProviderMgtConstants.ErrorMessage.ERROR_IDVP_ALREADY_EXISTS.getCode().equals(e.getErrorCode())) {
                 throw handleException(Response.Status.CONFLICT,
@@ -94,8 +99,7 @@ public class IdVProviderService {
         IdVProvider newIdVProvider;
         int tenantId = getTenantId();
         try {
-            oldIdVProvider = IdentityVerificationServiceHolder.getIdVProviderManager().
-                    getIdVProvider(idVProviderId, tenantId);
+            oldIdVProvider = idvProviderManager.getIdVProvider(idVProviderId, tenantId);
 
             if (oldIdVProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND,
@@ -103,8 +107,7 @@ public class IdVProviderService {
             }
             IdVProvider updatedIdVProvider =
                     createUpdatedIdVProvider(oldIdVProvider, idVProviderRequest);
-            newIdVProvider = IdentityVerificationServiceHolder.getIdVProviderManager().
-                    updateIdVProvider(oldIdVProvider, updatedIdVProvider, tenantId);
+            newIdVProvider = idvProviderManager.updateIdVProvider(oldIdVProvider, updatedIdVProvider, tenantId);
         } catch (IdVProviderMgtException e) {
             if (IdVProviderMgtConstants.ErrorMessage.ERROR_EMPTY_IDVP_ID.getCode().equals(e.getErrorCode())) {
                 throw handleIdVException(e, Constants.ErrorMessage.ERROR_CODE_IDV_PROVIDER_NOT_FOUND, idVProviderId);
@@ -129,8 +132,7 @@ public class IdVProviderService {
 
         try {
             int tenantId = getTenantId();
-            IdVProvider idVProvider =
-                    IdentityVerificationServiceHolder.getIdVProviderManager().getIdVProvider(idVProviderId, tenantId);
+            IdVProvider idVProvider = idvProviderManager.getIdVProvider(idVProviderId, tenantId);
             if (idVProvider == null) {
                 throw handleException(Response.Status.NOT_FOUND,
                         Constants.ErrorMessage.ERROR_CODE_IDVP_NOT_FOUND, idVProviderId);
@@ -156,13 +158,12 @@ public class IdVProviderService {
 
         int tenantId = getTenantId();
         try {
-            IdVProviderManager idVProviderManager = IdentityVerificationServiceHolder.getIdVProviderManager();
-            int totalResults = idVProviderManager.getCountOfIdVProviders(tenantId);
+            int totalResults = idvProviderManager.getCountOfIdVProviders(tenantId);
 
             IdVProviderListResponse idVProviderListResponse = new IdVProviderListResponse();
 
             if (totalResults > 0) {
-                List<IdVProvider> idVProviders = idVProviderManager.getIdVProviders(limit, offset, tenantId);
+                List<IdVProvider> idVProviders = idvProviderManager.getIdVProviders(limit, offset, tenantId);
 
                 if (CollectionUtils.isNotEmpty(idVProviders)) {
                     List<IdVProviderResponse> idVProvidersList = new ArrayList<>();
@@ -197,7 +198,7 @@ public class IdVProviderService {
 
         int tenantId = getTenantId();
         try {
-            IdentityVerificationServiceHolder.getIdVProviderManager().deleteIdVProvider(idVProviderId, tenantId);
+            idvProviderManager.deleteIdVProvider(idVProviderId, tenantId);
         } catch (IdVProviderMgtException e) {
             throw handleIdVException(e, Constants.ErrorMessage.ERROR_DELETING_IDVP, idVProviderId);
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.idv.provider.v1.factories;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.IdvProvidersApiService;
 import org.wso2.carbon.identity.api.server.idv.provider.v1.impl.IdvProvidersApiServiceImpl;
 
+/**
+ * Factory class for IdvProvidersApiService.
+ */
 public class IdvProvidersApiServiceFactory {
 
-   private final static IdvProvidersApiService service = new IdvProvidersApiServiceImpl();
+   private final static IdvProvidersApiService SERVICE = new IdvProvidersApiServiceImpl();
 
+   /**
+    * Get IdvProvidersApiService.
+    *
+    * @return IdvProvidersApiService
+    */
    public static IdvProvidersApiService getIdvProvidersApi()
    {
-      return service;
+      return SERVICE;
    }
 }
