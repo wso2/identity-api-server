@@ -36,17 +36,6 @@ public class TenantManagementConstants {
     public static final String NON_EXISTING_USER_CODE = "30007 - ";
 
     /**
-     * Supported filter operations.
-     */
-    public static class FilterOperations {
-
-        public static final String EQ = "eq";
-        public static final String SW = "sw";
-        public static final String EW = "ew";
-        public static final String CO = "co";
-    }
-
-    /**
      * Enum for error messages.
      */
     public enum ErrorMessage {
