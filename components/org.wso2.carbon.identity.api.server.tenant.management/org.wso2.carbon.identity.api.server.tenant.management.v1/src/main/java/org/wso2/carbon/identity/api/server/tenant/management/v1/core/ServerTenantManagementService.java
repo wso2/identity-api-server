@@ -45,7 +45,6 @@ import org.wso2.carbon.stratos.common.exception.TenantManagementClientException;
 import org.wso2.carbon.stratos.common.exception.TenantManagementServerException;
 import org.wso2.carbon.stratos.common.exception.TenantMgtException;
 import org.wso2.carbon.stratos.common.util.ClaimsMgtUtil;
-import org.wso2.carbon.tenant.mgt.services.TenantMgtImpl;
 import org.wso2.carbon.tenant.mgt.services.TenantMgtService;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.common.User;
@@ -68,17 +67,9 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_INVALID_FILTER_FORMAT;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_TENANT_LIMIT_REACHED;
-import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE;
-import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_UNSUPPORTED_FILTER_OPERATION_FOR_ATTRIBUTE;
-import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.CO;
-import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.EQ;
-import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.EW;
-import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.FilterOperations.SW;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.TENANT_MANAGEMENT_PATH_COMPONENT;
-import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_ILLEGAL_CHARACTERS_IN_DOMAIN;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_INVALID_EMAIL;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_MISSING_REQUIRED_PARAMETER;
 
@@ -94,8 +85,6 @@ public class ServerTenantManagementService {
     private static final String INLINE_PASSWORD = "inline-password";
     private static final String CODE = "code";
     private static final String PURPOSE = "purpose";
-    private static final String ILLEGAL_CHARACTERS_FOR_TENANT_DOMAIN = ".*[^a-z0-9\\._\\-].*";
-    private static final String SPACE_SEPARATOR = " ";
 
     /**
      * Add a tenant.
@@ -133,7 +122,6 @@ public class ServerTenantManagementService {
         TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
 
         try {
-            verifyFilter(filter);
             TenantSearchResult tenantSearchResult = tenantMgtService.listTenants(limit, offset, sortOrder, sortBy,
                     filter);
             return createTenantListResponse(tenantSearchResult);
@@ -726,38 +714,5 @@ public class ServerTenantManagementService {
         ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())
                                                    .withZoneSameInstant(ZoneId.of("UTC"));
         return ISO_OFFSET_DATE_TIME.format(zonedDateTime);
-    }
-
-
-    private void verifyFilter(String filter) throws TenantMgtException {
-
-        if (StringUtils.isNotBlank(filter)) {
-            String[] filterArgs = filter.split(SPACE_SEPARATOR);
-            if (filterArgs.length != 3) {
-                throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_INVALID_FILTER_FORMAT, null);
-            }
-
-            String filterAttribute = filterArgs[0];
-            String operation = filterArgs[1];
-            String attributeValue = filterArgs[2];
-
-            if (StringUtils.equalsIgnoreCase(filterAttribute, TenantMgtImpl.DOMAIN_NAME)) {
-                // Check tenant domain contains any illegal characters.
-                if (attributeValue.matches(ILLEGAL_CHARACTERS_FOR_TENANT_DOMAIN)) {
-                    throw new TenantManagementClientException(ERROR_CODE_ILLEGAL_CHARACTERS_IN_DOMAIN.getCode(),
-                            String.format(ERROR_CODE_ILLEGAL_CHARACTERS_IN_DOMAIN.getMessage(), attributeValue));
-                }
-                if (!StringUtils.equalsIgnoreCase(operation, SW) && !StringUtils.equalsIgnoreCase(operation, EW)
-                        && !StringUtils.equalsIgnoreCase(operation, EQ)
-                        && !StringUtils.equalsIgnoreCase(operation, CO)) {
-                    throw handleException(Response.Status.BAD_REQUEST,
-                            ERROR_CODE_UNSUPPORTED_FILTER_OPERATION_FOR_ATTRIBUTE, attributeValue);
-                }
-            } else {
-                throw handleException(Response.Status.BAD_REQUEST, ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE,
-                        filterAttribute);
-            }
-
-        }
     }
 }

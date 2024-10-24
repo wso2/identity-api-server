@@ -493,8 +493,8 @@ components:
       name: filter
       required: false
       description: >
-        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently filtering
-        through <b>domainName</b> only supported.
+        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations.
+        Currently, filtering is supported only by the <b>domainName</b>.
         E.g. /tenants?filter=domainName+sw+wso2.
       schema:
         type: string
