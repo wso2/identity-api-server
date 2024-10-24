@@ -124,13 +124,21 @@
 
     <!--
         The following exclusions added because the find bug issue is false positive.
-        while using "toUpperCase", ENGLISH locale is already specified to avoid  non-ASCII characters.
+        while using "toUpperCase" & "equalsIgnoreCase" functions, ENGLISH locale is already specified to avoid
+        non-ASCII characters.
     -->
     <FindBugsFilter>
         <Match>
             <Class name="org.wso2.carbon.identity.api.server.configs.v1.core.ServerConfigManagementService" />
             <Method name="resetRemoteServerConfig" />
             <Bug pattern="IMPROPER_UNICODE" />
+        </Match>
+    </FindBugsFilter>
+    <FindBugsFilter>
+        <Match>
+            <Class name="org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplateTypeService"/>
+            <Method name="resetTemplateType"/>
+            <Bug pattern="IMPROPER_UNICODE"/>
         </Match>
     </FindBugsFilter>
 </FindBugsFilter>
