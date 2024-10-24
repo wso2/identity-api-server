@@ -145,6 +145,9 @@ public class Util {
 
         Map<String, String> links = new HashMap<>();
 
+        if (limit == 0) {
+            return links;
+        }
         StringBuilder otherParams = new StringBuilder();
         if (!StringUtils.isEmpty(requiredAttributes)) {
             otherParams.append("&attributes=").append(requiredAttributes);
@@ -181,6 +184,9 @@ public class Util {
 
     private static int calculateOffsetForPreviousLink(int offset, int limit, int total) {
 
+        if (offset >= total && limit == 0) {
+            return offset;
+        }
         int newOffset = (offset - limit);
         if (newOffset < total) {
             return newOffset;
