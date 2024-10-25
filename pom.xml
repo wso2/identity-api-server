@@ -29,7 +29,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>identity-api-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.222-SNAPSHOT</version>
+    <version>1.2.244-SNAPSHOT</version>
     <name>WSO2 Identity Server - Server API Module</name>
     <description>
 
@@ -498,6 +498,12 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.notification.template.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.secret.management.common</artifactId>
                 <version>${project.version}</version>
                 <scope>provided</scope>
@@ -657,12 +663,6 @@
                 <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
                 <version>${apache.felix.scr.ds.annotations.version}</version>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>-->
-<!--                <artifactId>org.wso2.carbon.identity.oauth.rar</artifactId>-->
-<!--                <version>${identity.inbound.oauth2.version}</version>-->
-<!--                <scope>provided</scope>-->
-<!--            </dependency>-->
             <dependency>
                 <groupId>org.jacoco</groupId>
                 <artifactId>org.jacoco.agent</artifactId>
@@ -799,8 +799,8 @@
         <maven.bundle.plugin.version>2.4.0</maven.bundle.plugin.version>
         <jackson-jaxrs-json-provider.version>2.16.1</jackson-jaxrs-json-provider.version>
         <jackson-databind.version>2.16.1</jackson-databind.version>
-        <cxf-bundle.version>3.5.0</cxf-bundle.version>
-        <cxf.extensions.search.version>3.3.1</cxf.extensions.search.version>
+        <cxf-bundle.version>3.5.9</cxf-bundle.version>
+        <cxf.extensions.search.version>3.5.9</cxf.extensions.search.version>
         <jackson.version>2.16.1</jackson.version>
         <spring-web.version>5.3.25</spring-web.version>
         <swagger-jaxrs.version>1.6.2</swagger-jaxrs.version>
@@ -808,29 +808,29 @@
         <version.org.wso2.orbit.javax.xml.bind>2.3.1.wso2v1</version.org.wso2.orbit.javax.xml.bind>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
         <org.apache.felix.annotations.version>1.2.4</org.apache.felix.annotations.version>
-        <identity.governance.version>1.9.17</identity.governance.version>
-        <carbon.identity.framework.version>7.3.75-SNAPSHOT</carbon.identity.framework.version>
+        <identity.governance.version>1.11.11</identity.governance.version>
+        <carbon.identity.framework.version>7.5.84</carbon.identity.framework.version>
         <maven.findbugsplugin.version>3.0.5</maven.findbugsplugin.version>
         <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
         <maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>
-        <identity.event.handler.version>1.8.19</identity.event.handler.version>
-        <identity.inbound.oauth2.version>7.0.150-SNAPSHOT</identity.inbound.oauth2.version>
+        <identity.event.handler.version>1.9.12</identity.event.handler.version>
+        <identity.inbound.oauth2.version>7.0.169</identity.inbound.oauth2.version>
         <identity.inbound.saml2.version>5.11.41</identity.inbound.saml2.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <mavan.findbugsplugin.exclude.file>findbugs-exclude-filter.xml</mavan.findbugsplugin.exclude.file>
-        <carbon.kernel.version>4.9.17</carbon.kernel.version>
-        <carbon.multitenancy.version>4.9.10</carbon.multitenancy.version>
+        <carbon.kernel.version>4.10.23</carbon.kernel.version>
+        <carbon.multitenancy.version>4.11.27</carbon.multitenancy.version>
         <org.wso2.carbon.identity.remotefetch.version>0.7.12</org.wso2.carbon.identity.remotefetch.version>
         <org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>2.5.15</org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.version>
-        <org.wso2.carbon.logging.service.version>4.10.7</org.wso2.carbon.logging.service.version>
-        <org.wso2.carbon.event.publisher.version>5.2.15</org.wso2.carbon.event.publisher.version>
+        <org.wso2.carbon.logging.service.version>4.10.11</org.wso2.carbon.logging.service.version>
+        <org.wso2.carbon.event.publisher.version>5.3.15</org.wso2.carbon.event.publisher.version>
         <identity.branding.preference.management.version>1.1.16</identity.branding.preference.management.version>
         <apache.felix.scr.ds.annotations.version>1.2.4</apache.felix.scr.ds.annotations.version>
 
         <!--<maven.checkstyleplugin.excludes>**/gen/**/*</maven.checkstyleplugin.excludes>-->
 
         <tenant.resource.manager.version>1.5.55</tenant.resource.manager.version>
-        <identity.verification.version>1.0.3</identity.verification.version>
+        <identity.verification.version>1.0.12</identity.verification.version>
 
         <!-- Organization management core Version -->
         <org.wso2.carbon.identity.organization.management.core.version>1.1.12
@@ -839,7 +839,7 @@
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>1.4.42
+        <org.wso2.carbon.identity.organization.management.version>1.4.50
         </org.wso2.carbon.identity.organization.management.version>
 
         <!-- Unit test versions -->
@@ -881,6 +881,7 @@
         <module>components/org.wso2.carbon.identity.api.server.organization.configs</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.selfservice</module>
         <module>components/org.wso2.carbon.identity.api.server.action.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.notification.template</module>
     </modules>
 
 </project>

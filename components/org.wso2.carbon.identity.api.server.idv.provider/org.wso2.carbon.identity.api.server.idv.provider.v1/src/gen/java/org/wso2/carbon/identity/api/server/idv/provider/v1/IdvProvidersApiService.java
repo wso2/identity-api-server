@@ -39,7 +39,7 @@ public interface IdvProvidersApiService {
 
       public Response getIdVProvider(String idvProviderId);
 
-      public Response getIdVProviders(Integer limit, Integer offset);
+      public Response getIdVProviders(Integer limit, Integer offset, String filter);
 
       public Response updateIdVProviders(String idvProviderId, IdVProviderRequest idVProviderRequest);
 }

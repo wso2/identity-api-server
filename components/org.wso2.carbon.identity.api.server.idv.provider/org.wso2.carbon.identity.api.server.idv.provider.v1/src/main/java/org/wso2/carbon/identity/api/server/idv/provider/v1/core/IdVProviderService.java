@@ -154,15 +154,27 @@ public class IdVProviderService {
      */
     public IdVProviderListResponse getIdVProviders(Integer limit, Integer offset) {
 
+        return getIdVProviders(limit, offset, null);
+    }
+
+    /**
+     * Get all identity verification providers with filtering.
+     *
+     * @param limit  Limit per page.
+     * @param offset Offset value.
+     * @return Identity verification providers.
+     */
+    public IdVProviderListResponse getIdVProviders(Integer limit, Integer offset, String filter) {
+
         int tenantId = getTenantId();
         try {
             IdVProviderManager idVProviderManager = IdentityVerificationServiceHolder.getIdVProviderManager();
-            int totalResults = idVProviderManager.getCountOfIdVProviders(tenantId);
+            int totalResults = idVProviderManager.getCountOfIdVProviders(tenantId, filter);
 
             IdVProviderListResponse idVProviderListResponse = new IdVProviderListResponse();
 
             if (totalResults > 0) {
-                List<IdVProvider> idVProviders = idVProviderManager.getIdVProviders(limit, offset, tenantId);
+                List<IdVProvider> idVProviders = idVProviderManager.getIdVProviders(limit, offset, filter, tenantId);
 
                 if (CollectionUtils.isNotEmpty(idVProviders)) {
                     List<IdVProviderResponse> idVProvidersList = new ArrayList<>();
@@ -222,6 +234,7 @@ public class IdVProviderService {
         idvProviderResponse.setName(idVProvider.getIdVProviderName());
         idvProviderResponse.setIsEnabled(idVProvider.isEnabled());
         idvProviderResponse.setDescription(idVProvider.getIdVProviderDescription());
+        idvProviderResponse.setImage(idVProvider.getImageUrl());
 
         if (idVProvider.getIdVConfigProperties() != null) {
             List<ConfigProperty> configProperties =
@@ -243,6 +256,7 @@ public class IdVProviderService {
         idVProvider.setIdVProviderName(idVProviderRequest.getName());
         idVProvider.setIdVProviderDescription(idVProviderRequest.getDescription());
         idVProvider.setEnabled(idVProviderRequest.getIsEnabled());
+        idVProvider.setImageUrl(idVProviderRequest.getImage());
         if (idVProviderRequest.getClaims() != null) {
             idVProvider.setClaimMappings(getClaimMap(idVProviderRequest.getClaims()));
         }
@@ -263,6 +277,7 @@ public class IdVProviderService {
         idVProvider.setIdVProviderName(idVProviderRequest.getName());
         idVProvider.setIdVProviderDescription(idVProviderRequest.getDescription());
         idVProvider.setEnabled(idVProviderRequest.getIsEnabled());
+        idVProvider.setImageUrl(idVProviderRequest.getImage());
         if (idVProviderRequest.getClaims() != null) {
             idVProvider.setClaimMappings(getClaimMap(idVProviderRequest.getClaims()));
         }

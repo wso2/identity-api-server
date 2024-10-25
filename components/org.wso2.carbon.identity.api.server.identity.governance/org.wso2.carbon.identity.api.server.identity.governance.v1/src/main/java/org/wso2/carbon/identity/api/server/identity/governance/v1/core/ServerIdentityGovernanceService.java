@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.identity.governance.v1.core;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -43,6 +44,7 @@ import org.wso2.carbon.identity.governance.IdentityGovernanceException;
 import org.wso2.carbon.identity.governance.IdentityGovernanceService;
 import org.wso2.carbon.identity.governance.bean.ConnectorConfig;
 import org.wso2.carbon.identity.governance.exceptions.general.IdentityGovernanceClientException;
+import org.wso2.carbon.identity.password.expiry.models.PasswordExpiryRule;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -59,6 +61,7 @@ import static org.wso2.carbon.identity.api.server.identity.governance.common.Gov
 import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage.ERROR_CODE_PAGINATION_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.ErrorMessage.ERROR_CODE_SORTING_NOT_IMPLEMENTED;
 import static org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants.IDENTITY_GOVERNANCE_PATH_COMPONENT;
+import static org.wso2.carbon.identity.password.expiry.constants.PasswordPolicyConstants.PASSWORD_EXPIRY_RULES_PREFIX;
 
 /**
  * Call internal osgi services to perform identity governance related operations.
@@ -296,6 +299,13 @@ public class ServerIdentityGovernanceService {
             Map<String, String> configurationDetails = new HashMap<>();
             for (PropertyReq propertyReqDTO : governanceConnector.getProperties()) {
                 configurationDetails.put(propertyReqDTO.getName(), propertyReqDTO.getValue());
+                if (StringUtils.startsWith(propertyReqDTO.getName(), PASSWORD_EXPIRY_RULES_PREFIX) &&
+                        StringUtils.isNotBlank(propertyReqDTO.getValue()) &&
+                        !isValidPasswordExpiryRule(propertyReqDTO.getValue())) {
+                    throw handleBadRequestError(
+                            GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_PASSWORD_EXPIRY_RULE,
+                            propertyReqDTO.getValue());
+                }
             }
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
         } catch (IdentityGovernanceClientException e) {
@@ -344,6 +354,13 @@ public class ServerIdentityGovernanceService {
 
                 // Add properties of the connector to be updated to the configurationDetails hashmap.
                 for (PropertyReq propertyReqDTO : connectorReq.getProperties()) {
+                    if (StringUtils.startsWith(propertyReqDTO.getName(), PASSWORD_EXPIRY_RULES_PREFIX) &&
+                            StringUtils.isNotBlank(propertyReqDTO.getValue()) &&
+                            !isValidPasswordExpiryRule(propertyReqDTO.getValue())) {
+                        throw handleBadRequestError(
+                                GovernanceConstants.ErrorMessage.ERROR_CODE_INVALID_PASSWORD_EXPIRY_RULE,
+                                propertyReqDTO.getValue());
+                    }
                     configurationDetails.put(propertyReqDTO.getName(), propertyReqDTO.getValue());
                 }
             }
@@ -512,4 +529,19 @@ public class ServerIdentityGovernanceService {
         return new APIError(status, errorResponse);
     }
 
+    /**
+     * Validate the password expiry rule.
+     *
+     * @param rule Password expiry rule.
+     * @throws APIError if the rule is invalid.
+     */
+    private boolean isValidPasswordExpiryRule(String rule) throws APIError {
+
+        try {
+            new PasswordExpiryRule(rule);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
 }
