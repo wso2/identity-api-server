@@ -43,6 +43,8 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/TenantsListResponse'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -51,12 +53,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-        '501':
-          description: Not Implemented
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
     post:
       tags:
         - Tenants
@@ -488,7 +484,7 @@ components:
       name: sortBy
       required: false
       description: >-
-        Attribute by which the retrieved records should be sorted. Currently sorting through _<b>domainName<b>_ only
+        Attribute by which the retrieved records should be sorted. Currently sorting through <b>domainName</b> only
         supported.
       schema:
         type: string
@@ -497,10 +493,9 @@ components:
       name: filter
       required: false
       description: >
-        Condition to filter the retrival of records. Supports 'sw', 'co', 'ew'
-        and 'eq' operations and also complex queries with 'and' operations. E.g.
-        /tenants?filter=domain+sw+"wso2". _<b>This
-        option is not yet supported.<b>_
+        Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations.
+        Currently, filtering is supported only by the <b>domainName</b>.
+        E.g. /tenants?filter=domainName+sw+wso2.
       schema:
         type: string
     additionalClaimsQueryParam:

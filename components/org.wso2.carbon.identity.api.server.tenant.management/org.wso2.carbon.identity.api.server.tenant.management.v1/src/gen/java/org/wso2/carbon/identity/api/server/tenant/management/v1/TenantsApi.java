@@ -238,13 +238,13 @@ public class TenantsApi  {
     }, tags={ "Tenants", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = TenantsListResponse.class),
+        @ApiResponse(code = 400, message = "Invalid Input Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Resource Forbidden", response = Void.class),
         @ApiResponse(code = 404, message = "The specified resource is not found", response = Error.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class),
-        @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
+        @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public Response retrieveTenants(    @Valid @Min(0)@ApiParam(value = "Maximum number of records to return.")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination.")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order in which the retrieved tenants should be sorted.", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. Currently sorting through _<b>domainName<b>_ only supported.")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Condition to filter the retrival of records. Supports 'sw', 'co', 'ew' and 'eq' operations and also complex queries with 'and' operations. E.g. /tenants?filter=domain+sw+\"wso2\". _<b>This option is not yet supported.<b>_ ")  @QueryParam("filter") String filter) {
+    public Response retrieveTenants(    @Valid @Min(0)@ApiParam(value = "Maximum number of records to return.")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination.")  @QueryParam("offset") Integer offset,     @Valid@ApiParam(value = "Define the order in which the retrieved tenants should be sorted.", allowableValues="asc, desc")  @QueryParam("sortOrder") String sortOrder,     @Valid@ApiParam(value = "Attribute by which the retrieved records should be sorted. Currently sorting through <b>domainName</b> only supported.")  @QueryParam("sortBy") String sortBy,     @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. Currently, filtering is supported only by the <b>domainName</b>. E.g. /tenants?filter=domainName+sw+wso2. ")  @QueryParam("filter") String filter) {
 
         return delegate.retrieveTenants(limit,  offset,  sortOrder,  sortBy,  filter );
     }

@@ -119,7 +119,6 @@ public class ServerTenantManagementService {
     public TenantsListResponse listTenants(Integer limit, Integer offset, String sortOrder, String sortBy,
                                            String filter) {
 
-        handleNotImplementedCapabilities(filter);
         TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
 
         try {
@@ -603,26 +602,6 @@ public class ServerTenantManagementService {
             message = error.getDescription();
         }
         return message;
-    }
-
-    /**
-     * Return Not Implemented error response for tenant List filtering which are not yet supported by the server.
-     *
-     * @param filter Filter string.
-     */
-    private void handleNotImplementedCapabilities(String filter) {
-
-        TenantManagementConstants.ErrorMessage errorEnum = null;
-
-        if (filter != null) {
-            errorEnum = TenantManagementConstants.ErrorMessage.ERROR_CODE_FILTER_NOT_IMPLEMENTED;
-        }
-
-        if (errorEnum != null) {
-            ErrorResponse errorResponse = getErrorBuilder(errorEnum, null).build(log, errorEnum.getDescription());
-            Response.Status status = Response.Status.NOT_IMPLEMENTED;
-            throw new APIError(status, errorResponse);
-        }
     }
 
     public String addTenant(ChannelVerifiedTenantModel channelVerifiedTenantModel) {
