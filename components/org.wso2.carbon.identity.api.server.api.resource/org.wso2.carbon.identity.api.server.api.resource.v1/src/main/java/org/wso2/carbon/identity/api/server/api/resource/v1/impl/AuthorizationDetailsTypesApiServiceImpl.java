@@ -24,6 +24,11 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.core.AuthorizationDet
 
 import javax.ws.rs.core.Response;
 
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+
+/**
+ * Implementation of the Authorization details types REST Api.
+ */
 public class AuthorizationDetailsTypesApiServiceImpl implements AuthorizationDetailsTypesApiService {
 
     @Autowired
@@ -33,5 +38,13 @@ public class AuthorizationDetailsTypesApiServiceImpl implements AuthorizationDet
     public Response authorizationDetailsTypesGet(String filter) {
 
         return Response.ok().entity(typeMgtService.getAllAuthorizationDetailsTypes(filter)).build();
+    }
+
+    @Override
+    public Response isAuthorizationDetailsTypeExists(final String filter) {
+
+        return typeMgtService.isAuthorizationDetailsTypeExists(filter)
+                ? Response.ok().build()
+                : Response.status(NOT_FOUND).build();
     }
 }

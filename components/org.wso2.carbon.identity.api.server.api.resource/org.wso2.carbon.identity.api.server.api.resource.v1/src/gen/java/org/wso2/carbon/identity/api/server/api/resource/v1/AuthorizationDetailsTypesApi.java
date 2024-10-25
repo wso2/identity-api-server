@@ -53,7 +53,7 @@ public class AuthorizationDetailsTypesApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "API Resource Authorization Details Types" })
+    }, tags={ "API Resource Authorization Details Types", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = AuthorizationDetailsTypesGetModel.class, responseContainer = "List"),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
@@ -64,6 +64,28 @@ public class AuthorizationDetailsTypesApi  {
     public Response authorizationDetailsTypesGet(    @Valid@ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. ")  @QueryParam("filter") String filter) {
 
         return delegate.authorizationDetailsTypesGet(filter );
+    }
+
+    @Valid
+    @HEAD
+    
+    
+    
+    @ApiOperation(value = "Checks an authorization details type existence by type in the tenant", notes = "This API is used to check a registered authorization details type's existence using a given type in the tenant.  <b>Permission required:</b>     * /permission/admin/manage/identity/apiresourcemgt/view    <b>Scope required:</b>     * internal_api_resource_view ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "API Resource Authorization Details Types" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Provided authorization details type exists", response = Void.class),
+        @ApiResponse(code = 401, message = "Unauthorized request", response = Void.class),
+        @ApiResponse(code = 404, message = "Requested resource is not found", response = Void.class),
+        @ApiResponse(code = 500, message = "Encountered a server error", response = Void.class)
+    })
+    public Response isAuthorizationDetailsTypeExists(    @Valid @NotNull(message = "Property  cannot be null.") @ApiParam(value = "Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations. ",required=true)  @QueryParam("filter") String filter) {
+
+        return delegate.isAuthorizationDetailsTypeExists(filter );
     }
 
 }

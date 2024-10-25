@@ -30,7 +30,6 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesGetModel;
-import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesPatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.Error;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
@@ -42,6 +41,8 @@ import javax.ws.rs.core.Response;
 public interface ApiResourcesApiService {
 
       public Response addAPIResource(APIResourceCreationModel apIResourceCreationModel);
+
+      public Response addAuthorizationDetailsTypes(String apiResourceId, List<AuthorizationDetailsTypesCreationModel> authorizationDetailsTypesCreationModel);
 
       public Response apiResourcesApiResourceIdDelete(String apiResourceId);
 
@@ -57,17 +58,13 @@ public interface ApiResourcesApiService {
 
       public Response apiResourcesApiResourceIdScopesScopeNamePatch(String apiResourceId, String scopeName, ScopePatchModel scopePatchModel);
 
+      public Response deleteAuthorizationDetailsType(String apiResourceId, String authorizationDetailsTypeId);
+
       public Response getAPIResources(String before, String after, String filter, Integer limit, String attributes);
 
-      public Response addAuthorizationDetailsTypes(String apiResourceId, List<AuthorizationDetailsTypesCreationModel> authorizationDetailsTypesCreationModel);
-
-      public Response deleteAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType);
-
-      public Response getAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType);
+      public Response getAuthorizationDetailsType(String apiResourceId, String authorizationDetailsTypeId);
 
       public Response getAuthorizationDetailsTypes(String apiResourceId);
 
-      public Response isAuthorizationDetailsTypeExists(String apiResourceId, String authorizationDetailsType);
-
-      public Response updateAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType, AuthorizationDetailsTypesPatchModel authorizationDetailsTypesPatchModel);
+      public Response updateAuthorizationDetailsType(String apiResourceId, String authorizationDetailsTypeId, AuthorizationDetailsTypesCreationModel authorizationDetailsTypesCreationModel);
 }

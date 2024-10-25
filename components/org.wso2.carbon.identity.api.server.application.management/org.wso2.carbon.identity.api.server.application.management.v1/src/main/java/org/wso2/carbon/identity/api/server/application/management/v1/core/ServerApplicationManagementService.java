@@ -164,7 +164,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -1451,9 +1450,8 @@ public class ServerApplicationManagementService {
                             .appId(applicationId)
                             .apiId(authorizedAPIId)
                             .policyId(policyIdentifier)
-                            .scopes(authorizedAPICreationModel.getScopes().stream().map(
-                                    scope -> new Scope.ScopeBuilder().name(scope).build()).collect(Collectors.toList()))
-                            .authorizationDetailsTypes(toAuthorizationDetailsTypes(authorizedAPICreationModel))
+                            .scopes(getScopes(authorizedAPICreationModel))
+                            .authorizationDetailsTypes(getAuthorizationDetailsTypes(authorizedAPICreationModel))
                             .build(), tenantDomain);
         } catch (IdentityApplicationManagementException e) {
             String msg = "Error adding authorized API with id: " + authorizedAPICreationModel.getId() +
@@ -2109,33 +2107,43 @@ public class ServerApplicationManagementService {
         }
     }
 
-    private List<AuthorizationDetailsType> toAuthorizationDetailsTypes(AuthorizedAPICreationModel creationModel) {
+    private List<AuthorizationDetailsType> getAuthorizationDetailsTypes(AuthorizedAPICreationModel creationModel) {
+
+        if (CollectionUtils.isEmpty(creationModel.getAuthorizationDetailsTypes())) {
+            return null;
+        }
 
         return creationModel.getAuthorizationDetailsTypes().stream()
                 .map(type -> new AuthorizationDetailsType.AuthorizationDetailsTypesBuilder().type(type).build())
                 .collect(Collectors.toList());
     }
 
-    private AuthorizedAuthorizationDetailsTypes toAuthorizedAuthorizationDetailsType(
-            AuthorizationDetailsType authorizationDetailsType) {
+    private AuthorizedAuthorizationDetailsTypes toAuthorizedAuthorizationDetailsType(AuthorizationDetailsType type) {
 
-        if (authorizationDetailsType == null) {
-            return null;
-        }
-
-        return new AuthorizedAuthorizationDetailsTypes().id(authorizationDetailsType.getId())
-                .type(authorizationDetailsType.getType()).name(authorizationDetailsType.getName());
+        return (type == null) ? null
+                : new AuthorizedAuthorizationDetailsTypes().id(type.getId()).type(type.getType()).name(type.getName());
     }
 
     private List<AuthorizedAuthorizationDetailsTypes> toAuthorizedAuthorizationDetailsTypes(
             List<AuthorizationDetailsType> authorizationDetailsTypes) {
 
         if (CollectionUtils.isEmpty(authorizationDetailsTypes)) {
-            return Collections.emptyList();
+            return null;
         }
 
         return authorizationDetailsTypes.stream()
                 .map(this::toAuthorizedAuthorizationDetailsType)
+                .collect(Collectors.toList());
+    }
+
+    private List<Scope> getScopes(AuthorizedAPICreationModel creationModel) {
+
+        if (CollectionUtils.isEmpty(creationModel.getScopes())) {
+            return null;
+        }
+
+        return creationModel.getScopes().stream()
+                .map(scope -> new Scope.ScopeBuilder().name(scope).build())
                 .collect(Collectors.toList());
     }
 }

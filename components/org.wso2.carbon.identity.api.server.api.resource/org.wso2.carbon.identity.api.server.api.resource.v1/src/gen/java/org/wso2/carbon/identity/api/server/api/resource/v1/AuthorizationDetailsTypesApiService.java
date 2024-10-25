@@ -32,4 +32,6 @@ import javax.ws.rs.core.Response;
 public interface AuthorizationDetailsTypesApiService {
 
       public Response authorizationDetailsTypesGet(String filter);
+
+      public Response isAuthorizationDetailsTypeExists(String filter);
 }

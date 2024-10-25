@@ -25,7 +25,6 @@ import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
 import org.wso2.carbon.identity.api.server.api.resource.common.APIResourceManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesGetModel;
-import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesPatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.api.resource.v1.util.APIResourceMgtEndpointUtil;
 import org.wso2.carbon.identity.api.server.api.resource.v1.util.AuthorizationDetailsTypeMgtUtil;
@@ -36,12 +35,17 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
+import static org.wso2.carbon.identity.api.server.api.resource.v1.util.AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsType;
+
+/**
+ * Authorization Details Type Management Service.
+ */
 public class AuthorizationDetailsTypeManagementService {
 
     private static final Log LOG = LogFactory.getLog(AuthorizationDetailsTypeManagementService.class);
 
-    public void addAuthorizationDetailsTypes(String apiResourceId,
-                                             List<AuthorizationDetailsTypesCreationModel> creationModels) {
+    public List<AuthorizationDetailsType> addAuthorizationDetailsTypes(
+            String apiResourceId, List<AuthorizationDetailsTypesCreationModel> creationModels) {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Adding authorization details types to resource with id: " + apiResourceId);
@@ -54,7 +58,7 @@ public class AuthorizationDetailsTypeManagementService {
                         APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_API_RESOURCE_NOT_FOUND, apiResourceId);
             }
 
-            APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager().addAuthorizationDetailsTypes(
+            return APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager().addAuthorizationDetailsTypes(
                     apiResourceId,
                     AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsTypesList(creationModels),
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain()
@@ -64,17 +68,17 @@ public class AuthorizationDetailsTypeManagementService {
         }
     }
 
-    public void deleteAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType) {
+    public void deleteAuthorizationDetailsTypeById(String apiResourceId, String authorizationDetailsTypeId) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Deleting authorization details type against resource id: %s and type: %s ",
-                    apiResourceId, authorizationDetailsType));
+            LOG.debug(String.format("Deleting authorization details type against resource ID: %s and type ID: %s ",
+                    apiResourceId, authorizationDetailsTypeId));
         }
         try {
             APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager()
-                    .deleteAuthorizationDetailsTypeByApiIdAndType(
+                    .deleteAuthorizationDetailsTypeByApiIdAndTypeId(
                             apiResourceId,
-                            authorizationDetailsType,
+                            authorizationDetailsTypeId,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()
                     );
         } catch (APIResourceMgtException e) {
@@ -82,18 +86,19 @@ public class AuthorizationDetailsTypeManagementService {
         }
     }
 
-    public AuthorizationDetailsTypesGetModel getAuthorizationDetailsType(String apiResourceId, String type) {
+    public AuthorizationDetailsTypesGetModel getAuthorizationDetailsTypeById(String apiResourceId,
+                                                                             String authorizationDetailsTypeId) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Retrieving authorization details type against resource id: %s and type: %s ",
-                    apiResourceId, type));
+            LOG.debug(String.format("Retrieving authorization details type against resource ID: %s and type ID: %s ",
+                    apiResourceId, authorizationDetailsTypeId));
         }
         try {
             AuthorizationDetailsType authorizationDetailsType = APIResourceManagementServiceHolder
                     .getAuthorizationDetailsTypeManager()
-                    .getAuthorizationDetailsTypeByApiIdAndType(
+                    .getAuthorizationDetailsTypeByApiIdAndTypeId(
                             apiResourceId,
-                            type,
+                            authorizationDetailsTypeId,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()
                     );
             if (authorizationDetailsType == null) {
@@ -129,12 +134,12 @@ public class AuthorizationDetailsTypeManagementService {
         }
     }
 
-    public void updateAuthorizationDetailsTypes(String apiResourceId, String authorizationDetailsType,
-                                                AuthorizationDetailsTypesPatchModel patchModel) {
+    public void updateAuthorizationDetailsTypes(String apiResourceId, String authorizationDetailsTypeId,
+                                                AuthorizationDetailsTypesCreationModel creationModel) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Updating authorization details type against resource id: %s and type: %s ",
-                    apiResourceId, authorizationDetailsType));
+            LOG.debug(String.format("Updating authorization details type against resource ID: %s and type ID: %s ",
+                    apiResourceId, authorizationDetailsTypeId));
         }
         try {
             APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
@@ -144,7 +149,7 @@ public class AuthorizationDetailsTypeManagementService {
                         APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_API_RESOURCE_NOT_FOUND, apiResourceId);
             }
 
-            if (!this.isAuthorizationDetailsTypeExists(apiResourceId, authorizationDetailsType)) {
+            if (!this.isAuthorizationDetailsTypeIdExists(apiResourceId, authorizationDetailsTypeId)) {
                 throw APIResourceMgtEndpointUtil.handleException(
                         Response.Status.NOT_FOUND,
                         APIResourceMgtEndpointConstants.ErrorMessage.ERROR_CODE_AUTHORIZATION_DETAILS_TYPE_NOT_FOUND,
@@ -154,7 +159,7 @@ public class AuthorizationDetailsTypeManagementService {
 
             APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager().updateAuthorizationDetailsType(
                     apiResourceId,
-                    AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsType(authorizationDetailsType, patchModel),
+                    toAuthorizationDetailsType(authorizationDetailsTypeId, creationModel),
                     CarbonContext.getThreadLocalCarbonContext().getTenantDomain()
             );
         } catch (APIResourceMgtException e) {
@@ -162,14 +167,30 @@ public class AuthorizationDetailsTypeManagementService {
         }
     }
 
-    public boolean isAuthorizationDetailsTypeExists(String apiResourceId, String authorizationDetailsType) {
+    public boolean isAuthorizationDetailsTypeIdExists(String apiResourceId, String authorizationDetailsTypeId) {
 
         try {
             return APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager()
-                    .isAuthorizationDetailsTypeExists(
+                    .getAuthorizationDetailsTypeByApiIdAndTypeId(
                             apiResourceId,
-                            authorizationDetailsType,
+                            authorizationDetailsTypeId,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()
+                    ) != null;
+        } catch (APIResourceMgtException e) {
+            throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
+        }
+    }
+
+    public boolean isAuthorizationDetailsTypeExists(String filter) {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Checking authorization details type exists against filter: %s", filter));
+        }
+        try {
+            return APIResourceManagementServiceHolder
+                    .getAuthorizationDetailsTypeManager()
+                    .isAuthorizationDetailsTypeExists(
+                            filter, CarbonContext.getThreadLocalCarbonContext().getTenantDomain()
                     );
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
@@ -182,13 +203,13 @@ public class AuthorizationDetailsTypeManagementService {
             LOG.debug(String.format("Retrieving all authorization details type against filter: %s", filter));
         }
         try {
-            List<AuthorizationDetailsType> AuthorizationDetailsTypes = APIResourceManagementServiceHolder
+            List<AuthorizationDetailsType> authorizationDetailsTypes = APIResourceManagementServiceHolder
                     .getAuthorizationDetailsTypeManager()
                     .getAuthorizationDetailsTypes(
                             filter, CarbonContext.getThreadLocalCarbonContext().getTenantDomain()
                     );
 
-            return AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsGetModelsList(AuthorizationDetailsTypes);
+            return AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsGetModelsList(authorizationDetailsTypes);
         } catch (APIResourceMgtException e) {
             throw APIResourceMgtEndpointUtil.handleAPIResourceMgtException(e);
         }

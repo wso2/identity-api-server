@@ -24,20 +24,19 @@ import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourcePatchModel
 import org.wso2.carbon.identity.api.server.api.resource.v1.APIResourceResponse;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ApiResourcesApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesCreationModel;
-import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesPatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeCreationModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopePatchModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.AuthorizationDetailsTypeManagementService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceManagementService;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
+import org.wso2.carbon.identity.application.common.model.AuthorizationDetailsType;
 
 import java.net.URI;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
 
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 
 /**
@@ -59,6 +58,15 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
         URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT +
                 APIResourceMgtEndpointConstants.API_RESOURCE_PATH_COMPONENT + "/" + apiResourceResponse.getId());
         return Response.created(location).entity(apiResourceResponse).build();
+    }
+
+    @Override
+    public Response addAuthorizationDetailsTypes(
+            String apiResourceId, List<AuthorizationDetailsTypesCreationModel> authorizationDetailsTypesCreationModel) {
+
+        List<AuthorizationDetailsType> authorizationDetailsTypes =
+                typeMgtService.addAuthorizationDetailsTypes(apiResourceId, authorizationDetailsTypesCreationModel);
+        return Response.ok().entity(authorizationDetailsTypes).build();
     }
 
     @Override
@@ -112,6 +120,13 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     }
 
     @Override
+    public Response deleteAuthorizationDetailsType(String apiResourceId, String authorizationDetailsTypeId) {
+
+        typeMgtService.deleteAuthorizationDetailsTypeById(apiResourceId, authorizationDetailsTypeId);
+        return Response.noContent().build();
+    }
+
+    @Override
     public Response getAPIResources(String before, String after, String filter, Integer limit, String attributes) {
 
         return Response.ok().entity(serverAPIResourceManagementService.getAPIResources(before, after, filter, limit,
@@ -119,25 +134,10 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     }
 
     @Override
-    public Response addAuthorizationDetailsTypes(String apiResourceId,
-                                                 List<AuthorizationDetailsTypesCreationModel> typesCreationModel) {
+    public Response getAuthorizationDetailsType(String apiResourceId, String authorizationDetailsTypeId) {
 
-        typeMgtService.addAuthorizationDetailsTypes(apiResourceId, typesCreationModel);
-        return Response.noContent().build();
-    }
-
-    @Override
-    public Response deleteAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType) {
-
-        typeMgtService.deleteAuthorizationDetailsType(apiResourceId, authorizationDetailsType);
-        return Response.noContent().build();
-    }
-
-    @Override
-    public Response getAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType) {
-
-        return Response.ok()
-                .entity(typeMgtService.getAuthorizationDetailsType(apiResourceId, authorizationDetailsType)).build();
+        return Response.ok().entity(typeMgtService
+                .getAuthorizationDetailsTypeById(apiResourceId, authorizationDetailsTypeId)).build();
     }
 
     @Override
@@ -147,18 +147,10 @@ public class ApiResourcesApiServiceImpl implements ApiResourcesApiService {
     }
 
     @Override
-    public Response isAuthorizationDetailsTypeExists(String apiResourceId, String authorizationDetailsType) {
+    public Response updateAuthorizationDetailsType(String apiResourceId, String authorizationDetailsTypeId,
+                                                   AuthorizationDetailsTypesCreationModel creationModel) {
 
-        return typeMgtService.isAuthorizationDetailsTypeExists(apiResourceId, authorizationDetailsType)
-                ? Response.ok().build()
-                : Response.status(NOT_FOUND).build();
-    }
-
-    @Override
-    public Response updateAuthorizationDetailsType(String apiResourceId, String authorizationDetailsType,
-                                                   AuthorizationDetailsTypesPatchModel typesPatchModel) {
-
-        typeMgtService.updateAuthorizationDetailsTypes(apiResourceId, authorizationDetailsType, typesPatchModel);
+        typeMgtService.updateAuthorizationDetailsTypes(apiResourceId, authorizationDetailsTypeId, creationModel);
         return Response.noContent().build();
     }
 }

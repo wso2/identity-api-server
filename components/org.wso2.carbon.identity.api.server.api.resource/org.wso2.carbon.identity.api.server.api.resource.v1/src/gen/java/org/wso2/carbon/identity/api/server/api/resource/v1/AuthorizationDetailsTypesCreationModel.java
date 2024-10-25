@@ -25,8 +25,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesCreationModelAllOf;
-import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesPatchModel;
 import javax.validation.constraints.*;
 
 

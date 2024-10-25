@@ -510,8 +510,14 @@ paths:
               items:
                 $ref: "#/components/schemas/AuthorizationDetailsTypesCreationModel"
       responses:
-        204:
-          description: No Content
+        200:
+          description: Successfully added a list of authorization details types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuthorizationDetailsTypesGetModel"
         401:
           description: Unauthorized request
           content:
@@ -531,26 +537,26 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api-resources/{apiResourceId}/authorization-details-types/{authorizationDetailsType}:
+  /api-resources/{apiResourceId}/authorization-details-types/{authorizationDetailsTypeId}:
     get:
       tags:
         - API Resource Authorization Details Types
       description: |
-        This API is used to retrieve details of a registered authorization details type by a given type.
+        This API is used to retrieve details of a registered authorization details type by a given type ID.
         
         <b>Permission required:</b>  
           * /permission/admin/manage/identity/apiresourcemgt/view  
         
         <b>Scope required:</b>  
           * internal_api_resource_view
-      summary: Returns a registered authorization details type by type
+      summary: Returns a registered authorization details type by type ID
       operationId: getAuthorizationDetailsType
       parameters:
         - $ref: '#/components/parameters/apiResourceId'
-        - $ref: '#/components/parameters/authorizationDetailsType'
+        - $ref: '#/components/parameters/authorizationDetailsTypeId'
       responses:
         200:
-          description: Successfully retrieved an authorization details type by type
+          description: Successfully retrieved an authorization details type by type ID
           content:
             application/json:
               schema:
@@ -573,64 +579,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-    head:
-      tags:
-        - API Resource Authorization Details Types
-      description: |
-        This API is used to check a registered authorization details type's existence using a given type.
-        
-        <b>Permission required:</b>  
-          * /permission/admin/manage/identity/apiresourcemgt/view  
-        
-        <b>Scope required:</b>  
-          * internal_api_resource_view
-      summary: Checks an authorization details type existence by type
-      operationId: isAuthorizationDetailsTypeExists
-      parameters:
-        - $ref: '#/components/parameters/apiResourceId'
-        - $ref: '#/components/parameters/authorizationDetailsType'
-      responses:
-        200:
-          description: Provided authorization details type exists
-        401:
-          description: Unauthorized request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        404:
-          description: Requested resource is not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        500:
-          description: Encountered a server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
     patch:
       tags:
         - API Resource Authorization Details Types
       description: |
-        This API is used to update a registered authorization details type by a given type.
+        This API is used to update a registered authorization details type by a given type ID.
         
         <b>Permission required:</b>  
           * /permission/admin/manage/identity/apiresourcemgt/update  
         
         <b>Scope required:</b>  
           * internal_api_resource_update
-      summary: Updates a registered authorization details type by type
+      summary: Updates a registered authorization details type by type ID
       operationId: updateAuthorizationDetailsType
       parameters:
         - $ref: '#/components/parameters/apiResourceId'
-        - $ref: '#/components/parameters/authorizationDetailsType'
+        - $ref: '#/components/parameters/authorizationDetailsTypeId'
       requestBody:
         content:
           "application/json":
             schema:
-              $ref: "#/components/schemas/AuthorizationDetailsTypesPatchModel"
+              $ref: "#/components/schemas/AuthorizationDetailsTypesCreationModel"
       responses:
         204:
           description: No Content
@@ -656,21 +625,21 @@ paths:
       tags:
         - API Resource Authorization Details Types
       description: |
-        This API is used to delete a registered authorization details type by a given type.
+        This API is used to delete a registered authorization details type by a given type ID.
         
         <b>Permission required:</b>  
           * /permission/admin/manage/identity/apiresourcemgt/delete  
         
         <b>Scope required:</b>  
           * internal_api_resource_delete
-      summary: Deletes a registered authorization details type by type
+      summary: Deletes a registered authorization details type by type ID
       operationId: deleteAuthorizationDetailsType
       parameters:
         - $ref: '#/components/parameters/apiResourceId'
-        - $ref: '#/components/parameters/authorizationDetailsType'
+        - $ref: '#/components/parameters/authorizationDetailsTypeId'
       responses:
         204:
-          description: Successfully deleted an authorization details type by type
+          description: Successfully deleted an authorization details type by type ID
         401:
           description: Unauthorized request
           content:
@@ -696,7 +665,14 @@ paths:
         <b>Scope required:</b> <br>
           * internal_api_resource_view
       parameters:
-        - $ref: '#/components/parameters/filter'
+        - name: filter
+          in: query
+          required: false
+          description: |
+            Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations.
+          schema:
+            type: string
+          example: type+eq+payment_initiation
       responses:
         200:
           description: OK
@@ -722,6 +698,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    head:
+      tags:
+        - API Resource Authorization Details Types
+      description: |
+        This API is used to check a registered authorization details type's existence using a given type in the tenant.
+        
+        <b>Permission required:</b>  
+          * /permission/admin/manage/identity/apiresourcemgt/view  
+        
+        <b>Scope required:</b>  
+          * internal_api_resource_view
+      summary: Checks an authorization details type existence by type in the tenant
+      operationId: isAuthorizationDetailsTypeExists
+      parameters:
+        - name: filter
+          in: query
+          required: true
+          description: |
+            Condition to filter the retrieval of records. Supports 'sw', 'co', 'ew' and 'eq' operations.
+          schema:
+            type: string
+          example: type+eq+payment_initiation
+      responses:
+        200:
+          description: Provided authorization details type exists
+        401:
+          description: Unauthorized request
+        404:
+          description: Requested resource is not found
+        500:
+          description: Encountered a server error
 
   /meta/api-resource-collections:
     get:
@@ -907,14 +914,14 @@ components:
       schema:
         type: string
 
-    authorizationDetailsType:
-      name: authorizationDetailsType
+    authorizationDetailsTypeId:
+      name: authorizationDetailsTypeId
       in: path
-      description: Type of the authorization details type that is to be retrieved
+      description: The ID of the authorization details type that is to be retrieved
       required: true
       schema:
         type: string
-        example: payment_initiation
+        example: a9403470-dd11-46b4-8db9-aaa31f1d4423
 
   schemas:
     Error:
@@ -1264,13 +1271,20 @@ components:
           type: string
           example: "Internal"
 
-    AuthorizationDetailsTypesPatchModel:
+    AuthorizationDetailsTypesCreationModel:
       type: object
       required:
+        - type
         - name
         - description
         - schema
       properties:
+        type:
+          type: string
+          example: payment_initiation
+          description: an unique type of the authorization details type
+          minLength: 1
+          maxLength: 255
         name:
           type: string
           minLength: 3
@@ -1320,20 +1334,6 @@ components:
               creditorName: string
               creditorAccount:
                 type: object
-
-    AuthorizationDetailsTypesCreationModel:
-      allOf:
-        - type: object
-          required:
-            - type
-          properties:
-            type:
-              type: string
-              example: payment_initiation
-              description: an unique type of the authorization details type
-              minLength: 1
-              maxLength: 255
-        - $ref: "#/components/schemas/AuthorizationDetailsTypesPatchModel"
 
     AuthorizationDetailsTypesGetModel:
       allOf:
