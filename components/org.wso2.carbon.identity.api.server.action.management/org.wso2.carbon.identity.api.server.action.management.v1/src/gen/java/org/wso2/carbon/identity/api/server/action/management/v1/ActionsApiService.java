@@ -44,6 +44,8 @@ public interface ActionsApiService {
 
       public Response deleteAction(String actionType, String actionId);
 
+      public Response getActionByActionId(String actionType, String actionId);
+
       public Response getActionTypes();
 
       public Response getActionsByActionType(String actionType);

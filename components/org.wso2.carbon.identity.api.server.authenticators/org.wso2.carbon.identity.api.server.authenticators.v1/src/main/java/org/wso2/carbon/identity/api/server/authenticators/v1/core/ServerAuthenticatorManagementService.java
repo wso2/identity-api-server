@@ -41,6 +41,7 @@ import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorC
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
+import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
@@ -421,6 +422,19 @@ public class ServerAuthenticatorManagementService {
         authenticator.setType(Authenticator.TypeEnum.FEDERATED);
         authenticator.setImage(identityProvider.getImageUrl());
         authenticator.setDescription(identityProvider.getIdentityProviderDescription());
+
+        /* For the /authenticators APIs, per IDP have an item in the response payload, not per federated authenticator
+         within the IDP. If an IDP has more than one federated authenticator, it is considered as an existing older
+         authenticator and should always be classified as a SYSTEM type. Otherwise, it can be classified as either
+         SYSTEM or USER, depending on the 'definedBy' type of the federated authenticator. */
+        if (identityProvider.getFederatedAuthenticatorConfigs().length == 1) {
+            DefinedByType definedByType =
+                    identityProvider.getFederatedAuthenticatorConfigs()[0].getDefinedByType();
+            authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(definedByType.toString()));
+        } else {
+            authenticator.definedBy(Authenticator.DefinedByEnum.SYSTEM);
+        }
+
         if (CollectionUtils.isNotEmpty(configTagsListDistinct)) {
             authenticator.setTags(configTagsListDistinct);
         }
@@ -512,6 +526,7 @@ public class ServerAuthenticatorManagementService {
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setIsEnabled(config.isEnabled());
         authenticator.setType(Authenticator.TypeEnum.LOCAL);
+        authenticator.definedBy(Authenticator.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
         String[] tags = config.getTags();
         if (ArrayUtils.isNotEmpty(tags)) {
             authenticator.setTags(Arrays.asList(tags));

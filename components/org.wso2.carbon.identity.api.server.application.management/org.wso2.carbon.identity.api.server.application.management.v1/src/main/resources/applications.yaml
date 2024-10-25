@@ -38,6 +38,7 @@ paths:
         - $ref: '#/components/parameters/sortOrderQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
         - $ref: '#/components/parameters/attributesQueryParam'
+        - $ref: '#/components/parameters/excludeSystemPortalsQueryParam'
       responses:
         '200':
           description: OK
@@ -2701,6 +2702,17 @@ components:
         /applications?attributes=advancedConfigurations,templateId,templateVersion,clientId,applicationEnabled,associatedRoles.allowedAudience
       schema:
         type: string
+    excludeSystemPortalsQueryParam:
+      in: query
+      name: excludeSystemPortals
+      required: false
+      description: |
+        Specifies whether to include or exclude system portals in the response. 
+        Default will be treated as false if parameter is not preset in the request.
+
+        /applications?excludeSystemPortals=true
+      schema:
+        type: boolean
     exportSecretsQueryParam:
       in: query
       name: exportSecrets
@@ -2801,6 +2813,9 @@ components:
         description:
           type: string
           example: Application representing user portal
+        applicationVersion:
+          type: string
+          example: "v1.0.0"
         image:
           type: string
           example: 'https://example.com/logo/my-logo.png'
@@ -2913,6 +2928,9 @@ components:
         description:
           type: string
           example: This is the configuration for Pickup application.
+        applicationVersion:
+          type: string
+          example: "v1.0.0"
         imageUrl:
           type: string
           example: 'https://example.com/logo/my-logo.png'
@@ -2978,6 +2996,9 @@ components:
         description:
           type: string
           example: This is the configuration for Pickup application.
+        applicationVersion:
+          type: string
+          example: "v1.0.0"
         imageUrl:
           type: string
           example: 'https://example.com/logo/my-logo.png'
@@ -3603,12 +3624,6 @@ components:
             Enabling this option will allow the client to authenticate without a
             client secret.
           example: false
-        useClientIdAsSubClaimForAppTokens:
-          type: boolean
-          description: If enabled, client_id will be sent as the sub claim value for app tokens.
-        omitUsernameInIntrospectionRespForAppTokens:
-          type: boolean
-          description: If enabled, username will not be sent in the introspection response for app tokens.
         pkce:
           $ref: '#/components/schemas/OAuth2PKCEConfiguration'
         accessToken:

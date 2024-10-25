@@ -189,6 +189,68 @@ paths:
                 $ref: '#/components/schemas/Error'
 
   /actions/{actionType}/{actionId}:
+    get:
+      tags:
+        - Actions
+      operationId: getActionByActionId
+      summary: |
+        Retrieve Action information by given Id.
+      description: |
+        This API provides the capability to retrieve the action by action Id.<br>
+          <b>Scope required:</b> <br>
+              * internal_action_mgt_view
+      parameters:
+        - name: actionType
+          in: path
+          description: Name of the Action Type.
+          required: true
+          schema:
+            enum:
+              - preIssueAccessToken
+              - preUpdatePassword
+              - preUpdateProfile
+              - preRegistration
+        - name: actionId
+          in: path
+          description: Id of the Action.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     patch:
       tags:
         - Actions
@@ -511,6 +573,13 @@ components:
           scopes: {}
 
   schemas:
+    ActionType:
+      type: string
+      enum:
+        - PRE_ISSUE_ACCESS_TOKEN
+        - PRE_UPDATE_PASSWORD
+        - PRE_UPDATE_PROFILE
+        - PRE_REGISTRATION
     ActionModel:
       type: object
       required:
@@ -562,12 +631,7 @@ components:
           type: string
           example: '24f64d17-9824-4e28-8413-de45728d8e84'
         type:
-          type: string
-          enum:
-            - PRE_ISSUE_ACCESS_TOKEN
-            - PRE_UPDATE_PASSWORD
-            - PRE_UPDATE_PROFILE
-            - PRE_REGISTRATION
+          $ref: '#/components/schemas/ActionType'
         name:
           type: string
           example: Access Token Pre Issue
@@ -592,12 +656,7 @@ components:
           type: string
           example: '24f64d17-9824-4e28-8413-de45728d8e84'
         type:
-          type: string
-          enum:
-            - PRE_ISSUE_ACCESS_TOKEN
-            - PRE_UPDATE_PASSWORD
-            - PRE_UPDATE_PROFILE
-            - PRE_REGISTRATION
+          $ref: '#/components/schemas/ActionType'
         name:
           type: string
           example: Access Token Pre Issue
@@ -627,12 +686,7 @@ components:
       type: object
       properties:
         type:
-          type: string
-          enum:
-            - PRE_ISSUE_ACCESS_TOKEN
-            - PRE_UPDATE_PASSWORD
-            - PRE_UPDATE_PROFILE
-            - PRE_REGISTRATION
+          $ref: '#/components/schemas/ActionType'
         displayName:
           type: string
           example: "Pre Issue Access Token."
