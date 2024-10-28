@@ -294,7 +294,7 @@ public class ApiResourcesApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "API Resources", })
+    }, tags={ "API Resources" })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = APIResourceListResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),

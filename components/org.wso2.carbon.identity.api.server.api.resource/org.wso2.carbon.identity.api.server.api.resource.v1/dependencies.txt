@@ -1,300 +1,0 @@
-[INFO] Scanning for projects...
-Downloading from wso2.releases: https://maven.wso2.org/nexus/content/repositories/releases/org/apache/maven/plugins/maven-assembly-plugin/3.0.0/maven-assembly-plugin-3.0.0.pom
-Downloading from wso2-nexus: https://maven.wso2.org/nexus/content/groups/wso2-public/org/apache/maven/plugins/maven-assembly-plugin/3.0.0/maven-assembly-plugin-3.0.0.pom
-Progress (1): 684 BProgress (1): 2.1 kBProgress (1): 4.7 kBProgress (1): 8.4 kBProgress (1): 11 kB Progress (1): 12 kBProgress (1): 14 kBProgress (1): 15 kB                   Downloaded from wso2-nexus: https://maven.wso2.org/nexus/content/groups/wso2-public/org/apache/maven/plugins/maven-assembly-plugin/3.0.0/maven-assembly-plugin-3.0.0.pom (15 kB at 28 kB/s)
-Downloading from wso2.releases: https://maven.wso2.org/nexus/content/repositories/releases/org/apache/maven/plugins/maven-assembly-plugin/3.0.0/maven-assembly-plugin-3.0.0.jar
-Downloading from wso2-nexus: https://maven.wso2.org/nexus/content/groups/wso2-public/org/apache/maven/plugins/maven-assembly-plugin/3.0.0/maven-assembly-plugin-3.0.0.jar
-Progress (1): 0.4/241 kBProgress (1): 1.8/241 kBProgress (1): 3.1/241 kBProgress (1): 4.5/241 kBProgress (1): 5.9/241 kBProgress (1): 7.2/241 kBProgress (1): 8.6/241 kBProgress (1): 10.0/241 kBProgress (1): 11/241 kB  Progress (1): 13/241 kBProgress (1): 14/241 kBProgress (1): 15/241 kBProgress (1): 17/241 kBProgress (1): 18/241 kBProgress (1): 20/241 kBProgress (1): 21/241 kBProgress (1): 22/241 kBProgress (1): 24/241 kBProgress (1): 25/241 kBProgress (1): 26/241 kBProgress (1): 28/241 kBProgress (1): 29/241 kBProgress (1): 30/241 kBProgress (1): 32/241 kBProgress (1): 33/241 kBProgress (1): 34/241 kBProgress (1): 36/241 kBProgress (1): 37/241 kBProgress (1): 39/241 kBProgress (1): 40/241 kBProgress (1): 44/241 kBProgress (1): 45/241 kBProgress (1): 50/241 kBProgress (1): 54/241 kBProgress (1): 58/241 kBProgress (1): 62/241 kBProgress (1): 66/241 kBProgress (1): 70/241 kBProgress (1): 74/241 kBProgress (1): 78/241 kBProgress (1): 82/241 kBProgress (1): 87/241 kBProgress (1): 91/241 kBProgress (1): 94/241 kBProgress (1): 99/241 kBProgress (1): 103/241 kBProgress (1): 107/241 kBProgress (1): 111/241 kBProgress (1): 116/241 kBProgress (1): 120/241 kBProgress (1): 124/241 kBProgress (1): 127/241 kBProgress (1): 131/241 kBProgress (1): 136/241 kBProgress (1): 140/241 kBProgress (1): 144/241 kBProgress (1): 148/241 kBProgress (1): 152/241 kBProgress (1): 156/241 kBProgress (1): 160/241 kBProgress (1): 164/241 kBProgress (1): 168/241 kBProgress (1): 173/241 kBProgress (1): 177/241 kBProgress (1): 181/241 kBProgress (1): 185/241 kBProgress (1): 190/241 kBProgress (1): 193/241 kBProgress (1): 197/241 kBProgress (1): 201/241 kBProgress (1): 218/241 kBProgress (1): 226/241 kBProgress (1): 241 kB                        Downloaded from wso2-nexus: https://maven.wso2.org/nexus/content/groups/wso2-public/org/apache/maven/plugins/maven-assembly-plugin/3.0.0/maven-assembly-plugin-3.0.0.jar (241 kB at 170 kB/s)
-[INFO] 
-[INFO] --< org.wso2.carbon.identity.server.api:org.wso2.carbon.identity.api.server.api.resource.v1 >--
-[INFO] Building WSO2 Identity Server - API Resource Rest API 1.2.222-SNAPSHOT
-[INFO]   from pom.xml
-[INFO] --------------------------------[ jar ]---------------------------------
-[INFO] 
-[INFO] --- dependency:2.10:tree (default-cli) @ org.wso2.carbon.identity.api.server.api.resource.v1 ---
-[INFO] org.wso2.carbon.identity.server.api:org.wso2.carbon.identity.api.server.api.resource.v1:jar:1.2.222-SNAPSHOT
-[INFO] +- org.wso2.carbon.identity.organization.management.core:org.wso2.carbon.identity.organization.management.service:jar:1.1.12:provided
-[INFO] |  \- com.github.spotbugs:spotbugs-annotations:jar:4.1.3:provided
-[INFO] |     \- com.google.code.findbugs:jsr305:jar:3.0.2:provided
-[INFO] +- org.apache.cxf:cxf-rt-frontend-jaxrs:jar:3.5.0:provided
-[INFO] |  +- org.apache.cxf:cxf-core:jar:3.5.0:provided
-[INFO] |  |  +- org.glassfish.jaxb:jaxb-runtime:jar:2.3.5:provided
-[INFO] |  |  |  +- org.glassfish.jaxb:txw2:jar:2.3.5:provided
-[INFO] |  |  |  \- com.sun.istack:istack-commons-runtime:jar:3.0.12:provided
-[INFO] |  |  +- com.fasterxml.woodstox:woodstox-core:jar:6.2.7:provided
-[INFO] |  |  +- org.apache.ws.xmlschema:xmlschema-core:jar:2.3.0:provided
-[INFO] |  |  \- jakarta.xml.bind:jakarta.xml.bind-api:jar:2.3.3:provided
-[INFO] |  +- jakarta.ws.rs:jakarta.ws.rs-api:jar:2.1.6:provided
-[INFO] |  +- jakarta.annotation:jakarta.annotation-api:jar:1.3.5:provided
-[INFO] |  +- org.apache.cxf:cxf-rt-transports-http:jar:3.5.0:provided
-[INFO] |  +- org.apache.cxf:cxf-rt-security:jar:3.5.0:provided
-[INFO] |  +- jakarta.xml.ws:jakarta.xml.ws-api:jar:2.3.3:provided
-[INFO] |  +- jakarta.jws:jakarta.jws-api:jar:2.1.0:provided
-[INFO] |  +- jakarta.xml.soap:jakarta.xml.soap-api:jar:1.4.2:provided
-[INFO] |  |  \- jakarta.activation:jakarta.activation-api:jar:1.2.2:provided
-[INFO] |  +- com.sun.activation:jakarta.activation:jar:1.2.2:provided
-[INFO] |  +- com.sun.xml.messaging.saaj:saaj-impl:jar:1.5.3:provided
-[INFO] |  |  \- org.jvnet.staxex:stax-ex:jar:1.8.3:provided
-[INFO] |  \- org.apache.geronimo.specs:geronimo-jta_1.1_spec:jar:1.1.1:provided
-[INFO] +- org.apache.cxf:cxf-rt-rs-service-description:jar:3.5.0:provided
-[INFO] +- javax.ws.rs:javax.ws.rs-api:jar:2.1.1:provided
-[INFO] +- io.swagger:swagger-jaxrs:jar:1.6.2:compile
-[INFO] |  +- io.swagger:swagger-core:jar:1.6.2:compile
-[INFO] |  |  +- org.apache.commons:commons-lang3:jar:3.2.1:compile
-[INFO] |  |  +- org.slf4j:slf4j-api:jar:1.7.22:compile
-[INFO] |  |  +- io.swagger:swagger-models:jar:1.6.2:compile
-[INFO] |  |  |  \- io.swagger:swagger-annotations:jar:1.6.2:compile
-[INFO] |  |  \- javax.validation:validation-api:jar:1.1.0.Final:compile
-[INFO] |  \- org.reflections:reflections:jar:0.9.11:compile
-[INFO] |     \- org.javassist:javassist:jar:3.21.0-GA:compile
-[INFO] +- org.springframework:spring-web:jar:5.3.25:provided
-[INFO] |  +- org.springframework:spring-beans:jar:5.3.25:provided
-[INFO] |  \- org.springframework:spring-core:jar:5.3.25:provided
-[INFO] |     \- org.springframework:spring-jcl:jar:5.3.25:provided
-[INFO] +- com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:jar:2.16.1:provided
-[INFO] |  +- com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:jar:2.16.1:provided
-[INFO] |  |  +- com.fasterxml.jackson.core:jackson-core:jar:2.16.1:provided
-[INFO] |  |  \- com.fasterxml.jackson.core:jackson-databind:jar:2.16.1:provided
-[INFO] |  \- com.fasterxml.jackson.module:jackson-module-jaxb-annotations:jar:2.16.1:provided
-[INFO] +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.api.resource.mgt:jar:7.3.75-SNAPSHOT:provided
-[INFO] |  +- org.apache.felix:org.apache.felix.scr.ds-annotations:jar:1.2.4:provided
-[INFO] |  +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.core:jar:7.3.72:provided
-[INFO] |  |  +- commons-logging:commons-logging:jar:1.2:provided
-[INFO] |  |  +- org.wso2.securevault:org.wso2.securevault:jar:1.1.3:provided
-[INFO] |  |  |  +- org.apache.ws.commons.axiom:axiom-api:jar:1.2.11:provided
-[INFO] |  |  |  |  +- org.apache.geronimo.specs:geronimo-activation_1.1_spec:jar:1.0.2:provided
-[INFO] |  |  |  |  \- org.apache.geronimo.specs:geronimo-javamail_1.4_spec:jar:1.6:provided
-[INFO] |  |  |  +- org.apache.ws.commons.axiom:axiom-impl:jar:1.2.11:provided
-[INFO] |  |  |  |  \- org.codehaus.woodstox:wstx-asl:jar:3.2.9:provided
-[INFO] |  |  |  +- jline:jline:jar:0.9.94:provided
-[INFO] |  |  |  |  \- junit:junit:jar:3.8.1:provided
-[INFO] |  |  |  +- commons-cli:commons-cli:jar:1.0:provided
-[INFO] |  |  |  \- commons-io:commons-io:jar:2.0:provided
-[INFO] |  |  +- org.wso2.carbon.commons:org.wso2.carbon.tenant.common:jar:4.7.39:provided
-[INFO] |  |  +- ua.parser.wso2:ua-parser:jar:1.5.4.wso2v2:provided
-[INFO] |  |  |  \- org.yaml:snakeyaml:jar:2.0:provided
-[INFO] |  |  \- xml-apis:xml-apis:jar:1.4.01:provided
-[INFO] |  \- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.event:jar:7.3.75-SNAPSHOT:provided
-[INFO] |     \- org.apache.axis2.transport:axis2-transport-mail:jar:2.0.0-wso2v42:provided
-[INFO] |        +- javax.mail:mail:jar:1.4.1:provided
-[INFO] |        |  \- javax.activation:activation:jar:1.1:provided
-[INFO] |        +- org.apache.axis2:axis2-transport-base:jar:1.6.1-wso2v40:provided
-[INFO] |        +- org.apache.axis2:axis2-kernel:jar:1.6.1-wso2v40:provided
-[INFO] |        |  +- commons-httpclient:commons-httpclient:jar:3.1:provided
-[INFO] |        |  +- wsdl4j:wsdl4j:jar:1.6.2:provided
-[INFO] |        |  +- org.apache.neethi:neethi:jar:2.0.4:provided
-[INFO] |        |  +- org.apache.woden:woden-api:jar:1.0M9:provided
-[INFO] |        |  |  \- org.apache.ws.commons.schema:XmlSchema:jar:1.4.7:provided
-[INFO] |        |  +- org.apache.woden:woden-impl-dom:jar:1.0M9:provided
-[INFO] |        |  |  \- org.apache.woden:woden-impl-commons:jar:1.0M9:provided
-[INFO] |        |  \- javax.ws.rs:jsr311-api:jar:1.0:provided
-[INFO] |        \- org.wso2.orbit.javax.activation:activation:jar:1.1.1.wso2v2:provided
-[INFO] +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.api.resource.collection.mgt:jar:7.3.72:provided
-[INFO] +- org.wso2.carbon.identity.server.api:org.wso2.carbon.identity.api.server.common:jar:1.2.222-SNAPSHOT:provided
-[INFO] +- org.apache.cxf:cxf-rt-rs-extension-search:jar:3.3.1:provided
-[INFO] |  +- javax.annotation:javax.annotation-api:jar:1.3.1:provided
-[INFO] |  +- javax.xml.ws:jaxws-api:jar:2.3.0:provided
-[INFO] |  |  \- javax.xml.soap:javax.xml.soap-api:jar:1.4.0:provided
-[INFO] |  +- com.sun.activation:javax.activation:jar:1.2.0:provided
-[INFO] |  +- org.apache.geronimo.specs:geronimo-ws-metadata_2.0_spec:jar:1.1.3:provided
-[INFO] |  \- org.jboss.spec.javax.rmi:jboss-rmi-api_1.0_spec:jar:1.0.6.Final:provided
-[INFO] +- org.wso2.carbon.identity.server.api:org.wso2.carbon.identity.api.server.api.resource.common:jar:1.2.222-SNAPSHOT:provided
-[INFO] +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.application.common:jar:7.3.75-SNAPSHOT:provided
-[INFO] |  +- org.wso2.carbon:org.wso2.carbon.user.core:jar:4.9.17:provided
-[INFO] |  |  +- org.wso2.carbon:org.wso2.carbon.user.api:jar:4.9.17:provided
-[INFO] |  |  +- org.wso2.orbit.xerces:xercesImpl:jar:2.12.2.wso2v1:provided
-[INFO] |  |  +- org.wso2.org.ops4j.pax.logging:pax-logging-api:jar:2.1.0-wso2v4:provided
-[INFO] |  |  |  +- org.osgi:osgi.core:jar:7.0.0:provided
-[INFO] |  |  |  \- org.osgi:osgi.cmpn:jar:7.0.0:provided
-[INFO] |  |  +- org.wso2.orbit.org.apache.tomcat:jdbc-pool:jar:9.0.65.wso2v1:provided
-[INFO] |  |  +- org.wso2.orbit.org.apache.tomcat:tomcat:jar:9.0.82.wso2v1:provided
-[INFO] |  |  +- org.wso2.orbit.commons-collections:commons-collections:jar:3.2.2.wso2v1:provided
-[INFO] |  |  +- com.google.code.gson:gson:jar:2.9.0:provided
-[INFO] |  |  +- org.osgi:org.osgi.service.component.annotations:jar:1.3.0:provided
-[INFO] |  |  +- org.osgi:org.osgi.annotation:jar:6.0.0:provided
-[INFO] |  |  +- org.osgi:org.osgi.service.metatype.annotations:jar:1.3.0:provided
-[INFO] |  |  \- org.wso2.carbon.crypto:org.wso2.carbon.crypto.api:jar:1.1.14:provided
-[INFO] |  +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.base:jar:7.3.72:provided
-[INFO] |  |  \- org.wso2.orbit.org.apache.neethi:neethi:jar:2.0.4.wso2v5:provided
-[INFO] |  +- org.json.wso2:json:jar:3.0.0.wso2v1:provided
-[INFO] |  |  \- org.json:json:jar:20140107:provided
-[INFO] |  +- org.wso2.orbit.javax.xml.bind:jaxb-api:jar:2.3.1.wso2v1:provided
-[INFO] |  +- com.fasterxml.jackson.core:jackson-annotations:jar:2.16.1:provided
-[INFO] |  \- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.central.log.mgt:jar:7.3.75-SNAPSHOT:provided
-[INFO] \- org.wso2.carbon.identity.inbound.auth.oauth2:org.wso2.carbon.identity.oauth:jar:7.0.150-SNAPSHOT:provided
-[INFO]    +- org.apache.tomcat:tomcat-coyote:jar:9.0.93:provided
-[INFO]    |  +- org.apache.tomcat:tomcat-servlet-api:jar:9.0.93:provided
-[INFO]    |  +- org.apache.tomcat:tomcat-jni:jar:9.0.93:provided
-[INFO]    |  +- org.apache.tomcat:tomcat-juli:jar:9.0.93:provided
-[INFO]    |  \- org.apache.tomcat:tomcat-util:jar:9.0.93:provided
-[INFO]    +- commons-lang.wso2:commons-lang:jar:2.6.0.wso2v1:provided
-[INFO]    +- org.ops4j.pax.logging:pax-logging-api:jar:1.10.1:provided
-[INFO]    +- org.wso2.carbon:javax.cache.wso2:jar:4.9.23:provided
-[INFO]    |  +- org.eclipse.platform:org.eclipse.osgi:jar:3.14.0:provided
-[INFO]    |  \- org.wso2.carbon:org.wso2.carbon.base:jar:4.9.23:provided
-[INFO]    |     \- org.wso2.carbon:org.wso2.carbon.securevault:jar:4.9.23:provided
-[INFO]    +- org.wso2.orbit.commons-codec:commons-codec:jar:1.16.0.wso2v1:provided
-[INFO]    +- com.google.gdata.wso2:gdata-core:jar:1.47.0.wso2v1:provided
-[INFO]    +- org.apache.ws.commons.axiom.wso2:axiom:jar:1.2.11-wso2v16:provided
-[INFO]    |  +- org.apache.geronimo.specs.wso2:geronimo-stax-api_1.0_spec:jar:1.0.1.wso2v2:provided
-[INFO]    |  |  \- org.apache.geronimo.specs:geronimo-stax-api_1.0_spec:jar:1.0.1:provided
-[INFO]    |  +- org.codehaus.woodstox:woodstox-core-asl:jar:4.2.0:provided
-[INFO]    |  \- org.codehaus.woodstox:stax2-api:jar:3.1.4:provided
-[INFO]    +- org.apache.axis2.wso2:axis2:jar:1.6.1-wso2v38:provided
-[INFO]    +- org.wso2.carbon:org.wso2.carbon.utils:jar:4.9.17:provided
-[INFO]    |  +- org.wso2.orbit.org.bouncycastle:bcprov-jdk15on:jar:1.70.0.wso2v1:provided
-[INFO]    |  |  \- org.bouncycastle:bcprov-jdk15on:jar:1.70:provided
-[INFO]    |  +- org.wso2.carbon:org.wso2.carbon.bootstrap:jar:4.9.17:provided
-[INFO]    |  |  \- wrapper:wrapper:jar:3.2.3:provided
-[INFO]    |  +- org.wso2.org.ops4j.pax.logging:pax-logging-log4j2:jar:2.1.0-wso2v4:provided
-[INFO]    |  +- org.wso2.carbon:org.wso2.carbon.queuing:jar:4.9.17:provided
-[INFO]    |  +- org.igniterealtime.smack.wso2:smack:jar:3.0.4.wso2v1:provided
-[INFO]    |  +- org.igniterealtime.smack.wso2:smackx:jar:3.0.4.wso2v1:provided
-[INFO]    |  +- jaxen:jaxen:jar:1.1.1:provided
-[INFO]    |  |  +- jdom:jdom:jar:1.0:provided
-[INFO]    |  |  +- xerces:xercesImpl:jar:2.6.2:provided
-[INFO]    |  |  \- xom:xom:jar:1.0:provided
-[INFO]    |  |     \- xerces:xmlParserAPIs:jar:2.6.2:provided
-[INFO]    |  +- org.wso2.orbit.commons-fileupload:commons-fileupload:jar:1.5.0.wso2v2:provided
-[INFO]    |  +- org.apache.ant.wso2:ant:jar:1.10.12.wso2v1:provided
-[INFO]    |  |  \- org.apache.ant:ant:jar:1.10.12:provided
-[INFO]    |  |     \- org.apache.ant:ant-launcher:jar:1.10.12:provided
-[INFO]    |  +- org.eclipse.equinox:javax.servlet:jar:3.0.0.v201112011016:provided
-[INFO]    |  +- org.wso2.orbit.commons-httpclient:commons-httpclient:jar:3.1.0.wso2v6:provided
-[INFO]    |  +- org.wso2.carbon:org.wso2.carbon.registry.api:jar:4.9.17:provided
-[INFO]    |  +- org.wso2.orbit.org.apache.httpcomponents:httpclient:jar:4.5.13.wso2v1:provided
-[INFO]    |  \- org.wso2.orbit.org.apache.commons:commons-lang3:jar:3.4.0.wso2v1:provided
-[INFO]    +- org.wso2.carbon:org.wso2.carbon.core:jar:4.9.23:provided
-[INFO]    |  +- org.eclipse.equinox:org.eclipse.equinox.http.helper:jar:1.1.0.wso2v1:provided
-[INFO]    |  |  \- org.eclipse.osgi:org.eclipse.osgi.services:jar:3.3.0.v20110513:provided
-[INFO]    |  +- org.wso2.orbit.org.bouncycastle:bcprov-jdk18on:jar:1.74.0.wso2v1:provided
-[INFO]    |  |  \- org.bouncycastle:bcprov-jdk18on:jar:1.74:provided
-[INFO]    |  +- org.apache.httpcomponents.wso2:httpcore:jar:4.4.14.wso2v1:provided
-[INFO]    |  +- org.apache.tomcat:tomcat-catalina-ha:jar:9.0.82:provided
-[INFO]    |  |  +- org.apache.tomcat:tomcat-tribes:jar:9.0.82:provided
-[INFO]    |  |  +- org.apache.tomcat:tomcat-catalina:jar:9.0.82:provided
-[INFO]    |  |  |  +- org.apache.tomcat:tomcat-jsp-api:jar:9.0.82:provided
-[INFO]    |  |  |  |  \- org.apache.tomcat:tomcat-el-api:jar:9.0.82:provided
-[INFO]    |  |  |  +- org.apache.tomcat:tomcat-annotations-api:jar:9.0.82:provided
-[INFO]    |  |  |  +- org.apache.tomcat:tomcat-api:jar:9.0.82:provided
-[INFO]    |  |  |  \- org.apache.tomcat:tomcat-jaspic-api:jar:9.0.82:provided
-[INFO]    |  |  \- org.apache.tomcat:tomcat-util-scan:jar:9.0.82:provided
-[INFO]    |  \- wsdl4j.wso2:wsdl4j:jar:1.6.2.wso2v4:provided
-[INFO]    +- org.wso2.carbon:org.wso2.carbon.registry.core:jar:4.9.23:provided
-[INFO]    |  +- commons-io.wso2:commons-io:jar:2.11.0.wso2v1:provided
-[INFO]    |  +- net.sourceforge.findbugs:annotations:jar:1.3.2:provided
-[INFO]    |  +- org.apache.ws.commons.schema.wso2:XmlSchema:jar:1.4.7.wso2v6:provided
-[INFO]    |  +- org.wso2.carbon:org.wso2.carbon.registry.xboot:jar:4.9.23:provided
-[INFO]    |  +- org.compass-project.wso2:compass:jar:2.0.1.wso2v2:provided
-[INFO]    |  +- org.apache.abdera.wso2:abdera:jar:1.0.0.wso2v3:provided
-[INFO]    |  \- commons-pool.wso2:commons-pool:jar:1.5.6.wso2v1:provided
-[INFO]    |     \- commons-pool:commons-pool:jar:1.5.6:provided
-[INFO]    +- org.wso2.orbit.org.opensaml:opensaml:jar:3.3.1.wso2v11:provided
-[INFO]    |  +- commons-codec:commons-codec:jar:1.16.0:provided
-[INFO]    |  \- org.cryptacular:cryptacular:jar:1.2.5:provided
-[INFO]    +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.action.execution:jar:7.3.75-SNAPSHOT:provided
-[INFO]    |  \- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.action.management:jar:7.3.72:provided
-[INFO]    +- org.wso2.orbit.org.apache.oltu.oauth2:oltu:jar:1.0.0.wso2v3:provided
-[INFO]    +- org.wso2.carbon.identity.inbound.auth.oauth2:org.wso2.carbon.identity.oauth.common:jar:7.0.150-SNAPSHOT:provided
-[INFO]    +- org.wso2.carbon.identity.framework:org.wso2.carbon.idp.mgt:jar:7.3.72:provided
-[INFO]    |  +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.role.mgt.core:jar:7.3.72:provided
-[INFO]    |  \- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.secret.mgt.core:jar:7.3.72:provided
-[INFO]    +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.application.mgt:jar:7.3.72:provided
-[INFO]    |  +- org.wso2.carbon.consent.mgt:org.wso2.carbon.consent.mgt.core:jar:2.2.16:provided
-[INFO]    |  +- org.wso2.carbon.identity.framework:org.wso2.carbon.security.mgt:jar:7.3.72:provided
-[INFO]    |  |  \- backport-util-concurrent.wso2:backport-util-concurrent:jar:3.1.0.wso2v1:provided
-[INFO]    |  +- org.wso2.carbon.identity.framework:org.wso2.carbon.user.mgt:jar:7.3.72:provided
-[INFO]    |  |  +- org.wso2.carbon.identity.framework:org.wso2.carbon.user.mgt.common:jar:7.3.72:provided
-[INFO]    |  |  +- au.com.bytecode.opencsv.wso2:opencsv:jar:1.8.wso2v1:provided
-[INFO]    |  |  +- org.wso2.orbit.org.apache.poi:poi-scratchpad:jar:5.2.3.wso2v1:provided
-[INFO]    |  |  |  \- org.apache.poi:poi-scratchpad:jar:5.2.3:provided
-[INFO]    |  |  |     +- org.apache.poi:poi:jar:5.2.3:provided
-[INFO]    |  |  |     |  +- org.apache.commons:commons-collections4:jar:4.4:provided
-[INFO]    |  |  |     |  \- com.zaxxer:SparseBitSet:jar:1.2:provided
-[INFO]    |  |  |     +- org.apache.logging.log4j:log4j-api:jar:2.18.0:provided
-[INFO]    |  |  |     \- org.apache.commons:commons-math3:jar:3.6.1:provided
-[INFO]    |  |  +- org.wso2.orbit.org.apache.poi:poi-ooxml:jar:5.2.3.wso2v1:provided
-[INFO]    |  |  +- org.ops4j.pax.logging:pax-logging-log4j2:jar:1.10.1:provided
-[INFO]    |  |  +- org.wso2.orbit.org.apache.commons:commons-compress:jar:1.25.0.wso2v1:provided
-[INFO]    |  |  \- org.wso2.orbit.org.apache.xmlbeans:xmlbeans:jar:5.1.1.wso2v1:provided
-[INFO]    |  |     \- org.apache.xmlbeans:xmlbeans:jar:5.1.1:provided
-[INFO]    |  \- org.jacoco:org.jacoco.agent:jar:runtime:0.8.2:test
-[INFO]    +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.entitlement:jar:7.3.75-SNAPSHOT:provided
-[INFO]    |  +- org.wso2.balana:org.wso2.balana:jar:1.2.13:provided
-[INFO]    |  |  \- org.wso2.balana:org.wso2.balana.utils:jar:1.2.13:provided
-[INFO]    |  |     \- xerces.wso2:xercesImpl:jar:2.8.1.wso2v2:provided
-[INFO]    |  +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.authenticator.thrift:jar:7.3.75-SNAPSHOT:provided
-[INFO]    |  |  \- org.wso2.carbon:org.wso2.carbon.core.services:jar:4.10.10:provided
-[INFO]    |  +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.entitlement.common:jar:7.3.75-SNAPSHOT:provided
-[INFO]    |  |  \- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.entitlement.stub:jar:7.3.75-SNAPSHOT:provided
-[INFO]    |  |     \- org.apache.axis2.wso2:axis2-client:jar:1.6.1-wso2v40:provided
-[INFO]    |  |        +- org.apache.axis2.wso2:axis2-json:jar:1.6.1-wso2v40:provided
-[INFO]    |  |        +- org.apache.woden.wso2:woden:jar:1.0.0.M8-wso2v1:provided
-[INFO]    |  |        \- commons-codec.wso2:commons-codec:jar:1.3.0.wso2v1:provided
-[INFO]    |  +- libthrift.wso2:libthrift:jar:0.16.0.wso2v1:provided
-[INFO]    |  |  \- org.apache.thrift:libthrift:jar:0.16.0:provided
-[INFO]    |  |     +- org.apache.httpcomponents:httpclient:jar:4.5.13:provided
-[INFO]    |  |     \- org.apache.httpcomponents:httpcore:jar:4.4.15:provided
-[INFO]    |  +- org.apache.santuario:xmlsec:jar:2.3.4:provided
-[INFO]    |  \- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.notification.mgt:jar:7.3.75-SNAPSHOT:provided
-[INFO]    +- org.wso2.carbon.identity.saml.common:org.wso2.carbon.identity.saml.common.util:jar:1.4.0:provided
-[INFO]    |  +- org.apache.ws.security.wso2:wss4j:jar:1.5.11-wso2v18:provided
-[INFO]    |  \- com.google.guava:guava:jar:29.0-jre:provided
-[INFO]    |     +- com.google.guava:failureaccess:jar:1.0.1:provided
-[INFO]    |     +- com.google.guava:listenablefuture:jar:9999.0-empty-to-avoid-conflict-with-guava:provided
-[INFO]    |     +- org.checkerframework:checker-qual:jar:2.11.1:provided
-[INFO]    |     +- com.google.errorprone:error_prone_annotations:jar:2.3.4:provided
-[INFO]    |     \- com.google.j2objc:j2objc-annotations:jar:1.3:provided
-[INFO]    +- org.wso2.orbit.com.github.dblock.waffle:waffle-jna:jar:1.6.wso2v6:provided
-[INFO]    +- org.wso2.orbit.com.nimbusds:nimbus-jose-jwt:jar:7.9.0.wso2v1:provided
-[INFO]    +- net.minidev:json-smart:jar:2.4.10:provided
-[INFO]    |  \- net.minidev:accessors-smart:jar:2.4.9:provided
-[INFO]    |     \- org.ow2.asm:asm:jar:9.3:provided
-[INFO]    +- org.wso2.carbon:org.wso2.carbon.core.common:jar:4.9.23:provided
-[INFO]    +- javax.servlet:servlet-api:jar:2.5:provided
-[INFO]    +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.application.authentication.framework:jar:7.3.72:provided
-[INFO]    |  +- org.wso2.carbon:org.wso2.carbon.ui:jar:4.10.10:provided
-[INFO]    |  |  +- org.apache.tiles.wso2:tiles-jsp:jar:2.0.5.wso2v2:provided
-[INFO]    |  |  +- org.wso2.carbon:org.wso2.carbon.authenticator.proxy:jar:4.10.10:provided
-[INFO]    |  |  |  \- org.wso2.carbon:org.wso2.carbon.authenticator.stub:jar:4.10.10:provided
-[INFO]    |  |  +- org.wso2.carbon:org.wso2.carbon.tomcat:jar:4.10.10:provided
-[INFO]    |  |  |  \- org.wso2.eclipse.equinox:org.eclipse.equinox.common:jar:3.8.0.v20160509-1230:provided
-[INFO]    |  |  +- org.eclipse.equinox:org.eclipse.equinox.http.servlet:jar:1.1.400.v20130418-1354:provided
-[INFO]    |  |  +- org.eclipse.equinox:javax.servlet.jsp:jar:2.2.0.v201112011158:provided
-[INFO]    |  |  +- org.wso2.carbon:org.wso2.carbon.core.commons.stub:jar:4.10.10:provided
-[INFO]    |  |  +- org.wso2.orbit.javax.servlet.jsp.jstl:jstl:jar:1.2.2.wso2v1:provided
-[INFO]    |  |  \- org.wso2.orbit.org.owasp.encoder:encoder:jar:1.2.0.wso2v1:provided
-[INFO]    |  +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.user.profile:jar:7.3.72:provided
-[INFO]    |  +- org.graalvm.sdk:graal-sdk:jar:22.3.4:provided
-[INFO]    |  +- org.graalvm.js:js:jar:22.3.4:provided
-[INFO]    |  +- org.graalvm.truffle:truffle-api:jar:22.3.4:provided
-[INFO]    |  +- org.graalvm.regex:regex:jar:22.3.4:provided
-[INFO]    |  +- com.ibm.icu:icu4j:jar:71.1:provided
-[INFO]    |  +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.functions.library.mgt:jar:7.3.72:provided
-[INFO]    |  \- org.wso2.carbon.identity.framework:org.wso2.carbon.claim.mgt:jar:7.3.72:provided
-[INFO]    +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.user.store.configuration:jar:7.3.72:provided
-[INFO]    |  +- org.wso2.carbon:org.wso2.carbon.ndatasource.core:jar:4.10.10:provided
-[INFO]    |  |  \- org.wso2.carbon:org.wso2.carbon.ndatasource.common:jar:4.10.10:provided
-[INFO]    |  \- org.wso2.carbon:org.wso2.carbon.ndatasource.rdbms:jar:4.10.10:provided
-[INFO]    +- org.wso2.orbit.joda-time:joda-time:jar:2.9.4.wso2v1:provided
-[INFO]    +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.claim.metadata.mgt:jar:7.3.72:provided
-[INFO]    +- org.wso2.carbon.identity.organization.management:org.wso2.carbon.identity.organization.management.role.management.service:jar:1.4.42:provided
-[INFO]    +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.consent.server.configs.mgt:jar:7.3.75-SNAPSHOT:provided
-[INFO]    +- org.wso2.carbon.identity.organization.management:org.wso2.carbon.identity.organization.management.organization.user.sharing:jar:1.4.7:provided
-[INFO]    +- org.wso2.eclipse.osgi:org.eclipse.osgi.services:jar:3.5.100.v20160504-1419:provided
-[INFO]    +- com.google.code.findbugs:annotations:jar:3.0.1:provided
-[INFO]    |  \- net.jcip:jcip-annotations:jar:1.0:provided
-[INFO]    +- org.wso2.carbon.utils:org.wso2.carbon.database.utils:jar:2.0.11:provided
-[INFO]    |  +- commons-dbcp:commons-dbcp:jar:1.4:provided
-[INFO]    |  \- commons-lang:commons-lang:jar:2.6:provided
-[INFO]    +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.multi.attribute.login.mgt:jar:7.3.75-SNAPSHOT:provided
-[INFO]    +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.role.v2.mgt.core:jar:7.3.75-SNAPSHOT:provided
-[INFO]    +- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.cors.mgt.core:jar:7.3.72:provided
-[INFO]    \- org.wso2.carbon.identity.framework:org.wso2.carbon.identity.configuration.mgt.core:jar:7.3.72:provided
-[INFO]       \- org.eclipse.osgi:org.eclipse.osgi:jar:3.9.1.v20130814-1242:provided
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  5.687 s
-[INFO] Finished at: 2024-10-02T17:27:05+05:30
-[INFO] ------------------------------------------------------------------------

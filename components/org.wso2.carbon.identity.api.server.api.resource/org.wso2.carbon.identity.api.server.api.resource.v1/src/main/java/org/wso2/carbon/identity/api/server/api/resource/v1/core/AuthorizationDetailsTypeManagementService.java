@@ -117,7 +117,7 @@ public class AuthorizationDetailsTypeManagementService {
     public List<AuthorizationDetailsTypesGetModel> getAuthorizationDetailsTypes(String apiResourceId) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Retrieving authorization details type against resource id: %s", apiResourceId));
+            LOG.debug("Retrieving authorization details type against resource id: " + apiResourceId);
         }
         try {
             APIResource apiResource = APIResourceManagementServiceHolder.getApiResourceManager()
@@ -184,7 +184,7 @@ public class AuthorizationDetailsTypeManagementService {
     public boolean isAuthorizationDetailsTypeExists(String filter) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Checking authorization details type exists against filter: %s", filter));
+            LOG.debug("Checking authorization details type exists against filter: " + filter);
         }
         try {
             return APIResourceManagementServiceHolder
@@ -200,7 +200,7 @@ public class AuthorizationDetailsTypeManagementService {
     public List<AuthorizationDetailsTypesGetModel> getAllAuthorizationDetailsTypes(String filter) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Retrieving all authorization details type against filter: %s", filter));
+            LOG.debug("Retrieving all authorization details type against filter: " + filter);
         }
         try {
             List<AuthorizationDetailsType> authorizationDetailsTypes = APIResourceManagementServiceHolder

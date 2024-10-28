@@ -21,12 +21,14 @@ package org.wso2.carbon.identity.api.server.api.resource.v1.factories;
 import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.impl.AuthorizationDetailsTypesApiServiceImpl;
 
+/**
+ * Factory class for {@link AuthorizationDetailsTypesApiService}.
+ */
 public class AuthorizationDetailsTypesApiServiceFactory {
 
-   private final static AuthorizationDetailsTypesApiService service = new AuthorizationDetailsTypesApiServiceImpl();
+    private final static AuthorizationDetailsTypesApiService service = new AuthorizationDetailsTypesApiServiceImpl();
 
-   public static AuthorizationDetailsTypesApiService getAuthorizationDetailsTypesApi()
-   {
-      return service;
-   }
+    public static AuthorizationDetailsTypesApiService getAuthorizationDetailsTypesApi() {
+        return service;
+    }
 }

@@ -100,8 +100,7 @@ public class AuthorizationDetailsTypeMgtUtil {
      * @return A JSON string of the validated schema.
      * @throws APIResourceMgtClientException if the schema is empty or invalid.
      */
-    private static boolean isValidSchema(Map<String, Object> schema)
-            throws APIResourceMgtClientException {
+    private static boolean isValidSchema(Map<String, Object> schema) throws APIResourceMgtClientException {
 
         if (MapUtils.isEmpty(schema)) {
             throwAPIResourceMgtClientException("Schema is empty");
