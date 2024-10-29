@@ -43,7 +43,8 @@ public class UserSharingMgtServiceHolder {
      *
      * @param userSharingPolicyHandlerService InvitationCoreService.
      */
-    public static void setInvitationCoreService(UserSharingPolicyHandlerService userSharingPolicyHandlerService) {
+    public static void setUserSharingPolicyHandlerService(
+            UserSharingPolicyHandlerService userSharingPolicyHandlerService) {
 
         UserSharingMgtServiceHolder.userSharingPolicyHandlerService = userSharingPolicyHandlerService;
     }

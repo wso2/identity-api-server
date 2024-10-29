@@ -40,13 +40,13 @@ public class UserSharingMgtOSGIServiceFactory extends AbstractFactoryBean<UserSh
     protected UserSharingPolicyHandlerService createInstance() throws Exception {
 
         if (this.userSharingPolicyHandlerService == null) {
-            UserSharingPolicyHandlerService invitationCoreService = (UserSharingPolicyHandlerService)
+            UserSharingPolicyHandlerService userSharingPolicyHandlerService = (UserSharingPolicyHandlerService)
                     PrivilegedCarbonContext.getThreadLocalCarbonContext()
                             .getOSGiService(UserSharingPolicyHandlerService.class, null);
-            if (invitationCoreService == null) {
+            if (userSharingPolicyHandlerService == null) {
                 throw new Exception("Unable to retrieve InvitationCoreService.");
             }
-            this.userSharingPolicyHandlerService = invitationCoreService;
+            this.userSharingPolicyHandlerService = userSharingPolicyHandlerService;
         }
         return this.userSharingPolicyHandlerService;
     }
