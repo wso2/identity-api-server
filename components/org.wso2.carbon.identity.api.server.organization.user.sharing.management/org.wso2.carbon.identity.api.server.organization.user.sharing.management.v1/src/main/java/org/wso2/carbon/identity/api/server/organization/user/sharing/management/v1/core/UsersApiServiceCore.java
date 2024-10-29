@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.UserSharingMgtConstants;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.RoleWithAudience;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBodyOrganizations;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareWithAllRequestBody;
@@ -30,7 +31,10 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerServiceImpl;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserShareGeneralDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserShareSelectiveDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserUnshareGeneralDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserUnshareSelectiveDO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -102,6 +106,35 @@ public class UsersApiServiceCore {
 
         UserSharingPolicyHandlerServiceImpl userSharingPolicyHandlerService = new UserSharingPolicyHandlerServiceImpl();
 
+        // Populate UserShareGeneralDO object from the request body.
+        UserShareGeneralDO userShareGeneralDO = new UserShareGeneralDO();
+
+        // Set user criteria.
+        Map<String, List<String>> userCriteria = new HashMap<>();
+        userCriteria.put("userIds", userShareWithAllRequestBody.getUserCriteria().getUserIds());
+        userShareGeneralDO.setUserCriteria(userCriteria);
+
+        // Set policy.
+        userShareGeneralDO.setPolicy(userShareWithAllRequestBody.getPolicy().value());
+
+        // Set roles.
+        List<Map<String, String>> rolesList = new ArrayList<>();
+        if (userShareWithAllRequestBody.getRoles() != null) {
+            for (RoleWithAudience role : userShareWithAllRequestBody.getRoles()) {
+                Map<String, String> roleDetails = new HashMap<>();
+                roleDetails.put("displayName", role.getDisplayName());
+                roleDetails.put("audienceDisplay", role.getAudience().getDisplay());
+                roleDetails.put("audienceType", role.getAudience().getType());
+                rolesList.add(roleDetails);
+            }
+        }
+        userShareGeneralDO.setRoles(rolesList);
+
+        try {
+            userSharingPolicyHandlerService.propagateGeneralShare(userShareGeneralDO);
+        } catch (Exception e) {
+            // TODO: Handle exceptions in shareUserWithAll API
+        }
     }
 
     /**
@@ -113,6 +146,22 @@ public class UsersApiServiceCore {
 
         UserSharingPolicyHandlerServiceImpl userSharingPolicyHandlerService = new UserSharingPolicyHandlerServiceImpl();
 
+        // Populate UserUnshareSelectiveDO object from the request body.
+        UserUnshareSelectiveDO userUnshareSelectiveDO = new UserUnshareSelectiveDO();
+
+        // Set user criteria.
+        Map<String, List<String>> userCriteria = new HashMap<>();
+        userCriteria.put("userIds", userUnshareRequestBody.getUserCriteria().getUserIds());
+        userUnshareSelectiveDO.setUserCriteria(userCriteria);
+
+        // Set organizations.
+        userUnshareSelectiveDO.setOrganizations(userUnshareRequestBody.getOrganizations());
+
+        try {
+            userSharingPolicyHandlerService.propagateSelectiveUnshare(userUnshareSelectiveDO);
+        } catch (Exception e) {
+            // TODO: Handle exceptions in unshareUser API
+        }
     }
 
     /**
@@ -124,6 +173,19 @@ public class UsersApiServiceCore {
 
         UserSharingPolicyHandlerServiceImpl userSharingPolicyHandlerService = new UserSharingPolicyHandlerServiceImpl();
 
+        // Populate UserUnshareGeneralDO object from the request body.
+        UserUnshareGeneralDO userUnshareGeneralDO = new UserUnshareGeneralDO();
+
+        // Set user criteria.
+        Map<String, List<String>> userCriteria = new HashMap<>();
+        userCriteria.put("userIds", userUnshareWithAllRequestBody.getUserCriteria().getUserIds());
+        userUnshareGeneralDO.setUserCriteria(userCriteria);
+
+        try {
+            userSharingPolicyHandlerService.propagateGeneralUnshare(userUnshareGeneralDO);
+        } catch (Exception e) {
+            // TODO: Handle exceptions in unshareUserWithAll API
+        }
     }
 
     /**
