@@ -18,37 +18,36 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.factory;
 
-//import org.springframework.beans.factory.config.AbstractFactoryBean;
-//import org.wso2.carbon.context.PrivilegedCarbonContext;
-//import org.wso2.carbon.identity.organization.user.sharing.UserSharingPolicyHandlerService;
+import org.springframework.beans.factory.config.AbstractFactoryBean;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerService;
 
 /**
  * Factory Beans serves as a factory for creating other beans within the IOC container. This factory bean is used to
  * instantiate the Invitation Core Service inside the container.
  */
-public class UserSharingMgtOSGIServiceFactory {
-    //extends AbstractFactoryBean<UserSharingPolicyHandlerService> {
+public class UserSharingMgtOSGIServiceFactory extends AbstractFactoryBean<UserSharingPolicyHandlerService> {
 
-//    private InvitationCoreService invitationCoreService;
-//
-//    @Override
-//    public Class<?> getObjectType() {
-//
-//        return Object.class;
-//    }
-//
-//    @Override
-//    protected InvitationCoreService createInstance() throws Exception {
-//
-//        if (this.invitationCoreService == null) {
-//            InvitationCoreService invitationCoreService = (InvitationCoreService)
-//                    PrivilegedCarbonContext.getThreadLocalCarbonContext()
-//                            .getOSGiService(InvitationCoreService.class, null);
-//            if (invitationCoreService == null) {
-//                throw new Exception("Unable to retrieve InvitationCoreService.");
-//            }
-//            this.invitationCoreService = invitationCoreService;
-//        }
-//        return this.invitationCoreService;
-//    }
+    private UserSharingPolicyHandlerService userSharingPolicyHandlerService;
+
+    @Override
+    public Class<?> getObjectType() {
+
+        return Object.class;
+    }
+
+    @Override
+    protected UserSharingPolicyHandlerService createInstance() throws Exception {
+
+        if (this.userSharingPolicyHandlerService == null) {
+            UserSharingPolicyHandlerService invitationCoreService = (UserSharingPolicyHandlerService)
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                            .getOSGiService(UserSharingPolicyHandlerService.class, null);
+            if (invitationCoreService == null) {
+                throw new Exception("Unable to retrieve InvitationCoreService.");
+            }
+            this.userSharingPolicyHandlerService = invitationCoreService;
+        }
+        return this.userSharingPolicyHandlerService;
+    }
 }

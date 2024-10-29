@@ -18,32 +18,33 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.common;
 
-//import org.wso2.carbon.identity.organization.user.invitation.management.InvitationCoreService;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerService;
+
 
 /**
  * Holds the services which the shared user invitation management API component is using.
  */
 public class UserSharingMgtServiceHolder {
 
-//    private static InvitationCoreService invitationCoreService;
-//
-//    /**
-//     * Get Invitation Core osgi service.
-//     *
-//     * @return InvitationCoreService.
-//     */
-//    public static InvitationCoreService getInvitationCoreService() {
-//
-//        return invitationCoreService;
-//    }
-//
-//    /**
-//     * Set Invitation Core osgi service.
-//     *
-//     * @param invitationCoreService InvitationCoreService.
-//     */
-//    public static void setInvitationCoreService(InvitationCoreService invitationCoreService) {
-//
-//        UserInvitationMgtServiceHolder.invitationCoreService = invitationCoreService;
-//    }
+    private static UserSharingPolicyHandlerService userSharingPolicyHandlerService;
+
+    /**
+     * Get Invitation Core osgi service.
+     *
+     * @return InvitationCoreService.
+     */
+    public static UserSharingPolicyHandlerService getUserSharingPolicyHandlerService() {
+
+        return userSharingPolicyHandlerService;
+    }
+
+    /**
+     * Set Invitation Core osgi service.
+     *
+     * @param userSharingPolicyHandlerService InvitationCoreService.
+     */
+    public static void setInvitationCoreService(UserSharingPolicyHandlerService userSharingPolicyHandlerService) {
+
+        UserSharingMgtServiceHolder.userSharingPolicyHandlerService = userSharingPolicyHandlerService;
+    }
 }
