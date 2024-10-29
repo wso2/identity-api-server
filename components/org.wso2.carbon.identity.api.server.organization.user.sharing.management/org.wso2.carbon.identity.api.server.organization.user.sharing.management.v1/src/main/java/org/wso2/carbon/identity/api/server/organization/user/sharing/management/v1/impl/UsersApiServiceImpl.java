@@ -18,53 +18,70 @@
 
 package org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.impl;
 
-import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.*;
-import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.*;
-import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.UsersApiService;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.core.UsersApiServiceCore;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBody;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareWithAllRequestBody;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedOrganizationsResponse;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedRolesResponse;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 
 import javax.ws.rs.core.Response;
 
+/**
+ * Implementation of the user sharing management APIs.
+ */
 public class UsersApiServiceImpl implements UsersApiService {
+
+    @Autowired
+    private UsersApiServiceCore usersApiServiceCore;
 
     @Override
     public Response processUserSharing(UserShareRequestBody userShareRequestBody) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        usersApiServiceCore.shareUser(userShareRequestBody);
+        return Response.noContent().build();
     }
 
     @Override
     public Response processUserSharingAll(UserShareWithAllRequestBody userShareWithAllRequestBody) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        usersApiServiceCore.shareUserWithAll(userShareWithAllRequestBody);
+        return Response.noContent().build();
     }
 
     @Override
     public Response processUserUnsharing(UserUnshareRequestBody userUnshareRequestBody) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        usersApiServiceCore.unshareUser(userUnshareRequestBody);
+        return Response.noContent().build();
     }
 
     @Override
     public Response removeUserSharing(UserUnshareWithAllRequestBody userUnshareWithAllRequestBody) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        usersApiServiceCore.unshareUserWithAll(userUnshareWithAllRequestBody);
+        return Response.noContent().build();
     }
 
     @Override
-    public Response usersUserIdSharedOrganizationsGet(String userId, String after, String before, Integer limit, String filter, Boolean recursive) {
+    public Response usersUserIdSharedOrganizationsGet(String userId, String after, String before, Integer limit,
+                                                      String filter, Boolean recursive) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        UserSharedOrganizationsResponse response = usersApiServiceCore.getSharedOrganizations(
+                userId, after, before, limit, filter, recursive);
+        return Response.ok().entity(response).build();
     }
 
     @Override
-    public Response usersUserIdSharedRolesGet(String userId, String orgId, String after, String before, Integer limit, String filter, Boolean recursive) {
+    public Response usersUserIdSharedRolesGet(String userId, String orgId, String after, String before, Integer limit,
+                                              String filter, Boolean recursive) {
 
-        // do some magic!
-        return Response.ok().entity("magic!").build();
+        UserSharedRolesResponse response = usersApiServiceCore.getSharedRoles(
+                userId, orgId, after, before, limit, filter, recursive);
+        return Response.ok().entity(response).build();
     }
 }
