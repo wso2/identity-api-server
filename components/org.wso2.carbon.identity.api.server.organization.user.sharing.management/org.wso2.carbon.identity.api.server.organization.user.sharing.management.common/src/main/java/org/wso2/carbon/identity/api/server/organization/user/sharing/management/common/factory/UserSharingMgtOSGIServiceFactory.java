@@ -24,7 +24,7 @@ import org.wso2.carbon.identity.organization.management.organization.user.sharin
 
 /**
  * Factory Beans serves as a factory for creating other beans within the IOC container. This factory bean is used to
- * instantiate the Invitation Core Service inside the container.
+ * instantiate the User Sharing Policy Handler Service inside the container.
  */
 public class UserSharingMgtOSGIServiceFactory extends AbstractFactoryBean<UserSharingPolicyHandlerService> {
 

@@ -24,10 +24,10 @@
        http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
     <bean class="org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.core.UsersApiServiceCore"/>
     <bean class="org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.impl.UsersApiServiceImpl"/>
-    <bean id="userInvitationMgtOSGIServiceFactoryBean"
+    <bean id="userSharingMgtOSGIServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.factory.UserSharingMgtOSGIServiceFactory"/>
-    <bean id="userInvitationManagerHolderBean"
+    <bean id="userSharingManagerHolderBean"
           class="org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.UserSharingMgtServiceHolder">
-        <property name="userSharingPolicyHandlerService" ref="userInvitationMgtOSGIServiceFactoryBean"/>
+        <property name="userSharingPolicyHandlerService" ref="userSharingMgtOSGIServiceFactoryBean"/>
     </bean>
 </beans>
