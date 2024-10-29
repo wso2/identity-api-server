@@ -42,7 +42,6 @@ public class AccessTokenConfiguration  {
     private Boolean validateTokenBinding;
     private List<String> accessTokenAttributes = null;
 
-    private Boolean accessTokenAttributesEnabled;
 
     /**
     **/
@@ -181,26 +180,7 @@ public class AccessTokenConfiguration  {
         return this;
     }
 
-        /**
-    * If enabled, the access token attributes will be included in the access token.
-    **/
-    public AccessTokenConfiguration accessTokenAttributesEnabled(Boolean accessTokenAttributesEnabled) {
-
-        this.accessTokenAttributesEnabled = accessTokenAttributesEnabled;
-        return this;
-    }
     
-    @ApiModelProperty(value = "If enabled, the access token attributes will be included in the access token.")
-    @JsonProperty("accessTokenAttributesEnabled")
-    @Valid
-    public Boolean getAccessTokenAttributesEnabled() {
-        return accessTokenAttributesEnabled;
-    }
-    public void setAccessTokenAttributesEnabled(Boolean accessTokenAttributesEnabled) {
-        this.accessTokenAttributesEnabled = accessTokenAttributesEnabled;
-    }
-
-
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -218,13 +198,12 @@ public class AccessTokenConfiguration  {
             Objects.equals(this.bindingType, accessTokenConfiguration.bindingType) &&
             Objects.equals(this.revokeTokensWhenIDPSessionTerminated, accessTokenConfiguration.revokeTokensWhenIDPSessionTerminated) &&
             Objects.equals(this.validateTokenBinding, accessTokenConfiguration.validateTokenBinding) &&
-            Objects.equals(this.accessTokenAttributes, accessTokenConfiguration.accessTokenAttributes) &&
-            Objects.equals(this.accessTokenAttributesEnabled, accessTokenConfiguration.accessTokenAttributesEnabled);
+            Objects.equals(this.accessTokenAttributes, accessTokenConfiguration.accessTokenAttributes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding, accessTokenAttributes, accessTokenAttributesEnabled);
+        return Objects.hash(type, userAccessTokenExpiryInSeconds, applicationAccessTokenExpiryInSeconds, bindingType, revokeTokensWhenIDPSessionTerminated, validateTokenBinding, accessTokenAttributes);
     }
 
     @Override
@@ -240,7 +219,6 @@ public class AccessTokenConfiguration  {
         sb.append("    revokeTokensWhenIDPSessionTerminated: ").append(toIndentedString(revokeTokensWhenIDPSessionTerminated)).append("\n");
         sb.append("    validateTokenBinding: ").append(toIndentedString(validateTokenBinding)).append("\n");
         sb.append("    accessTokenAttributes: ").append(toIndentedString(accessTokenAttributes)).append("\n");
-        sb.append("    accessTokenAttributesEnabled: ").append(toIndentedString(accessTokenAttributesEnabled)).append("\n");
         sb.append("}");
         return sb.toString();
     }
