@@ -23,12 +23,19 @@ import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.common.UserSharingMgtConstants;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBody;
+import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareRequestBodyOrganizations;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserShareWithAllRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedOrganizationsResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserSharedRolesResponse;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerServiceImpl;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserShareSelectiveDO;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
@@ -48,6 +55,42 @@ public class UsersApiServiceCore {
 
         UserSharingPolicyHandlerServiceImpl userSharingPolicyHandlerService = new UserSharingPolicyHandlerServiceImpl();
 
+        // Populate UserShareSelectiveDO object from the request body.
+        UserShareSelectiveDO userShareSelectiveDO = new UserShareSelectiveDO();
+
+        // Set user criteria.
+        Map<String, List<String>> userCriteria = new HashMap<>();
+        userCriteria.put("userIds", userShareRequestBody.getUserCriteria().getUserIds());
+        userShareSelectiveDO.setUserCriteria(userCriteria);
+
+        // Set organizations.
+        List<Map<String, Object>> organizationsList = new ArrayList<>();
+        for (UserShareRequestBodyOrganizations org : userShareRequestBody.getOrganizations()) {
+            Map<String, Object> orgDetails = new HashMap<>();
+            orgDetails.put("orgId", org.getOrgId());
+            orgDetails.put("policy", org.getPolicy().value());
+
+            List<Map<String, String>> rolesList = new ArrayList<>();
+            if (org.getRoles() != null) {
+                org.getRoles().forEach(role -> {
+                    Map<String, String> roleDetails = new HashMap<>();
+                    roleDetails.put("displayName", role.getDisplayName());
+                    roleDetails.put("audienceDisplay", role.getAudience().getDisplay());
+                    roleDetails.put("audienceType", role.getAudience().getType());
+                    rolesList.add(roleDetails);
+                });
+            }
+            orgDetails.put("roles", rolesList);
+
+            organizationsList.add(orgDetails);
+        }
+        userShareSelectiveDO.setOrganizations(organizationsList);
+
+        try {
+            userSharingPolicyHandlerService.propagateSelectiveShare(userShareSelectiveDO);
+        } catch (Exception e) {
+            // TODO: Handle exceptions in selective share API
+        }
     }
 
     /**
