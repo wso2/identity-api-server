@@ -621,6 +621,26 @@
                 <version>${org.wso2.carbon.identity.organization.management.version}</version>
                 <scope>provided</scope>
             </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.organization.user.sharing.management.common</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.server.api</groupId>
+                <artifactId>org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.organization.management</groupId>
+                <artifactId>org.wso2.carbon.identity.organization.management.organization.user.sharing</artifactId>
+                <version>${org.wso2.carbon.identity.organization.management.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
                 <artifactId>org.wso2.carbon.identity.api.server.organization.selfservice.common</artifactId>
@@ -839,7 +859,7 @@
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>1.4.52
+        <org.wso2.carbon.identity.organization.management.version>1.4.53-SNAPSHOT
         </org.wso2.carbon.identity.organization.management.version>
 
         <!-- Unit test versions -->
@@ -877,6 +897,7 @@
         <module>components/org.wso2.carbon.identity.api.idle.account.identification</module>
         <module>components/org.wso2.carbon.identity.api.expired.password.identification</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.user.invitation.management</module>
+        <module>components/org.wso2.carbon.identity.api.server.organization.user.sharing.management</module>
         <module>components/org.wso2.carbon.identity.api.server.api.resource</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.configs</module>
         <module>components/org.wso2.carbon.identity.api.server.organization.selfservice</module>
