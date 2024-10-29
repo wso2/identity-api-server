@@ -107,8 +107,7 @@ public class OAuthConsumerAppToApiModel implements Function<OAuthConsumerAppDTO,
                 .revokeTokensWhenIDPSessionTerminated(oAuthConsumerAppDTO
                         .isTokenRevocationWithIDPSessionTerminationEnabled())
                 .validateTokenBinding(oAuthConsumerAppDTO.isTokenBindingValidationEnabled())
-                .accessTokenAttributes(getAccessTokenAttributes(oAuthConsumerAppDTO))
-                .accessTokenAttributesEnabled(oAuthConsumerAppDTO.isAccessTokenClaimsSeparationEnabled());
+                .accessTokenAttributes(getAccessTokenAttributes(oAuthConsumerAppDTO));
     }
 
     private List<String> getAccessTokenAttributes(OAuthConsumerAppDTO oauthAppDTO) {
