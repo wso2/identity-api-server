@@ -230,7 +230,40 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Authenticator'
+                oneOf:
+                  - $ref: '#/components/schemas/Authenticator'
+                  - $ref: '#/components/schemas/UserDefinedAuthenticator'
+              examples:
+                UserDefinedAuthenticatorExample:
+                  summary: "Response for user defined authenticator"
+                  value:
+                    id: "Y3VzdG9tQXV0aGVudGljYXRvcg"
+                    name: "customAuthenticator"
+                    displayName: "Custom auth"
+                    definedBy: "SYSTEM"
+                    type: "LOCAL"
+                    isEnabled: true
+                    tags: [MFA]
+                    endpoint:
+                      uri: "https://abc.com/token"
+                      authentication:
+                        type: "BASIC"
+                        properties:
+                          username: "auth_username"
+                          password: "auth_password"
+                SystemDefinedAuthenticatorExample:
+                  summary: "Response for system defined authenticators"
+                  value:
+                    id: "QmFzaWNBdXRoZW50aWNhdG9y"
+                    name: "BasicAuthenticator"
+                    displayName: "basic"
+                    definedBy: "USER"
+                    type: "LOCAL"
+                    isEnabled: true
+                    tags: [Custom, 2FA]
+                    properties:
+                      - key: "somePropertyKey"
+                        value: "somePropertyValue"
         '400':
           description: Bad Request
           content:
@@ -1245,6 +1278,75 @@ components:
       required:
         - name
         - displayName
+    UserDefinedAuthenticator:
+      type: object
+      properties:
+        id:
+          type: string
+          example: Q3VzdG9tQXV0aGVudGljYXRvcg
+          readOnly: true
+        name:
+          type: string
+          example: customAuthenticator
+        displayName:
+          type: string
+          example: Custom auth
+        isEnabled:
+          type: boolean
+          default: true
+        definedBy:
+          type: string
+          enum:
+            - SYSTEM
+            - USER
+          readOnly: true
+        type:
+          type: string
+          enum:
+            - LOCAL
+            - REQUEST_PATH
+        tags:
+          type: array
+          items:
+            type: string
+          example: [2FA,MFA]
+          readOnly: true
+        endpoint:
+          type: array
+          items:
+            $ref: '#/components/schemas/Endpoint'
+      required:
+        - name
+        - displayName
+    Endpoint:
+      type: object
+      properties:
+        uri:
+          type: string
+          example: https://abc.com/token
+          pattern: '^https?://.+'
+        authentication:
+          $ref: '#/components/schemas/AuthenticationType'
+    AuthenticationType:
+      type: object
+      required:
+        - type
+        - properties
+      properties:
+        type:
+          type: string
+          enum:
+            - NONE
+            - BEARER
+            - API_KEY
+            - BASIC
+          example: BASIC
+        properties:
+          type: object
+          additionalProperties: true
+          example:
+            username: "auth_username"
+            password: "auth_password"
     AuthenticatorProperty:
       required:
         - key
