@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 1.0.1
+  version: 1.0.2
   title: 'User Share API Definition'
   description: |-
     This API provides organization administrators with the ability to manage user access across child organizations. It supports operations to share users with specific or all child organizations, retrieve shared access details, and remove shared access as needed. The API also includes features for paginated retrieval of organizations and roles associated with shared users.
@@ -14,7 +14,7 @@ info:
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/DinukaBimsaraBodaragama/user-sahred-access-API-4/1.0.1
+    url: https://virtserver.swaggerhub.com/DinukaBimsaraBodaragama/user-sahred-access-API-4/1.0.2
   - url: 'https://{server-url}/t/{tenant-domain}/api/server/v1'
     variables:
       tenant-domain:
@@ -45,14 +45,14 @@ paths:
                   - "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
               organizations:
                 - orgId: "b028ca17-8f89-449c-ae27-fa955e66465d"
-                  policy: "THIS_ORG_AND_ALL_CHILDREN_OF_THIS_ORG"
+                  policy: "SELECTED_ORG_ONLY"
                   roles:
                     - displayName: "role_2"
                       audience:
                         display: "My Org 1"
                         type: "organization"
                 - orgId: "a17b28ca-9f89-449c-ae27-fa955e66465f"
-                  policy: "THIS_ORG_ONLY"
+                  policy: "SELECTED_ORG_ONLY"
                   roles: []
         required: true
       responses:
@@ -95,7 +95,7 @@ paths:
                 userIds:
                   - "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
                   - "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
-              policy: "ALL_EXISTING_ORGS_AND_FUTURE_ORGS"
+              policy: "ALL_EXISTING_ORGS_ONLY"
               roles:
                 - displayName: "role_1"
                   audience:
@@ -373,7 +373,10 @@ components:
               policy:
                 type: string
                 description: The scope of sharing for this organization.
-                enum: ["THIS_ORG_ONLY", "THIS_ORG_AND_ALL_EXISTING_CHILDREN_OF_THIS_ORG", "THIS_ORG_AND_ALL_EXISTING_AND_FUTURE_CHILDREN"]
+                enum: ["SELECTED_ORG_ONLY", "SELECTED_ORG_WITH_ALL_EXISTING_CHILDREN_ONLY",
+                       "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN",
+                       "SELECTED_ORG_WITH_EXISTING_IMMEDIATE_CHILDREN_ONLY",
+                       "SELECTED_ORG_WITH_EXISTING_IMMEDIATE_AND_FUTURE_CHILDREN", "NO_ORG"]
               roles:
                 type: array
                 description: A list of roles to be shared with the organization.
@@ -386,14 +389,14 @@ components:
             - "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
         organizations:
           - orgId: "b028ca17-8f89-449c-ae27-fa955e66465d"
-            policy: "THIS_ORG_AND_ALL_CHILDREN_OF_THIS_ORG"
+            policy: "SELECTED_ORG_ONLY"
             roles:
               - displayName: "role_2"
                 audience:
                   display: "My Org 1"
                   type: "organization"
           - orgId: "a17b28ca-9f89-449c-ae27-fa955e66465f"
-            policy: "THIS_ORG_ONLY"
+            policy: "SELECTED_ORG_ONLY"
             roles: []
 
     UserShareWithAllRequestBody:
@@ -415,7 +418,7 @@ components:
         policy:
           type: string
           description: A policy to specify the sharing scope.
-          enum: ["ALL_EXISTING_ORGS", "ALL_EXISTING_ORGS_AND_FUTURE_ORGS", "ONLY_EXISTING_IMMEDIATE_ORGS", "ONLY_EXISTING_IMMEDIATE_ORGS_AND_FUTURE_IMMEDIATE_ORGS"]
+          enum: ["ALL_EXISTING_ORGS_ONLY", "ALL_EXISTING_AND_FUTURE_ORGS", "IMMEDIATE_EXISTING_ORGS_ONLY", "IMMEDIATE_EXISTING_AND_FUTURE_ORGS"]
         roles:
           type: array
           description: A list of roles shared across all organizations.
@@ -426,7 +429,7 @@ components:
           userIds:
             - "7a1b7d63-8cfc-4dc9-9332-3f84641b72d8"
             - "5d2a1c84-9f7a-43cd-b12e-6e52d7f87e16"
-        policy: "ALL_EXISTING_ORGS_AND_FUTURE_ORGS"
+        policy: "ALL_EXISTING_ORGS_ONLY"
         roles:
           - displayName: "role_1"
             audience:
@@ -492,12 +495,8 @@ components:
     UserSharedOrganizationsResponse:
       type: object
       description: |
-        Response listing organizations where a user has shared access, including sharing policies and pagination links for navigating results.
+        Response listing organizations where a user has shared access, including sharing policies, shared type and pagination links for navigating results.
       properties:
-        shareWithAllOrgs:
-          type: boolean
-          description: Flag to indicate if the user is shared with all organizations.
-          example: false
         links:
           type: array
           description: Pagination links for navigating the result set.
@@ -524,6 +523,10 @@ components:
                 type: string
                 description: Name of the child organization
                 example: "Organization Name"
+              sharedType:
+                type: string
+                description: Shared type of the user (pulled/pushed)
+                example: "Pushed"
               sharedUserId:
                 type: string
                 description: ID of the shared user
@@ -531,7 +534,9 @@ components:
               policy:
                 type: string
                 description: The scope of sharing for this organization.
-                enum: ["THIS_ORG_ONLY", "THIS_ORG_AND_ALL_CHILDREN_OF_THIS_ORG", "THIS_ORG_AND_ALL_EXISTING_AND_FUTURE_CHILDREN"]
+                enum: ["SELECTED_ORG_ONLY", "SELECTED_ORG_WITH_ALL_EXISTING_CHILDREN_ONLY",
+                       "SELECTED_ORG_WITH_ALL_EXISTING_AND_FUTURE_CHILDREN",
+                       "SELECTED_ORG_WITH_EXISTING_IMMEDIATE_CHILDREN_ONLY", "SELECTED_ORG_WITH_EXISTING_IMMEDIATE_AND_FUTURE_CHILDREN", "NO_ORG"]
               rolesRef:
                 type: string
                 description: URL reference to retrieve paginated roles for the shared user in this organization

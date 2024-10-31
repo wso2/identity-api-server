@@ -29,40 +29,20 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import javax.validation.constraints.*;
 
 /**
- * Response listing organizations where a user has shared access, including sharing policies and pagination links for navigating results. 
+ * Response listing organizations where a user has shared access, including sharing policies, shared type and pagination links for navigating results. 
  **/
 
 import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
-@ApiModel(description = "Response listing organizations where a user has shared access, including sharing policies and pagination links for navigating results. ")
+@ApiModel(description = "Response listing organizations where a user has shared access, including sharing policies, shared type and pagination links for navigating results. ")
 public class UserSharedOrganizationsResponse  {
   
-    private Boolean shareWithAllOrgs;
     private List<UserSharedOrganizationsResponseLinks> links = null;
 
     private List<UserSharedOrganizationsResponseSharedOrganizations> sharedOrganizations = null;
 
-
-    /**
-    * Flag to indicate if the user is shared with all organizations.
-    **/
-    public UserSharedOrganizationsResponse shareWithAllOrgs(Boolean shareWithAllOrgs) {
-
-        this.shareWithAllOrgs = shareWithAllOrgs;
-        return this;
-    }
-    
-    @ApiModelProperty(example = "false", value = "Flag to indicate if the user is shared with all organizations.")
-    @JsonProperty("shareWithAllOrgs")
-    @Valid
-    public Boolean getShareWithAllOrgs() {
-        return shareWithAllOrgs;
-    }
-    public void setShareWithAllOrgs(Boolean shareWithAllOrgs) {
-        this.shareWithAllOrgs = shareWithAllOrgs;
-    }
 
     /**
     * Pagination links for navigating the result set.
@@ -130,14 +110,13 @@ public class UserSharedOrganizationsResponse  {
             return false;
         }
         UserSharedOrganizationsResponse userSharedOrganizationsResponse = (UserSharedOrganizationsResponse) o;
-        return Objects.equals(this.shareWithAllOrgs, userSharedOrganizationsResponse.shareWithAllOrgs) &&
-            Objects.equals(this.links, userSharedOrganizationsResponse.links) &&
+        return Objects.equals(this.links, userSharedOrganizationsResponse.links) &&
             Objects.equals(this.sharedOrganizations, userSharedOrganizationsResponse.sharedOrganizations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(shareWithAllOrgs, links, sharedOrganizations);
+        return Objects.hash(links, sharedOrganizations);
     }
 
     @Override
@@ -146,7 +125,6 @@ public class UserSharedOrganizationsResponse  {
         StringBuilder sb = new StringBuilder();
         sb.append("class UserSharedOrganizationsResponse {\n");
         
-        sb.append("    shareWithAllOrgs: ").append(toIndentedString(shareWithAllOrgs)).append("\n");
         sb.append("    links: ").append(toIndentedString(links)).append("\n");
         sb.append("    sharedOrganizations: ").append(toIndentedString(sharedOrganizations)).append("\n");
         sb.append("}");
