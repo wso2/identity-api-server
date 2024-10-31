@@ -944,6 +944,7 @@ public class ServerClaimManagementService {
         externalClaimResDTO.setClaimDialectURI(externalClaim.getClaimDialectURI());
         externalClaimResDTO.setClaimURI(externalClaim.getClaimURI());
         externalClaimResDTO.setMappedLocalClaimURI(externalClaim.getMappedLocalClaim());
+        externalClaimResDTO.setProperties(mapToProperties(externalClaim.getClaimProperties()));
 
         return externalClaimResDTO;
     }

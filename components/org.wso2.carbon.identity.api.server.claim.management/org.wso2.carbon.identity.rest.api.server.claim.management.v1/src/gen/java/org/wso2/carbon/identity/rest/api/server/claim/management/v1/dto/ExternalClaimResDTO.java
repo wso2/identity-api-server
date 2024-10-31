@@ -23,6 +23,8 @@ import com.fasterxml.jackson.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
     /**
     * External claim response.
@@ -41,6 +43,9 @@ public class ExternalClaimResDTO extends ClaimResDTO {
 
     @Valid 
     private String mappedLocalClaimURI = null;
+
+    @Valid
+    private List<PropertyDTO> properties = new ArrayList<PropertyDTO>();
 
     /**
     * External claim ID.
@@ -90,6 +95,18 @@ public class ExternalClaimResDTO extends ClaimResDTO {
         this.mappedLocalClaimURI = mappedLocalClaimURI;
     }
 
+    /**
+     * Define any additional properties if required.
+     **/
+    @ApiModelProperty(value = "Define any additional properties if required.")
+    @JsonProperty("properties")
+    public List<PropertyDTO> getProperties() {
+        return properties;
+    }
+    public void setProperties(List<PropertyDTO> properties) {
+        this.properties = properties;
+    }
+
     @Override
     public String toString() {
 
@@ -101,6 +118,7 @@ public class ExternalClaimResDTO extends ClaimResDTO {
         sb.append("    claimURI: ").append(claimURI).append("\n");
         sb.append("    claimDialectURI: ").append(claimDialectURI).append("\n");
         sb.append("    mappedLocalClaimURI: ").append(mappedLocalClaimURI).append("\n");
+        sb.append("    properties: ").append(properties).append("\n");
         
         sb.append("}\n");
         return sb.toString();
