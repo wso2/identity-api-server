@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -99,7 +99,7 @@ public class OrganizationConfigsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Discovery" })
+    }, tags={ "Discovery", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful response.", response = Config.class),
         @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
@@ -110,6 +110,29 @@ public class OrganizationConfigsApi  {
     public Response getDiscoveryConfig() {
 
         return delegate.getDiscoveryConfig();
+    }
+
+    @Valid
+    @PUT
+    @Path("/discovery")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update organization discovery configuration.", notes = "This API provides the capability to update discovery configuration of the primary organization. <br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/update <br>   <b>Scope required:</b> <br>     * internal_config_mgt_update ", response = Config.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "Discovery" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful Response", response = Config.class),
+        @ApiResponse(code = 400, message = "Invalid input in the request.", response = Error.class),
+        @ApiResponse(code = 401, message = "Authentication information is missing or invalid.", response = Void.class),
+        @ApiResponse(code = 403, message = "Access forbidden.", response = Void.class),
+        @ApiResponse(code = 500, message = "Internal server error.", response = Error.class)
+    })
+    public Response updateDiscoveryConfig(@ApiParam(value = "" ) @Valid Config config) {
+
+        return delegate.updateDiscoveryConfig(config );
     }
 
 }
