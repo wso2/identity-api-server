@@ -31,8 +31,10 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerServiceImpl;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.RoleWithAudienceDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserShareGeneralDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserShareSelectiveDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserShareSelectiveOrgDetailsDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserUnshareGeneralDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserUnshareSelectiveDO;
 
@@ -68,30 +70,30 @@ public class UsersApiServiceCore {
         userShareSelectiveDO.setUserCriteria(userCriteria);
 
         // Set organizations.
-        List<Map<String, Object>> organizationsList = new ArrayList<>();
+        List<UserShareSelectiveOrgDetailsDO> organizationsList = new ArrayList<>();
         for (UserShareRequestBodyOrganizations org : userShareRequestBody.getOrganizations()) {
-            Map<String, Object> orgDetails = new HashMap<>();
-            orgDetails.put("orgId", org.getOrgId());
-            orgDetails.put("policy", org.getPolicy().value());
+            UserShareSelectiveOrgDetailsDO userShareSelectiveOrgDetailsDO = new UserShareSelectiveOrgDetailsDO();
+            userShareSelectiveOrgDetailsDO.setOrganizationId(org.getOrgId());
+            userShareSelectiveOrgDetailsDO.setPolicy(org.getPolicy().value());
 
-            List<Map<String, String>> rolesList = new ArrayList<>();
-            if (org.getRoles() != null) {
-                org.getRoles().forEach(role -> {
-                    Map<String, String> roleDetails = new HashMap<>();
-                    roleDetails.put("displayName", role.getDisplayName());
-                    roleDetails.put("audienceDisplay", role.getAudience().getDisplay());
-                    roleDetails.put("audienceType", role.getAudience().getType());
-                    rolesList.add(roleDetails);
-                });
+            List<RoleWithAudienceDO> roleWithAudiences = new ArrayList<>();
+
+            for(RoleWithAudience role : org.getRoles()) {
+                RoleWithAudienceDO roleWithAudienceDO = new RoleWithAudienceDO();
+                roleWithAudienceDO.setRoleName(role.getDisplayName());
+                roleWithAudienceDO.setAudienceName(role.getAudience().getDisplay());
+                roleWithAudienceDO.setAudienceType(role.getAudience().getType());
+                roleWithAudiences.add(roleWithAudienceDO);
             }
-            orgDetails.put("roles", rolesList);
 
-            organizationsList.add(orgDetails);
+            userShareSelectiveOrgDetailsDO.setRoles(roleWithAudiences);
+
+            organizationsList.add(userShareSelectiveOrgDetailsDO);
         }
         userShareSelectiveDO.setOrganizations(organizationsList);
 
         try {
-            userSharingPolicyHandlerService.propagateSelectiveShare(userShareSelectiveDO);
+            userSharingPolicyHandlerService.propagateUserSelectiveShare(userShareSelectiveDO);
         } catch (Exception e) {
             // TODO: Handle exceptions in selective share API
         }
@@ -118,20 +120,20 @@ public class UsersApiServiceCore {
         userShareGeneralDO.setPolicy(userShareWithAllRequestBody.getPolicy().value());
 
         // Set roles.
-        List<Map<String, String>> rolesList = new ArrayList<>();
+        List<RoleWithAudienceDO> rolesList = new ArrayList<>();
         if (userShareWithAllRequestBody.getRoles() != null) {
             for (RoleWithAudience role : userShareWithAllRequestBody.getRoles()) {
-                Map<String, String> roleDetails = new HashMap<>();
-                roleDetails.put("displayName", role.getDisplayName());
-                roleDetails.put("audienceDisplay", role.getAudience().getDisplay());
-                roleDetails.put("audienceType", role.getAudience().getType());
+                RoleWithAudienceDO roleDetails = new RoleWithAudienceDO();
+                roleDetails.setRoleName(role.getDisplayName());
+                roleDetails.setAudienceName(role.getAudience().getDisplay());
+                roleDetails.setAudienceType(role.getAudience().getType());
                 rolesList.add(roleDetails);
             }
         }
         userShareGeneralDO.setRoles(rolesList);
 
         try {
-            userSharingPolicyHandlerService.propagateGeneralShare(userShareGeneralDO);
+            userSharingPolicyHandlerService.propagateUserGeneralShare(userShareGeneralDO);
         } catch (Exception e) {
             // TODO: Handle exceptions in shareUserWithAll API
         }
@@ -158,7 +160,7 @@ public class UsersApiServiceCore {
         userUnshareSelectiveDO.setOrganizations(userUnshareRequestBody.getOrganizations());
 
         try {
-            userSharingPolicyHandlerService.propagateSelectiveUnshare(userUnshareSelectiveDO);
+            userSharingPolicyHandlerService.propagateUserSelectiveUnshare(userUnshareSelectiveDO);
         } catch (Exception e) {
             // TODO: Handle exceptions in unshareUser API
         }
@@ -182,7 +184,7 @@ public class UsersApiServiceCore {
         userUnshareGeneralDO.setUserCriteria(userCriteria);
 
         try {
-            userSharingPolicyHandlerService.propagateGeneralUnshare(userUnshareGeneralDO);
+            userSharingPolicyHandlerService.propagateUserGeneralUnshare(userUnshareGeneralDO);
         } catch (Exception e) {
             // TODO: Handle exceptions in unshareUserWithAll API
         }
