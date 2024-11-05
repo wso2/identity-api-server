@@ -138,6 +138,7 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
 import static org.wso2.carbon.identity.api.server.common.Constants.XML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Constants.YAML_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForBody;
+import static org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants.ErrorMessage.ERROR_CODE_NO_DELETE_SYSTEM_CLAIM;
 import static org.wso2.carbon.identity.organization.management.service.constant.OrganizationManagementConstants.ErrorMessages.ERROR_CODE_ORGANIZATION_NOT_FOUND_FOR_TENANT;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
@@ -157,6 +158,12 @@ public class ServerClaimManagementService {
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_CLAIM_DIALECT.getCode(),
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_EXTERNAL_CLAIM_URI.getCode(),
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_LOCAL_CLAIM_URI.getCode()
+    );
+
+    private static final List<String> forbiddenErrorScenarios = Arrays.asList(
+            ClaimConstants.ErrorMessage.ERROR_CODE_NO_RENAME_SYSTEM_DIALECT.getCode(),
+            ClaimConstants.ErrorMessage.ERROR_CODE_NO_DELETE_SYSTEM_DIALECT.getCode(),
+            ClaimConstants.ErrorMessage.ERROR_CODE_NO_DELETE_SYSTEM_CLAIM.getCode()
     );
 
     /**
@@ -1266,6 +1273,9 @@ public class ServerClaimManagementService {
             if (isConflictScenario(e.getErrorCode())) {
                 status = CONFLICT;
             }
+            if (isForbiddenScenario(e.getErrorCode())) {
+                status = FORBIDDEN;
+            }
             if (StringUtils.isNotBlank(e.getErrorCode()) &&
                     e.getErrorCode().contains(Constant.CLAIM_MANAGEMENT_PREFIX)) {
                 return handleClaimManagementClientError(e.getErrorCode(), e.getMessage(), status, data);
@@ -1286,6 +1296,11 @@ public class ServerClaimManagementService {
     private boolean isConflictScenario(String errorCode) {
 
         return !StringUtils.isBlank(errorCode) && conflictErrorScenarios.contains(errorCode);
+    }
+
+    private boolean isForbiddenScenario(String errorCode) {
+
+        return !StringUtils.isBlank(errorCode) && forbiddenErrorScenarios.contains(errorCode);
     }
 
     private APIError handleClaimManagementClientError(Constant.ErrorMessage errorEnum, Response.Status status) {
