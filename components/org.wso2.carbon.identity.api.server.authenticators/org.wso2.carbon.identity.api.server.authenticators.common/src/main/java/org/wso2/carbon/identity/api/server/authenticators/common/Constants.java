@@ -70,6 +70,9 @@ public class Constants {
                 "Filter needs to be in the format <attribute>+<operation>+<value>. Eg: tag+eq+2FA"),
         ERROR_CODE_UNSUPPORTED_FILTER_ATTRIBUTE("60002", "Unsupported filter attribute.",
                 "The filter attribute '%s' is not supported."),
+        ERROR_CODE_ENDPOINT_CONFIG("60003", "Unsupported filter attribute.",
+                "The filter attribute '%s' is not supported."),
+
         ERROR_CODE_ERROR_LISTING_AUTHENTICATORS("65001", "Unable to list the existing authenticators.",
                 "Server encountered an error while listing the authenticators."),
         ERROR_CODE_ERROR_LISTING_IDPS("65002", "Unable to list the existing identity providers.",
