@@ -34,6 +34,8 @@ import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchContext;
+import org.wso2.carbon.identity.action.management.model.AuthProperty;
+import org.wso2.carbon.identity.action.management.model.EndpointConfig;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.FileContent;
 import org.wso2.carbon.identity.api.server.common.Util;
@@ -43,11 +45,13 @@ import org.wso2.carbon.identity.api.server.idp.common.Constants;
 import org.wso2.carbon.identity.api.server.idp.common.IdentityProviderServiceHolder;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationResponse;
+import org.wso2.carbon.identity.api.server.idp.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claim;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApp;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApps;
+import org.wso2.carbon.identity.api.server.idp.v1.model.Endpoint;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticator;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
@@ -93,6 +97,8 @@ import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.ProvisioningConnectorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.SubProperty;
+import org.wso2.carbon.identity.application.common.model.UserDefinedAuthenticatorEndpointConfig;
+import org.wso2.carbon.identity.application.common.model.UserDefinedFederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
 import org.wso2.carbon.identity.claim.metadata.mgt.exception.ClaimMetadataException;
@@ -2842,17 +2848,30 @@ public class ServerIdpManagementService {
                                                                             FederatedAuthenticatorPUTRequest
                                                                                     authenticator) {
 
-        FederatedAuthenticatorConfig authConfig = new FederatedAuthenticatorConfig();
         String authenticatorName = base64URLDecode(federatedAuthenticatorId);
+        FederatedAuthenticatorConfig authConfig;
+        DefinedByType definedByType = null;
+        if (authenticator.getDefinedBy() != null) {
+            definedByType = authenticator.getDefinedBy().toString();
+        }
+        definedByType = resolveDefinedByType(authenticatorName, definedByType.toString(), false);
+        if (definedByType == DefinedByType.SYSTEM) {
+            authConfig = createSystemDefinedFederatedAuthenticator(authenticator, authenticatorName);
+        } else {
+            authConfig = createUserDefinedFederatedAuthenticator(authenticator);
+        }
         authConfig.setName(authenticatorName);
         authConfig.setDisplayName(getDisplayNameOfAuthenticator(authenticatorName));
         authConfig.setEnabled(authenticator.getIsEnabled());
 
-        String definedByType = null;
-        if (authenticator.getDefinedBy() != null) {
-            definedByType = authenticator.getDefinedBy().toString();
-        }
-        authConfig.setDefinedByType(resolveDefinedByType(authenticatorName, definedByType, false));
+        return authConfig;
+    }
+
+    private FederatedAuthenticatorConfig createSystemDefinedFederatedAuthenticator(
+            FederatedAuthenticatorPUTRequest authenticator, String authenticatorName) {
+
+        FederatedAuthenticatorConfig authConfig = new FederatedAuthenticatorConfig();
+        authConfig.setDefinedByType(DefinedByType.SYSTEM);
 
         List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> authProperties = authenticator.getProperties();
         if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authenticatorName)) {
@@ -2864,7 +2883,24 @@ public class ServerIdpManagementService {
         }
         List<Property> properties = authProperties.stream().map(propertyToInternal).collect(Collectors.toList());
         authConfig.setProperties(properties.toArray(new Property[0]));
+
         return authConfig;
+    }
+
+    private UserDefinedFederatedAuthenticatorConfig createUserDefinedFederatedAuthenticator(
+            FederatedAuthenticatorPUTRequest authenticator) {
+
+        UserDefinedFederatedAuthenticatorConfig userDefinedAuthConfig = new UserDefinedFederatedAuthenticatorConfig();
+        userDefinedAuthConfig.setDefinedByType(DefinedByType.USER);
+
+        UserDefinedAuthenticatorEndpointConfig.UserDefinedAuthenticatorEndpointConfigBuilder endpointConfigBuilder =
+                new UserDefinedAuthenticatorEndpointConfig.UserDefinedAuthenticatorEndpointConfigBuilder();
+        endpointConfigBuilder.uri(authenticator.getEndpoint().getUri());
+        endpointConfigBuilder.authenticationType(authenticator.getEndpoint().getAuthentication().getType().toString());
+        endpointConfigBuilder.authenticationProperties(authenticator.getEndpoint().getAuthentication().getProperties()
+                .entrySet().stream().collect(Collectors.toMap(
+                        Map.Entry::getKey, entry -> entry.getValue().toString())));
+        return userDefinedAuthConfig;
     }
 
     private DefinedByType resolveDefinedByType(
@@ -3046,7 +3082,7 @@ public class ServerIdpManagementService {
      * @return FederatedAuthenticator.
      */
     private FederatedAuthenticator createFederatedAuthenticator(String authenticatorId,
-                                                                IdentityProvider identityProvider) {
+                   IdentityProvider identityProvider) throws IdentityProviderManagementServerException {
 
         FederatedAuthenticatorConfig[] authConfigs = identityProvider.getFederatedAuthenticatorConfigs();
         if (ArrayUtils.isEmpty(authConfigs)) {
@@ -3070,8 +3106,6 @@ public class ServerIdpManagementService {
             federatedAuthenticator.setName(config.getName());
             federatedAuthenticator.setIsEnabled(config.isEnabled());
             federatedAuthenticator.setIsDefault(isDefaultAuthenticator);
-            federatedAuthenticator.setDefinedBy(FederatedAuthenticator.DefinedByEnum.valueOf(
-                    config.getDefinedByType().toString()));
             FederatedAuthenticatorConfig federatedAuthenticatorConfig =
                     ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
                             config.getName());
@@ -3081,11 +3115,46 @@ public class ServerIdpManagementService {
                     federatedAuthenticator.setTags(Arrays.asList(tags));
                 }
             }
-            List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties =
-                    Arrays.stream(config.getProperties()).map(propertyToExternal).collect(Collectors.toList());
-            federatedAuthenticator.setProperties(properties);
+
+            if (DefinedByType.SYSTEM == config.getDefinedByType()) {
+                federatedAuthenticator.setDefinedBy(FederatedAuthenticator.DefinedByEnum.SYSTEM);
+                List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties =
+                        Arrays.stream(config.getProperties()).map(propertyToExternal).collect(Collectors.toList());
+                federatedAuthenticator.setProperties(properties);
+            } else {
+                federatedAuthenticator.setDefinedBy(FederatedAuthenticator.DefinedByEnum.USER);
+                resolveEndpointConfiguration(federatedAuthenticator, config);
+            }
+
         }
         return federatedAuthenticator;
+    }
+
+    private void resolveEndpointConfiguration(FederatedAuthenticator authenticator,
+                        FederatedAuthenticatorConfig config) throws IdentityProviderManagementServerException {
+
+        try {
+            UserDefinedFederatedAuthenticatorConfig userDefinedConfig =
+                    (UserDefinedFederatedAuthenticatorConfig) config;
+            EndpointConfig endpointConfig = userDefinedConfig.getEndpointConfig().getEndpointConfig();
+
+            AuthenticationType authenticationType = new AuthenticationType();
+            authenticationType.setType(AuthenticationType.TypeEnum.fromValue(endpointConfig
+                    .getAuthentication().getType().toString()));
+            Map<String, Object> authenticatorProperties = new HashMap<>();
+            for (AuthProperty prop: endpointConfig.getAuthentication().getProperties()) {
+                authenticatorProperties.put(prop.getName(), prop.getValue());
+            }
+            authenticationType.setProperties(authenticatorProperties);
+
+            Endpoint endpoint = new Endpoint();
+            endpoint.setAuthentication(authenticationType);
+            endpoint.setUri(userDefinedConfig.getEndpointConfig().getEndpointConfig().getUri());
+            authenticator.setEndpoint(endpoint);
+        } catch (ClassCastException e) {
+            throw new IdentityProviderManagementServerException("Error occurred while resolving endpoint " +
+                    "configuration of the authenticator.", e);
+        }
     }
 
     /**
