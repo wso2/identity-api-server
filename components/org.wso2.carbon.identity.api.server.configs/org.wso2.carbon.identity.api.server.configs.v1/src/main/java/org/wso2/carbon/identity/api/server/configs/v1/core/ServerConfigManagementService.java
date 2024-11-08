@@ -822,8 +822,9 @@ public class ServerConfigManagementService {
             endpoint.setUri(endpointConfig.getAuthenticatorEndpointUri());
             authenticator.addEndpointItem(endpoint);
         } catch (ClassCastException e) {
-            throw new IdentityApplicationManagementServerException("Error occurred while resolving endpoint " +
-                    "configuration of the authenticator.", e);
+            throw new IdentityApplicationManagementServerException(String.format("For authenticator: %s of " +
+                    "definedBy: USER,  the authenticator config must be an instance of " +
+                    "UserDefinedAuthenticatorEndpointConfig", config.getName()) , e);
         }
     }
 
