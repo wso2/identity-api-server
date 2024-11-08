@@ -786,15 +786,15 @@ public class ServerConfigManagementService {
             authenticator.setDefinedBy(Authenticator.DefinedByEnum.SYSTEM);
         } else {
             authenticator.setType(Authenticator.TypeEnum.LOCAL);
-            if (AuthenticatorPropertyConstants.DefinedByType.SYSTEM == config.getDefinedByType()) {
+            if (AuthenticatorPropertyConstants.DefinedByType.USER == config.getDefinedByType()) {
+                authenticator.setDefinedBy(Authenticator.DefinedByEnum.USER);
+                resolveEndpointConfiguration(authenticator, config);
+            } else {
                 authenticator.setDefinedBy(Authenticator.DefinedByEnum.SYSTEM);
                 List<AuthenticatorProperty> authenticatorProperties =
                         Arrays.stream(config.getProperties()).map(propertyToExternal)
                                 .collect(Collectors.toList());
                 authenticator.setProperties(authenticatorProperties);
-            } else {
-                authenticator.setDefinedBy(Authenticator.DefinedByEnum.USER);
-                resolveEndpointConfiguration(authenticator, config);
             }
         }
         String[] tags = config.getTags();
