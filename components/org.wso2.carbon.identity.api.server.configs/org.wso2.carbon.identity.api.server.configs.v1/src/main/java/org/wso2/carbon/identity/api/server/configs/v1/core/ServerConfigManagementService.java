@@ -29,8 +29,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
-import org.wso2.carbon.identity.action.management.model.AuthProperty;
-import org.wso2.carbon.identity.action.management.model.EndpointConfig;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
@@ -78,6 +76,7 @@ import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfi
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.UserDefinedAuthenticatorEndpointConfig;
 import org.wso2.carbon.identity.application.common.model.UserDefinedLocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationManagementUtil;
@@ -810,20 +809,17 @@ public class ServerConfigManagementService {
 
         try {
             UserDefinedLocalAuthenticatorConfig userDefinedConfig = (UserDefinedLocalAuthenticatorConfig) config;
-            EndpointConfig endpointConfig = userDefinedConfig.getEndpointConfig().getEndpointConfig();
+            UserDefinedAuthenticatorEndpointConfig endpointConfig = userDefinedConfig.getEndpointConfig();
 
             AuthenticationType authenticationType = new AuthenticationType();
-            authenticationType.setType(AuthenticationType.TypeEnum.fromValue(endpointConfig
-                    .getAuthentication().getType().toString()));
-            Map<String, Object> authenticatorProperties = new HashMap<>();
-            for (AuthProperty prop: endpointConfig.getAuthentication().getProperties()) {
-                authenticatorProperties.put(prop.getName(), prop.getValue());
-            }
-            authenticationType.setProperties(authenticatorProperties);
+            authenticationType.setType(AuthenticationType.TypeEnum.fromValue(
+                    endpointConfig.getAuthenticatorEndpointAuthenticationType()));
+            authenticationType.setProperties(new HashMap<>(
+                    endpointConfig.getAuthenticatorEndpointAuthenticationProperties()));
 
             Endpoint endpoint = new Endpoint();
             endpoint.setAuthentication(authenticationType);
-            endpoint.setUri(userDefinedConfig.getEndpointConfig().getEndpointConfig().getUri());
+            endpoint.setUri(endpointConfig.getAuthenticatorEndpointUri());
             authenticator.addEndpointItem(endpoint);
         } catch (ClassCastException e) {
             throw new IdentityApplicationManagementServerException("Error occurred while resolving endpoint " +
