@@ -44,9 +44,11 @@ public class Endpoint  {
         return this;
     }
     
-    @ApiModelProperty(example = "https://abc.com/token", value = "")
+    @ApiModelProperty(example = "https://abc.com/token", required = true, value = "")
     @JsonProperty("uri")
-    @Valid @Pattern(regexp="^https?://.+")
+    @Valid
+    @NotNull(message = "Property uri cannot be null.")
+ @Pattern(regexp="^https?://.+")
     public String getUri() {
         return uri;
     }
@@ -62,9 +64,11 @@ public class Endpoint  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(required = true, value = "")
     @JsonProperty("authentication")
     @Valid
+    @NotNull(message = "Property authentication cannot be null.")
+
     public AuthenticationType getAuthentication() {
         return authentication;
     }
