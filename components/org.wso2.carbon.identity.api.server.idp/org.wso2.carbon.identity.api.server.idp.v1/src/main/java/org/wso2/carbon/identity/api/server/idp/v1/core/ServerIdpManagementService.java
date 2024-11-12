@@ -1699,6 +1699,7 @@ public class ServerIdpManagementService {
         String authenticatorId = base64URLEncode(authenticatorConfig.getName());
         metaFederatedAuthenticator.setName(authenticatorConfig.getName());
         metaFederatedAuthenticator.setAuthenticatorId(authenticatorId);
+        metaFederatedAuthenticator.setDefinedBy(MetaFederatedAuthenticatorListItem.DefinedByEnum.SYSTEM);
         FederatedAuthenticatorConfig federatedAuthenticatorConfig = ApplicationAuthenticatorService.getInstance()
                 .getFederatedAuthenticatorByName(authenticatorConfig.getName());
         if (federatedAuthenticatorConfig != null) {
@@ -1727,6 +1728,7 @@ public class ServerIdpManagementService {
                 metaFederatedAuthenticator.setTags(Arrays.asList(tags));
             }
         }
+        metaFederatedAuthenticator.setDefinedBy(MetaFederatedAuthenticator.DefinedByEnum.SYSTEM);
         Property[] properties = authenticatorConfig.getProperties();
         List<MetaProperty> metaProperties = Arrays.stream(properties).map(propertyToExternalMeta).collect(Collectors
                 .toList());

@@ -2824,8 +2824,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MetaProperty'
-        endpoint:
-          $ref: '#/components/schemas/Endpoint'
     FederatedAuthenticatorRequest:
       type: object
       required:

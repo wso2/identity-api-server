@@ -22,7 +22,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.wso2.carbon.identity.api.server.idp.v1.model.Endpoint;
 import org.wso2.carbon.identity.api.server.idp.v1.model.MetaProperty;
 import javax.validation.constraints.*;
 
@@ -75,7 +74,6 @@ public enum DefinedByEnum {
 
     private List<MetaProperty> properties = null;
 
-    private Endpoint endpoint;
 
     /**
     **/
@@ -201,25 +199,7 @@ public enum DefinedByEnum {
         return this;
     }
 
-        /**
-    **/
-    public MetaFederatedAuthenticator endpoint(Endpoint endpoint) {
-
-        this.endpoint = endpoint;
-        return this;
-    }
     
-    @ApiModelProperty(value = "")
-    @JsonProperty("endpoint")
-    @Valid
-    public Endpoint getEndpoint() {
-        return endpoint;
-    }
-    public void setEndpoint(Endpoint endpoint) {
-        this.endpoint = endpoint;
-    }
-
-
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -236,13 +216,12 @@ public enum DefinedByEnum {
             Objects.equals(this.displayName, metaFederatedAuthenticator.displayName) &&
             Objects.equals(this.definedBy, metaFederatedAuthenticator.definedBy) &&
             Objects.equals(this.tags, metaFederatedAuthenticator.tags) &&
-            Objects.equals(this.properties, metaFederatedAuthenticator.properties) &&
-            Objects.equals(this.endpoint, metaFederatedAuthenticator.endpoint);
+            Objects.equals(this.properties, metaFederatedAuthenticator.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, displayName, definedBy, tags, properties, endpoint);
+        return Objects.hash(authenticatorId, name, displayName, definedBy, tags, properties);
     }
 
     @Override
@@ -257,7 +236,6 @@ public enum DefinedByEnum {
         sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
-        sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("}");
         return sb.toString();
     }
