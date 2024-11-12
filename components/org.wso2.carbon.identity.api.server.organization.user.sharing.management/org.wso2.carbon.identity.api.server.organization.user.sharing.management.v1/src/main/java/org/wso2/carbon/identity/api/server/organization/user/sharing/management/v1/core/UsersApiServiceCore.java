@@ -37,6 +37,8 @@ import org.wso2.carbon.identity.organization.management.organization.user.sharin
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserShareSelectiveOrgDetailsDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserUnshareGeneralDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserUnshareSelectiveDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.userCriteria.UserCriteriaType;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.userCriteria.UserIds;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,8 +67,9 @@ public class UsersApiServiceCore {
         UserShareSelectiveDO userShareSelectiveDO = new UserShareSelectiveDO();
 
         // Set user criteria.
-        Map<String, List<String>> userCriteria = new HashMap<>();
-        userCriteria.put("userIds", userShareRequestBody.getUserCriteria().getUserIds());
+        Map<String, UserCriteriaType> userCriteria = new HashMap<>();
+        UserCriteriaType userIds = new UserIds(userShareRequestBody.getUserCriteria().getUserIds());
+        userCriteria.put("userIds", userIds);
         userShareSelectiveDO.setUserCriteria(userCriteria);
 
         // Set organizations.
@@ -112,8 +115,9 @@ public class UsersApiServiceCore {
         UserShareGeneralDO userShareGeneralDO = new UserShareGeneralDO();
 
         // Set user criteria.
-        Map<String, List<String>> userCriteria = new HashMap<>();
-        userCriteria.put("userIds", userShareWithAllRequestBody.getUserCriteria().getUserIds());
+        Map<String, UserCriteriaType> userCriteria = new HashMap<>();
+        UserCriteriaType userIds = new UserIds(userShareWithAllRequestBody.getUserCriteria().getUserIds());
+        userCriteria.put("userIds", userIds);
         userShareGeneralDO.setUserCriteria(userCriteria);
 
         // Set policy.
