@@ -31,6 +31,7 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerServiceImpl;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.constant.PolicyEnum;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.RoleWithAudienceDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserShareGeneralDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.UserShareSelectiveDO;
@@ -77,7 +78,7 @@ public class UsersApiServiceCore {
         for (UserShareRequestBodyOrganizations org : userShareRequestBody.getOrganizations()) {
             UserShareSelectiveOrgDetailsDO userShareSelectiveOrgDetailsDO = new UserShareSelectiveOrgDetailsDO();
             userShareSelectiveOrgDetailsDO.setOrganizationId(org.getOrgId());
-            userShareSelectiveOrgDetailsDO.setPolicy(org.getPolicy().value());
+            userShareSelectiveOrgDetailsDO.setPolicy(PolicyEnum.getPolicyByValue(org.getPolicy().value()));
 
             List<RoleWithAudienceDO> roleWithAudiences = new ArrayList<>();
 
@@ -121,7 +122,7 @@ public class UsersApiServiceCore {
         userShareGeneralDO.setUserCriteria(userCriteria);
 
         // Set policy.
-        userShareGeneralDO.setPolicy(userShareWithAllRequestBody.getPolicy().value());
+        userShareGeneralDO.setPolicy(PolicyEnum.getPolicyByValue(userShareWithAllRequestBody.getPolicy().value()));
 
         // Set roles.
         List<RoleWithAudienceDO> rolesList = new ArrayList<>();
