@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.util;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,12 +44,14 @@ public class AuthorizationDetailsTypeMgtUtil {
 
     private static final Log log = LogFactory.getLog(AuthorizationDetailsTypeMgtUtil.class);
 
-    public static List<AuthorizationDetailsTypesGetModel> toAuthorizationDetailsGetModelsList(
+    public static List<AuthorizationDetailsTypesGetModel> toAuthorizationDetailsGetModels(
             final List<AuthorizationDetailsType> authorizationDetailsTypes) {
 
-        return CollectionUtils.isEmpty(authorizationDetailsTypes) ? Collections.emptyList() :
-                authorizationDetailsTypes.stream().map(AuthorizationDetailsTypeMgtUtil::toAuthorizationDetailsGetModel)
-                        .collect(Collectors.toList());
+        if (authorizationDetailsTypes == null) {
+            return Collections.emptyList();
+        }
+        return authorizationDetailsTypes.stream().map(AuthorizationDetailsTypeMgtUtil::toAuthorizationDetailsGetModel)
+                .collect(Collectors.toList());
     }
 
     public static AuthorizationDetailsTypesGetModel toAuthorizationDetailsGetModel(
@@ -103,7 +104,7 @@ public class AuthorizationDetailsTypeMgtUtil {
     private static boolean isValidSchema(Map<String, Object> schema) throws APIResourceMgtClientException {
 
         if (MapUtils.isEmpty(schema)) {
-            throwAPIResourceMgtClientException("Schema is empty");
+            throwAPIResourceMgtClientException("Authorization details schema cannot be empty.");
         }
 
         try {
@@ -111,7 +112,7 @@ public class AuthorizationDetailsTypeMgtUtil {
                 return true;
             }
 
-            throwAPIResourceMgtClientException("Invalid schema");
+            throwAPIResourceMgtClientException("Invalid authorization details schema received.");
         } catch (AuthorizationDetailsProcessingException e) {
             log.debug(ERROR_CODE_INVALID_AUTHORIZATION_DETAILS_SCHEMA.getMessage(), e);
             throwAPIResourceMgtClientException(e.getMessage());

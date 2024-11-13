@@ -2100,9 +2100,11 @@ public class ServerApplicationManagementService {
 
     private void validateAPIResourceAuthorizationDetailsTypes(APIResource apiResource, List<String> requestedTypes) {
 
-        if (apiResource == null || CollectionUtils.isEmpty(apiResource.getAuthorizationDetailsTypes())) {
+        if (apiResource == null || CollectionUtils.isEmpty(apiResource.getAuthorizationDetailsTypes())
+                || CollectionUtils.isEmpty(requestedTypes)) {
             return;
         }
+
         final Set<String> existingTypes = apiResource.getAuthorizationDetailsTypes().stream()
                 .map(AuthorizationDetailsType::getType)
                 .collect(Collectors.toSet());
