@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedAuthorizationDetailsTypes;
 import org.wso2.carbon.identity.api.server.application.management.v1.AuthorizedScope;
 import javax.validation.constraints.*;
 
@@ -41,6 +42,8 @@ public class AuthorizedAPIResponse  {
     private String policyId;
     private String type;
     private List<AuthorizedScope> authorizedScopes = null;
+
+    private List<AuthorizedAuthorizationDetailsTypes> authorizedAuthorizationDetailsTypes = null;
 
 
     /**
@@ -159,6 +162,32 @@ public class AuthorizedAPIResponse  {
         return this;
     }
 
+        /**
+    **/
+    public AuthorizedAPIResponse authorizedAuthorizationDetailsTypes(List<AuthorizedAuthorizationDetailsTypes> authorizedAuthorizationDetailsTypes) {
+
+        this.authorizedAuthorizationDetailsTypes = authorizedAuthorizationDetailsTypes;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("authorizedAuthorizationDetailsTypes")
+    @Valid
+    public List<AuthorizedAuthorizationDetailsTypes> getAuthorizedAuthorizationDetailsTypes() {
+        return authorizedAuthorizationDetailsTypes;
+    }
+    public void setAuthorizedAuthorizationDetailsTypes(List<AuthorizedAuthorizationDetailsTypes> authorizedAuthorizationDetailsTypes) {
+        this.authorizedAuthorizationDetailsTypes = authorizedAuthorizationDetailsTypes;
+    }
+
+    public AuthorizedAPIResponse addAuthorizedAuthorizationDetailsTypesItem(AuthorizedAuthorizationDetailsTypes authorizedAuthorizationDetailsTypesItem) {
+        if (this.authorizedAuthorizationDetailsTypes == null) {
+            this.authorizedAuthorizationDetailsTypes = new ArrayList<>();
+        }
+        this.authorizedAuthorizationDetailsTypes.add(authorizedAuthorizationDetailsTypesItem);
+        return this;
+    }
+
     
 
     @Override
@@ -176,12 +205,13 @@ public class AuthorizedAPIResponse  {
             Objects.equals(this.displayName, authorizedAPIResponse.displayName) &&
             Objects.equals(this.policyId, authorizedAPIResponse.policyId) &&
             Objects.equals(this.type, authorizedAPIResponse.type) &&
-            Objects.equals(this.authorizedScopes, authorizedAPIResponse.authorizedScopes);
+            Objects.equals(this.authorizedScopes, authorizedAPIResponse.authorizedScopes) &&
+            Objects.equals(this.authorizedAuthorizationDetailsTypes, authorizedAPIResponse.authorizedAuthorizationDetailsTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, identifier, displayName, policyId, type, authorizedScopes);
+        return Objects.hash(id, identifier, displayName, policyId, type, authorizedScopes, authorizedAuthorizationDetailsTypes);
     }
 
     @Override
@@ -196,6 +226,7 @@ public class AuthorizedAPIResponse  {
         sb.append("    policyId: ").append(toIndentedString(policyId)).append("\n");
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    authorizedScopes: ").append(toIndentedString(authorizedScopes)).append("\n");
+        sb.append("    authorizedAuthorizationDetailsTypes: ").append(toIndentedString(authorizedAuthorizationDetailsTypes)).append("\n");
         sb.append("}");
         return sb.toString();
     }

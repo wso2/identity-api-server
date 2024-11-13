@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+  ~ Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
   ~
   ~ WSO2 LLC. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
@@ -25,12 +25,15 @@
     <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.impl.ApiResourcesApiServiceImpl"/>
     <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.impl.MetaApiServiceImpl"/>
     <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.impl.ScopesApiServiceImpl"/>
+    <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.impl.AuthorizationDetailsTypesApiServiceImpl"/>
+    <bean class="org.wso2.carbon.identity.api.server.api.resource.v1.core.AuthorizationDetailsTypeManagementService"/>
 
     <bean id="apiResourceManagementServiceHolderBean"
           class="org.wso2.carbon.identity.api.server.api.resource.common.APIResourceManagementServiceHolder">
         <property name="apiResourceManager" ref="apiResourceManagementServiceFactoryBean"/>
         <property name="oAuthAdminServiceImpl" ref="oAuthAdminOSGiServiceFactoryBean"/>
         <property name="apiResourceCollectionManager" ref="apiResourceCollectionManagementServiceFactoryBean"/>
+        <property name="authorizationDetailsTypeManager" ref="authorizationDetailsTypeMgtOSGiServiceFactoryBean"/>
     </bean>
 
     <bean id="apiResourceManagementServiceFactoryBean"
@@ -41,4 +44,7 @@
 
     <bean id="apiResourceCollectionManagementServiceFactoryBean"
           class="org.wso2.carbon.identity.api.server.api.resource.common.factory.APIResourceCollectionMgtOSGiServiceFactory"/>
+
+    <bean id="authorizationDetailsTypeMgtOSGiServiceFactoryBean"
+          class="org.wso2.carbon.identity.api.server.api.resource.common.factory.AuthorizationDetailsTypeMgtOSGiServiceFactory"/>
 </beans>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.api.resource.v1.AuthorizationDetailsTypesGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.Property;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopeGetModel;
 import org.wso2.carbon.identity.api.server.api.resource.v1.SubscribedApplicationGetModel;
@@ -44,6 +45,8 @@ public class APIResourceResponse  {
     private String type;
     private Boolean requiresAuthorization;
     private List<ScopeGetModel> scopes = null;
+
+    private List<AuthorizationDetailsTypesGetModel> authorizationDetailsTypes = null;
 
     private List<SubscribedApplicationGetModel> subscribedApplications = null;
 
@@ -193,6 +196,32 @@ public class APIResourceResponse  {
 
         /**
     **/
+    public APIResourceResponse authorizationDetailsTypes(List<AuthorizationDetailsTypesGetModel> authorizationDetailsTypes) {
+
+        this.authorizationDetailsTypes = authorizationDetailsTypes;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("authorizationDetailsTypes")
+    @Valid
+    public List<AuthorizationDetailsTypesGetModel> getAuthorizationDetailsTypes() {
+        return authorizationDetailsTypes;
+    }
+    public void setAuthorizationDetailsTypes(List<AuthorizationDetailsTypesGetModel> authorizationDetailsTypes) {
+        this.authorizationDetailsTypes = authorizationDetailsTypes;
+    }
+
+    public APIResourceResponse addAuthorizationDetailsTypesItem(AuthorizationDetailsTypesGetModel authorizationDetailsTypesItem) {
+        if (this.authorizationDetailsTypes == null) {
+            this.authorizationDetailsTypes = new ArrayList<AuthorizationDetailsTypesGetModel>();
+        }
+        this.authorizationDetailsTypes.add(authorizationDetailsTypesItem);
+        return this;
+    }
+
+        /**
+    **/
     public APIResourceResponse subscribedApplications(List<SubscribedApplicationGetModel> subscribedApplications) {
 
         this.subscribedApplications = subscribedApplications;
@@ -282,6 +311,7 @@ public class APIResourceResponse  {
             Objects.equals(this.type, apIResourceResponse.type) &&
             Objects.equals(this.requiresAuthorization, apIResourceResponse.requiresAuthorization) &&
             Objects.equals(this.scopes, apIResourceResponse.scopes) &&
+            Objects.equals(this.authorizationDetailsTypes, apIResourceResponse.authorizationDetailsTypes) &&
             Objects.equals(this.subscribedApplications, apIResourceResponse.subscribedApplications) &&
             Objects.equals(this.properties, apIResourceResponse.properties) &&
             Objects.equals(this.self, apIResourceResponse.self);
@@ -289,7 +319,7 @@ public class APIResourceResponse  {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, identifier, type, requiresAuthorization, scopes, subscribedApplications, properties, self);
+        return Objects.hash(id, name, description, identifier, type, requiresAuthorization, scopes, authorizationDetailsTypes, subscribedApplications, properties, self);
     }
 
     @Override
@@ -305,6 +335,7 @@ public class APIResourceResponse  {
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    requiresAuthorization: ").append(toIndentedString(requiresAuthorization)).append("\n");
         sb.append("    scopes: ").append(toIndentedString(scopes)).append("\n");
+        sb.append("    authorizationDetailsTypes: ").append(toIndentedString(authorizationDetailsTypes)).append("\n");
         sb.append("    subscribedApplications: ").append(toIndentedString(subscribedApplications)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("    self: ").append(toIndentedString(self)).append("\n");
