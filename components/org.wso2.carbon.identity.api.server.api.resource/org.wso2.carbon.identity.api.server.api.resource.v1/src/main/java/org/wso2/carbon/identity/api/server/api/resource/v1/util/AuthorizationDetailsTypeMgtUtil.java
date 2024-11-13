@@ -44,6 +44,12 @@ public class AuthorizationDetailsTypeMgtUtil {
 
     private static final Log log = LogFactory.getLog(AuthorizationDetailsTypeMgtUtil.class);
 
+    /**
+     * Converts a list of {@link AuthorizationDetailsType} to a list of {@link AuthorizationDetailsTypesGetModel}.
+     *
+     * @param authorizationDetailsTypes The list of {@link AuthorizationDetailsType} objects to convert.
+     * @return A list of {@link AuthorizationDetailsTypesGetModel} objects, or an empty list if the input is null.
+     */
     public static List<AuthorizationDetailsTypesGetModel> toAuthorizationDetailsGetModels(
             final List<AuthorizationDetailsType> authorizationDetailsTypes) {
 
@@ -54,6 +60,12 @@ public class AuthorizationDetailsTypeMgtUtil {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Converts a {@link AuthorizationDetailsType} to a {@link AuthorizationDetailsTypesGetModel}.
+     *
+     * @param authorizationDetailsType The {@link AuthorizationDetailsType} object to convert.
+     * @return A {@link AuthorizationDetailsTypesGetModel} object.
+     */
     public static AuthorizationDetailsTypesGetModel toAuthorizationDetailsGetModel(
             final AuthorizationDetailsType authorizationDetailsType) {
 
@@ -65,7 +77,13 @@ public class AuthorizationDetailsTypeMgtUtil {
                 .schema(authorizationDetailsType.getSchema());
     }
 
-    public static List<AuthorizationDetailsType> toAuthorizationDetailsTypesList(
+    /**
+     * Converts a list of {@link AuthorizationDetailsTypesCreationModel} to a list of {@link AuthorizationDetailsType}.
+     *
+     * @param creationModels The list of {@link AuthorizationDetailsTypesCreationModel} objects to convert.
+     * @return A list of {@link AuthorizationDetailsType} objects, or an empty list if the input is null.
+     */
+    public static List<AuthorizationDetailsType> toAuthorizationDetailsTypes(
             final List<AuthorizationDetailsTypesCreationModel> creationModels) throws APIResourceMgtClientException {
 
         if (creationModels == null) {
@@ -79,6 +97,12 @@ public class AuthorizationDetailsTypeMgtUtil {
         return authorizationDetailsTypes;
     }
 
+    /**
+     * Converts a {@link AuthorizationDetailsTypesCreationModel} to a {@link AuthorizationDetailsType}.
+     *
+     * @param creationModel The {@link AuthorizationDetailsTypesCreationModel} object to convert.
+     * @return A {@link AuthorizationDetailsType} object.
+     */
     public static AuthorizationDetailsType toAuthorizationDetailsType(
             final AuthorizationDetailsTypesCreationModel creationModel) throws APIResourceMgtClientException {
 
@@ -91,6 +115,22 @@ public class AuthorizationDetailsTypeMgtUtil {
             authorizationDetailsType.setSchema(creationModel.getSchema());
         }
 
+        return authorizationDetailsType;
+    }
+
+    /**
+     * Converts a {@link AuthorizationDetailsTypesCreationModel} to a {@link AuthorizationDetailsType}.
+     *
+     * @param authorizationDetailsTypeId The authorization details type ID.
+     * @param creationModel              The {@link AuthorizationDetailsTypesCreationModel} object to convert.
+     * @return A {@link AuthorizationDetailsType} object.
+     */
+    public static AuthorizationDetailsType toAuthorizationDetailsType(
+            String authorizationDetailsTypeId, AuthorizationDetailsTypesCreationModel creationModel)
+            throws APIResourceMgtClientException {
+
+        final AuthorizationDetailsType authorizationDetailsType = toAuthorizationDetailsType(creationModel);
+        authorizationDetailsType.setId(authorizationDetailsTypeId);
         return authorizationDetailsType;
     }
 
@@ -120,20 +160,15 @@ public class AuthorizationDetailsTypeMgtUtil {
         return false;
     }
 
-    public static AuthorizationDetailsType toAuthorizationDetailsType(
-            String authorizationDetailsTypeId, AuthorizationDetailsTypesCreationModel creationModel)
-            throws APIResourceMgtClientException {
-
-        final AuthorizationDetailsType authorizationDetailsType = toAuthorizationDetailsType(creationModel);
-        authorizationDetailsType.setId(authorizationDetailsTypeId);
-        return authorizationDetailsType;
-    }
-
     private static void throwAPIResourceMgtClientException(final String message) throws APIResourceMgtClientException {
 
         throw new APIResourceMgtClientException(
                 ERROR_CODE_INVALID_AUTHORIZATION_DETAILS_SCHEMA.getMessage(),
                 String.format(ERROR_CODE_INVALID_AUTHORIZATION_DETAILS_SCHEMA.getDescription(), message),
                 ERROR_CODE_INVALID_AUTHORIZATION_DETAILS_SCHEMA.getCode());
+    }
+
+    private AuthorizationDetailsTypeMgtUtil() {
+        // Adding a private constructor to hide the implicit public one.
     }
 }

@@ -61,7 +61,7 @@ import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIR
 import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.DEFAULT_LIMIT;
 import static org.wso2.carbon.identity.api.server.api.resource.v1.constants.APIResourceMgtEndpointConstants.DESC_SORT_ORDER;
 import static org.wso2.carbon.identity.api.server.api.resource.v1.util.AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsGetModels;
-import static org.wso2.carbon.identity.api.server.api.resource.v1.util.AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsTypesList;
+import static org.wso2.carbon.identity.api.server.api.resource.v1.util.AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsTypes;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 
 /**
@@ -254,7 +254,7 @@ public class ServerAPIResourceManagementService {
             APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager()
                     .replaceAuthorizationDetailsTypes(apiResourceID,
                             apiResourcePatchModel.getRemovedAuthorizationDetailsTypes(),
-                            toAuthorizationDetailsTypesList(apiResourcePatchModel.getAddedAuthorizationDetailsTypes()),
+                            toAuthorizationDetailsTypes(apiResourcePatchModel.getAddedAuthorizationDetailsTypes()),
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain()
                     );
         } catch (APIResourceMgtException e) {
@@ -491,7 +491,7 @@ public class ServerAPIResourceManagementService {
                 .requiresAuthorization(apIResourceCreationModel.getRequiresAuthorization() != null ?
                         apIResourceCreationModel.getRequiresAuthorization() : true)
                 .authorizationDetailsTypes(
-                        toAuthorizationDetailsTypesList(apIResourceCreationModel.getAuthorizationDetailsTypes()))
+                        toAuthorizationDetailsTypes(apIResourceCreationModel.getAuthorizationDetailsTypes()))
                 .type(APIResourceMgtEndpointConstants.BUSINESS_API_RESOURCE_TYPE);
         return apiResourceBuilder.build();
     }

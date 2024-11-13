@@ -45,6 +45,13 @@ public class AuthorizationDetailsTypeManagementService {
 
     private static final Log LOG = LogFactory.getLog(AuthorizationDetailsTypeManagementService.class);
 
+    /**
+     * Adds a list of authorization details types to a specified API resource.
+     *
+     * @param apiResourceId  The ID of the API resource.
+     * @param creationModels List of models containing the authorization details types to be added.
+     * @return A list of added {@link AuthorizationDetailsType} instances.
+     */
     public List<AuthorizationDetailsType> addAuthorizationDetailsTypes(
             final String apiResourceId, final List<AuthorizationDetailsTypesCreationModel> creationModels) {
 
@@ -57,7 +64,7 @@ public class AuthorizationDetailsTypeManagementService {
 
             return APIResourceManagementServiceHolder.getAuthorizationDetailsTypeManager().addAuthorizationDetailsTypes(
                     apiResourceId,
-                    AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsTypesList(creationModels),
+                    AuthorizationDetailsTypeMgtUtil.toAuthorizationDetailsTypes(creationModels),
                     getThreadLocalCarbonContext().getTenantDomain()
             );
         } catch (APIResourceMgtException e) {
@@ -65,6 +72,12 @@ public class AuthorizationDetailsTypeManagementService {
         }
     }
 
+    /**
+     * Deletes a specific authorization details type by its ID for a given API resource ID.
+     *
+     * @param apiResourceId              The ID of the API resource.
+     * @param authorizationDetailsTypeId The ID of the authorization details type to be deleted.
+     */
     public void deleteAuthorizationDetailsTypeById(String apiResourceId, String authorizationDetailsTypeId) {
 
         if (LOG.isDebugEnabled()) {
@@ -83,6 +96,13 @@ public class AuthorizationDetailsTypeManagementService {
         }
     }
 
+    /**
+     * Retrieves a specific authorization details type by its ID for a given API resource ID.
+     *
+     * @param apiResourceId              The ID of the API resource.
+     * @param authorizationDetailsTypeId The ID of the authorization details type to retrieve.
+     * @return An {@link AuthorizationDetailsTypesGetModel} containing the authorization details type.
+     */
     public AuthorizationDetailsTypesGetModel getAuthorizationDetailsTypeById(String apiResourceId,
                                                                              String authorizationDetailsTypeId) {
 
@@ -111,6 +131,12 @@ public class AuthorizationDetailsTypeManagementService {
         }
     }
 
+    /**
+     * Retrieves a list of authorization details types by a given API resource ID.
+     *
+     * @param apiResourceId The ID of the API resource.
+     * @return A list of {@link AuthorizationDetailsTypesGetModel} containing the authorization details types.
+     */
     public List<AuthorizationDetailsTypesGetModel> getAuthorizationDetailsTypes(String apiResourceId) {
 
         if (LOG.isDebugEnabled()) {
@@ -131,6 +157,13 @@ public class AuthorizationDetailsTypeManagementService {
         }
     }
 
+    /**
+     * Updates the authorization details type for a specified API resource.
+     *
+     * @param apiResourceId              The ID of the API resource.
+     * @param authorizationDetailsTypeId The ID of the authorization details type to update.
+     * @param creationModel              The authorization details types to be updated.
+     */
     public void updateAuthorizationDetailsTypes(String apiResourceId, String authorizationDetailsTypeId,
                                                 AuthorizationDetailsTypesCreationModel creationModel) {
 
@@ -159,6 +192,13 @@ public class AuthorizationDetailsTypeManagementService {
         }
     }
 
+    /**
+     * Checks if the specified authorization details type exists for a given type ID and API resource ID.
+     *
+     * @param apiResourceId              The ID of the API resource.
+     * @param authorizationDetailsTypeId The ID of the authorization details type to check.
+     * @return {@code true} if the authorization details type exists, {@code false} otherwise.
+     */
     public boolean isAuthorizationDetailsTypeIdExists(String apiResourceId, String authorizationDetailsTypeId) {
 
         try {
@@ -173,6 +213,12 @@ public class AuthorizationDetailsTypeManagementService {
         }
     }
 
+    /**
+     * Checks if an authorization details type exists based on a filter.
+     *
+     * @param filter The filter string to match authorization details types.
+     * @return {@code true} if at least one authorization details type matches the filter, {@code false} otherwise.
+     */
     public boolean isAuthorizationDetailsTypeExists(String filter) {
 
         if (LOG.isDebugEnabled()) {
@@ -189,6 +235,12 @@ public class AuthorizationDetailsTypeManagementService {
         }
     }
 
+    /**
+     * Retrieves all authorization details types that match a specific filter.
+     *
+     * @param filter The filter string to retrieve matching authorization details types.
+     * @return A list of {@link AuthorizationDetailsTypesGetModel} objects that match the filter.
+     */
     public List<AuthorizationDetailsTypesGetModel> getAllAuthorizationDetailsTypes(final String filter) {
 
         if (LOG.isDebugEnabled()) {
