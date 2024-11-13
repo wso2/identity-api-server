@@ -146,6 +146,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -1775,15 +1776,15 @@ public class ServerIdpManagementService {
             List<FederatedAuthenticatorConfig> fedAuthConfigs = new ArrayList<>();
             for (FederatedAuthenticator authenticator : federatedAuthenticators) {
                 String authenticatorName = getDecodedAuthenticatorName(authenticator.getAuthenticatorId());
-                String definedByType;
+                DefinedByType definedByType;
                 if (isNewFederatedAuthenticator) {
-                    definedByType = resolveDefinedByTypeForCreateFederatedAuthenticator(
-                            authenticator.getDefinedBy().toString()).toString();
+                    definedByType = resolveDefinedByTypeToCreateFederatedAuthenticator(
+                            authenticator.getDefinedBy());
                 } else {
-                    definedByType = resolveDefinedByTypeForUpdateFederatedAuthenticator(authenticatorName).toString();
+                    definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName);
                 }
 
-                if (DefinedByType.SYSTEM.toString().equals(definedByType)) {
+                if (DefinedByType.SYSTEM == definedByType) {
                     validateAuthenticatorProperties(authenticatorName, authenticator.getProperties());
                 }
 
@@ -1794,8 +1795,9 @@ public class ServerIdpManagementService {
                 builder.enabled(authenticator.getIsEnabled());
                 builder.displayName(getDisplayNameOfAuthenticator(authenticatorName));
                 builder.endpoint(authenticator.getEndpoint());
-                List<Property> properties = authenticator.getProperties().stream().map(propertyToInternal)
-                        .collect(Collectors.toList());
+                List<Property> properties = Optional.ofNullable(authenticator.getProperties())
+                        .map(props -> props.stream().map(propertyToInternal).collect(Collectors.toList()))
+                        .orElse(null);
                 builder.properties(properties);
                 FederatedAuthenticatorConfig authConfig = builder.build();
 
@@ -2701,6 +2703,12 @@ public class ServerIdpManagementService {
 
         Gson gson = new Gson();
         IdentityProvider clonedIdentityProvider = gson.fromJson(gson.toJson(idP), IdentityProvider.class);
+        if (idP.getFederatedAuthenticatorConfigs().length == 1 &&
+                idP.getFederatedAuthenticatorConfigs()[0].getDefinedByType() == DefinedByType.USER) {
+            UserDefinedFederatedAuthenticatorConfig clonedFedAuth = gson.fromJson(gson.toJson(
+                    idP.getFederatedAuthenticatorConfigs()[0]), UserDefinedFederatedAuthenticatorConfig.class);
+            clonedIdentityProvider.setFederatedAuthenticatorConfigs(new FederatedAuthenticatorConfig[]{clonedFedAuth});
+        }
         return clonedIdentityProvider;
     }
 
@@ -2848,8 +2856,8 @@ public class ServerIdpManagementService {
                   FederatedAuthenticatorPUTRequest authenticator) throws IdentityProviderManagementClientException {
 
         String authenticatorName = getDecodedAuthenticatorName(federatedAuthenticatorId);
-        String definedByType = resolveDefinedByTypeForUpdateFederatedAuthenticator(authenticatorName).toString();
-        if (DefinedByType.SYSTEM.toString().equals(definedByType)) {
+        DefinedByType definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName);
+        if (DefinedByType.SYSTEM == definedByType) {
             validateAuthenticatorProperties(authenticatorName, authenticator.getProperties());
         }
 
@@ -2860,24 +2868,26 @@ public class ServerIdpManagementService {
         builder.enabled(authenticator.getIsEnabled());
         builder.displayName(getDisplayNameOfAuthenticator(authenticatorName));
         builder.endpoint(authenticator.getEndpoint());
-        List<Property> properties = authenticator.getProperties().stream().map(propertyToInternal)
-                .collect(Collectors.toList());
+        List<Property> properties = Optional.ofNullable(authenticator.getProperties())
+                .map(props -> props.stream().map(propertyToInternal).collect(Collectors.toList()))
+                .orElse(null);
         builder.properties(properties);
 
         return builder.build();
     }
 
-    private DefinedByType resolveDefinedByTypeForCreateFederatedAuthenticator(String definedByType) {
+    private DefinedByType resolveDefinedByTypeToCreateFederatedAuthenticator(
+            FederatedAuthenticator.DefinedByEnum definedByType) {
 
         /* For new federated authenticators:
          If 'definedByType' is not null, use the value provided in the request payload. If not, default to SYSTEM. */
         if (definedByType != null) {
-            return DefinedByType.valueOf(definedByType);
+            return DefinedByType.valueOf(definedByType.toString());
         }
         return DefinedByType.SYSTEM;
     }
 
-    private DefinedByType resolveDefinedByTypeForUpdateFederatedAuthenticator(String authenticatorName) {
+    private DefinedByType resolveDefinedByTypeToUpdateFederatedAuthenticator(String authenticatorName) {
 
         /* For existing federated authenticators, disregard any value provided in the request payload.
          Instead, resolve and retrieve the 'definedBy' type of the corresponding existing authenticator.
@@ -3897,6 +3907,10 @@ public class ServerIdpManagementService {
     private void validateAuthenticatorProperties(String authenticatorName,
             List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties)
             throws IdentityProviderManagementClientException {
+
+        if (properties == null) {
+            return;
+        }
 
         if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authenticatorName)) {
             validateSamlMetadata(properties);

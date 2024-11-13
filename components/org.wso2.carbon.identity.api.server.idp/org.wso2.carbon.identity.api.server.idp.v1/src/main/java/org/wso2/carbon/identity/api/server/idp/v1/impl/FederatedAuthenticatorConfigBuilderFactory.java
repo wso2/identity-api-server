@@ -20,7 +20,6 @@ package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
 import org.wso2.carbon.identity.api.server.idp.common.Constants;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Endpoint;
-import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.UserDefinedAuthenticatorEndpointConfig;
@@ -42,7 +41,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             throws IdentityProviderManagementClientException {
 
         FederatedAuthenticatorConfig config;
-        if (DefinedByType.SYSTEM.toString().equals(builder.definedByType)) {
+        if (DefinedByType.SYSTEM == builder.definedByType) {
             config = createSystemDefinedFederatedAuthenticator(builder);
         } else {
             config = createUserDefinedFederatedAuthenticator(builder);
@@ -74,14 +73,6 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             throw new IdentityProviderManagementClientException(error.getCode(), String.format(error.getDescription(),
                     builder.authenticatorName));
         }
-
-        // Check if there is an authenticator registered in the system for the given authenticator ID.
-        if (ApplicationAuthenticatorService.getInstance()
-                .getFederatedAuthenticatorByName(builder.authenticatorName) == null) {
-            Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_NO_SYSTEM_AUTHENTICATOR_FOUND;
-            throw new IdentityProviderManagementClientException(error.getCode(),
-                    String.format(error.getDescription(), builder.authenticatorName));
-        }
     }
 
     private static UserDefinedFederatedAuthenticatorConfig createUserDefinedFederatedAuthenticator(Builder builder)
@@ -106,7 +97,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             throws IdentityProviderManagementClientException {
 
         // The User-defined authenticator configs must not have properties configurations; throw an error if they do.
-        if (builder.properties == null || !builder.properties.isEmpty()) {
+        if (builder.properties != null) {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_PROPERTIES_PROVIDED_FOR_USER_AUTH;
             throw new IdentityProviderManagementClientException(error.getCode(),
                     String.format(error.getDescription(), builder.authenticatorName));
@@ -124,14 +115,14 @@ public class FederatedAuthenticatorConfigBuilderFactory {
      * Builder class to build FederatedAuthenticatorConfig.
      */
     public static class Builder {
-        private String definedByType;
+        private DefinedByType definedByType;
         private String authenticatorName;
         private String displayName;
         private Endpoint endpoint;
         private List<Property> properties;
         private Boolean isEnabled;
 
-        public Builder definedByType(String definedByType) {
+        public Builder definedByType(DefinedByType definedByType) {
 
             this.definedByType = definedByType;
             return this;
