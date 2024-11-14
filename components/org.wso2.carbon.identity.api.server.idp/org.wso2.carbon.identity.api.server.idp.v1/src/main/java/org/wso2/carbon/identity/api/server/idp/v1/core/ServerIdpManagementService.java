@@ -44,13 +44,11 @@ import org.wso2.carbon.identity.api.server.idp.common.IdentityProviderServiceHol
 import org.wso2.carbon.identity.api.server.idp.v1.impl.FederatedAuthenticatorConfigBuilderFactory;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationRequest;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AssociationResponse;
-import org.wso2.carbon.identity.api.server.idp.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Certificate;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claim;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Claims;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApp;
 import org.wso2.carbon.identity.api.server.idp.v1.model.ConnectedApps;
-import org.wso2.carbon.identity.api.server.idp.v1.model.Endpoint;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticator;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListResponse;
@@ -96,7 +94,6 @@ import org.wso2.carbon.identity.application.common.model.Property;
 import org.wso2.carbon.identity.application.common.model.ProvisioningConnectorConfig;
 import org.wso2.carbon.identity.application.common.model.RoleMapping;
 import org.wso2.carbon.identity.application.common.model.SubProperty;
-import org.wso2.carbon.identity.application.common.model.UserDefinedAuthenticatorEndpointConfig;
 import org.wso2.carbon.identity.application.common.model.UserDefinedFederatedAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.util.IdentityApplicationConstants;
 import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
@@ -146,7 +143,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -1783,23 +1779,8 @@ public class ServerIdpManagementService {
                 } else {
                     definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName);
                 }
-
-                if (DefinedByType.SYSTEM == definedByType) {
-                    validateAuthenticatorProperties(authenticatorName, authenticator.getProperties());
-                }
-
-                FederatedAuthenticatorConfigBuilderFactory.Builder builder =
-                        new FederatedAuthenticatorConfigBuilderFactory.Builder();
-                builder.authenticatorName(authenticatorName);
-                builder.definedByType(definedByType);
-                builder.enabled(authenticator.getIsEnabled());
-                builder.displayName(getDisplayNameOfAuthenticator(authenticatorName));
-                builder.endpoint(authenticator.getEndpoint());
-                List<Property> properties = Optional.ofNullable(authenticator.getProperties())
-                        .map(props -> props.stream().map(propertyToInternal).collect(Collectors.toList()))
-                        .orElse(null);
-                builder.properties(properties);
-                FederatedAuthenticatorConfig authConfig = builder.build();
+                FederatedAuthenticatorConfig authConfig = FederatedAuthenticatorConfigBuilderFactory.build(
+                        authenticator, authenticatorName, definedByType);
 
                 fedAuthConfigs.add(authConfig);
 
@@ -1815,30 +1796,6 @@ public class ServerIdpManagementService {
             idp.setFederatedAuthenticatorConfigs(fedAuthConfigs.toArray(new FederatedAuthenticatorConfig[0]));
             idp.setDefaultAuthenticatorConfig(defaultAuthConfig);
         }
-    }
-
-    /**
-     * Returns the 'DisplayName' property of the federated authenticator identified by authenticator name.
-     *
-     * @param authenticatorName Federated authenticator name.
-     * @return Display name of authenticator.
-     */
-    private String getDisplayNameOfAuthenticator(String authenticatorName) {
-
-        try {
-            FederatedAuthenticatorConfig[] authenticatorConfigs =
-                    IdentityProviderServiceHolder.getIdentityProviderManager()
-                            .getAllFederatedAuthenticators();
-            for (FederatedAuthenticatorConfig config : authenticatorConfigs) {
-
-                if (StringUtils.equals(config.getName(), authenticatorName)) {
-                    return config.getDisplayName();
-                }
-            }
-        } catch (IdentityProviderManagementException e) {
-            throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP, null);
-        }
-        return null;
     }
 
     private void updateOutboundConnectorConfig(IdentityProvider idp,
@@ -2857,23 +2814,8 @@ public class ServerIdpManagementService {
 
         String authenticatorName = getDecodedAuthenticatorName(federatedAuthenticatorId);
         DefinedByType definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName);
-        if (DefinedByType.SYSTEM == definedByType) {
-            validateAuthenticatorProperties(authenticatorName, authenticator.getProperties());
-        }
 
-        FederatedAuthenticatorConfigBuilderFactory.Builder builder = new FederatedAuthenticatorConfigBuilderFactory
-                .Builder();
-        builder.authenticatorName(authenticatorName);
-        builder.definedByType(definedByType);
-        builder.enabled(authenticator.getIsEnabled());
-        builder.displayName(getDisplayNameOfAuthenticator(authenticatorName));
-        builder.endpoint(authenticator.getEndpoint());
-        List<Property> properties = Optional.ofNullable(authenticator.getProperties())
-                .map(props -> props.stream().map(propertyToInternal).collect(Collectors.toList()))
-                .orElse(null);
-        builder.properties(properties);
-
-        return builder.build();
+        return FederatedAuthenticatorConfigBuilderFactory.build(authenticator, authenticatorName, definedByType);
     }
 
     private DefinedByType resolveDefinedByTypeToCreateFederatedAuthenticator(
@@ -2899,105 +2841,6 @@ public class ServerIdpManagementService {
             return DefinedByType.valueOf(authenticatorConfig.getDefinedByType().toString());
         }
         return DefinedByType.USER;
-    }
-
-    /**
-     * Verify if scopes have not been set in both Scopes field and Additional Query Parameters field
-     *
-     * @param oidcAuthenticatorProperties Authenticator properties of OIDC authenticator.
-     */
-    private void validateDuplicateOpenIDConnectScopes(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
-                                                              oidcAuthenticatorProperties) {
-
-        if (oidcAuthenticatorProperties != null) {
-            boolean scopesFieldFilled = false;
-            boolean queryParamsScopesFilled = false;
-            for (org.wso2.carbon.identity.api.server.idp.v1
-                    .model.Property oidcAuthenticatorProperty : oidcAuthenticatorProperties) {
-                if (IdentityApplicationConstants.Authenticator.OIDC.SCOPES.equals(oidcAuthenticatorProperty.getKey()) &&
-                        StringUtils.isNotBlank(oidcAuthenticatorProperty.getValue())) {
-                    scopesFieldFilled = true;
-                }
-                if (IdentityApplicationConstants.Authenticator.OIDC.QUERY_PARAMS.equals
-                        (oidcAuthenticatorProperty.getKey())
-                        && oidcAuthenticatorProperty.getValue().contains("scope=")) {
-                    queryParamsScopesFilled = true;
-                }
-            }
-            if (scopesFieldFilled && queryParamsScopesFilled) {
-                throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                        .ERROR_CODE_DUPLICATE_OIDC_SCOPES, null);
-            }
-        }
-    }
-
-    /**
-     * Verify if scopes contain `openid`.
-     *
-     * @param oidcAuthenticatorProperties Authenticator properties of OIDC authenticator.
-     */
-    private void validateDefaultOpenIDConnectScopes(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
-                                                            oidcAuthenticatorProperties) {
-
-        if (oidcAuthenticatorProperties != null) {
-            for (org.wso2.carbon.identity.api.server.idp.v1
-                    .model.Property oidcAuthenticatorProperty : oidcAuthenticatorProperties) {
-                if (IdentityApplicationConstants.Authenticator.OIDC.SCOPES.equals(oidcAuthenticatorProperty.getKey())) {
-                    String scopes = oidcAuthenticatorProperty.getValue();
-                    if (StringUtils.isNotBlank(scopes) && !scopes.contains("openid")) {
-                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                                .ERROR_CODE_INVALID_OIDC_SCOPES, null);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * If selectMode property is set as saml metadata file configuration mode, this function validates whether a
-     * valid base-64 encoded SAML metadata file content is provided with the property key 'meta_data_saml'. If found,
-     * it will decode the file content and update the value of 'meta_data_saml' property with decoded content.
-     *
-     * @param samlAuthenticatorProperties Authenticator properties of SAML authenticator.
-     */
-    private void validateSamlMetadata(List<org.wso2.carbon.identity.api.server.idp.v1.model.Property>
-                                              samlAuthenticatorProperties) {
-
-        if (samlAuthenticatorProperties != null) {
-            for (org.wso2.carbon.identity.api.server.idp.v1.model.Property property : samlAuthenticatorProperties) {
-
-                if (Constants.SELECT_MODE.equals(property.getKey()) &&
-                        Constants.SELECT_MODE_METADATA.equals(property.getValue())) {
-                    // SAML metadata file configuration has been selected. Hence we need to validate whether valid SAML
-                    // metadata (property with key = 'meta_data_saml') is sent.
-
-                    boolean validMetadataFound = false;
-                    String encodedData = null;
-                    int positionOfMetadataKey = -1;
-
-                    for (int i = 0; i < samlAuthenticatorProperties.size(); i++) {
-                        if (Constants.META_DATA_SAML.equals(samlAuthenticatorProperties.get(i).getKey()) &&
-                                StringUtils.isNotBlank
-                                        (samlAuthenticatorProperties.get(i).getValue())) {
-                            validMetadataFound = true;
-                            encodedData = samlAuthenticatorProperties.get(i).getValue();
-                            positionOfMetadataKey = i;
-                        }
-                    }
-                    if (validMetadataFound) {
-                        String metadata = base64Decode(encodedData);
-                        // Add decoded data to property list.
-                        org.wso2.carbon.identity.api.server.idp.v1.model.Property metadataProperty =
-                                samlAuthenticatorProperties.get(positionOfMetadataKey);
-                        metadataProperty.setValue(metadata);
-                        samlAuthenticatorProperties.set(positionOfMetadataKey, metadataProperty);
-                    } else {
-                        throw handleException(Response.Status.BAD_REQUEST, Constants.ErrorMessage
-                                .ERROR_CODE_INVALID_SAML_METADATA, null);
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -3076,53 +2919,11 @@ public class ServerIdpManagementService {
         }
         FederatedAuthenticator federatedAuthenticator = new FederatedAuthenticator();
         if (config != null) {
+            federatedAuthenticator = FederatedAuthenticatorConfigBuilderFactory.build(config);
             federatedAuthenticator.setAuthenticatorId(authenticatorId);
-            federatedAuthenticator.setName(config.getName());
-            federatedAuthenticator.setIsEnabled(config.isEnabled());
             federatedAuthenticator.setIsDefault(isDefaultAuthenticator);
-            FederatedAuthenticatorConfig federatedAuthenticatorConfig =
-                    ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
-                            config.getName());
-            if (federatedAuthenticatorConfig != null) {
-                String[] tags = federatedAuthenticatorConfig.getTags();
-                if (ArrayUtils.isNotEmpty(tags)) {
-                    federatedAuthenticator.setTags(Arrays.asList(tags));
-                }
-            }
-
-            if (DefinedByType.SYSTEM == config.getDefinedByType()) {
-                federatedAuthenticator.setDefinedBy(FederatedAuthenticator.DefinedByEnum.SYSTEM);
-                List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties =
-                        Arrays.stream(config.getProperties()).map(propertyToExternal).collect(Collectors.toList());
-                federatedAuthenticator.setProperties(properties);
-            } else {
-                federatedAuthenticator.setDefinedBy(FederatedAuthenticator.DefinedByEnum.USER);
-                resolveEndpointConfiguration(federatedAuthenticator, config);
-            }
-
         }
         return federatedAuthenticator;
-    }
-
-    private void resolveEndpointConfiguration(FederatedAuthenticator authenticator,
-                        FederatedAuthenticatorConfig config) throws IdentityProviderManagementServerException {
-
-        try {
-            UserDefinedFederatedAuthenticatorConfig userDefinedConfig =
-                    (UserDefinedFederatedAuthenticatorConfig) config;
-            UserDefinedAuthenticatorEndpointConfig endpointConfig = userDefinedConfig.getEndpointConfig();
-
-            AuthenticationType authenticationType = new AuthenticationType();
-            authenticationType.setType(AuthenticationType.TypeEnum.fromValue(endpointConfig.getEndpointConfig()
-                    .getAuthentication().getType().toString()));
-
-            Endpoint endpoint = new Endpoint();
-            endpoint.setUri(endpointConfig.getEndpointConfig().getUri());
-            authenticator.setEndpoint(endpoint);
-        } catch (ClassCastException e) {
-            throw new IdentityProviderManagementServerException(String.format("Error occurred while resolving" +
-                    " endpoint configuration of the authenticator %s.", authenticator.getName()), e);
-        }
     }
 
     /**
@@ -3901,28 +3702,6 @@ public class ServerIdpManagementService {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_NON_DECODABLE_AUTH_ID;
             throw new IdentityProviderManagementClientException(error.getCode(),
                     String.format(error.getDescription(), authId));
-        }
-    }
-
-    private void validateAuthenticatorProperties(String authenticatorName,
-            List<org.wso2.carbon.identity.api.server.idp.v1.model.Property> properties)
-            throws IdentityProviderManagementClientException {
-
-        if (properties == null) {
-            return;
-        }
-
-        if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authenticatorName)) {
-            validateSamlMetadata(properties);
-        }
-        if (IdentityApplicationConstants.Authenticator.OIDC.FED_AUTH_NAME.equals(authenticatorName)) {
-            validateDuplicateOpenIDConnectScopes(properties);
-            validateDefaultOpenIDConnectScopes(properties);
-        }
-
-        if (!areAllDistinct(properties)) {
-            Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT;
-            throw new IdentityProviderManagementClientException(error.getCode(), error.getDescription());
         }
     }
 }

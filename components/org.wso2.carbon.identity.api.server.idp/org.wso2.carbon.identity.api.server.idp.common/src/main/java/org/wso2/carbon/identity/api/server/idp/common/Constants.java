@@ -146,13 +146,13 @@ public class Constants {
         ERROR_CODE_ERROR_LISTING_TRUSTED_TOKEN_ISSUERS("60021",
                 "Unable to list existing trusted token issuers.",
                 "Server encountered an error while listing the trusted token issuers."),
-        ERROR_CODE_ENDPOINT_PROVIDED_FOR_SYSTEM_AUTH("60039", "Invalid Request.",
+        ERROR_CODE_ENDPOINT_PROVIDED_FOR_SYSTEM_AUTH("60039", "No endpoint configuration is allowed.",
                 "No endpoint configuration must be " +
                 "provided for the system defined federated authenticators %s."),
-        ERROR_CODE_PROPERTIES_PROVIDED_FOR_USER_AUTH("60040", "Invalid Request.",
+        ERROR_CODE_PROPERTIES_PROVIDED_FOR_USER_AUTH("60040", "No properties are allowed.",
                 "No properties must be provided for the user defined " +
                 "federated authenticators %s."),
-        ERROR_CODE_NO_ENDPOINT_PROVIDED("60041", "Invalid Request.", "Endpoint " +
+        ERROR_CODE_NO_ENDPOINT_PROVIDED("60041", "No endpoint provided.", "Endpoint " +
                 "configuration must be provided for the user defined federated authenticators %s."),
         ERROR_CODE_NON_DECODABLE_AUTH_ID("60042", "Non-decodable authenticator ID.",
                 "Unable to decode the provided authenticator ID %s."),
