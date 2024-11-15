@@ -97,7 +97,7 @@ public class UsersApiServiceCore {
         userShareSelectiveDO.setOrganizations(organizationsList);
 
         try {
-            userSharingPolicyHandlerService.propagateUserSelectiveShare(userShareSelectiveDO);
+            userSharingPolicyHandlerService.populateSelectiveUserShare(userShareSelectiveDO);
         } catch (Exception e) {
             // TODO: Handle exceptions in selective share API
         }
@@ -138,7 +138,7 @@ public class UsersApiServiceCore {
         userShareGeneralDO.setRoles(rolesList);
 
         try {
-            userSharingPolicyHandlerService.propagateUserGeneralShare(userShareGeneralDO);
+            userSharingPolicyHandlerService.populateGeneralUserShare(userShareGeneralDO);
         } catch (Exception e) {
             // TODO: Handle exceptions in shareUserWithAll API
         }
@@ -165,7 +165,7 @@ public class UsersApiServiceCore {
         userUnshareSelectiveDO.setOrganizations(userUnshareRequestBody.getOrganizations());
 
         try {
-            userSharingPolicyHandlerService.propagateUserSelectiveUnshare(userUnshareSelectiveDO);
+            userSharingPolicyHandlerService.populateSelectiveUserUnshare(userUnshareSelectiveDO);
         } catch (Exception e) {
             // TODO: Handle exceptions in unshareUser API
         }
@@ -189,7 +189,7 @@ public class UsersApiServiceCore {
         userUnshareGeneralDO.setUserCriteria(userCriteria);
 
         try {
-            userSharingPolicyHandlerService.propagateUserGeneralUnshare(userUnshareGeneralDO);
+            userSharingPolicyHandlerService.populateGeneralUserUnshare(userUnshareGeneralDO);
         } catch (Exception e) {
             // TODO: Handle exceptions in unshareUserWithAll API
         }
