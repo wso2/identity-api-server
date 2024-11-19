@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -184,17 +185,22 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
         validateUserDefinedFederatedAuthenticatorModel(config);
 
-        UserDefinedFederatedAuthenticatorConfig authConfig = new UserDefinedFederatedAuthenticatorConfig();
-        UserDefinedAuthenticatorEndpointConfig.UserDefinedAuthenticatorEndpointConfigBuilder endpointConfigBuilder =
-                new UserDefinedAuthenticatorEndpointConfig.UserDefinedAuthenticatorEndpointConfigBuilder();
-        endpointConfigBuilder.uri(config.endpoint.getUri());
-        endpointConfigBuilder.authenticationType(config.endpoint.getAuthentication().getType().toString());
-        endpointConfigBuilder.authenticationProperties(config.endpoint.getAuthentication().getProperties()
-                .entrySet().stream().collect(Collectors.toMap(
-                        Map.Entry::getKey, entry -> entry.getValue().toString())));
-        authConfig.setEndpointConfig(endpointConfigBuilder.build());
+        try {
+            UserDefinedFederatedAuthenticatorConfig authConfig = new UserDefinedFederatedAuthenticatorConfig();
+            UserDefinedAuthenticatorEndpointConfig.UserDefinedAuthenticatorEndpointConfigBuilder endpointConfigBuilder =
+                    new UserDefinedAuthenticatorEndpointConfig.UserDefinedAuthenticatorEndpointConfigBuilder();
+            endpointConfigBuilder.uri(config.endpoint.getUri());
+            endpointConfigBuilder.authenticationType(config.endpoint.getAuthentication().getType().toString());
+            endpointConfigBuilder.authenticationProperties(config.endpoint.getAuthentication().getProperties()
+                    .entrySet().stream().collect(Collectors.toMap(
+                            Map.Entry::getKey, entry -> entry.getValue().toString())));
+            authConfig.setEndpointConfig(endpointConfigBuilder.build());
 
-        return authConfig;
+            return authConfig;
+        } catch (NoSuchElementException e) {
+            throw new IdentityProviderManagementClientException(Constants.ErrorMessage
+                    .ERROR_CODE_INVALID_INPUT.getCode(), e.getMessage());
+        }
     }
 
     private static void validateUserDefinedFederatedAuthenticatorModel(Config config)

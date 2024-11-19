@@ -158,6 +158,8 @@ public class Constants {
                 "Unable to decode the provided authenticator ID %s."),
         ERROR_CODE_NO_SYSTEM_AUTHENTICATOR_FOUND("60043", "No system authenticator found.",
                 "No system authenticator found for the provided authenticator Id %s."),
+        ERROR_COED_MULTIPLE_USER_DEFINED_AUTHENTICATORS_FOUND("60044", "Multiple authenticators found.",
+                "Multiple user defined authenticators are not allowed."),
 
         // Server Error starting from 650xx.
         ERROR_CODE_ERROR_ADDING_IDP("65002",

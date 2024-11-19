@@ -1779,6 +1779,10 @@ public class ServerIdpManagementService {
                 } else {
                     definedByType = resolveDefinedByTypeToUpdateFederatedAuthenticator(authenticatorName);
                 }
+                if (definedByType == DefinedByType.USER && federatedAuthenticators.size() > 1) {
+                    throw handleException(Response.Status.BAD_REQUEST,
+                            Constants.ErrorMessage.ERROR_COED_MULTIPLE_USER_DEFINED_AUTHENTICATORS_FOUND, null);
+                }
                 FederatedAuthenticatorConfig authConfig = FederatedAuthenticatorConfigBuilderFactory.build(
                         authenticator, authenticatorName, definedByType);
 
