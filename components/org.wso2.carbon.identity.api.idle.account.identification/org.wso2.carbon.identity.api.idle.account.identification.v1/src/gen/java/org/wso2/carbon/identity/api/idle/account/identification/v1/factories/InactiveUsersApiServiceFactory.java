@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.idle.account.identification.v1.factories;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.InactiveUsersApiService;
 import org.wso2.carbon.identity.api.idle.account.identification.v1.impl.InactiveUsersApiServiceImpl;
 
+/**
+ * Factory class for InactiveUsersApiService.
+ */
 public class InactiveUsersApiServiceFactory {
 
-    private final static InactiveUsersApiService service = new InactiveUsersApiServiceImpl();
+    private final static InactiveUsersApiService SERVICE = new InactiveUsersApiServiceImpl();
 
+    /**
+     * Get InactiveUsersApiService.
+     *
+     * @return InactiveUsersApiService.
+     */
     public static InactiveUsersApiService getInactiveUsersApi()
     {
-        return service;
+        return SERVICE;
     }
 }
