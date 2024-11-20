@@ -640,6 +640,12 @@
                 <version>${org.wso2.carbon.identity.organization.management.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity.organization.management</groupId>
+                <artifactId>org.wso2.carbon.identity.organization.resource.sharing.policy.management</artifactId>
+                <version>${org.wso2.carbon.identity.organization.management.version}</version>
+                <scope>provided</scope>
+            </dependency>
 
             <dependency>
                 <groupId>org.wso2.carbon.identity.server.api</groupId>
@@ -859,7 +865,7 @@
         </org.wso2.carbon.identity.organization.management.core.version.range>
 
         <!-- Organization management service Version -->
-        <org.wso2.carbon.identity.organization.management.version>1.4.52
+        <org.wso2.carbon.identity.organization.management.version>1.4.54
         </org.wso2.carbon.identity.organization.management.version>
 
         <!-- Unit test versions -->

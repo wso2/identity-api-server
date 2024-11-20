@@ -31,7 +31,6 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerServiceImpl;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.constant.PolicyEnum;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.RoleWithAudienceDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.GeneralUserShareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.SelectiveUserShareDO;
@@ -40,6 +39,7 @@ import org.wso2.carbon.identity.organization.management.organization.user.sharin
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.SelectiveUserUnshareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.userCriteria.UserCriteriaType;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.userCriteria.UserIds;
+import org.wso2.carbon.identity.organization.resource.sharing.policy.management.constant.PolicyEnum;
 
 import java.util.ArrayList;
 import java.util.HashMap;
