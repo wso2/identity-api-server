@@ -33,7 +33,7 @@ import org.wso2.carbon.identity.api.server.organization.user.invitation.manageme
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.InvitationsListResponse;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.Property;
 import org.wso2.carbon.identity.api.server.organization.user.invitation.management.v1.model.RoleAssignmentResponse;
-import org.wso2.carbon.identity.organization.user.invitation.management.InvitationCoreServiceImpl;
+import org.wso2.carbon.identity.organization.user.invitation.management.InvitationCoreService;
 import org.wso2.carbon.identity.organization.user.invitation.management.exception.UserInvitationMgtException;
 import org.wso2.carbon.identity.organization.user.invitation.management.models.GroupAssignments;
 import org.wso2.carbon.identity.organization.user.invitation.management.models.Invitation;
@@ -62,6 +62,13 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
  * Service class for the User Invitation Management APIs.
  */
 public class GuestApiServiceCore {
+
+    private final InvitationCoreService invitationCoreService;
+
+    public GuestApiServiceCore(InvitationCoreService invitationCoreService) {
+
+        this.invitationCoreService = invitationCoreService;
+    }
 
     private static List<RoleAssignmentResponse> buildRoleAssignmentResponse(Invitation invitationRecord) {
 
@@ -104,7 +111,6 @@ public class GuestApiServiceCore {
      */
     public List<InvitationSuccessResponse> createInvitation(InvitationRequestBody invitationRequestBody) {
 
-        InvitationCoreServiceImpl invitationCoreService = new InvitationCoreServiceImpl();
         InvitationDO invitation = new InvitationDO();
         invitation.setUsernamesList(invitationRequestBody.getUsernames());
         invitation.setUserDomain(invitationRequestBody.getUserDomain());
@@ -161,7 +167,6 @@ public class GuestApiServiceCore {
                                                   String sortBy) {
 
         if (!isUnsupportedParamAvailable(limit, offset, sortOrder, sortBy)) {
-            InvitationCoreServiceImpl invitationCoreService = new InvitationCoreServiceImpl();
             try {
                 return buildInvitationsListResponse(invitationCoreService.getInvitations(filter));
             } catch (UserInvitationMgtException e) {
@@ -190,7 +195,6 @@ public class GuestApiServiceCore {
      */
     public IntrospectSuccessResponse introspectInvitation(String confirmationCode) {
 
-        InvitationCoreServiceImpl invitationCoreService = new InvitationCoreServiceImpl();
         try {
             return buildValidateResponse(invitationCoreService.introspectInvitation(confirmationCode));
         } catch (UserInvitationMgtException e) {
@@ -211,7 +215,6 @@ public class GuestApiServiceCore {
      */
     public boolean deleteInvitation(String invitationId) {
 
-        InvitationCoreServiceImpl invitationCoreService = new InvitationCoreServiceImpl();
         try {
             return invitationCoreService.deleteInvitation(invitationId);
         } catch (UserInvitationMgtException e) {
@@ -233,7 +236,6 @@ public class GuestApiServiceCore {
      */
     public void acceptInvitation(AcceptanceRequestBody acceptanceRequestBody) {
 
-        InvitationCoreServiceImpl invitationCoreService = new InvitationCoreServiceImpl();
         try {
             invitationCoreService.acceptInvitation(acceptanceRequestBody.getConfirmationCode());
         } catch (UserInvitationMgtException e) {
