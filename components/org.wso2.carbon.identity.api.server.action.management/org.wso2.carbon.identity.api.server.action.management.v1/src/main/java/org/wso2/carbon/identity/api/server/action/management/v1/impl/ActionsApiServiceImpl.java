@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
@@ -26,6 +25,7 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiServic
 import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeProperties;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.action.management.v1.core.ServerActionManagementService;
+import org.wso2.carbon.identity.api.server.action.management.v1.factories.ActionManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
 import java.net.URI;
@@ -39,8 +39,15 @@ import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_C
  */
 public class ActionsApiServiceImpl implements ActionsApiService {
 
-    @Autowired
-    ServerActionManagementService serverActionManagementService;
+    private final ServerActionManagementService serverActionManagementService;
+
+    public ActionsApiServiceImpl() {
+        try {
+            this.serverActionManagementService = ActionManagementServiceFactory.getActionManagementService();
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while initiating server action management service.", e);
+        }
+    }
 
     @Override
     public Response createAction(String actionType, ActionModel actionModel) {

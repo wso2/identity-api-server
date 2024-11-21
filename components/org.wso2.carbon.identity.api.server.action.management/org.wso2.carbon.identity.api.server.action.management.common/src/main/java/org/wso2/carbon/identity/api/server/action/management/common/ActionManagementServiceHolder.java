@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.action.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.action.management.ActionManagementService;
 
 /**
@@ -25,7 +26,12 @@ import org.wso2.carbon.identity.action.management.ActionManagementService;
  */
 public class ActionManagementServiceHolder {
 
-    private static ActionManagementService actionManagementService;
+    private ActionManagementServiceHolder() {}
+
+    private static class ActionServiceHolder {
+        static final ActionManagementService SERVICE = (ActionManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(ActionManagementService.class, null);
+    }
 
     /**
      * Get ActionManagementService osgi service.
@@ -34,16 +40,6 @@ public class ActionManagementServiceHolder {
      */
     public static ActionManagementService getActionManagementService() {
 
-        return actionManagementService;
-    }
-
-    /**
-     * Set ActionManagementService osgi service.
-     *
-     * @param actionManagementService ActionManagementService.
-     */
-    public static void setActionManagementService(ActionManagementService actionManagementService) {
-
-        ActionManagementServiceHolder.actionManagementService = actionManagementService;
+        return ActionServiceHolder.SERVICE;
     }
 }
