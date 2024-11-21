@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.api.server.authenticators.common.AuthenticatorsServiceHolder;
 import org.wso2.carbon.identity.api.server.authenticators.common.Constants;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApp;
@@ -41,6 +40,7 @@ import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorC
 import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
+import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.model.ExpressionNode;
 import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
@@ -50,6 +50,7 @@ import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementClientException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
+import org.wso2.carbon.idp.mgt.IdpManager;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
 
@@ -72,7 +73,16 @@ import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
  */
 public class ServerAuthenticatorManagementService {
 
+    private final ApplicationManagementService applicationManagementService;
+    private final IdpManager idpManager;
     private static final Log log = LogFactory.getLog(ServerAuthenticatorManagementService.class);
+
+    public ServerAuthenticatorManagementService(ApplicationManagementService applicationManagementService,
+                                                IdpManager idpManager) {
+
+        this.applicationManagementService = applicationManagementService;
+        this.idpManager = idpManager;
+    }
 
     /**
      * Retrieves the list of available authenticators.
@@ -103,9 +113,8 @@ public class ServerAuthenticatorManagementService {
                 }
             }
 
-            LocalAuthenticatorConfig[] localAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
-                    .getApplicationManagementService().getAllLocalAuthenticators(ContextLoader
-                            .getTenantDomainFromContext());
+            LocalAuthenticatorConfig[] localAuthenticatorConfigs = applicationManagementService
+                    .getAllLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
 
             int localAuthenticatorsCount = localAuthenticatorConfigs.length;
             RequestPathAuthenticatorConfig[] requestPathAuthenticatorConfigs = new RequestPathAuthenticatorConfig[0];
@@ -115,9 +124,8 @@ public class ServerAuthenticatorManagementService {
             count as the no. of items returned in the response will be capped at the maximum items per page count. */
             if (StringUtils.isNotBlank(filter) || (StringUtils.isBlank(filter) && localAuthenticatorsCount <
                     maximumItemPerPage)) {
-                requestPathAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
-                        .getApplicationManagementService().getAllRequestPathAuthenticators(ContextLoader
-                                .getTenantDomainFromContext());
+                requestPathAuthenticatorConfigs = applicationManagementService
+                        .getAllRequestPathAuthenticators(ContextLoader.getTenantDomainFromContext());
             }
 
             List<String> requestedAttributeList = new ArrayList<>();
@@ -132,9 +140,8 @@ public class ServerAuthenticatorManagementService {
             less than the maximum items per page count as the no. of items returned in the response will be capped
             at the maximum items per page count. */
             if (idPCountToBeRetrieved > 0 && StringUtils.isBlank(filter)) {
-                IdpSearchResult idpSearchResult = AuthenticatorsServiceHolder.getInstance().getIdentityProviderManager()
-                        .getIdPs(idPCountToBeRetrieved, null, null, null, null,
-                                ContextLoader.getTenantDomainFromContext(), requestedAttributeList);
+                IdpSearchResult idpSearchResult = idpManager.getIdPs(idPCountToBeRetrieved, null, null,
+                        null, null, ContextLoader.getTenantDomainFromContext(), requestedAttributeList);
                 identityProviders = idpSearchResult.getIdPs();
             }
 
@@ -157,16 +164,13 @@ public class ServerAuthenticatorManagementService {
     public List<String> getTags() {
 
         try {
-            LocalAuthenticatorConfig[] localAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
-                    .getApplicationManagementService().getAllLocalAuthenticators(ContextLoader
-                            .getTenantDomainFromContext());
+            LocalAuthenticatorConfig[] localAuthenticatorConfigs = applicationManagementService
+                    .getAllLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
 
-            RequestPathAuthenticatorConfig[] requestPathAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
-                    .getApplicationManagementService().getAllRequestPathAuthenticators(ContextLoader
-                            .getTenantDomainFromContext());
+            RequestPathAuthenticatorConfig[] requestPathAuthenticatorConfigs = applicationManagementService
+                    .getAllRequestPathAuthenticators(ContextLoader.getTenantDomainFromContext());
 
-            FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
-                    .getIdentityProviderManager().getAllFederatedAuthenticators();
+            FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs = idpManager.getAllFederatedAuthenticators();
 
             return buildTagsListResponse(localAuthenticatorConfigs, requestPathAuthenticatorConfigs,
                     federatedAuthenticatorConfigs);
@@ -181,8 +185,7 @@ public class ServerAuthenticatorManagementService {
     public ConnectedApps getConnectedAppsOfLocalAuthenticator(String authenticatorId, Integer limit, Integer offset) {
 
         try {
-            ConnectedAppsResult connectedAppsResult = AuthenticatorsServiceHolder.getInstance()
-                    .getApplicationManagementService()
+            ConnectedAppsResult connectedAppsResult = applicationManagementService
                     .getConnectedAppsForLocalAuthenticator(authenticatorId, ContextLoader.getTenantDomainFromContext(),
                             limit, offset);
             return createConnectedAppsResponse(authenticatorId, connectedAppsResult);
@@ -311,8 +314,7 @@ public class ServerAuthenticatorManagementService {
             int idPCountToBeRetrieved = maximumItemsPerPage - authenticators.size();
             IdpSearchResult idpSearchResult;
             try {
-                idpSearchResult = AuthenticatorsServiceHolder.getInstance().getIdentityProviderManager()
-                        .getIdPs(idPCountToBeRetrieved, null, null, null,
+                idpSearchResult = idpManager.getIdPs(idPCountToBeRetrieved, null, null, null,
                                 ContextLoader.getTenantDomainFromContext(), requestedAttributeList,
                                 expressionNodesForIdp);
                 identityProviders = idpSearchResult.getIdPs();
@@ -758,8 +760,7 @@ public class ServerAuthenticatorManagementService {
                                  List<IdentityProvider> identityProviders, List<ExpressionNode> expressionNodes) {
 
         try {
-            IdpSearchResult idpSearchResult = AuthenticatorsServiceHolder.getInstance().getIdentityProviderManager()
-                    .getIdPs(limit, (offSet + limit), null, null,
+            IdpSearchResult idpSearchResult = idpManager.getIdPs(limit, (offSet + limit), null, null,
                             ContextLoader.getTenantDomainFromContext(), requestedAttributeList, expressionNodes);
             identityProviders.addAll(idpSearchResult.getIdPs());
         } catch (IdentityProviderManagementException e) {
