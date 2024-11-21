@@ -24,8 +24,8 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
-import org.wso2.carbon.identity.api.server.configs.common.factory.JWTAuthenticationMgtOGSiServiceFactory;
 import org.wso2.carbon.identity.api.server.configs.v1.model.JWTValidatorConfig;
+import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.JWTClientAuthenticatorMgtService;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.exception.JWTClientAuthenticatorServiceClientException;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.exception.JWTClientAuthenticatorServiceServerException;
 import org.wso2.carbon.identity.oauth2.token.handler.clientauth.jwt.core.model.JWTClientAuthenticatorConfig;
@@ -50,10 +50,12 @@ public class JWTConnectorUtil {
      * @return JWTValidatorConfig.
      * @throws Exception Exception.
      */
-    public static JWTValidatorConfig getJWTValidatorConfig(String tenantDomain) throws Exception {
+    public static JWTValidatorConfig getJWTValidatorConfig(String tenantDomain,
+                                     JWTClientAuthenticatorMgtService jwtClientAuthenticatorMgtService)
+            throws Exception {
 
 
-        return new JWTValidatorConfig().enableTokenReuse(JWTAuthenticationMgtOGSiServiceFactory.getInstance().
+        return new JWTValidatorConfig().enableTokenReuse(jwtClientAuthenticatorMgtService.
                 getPrivateKeyJWTClientAuthenticatorConfiguration(tenantDomain).isEnableTokenReuse());
     }
 

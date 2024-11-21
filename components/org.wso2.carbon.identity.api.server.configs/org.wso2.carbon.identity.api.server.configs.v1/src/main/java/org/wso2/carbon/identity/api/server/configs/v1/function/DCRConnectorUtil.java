@@ -23,9 +23,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.configs.common.ConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.configs.common.Constants;
 import org.wso2.carbon.identity.api.server.configs.v1.model.DCRConfig;
+import org.wso2.carbon.identity.oauth.dcr.DCRConfigurationMgtService;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMClientException;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMException;
 import org.wso2.carbon.identity.oauth.dcr.exception.DCRMServerException;
@@ -46,10 +46,9 @@ public class DCRConnectorUtil {
      * @return DCRConfig.
      * @throws DCRMException DCRMException.
      */
-    public static DCRConfig getDCRConfig() throws DCRMException {
+    public static DCRConfig getDCRConfig(DCRConfigurationMgtService dcrConfigurationMgtService) throws DCRMException {
 
-        DCRConfiguration dcrConfiguration = ConfigsServiceHolder.getInstance().getDcrConfigurationMgtService()
-                .getDCRConfiguration();
+        DCRConfiguration dcrConfiguration = dcrConfigurationMgtService.getDCRConfiguration();
 
         return dcrConfigurationToDCRConfig(dcrConfiguration);
 
@@ -60,10 +59,10 @@ public class DCRConnectorUtil {
      * @param dcrConfig DCRConfig instance.
      * @throws DCRMException DCRMException.
      */
-    public static void setDCRConfig(DCRConfig dcrConfig) throws DCRMException {
+    public static void setDCRConfig(DCRConfig dcrConfig, DCRConfigurationMgtService dcrConfigurationMgtService)
+            throws DCRMException {
 
-        ConfigsServiceHolder.getInstance().getDcrConfigurationMgtService()
-                .setDCRConfiguration((getDCRConfigurationFromDCRConfig(dcrConfig)));
+        dcrConfigurationMgtService.setDCRConfiguration((getDCRConfigurationFromDCRConfig(dcrConfig)));
     }
 
     private static DCRConfig dcrConfigurationToDCRConfig(DCRConfiguration dcrConfiguration) {
