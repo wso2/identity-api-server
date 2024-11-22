@@ -117,7 +117,7 @@ public class OrganizationConfigsApi  {
     @Path("/discovery")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @ApiOperation(value = "Update organization discovery configuration.", notes = "This API provides the capability to update discovery configuration of the primary organization. <br>   <b>Permission required:</b> <br>     * /permission/admin/manage/identity/configmgt/update <br>   <b>Scope required:</b> <br>     * internal_config_mgt_update ", response = Config.class, authorizations = {
+    @ApiOperation(value = "Update organization discovery configuration.", notes = "This API provides the capability to update discovery configuration of the primary organization. <br>     <b>Scope(Permission) required:</b> <br>     * internal_config_mgt_update ", response = Config.class, authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
