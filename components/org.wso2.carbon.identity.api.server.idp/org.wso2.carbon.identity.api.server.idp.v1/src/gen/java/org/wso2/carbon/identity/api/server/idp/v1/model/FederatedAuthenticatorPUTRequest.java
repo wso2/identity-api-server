@@ -37,6 +37,40 @@ public class FederatedAuthenticatorPUTRequest  {
     private String name;
     private Boolean isEnabled = false;
     private Boolean isDefault = false;
+
+@XmlType(name="DefinedByEnum")
+@XmlEnum(String.class)
+public enum DefinedByEnum {
+
+    @XmlEnumValue("SYSTEM") SYSTEM(String.valueOf("SYSTEM")), @XmlEnumValue("USER") USER(String.valueOf("USER"));
+
+
+    private String value;
+
+    DefinedByEnum(String v) {
+        value = v;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
+
+    public static DefinedByEnum fromValue(String value) {
+        for (DefinedByEnum b : DefinedByEnum.values()) {
+            if (b.value.equals(value)) {
+                return b;
+            }
+        }
+        throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+}
+
+    private DefinedByEnum definedBy;
     private List<Property> properties = null;
 
 
@@ -114,6 +148,24 @@ public class FederatedAuthenticatorPUTRequest  {
 
     /**
     **/
+    public FederatedAuthenticatorPUTRequest definedBy(DefinedByEnum definedBy) {
+
+        this.definedBy = definedBy;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("definedBy")
+    @Valid
+    public DefinedByEnum getDefinedBy() {
+        return definedBy;
+    }
+    public void setDefinedBy(DefinedByEnum definedBy) {
+        this.definedBy = definedBy;
+    }
+
+    /**
+    **/
     public FederatedAuthenticatorPUTRequest properties(List<Property> properties) {
 
         this.properties = properties;
@@ -154,12 +206,13 @@ public class FederatedAuthenticatorPUTRequest  {
             Objects.equals(this.name, federatedAuthenticatorPUTRequest.name) &&
             Objects.equals(this.isEnabled, federatedAuthenticatorPUTRequest.isEnabled) &&
             Objects.equals(this.isDefault, federatedAuthenticatorPUTRequest.isDefault) &&
+            Objects.equals(this.definedBy, federatedAuthenticatorPUTRequest.definedBy) &&
             Objects.equals(this.properties, federatedAuthenticatorPUTRequest.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, isEnabled, isDefault, properties);
+        return Objects.hash(authenticatorId, name, isEnabled, isDefault, definedBy, properties);
     }
 
     @Override
@@ -172,6 +225,7 @@ public class FederatedAuthenticatorPUTRequest  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    isDefault: ").append(toIndentedString(isDefault)).append("\n");
+        sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("}");
         return sb.toString();

@@ -38,6 +38,7 @@ paths:
         - $ref: '#/components/parameters/sortOrderQueryParam'
         - $ref: '#/components/parameters/sortByQueryParam'
         - $ref: '#/components/parameters/attributesQueryParam'
+        - $ref: '#/components/parameters/excludeSystemPortalsQueryParam'
       responses:
         '200':
           description: OK
@@ -2701,6 +2702,17 @@ components:
         /applications?attributes=advancedConfigurations,templateId,templateVersion,clientId,applicationEnabled,associatedRoles.allowedAudience
       schema:
         type: string
+    excludeSystemPortalsQueryParam:
+      in: query
+      name: excludeSystemPortals
+      required: false
+      description: |
+        Specifies whether to include or exclude system portals in the response. 
+        Default will be treated as false if parameter is not preset in the request.
+
+        /applications?excludeSystemPortals=true
+      schema:
+        type: boolean
     exportSecretsQueryParam:
       in: query
       name: exportSecrets
@@ -3700,9 +3712,6 @@ components:
           type: array
           items:
             type: string
-        accessTokenAttributesEnabled:
-          type: boolean
-          description: "If enabled, the access token attributes will be included in the access token."
     RefreshTokenConfiguration:
       type: object
       properties:

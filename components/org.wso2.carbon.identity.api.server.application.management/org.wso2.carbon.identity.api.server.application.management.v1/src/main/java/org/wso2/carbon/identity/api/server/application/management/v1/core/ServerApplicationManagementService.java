@@ -251,8 +251,16 @@ public class ServerApplicationManagementService {
     @Autowired
     private ServerApplicationMetadataService applicationMetadataService;
 
+    @Deprecated
     public ApplicationListResponse getAllApplications(Integer limit, Integer offset, String filter, String sortOrder,
                                                       String sortBy, String requiredAttributes) {
+
+        return getAllApplications(limit, offset, filter, sortOrder, sortBy, requiredAttributes, false);
+    }
+
+    public ApplicationListResponse getAllApplications(Integer limit, Integer offset, String filter, String sortOrder,
+                                                      String sortBy, String requiredAttributes,
+                                                      Boolean excludeSystemPortals) {
 
         handleNotImplementedCapabilities(sortOrder, sortBy);
         String tenantDomain = ContextLoader.getTenantDomainFromContext();
@@ -277,10 +285,10 @@ public class ServerApplicationManagementService {
         String username = ContextLoader.getUsernameFromContext();
         try {
             int totalResults = getApplicationManagementService()
-                    .getCountOfApplications(tenantDomain, username, filter);
+                    .getCountOfApplications(tenantDomain, username, filter, excludeSystemPortals);
 
             ApplicationBasicInfo[] filteredAppList = getApplicationManagementService()
-                    .getApplicationBasicInfo(tenantDomain, username, filter, offset, limit);
+                    .getApplicationBasicInfo(tenantDomain, username, filter, offset, limit, excludeSystemPortals);
             int resultsInCurrentPage = filteredAppList.length;
 
             List<String> requestedAttributeList = new ArrayList<>();
