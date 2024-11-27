@@ -405,9 +405,11 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             AuthenticationType authenticationType = new AuthenticationType();
             authenticationType.setType(AuthenticationType.TypeEnum.fromValue(endpointConfig.getEndpointConfig()
                     .getAuthentication().getType().toString()));
+            authenticationType.setProperties(null);
 
             Endpoint endpoint = new Endpoint();
             endpoint.setUri(endpointConfig.getEndpointConfig().getUri());
+            endpoint.setAuthentication(authenticationType);
             authenticator.setEndpoint(endpoint);
         } catch (ClassCastException e) {
             throw new IdentityProviderManagementServerException(String.format("Error occurred while resolving" +
