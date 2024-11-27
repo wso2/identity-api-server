@@ -61,6 +61,11 @@
                           <artifactId>cxf-wso2-openapi-generator</artifactId>
                           <version>1.0.0</version>
                       </dependency>
+                                    <dependency>
+                          <groupId>org.jacoco</groupId>
+                          <artifactId>jacoco-maven-plugin</artifactId>
+                          <version>${jacoco.version}</version>
+                      </dependency>
                   </dependencies>
               </plugin>-->
             <plugin>
@@ -91,7 +96,26 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-        </plugins>
+                  <plugin>
+                      <groupId>org.jacoco</groupId>
+                      <artifactId>jacoco-maven-plugin</artifactId>
+                      <version>${jacoco.version}</version>
+                      <executions>
+                          <execution>
+                              <goals>
+                                  <goal>prepare-agent</goal>
+                              </goals>
+                          </execution>
+                          <execution>
+                              <id>report</id>
+                              <phase>test</phase>
+                              <goals>
+                                  <goal>report</goal>
+                              </goals>
+                          </execution>
+                      </executions>
+                  </plugin>
+              </plugins>
     </build>
     <dependencies>
         <dependency>
@@ -165,6 +189,11 @@
             <artifactId>org.wso2.carbon.identity.api.server.secret.management.common</artifactId>
         </dependency>
 
-    </dependencies>
+                      <dependency>
+                          <groupId>org.jacoco</groupId>
+                          <artifactId>jacoco-maven-plugin</artifactId>
+                          <version>${jacoco.version}</version>
+                      </dependency>
+                  </dependencies>
 
 </project>
