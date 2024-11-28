@@ -212,7 +212,7 @@ public class ServerAuthenticatorManagementService {
 
         try {
             UserDefinedLocalAuthenticatorConfig createdConfig = AuthenticatorsServiceHolder.getInstance()
-                    .getApplicationCommonService().addUserDefinedLocalAuthenticator(
+                    .getApplicationAuthenticatorService().addUserDefinedLocalAuthenticator(
                             LocalAuthenticatorConfigBuilderFactory.build(config),
                             AuthenticatorPropertyConstants.AuthenticationType.valueOf(config.getAuthenticationType()
                             .toString()), CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
@@ -231,7 +231,7 @@ public class ServerAuthenticatorManagementService {
     public void deleteUserDefinedLocalAuthenticator(String authenticatorId) {
 
         try {
-            AuthenticatorsServiceHolder.getInstance().getApplicationCommonService().deleteUserDefinedLocalAuthenticator(
+            AuthenticatorsServiceHolder.getInstance().getApplicationAuthenticatorService().deleteUserDefinedLocalAuthenticator(
                     authenticatorId, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         } catch (AuthenticatorMgtException e) {
             throw handleAuthenticatorException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS,
@@ -253,13 +253,13 @@ public class ServerAuthenticatorManagementService {
             String authenticatorName = "";
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             LocalAuthenticatorConfig existingAuthenticator = AuthenticatorsServiceHolder.getInstance()
-                    .getApplicationCommonService().getLocalAuthenticatorByName(authenticatorName, tenantDomain);
+                    .getApplicationAuthenticatorService().getLocalAuthenticatorByName(authenticatorName, tenantDomain);
             if (existingAuthenticator == null) {
                 throw handleException(Response.Status.NOT_FOUND,
                         Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS, authenticatorName);
             }
             UserDefinedLocalAuthenticatorConfig updatedConfig = AuthenticatorsServiceHolder.getInstance()
-                    .getApplicationCommonService().updateUserDefinedLocalAuthenticator(
+                    .getApplicationAuthenticatorService().updateUserDefinedLocalAuthenticator(
                             LocalAuthenticatorConfigBuilderFactory.build(config, existingAuthenticator),
                             tenantDomain);
             return LocalAuthenticatorConfigBuilderFactory.build(updatedConfig);
@@ -460,7 +460,7 @@ public class ServerAuthenticatorManagementService {
             for (FederatedAuthenticatorConfig config : fedAuthConfigs) {
                 if (config.isEnabled()) {
                     FederatedAuthenticatorConfig federatedAuthenticatorConfig = AuthenticatorsServiceHolder
-                            .getInstance().getApplicationCommonService()
+                            .getInstance().getApplicationAuthenticatorService()
                             .getFederatedAuthenticatorByName(config.getName());
                     if (federatedAuthenticatorConfig != null) {
                         String[] tags = federatedAuthenticatorConfig.getTags();

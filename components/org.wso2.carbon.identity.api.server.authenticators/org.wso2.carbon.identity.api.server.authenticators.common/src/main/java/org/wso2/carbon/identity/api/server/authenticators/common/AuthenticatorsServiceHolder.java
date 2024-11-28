@@ -85,9 +85,9 @@ public class AuthenticatorsServiceHolder {
      *
      * @return ApplicationAuthenticatorService
      */
-    public ApplicationAuthenticatorService getApplicationCommonService() {
+    public ApplicationAuthenticatorService getApplicationAuthenticatorService() {
 
-        return applicationAuthenticatorService;
+        return AuthenticatorsServiceHolder.getInstance().applicationAuthenticatorService;
     }
 
     /**
@@ -97,6 +97,6 @@ public class AuthenticatorsServiceHolder {
      */
     public void setApplicationCommonService(ApplicationAuthenticatorService applicationAuthenticatorService) {
 
-        this.applicationAuthenticatorService = applicationAuthenticatorService;
+        AuthenticatorsServiceHolder.getInstance().applicationAuthenticatorService = applicationAuthenticatorService;
     }
 }
