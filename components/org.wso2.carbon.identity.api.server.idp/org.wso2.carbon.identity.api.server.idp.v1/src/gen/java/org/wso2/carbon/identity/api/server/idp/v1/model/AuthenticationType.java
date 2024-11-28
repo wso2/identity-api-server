@@ -69,7 +69,7 @@ public enum TypeEnum {
 }
 
     private TypeEnum type;
-    private Map<String, Object> properties = new HashMap<>();
+    private Map<String, Object> properties = null;
 
 
     /**
@@ -100,11 +100,9 @@ public enum TypeEnum {
         return this;
     }
     
-    @ApiModelProperty(example = "{\"username\":\"auth_username\",\"password\":\"auth_password\"}", required = true, value = "")
+    @ApiModelProperty(example = "{\"username\":\"auth_username\",\"password\":\"auth_password\"}", value = "")
     @JsonProperty("properties")
     @Valid
-    @NotNull(message = "Property properties cannot be null.")
-
     public Map<String, Object> getProperties() {
         return properties;
     }
@@ -114,6 +112,9 @@ public enum TypeEnum {
 
 
     public AuthenticationType putPropertiesItem(String key, Object propertiesItem) {
+        if (this.properties == null) {
+            this.properties = new HashMap<>();
+        }
         this.properties.put(key, propertiesItem);
         return this;
     }

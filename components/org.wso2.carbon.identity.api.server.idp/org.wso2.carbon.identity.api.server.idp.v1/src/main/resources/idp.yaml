@@ -2895,7 +2895,6 @@ components:
       type: object
       required:
         - type
-        - properties
       properties:
         type:
           type: string
