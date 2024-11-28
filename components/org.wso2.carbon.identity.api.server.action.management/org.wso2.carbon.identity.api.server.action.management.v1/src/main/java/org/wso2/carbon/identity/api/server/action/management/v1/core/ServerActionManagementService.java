@@ -33,7 +33,6 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionType;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeProperties;
 import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.EndpointResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMgtEndpointUtil;
@@ -49,7 +48,6 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_EMPTY_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTH_TYPE;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_TYPE;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_IMPLEMENTED_ACTION_TYPE;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID;
@@ -189,21 +187,6 @@ public class ServerActionManagementService {
             }
 
             return actionTypesResponseItems;
-        } catch (ActionMgtException e) {
-            throw ActionMgtEndpointUtil.handleActionMgtException(e);
-        }
-    }
-
-    public ActionResponse updateActionEndpointAuthentication(String actionType, String actionId, String authType,
-                                                         AuthenticationTypeProperties authenticationTypeProperties) {
-
-        try {
-            validateActionType(actionType);
-            Authentication authentication = buildAuthentication(getAuthTypeFromPath(authType),
-                    authenticationTypeProperties.getProperties());
-            return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
-                    .updateActionEndpointAuthentication(actionType, actionId, authentication,
-                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -359,21 +342,6 @@ public class ServerActionManagementService {
             default:
                 return null;
         }
-    }
-
-    /**
-     * Get Authentication Type from path.
-     *
-     * @param authType Authentication Type.
-     * @return Auth Type resolved from the path param.
-     */
-    private Authentication.Type getAuthTypeFromPath(String authType) {
-
-        return Arrays.stream(Authentication.Type.values())
-                .filter(type -> type.getPathParam().equals(authType))
-                .findFirst()
-                .orElseThrow(() -> ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
-                        ERROR_INVALID_ACTION_ENDPOINT_AUTH_TYPE));
     }
 
     private void validateActionType(String actionType) {
