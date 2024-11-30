@@ -123,6 +123,7 @@
 <!--                        <configuration>-->
 <!--                            <inputSpec>${project.basedir}/src/main/resources/rule-metadata.yaml</inputSpec>-->
 <!--                            <generatorName>org.wso2.carbon.codegen.CxfWso2Generator</generatorName>-->
+<!--                            <templateDirectory>${project.basedir}/src/main/resources/templates</templateDirectory>-->
 <!--                            <configOptions>-->
 <!--                                <sourceFolder>src/gen/java</sourceFolder>-->
 <!--                                <apiPackage>org.wso2.carbon.identity.api.server.rule.metadata.v1</apiPackage>-->
