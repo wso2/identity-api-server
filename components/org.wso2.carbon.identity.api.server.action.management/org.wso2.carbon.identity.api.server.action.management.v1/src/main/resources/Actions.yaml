@@ -484,81 +484,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /actions/{actionType}/{actionId}/{authType}:
-    put:
-      tags:
-        - Actions
-      summary: |
-        Update Action endpoint authentication information by given Id.
-      operationId: updateActionEndpointAuthentication
-      description: |
-        This API provides the capability to update Action endpoint authentication information by given Id. <br>
-          <b>Scope required:</b> <br>
-              * internal_action_mgt_update
-      parameters:
-        - name: actionType
-          in: path
-          description: Name of the Action Type.
-          required: true
-          schema:
-            enum:
-              - preIssueAccessToken
-              - preUpdatePassword
-              - preUpdateProfile
-              - preRegistration
-        - name: actionId
-          in: path
-          description: Id of the Action.
-          required: true
-          schema:
-            type: string
-        - name: authType
-          in: path
-          description: Authentication Type of the Action Endpoint.
-          required: true
-          schema:
-            enum:
-              - none
-              - basic
-              - apiKey
-              - bearer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuthenticationTypeProperties'
-        description: This represents the action endpoint authentication to be updated.
-        required: true
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ActionResponse'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
 components:
   securitySchemes:
     BasicAuth:
@@ -714,16 +639,6 @@ components:
             - API_KEY
             - BASIC
           example: BASIC
-        properties:
-          type: object
-          additionalProperties: true
-          example:
-            username: "auth_username"
-            password: "auth_password"
-
-    AuthenticationTypeProperties:
-      type: object
-      properties:
         properties:
           type: object
           additionalProperties: true
