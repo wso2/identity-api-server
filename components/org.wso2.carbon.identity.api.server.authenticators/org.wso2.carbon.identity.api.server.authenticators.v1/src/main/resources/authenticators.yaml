@@ -168,7 +168,7 @@ paths:
         description: This represents the user defined local authenticator to be created.
         required: true
   /authenticators/custom/{authenticator-id}:
-    patch:
+    put:
       tags:
         - User defined local authenticators
       summary: |
@@ -381,6 +381,9 @@ components:
         name:
           type: string
           example: CustomAuthenticator
+        id:
+          type: string
+          example: Q3VzdG9tQXV0aGVudGljYXRvcg==
         displayName:
           type: string
           example: Custom auth

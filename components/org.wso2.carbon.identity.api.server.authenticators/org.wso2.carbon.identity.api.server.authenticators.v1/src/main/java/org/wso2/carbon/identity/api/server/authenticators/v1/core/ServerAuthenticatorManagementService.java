@@ -48,7 +48,6 @@ import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.UserDefinedLocalAuthenticatorConfig;
-import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants;
 import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.model.ExpressionNode;
@@ -74,6 +73,7 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.authenticators.common.Constants.AUTHENTICATOR_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.common.Util.base64URLDecode;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 
 /**
@@ -214,12 +214,10 @@ public class ServerAuthenticatorManagementService {
             UserDefinedLocalAuthenticatorConfig createdConfig = AuthenticatorsServiceHolder.getInstance()
                     .getApplicationAuthenticatorService().addUserDefinedLocalAuthenticator(
                             LocalAuthenticatorConfigBuilderFactory.build(config),
-                            AuthenticatorPropertyConstants.AuthenticationType.valueOf(config.getAuthenticationType()
-                            .toString()), CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
             return LocalAuthenticatorConfigBuilderFactory.build(createdConfig);
         } catch (AuthenticatorMgtException e) {
-            throw handleAuthenticatorException(e, Constants.ErrorMessage
-                    .ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS, config.getName());
+            throw handleAuthenticatorException(e);
         }
     }
 
@@ -231,11 +229,11 @@ public class ServerAuthenticatorManagementService {
     public void deleteUserDefinedLocalAuthenticator(String authenticatorId) {
 
         try {
-            AuthenticatorsServiceHolder.getInstance().getApplicationAuthenticatorService().deleteUserDefinedLocalAuthenticator(
-                    authenticatorId, CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            AuthenticatorsServiceHolder.getInstance().getApplicationAuthenticatorService()
+                    .deleteUserDefinedLocalAuthenticator(base64URLDecode(authenticatorId),
+                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         } catch (AuthenticatorMgtException e) {
-            throw handleAuthenticatorException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS,
-                    authenticatorId);
+            throw handleAuthenticatorException(e);
         }
     }
 
@@ -250,13 +248,13 @@ public class ServerAuthenticatorManagementService {
             String authenticatorId, UserDefinedLocalAuthenticatorUpdate config) {
 
         try {
-            String authenticatorName = "";
+            String authenticatorName = base64URLDecode(authenticatorId);
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             LocalAuthenticatorConfig existingAuthenticator = AuthenticatorsServiceHolder.getInstance()
                     .getApplicationAuthenticatorService().getLocalAuthenticatorByName(authenticatorName, tenantDomain);
             if (existingAuthenticator == null) {
                 throw handleException(Response.Status.NOT_FOUND,
-                        Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS, authenticatorName);
+                        Constants.ErrorMessage.ERROR_CODE_ERROR_AUTHENTICATOR_NOT_FOUND, authenticatorName);
             }
             UserDefinedLocalAuthenticatorConfig updatedConfig = AuthenticatorsServiceHolder.getInstance()
                     .getApplicationAuthenticatorService().updateUserDefinedLocalAuthenticator(
@@ -264,8 +262,7 @@ public class ServerAuthenticatorManagementService {
                             tenantDomain);
             return LocalAuthenticatorConfigBuilderFactory.build(updatedConfig);
         } catch (AuthenticatorMgtException e) {
-            throw handleAuthenticatorException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_RETRIEVING_IDP_CONNECTED_APPS,
-                    authenticatorId);
+            throw handleAuthenticatorException(e);
         }
     }
 
@@ -989,17 +986,15 @@ public class ServerAuthenticatorManagementService {
      * in the response.
      *
      * @param e         IdentityProviderManagementException.
-     * @param errorEnum Error information.
      * @return APIError.
      */
-    private APIError handleAuthenticatorException(AuthenticatorMgtException e,
-                                        Constants.ErrorMessage errorEnum, String data) {
+    private APIError handleAuthenticatorException(AuthenticatorMgtException e) {
 
-        ErrorResponse errorResponse;
+        ErrorResponse errorResponse = new ErrorResponse.Builder().withCode(e.getErrorCode()).withMessage(e.getMessage())
+                .withDescription(e.getDescription()).build();
         Response.Status status;
 
         if (e instanceof AuthenticatorMgtClientException) {
-            errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -1009,9 +1004,7 @@ public class ServerAuthenticatorManagementService {
             }
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.BAD_REQUEST;
-
         } else if (e instanceof AuthenticatorMgtServerException) {
-            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -1022,7 +1015,6 @@ public class ServerAuthenticatorManagementService {
             errorResponse.setDescription(e.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
-            errorResponse = getErrorBuilder(errorEnum, data).build(log, e, errorEnum.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);

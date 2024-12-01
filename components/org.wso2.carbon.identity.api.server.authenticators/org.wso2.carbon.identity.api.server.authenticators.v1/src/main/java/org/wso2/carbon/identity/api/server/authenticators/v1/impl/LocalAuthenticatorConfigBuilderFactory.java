@@ -35,9 +35,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import static org.wso2.carbon.identity.api.server.authenticators.common.Constants.AUTHENTICATOR_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.authenticators.common.Constants.ErrorMessage.ERROR_CODE_ENDPOINT_CONFIG;
+import static org.wso2.carbon.identity.api.server.authenticators.common.Constants.CONFIGS_AUTHENTICATOR_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.authenticators.common.Constants.ErrorMessage.ERROR_CODE_INVALID_ENDPOINT_CONFIG;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 
 /**
  * The factory class for building user defined local authenticator configuration related models.
@@ -54,12 +55,14 @@ public class LocalAuthenticatorConfigBuilderFactory {
 
         Authenticator authenticator = new Authenticator();
         authenticator.setName(config.getName());
+        authenticator.setId(base64URLEncode(config.getName()));
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setIsEnabled(config.isEnabled());
         authenticator.setDefinedBy(Authenticator.DefinedByEnum.USER);
         authenticator.setType(Authenticator.TypeEnum.LOCAL);
+        authenticator.setTags(Arrays.asList(config.getTags()));
         authenticator.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
-                AUTHENTICATOR_PATH_COMPONENT + "/%s", config.getName())).toString());
+                CONFIGS_AUTHENTICATOR_PATH_COMPONENT + "/%s", config.getName())).toString());
 
         return authenticator;
     }
@@ -77,6 +80,8 @@ public class LocalAuthenticatorConfigBuilderFactory {
         UserDefinedLocalAuthenticatorConfig authConfig = new UserDefinedLocalAuthenticatorConfig(
                 AuthenticatorPropertyConstants.AuthenticationType.valueOf(
                         config.getAuthenticationType().toString()));
+        authConfig.setAuthenticationType(AuthenticatorPropertyConstants.AuthenticationType.valueOf(
+                config.getAuthenticationType().toString()));
         authConfig.setName(config.getName());
         authConfig.setDisplayName(config.getDisplayName());
         authConfig.setEnabled(config.getIsEnabled());
@@ -119,7 +124,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
                             Map.Entry::getKey, entry -> entry.getValue().toString())));
             return endpointConfigBuilder.build();
         } catch (NoSuchElementException e) {
-            Constants.ErrorMessage error = ERROR_CODE_ENDPOINT_CONFIG;
+            Constants.ErrorMessage error = ERROR_CODE_INVALID_ENDPOINT_CONFIG;
             throw new AuthenticatorMgtClientException(error.getCode(), error.getMessage(), error.getMessage());
         }
     }

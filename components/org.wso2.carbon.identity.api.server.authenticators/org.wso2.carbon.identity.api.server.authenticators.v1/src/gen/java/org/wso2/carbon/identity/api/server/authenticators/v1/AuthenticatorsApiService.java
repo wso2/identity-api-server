@@ -32,11 +32,11 @@ import javax.ws.rs.core.Response;
 
 public interface AuthenticatorsApiService {
 
+      public Response addUserDefinedLocalAuthenticator(UserDefinedLocalAuthenticatorCreation userDefinedLocalAuthenticatorCreation);
+
       public Response authenticatorsGet(String filter, Integer limit, Integer offset);
 
       public Response authenticatorsMetaTagsGet();
-
-      public Response addUserDefinedLocalAuthenticator(UserDefinedLocalAuthenticatorCreation userDefinedLocalAuthenticatorCreation);
 
       public Response deleteUserDefinedLocalAuthenticator(String authenticatorId);
 

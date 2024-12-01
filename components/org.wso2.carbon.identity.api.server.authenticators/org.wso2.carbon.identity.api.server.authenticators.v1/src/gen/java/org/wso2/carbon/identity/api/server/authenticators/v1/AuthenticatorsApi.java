@@ -45,6 +45,30 @@ public class AuthenticatorsApi  {
     private AuthenticatorsApiService delegate;
 
     @Valid
+    @POST
+    @Path("/custom")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Create a new user defined local authenticator. ", notes = "This API provides the capability to create a new user defined local authenticator. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/custom_authenticator/create <br> <b>Scope required:</b> <br>     * internal_custom_authenticator_create <br> ", response = Authenticator.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "User defined local authenticators", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Successful response", response = Authenticator.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response addUserDefinedLocalAuthenticator(@ApiParam(value = "This represents the user defined local authenticator to be created." ,required=true) @Valid UserDefinedLocalAuthenticatorCreation userDefinedLocalAuthenticatorCreation) {
+
+        return delegate.addUserDefinedLocalAuthenticator(userDefinedLocalAuthenticatorCreation );
+    }
+
+    @Valid
     @GET
     
     
@@ -91,30 +115,6 @@ public class AuthenticatorsApi  {
     public Response authenticatorsMetaTagsGet() {
 
         return delegate.authenticatorsMetaTagsGet();
-    }
-
-    @Valid
-    @POST
-    @Path("/custom")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Create a new user defined local authenticator. ", notes = "This API provides the capability to create a new user defined local authenticator. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/custom_authenticator/create <br> <b>Scope required:</b> <br>     * internal_custom_authenticator_create <br> ", response = Authenticator.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "User defined local authenticators", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "Successful response", response = Authenticator.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 409, message = "Conflict", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response addUserDefinedLocalAuthenticator(@ApiParam(value = "This represents the user defined local authenticator to be created." ,required=true) @Valid UserDefinedLocalAuthenticatorCreation userDefinedLocalAuthenticatorCreation) {
-
-        return delegate.addUserDefinedLocalAuthenticator(userDefinedLocalAuthenticatorCreation );
     }
 
     @Valid
@@ -166,7 +166,7 @@ public class AuthenticatorsApi  {
     }
 
     @Valid
-    @PATCH
+    @PUT
     @Path("/custom/{authenticator-id}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })

@@ -95,7 +95,7 @@ public class AuthenticatorsServiceHolder {
      *
      * @param applicationAuthenticatorService ApplicationAuthenticatorService.
      */
-    public void setApplicationCommonService(ApplicationAuthenticatorService applicationAuthenticatorService) {
+    public void setApplicationAuthenticatorService(ApplicationAuthenticatorService applicationAuthenticatorService) {
 
         AuthenticatorsServiceHolder.getInstance().applicationAuthenticatorService = applicationAuthenticatorService;
     }

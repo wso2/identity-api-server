@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.*;
 public class UserDefinedLocalAuthenticatorCreation  {
   
     private String name;
+    private String id;
     private String displayName;
     private Boolean isEnabled;
 
@@ -95,6 +96,24 @@ public enum AuthenticationTypeEnum {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+    **/
+    public UserDefinedLocalAuthenticatorCreation id(String id) {
+
+        this.id = id;
+        return this;
+    }
+    
+    @ApiModelProperty(example = "Q3VzdG9tQXV0aGVudGljYXRvcg==", value = "")
+    @JsonProperty("id")
+    @Valid
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
@@ -224,6 +243,7 @@ public enum AuthenticationTypeEnum {
         }
         UserDefinedLocalAuthenticatorCreation userDefinedLocalAuthenticatorCreation = (UserDefinedLocalAuthenticatorCreation) o;
         return Objects.equals(this.name, userDefinedLocalAuthenticatorCreation.name) &&
+            Objects.equals(this.id, userDefinedLocalAuthenticatorCreation.id) &&
             Objects.equals(this.displayName, userDefinedLocalAuthenticatorCreation.displayName) &&
             Objects.equals(this.isEnabled, userDefinedLocalAuthenticatorCreation.isEnabled) &&
             Objects.equals(this.authenticationType, userDefinedLocalAuthenticatorCreation.authenticationType) &&
@@ -234,7 +254,7 @@ public enum AuthenticationTypeEnum {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, displayName, isEnabled, authenticationType, image, description, endpoint);
+        return Objects.hash(name, id, displayName, isEnabled, authenticationType, image, description, endpoint);
     }
 
     @Override
@@ -244,6 +264,7 @@ public enum AuthenticationTypeEnum {
         sb.append("class UserDefinedLocalAuthenticatorCreation {\n");
         
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("    isEnabled: ").append(toIndentedString(isEnabled)).append("\n");
         sb.append("    authenticationType: ").append(toIndentedString(authenticationType)).append("\n");
