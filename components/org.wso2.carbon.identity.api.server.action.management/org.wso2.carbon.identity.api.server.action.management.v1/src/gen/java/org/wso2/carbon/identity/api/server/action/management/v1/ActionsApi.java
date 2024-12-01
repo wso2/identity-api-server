@@ -199,14 +199,14 @@ public class ActionsApi  {
     @Path("/{actionType}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List action ", notes = "This API provides the capability to retrieve the action by action type.<br>   <b>Scope required:</b> <br>       * internal_action_mgt_view ", response = ActionResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "List action ", notes = "This API provides the capability to retrieve the action by action type.<br>   <b>Scope required:</b> <br>       * internal_action_mgt_view ", response = ActionBasicResponse.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Actions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ActionResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "OK", response = ActionBasicResponse.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
