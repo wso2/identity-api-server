@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: WSO2 Identity Server Rule Metadata Service REST API
-  description: "The Rule Metadata Service API provides the essential metadata required to configure rules dynamically based on the flow context. \nThe metadata retrieved by this API is designed to support rule configuration in the user interface (UI) by delivering information about each configurable field, the set of applicable comparison operators (e.g., equals, contains) for each field, and lists of possible values or options for fields.\n"
+  title: WSO2 Identity Server Rule Metadata REST API
+  description: "The Rule Metadata API provides the essential metadata required to configure rules dynamically based on the flow context. \nThe metadata retrieved by this API is designed to support rule configuration in the user interface (UI) by delivering information about each configurable field, the set of applicable comparison operators (e.g., equals, contains) for each field, and lists of possible values or options for fields.\n"
   contact:
     name: WSO2
     url: https://wso2.com/identity-and-access-management/
@@ -34,7 +34,10 @@ paths:
       parameters:
       - name: flow
         in: query
-        description: Specifies the flow to retrieve rule metadata. This ensures that the metadata returned is relevant to the given flow.
+        description: |
+          Specifies the flow to retrieve rule metadata. This ensures that the metadata returned is relevant to the given flow.
+
+          Note: At present, only the 'preIssueAccessToken' flow is supported.
         required: true
         style: form
         explode: true
@@ -212,6 +215,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      x-codeSamples:
+      - lang: Curl
+        source: |
+          curl --location 'https://localhost:9443/api/server/v1/rules/metadata?flow=preIssueAccessToken' \
+            --header 'Authorization: Basic YWRtaW46YWRtaW4='
 components:
   schemas:
     ExpressionMeta:
