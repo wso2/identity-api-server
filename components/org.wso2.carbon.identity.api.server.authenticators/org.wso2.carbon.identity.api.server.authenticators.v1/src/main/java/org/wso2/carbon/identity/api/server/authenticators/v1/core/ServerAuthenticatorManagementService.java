@@ -115,7 +115,13 @@ public class ServerAuthenticatorManagementService {
             LocalAuthenticatorConfig[] localAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
                     .getApplicationManagementService().getAllLocalAuthenticators(ContextLoader
                             .getTenantDomainFromContext());
-
+            List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs =
+                    AuthenticatorsServiceHolder.getInstance().getApplicationAuthenticatorService()
+                    .getAllUserDefinedLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
+            if (CollectionUtils.isNotEmpty(userDefinedLocalAuthConfigs)) {
+                localAuthenticatorConfigs = (LocalAuthenticatorConfig[]) ArrayUtils.addAll(localAuthenticatorConfigs,
+                        userDefinedLocalAuthConfigs.toArray(new LocalAuthenticatorConfig[0]));
+            }
             int localAuthenticatorsCount = localAuthenticatorConfigs.length;
             RequestPathAuthenticatorConfig[] requestPathAuthenticatorConfigs = new RequestPathAuthenticatorConfig[0];
 
@@ -155,6 +161,8 @@ public class ServerAuthenticatorManagementService {
                     null);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
+        } catch (AuthenticatorMgtException e) {
+            throw handleAuthenticatorException(e);
         }
     }
 
@@ -207,8 +215,7 @@ public class ServerAuthenticatorManagementService {
      * @param config          The user defined local authenticator update request.
      * @return The created authenticator.
      */
-    public Authenticator addUserDefinedLocalAuthenticator(
-            UserDefinedLocalAuthenticatorCreation config) {
+    public Authenticator addUserDefinedLocalAuthenticator(UserDefinedLocalAuthenticatorCreation config) {
 
         try {
             UserDefinedLocalAuthenticatorConfig createdConfig = AuthenticatorsServiceHolder.getInstance()
@@ -1002,7 +1009,7 @@ public class ServerAuthenticatorManagementService {
                                 errorCode : Constants.AUTHENTICATOR_ERROR_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
             }
-            errorResponse.setDescription(e.getMessage());
+            errorResponse.setDescription(e.getDescription());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof AuthenticatorMgtServerException) {
             if (e.getErrorCode() != null) {
@@ -1012,7 +1019,7 @@ public class ServerAuthenticatorManagementService {
                                 errorCode : Constants.AUTHENTICATOR_ERROR_PREFIX + errorCode;
                 errorResponse.setCode(errorCode);
             }
-            errorResponse.setDescription(e.getMessage());
+            errorResponse.setDescription(e.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
             status = Response.Status.INTERNAL_SERVER_ERROR;

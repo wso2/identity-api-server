@@ -77,11 +77,12 @@ public class LocalAuthenticatorConfigBuilderFactory {
     public static UserDefinedLocalAuthenticatorConfig build(UserDefinedLocalAuthenticatorCreation config)
             throws AuthenticatorMgtClientException {
 
+        String authenticationType = AuthenticatorPropertyConstants.AuthenticationType.IDENTIFICATION.toString();
+        if (config.getAuthenticationType() != null) {
+            authenticationType = config.getAuthenticationType().toString();
+        }
         UserDefinedLocalAuthenticatorConfig authConfig = new UserDefinedLocalAuthenticatorConfig(
-                AuthenticatorPropertyConstants.AuthenticationType.valueOf(
-                        config.getAuthenticationType().toString()));
-        authConfig.setAuthenticationType(AuthenticatorPropertyConstants.AuthenticationType.valueOf(
-                config.getAuthenticationType().toString()));
+                AuthenticatorPropertyConstants.AuthenticationType.valueOf(authenticationType));
         authConfig.setName(config.getName());
         authConfig.setDisplayName(config.getDisplayName());
         authConfig.setEnabled(config.getIsEnabled());
@@ -123,9 +124,9 @@ public class LocalAuthenticatorConfigBuilderFactory {
                     .entrySet().stream().collect(Collectors.toMap(
                             Map.Entry::getKey, entry -> entry.getValue().toString())));
             return endpointConfigBuilder.build();
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException | IllegalArgumentException e) {
             Constants.ErrorMessage error = ERROR_CODE_INVALID_ENDPOINT_CONFIG;
-            throw new AuthenticatorMgtClientException(error.getCode(), error.getMessage(), error.getMessage());
+            throw new AuthenticatorMgtClientException(error.getCode(), error.getMessage(), e.getMessage());
         }
     }
 
