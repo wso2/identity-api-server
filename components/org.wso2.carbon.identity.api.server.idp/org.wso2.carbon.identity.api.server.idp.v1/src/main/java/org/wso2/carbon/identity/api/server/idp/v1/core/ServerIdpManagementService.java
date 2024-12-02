@@ -596,6 +596,8 @@ public class ServerIdpManagementService {
                     listItem.setAuthenticatorId(fedAuthId);
                     listItem.setName(config.getName());
                     listItem.setIsEnabled(config.isEnabled());
+                    listItem.setDefinedBy(
+                            FederatedAuthenticatorListItem.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
                     FederatedAuthenticatorConfig federatedAuthenticatorConfig =
                             ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
                                     config.getName());

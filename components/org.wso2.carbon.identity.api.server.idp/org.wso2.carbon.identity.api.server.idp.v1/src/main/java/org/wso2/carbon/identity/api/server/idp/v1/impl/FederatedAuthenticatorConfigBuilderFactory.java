@@ -197,7 +197,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             authConfig.setEndpointConfig(endpointConfigBuilder.build());
 
             return authConfig;
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException | IllegalArgumentException e) {
             throw new IdentityProviderManagementClientException(Constants.ErrorMessage
                     .ERROR_CODE_INVALID_INPUT.getCode(), e.getMessage());
         }
