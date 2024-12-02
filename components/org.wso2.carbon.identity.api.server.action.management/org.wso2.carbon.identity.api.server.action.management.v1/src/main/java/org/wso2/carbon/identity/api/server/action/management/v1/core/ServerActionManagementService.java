@@ -35,6 +35,8 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesRespo
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.EndpointResponse;
+import org.wso2.carbon.identity.api.server.action.management.v1.Link;
+import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMgtEndpointUtil;
 
 import java.util.ArrayList;
@@ -79,7 +81,7 @@ public class ServerActionManagementService {
         }
     }
 
-    public List<ActionResponse> getActionsByActionType(String actionType) {
+    public List<ActionBasicResponse> getActionsByActionType(String actionType) {
 
         try {
             validateActionType(actionType);
@@ -87,11 +89,11 @@ public class ServerActionManagementService {
                     .getActionsByActionType(actionType,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
 
-            List<ActionResponse> actionResponses = new ArrayList<>();
+            List<ActionBasicResponse> actionBasicResponses = new ArrayList<>();
             for (Action action : actions) {
-                actionResponses.add(buildActionResponse(action));
+                actionBasicResponses.add(buildActionBasicResponse(action));
             }
-            return actionResponses;
+            return actionBasicResponses;
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -226,7 +228,26 @@ public class ServerActionManagementService {
                 .type(ActionType.valueOf(activatedAction.getType().toString()))
                 .name(activatedAction.getName())
                 .description(activatedAction.getDescription())
-                .status(ActionBasicResponse.StatusEnum.valueOf(activatedAction.getStatus().toString()));
+                .status(ActionBasicResponse.StatusEnum.valueOf(activatedAction.getStatus().toString()))
+                .links(buildLinks(activatedAction));
+    }
+
+    /**
+     * Build Links for the Action.
+     *
+     * @param activatedAction Action object.
+     * @return List of Links.
+     */
+    private List<Link> buildLinks(Action activatedAction) {
+
+        String baseUrl = ActionMgtEndpointUtil.buildURIForActionType(activatedAction.getType().getActionType());
+
+        List<Link> links = new ArrayList<>();
+        links.add(new Link()
+                .href(baseUrl + ActionMgtEndpointConstants.PATH_SEPARATOR + activatedAction.getId())
+                .rel("self")
+                .method(Link.MethodEnum.GET));
+        return links;
     }
 
     /**
