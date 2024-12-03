@@ -2877,6 +2877,39 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Property'
+        endpoint:
+          $ref: '#/components/schemas/Endpoint'
+    Endpoint:
+      type: object
+      required:
+        - uri
+        - authentication
+      properties:
+        uri:
+          type: string
+          example: https://abc.com/token
+          pattern: '^https?://.+'
+        authentication:
+          $ref: '#/components/schemas/AuthenticationType'
+    AuthenticationType:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - NONE
+            - BEARER
+            - API_KEY
+            - BASIC
+          example: BASIC
+        properties:
+          type: object
+          additionalProperties: true
+          example:
+            username: "auth_username"
+            password: "auth_password"
     FederatedAuthenticatorPUTRequest:
       type: object
       properties:
@@ -2905,6 +2938,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Property'
+        endpoint:
+          $ref: '#/components/schemas/Endpoint'
     FederatedAuthenticatorListResponse:
       type: object
       properties:

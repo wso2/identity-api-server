@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+import org.wso2.carbon.identity.api.server.idp.v1.model.Endpoint;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Property;
 import javax.validation.constraints.*;
 
@@ -73,6 +74,7 @@ public enum DefinedByEnum {
     private DefinedByEnum definedBy;
     private List<Property> properties = null;
 
+    private Endpoint endpoint;
 
     /**
     **/
@@ -190,7 +192,25 @@ public enum DefinedByEnum {
         return this;
     }
 
+        /**
+    **/
+    public FederatedAuthenticatorPUTRequest endpoint(Endpoint endpoint) {
+
+        this.endpoint = endpoint;
+        return this;
+    }
     
+    @ApiModelProperty(value = "")
+    @JsonProperty("endpoint")
+    @Valid
+    public Endpoint getEndpoint() {
+        return endpoint;
+    }
+    public void setEndpoint(Endpoint endpoint) {
+        this.endpoint = endpoint;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -207,12 +227,13 @@ public enum DefinedByEnum {
             Objects.equals(this.isEnabled, federatedAuthenticatorPUTRequest.isEnabled) &&
             Objects.equals(this.isDefault, federatedAuthenticatorPUTRequest.isDefault) &&
             Objects.equals(this.definedBy, federatedAuthenticatorPUTRequest.definedBy) &&
-            Objects.equals(this.properties, federatedAuthenticatorPUTRequest.properties);
+            Objects.equals(this.properties, federatedAuthenticatorPUTRequest.properties) &&
+            Objects.equals(this.endpoint, federatedAuthenticatorPUTRequest.endpoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, isEnabled, isDefault, definedBy, properties);
+        return Objects.hash(authenticatorId, name, isEnabled, isDefault, definedBy, properties, endpoint);
     }
 
     @Override
@@ -227,6 +248,7 @@ public enum DefinedByEnum {
         sb.append("    isDefault: ").append(toIndentedString(isDefault)).append("\n");
         sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+        sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("}");
         return sb.toString();
     }

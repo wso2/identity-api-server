@@ -1,18 +1,20 @@
 /*
-* Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.identity.api.server.idp.v1.model;
 
@@ -23,7 +25,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Endpoint;
-import org.wso2.carbon.identity.api.server.idp.v1.model.Property;
 import javax.validation.constraints.*;
 
 
@@ -32,7 +33,7 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class FederatedAuthenticator  {
+public class FederatedUserDefinedAuthenticator  {
   
     private String authenticatorId;
     private String name;
@@ -42,7 +43,7 @@ public class FederatedAuthenticator  {
 @XmlEnum(String.class)
 public enum DefinedByEnum {
 
-    @XmlEnumValue("SYSTEM") SYSTEM(String.valueOf("SYSTEM")), @XmlEnumValue("USER") USER(String.valueOf("USER"));
+    @XmlEnumValue("USER") USER(String.valueOf("USER"));
 
 
     private String value;
@@ -74,19 +75,17 @@ public enum DefinedByEnum {
     private Boolean isDefault = false;
     private List<String> tags = null;
 
-    private List<Property> properties = null;
-
     private Endpoint endpoint;
 
     /**
     **/
-    public FederatedAuthenticator authenticatorId(String authenticatorId) {
+    public FederatedUserDefinedAuthenticator authenticatorId(String authenticatorId) {
 
         this.authenticatorId = authenticatorId;
         return this;
     }
     
-    @ApiModelProperty(example = "U0FNTDJBdXRoZW50aWNhdG9y", required = true, value = "")
+    @ApiModelProperty(example = "Y3VzdG9tQXV0aGVudGljYXRvcg", required = true, value = "")
     @JsonProperty("authenticatorId")
     @Valid
     @NotNull(message = "Property authenticatorId cannot be null.")
@@ -100,13 +99,13 @@ public enum DefinedByEnum {
 
     /**
     **/
-    public FederatedAuthenticator name(String name) {
+    public FederatedUserDefinedAuthenticator name(String name) {
 
         this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "SAML2Authenticator", value = "")
+    @ApiModelProperty(example = "customAuthenticator", value = "")
     @JsonProperty("name")
     @Valid
     public String getName() {
@@ -118,7 +117,7 @@ public enum DefinedByEnum {
 
     /**
     **/
-    public FederatedAuthenticator isEnabled(Boolean isEnabled) {
+    public FederatedUserDefinedAuthenticator isEnabled(Boolean isEnabled) {
 
         this.isEnabled = isEnabled;
         return this;
@@ -136,7 +135,7 @@ public enum DefinedByEnum {
 
     /**
     **/
-    public FederatedAuthenticator definedBy(DefinedByEnum definedBy) {
+    public FederatedUserDefinedAuthenticator definedBy(DefinedByEnum definedBy) {
 
         this.definedBy = definedBy;
         return this;
@@ -154,7 +153,7 @@ public enum DefinedByEnum {
 
     /**
     **/
-    public FederatedAuthenticator isDefault(Boolean isDefault) {
+    public FederatedUserDefinedAuthenticator isDefault(Boolean isDefault) {
 
         this.isDefault = isDefault;
         return this;
@@ -172,13 +171,13 @@ public enum DefinedByEnum {
 
     /**
     **/
-    public FederatedAuthenticator tags(List<String> tags) {
+    public FederatedUserDefinedAuthenticator tags(List<String> tags) {
 
         this.tags = tags;
         return this;
     }
     
-    @ApiModelProperty(example = "[\"Social Login\",\"OIDC\"]", value = "")
+    @ApiModelProperty(example = "[\"Custom\"]", value = "")
     @JsonProperty("tags")
     @Valid
     public List<String> getTags() {
@@ -188,7 +187,7 @@ public enum DefinedByEnum {
         this.tags = tags;
     }
 
-    public FederatedAuthenticator addTagsItem(String tagsItem) {
+    public FederatedUserDefinedAuthenticator addTagsItem(String tagsItem) {
         if (this.tags == null) {
             this.tags = new ArrayList<>();
         }
@@ -198,33 +197,7 @@ public enum DefinedByEnum {
 
         /**
     **/
-    public FederatedAuthenticator properties(List<Property> properties) {
-
-        this.properties = properties;
-        return this;
-    }
-    
-    @ApiModelProperty(value = "")
-    @JsonProperty("properties")
-    @Valid
-    public List<Property> getProperties() {
-        return properties;
-    }
-    public void setProperties(List<Property> properties) {
-        this.properties = properties;
-    }
-
-    public FederatedAuthenticator addPropertiesItem(Property propertiesItem) {
-        if (this.properties == null) {
-            this.properties = new ArrayList<>();
-        }
-        this.properties.add(propertiesItem);
-        return this;
-    }
-
-        /**
-    **/
-    public FederatedAuthenticator endpoint(Endpoint endpoint) {
+    public FederatedUserDefinedAuthenticator endpoint(Endpoint endpoint) {
 
         this.endpoint = endpoint;
         return this;
@@ -251,27 +224,26 @@ public enum DefinedByEnum {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        FederatedAuthenticator federatedAuthenticator = (FederatedAuthenticator) o;
-        return Objects.equals(this.authenticatorId, federatedAuthenticator.authenticatorId) &&
-            Objects.equals(this.name, federatedAuthenticator.name) &&
-            Objects.equals(this.isEnabled, federatedAuthenticator.isEnabled) &&
-            Objects.equals(this.definedBy, federatedAuthenticator.definedBy) &&
-            Objects.equals(this.isDefault, federatedAuthenticator.isDefault) &&
-            Objects.equals(this.tags, federatedAuthenticator.tags) &&
-            Objects.equals(this.properties, federatedAuthenticator.properties) &&
-            Objects.equals(this.endpoint, federatedAuthenticator.endpoint);
+        FederatedUserDefinedAuthenticator federatedUserDefinedAuthenticator = (FederatedUserDefinedAuthenticator) o;
+        return Objects.equals(this.authenticatorId, federatedUserDefinedAuthenticator.authenticatorId) &&
+            Objects.equals(this.name, federatedUserDefinedAuthenticator.name) &&
+            Objects.equals(this.isEnabled, federatedUserDefinedAuthenticator.isEnabled) &&
+            Objects.equals(this.definedBy, federatedUserDefinedAuthenticator.definedBy) &&
+            Objects.equals(this.isDefault, federatedUserDefinedAuthenticator.isDefault) &&
+            Objects.equals(this.tags, federatedUserDefinedAuthenticator.tags) &&
+            Objects.equals(this.endpoint, federatedUserDefinedAuthenticator.endpoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authenticatorId, name, isEnabled, definedBy, isDefault, tags, properties, endpoint);
+        return Objects.hash(authenticatorId, name, isEnabled, definedBy, isDefault, tags, endpoint);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class FederatedAuthenticator {\n");
+        sb.append("class FederatedUserDefinedAuthenticator {\n");
         
         sb.append("    authenticatorId: ").append(toIndentedString(authenticatorId)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
@@ -279,7 +251,6 @@ public enum DefinedByEnum {
         sb.append("    definedBy: ").append(toIndentedString(definedBy)).append("\n");
         sb.append("    isDefault: ").append(toIndentedString(isDefault)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
-        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("}");
         return sb.toString();
