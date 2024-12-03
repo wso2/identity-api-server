@@ -29,7 +29,6 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeProperties;
 import org.wso2.carbon.identity.api.server.action.management.v1.Error;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
 
@@ -200,14 +199,14 @@ public class ActionsApi  {
     @Path("/{actionType}")
     
     @Produces({ "application/json" })
-    @ApiOperation(value = "List action ", notes = "This API provides the capability to retrieve the action by action type.<br>   <b>Scope required:</b> <br>       * internal_action_mgt_view ", response = ActionResponse.class, responseContainer = "List", authorizations = {
+    @ApiOperation(value = "List action ", notes = "This API provides the capability to retrieve the action by action type.<br>   <b>Scope required:</b> <br>       * internal_action_mgt_view ", response = ActionBasicResponse.class, responseContainer = "List", authorizations = {
         @Authorization(value = "BasicAuth"),
         @Authorization(value = "OAuth2", scopes = {
             
         })
     }, tags={ "Actions", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ActionResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 200, message = "OK", response = ActionBasicResponse.class, responseContainer = "List"),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
         @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
@@ -230,7 +229,7 @@ public class ActionsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Actions", })
+    }, tags={ "Actions" })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = ActionResponse.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -242,30 +241,6 @@ public class ActionsApi  {
     public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action information to be updated." ,required=true) @Valid ActionUpdateModel actionUpdateModel) {
 
         return delegate.updateAction(actionType,  actionId,  actionUpdateModel );
-    }
-
-    @Valid
-    @PUT
-    @Path("/{actionType}/{actionId}/{authType}")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @ApiOperation(value = "Update Action endpoint authentication information by given Id. ", notes = "This API provides the capability to update Action endpoint authentication information by given Id. <br>   <b>Scope required:</b> <br>       * internal_action_mgt_update ", response = ActionResponse.class, authorizations = {
-        @Authorization(value = "BasicAuth"),
-        @Authorization(value = "OAuth2", scopes = {
-            
-        })
-    }, tags={ "Actions" })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "OK", response = ActionResponse.class),
-        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
-    })
-    public Response updateActionEndpointAuthentication(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "Authentication Type of the Action Endpoint.",required=true, allowableValues="none, basic, apiKey, bearer") @PathParam("authType") String authType, @ApiParam(value = "This represents the action endpoint authentication to be updated." ,required=true) @Valid AuthenticationTypeProperties authenticationTypeProperties) {
-
-        return delegate.updateActionEndpointAuthentication(actionType,  actionId,  authType,  authenticationTypeProperties );
     }
 
 }

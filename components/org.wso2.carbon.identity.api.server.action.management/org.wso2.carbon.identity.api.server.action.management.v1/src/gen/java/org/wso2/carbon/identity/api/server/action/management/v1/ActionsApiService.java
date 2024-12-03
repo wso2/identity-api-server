@@ -29,7 +29,6 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeProperties;
 import org.wso2.carbon.identity.api.server.action.management.v1.Error;
 import javax.ws.rs.core.Response;
 
@@ -51,6 +50,4 @@ public interface ActionsApiService {
       public Response getActionsByActionType(String actionType);
 
       public Response updateAction(String actionType, String actionId, ActionUpdateModel actionUpdateModel);
-
-      public Response updateActionEndpointAuthentication(String actionType, String actionId, String authType, AuthenticationTypeProperties authenticationTypeProperties);
 }

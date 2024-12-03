@@ -33,7 +33,7 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.action.management.constant.ActionMgtConstants.ErrorMessages.ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ACTION_TYPE_AND_ID;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ACTION_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.PATH_CONSTANT;
+import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
 
 /**
@@ -43,7 +43,7 @@ public class ActionMgtEndpointUtil {
 
     private static final Log LOG = LogFactory.getLog(ActionMgtEndpointUtil.class);
     private static final String ACTION_TYPE_LINK_FORMAT = Constants.V1_API_PATH_COMPONENT + ACTION_PATH_COMPONENT
-            + PATH_CONSTANT;
+            + PATH_SEPARATOR;
 
     public static String buildURIForActionType(String actionType) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -57,6 +57,24 @@ public class OrganizationConfigsService {
                 .collect(Collectors.toList());
         try {
             OrganizationConfigsServiceHolder.getOrganizationConfigManager().addDiscoveryConfiguration
+                    (new DiscoveryConfig(configProperties));
+        } catch (OrganizationConfigException e) {
+            throw handleException(e);
+        }
+    }
+
+    /**
+     * Update the organization discovery configuration in the primary organization.
+     *
+     * @param config The organization discovery configuration.
+     */
+    public void updateDiscoveryConfiguration(Config config) {
+
+        List<ConfigProperty> configProperties = config.getProperties().stream()
+                .map(property -> new ConfigProperty(property.getKey(), property.getValue()))
+                .collect(Collectors.toList());
+        try {
+            OrganizationConfigsServiceHolder.getOrganizationConfigManager().updateDiscoveryConfiguration
                     (new DiscoveryConfig(configProperties));
         } catch (OrganizationConfigException e) {
             throw handleException(e);

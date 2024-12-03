@@ -23,7 +23,6 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
-import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeProperties;
 import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.action.management.v1.core.ServerActionManagementService;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
@@ -43,6 +42,12 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     ServerActionManagementService serverActionManagementService;
 
     @Override
+    public Response activateAction(String actionType, String actionId) {
+
+        return Response.ok().entity(serverActionManagementService.activateAction(actionType, actionId)).build();
+    }
+
+    @Override
     public Response createAction(String actionType, ActionModel actionModel) {
 
         ActionResponse actionResponse = serverActionManagementService.createAction(actionType, actionModel);
@@ -52,22 +57,9 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     }
 
     @Override
-    public Response getActionsByActionType(String actionType) {
+    public Response deactivateAction(String actionType, String actionId) {
 
-        return Response.ok().entity(serverActionManagementService.getActionsByActionType(actionType)).build();
-    }
-
-    @Override
-    public Response getActionByActionId(String actionType, String actionId) {
-
-        return Response.ok().entity(serverActionManagementService.getActionByActionId(actionType, actionId)).build();
-    }
-
-    @Override
-    public Response updateAction(String actionType, String actionId, ActionUpdateModel actionUpdateModel) {
-
-        return Response.ok().entity(serverActionManagementService.updateAction(actionType, actionId, actionUpdateModel))
-                .build();
+        return Response.ok().entity(serverActionManagementService.deactivateAction(actionType, actionId)).build();
     }
 
     @Override
@@ -78,15 +70,9 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     }
 
     @Override
-    public Response activateAction(String actionType, String actionId) {
+    public Response getActionByActionId(String actionType, String actionId) {
 
-        return Response.ok().entity(serverActionManagementService.activateAction(actionType, actionId)).build();
-    }
-
-    @Override
-    public Response deactivateAction(String actionType, String actionId) {
-
-        return Response.ok().entity(serverActionManagementService.deactivateAction(actionType, actionId)).build();
+        return Response.ok().entity(serverActionManagementService.getActionByActionId(actionType, actionId)).build();
     }
 
     @Override
@@ -96,10 +82,15 @@ public class ActionsApiServiceImpl implements ActionsApiService {
     }
 
     @Override
-    public Response updateActionEndpointAuthentication(String actionType, String actionId, String authType,
-                                                       AuthenticationTypeProperties authenticationTypeProperties) {
+    public Response getActionsByActionType(String actionType) {
 
-        return Response.ok().entity(serverActionManagementService.updateActionEndpointAuthentication(actionType,
-                actionId, authType, authenticationTypeProperties)).build();
+        return Response.ok().entity(serverActionManagementService.getActionsByActionType(actionType)).build();
+    }
+
+    @Override
+    public Response updateAction(String actionType, String actionId, ActionUpdateModel actionUpdateModel) {
+
+        return Response.ok().entity(serverActionManagementService.updateAction(actionType, actionId, actionUpdateModel))
+                .build();
     }
 }
