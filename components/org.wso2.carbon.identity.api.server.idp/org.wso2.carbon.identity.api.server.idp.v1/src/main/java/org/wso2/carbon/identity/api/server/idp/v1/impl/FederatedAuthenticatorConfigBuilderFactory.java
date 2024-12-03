@@ -173,8 +173,8 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         // The System-defined authenticator configs must not have endpoint configurations; throw an error if they do.
         if (config.endpoint != null) {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_ENDPOINT_PROVIDED_FOR_SYSTEM_AUTH;
-            throw new IdentityProviderManagementClientException(error.getCode(), String.format(error.getDescription(),
-                    config.authenticatorName));
+            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
+                    String.format(error.getDescription(), config.authenticatorName));
         }
 
         validateAuthenticatorProperties(config.authenticatorName, config.properties);
@@ -199,7 +199,8 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             return authConfig;
         } catch (NoSuchElementException | IllegalArgumentException e) {
             throw new IdentityProviderManagementClientException(Constants.ErrorMessage
-                    .ERROR_CODE_INVALID_INPUT.getCode(), e.getMessage());
+                    .ERROR_CODE_INVALID_INPUT.getCode(), Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT.getMessage(),
+                    e.getMessage());
         }
     }
 
@@ -209,14 +210,14 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         // The User-defined authenticator configs must not have properties configurations; throw an error if they do.
         if (config.properties != null) {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_PROPERTIES_PROVIDED_FOR_USER_AUTH;
-            throw new IdentityProviderManagementClientException(error.getCode(),
+            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription(), config.authenticatorName));
         }
 
         // The User-defined authenticator configs must have endpoint configurations; throw an error if they don't.
         if (config.endpoint == null) {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_NO_ENDPOINT_PROVIDED;
-            throw new IdentityProviderManagementClientException(error.getCode(),
+            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription(), config.authenticatorName));
         }
     }
@@ -238,7 +239,8 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
         if (!areAllDistinct(properties)) {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT;
-            throw new IdentityProviderManagementClientException(error.getCode(), error.getDescription());
+            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
+                    error.getDescription());
         }
     }
 
@@ -282,7 +284,8 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                         samlAuthenticatorProperties.set(positionOfMetadataKey, metadataProperty);
                     } else {
                         Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_SAML_METADATA;
-                        throw new IdentityProviderManagementClientException(error.getCode(), error.getDescription());
+                        throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
+                                error.getDescription());
                     }
                 }
             }
@@ -313,7 +316,8 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             }
             if (scopesFieldFilled && queryParamsScopesFilled) {
                 Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_DUPLICATE_OIDC_SCOPES;
-                throw new IdentityProviderManagementClientException(error.getCode(), error.getDescription());
+                throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
+                        error.getDescription());
             }
         }
     }
@@ -333,7 +337,8 @@ public class FederatedAuthenticatorConfigBuilderFactory {
                     String scopes = oidcAuthenticatorProperty.getValue();
                     if (StringUtils.isNotBlank(scopes) && !scopes.contains("openid")) {
                         Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_OIDC_SCOPES;
-                        throw new IdentityProviderManagementClientException(error.getCode(), error.getDescription());
+                        throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
+                                error.getDescription());
                     }
                 }
             }
@@ -389,7 +394,8 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             }
         } catch (IdentityProviderManagementException e) {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_ERROR_ADDING_IDP;
-            throw new IdentityProviderManagementClientException(error.getCode(), error.getDescription());
+            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
+                    error.getDescription());
         }
         return null;
     }
