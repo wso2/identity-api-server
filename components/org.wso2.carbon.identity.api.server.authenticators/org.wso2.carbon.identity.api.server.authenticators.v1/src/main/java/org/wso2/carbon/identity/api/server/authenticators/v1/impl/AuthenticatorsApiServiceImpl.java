@@ -19,6 +19,8 @@ package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.authenticators.v1.AuthenticatorsApiService;
 import org.wso2.carbon.identity.api.server.authenticators.v1.core.ServerAuthenticatorManagementService;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorUpdate;
 
 import javax.ws.rs.core.Response;
 
@@ -43,9 +45,32 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
     }
 
     @Override
+    public Response addUserDefinedLocalAuthenticator(
+            UserDefinedLocalAuthenticatorCreation userDefinedLocalAuthenticatorCreation) {
+
+        return Response.ok().entity(authenticatorManagementService
+                .addUserDefinedLocalAuthenticator(userDefinedLocalAuthenticatorCreation)).build();
+    }
+
+    @Override
+    public Response deleteUserDefinedLocalAuthenticator(String authenticatorId) {
+
+        authenticatorManagementService.deleteUserDefinedLocalAuthenticator(authenticatorId);
+        return Response.noContent().build();
+    }
+
+    @Override
     public Response getConnectedAppsOfLocalAuthenticator(String authenticatorId, Integer limit, Integer offset) {
 
         return Response.ok().entity(authenticatorManagementService
                 .getConnectedAppsOfLocalAuthenticator(authenticatorId, limit, offset)).build();
+    }
+
+    @Override
+    public Response updateUserDefinedLocalAuthenticator(
+            String authenticatorId, UserDefinedLocalAuthenticatorUpdate userDefinedLocalAuthenticatorUpdate) {
+
+        return Response.ok().entity(authenticatorManagementService
+                .updateUserDefinedLocalAuthenticator(authenticatorId, userDefinedLocalAuthenticatorUpdate)).build();
     }
 }
