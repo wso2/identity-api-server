@@ -70,6 +70,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         List<Property> properties = Optional.ofNullable(authenticator.getProperties())
                 .map(props -> props.stream().map(propertyToInternal).collect(Collectors.toList()))
                 .orElse(null);
+        validateAuthPropForFederatedAuthenticatorPUTRequest(authenticatorName, properties);
         FederatedAuthenticatorConfigBuilderFactory.Config config =
                 new FederatedAuthenticatorConfigBuilderFactory.Config(authenticatorName,
                         getDisplayNameOfAuthenticator(authenticatorName),
@@ -92,6 +93,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         List<Property> properties = Optional.ofNullable(authenticator.getProperties())
                 .map(props -> props.stream().map(propertyToInternal).collect(Collectors.toList()))
                 .orElse(null);
+        validateAuthPropForFederatedAuthenticator(authenticatorName, properties);
         FederatedAuthenticatorConfigBuilderFactory.Config config =
                 new FederatedAuthenticatorConfigBuilderFactory.Config(authenticatorName,
                         getDisplayNameOfAuthenticator(authenticatorName),
@@ -176,8 +178,6 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription(), config.authenticatorName));
         }
-
-        validateAuthenticatorProperties(config.authenticatorName, config.properties);
     }
 
     private static UserDefinedFederatedAuthenticatorConfig createUserDefinedFederatedAuthenticator(Config config)
@@ -222,8 +222,25 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         }
     }
 
-    private static void validateAuthenticatorProperties(String authenticatorName, List<Property> properties)
-            throws IdentityProviderManagementClientException {
+    private static void validateAuthPropForFederatedAuthenticator(
+            String authenticatorName, List<Property> properties) throws IdentityProviderManagementClientException {
+
+        if (properties == null) {
+            return;
+        }
+
+        if (IdentityApplicationConstants.Authenticator.SAML2SSO.FED_AUTH_NAME.equals(authenticatorName)) {
+            validateSamlMetadata(properties);
+        }
+        if (!areAllDistinct(properties)) {
+            Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT;
+            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
+                    error.getDescription());
+        }
+    }
+
+    private static void validateAuthPropForFederatedAuthenticatorPUTRequest(
+            String authenticatorName, List<Property> properties) throws IdentityProviderManagementClientException {
 
         if (properties == null) {
             return;
@@ -235,12 +252,6 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         if (IdentityApplicationConstants.Authenticator.OIDC.FED_AUTH_NAME.equals(authenticatorName)) {
             validateDuplicateOpenIDConnectScopes(properties);
             validateDefaultOpenIDConnectScopes(properties);
-        }
-
-        if (!areAllDistinct(properties)) {
-            Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT;
-            throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
-                    error.getDescription());
         }
     }
 
