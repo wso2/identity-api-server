@@ -3262,6 +3262,10 @@ public class ServerIdpManagementService {
                 errorResponse = getErrorBuilder(errorEnum, data).build(log, e.getMessage());
             }
             errorResponse.setDescription(e.getMessage());
+            IdentityProviderManagementClientException clientException = (IdentityProviderManagementClientException) e;
+            if (StringUtils.isNotEmpty(clientException.getDescription())) {
+                errorResponse.setDescription(clientException.getDescription());
+            }
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof IdentityProviderManagementServerException) {
             if (e.getErrorCode() != null) {
