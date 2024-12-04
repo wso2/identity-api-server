@@ -20,7 +20,7 @@ package org.wso2.carbon.identity.api.server.action.management.common.factory;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.action.management.ActionManagementService;
+import org.wso2.carbon.identity.action.management.service.ActionManagementService;
 
 /**
  * Factory class for ActionManagementOSGiService.

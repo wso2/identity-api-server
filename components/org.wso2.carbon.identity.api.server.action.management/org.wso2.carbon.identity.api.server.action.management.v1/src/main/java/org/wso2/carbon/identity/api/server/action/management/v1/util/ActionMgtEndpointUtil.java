@@ -31,7 +31,7 @@ import org.wso2.carbon.identity.api.server.common.error.ErrorDTO;
 
 import javax.ws.rs.core.Response;
 
-import static org.wso2.carbon.identity.action.management.constant.ActionMgtConstants.ErrorMessages.ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ACTION_TYPE_AND_ID;
+import static org.wso2.carbon.identity.action.management.constant.error.ErrorMessage.ERROR_NO_ACTION_CONFIGURED_ON_GIVEN_ACTION_TYPE_AND_ID;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ACTION_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.PATH_SEPARATOR;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_DELIMITER;
