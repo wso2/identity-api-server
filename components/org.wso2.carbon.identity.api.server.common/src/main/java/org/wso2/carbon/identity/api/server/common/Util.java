@@ -181,11 +181,17 @@ public class Util {
 
     private static int calculateOffsetForPreviousLink(int offset, int limit, int total) {
 
+        if (limit <= 0) {
+            // If limit is 0 or negative, consider it as 0 and build the previous page.
+            return offset;
+        }
+
         int newOffset = (offset - limit);
         if (newOffset < total) {
             return newOffset;
         }
 
+        // If offset is greater than total, go back by the chunks of limit until a proper page is found.
         return calculateOffsetForPreviousLink(newOffset, limit, total);
     }
 
