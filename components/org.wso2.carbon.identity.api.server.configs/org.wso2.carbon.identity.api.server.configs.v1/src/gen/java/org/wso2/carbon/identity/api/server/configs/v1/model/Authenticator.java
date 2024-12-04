@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.wso2.carbon.identity.api.server.configs.v1.model.AuthenticatorProperty;
+import org.wso2.carbon.identity.api.server.configs.v1.model.Endpoint;
 import javax.validation.constraints.*;
 
 
@@ -108,6 +109,8 @@ public enum TypeEnum {
     private List<String> tags = null;
 
     private List<AuthenticatorProperty> properties = null;
+
+    private List<Endpoint> endpoint = null;
 
 
     /**
@@ -274,6 +277,32 @@ public enum TypeEnum {
         return this;
     }
 
+        /**
+    **/
+    public Authenticator endpoint(List<Endpoint> endpoint) {
+
+        this.endpoint = endpoint;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("endpoint")
+    @Valid
+    public List<Endpoint> getEndpoint() {
+        return endpoint;
+    }
+    public void setEndpoint(List<Endpoint> endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public Authenticator addEndpointItem(Endpoint endpointItem) {
+        if (this.endpoint == null) {
+            this.endpoint = new ArrayList<>();
+        }
+        this.endpoint.add(endpointItem);
+        return this;
+    }
+
     
 
     @Override
@@ -293,12 +322,13 @@ public enum TypeEnum {
             Objects.equals(this.definedBy, authenticator.definedBy) &&
             Objects.equals(this.type, authenticator.type) &&
             Objects.equals(this.tags, authenticator.tags) &&
-            Objects.equals(this.properties, authenticator.properties);
+            Objects.equals(this.properties, authenticator.properties) &&
+            Objects.equals(this.endpoint, authenticator.endpoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, displayName, isEnabled, definedBy, type, tags, properties);
+        return Objects.hash(id, name, displayName, isEnabled, definedBy, type, tags, properties, endpoint);
     }
 
     @Override
@@ -315,6 +345,7 @@ public enum TypeEnum {
         sb.append("    type: ").append(toIndentedString(type)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+        sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
         sb.append("}");
         return sb.toString();
     }
