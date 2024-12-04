@@ -28,7 +28,7 @@ public class Constants {
     public static final String AUTHENTICATOR_ERROR_PREFIX = "AUT-";
     public static final String FEDERATED_AUTHENTICATORS = "federatedAuthenticators";
     public static final String AUTHENTICATOR_PATH_COMPONENT = "/authenticators";
-    public static final String CONFIGS_AUTHENTICATOR_PATH_COMPONENT = "/configs/authenticators";
+    public static final String CONFIGS_AUTHENTICATOR_PATH_COMPONENT = "/configs/authenticators/%s";
     public static final String PATH_SEPERATOR = "/";
     public static final String PAGE_LINK_REL_NEXT = "next";
     public static final String PAGE_LINK_REL_PREVIOUS = "previous";

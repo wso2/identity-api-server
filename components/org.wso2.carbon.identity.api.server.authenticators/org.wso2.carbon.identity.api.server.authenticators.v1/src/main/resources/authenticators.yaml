@@ -148,12 +148,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -204,12 +198,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -255,12 +243,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
-        '409':
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:

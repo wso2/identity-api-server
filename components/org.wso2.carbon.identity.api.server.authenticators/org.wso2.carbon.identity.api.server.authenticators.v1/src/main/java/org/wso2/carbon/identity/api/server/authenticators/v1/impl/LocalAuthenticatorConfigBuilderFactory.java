@@ -45,6 +45,8 @@ import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
  */
 public class LocalAuthenticatorConfigBuilderFactory {
 
+    private static final String TAG_2FA = "2FA";
+
     /**
      * Builds the authenticator model from the UserDefinedLocalAuthenticatorConfig.
      *
@@ -62,7 +64,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
         authenticator.setType(Authenticator.TypeEnum.LOCAL);
         authenticator.setTags(Arrays.asList(config.getTags()));
         authenticator.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
-                CONFIGS_AUTHENTICATOR_PATH_COMPONENT + "/%s", config.getName())).toString());
+                CONFIGS_AUTHENTICATOR_PATH_COMPONENT, config.getName())).toString());
 
         return authenticator;
     }
@@ -133,7 +135,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
     private static AuthenticatorPropertyConstants.AuthenticationType resolveAuthenticationType(
             LocalAuthenticatorConfig config) {
 
-        if (Arrays.asList(config.getTags()).contains("2FA")) {
+        if (Arrays.asList(config.getTags()).contains(TAG_2FA)) {
             return AuthenticatorPropertyConstants.AuthenticationType.VERIFICATION;
         } else {
             return AuthenticatorPropertyConstants.AuthenticationType.IDENTIFICATION;
