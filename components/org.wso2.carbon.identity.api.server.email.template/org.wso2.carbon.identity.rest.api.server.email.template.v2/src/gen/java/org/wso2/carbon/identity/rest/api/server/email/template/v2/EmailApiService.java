@@ -49,9 +49,9 @@ public interface EmailApiService {
 
       public Response getAllEmailTemplateTypes(Integer limit, Integer offset, String sortOrder, String sortBy);
 
-      public Response getAppEmailTemplate(String templateTypeId, String appUuid, String locale, Integer limit, Integer offset, String sortOrder, String sortBy);
+      public Response getAppEmailTemplate(String templateTypeId, String appUuid, String locale, Boolean resolve, Integer limit, Integer offset, String sortOrder, String sortBy);
 
-      public Response getAppTemplatesListOfEmailTemplateType(String templateTypeId, String appUuid, Integer limit, Integer offset, String sortOrder, String sortBy);
+      public Response getAppTemplatesListOfEmailTemplateType(String templateTypeId, String appUuid, Boolean resolve, Integer limit, Integer offset, String sortOrder, String sortBy);
 
       public Response getEmailTemplateType(String templateTypeId);
 

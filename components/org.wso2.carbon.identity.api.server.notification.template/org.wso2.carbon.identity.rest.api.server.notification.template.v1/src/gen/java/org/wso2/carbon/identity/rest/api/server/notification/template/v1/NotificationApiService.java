@@ -62,15 +62,15 @@ public interface NotificationApiService {
 
       public Response deleteSMSTemplateType(String templateTypeId);
 
-      public Response getAllAppTemplatesOfEmailTemplateType(String templateTypeId, String appUuid);
+      public Response getAllAppTemplatesOfEmailTemplateType(String templateTypeId, String appUuid, Boolean resolve);
 
-      public Response getAllAppTemplatesOfSMSTemplateType(String templateTypeId, String appUuid);
+      public Response getAllAppTemplatesOfSMSTemplateType(String templateTypeId, String appUuid, Boolean resolve);
 
       public Response getAllEmailTemplateTypes();
 
-      public Response getAllOrgTemplatesOfEmailTemplateType(String templateTypeId);
+      public Response getAllOrgTemplatesOfEmailTemplateType(String templateTypeId, Boolean resolve);
 
-      public Response getAllOrgTemplatesOfSMSTemplateType(String templateTypeId);
+      public Response getAllOrgTemplatesOfSMSTemplateType(String templateTypeId, Boolean resolve);
 
       public Response getAllSMSTemplateTypes();
 
@@ -78,15 +78,15 @@ public interface NotificationApiService {
 
       public Response getAllSystemTemplatesOfSMSTemplateType(String templateTypeId);
 
-      public Response getAppEmailTemplate(String templateTypeId, String appUuid, String locale);
+      public Response getAppEmailTemplate(String templateTypeId, String appUuid, String locale, Boolean resolve);
 
-      public Response getAppSMSTemplate(String templateTypeId, String appUuid, String locale);
+      public Response getAppSMSTemplate(String templateTypeId, String appUuid, String locale, Boolean resolve);
 
       public Response getEmailTemplateType(String templateTypeId);
 
-      public Response getOrgEmailTemplate(String templateTypeId, String locale);
+      public Response getOrgEmailTemplate(String templateTypeId, String locale, Boolean resolve);
 
-      public Response getOrgSMSTemplate(String templateTypeId, String locale);
+      public Response getOrgSMSTemplate(String templateTypeId, String locale, Boolean resolve);
 
       public Response getSMSTemplateType(String templateTypeId);
 

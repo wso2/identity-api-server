@@ -134,29 +134,36 @@ public class TemplatesService {
     /**
      * Retrieves the list of organization email templates of the given template type.
      *
-     * @param templateTypeId Template type ID.
+     * @param templateTypeId      Template type ID.
+     * @param notificationChannel Notification channel.
+     * @param resolve             Whether to retrieve templates resolved through the ancestor organization hierarchy,
+     *                            returning templates that are applicable across the tenant's organizational structure.
      * @return List of email templates.
      */
-    public List<SimpleTemplate> getAllTemplatesOfTemplateType(String templateTypeId, String notificationChannel) {
+    public List<SimpleTemplate> getAllTemplatesOfTemplateType(String templateTypeId, String notificationChannel,
+                                                              boolean resolve) {
 
-        return getAllTemplatesOfTemplateType(templateTypeId, null, notificationChannel);
+        return getAllTemplatesOfTemplateType(templateTypeId, null, notificationChannel, resolve);
     }
 
     /**
      * Retrieves the list of application email templates of the given template type.
      *
-     * @param templateTypeId  Template type ID.
-     * @param applicationUuid Application UUID.
+     * @param templateTypeId      Template type ID.
+     * @param applicationUuid     Application UUID.
+     * @param notificationChannel Notification channel.
+     * @param resolve             Whether to retrieve templates resolved through the ancestor organization hierarchy,
+     *                            returning templates that are applicable across the tenant's organizational structure.
      * @return List of email templates.
      */
     public List<SimpleTemplate> getAllTemplatesOfTemplateType(String templateTypeId, String applicationUuid,
-                                                              String notificationChannel) {
+                                                              String notificationChannel, boolean resolve) {
 
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
         try {
             List<NotificationTemplate> templates = TemplatesServiceHolder.getNotificationTemplateManager()
                     .getNotificationTemplatesOfType(notificationChannel, templateTypeDisplayName,
-                            getTenantDomainFromContext(), applicationUuid);
+                            getTenantDomainFromContext(), applicationUuid, resolve);
             String templateOwner = StringUtils.isNotBlank(applicationUuid) ? Constants.NOTIFICATION_TEMPLATE_OWNER_APP :
                     Constants.NOTIFICATION_TEMPLATE_OWNER_ORG;
             return Util.buildSimpleTemplateList(templates, applicationUuid, templateOwner, notificationChannel);
@@ -192,11 +199,12 @@ public class TemplatesService {
      *
      * @param templateTypeId Template type ID.
      * @param templateId     Template ID.
+     * @param resolve         Whether to retrieve the template resolved through the ancestor organization hierarchy.
      * @return Email template.
      */
-    public EmailTemplateWithID getEmailTemplate(String templateTypeId, String templateId) {
+    public EmailTemplateWithID getEmailTemplate(String templateTypeId, String templateId, boolean resolve) {
 
-        return getEmailTemplate(templateTypeId, templateId, null);
+        return getEmailTemplate(templateTypeId, templateId, null, resolve);
     }
 
     /**
@@ -205,15 +213,17 @@ public class TemplatesService {
      * @param templateTypeId  Template type ID.
      * @param templateId      Template ID.
      * @param applicationUuid Application UUID.
+     * @param resolve         Whether to retrieve the template resolved through the ancestor organization hierarchy.
      * @return Email template.
      */
-    public EmailTemplateWithID getEmailTemplate(String templateTypeId, String templateId, String applicationUuid) {
+    public EmailTemplateWithID getEmailTemplate(String templateTypeId, String templateId, String applicationUuid,
+                                                boolean resolve) {
 
         try {
             String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
             NotificationTemplate internalEmailTemplate = TemplatesServiceHolder.getNotificationTemplateManager().
                     getNotificationTemplate(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeDisplayName, templateId,
-                            getTenantDomainFromContext(), applicationUuid);
+                            getTenantDomainFromContext(), applicationUuid, resolve);
             // NotificationTemplateManager sends the default template if no matching template found.
             // We need to check for the locale specifically.
             if (!internalEmailTemplate.getLocale().equals(templateId)) {
@@ -230,13 +240,14 @@ public class TemplatesService {
     /**
      * Retrieves the organization SMS template of the given template type and locale.
      *
-     * @param templateTypeId  Template type ID.
-     * @param templateId      Template ID.
+     * @param templateTypeId Template type ID.
+     * @param templateId     Template ID.
+     * @param resolve         Whether to retrieve the template resolved through the ancestor organization hierarchy.
      * @return SMS template.
      */
-    public SMSTemplateWithID getSMSTemplate(String templateTypeId, String templateId) {
+    public SMSTemplateWithID getSMSTemplate(String templateTypeId, String templateId, boolean resolve) {
 
-        return getSMSTemplate(templateTypeId, templateId, null);
+        return getSMSTemplate(templateTypeId, templateId, null, resolve);
     }
 
     /**
@@ -245,15 +256,17 @@ public class TemplatesService {
      * @param templateTypeId  Template type ID.
      * @param templateId      Template ID.
      * @param applicationUuid Application UUID.
+     * @param resolve         Whether to retrieve the template resolved through the ancestor organization hierarchy.
      * @return SMS template.
      */
-    public SMSTemplateWithID getSMSTemplate(String templateTypeId, String templateId, String applicationUuid) {
+    public SMSTemplateWithID getSMSTemplate(String templateTypeId, String templateId, String applicationUuid,
+                                            boolean resolve) {
 
         try {
             String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
             NotificationTemplate internalEmailTemplate = TemplatesServiceHolder.getNotificationTemplateManager().
                     getNotificationTemplate(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeDisplayName, templateId,
-                            getTenantDomainFromContext(), applicationUuid);
+                            getTenantDomainFromContext(), applicationUuid, resolve);
             // NotificationTemplateManager sends the default template if no matching template found.
             // We need to check for the locale specifically.
             if (!internalEmailTemplate.getLocale().equals(templateId)) {
