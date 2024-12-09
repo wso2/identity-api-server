@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,8 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.organization.selfservice.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
+import org.wso2.carbon.identity.api.server.organization.selfservice.v1.factories.SelfServiceApiServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyPatchReq;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyRes;
@@ -36,8 +35,12 @@ import javax.validation.constraints.*;
 
 public class SelfServiceApi  {
 
-    @Autowired
-    private SelfServiceApiService delegate;
+    private final SelfServiceApiService delegate;
+
+    public SelfServiceApi() {
+
+        this.delegate = SelfServiceApiServiceFactory.getSelfServiceApi();
+    }
 
     @Valid
     @GET

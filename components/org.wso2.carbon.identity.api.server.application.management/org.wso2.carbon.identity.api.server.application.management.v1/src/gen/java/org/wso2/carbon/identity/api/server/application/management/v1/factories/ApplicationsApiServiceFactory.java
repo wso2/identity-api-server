@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.application.management.v1.factories;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationsApiService;
 import org.wso2.carbon.identity.api.server.application.management.v1.impl.ApplicationsApiServiceImpl;
 
+/**
+ * Factory class for ApplicationsApiService.
+ */
 public class ApplicationsApiServiceFactory {
 
-   private final static ApplicationsApiService service = new ApplicationsApiServiceImpl();
+   private final static ApplicationsApiService SERVICE = new ApplicationsApiServiceImpl();
 
+   /**
+    * Get ApplicationsApiService.
+    *
+    * @return ApplicationsApiService.
+    */
    public static ApplicationsApiService getApplicationsApi()
    {
-      return service;
+      return SERVICE;
    }
 }
