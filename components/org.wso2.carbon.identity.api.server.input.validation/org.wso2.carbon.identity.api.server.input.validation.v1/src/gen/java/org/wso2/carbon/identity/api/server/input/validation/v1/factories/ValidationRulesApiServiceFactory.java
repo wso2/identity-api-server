@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2022-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -26,7 +26,7 @@ import org.wso2.carbon.identity.api.server.input.validation.v1.impl.ValidationRu
  */
 public class ValidationRulesApiServiceFactory {
 
-   private final static ValidationRulesApiService service = new ValidationRulesApiServiceImpl();
+   private final static ValidationRulesApiService SERVICE = new ValidationRulesApiServiceImpl();
 
    /**
     * Method to get ValidationRulesApiService.
@@ -35,6 +35,6 @@ public class ValidationRulesApiServiceFactory {
     */
    public static ValidationRulesApiService getValidationRulesApi() {
 
-      return service;
+      return SERVICE;
    }
 }
