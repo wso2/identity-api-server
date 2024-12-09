@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.authenticators.common;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.idp.mgt.IdpManager;
 
@@ -43,6 +44,13 @@ public class AuthenticatorsServiceHolder {
         static final IdpManager SERVICE = (IdpManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext()
                 .getOSGiService(IdpManager.class, null);
+    }
+
+    private static class ApplicationAuthenticatorServiceHolder {
+
+       static final ApplicationAuthenticatorService SERVICE = (ApplicationAuthenticatorService) PrivilegedCarbonContext
+               .getThreadLocalCarbonContext()
+               .getOSGiService(ApplicationAuthenticatorService.class, null);
     }
 
     /**
@@ -70,18 +78,8 @@ public class AuthenticatorsServiceHolder {
      *
      * @return ApplicationAuthenticatorService
      */
-    public ApplicationAuthenticatorService getApplicationAuthenticatorService() {
+    public static ApplicationAuthenticatorService getApplicationAuthenticatorService() {
 
-        return AuthenticatorsServiceHolder.getInstance().applicationAuthenticatorService;
-    }
-
-    /**
-     * Set ApplicationAuthenticatorService osgi service.
-     *
-     * @param applicationAuthenticatorService ApplicationAuthenticatorService.
-     */
-    public void setApplicationAuthenticatorService(ApplicationAuthenticatorService applicationAuthenticatorService) {
-
-        AuthenticatorsServiceHolder.getInstance().applicationAuthenticatorService = applicationAuthenticatorService;
+        return ApplicationAuthenticatorServiceHolder.SERVICE;
     }
 }

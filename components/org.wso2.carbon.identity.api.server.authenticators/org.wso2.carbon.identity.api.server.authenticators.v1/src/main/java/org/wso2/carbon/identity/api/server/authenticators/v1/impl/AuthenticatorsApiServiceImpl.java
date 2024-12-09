@@ -21,6 +21,10 @@ package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 import org.wso2.carbon.identity.api.server.authenticators.v1.AuthenticatorsApiService;
 import org.wso2.carbon.identity.api.server.authenticators.v1.core.ServerAuthenticatorManagementService;
 import org.wso2.carbon.identity.api.server.authenticators.v1.factories.ServerAuthenticatorManagementServiceFactory;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorUpdate;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
 import java.net.URI;
 import javax.ws.rs.core.Response;

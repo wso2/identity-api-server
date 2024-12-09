@@ -23,6 +23,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.identity.api.server.authenticators.common.Constants;
 import org.wso2.carbon.identity.api.server.authenticators.v1.impl.LocalAuthenticatorConfigBuilderFactory;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
@@ -85,13 +86,17 @@ public class ServerAuthenticatorManagementService {
 
     private final ApplicationManagementService applicationManagementService;
     private final IdpManager idpManager;
+    private final ApplicationAuthenticatorService applicationAuthenticatorService;
+
     private static final Log log = LogFactory.getLog(ServerAuthenticatorManagementService.class);
 
     public ServerAuthenticatorManagementService(ApplicationManagementService applicationManagementService,
-                                                IdpManager idpManager) {
+                                                IdpManager idpManager,
+                                                ApplicationAuthenticatorService applicationAuthenticatorService) {
 
         this.applicationManagementService = applicationManagementService;
         this.idpManager = idpManager;
+        this.applicationAuthenticatorService = applicationAuthenticatorService;
     }
 
     /**
@@ -123,10 +128,10 @@ public class ServerAuthenticatorManagementService {
                 }
             }
 
-            LocalAuthenticatorConfig[] localAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
-                    .getApplicationManagementService().getAllLocalAuthenticators(ContextLoader
+            LocalAuthenticatorConfig[] localAuthenticatorConfigs = applicationManagementService
+                    .getAllLocalAuthenticators(ContextLoader
                             .getTenantDomainFromContext());
-            List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs = getApplicationAuthenticatorService()
+            List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs = applicationAuthenticatorService
                     .getAllUserDefinedLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
             if (CollectionUtils.isNotEmpty(userDefinedLocalAuthConfigs)) {
                 localAuthenticatorConfigs = (LocalAuthenticatorConfig[]) ArrayUtils.addAll(localAuthenticatorConfigs,
@@ -188,11 +193,10 @@ public class ServerAuthenticatorManagementService {
             RequestPathAuthenticatorConfig[] requestPathAuthenticatorConfigs = applicationManagementService
                     .getAllRequestPathAuthenticators(ContextLoader.getTenantDomainFromContext());
 
-            FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
-                    .getIdentityProviderManager()
+            FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs = idpManager
                     .getAllFederatedAuthenticators(ContextLoader.getTenantDomainFromContext());
 
-            List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs = getApplicationAuthenticatorService()
+            List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs = applicationAuthenticatorService
                     .getAllUserDefinedLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
 
             return buildTagsListResponse(localAuthenticatorConfigs, requestPathAuthenticatorConfigs,
@@ -229,7 +233,7 @@ public class ServerAuthenticatorManagementService {
     public Authenticator addUserDefinedLocalAuthenticator(UserDefinedLocalAuthenticatorCreation config) {
 
         try {
-            UserDefinedLocalAuthenticatorConfig createdConfig = getApplicationAuthenticatorService()
+            UserDefinedLocalAuthenticatorConfig createdConfig = applicationAuthenticatorService
                     .addUserDefinedLocalAuthenticator(
                             LocalAuthenticatorConfigBuilderFactory.build(config),
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
@@ -247,7 +251,7 @@ public class ServerAuthenticatorManagementService {
     public void deleteUserDefinedLocalAuthenticator(String authenticatorId) {
 
         try {
-            getApplicationAuthenticatorService().deleteUserDefinedLocalAuthenticator(base64URLDecode(authenticatorId),
+            applicationAuthenticatorService.deleteUserDefinedLocalAuthenticator(base64URLDecode(authenticatorId),
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         } catch (AuthenticatorMgtException e) {
             throw handleAuthenticatorException(e);
@@ -267,7 +271,7 @@ public class ServerAuthenticatorManagementService {
         try {
             String authenticatorName = base64URLDecode(authenticatorId);
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            LocalAuthenticatorConfig existingAuthenticator = getApplicationAuthenticatorService()
+            LocalAuthenticatorConfig existingAuthenticator =applicationAuthenticatorService
                     .getLocalAuthenticatorByName(authenticatorName, tenantDomain);
             if (existingAuthenticator == null) {
                 AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_ERROR_AUTHENTICATOR_NOT_FOUND;
@@ -275,7 +279,7 @@ public class ServerAuthenticatorManagementService {
                                 error.getMessage(), String.format(error.getMessage(), authenticatorName)),
                         Response.Status.NOT_FOUND);
             }
-            UserDefinedLocalAuthenticatorConfig updatedConfig = getApplicationAuthenticatorService()
+            UserDefinedLocalAuthenticatorConfig updatedConfig = applicationAuthenticatorService
                     .updateUserDefinedLocalAuthenticator(
                             LocalAuthenticatorConfigBuilderFactory.build(config, existingAuthenticator),
                             tenantDomain);
@@ -474,7 +478,7 @@ public class ServerAuthenticatorManagementService {
         if (fedAuthConfigs != null) {
             for (FederatedAuthenticatorConfig config : fedAuthConfigs) {
                 if (config.isEnabled()) {
-                    FederatedAuthenticatorConfig federatedAuthenticatorConfig = getApplicationAuthenticatorService()
+                    FederatedAuthenticatorConfig federatedAuthenticatorConfig = applicationAuthenticatorService
                             .getFederatedAuthenticatorByName(config.getName());
                     if (federatedAuthenticatorConfig != null) {
                         String[] tags = federatedAuthenticatorConfig.getTags();
@@ -1133,10 +1137,5 @@ public class ServerAuthenticatorManagementService {
             Response.Status status = Response.Status.NOT_IMPLEMENTED;
             throw new APIError(status, errorResponse);
         }
-    }
-
-    private ApplicationAuthenticatorService getApplicationAuthenticatorService() {
-
-        return AuthenticatorsServiceHolder.getInstance().getApplicationAuthenticatorService();
     }
 }

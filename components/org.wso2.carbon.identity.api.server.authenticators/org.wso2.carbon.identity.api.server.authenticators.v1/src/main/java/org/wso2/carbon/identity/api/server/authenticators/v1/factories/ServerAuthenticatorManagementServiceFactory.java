@@ -20,6 +20,7 @@ package org.wso2.carbon.identity.api.server.authenticators.v1.factories;
 
 import org.wso2.carbon.identity.api.server.authenticators.common.AuthenticatorsServiceHolder;
 import org.wso2.carbon.identity.api.server.authenticators.v1.core.ServerAuthenticatorManagementService;
+import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.idp.mgt.IdpManager;
 
@@ -41,8 +42,10 @@ public class ServerAuthenticatorManagementServiceFactory {
 
         ApplicationManagementService applicationManagementService = getApplicationManagementService();
         IdpManager idpManager = getIdpManager();
+        ApplicationAuthenticatorService applicationAuthenticatorService = getApplicationAuthenticatorService();
 
-        return new ServerAuthenticatorManagementService(applicationManagementService, idpManager);
+        return new ServerAuthenticatorManagementService(applicationManagementService, idpManager,
+                applicationAuthenticatorService);
     }
 
     /**
@@ -70,6 +73,16 @@ public class ServerAuthenticatorManagementServiceFactory {
         IdpManager service = AuthenticatorsServiceHolder.getIdentityProviderManager();
         if (service == null) {
             throw new IllegalStateException("IdpManager service is not available from OSGi context.");
+        }
+
+        return service;
+    }
+
+    private static ApplicationAuthenticatorService getApplicationAuthenticatorService() {
+
+        ApplicationAuthenticatorService service = AuthenticatorsServiceHolder.getApplicationAuthenticatorService();
+        if (service == null) {
+            throw new IllegalStateException("ApplicationAuthenticatorService is not available from OSGi context.");
         }
 
         return service;
