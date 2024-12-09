@@ -29,6 +29,7 @@ public class InputValidationServiceHolder {
     private InputValidationServiceHolder () {};
 
     private static class InputValidationManagementServiceHolder {
+
         static final InputValidationManagementService SERVICE = (InputValidationManagementService)
                 PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(InputValidationManagementService.class, null);
