@@ -1,41 +1,46 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *                                                                         
- * Licensed under the Apache License, Version 2.0 (the "License");         
- * you may not use this file except in compliance with the License.        
- * You may obtain a copy of the License at                                 
- *                                                                         
- * http://www.apache.org/licenses/LICENSE-2.0                              
- *                                                                         
- * Unless required by applicable law or agreed to in writing, software     
- * distributed under the License is distributed on an "AS IS" BASIS,       
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and     
- * limitations under the License.
+ * Copyright (c) 2021-2024, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.identity.api.server.authenticators.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
-import org.wso2.carbon.idp.mgt.IdentityProviderManager;
+import org.wso2.carbon.idp.mgt.IdpManager;
 
 /**
  * Service holder class for server configuration related services.
  */
 public class AuthenticatorsServiceHolder {
 
-    private static AuthenticatorsServiceHolder instance = new AuthenticatorsServiceHolder();
-
-    private ApplicationManagementService applicationManagementService;
-    private IdentityProviderManager identityProviderManager;
-
     private AuthenticatorsServiceHolder() {
 
     }
 
-    public static AuthenticatorsServiceHolder getInstance() {
+    private static class ApplicationManagementServiceHolder {
+        static final ApplicationManagementService SERVICE = (ApplicationManagementService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext()
+                .getOSGiService(ApplicationManagementService.class, null);
+    }
 
-        return instance;
+    private static class IdentityProviderManagerHolder {
+        static final IdpManager SERVICE = (IdpManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext()
+                .getOSGiService(IdpManager.class, null);
     }
 
     /**
@@ -43,38 +48,18 @@ public class AuthenticatorsServiceHolder {
      *
      * @return ApplicationManagementService
      */
-    public ApplicationManagementService getApplicationManagementService() {
+    public static ApplicationManagementService getApplicationManagementService() {
 
-        return AuthenticatorsServiceHolder.getInstance().applicationManagementService;
+        return ApplicationManagementServiceHolder.SERVICE;
     }
 
     /**
-     * Set ApplicationManagementService osgi service.
+     * Get IdpManager osgi service.
      *
-     * @param applicationManagementService ApplicationManagementService.
+     * @return IdpManager
      */
-    public void setApplicationManagementService(ApplicationManagementService applicationManagementService) {
+    public static IdpManager getIdentityProviderManager() {
 
-        AuthenticatorsServiceHolder.getInstance().applicationManagementService = applicationManagementService;
-    }
-
-    /**
-     * Get IdentityProviderManager osgi service.
-     *
-     * @return IdentityProviderManager
-     */
-    public IdentityProviderManager getIdentityProviderManager() {
-
-        return AuthenticatorsServiceHolder.getInstance().identityProviderManager;
-    }
-
-    /**
-     * Set IdentityProviderManager osgi service.
-     *
-     * @param identityProviderManager IdentityProviderManager.
-     */
-    public void setIdentityProviderManager(IdentityProviderManager identityProviderManager) {
-
-        AuthenticatorsServiceHolder.getInstance().identityProviderManager = identityProviderManager;
+        return IdentityProviderManagerHolder.SERVICE;
     }
 }
