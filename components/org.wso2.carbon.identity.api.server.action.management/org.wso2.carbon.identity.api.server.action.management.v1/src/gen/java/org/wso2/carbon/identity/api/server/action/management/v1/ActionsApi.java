@@ -18,35 +18,23 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import java.io.InputStream;
-import java.util.List;
-
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeProperties;
-import org.wso2.carbon.identity.api.server.action.management.v1.Error;
-import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
-
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
-
-import javax.validation.constraints.*;
+import org.wso2.carbon.identity.api.server.action.management.v1.factories.ActionsApiServiceFactory;
 
 @Path("/actions")
 @Api(description = "The actions API")
 
 public class ActionsApi  {
 
-    @Autowired
-    private ActionsApiService delegate;
+    private final ActionsApiService delegate;
+
+    public ActionsApi() {
+
+        this.delegate = ActionsApiServiceFactory.getActionsApi();
+    }
 
     @Valid
     @POST

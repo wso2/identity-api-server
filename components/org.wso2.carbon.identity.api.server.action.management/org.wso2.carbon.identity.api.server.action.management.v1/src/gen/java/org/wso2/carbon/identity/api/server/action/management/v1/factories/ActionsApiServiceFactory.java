@@ -21,12 +21,20 @@ package org.wso2.carbon.identity.api.server.action.management.v1.factories;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
 import org.wso2.carbon.identity.api.server.action.management.v1.impl.ActionsApiServiceImpl;
 
+/**
+ * Factory class for Actions API Service.
+ */
 public class ActionsApiServiceFactory {
 
-   private final static ActionsApiService service = new ActionsApiServiceImpl();
+   private final static ActionsApiService SERVICE = new ActionsApiServiceImpl();
 
+   /**
+    * Get Actions API Service.
+    *
+    * @return ActionsApiService.
+    */
    public static ActionsApiService getActionsApi()
    {
-      return service;
+      return SERVICE;
    }
 }
