@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.organization.configs.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.OrganizationConfigsApiService;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.core.OrganizationConfigsService;
+import org.wso2.carbon.identity.api.server.organization.configs.v1.factories.OrganizationConfigsServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.model.Config;
 
 import javax.ws.rs.core.Response;
@@ -30,8 +30,15 @@ import javax.ws.rs.core.Response;
  */
 public class OrganizationConfigsApiServiceImpl implements OrganizationConfigsApiService {
 
-    @Autowired
-    private OrganizationConfigsService organizationConfigsService;
+    private final OrganizationConfigsService organizationConfigsService;
+
+    public OrganizationConfigsApiServiceImpl() {
+        try {
+            this.organizationConfigsService = OrganizationConfigsServiceFactory.getOrganizationConfigsService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating organization configuration service.", e);
+        }
+    }
 
     @Override
     public Response createDiscoveryConfig(Config config) {
