@@ -235,7 +235,8 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         if (!areAllDistinct(properties)) {
             Constants.ErrorMessage error = Constants.ErrorMessage.ERROR_CODE_INVALID_INPUT;
             throw new IdentityProviderManagementClientException(error.getCode(), error.getMessage(),
-                    error.getDescription());
+                    String.format(error.getDescription(), " Duplicate properties are found in " +
+                            "the request."));
         }
     }
 
