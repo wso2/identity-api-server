@@ -20,11 +20,13 @@ package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.idp.common.Constants;
 import org.wso2.carbon.identity.api.server.idp.common.IdentityProviderServiceHolder;
 import org.wso2.carbon.identity.api.server.idp.v1.model.AuthenticationType;
 import org.wso2.carbon.identity.api.server.idp.v1.model.Endpoint;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticator;
+import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorListItem;
 import org.wso2.carbon.identity.api.server.idp.v1.model.FederatedAuthenticatorPUTRequest;
 import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.common.model.FederatedAuthenticatorConfig;
@@ -38,6 +40,7 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManagementException;
 import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
@@ -47,7 +50,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 import static org.wso2.carbon.identity.api.server.idp.common.Constants.GOOGLE_PRIVATE_KEY;
+import static org.wso2.carbon.identity.api.server.idp.common.Constants.IDP_PATH_COMPONENT;
 
 /**
  * The factory class for building federated authenticator configuration related models.
@@ -118,15 +124,9 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
         federatedAuthenticator.setName(config.getName());
         federatedAuthenticator.setIsEnabled(config.isEnabled());
-
-        FederatedAuthenticatorConfig federatedAuthenticatorConfig =
-                ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
-                        config.getName());
-        if (federatedAuthenticatorConfig != null) {
-            String[] tags = federatedAuthenticatorConfig.getTags();
-            if (ArrayUtils.isNotEmpty(tags)) {
-                federatedAuthenticator.setTags(Arrays.asList(tags));
-            }
+        String[] tags = resolveAuthenticatorTags(config);
+        if (ArrayUtils.isNotEmpty(tags)) {
+            federatedAuthenticator.setTags(Arrays.asList(tags));
         }
 
         if (DefinedByType.SYSTEM == config.getDefinedByType()) {
@@ -140,6 +140,37 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         }
 
         return federatedAuthenticator;
+    }
+
+    /**
+     * Builds a list of FederatedAuthenticatorListItem instances based on the given array of
+     * FederatedAuthenticatorConfig.
+     *
+     * @param fedAuthConfigs Array of FederatedAuthenticatorConfig instances.
+     * @return List of FederatedAuthenticatorListItem instances.
+     */
+    public static List<FederatedAuthenticatorListItem> build(FederatedAuthenticatorConfig[] fedAuthConfigs,
+                                                             String idpResourceId) {
+
+        List<FederatedAuthenticatorListItem> authenticators = new ArrayList<>();
+        for (FederatedAuthenticatorConfig config : fedAuthConfigs) {
+            FederatedAuthenticatorListItem authenticatorListItem = new FederatedAuthenticatorListItem();
+            authenticatorListItem.setAuthenticatorId(base64URLEncode(config.getName()));
+            authenticatorListItem.setName(config.getName());
+            authenticatorListItem.setIsEnabled(config.isEnabled());
+            authenticatorListItem.definedBy(FederatedAuthenticatorListItem.DefinedByEnum.valueOf(
+                    config.getDefinedByType().toString()));
+            String[] tags = resolveAuthenticatorTags(config);
+            if (ArrayUtils.isNotEmpty(tags)) {
+                authenticatorListItem.setTags(Arrays.asList(tags));
+            }
+            authenticatorListItem.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
+                     IDP_PATH_COMPONENT + "/%s/federated-authenticators/%s", idpResourceId,
+                                    base64URLEncode(config.getName()))).toString());
+            authenticators.add(authenticatorListItem);
+        }
+
+        return authenticators;
     }
     
     private static FederatedAuthenticatorConfig createFederatedAuthenticatorConfig(Config config)
@@ -433,6 +464,23 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             throw new IdentityProviderManagementServerException(String.format("Error occurred while resolving" +
                     " endpoint configuration of the authenticator %s.", authenticator.getName()), e);
         }
+    }
+
+    private static String[] resolveAuthenticatorTags(FederatedAuthenticatorConfig config) {
+
+        /* If the authenticator is defined by the user, return the tags of the authenticator config. Otherwise, return
+        the tags of the system registered federated authenticator template.
+         */
+        if (DefinedByType.USER == config.getDefinedByType()) {
+            return config.getTags();
+
+        }
+        FederatedAuthenticatorConfig federatedAuthenticatorConfig =
+                ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(config.getName());
+        if (federatedAuthenticatorConfig != null) {
+            return federatedAuthenticatorConfig.getTags();
+        }
+        return new String[0];
     }
 
     /**
