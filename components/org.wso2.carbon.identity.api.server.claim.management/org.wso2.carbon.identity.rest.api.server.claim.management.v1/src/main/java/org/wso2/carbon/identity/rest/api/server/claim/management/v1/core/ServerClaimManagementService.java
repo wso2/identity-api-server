@@ -160,6 +160,12 @@ public class ServerClaimManagementService {
             ClaimConstants.ErrorMessage.ERROR_CODE_EXISTING_LOCAL_CLAIM_URI.getCode()
     );
 
+    private static final List<String> forbiddenErrorScenarios = Arrays.asList(
+            ClaimConstants.ErrorMessage.ERROR_CODE_NO_RENAME_SYSTEM_DIALECT.getCode(),
+            ClaimConstants.ErrorMessage.ERROR_CODE_NO_DELETE_SYSTEM_DIALECT.getCode(),
+            ClaimConstants.ErrorMessage.ERROR_CODE_NO_DELETE_SYSTEM_CLAIM.getCode()
+    );
+
     /**
      * Add a claim dialect.
      *
@@ -945,6 +951,7 @@ public class ServerClaimManagementService {
         externalClaimResDTO.setClaimDialectURI(externalClaim.getClaimDialectURI());
         externalClaimResDTO.setClaimURI(externalClaim.getClaimURI());
         externalClaimResDTO.setMappedLocalClaimURI(externalClaim.getMappedLocalClaim());
+        externalClaimResDTO.setProperties(mapToProperties(externalClaim.getClaimProperties()));
 
         return externalClaimResDTO;
     }
@@ -1279,6 +1286,9 @@ public class ServerClaimManagementService {
             if (isConflictScenario(e.getErrorCode())) {
                 status = CONFLICT;
             }
+            if (isForbiddenScenario(e.getErrorCode())) {
+                status = FORBIDDEN;
+            }
             if (StringUtils.isNotBlank(e.getErrorCode()) &&
                     e.getErrorCode().contains(Constant.CLAIM_MANAGEMENT_PREFIX)) {
                 return handleClaimManagementClientError(e.getErrorCode(), e.getMessage(), status, data);
@@ -1299,6 +1309,11 @@ public class ServerClaimManagementService {
     private boolean isConflictScenario(String errorCode) {
 
         return !StringUtils.isBlank(errorCode) && conflictErrorScenarios.contains(errorCode);
+    }
+
+    private boolean isForbiddenScenario(String errorCode) {
+
+        return !StringUtils.isBlank(errorCode) && forbiddenErrorScenarios.contains(errorCode);
     }
 
     private APIError handleClaimManagementClientError(Constant.ErrorMessage errorEnum, Response.Status status) {

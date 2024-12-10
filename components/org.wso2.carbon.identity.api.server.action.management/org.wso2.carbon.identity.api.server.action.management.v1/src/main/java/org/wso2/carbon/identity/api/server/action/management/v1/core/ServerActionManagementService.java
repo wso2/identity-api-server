@@ -33,9 +33,10 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ActionResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionType;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionTypesResponseItem;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateModel;
-import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeProperties;
 import org.wso2.carbon.identity.api.server.action.management.v1.AuthenticationTypeResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.EndpointResponse;
+import org.wso2.carbon.identity.api.server.action.management.v1.Link;
+import org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants;
 import org.wso2.carbon.identity.api.server.action.management.v1.util.ActionMgtEndpointUtil;
 
 import java.util.ArrayList;
@@ -49,7 +50,6 @@ import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_EMPTY_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES;
-import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_ENDPOINT_AUTH_TYPE;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_INVALID_ACTION_TYPE;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NOT_IMPLEMENTED_ACTION_TYPE;
 import static org.wso2.carbon.identity.api.server.action.management.v1.constants.ActionMgtEndpointConstants.ErrorMessage.ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID;
@@ -81,7 +81,7 @@ public class ServerActionManagementService {
         }
     }
 
-    public List<ActionResponse> getActionsByActionType(String actionType) {
+    public List<ActionBasicResponse> getActionsByActionType(String actionType) {
 
         try {
             validateActionType(actionType);
@@ -89,11 +89,11 @@ public class ServerActionManagementService {
                     .getActionsByActionType(actionType,
                             CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
 
-            List<ActionResponse> actionResponses = new ArrayList<>();
+            List<ActionBasicResponse> actionBasicResponses = new ArrayList<>();
             for (Action action : actions) {
-                actionResponses.add(buildActionResponse(action));
+                actionBasicResponses.add(buildActionBasicResponse(action));
             }
-            return actionResponses;
+            return actionBasicResponses;
         } catch (ActionMgtException e) {
             throw ActionMgtEndpointUtil.handleActionMgtException(e);
         }
@@ -194,21 +194,6 @@ public class ServerActionManagementService {
         }
     }
 
-    public ActionResponse updateActionEndpointAuthentication(String actionType, String actionId, String authType,
-                                                         AuthenticationTypeProperties authenticationTypeProperties) {
-
-        try {
-            validateActionType(actionType);
-            Authentication authentication = buildAuthentication(getAuthTypeFromPath(authType),
-                    authenticationTypeProperties.getProperties());
-            return buildActionResponse(ActionManagementServiceHolder.getActionManagementService()
-                    .updateActionEndpointAuthentication(actionType, actionId, authentication,
-                            CarbonContext.getThreadLocalCarbonContext().getTenantDomain()));
-        } catch (ActionMgtException e) {
-            throw ActionMgtEndpointUtil.handleActionMgtException(e);
-        }
-    }
-
     /**
      * Build ActionResponse from Action.
      *
@@ -243,7 +228,26 @@ public class ServerActionManagementService {
                 .type(ActionType.valueOf(activatedAction.getType().toString()))
                 .name(activatedAction.getName())
                 .description(activatedAction.getDescription())
-                .status(ActionBasicResponse.StatusEnum.valueOf(activatedAction.getStatus().toString()));
+                .status(ActionBasicResponse.StatusEnum.valueOf(activatedAction.getStatus().toString()))
+                .links(buildLinks(activatedAction));
+    }
+
+    /**
+     * Build Links for the Action.
+     *
+     * @param activatedAction Action object.
+     * @return List of Links.
+     */
+    private List<Link> buildLinks(Action activatedAction) {
+
+        String baseUrl = ActionMgtEndpointUtil.buildURIForActionType(activatedAction.getType().getActionType());
+
+        List<Link> links = new ArrayList<>();
+        links.add(new Link()
+                .href(baseUrl + ActionMgtEndpointConstants.PATH_SEPARATOR + activatedAction.getId())
+                .rel("self")
+                .method(Link.MethodEnum.GET));
+        return links;
     }
 
     /**
@@ -359,21 +363,6 @@ public class ServerActionManagementService {
             default:
                 return null;
         }
-    }
-
-    /**
-     * Get Authentication Type from path.
-     *
-     * @param authType Authentication Type.
-     * @return Auth Type resolved from the path param.
-     */
-    private Authentication.Type getAuthTypeFromPath(String authType) {
-
-        return Arrays.stream(Authentication.Type.values())
-                .filter(type -> type.getPathParam().equals(authType))
-                .findFirst()
-                .orElseThrow(() -> ActionMgtEndpointUtil.handleException(Response.Status.BAD_REQUEST,
-                        ERROR_INVALID_ACTION_ENDPOINT_AUTH_TYPE));
     }
 
     private void validateActionType(String actionType) {

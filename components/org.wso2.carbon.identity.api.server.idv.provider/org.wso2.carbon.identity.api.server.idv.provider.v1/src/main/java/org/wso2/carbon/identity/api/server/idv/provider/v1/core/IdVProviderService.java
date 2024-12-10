@@ -256,7 +256,6 @@ public class IdVProviderService {
         idVProvider.setIdVProviderName(idVProviderRequest.getName());
         idVProvider.setIdVProviderDescription(idVProviderRequest.getDescription());
         idVProvider.setEnabled(idVProviderRequest.getIsEnabled());
-        idVProvider.setImageUrl(idVProviderRequest.getImage());
         if (idVProviderRequest.getClaims() != null) {
             idVProvider.setClaimMappings(getClaimMap(idVProviderRequest.getClaims()));
         }
@@ -277,7 +276,6 @@ public class IdVProviderService {
         idVProvider.setIdVProviderName(idVProviderRequest.getName());
         idVProvider.setIdVProviderDescription(idVProviderRequest.getDescription());
         idVProvider.setEnabled(idVProviderRequest.getIsEnabled());
-        idVProvider.setImageUrl(idVProviderRequest.getImage());
         if (idVProviderRequest.getClaims() != null) {
             idVProvider.setClaimMappings(getClaimMap(idVProviderRequest.getClaims()));
         }
