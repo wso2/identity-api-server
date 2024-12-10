@@ -142,7 +142,7 @@ public class ApplicationEmailTemplatesService {
         try {
             boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager()
                     .isEmailTemplateExists(templateTypeDisplayName, emailTemplateWithID.getLocale(),
-                            getTenantDomainFromContext(), applicationUuid);
+                            getTenantDomainFromContext(), applicationUuid, false);
             if (!isTemplateExists) {
                 // Email template is new, hence add to the system.
                 addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplateWithID, applicationUuid);
@@ -179,7 +179,7 @@ public class ApplicationEmailTemplatesService {
         }
         try {
             boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateExists(
-                    templateTypeDisplayName, templateId, getTenantDomainFromContext(), applicationUuid);
+                    templateTypeDisplayName, templateId, getTenantDomainFromContext(), applicationUuid, false);
             if (isTemplateExists) {
                 EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplate(templateTypeDisplayName,
                         templateId, getTenantDomainFromContext(), applicationUuid);
@@ -229,9 +229,11 @@ public class ApplicationEmailTemplatesService {
 
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
-            // Check whether the email template exists, first.
+            /* Check whether the email template exists, first. Here, resolve param is specified as true since
+              resolved org templates are returned in GET endpoint, by default. Therefore, resolved template existence
+              is checked before updating. */
             boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateExists(
-                    templateTypeDisplayName, templateId, getTenantDomainFromContext(), applicationUuid);
+                    templateTypeDisplayName, templateId, getTenantDomainFromContext(), applicationUuid, true);
             if (isTemplateExists) {
                 addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplateWithID, applicationUuid);
             } else {
