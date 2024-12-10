@@ -243,7 +243,7 @@ public class ServerEmailTemplatesService {
         try {
             boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager()
                     .isEmailTemplateExists(templateTypeDisplayName, emailTemplateWithID.getLocale(),
-                            getTenantDomainFromContext());
+                            getTenantDomainFromContext(), null, false);
             if (!isTemplateExists) {
                 // Email template is new, hence add to the system.
                 addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplateWithID);
@@ -332,7 +332,7 @@ public class ServerEmailTemplatesService {
         }
         try {
             boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateExists(
-                    templateTypeDisplayName, templateId, getTenantDomainFromContext());
+                    templateTypeDisplayName, templateId, getTenantDomainFromContext(), null, false);
             if (isTemplateExists) {
                 EmailTemplatesServiceHolder.getEmailTemplateManager().deleteEmailTemplate(templateTypeDisplayName,
                         templateId, getTenantDomainFromContext());
@@ -353,9 +353,11 @@ public class ServerEmailTemplatesService {
 
         String templateTypeDisplayName = decodeTemplateTypeId(templateTypeId);
         try {
-            // Check whether the email template exists, first.
+            /* Check whether the email template exists, first. Here, resolve param is specified as true since
+              resolved org templates are returned in GET endpoint, by default. Therefore, resolved template existence
+              is checked before updating. */
             boolean isTemplateExists = EmailTemplatesServiceHolder.getEmailTemplateManager().isEmailTemplateExists(
-                    templateTypeDisplayName, templateId, getTenantDomainFromContext());
+                    templateTypeDisplayName, templateId, getTenantDomainFromContext(), null, true);
             if (isTemplateExists) {
                 addEmailTemplateToTheSystem(templateTypeDisplayName, emailTemplateWithID);
             } else {
