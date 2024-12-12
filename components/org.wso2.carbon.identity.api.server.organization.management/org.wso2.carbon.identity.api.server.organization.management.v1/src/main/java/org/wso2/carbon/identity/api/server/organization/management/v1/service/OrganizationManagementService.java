@@ -24,7 +24,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.Util;
-import org.wso2.carbon.identity.api.server.organization.management.common.OrganizationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ApplicationSharePOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Attribute;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.BasicOrganizationResponse;
@@ -110,7 +109,20 @@ import static org.wso2.carbon.identity.organization.management.service.util.Util
  */
 public class OrganizationManagementService {
 
+    private final OrgApplicationManager orgApplicationManager;
+    private final OrganizationManager organizationManager;
+    private final OrganizationDiscoveryManager organizationDiscoveryManager;
+
     private static final Log LOG = LogFactory.getLog(OrganizationManagementService.class);
+
+    public OrganizationManagementService(OrgApplicationManager orgApplicationManager,
+                                         OrganizationManager organizationManager,
+                                         OrganizationDiscoveryManager organizationDiscoveryManager) {
+
+        this.orgApplicationManager = orgApplicationManager;
+        this.organizationManager = organizationManager;
+        this.organizationDiscoveryManager = organizationDiscoveryManager;
+    }
 
     /**
      * Retrieve organization IDs.
@@ -127,7 +139,7 @@ public class OrganizationManagementService {
         try {
             limit = validateLimit(limit);
             String sortOrder = StringUtils.isNotBlank(before) ? ASC_SORT_ORDER : DESC_SORT_ORDER;
-            List<Organization> organizations = getOrganizationManager().getOrganizationsList(limit + 1, after,
+            List<Organization> organizations = organizationManager.getOrganizationsList(limit + 1, after,
                     before, sortOrder, filter, Boolean.TRUE.equals(recursive));
             return Response.ok().entity(getOrganizationsResponse(limit, after, before, filter, organizations,
                     Boolean.TRUE.equals(recursive))).build();
@@ -146,7 +158,7 @@ public class OrganizationManagementService {
      */
     public Response checkOrganizationName(String organizationName) {
 
-        boolean nameExist = getOrganizationManager().isOrganizationExistByNameInGivenHierarchy(organizationName);
+        boolean nameExist = organizationManager.isOrganizationExistByNameInGivenHierarchy(organizationName);
         OrganizationNameCheckPOSTResponse response = new OrganizationNameCheckPOSTResponse().available(false);
         if (!nameExist) {
             response.setAvailable(true);
@@ -163,7 +175,7 @@ public class OrganizationManagementService {
     public Response deleteOrganization(String organizationId) {
 
         try {
-            getOrganizationManager().deleteOrganization(organizationId);
+            organizationManager.deleteOrganization(organizationId);
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -181,7 +193,7 @@ public class OrganizationManagementService {
     public Response getOrganization(String organizationId, Boolean includePermissions) {
 
         try {
-            Organization organization = getOrganizationManager().getOrganization(organizationId,
+            Organization organization = organizationManager.getOrganization(organizationId,
                     false, Boolean.TRUE.equals(includePermissions));
             return Response.ok().entity(getOrganizationResponseWithPermission(organization)).build();
         } catch (OrganizationManagementClientException e) {
@@ -202,7 +214,7 @@ public class OrganizationManagementService {
             organizationPatchRequestItem) {
 
         try {
-            Organization organization = getOrganizationManager().patchOrganization(organizationId,
+            Organization organization = organizationManager.patchOrganization(organizationId,
                     organizationPatchRequestItem.stream().map(op ->
                             new PatchOperation(op.getOperation() == null ? null : op.getOperation().toString(),
                                     op.getPath(), op.getValue())).collect(Collectors.toList()));
@@ -242,7 +254,7 @@ public class OrganizationManagementService {
     public Response addOrganization(OrganizationPOSTRequest organizationPOSTRequest) {
 
         try {
-            Organization organization = getOrganizationManager().addOrganization(getOrganizationFromPostRequest
+            Organization organization = organizationManager.addOrganization(getOrganizationFromPostRequest
                     (organizationPOSTRequest));
             String organizationId = organization.getId();
             return Response.created(OrganizationManagementEndpointUtil.getResourceLocation(organizationId)).entity
@@ -269,7 +281,7 @@ public class OrganizationManagementService {
             validateApplicationSharePostRequestBody(requestBody);
             boolean shareWithAllChildren = (requestBody.getShareWithAllChildren() != null)
                     ? requestBody.getShareWithAllChildren() : false;
-            getOrgApplicationManager().shareOrganizationApplication(organizationId, applicationId,
+            orgApplicationManager.shareOrganizationApplication(organizationId, applicationId,
                     shareWithAllChildren, requestBody.getSharedOrganizations());
             return Response.ok().build();
         } catch (OrganizationManagementClientException e) {
@@ -306,7 +318,7 @@ public class OrganizationManagementService {
     public Response deleteSharedApplication(String organizationId, String applicationId, String sharedOrganizationId) {
 
         try {
-            getOrgApplicationManager().deleteSharedApplication(organizationId, applicationId, sharedOrganizationId);
+            orgApplicationManager.deleteSharedApplication(organizationId, applicationId, sharedOrganizationId);
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -325,7 +337,7 @@ public class OrganizationManagementService {
     public Response deleteAllSharedApplications(String organizationId, String applicationId) {
 
         try {
-            getOrgApplicationManager().deleteSharedApplication(organizationId, applicationId, null);
+            orgApplicationManager.deleteSharedApplication(organizationId, applicationId, null);
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -345,7 +357,7 @@ public class OrganizationManagementService {
 
         try {
             List<BasicOrganization> basicOrganizations =
-                    getOrgApplicationManager().getApplicationSharedOrganizations(organizationId, applicationId);
+                    orgApplicationManager.getApplicationSharedOrganizations(organizationId, applicationId);
             return Response.ok(createSharedOrgResponse(basicOrganizations)).build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -365,7 +377,7 @@ public class OrganizationManagementService {
 
         try {
             List<SharedApplication> sharedApplications =
-                    getOrgApplicationManager().getSharedApplications(organizationId, applicationId);
+                    orgApplicationManager.getSharedApplications(organizationId, applicationId);
             return Response.ok(createSharedApplicationsResponse(sharedApplications)).build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -384,7 +396,7 @@ public class OrganizationManagementService {
                                                                organizationDiscoveryPostRequest) {
 
         try {
-            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = getOrganizationDiscoveryManager()
+            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = organizationDiscoveryManager
                     .addOrganizationDiscoveryAttributes(organizationDiscoveryPostRequest.getOrganizationId(),
                             getOrgDiscoveryAttributesFromPostRequest(organizationDiscoveryPostRequest), true);
             String organizationId = organizationDiscoveryPostRequest.getOrganizationId();
@@ -406,7 +418,7 @@ public class OrganizationManagementService {
     public Response getOrganizationDiscoveryAttributes(String organizationId) {
 
         try {
-            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = getOrganizationDiscoveryManager()
+            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = organizationDiscoveryManager
                     .getOrganizationDiscoveryAttributes(organizationId, true);
             return Response.ok().entity(getOrganizationDiscoveryAttributesResponse(orgDiscoveryAttributeList)).build();
         } catch (OrganizationManagementClientException e) {
@@ -428,7 +440,7 @@ public class OrganizationManagementService {
             organizationDiscoveryAttributes) {
 
         try {
-            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = getOrganizationDiscoveryManager()
+            List<OrgDiscoveryAttribute> orgDiscoveryAttributeList = organizationDiscoveryManager
                     .updateOrganizationDiscoveryAttributes(organizationId,
                             getOrgDiscoveryAttributesFromPutRequest(organizationDiscoveryAttributes), true);
             return Response.ok().entity(getOrganizationDiscoveryAttributesResponse(orgDiscoveryAttributeList)).build();
@@ -448,7 +460,7 @@ public class OrganizationManagementService {
     public Response deleteOrganizationDiscoveryAttributes(String organizationId) {
 
         try {
-            getOrganizationDiscoveryManager().deleteOrganizationDiscoveryAttributes(organizationId, true);
+            organizationDiscoveryManager.deleteOrganizationDiscoveryAttributes(organizationId, true);
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
             return OrganizationManagementEndpointUtil.handleClientErrorResponse(e, LOG);
@@ -468,7 +480,7 @@ public class OrganizationManagementService {
     public Response getOrganizationsDiscoveryAttributes(String filter, Integer offset, Integer limit) {
 
         try {
-            DiscoveryOrganizationsResult discoveryOrganizationsResult = getOrganizationDiscoveryManager()
+            DiscoveryOrganizationsResult discoveryOrganizationsResult = organizationDiscoveryManager
                     .getOrganizationsDiscoveryAttributes(limit, offset, filter);
             OrganizationsDiscoveryResponse response = new OrganizationsDiscoveryResponse();
             List<OrganizationDiscovery> organizationsDiscoveryAttributes = discoveryOrganizationsResult
@@ -516,7 +528,7 @@ public class OrganizationManagementService {
                                                           organizationDiscoveryCheckPOSTRequest) {
 
         try {
-            boolean discoveryAttributeValueAvailable = getOrganizationDiscoveryManager()
+            boolean discoveryAttributeValueAvailable = organizationDiscoveryManager
                     .isDiscoveryAttributeValueAvailable(organizationDiscoveryCheckPOSTRequest.getType(),
                             organizationDiscoveryCheckPOSTRequest.getValue());
             OrganizationDiscoveryCheckPOSTResponse organizationDiscoveryCheckPOSTResponse =
@@ -538,8 +550,8 @@ public class OrganizationManagementService {
     public Response getOrganizationMetadata() {
 
         try {
-            Organization organization = getOrganizationManager().getOrganization(getOrganizationId(), false, true);
-            List<OrgDiscoveryAttribute> organizationDiscoveryAttributes = getOrganizationDiscoveryManager()
+            Organization organization = organizationManager.getOrganization(getOrganizationId(), false, true);
+            List<OrgDiscoveryAttribute> organizationDiscoveryAttributes = organizationDiscoveryManager
                     .getOrganizationDiscoveryAttributes(getOrganizationId(), false);
             return Response.ok().entity(getOrganizationMetadataResponse(organization, organizationDiscoveryAttributes))
                     .build();
@@ -566,7 +578,7 @@ public class OrganizationManagementService {
         try {
             limit = validateLimit(limit);
             String sortOrder = StringUtils.isNotBlank(before) ? DESC_SORT_ORDER : ASC_SORT_ORDER;
-            List<String> metaAttributes = getOrganizationManager().getOrganizationsMetaAttributes(limit + 1, after,
+            List<String> metaAttributes = organizationManager.getOrganizationsMetaAttributes(limit + 1, after,
                     before, sortOrder, filter, Boolean.TRUE.equals(recursive));
             return Response.ok().entity(getMetaAttributesResponse(limit, after, before, filter, metaAttributes,
                     Boolean.TRUE.equals(recursive))).build();
@@ -803,7 +815,7 @@ public class OrganizationManagementService {
     private Organization getUpdatedOrganization(String organizationId, OrganizationPUTRequest organizationPUTRequest)
             throws OrganizationManagementException {
 
-        Organization oldOrganization = getOrganizationManager().getOrganization(organizationId, false, false);
+        Organization oldOrganization = organizationManager.getOrganization(organizationId, false, false);
         String currentOrganizationName = oldOrganization.getName();
         Organization organization = createOrganizationClone(oldOrganization);
 
@@ -827,7 +839,7 @@ public class OrganizationManagementService {
         } else {
             organization.setAttributes(null);
         }
-        return getOrganizationManager().updateOrganization(organizationId, currentOrganizationName, organization);
+        return organizationManager.updateOrganization(organizationId, currentOrganizationName, organization);
     }
 
     private Organization createOrganizationClone(Organization organization) {
@@ -1004,20 +1016,5 @@ public class OrganizationManagementService {
             metaAttributesResponse.attributes(metaAttributes);
         }
         return metaAttributesResponse;
-    }
-
-    private OrganizationManager getOrganizationManager() {
-
-        return OrganizationManagementServiceHolder.getInstance().getOrganizationManager();
-    }
-
-    private OrgApplicationManager getOrgApplicationManager() {
-
-        return OrganizationManagementServiceHolder.getInstance().getOrgApplicationManager();
-    }
-
-    private OrganizationDiscoveryManager getOrganizationDiscoveryManager() {
-
-        return OrganizationManagementServiceHolder.getInstance().getOrganizationDiscoveryManager();
     }
 }
