@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,9 +22,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
-import org.wso2.carbon.identity.api.server.organization.configs.common.OrganizationConfigsServiceHolder;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.model.Config;
 import org.wso2.carbon.identity.api.server.organization.configs.v1.model.Properties;
+import org.wso2.carbon.identity.organization.config.service.OrganizationConfigManager;
 import org.wso2.carbon.identity.organization.config.service.exception.OrganizationConfigClientException;
 import org.wso2.carbon.identity.organization.config.service.exception.OrganizationConfigException;
 import org.wso2.carbon.identity.organization.config.service.model.ConfigProperty;
@@ -43,7 +43,13 @@ import static org.wso2.carbon.identity.organization.config.service.constant.Orga
  */
 public class OrganizationConfigsService {
 
+    private final OrganizationConfigManager organizationConfigManager;
     private static final Log LOG = LogFactory.getLog(OrganizationConfigsService.class);
+
+    public OrganizationConfigsService(OrganizationConfigManager organizationConfigManager) {
+
+        this.organizationConfigManager = organizationConfigManager;
+    }
 
     /**
      * Add the organization discovery configuration in the primary organization.
@@ -56,8 +62,7 @@ public class OrganizationConfigsService {
                 .map(property -> new ConfigProperty(property.getKey(), property.getValue()))
                 .collect(Collectors.toList());
         try {
-            OrganizationConfigsServiceHolder.getOrganizationConfigManager().addDiscoveryConfiguration
-                    (new DiscoveryConfig(configProperties));
+            organizationConfigManager.addDiscoveryConfiguration(new DiscoveryConfig(configProperties));
         } catch (OrganizationConfigException e) {
             throw handleException(e);
         }
@@ -71,8 +76,7 @@ public class OrganizationConfigsService {
     public Config getDiscoveryConfiguration() {
 
         try {
-            DiscoveryConfig discoveryConfig = OrganizationConfigsServiceHolder.getOrganizationConfigManager()
-                    .getDiscoveryConfiguration();
+            DiscoveryConfig discoveryConfig = organizationConfigManager.getDiscoveryConfiguration();
 
             List<Properties> properties = discoveryConfig.getConfigProperties().stream()
                     .map(configProperty -> {
@@ -95,7 +99,7 @@ public class OrganizationConfigsService {
     public void deleteDiscoveryConfiguration() {
 
         try {
-            OrganizationConfigsServiceHolder.getOrganizationConfigManager().deleteDiscoveryConfiguration();
+            organizationConfigManager.deleteDiscoveryConfiguration();
         } catch (OrganizationConfigException e) {
             throw handleException(e);
         }
