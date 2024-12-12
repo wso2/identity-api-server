@@ -31,6 +31,7 @@ public class UserInvitationMgtServiceHolder {
     }
 
     private static class InvitationCoreServiceHolder {
+
         static final InvitationCoreService SERVICE = (InvitationCoreService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(InvitationCoreService.class, null);
     }
