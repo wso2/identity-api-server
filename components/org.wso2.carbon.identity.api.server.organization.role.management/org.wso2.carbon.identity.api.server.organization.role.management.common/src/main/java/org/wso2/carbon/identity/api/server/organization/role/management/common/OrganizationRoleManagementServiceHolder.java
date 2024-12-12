@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.organization.role.management.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.organization.management.role.management.service.RoleManager;
 import org.wso2.carbon.identity.organization.management.service.OrganizationUserResidentResolverService;
 
@@ -26,19 +27,17 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationUser
  */
 public class OrganizationRoleManagementServiceHolder {
 
-    private static OrganizationRoleManagementServiceHolder instance = new OrganizationRoleManagementServiceHolder();
+    private OrganizationRoleManagementServiceHolder() {}
 
-    private RoleManager roleManager;
-
-    private OrganizationUserResidentResolverService organizationUserResidentResolverService;
-
-    private OrganizationRoleManagementServiceHolder() {
-
+    private static class RoleManagerServiceHolder {
+        static final RoleManager SERVICE = (RoleManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                .getOSGiService(RoleManager.class, null);
     }
 
-    public static OrganizationRoleManagementServiceHolder getInstance() {
-
-        return instance;
+    private static class OrganizationUserResidentResolverServiceHolder {
+        static final OrganizationUserResidentResolverService SERVICE =
+                (OrganizationUserResidentResolverService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(OrganizationUserResidentResolverService.class, null);
     }
 
     /**
@@ -46,19 +45,9 @@ public class OrganizationRoleManagementServiceHolder {
      *
      * @return RoleManager.
      */
-    public RoleManager getRoleManager() {
+    public static RoleManager getRoleManager() {
 
-        return OrganizationRoleManagementServiceHolder.getInstance().roleManager;
-    }
-
-    /**
-     * Set RoleManager OSGi service.
-     *
-     * @param roleManager RoleManager.
-     */
-    public void setRoleManager(RoleManager roleManager) {
-
-        OrganizationRoleManagementServiceHolder.getInstance().roleManager = roleManager;
+        return RoleManagerServiceHolder.SERVICE;
     }
 
     /**
@@ -66,20 +55,8 @@ public class OrganizationRoleManagementServiceHolder {
      *
      * @return OrganizationUserResidentResolverService.
      */
-    public OrganizationUserResidentResolverService getOrganizationUserResidentResolverService() {
+    public static OrganizationUserResidentResolverService getOrganizationUserResidentResolverService() {
 
-        return OrganizationRoleManagementServiceHolder.getInstance().organizationUserResidentResolverService;
-    }
-
-    /**
-     * Set OrganizationUserResidentResolverService OSGi service.
-     *
-     * @param organizationUserResidentResolverService OrganizationUserResidentResolverService.
-     */
-    public void setOrganizationUserResidentResolverService(
-            OrganizationUserResidentResolverService organizationUserResidentResolverService) {
-
-        OrganizationRoleManagementServiceHolder.getInstance().organizationUserResidentResolverService
-                = organizationUserResidentResolverService;
+        return OrganizationUserResidentResolverServiceHolder.SERVICE;
     }
 }
