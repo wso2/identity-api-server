@@ -28,7 +28,7 @@ public class ActionMgtEndpointConstants {
 
     public static final String ACTION_MANAGEMENT_PREFIX = "ACTION-";
     public static final String ACTION_PATH_COMPONENT = "/actions";
-    public static final String PATH_CONSTANT = "/";
+    public static final String PATH_SEPARATOR = "/";
 
     /**
      * Enum for error messages.
