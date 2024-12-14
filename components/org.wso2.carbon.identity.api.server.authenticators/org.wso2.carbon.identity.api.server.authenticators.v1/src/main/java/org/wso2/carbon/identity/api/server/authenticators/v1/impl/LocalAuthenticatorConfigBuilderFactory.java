@@ -56,15 +56,16 @@ public class LocalAuthenticatorConfigBuilderFactory {
     public static Authenticator build(UserDefinedLocalAuthenticatorConfig config) {
 
         Authenticator authenticator = new Authenticator();
+        String authenticatorId = base64URLEncode(config.getName());
         authenticator.setName(config.getName());
-        authenticator.setId(base64URLEncode(config.getName()));
+        authenticator.setId(authenticatorId);
         authenticator.setDisplayName(config.getDisplayName());
         authenticator.setIsEnabled(config.isEnabled());
         authenticator.setDefinedBy(Authenticator.DefinedByEnum.USER);
         authenticator.setType(Authenticator.TypeEnum.LOCAL);
         authenticator.setTags(Arrays.asList(config.getTags()));
         authenticator.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
-                CONFIGS_AUTHENTICATOR_PATH_COMPONENT, config.getName())).toString());
+                CONFIGS_AUTHENTICATOR_PATH_COMPONENT, authenticatorId)).toString());
 
         return authenticator;
     }

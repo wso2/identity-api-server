@@ -19,10 +19,15 @@ package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.authenticators.v1.AuthenticatorsApiService;
 import org.wso2.carbon.identity.api.server.authenticators.v1.core.ServerAuthenticatorManagementService;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorUpdate;
+import org.wso2.carbon.identity.api.server.common.ContextLoader;
 
+import java.net.URI;
 import javax.ws.rs.core.Response;
+
+import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 
 /**
  * Implementation of the Server Authenticators Rest API.
@@ -48,8 +53,11 @@ public class AuthenticatorsApiServiceImpl implements AuthenticatorsApiService {
     public Response addUserDefinedLocalAuthenticator(
             UserDefinedLocalAuthenticatorCreation userDefinedLocalAuthenticatorCreation) {
 
-        return Response.ok().entity(authenticatorManagementService
-                .addUserDefinedLocalAuthenticator(userDefinedLocalAuthenticatorCreation)).build();
+        Authenticator response = authenticatorManagementService
+                .addUserDefinedLocalAuthenticator(userDefinedLocalAuthenticatorCreation);
+        URI location = ContextLoader.buildURIForHeader(V1_API_PATH_COMPONENT +
+                "/authenticator/custom/" + response.getId());
+        return Response.created(location).entity(response).build();
     }
 
     @Override
