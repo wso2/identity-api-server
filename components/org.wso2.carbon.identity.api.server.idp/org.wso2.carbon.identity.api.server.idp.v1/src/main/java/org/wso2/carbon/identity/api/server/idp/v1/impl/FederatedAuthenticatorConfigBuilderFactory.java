@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.idp.v1.impl;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.common.ContextLoader;
 import org.wso2.carbon.identity.api.server.idp.common.Constants;
@@ -124,9 +123,9 @@ public class FederatedAuthenticatorConfigBuilderFactory {
 
         federatedAuthenticator.setName(config.getName());
         federatedAuthenticator.setIsEnabled(config.isEnabled());
-        String[] tags = resolveAuthenticatorTags(config);
-        if (ArrayUtils.isNotEmpty(tags)) {
-            federatedAuthenticator.setTags(Arrays.asList(tags));
+        List<String> tags = resolveAuthenticatorTags(config);
+        if (tags.isEmpty()) {
+            federatedAuthenticator.setTags(tags);
         }
 
         if (DefinedByType.SYSTEM == config.getDefinedByType()) {
@@ -147,6 +146,7 @@ public class FederatedAuthenticatorConfigBuilderFactory {
      * FederatedAuthenticatorConfig.
      *
      * @param fedAuthConfigs Array of FederatedAuthenticatorConfig instances.
+     * @param idpResourceId  Identity provider resource ID.
      * @return List of FederatedAuthenticatorListItem instances.
      */
     public static List<FederatedAuthenticatorListItem> build(FederatedAuthenticatorConfig[] fedAuthConfigs,
@@ -160,9 +160,9 @@ public class FederatedAuthenticatorConfigBuilderFactory {
             authenticatorListItem.setIsEnabled(config.isEnabled());
             authenticatorListItem.definedBy(FederatedAuthenticatorListItem.DefinedByEnum.valueOf(
                     config.getDefinedByType().toString()));
-            String[] tags = resolveAuthenticatorTags(config);
-            if (ArrayUtils.isNotEmpty(tags)) {
-                authenticatorListItem.setTags(Arrays.asList(tags));
+            List<String> tags = resolveAuthenticatorTags(config);
+            if (tags.isEmpty()) {
+                authenticatorListItem.setTags(tags);
             }
             authenticatorListItem.setSelf(ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT +
                      IDP_PATH_COMPONENT + "/%s/federated-authenticators/%s", idpResourceId,
@@ -466,21 +466,19 @@ public class FederatedAuthenticatorConfigBuilderFactory {
         }
     }
 
-    private static String[] resolveAuthenticatorTags(FederatedAuthenticatorConfig config) {
+    private static List<String> resolveAuthenticatorTags(FederatedAuthenticatorConfig config) {
 
         /* If the authenticator is defined by the user, return the tags of the authenticator config. Otherwise, return
         the tags of the system registered federated authenticator template.
          */
         if (DefinedByType.USER == config.getDefinedByType()) {
-            return config.getTags();
-
+            return Arrays.asList(config.getTags());
         }
+
         FederatedAuthenticatorConfig federatedAuthenticatorConfig =
                 ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(config.getName());
-        if (federatedAuthenticatorConfig != null) {
-            return federatedAuthenticatorConfig.getTags();
-        }
-        return new String[0];
+        return federatedAuthenticatorConfig != null ? Arrays.asList(federatedAuthenticatorConfig.getTags())
+                : new ArrayList<>();
     }
 
     /**
