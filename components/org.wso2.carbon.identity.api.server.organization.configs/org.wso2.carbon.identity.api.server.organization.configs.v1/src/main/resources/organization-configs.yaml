@@ -80,6 +80,35 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/ServerError'
+    put:
+      tags:
+        - Discovery
+      summary: Update organization discovery configuration.
+      description: |
+        This API provides the capability to update discovery configuration of the primary organization. <br>
+          <b>Scope(Permission) required:</b> <br>
+            * internal_config_mgt_update
+      operationId: updateDiscoveryConfig
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Config'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/ServerError'
     delete:
       tags:
         - Discovery
