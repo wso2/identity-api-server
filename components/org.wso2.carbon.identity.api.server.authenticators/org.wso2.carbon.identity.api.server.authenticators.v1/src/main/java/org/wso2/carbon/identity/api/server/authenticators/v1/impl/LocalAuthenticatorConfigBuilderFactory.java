@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.v1.impl;
 
-import org.wso2.carbon.identity.api.server.authenticators.common.Constants;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Endpoint;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
@@ -28,6 +27,7 @@ import org.wso2.carbon.identity.application.common.exception.AuthenticatorMgtCli
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.UserDefinedAuthenticatorEndpointConfig;
 import org.wso2.carbon.identity.application.common.model.UserDefinedLocalAuthenticatorConfig;
+import org.wso2.carbon.identity.application.common.util.AuthenticatorMgtExceptionBuilder.AuthenticatorMgtError;
 import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants;
 
 import java.util.Arrays;
@@ -36,7 +36,6 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import static org.wso2.carbon.identity.api.server.authenticators.common.Constants.CONFIGS_AUTHENTICATOR_PATH_COMPONENT;
-import static org.wso2.carbon.identity.api.server.authenticators.common.Constants.ErrorMessage.ERROR_CODE_INVALID_ENDPOINT_CONFIG;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.Util.base64URLEncode;
 
@@ -128,7 +127,7 @@ public class LocalAuthenticatorConfigBuilderFactory {
                             Map.Entry::getKey, entry -> entry.getValue().toString())));
             return endpointConfigBuilder.build();
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            Constants.ErrorMessage error = ERROR_CODE_INVALID_ENDPOINT_CONFIG;
+            AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_INVALID_ENDPOINT_CONFIG;
             throw new AuthenticatorMgtClientException(error.getCode(), error.getMessage(), e.getMessage());
         }
     }
