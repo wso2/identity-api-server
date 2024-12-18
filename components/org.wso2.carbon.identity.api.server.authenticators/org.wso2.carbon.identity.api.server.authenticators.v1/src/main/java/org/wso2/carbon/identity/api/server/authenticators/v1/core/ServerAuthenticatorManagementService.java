@@ -1018,7 +1018,7 @@ public class ServerAuthenticatorManagementService {
                 .withMessage(e.getMessage())
                 .withDescription(e.getDescription());
         Response.Status status = null;
-        if (responseStatus != null && responseStatus[0] != null) {
+        if (ArrayUtils.isNotEmpty(responseStatus)) {
             status = responseStatus[0];
         }
         ErrorResponse errorResponse;
