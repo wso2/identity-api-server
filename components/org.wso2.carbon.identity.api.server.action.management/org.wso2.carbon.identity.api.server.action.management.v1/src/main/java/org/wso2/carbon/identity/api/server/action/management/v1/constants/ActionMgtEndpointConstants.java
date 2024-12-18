@@ -28,7 +28,7 @@ public class ActionMgtEndpointConstants {
 
     public static final String ACTION_MANAGEMENT_PREFIX = "ACTION-";
     public static final String ACTION_PATH_COMPONENT = "/actions";
-    public static final String PATH_CONSTANT = "/";
+    public static final String PATH_SEPARATOR = "/";
 
     /**
      * Enum for error messages.
@@ -41,13 +41,10 @@ public class ActionMgtEndpointConstants {
         ERROR_INVALID_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES("60010",
                 "Unable to perform the operation.",
                 "Required authentication properties are not provided or invalid."),
-        ERROR_INVALID_ACTION_ENDPOINT_AUTH_TYPE("60011",
-                "Invalid Authentication Type for Action Endpoint.",
-                "Invalid authentication type used for path parameter."),
-        ERROR_EMPTY_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES("60012",
+        ERROR_EMPTY_ACTION_ENDPOINT_AUTHENTICATION_PROPERTIES("60011",
                 "Unable to perform the operation.",
                 "Authentication property values cannot be empty."),
-        ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID("60013",
+        ERROR_NO_ACTION_FOUND_ON_GIVEN_ACTION_TYPE_AND_ID("60012",
                 "Action is not found.",
                 "No action is found for given action id and action type"),
 

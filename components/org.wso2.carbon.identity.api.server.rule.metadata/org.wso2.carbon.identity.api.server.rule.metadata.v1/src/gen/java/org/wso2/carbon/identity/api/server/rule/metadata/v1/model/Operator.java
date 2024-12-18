@@ -16,15 +16,12 @@
  * under the License.
  */
 
-package org.wso2.carbon.identity.api.server.action.management.v1;
+package org.wso2.carbon.identity.api.server.rule.metadata.v1.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import javax.validation.constraints.*;
 
 
@@ -32,40 +29,52 @@ import io.swagger.annotations.*;
 import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-public class AuthenticationTypeProperties  {
+public class Operator  {
   
-    private Map<String, Object> properties = null;
-
+    private String name;
+    private String displayName;
 
     /**
+    * Name of the operator. The immutable identifier of the operator referenced within the rule expression.
     **/
-    public AuthenticationTypeProperties properties(Map<String, Object> properties) {
+    public Operator name(String name) {
 
-        this.properties = properties;
+        this.name = name;
         return this;
     }
     
-    @ApiModelProperty(example = "{\"username\":\"auth_username\",\"password\":\"auth_password\"}", value = "")
-    @JsonProperty("properties")
+    @ApiModelProperty(value = "Name of the operator. The immutable identifier of the operator referenced within the rule expression.")
+    @JsonProperty("name")
     @Valid
-    public Map<String, Object> getProperties() {
-        return properties;
+    public String getName() {
+        return name;
     }
-    public void setProperties(Map<String, Object> properties) {
-        this.properties = properties;
+    public void setName(String name) {
+        this.name = name;
     }
 
+    /**
+    * Display name of the operator. Use as a user friendly label of the operator to show in UI.
+    **/
+    public Operator displayName(String displayName) {
 
-    public AuthenticationTypeProperties putPropertiesItem(String key, Object propertiesItem) {
-        if (this.properties == null) {
-            this.properties = new HashMap<String, Object>();
-        }
-        this.properties.put(key, propertiesItem);
+        this.displayName = displayName;
         return this;
     }
-
     
+    @ApiModelProperty(value = "Display name of the operator. Use as a user friendly label of the operator to show in UI.")
+    @JsonProperty("displayName")
+    @Valid
+    public String getDisplayName() {
+        return displayName;
+    }
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -76,22 +85,24 @@ public class AuthenticationTypeProperties  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AuthenticationTypeProperties authenticationTypeProperties = (AuthenticationTypeProperties) o;
-        return Objects.equals(this.properties, authenticationTypeProperties.properties);
+        Operator operator = (Operator) o;
+        return Objects.equals(this.name, operator.name) &&
+            Objects.equals(this.displayName, operator.displayName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(properties);
+        return Objects.hash(name, displayName);
     }
 
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class AuthenticationTypeProperties {\n");
+        sb.append("class Operator {\n");
         
-        sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
         sb.append("}");
         return sb.toString();
     }

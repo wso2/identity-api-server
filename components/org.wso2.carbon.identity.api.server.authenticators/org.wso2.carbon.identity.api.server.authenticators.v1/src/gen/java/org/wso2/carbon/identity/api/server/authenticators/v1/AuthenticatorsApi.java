@@ -25,6 +25,8 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Authenticator;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.ConnectedApps;
 import org.wso2.carbon.identity.api.server.authenticators.v1.model.Error;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorCreation;
+import org.wso2.carbon.identity.api.server.authenticators.v1.model.UserDefinedLocalAuthenticatorUpdate;
 import org.wso2.carbon.identity.api.server.authenticators.v1.AuthenticatorsApiService;
 
 import javax.validation.Valid;
@@ -41,6 +43,29 @@ public class AuthenticatorsApi  {
 
     @Autowired
     private AuthenticatorsApiService delegate;
+
+    @Valid
+    @POST
+    @Path("/custom")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Create a new user defined local authenticator. ", notes = "This API provides the capability to create a new user defined local authenticator. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/custom_authenticator/create <br> <b>Scope required:</b> <br>     * internal_custom_authenticator_create <br> ", response = Authenticator.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "User defined local authenticators", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "Successful response", response = Authenticator.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response addUserDefinedLocalAuthenticator(@ApiParam(value = "This represents the user defined local authenticator to be created." ,required=true) @Valid UserDefinedLocalAuthenticatorCreation userDefinedLocalAuthenticatorCreation) {
+
+        return delegate.addUserDefinedLocalAuthenticator(userDefinedLocalAuthenticatorCreation );
+    }
 
     @Valid
     @GET
@@ -92,6 +117,29 @@ public class AuthenticatorsApi  {
     }
 
     @Valid
+    @DELETE
+    @Path("/custom/{authenticator-id}")
+    
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Delete a user defined local authenticator. ", notes = "This API provides the capability to delete a user defined local authenticators. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/custom_authenticator/delete <br> <b>Scope required:</b> <br>     * internal_custom_authenticator_delete <br> ", response = Void.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "User defined local authenticators", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 204, message = "Successful response", response = Void.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response deleteUserDefinedLocalAuthenticator(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId) {
+
+        return delegate.deleteUserDefinedLocalAuthenticator(authenticatorId );
+    }
+
+    @Valid
     @GET
     @Path("/{authenticator-id}/connected-apps")
     
@@ -101,7 +149,7 @@ public class AuthenticatorsApi  {
         @Authorization(value = "OAuth2", scopes = {
             
         })
-    }, tags={ "Connected apps of local authenticators" })
+    }, tags={ "Connected apps of local authenticators", })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "Successful Response", response = ConnectedApps.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
@@ -113,6 +161,29 @@ public class AuthenticatorsApi  {
     public Response getConnectedAppsOfLocalAuthenticator(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId,     @Valid @Min(0)@ApiParam(value = "Maximum number of records to return. _<b>This option is not yet supported.<b>_ ")  @QueryParam("limit") Integer limit,     @Valid @Min(0)@ApiParam(value = "Number of records to skip for pagination. _<b>This option is not yet supported.<b>_ ")  @QueryParam("offset") Integer offset) {
 
         return delegate.getConnectedAppsOfLocalAuthenticator(authenticatorId,  limit,  offset );
+    }
+
+    @Valid
+    @PUT
+    @Path("/custom/{authenticator-id}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @ApiOperation(value = "Update a user defined local authenticator. ", notes = "This API provides the capability to update a user defined local authenticator configurations. <br> <b>Permission required:</b> <br>     * /permission/admin/manage/custom_authenticator/update <br> <b>Scope required:</b> <br>     * internal_custom_authenticator_update <br> ", response = Authenticator.class, authorizations = {
+        @Authorization(value = "BasicAuth"),
+        @Authorization(value = "OAuth2", scopes = {
+            
+        })
+    }, tags={ "User defined local authenticators" })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "Successful response", response = Authenticator.class),
+        @ApiResponse(code = 400, message = "Bad Request", response = Error.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = Void.class),
+        @ApiResponse(code = 500, message = "Server Error", response = Error.class)
+    })
+    public Response updateUserDefinedLocalAuthenticator(@ApiParam(value = "ID of an authenticator",required=true) @PathParam("authenticator-id") String authenticatorId, @ApiParam(value = "This represents the user defined local authenticator to be created." ,required=true) @Valid UserDefinedLocalAuthenticatorUpdate userDefinedLocalAuthenticatorUpdate) {
+
+        return delegate.updateUserDefinedLocalAuthenticator(authenticatorId,  userDefinedLocalAuthenticatorUpdate );
     }
 
 }

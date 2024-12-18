@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.identity.api.server.authenticators.common;
 
+import org.wso2.carbon.identity.application.common.ApplicationAuthenticatorService;
 import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.idp.mgt.IdentityProviderManager;
 
@@ -28,6 +29,7 @@ public class AuthenticatorsServiceHolder {
 
     private ApplicationManagementService applicationManagementService;
     private IdentityProviderManager identityProviderManager;
+    private ApplicationAuthenticatorService applicationAuthenticatorService;
 
     private AuthenticatorsServiceHolder() {
 
@@ -76,5 +78,25 @@ public class AuthenticatorsServiceHolder {
     public void setIdentityProviderManager(IdentityProviderManager identityProviderManager) {
 
         AuthenticatorsServiceHolder.getInstance().identityProviderManager = identityProviderManager;
+    }
+
+    /**
+     * Get ApplicationAuthenticatorService osgi service.
+     *
+     * @return ApplicationAuthenticatorService
+     */
+    public ApplicationAuthenticatorService getApplicationAuthenticatorService() {
+
+        return AuthenticatorsServiceHolder.getInstance().applicationAuthenticatorService;
+    }
+
+    /**
+     * Set ApplicationAuthenticatorService osgi service.
+     *
+     * @param applicationAuthenticatorService ApplicationAuthenticatorService.
+     */
+    public void setApplicationAuthenticatorService(ApplicationAuthenticatorService applicationAuthenticatorService) {
+
+        AuthenticatorsServiceHolder.getInstance().applicationAuthenticatorService = applicationAuthenticatorService;
     }
 }
