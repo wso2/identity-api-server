@@ -588,33 +588,10 @@ public class ServerIdpManagementService {
             listResponse = new FederatedAuthenticatorListResponse();
             FederatedAuthenticatorConfig[] fedAuthConfigs = idP.getFederatedAuthenticatorConfigs();
             if (fedAuthConfigs != null) {
-                List<FederatedAuthenticatorListItem> fedAuthList = new ArrayList<>();
-                String defaultAuthenticator = null;
-                for (FederatedAuthenticatorConfig config : fedAuthConfigs) {
-                    String fedAuthId = base64URLEncode(config.getName());
-                    FederatedAuthenticatorListItem listItem = new FederatedAuthenticatorListItem();
-                    listItem.setAuthenticatorId(fedAuthId);
-                    listItem.setName(config.getName());
-                    listItem.setIsEnabled(config.isEnabled());
-                    listItem.setDefinedBy(
-                            FederatedAuthenticatorListItem.DefinedByEnum.valueOf(config.getDefinedByType().toString()));
-                    FederatedAuthenticatorConfig federatedAuthenticatorConfig =
-                            ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
-                                    config.getName());
-                    if (federatedAuthenticatorConfig != null) {
-                        String[] tags = federatedAuthenticatorConfig.getTags();
-                        if (ArrayUtils.isNotEmpty(tags)) {
-                            listItem.setTags(Arrays.asList(tags));
-                        }
-                    }
-                    listItem.setSelf(
-                            ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT +
-                                    "/%s/federated-authenticators/%s", idpId, fedAuthId)).toString());
-                    fedAuthList.add(listItem);
-                    if (idP.getDefaultAuthenticatorConfig() != null) {
-                        defaultAuthenticator = base64URLEncode(idP.getDefaultAuthenticatorConfig().getName());
-                    }
-                }
+                List<FederatedAuthenticatorListItem> fedAuthList = FederatedAuthenticatorConfigBuilderFactory.build(
+                        fedAuthConfigs, idP.getResourceId());
+                String defaultAuthenticator = (idP.getDefaultAuthenticatorConfig() != null ? base64URLEncode(idP
+                        .getDefaultAuthenticatorConfig().getName()) : null);
                 listResponse.setDefaultAuthenticatorId(defaultAuthenticator);
                 listResponse.setAuthenticators(fedAuthList);
             }
@@ -2428,30 +2405,8 @@ public class ServerIdpManagementService {
 
         FederatedAuthenticatorConfig[] fedAuthConfigs = idp.getFederatedAuthenticatorConfigs();
         FederatedAuthenticatorListResponse fedAuthIDPResponse = new FederatedAuthenticatorListResponse();
-        List<FederatedAuthenticatorListItem> authenticators = new ArrayList<>();
-        for (FederatedAuthenticatorConfig fedAuthConfig : fedAuthConfigs) {
-            FederatedAuthenticatorListItem fedAuthListItem = new FederatedAuthenticatorListItem();
-            fedAuthListItem.setAuthenticatorId(base64URLEncode(fedAuthConfig.getName()));
-            fedAuthListItem.setName(fedAuthConfig.getName());
-            fedAuthListItem.setIsEnabled(fedAuthConfig.isEnabled());
-            fedAuthListItem.setDefinedBy(FederatedAuthenticatorListItem.DefinedByEnum.valueOf(
-                    fedAuthConfig.getDefinedByType().toString()));
-            FederatedAuthenticatorConfig federatedAuthenticatorConfig =
-                    ApplicationAuthenticatorService.getInstance().getFederatedAuthenticatorByName(
-                            fedAuthConfig.getName());
-            if (federatedAuthenticatorConfig != null) {
-                String[] tags = federatedAuthenticatorConfig.getTags();
-                if (ArrayUtils.isNotEmpty(tags)) {
-                    fedAuthListItem.setTags(Arrays.asList(tags));
-                }
-            }
-            fedAuthListItem.setSelf(
-                    ContextLoader.buildURIForBody(String.format(V1_API_PATH_COMPONENT + IDP_PATH_COMPONENT +
-                                    "/%s/federated-authenticators/%s", idp.getResourceId(),
-                            base64URLEncode(fedAuthConfig.getName())))
-                            .toString());
-            authenticators.add(fedAuthListItem);
-        }
+        List<FederatedAuthenticatorListItem> authenticators =
+                FederatedAuthenticatorConfigBuilderFactory.build(fedAuthConfigs, idp.getResourceId());
         fedAuthIDPResponse.setDefaultAuthenticatorId(idp.getDefaultAuthenticatorConfig() != null ? base64URLEncode(idp
                 .getDefaultAuthenticatorConfig().getName()) : null);
         fedAuthIDPResponse.setAuthenticators(authenticators);
