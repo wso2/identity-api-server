@@ -183,15 +183,21 @@ public class ServerAuthenticatorManagementService {
                             .getTenantDomainFromContext());
 
             FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
-                    .getIdentityProviderManager().getAllFederatedAuthenticators();
+                    .getIdentityProviderManager()
+                    .getAllFederatedAuthenticators(ContextLoader.getTenantDomainFromContext());
+
+            List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs = getApplicationAuthenticatorService()
+                    .getAllUserDefinedLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
 
             return buildTagsListResponse(localAuthenticatorConfigs, requestPathAuthenticatorConfigs,
-                    federatedAuthenticatorConfigs);
+                    federatedAuthenticatorConfigs, userDefinedLocalAuthConfigs);
         } catch (IdentityApplicationManagementException e) {
             throw handleApplicationMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_AUTHENTICATORS,
                     null);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
+        } catch (AuthenticatorMgtException e) {
+            throw handleAuthenticatorException(e);
         }
     }
 
@@ -616,7 +622,8 @@ public class ServerAuthenticatorManagementService {
 
     private List<String> buildTagsListResponse(LocalAuthenticatorConfig[] localAuthenticatorConfigs,
                                                RequestPathAuthenticatorConfig[] requestPathAuthenticatorConfigs,
-                                               FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs) {
+                                               FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs,
+                                               List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs) {
 
         ArrayList<String> tagsList = new ArrayList<>();
         if (localAuthenticatorConfigs != null) {
@@ -637,6 +644,14 @@ public class ServerAuthenticatorManagementService {
         }
         if (ArrayUtils.isNotEmpty(federatedAuthenticatorConfigs)) {
             for (FederatedAuthenticatorConfig config : federatedAuthenticatorConfigs) {
+                String[] tags = config.getTags();
+                if (ArrayUtils.isNotEmpty(tags)) {
+                    tagsList.addAll(Arrays.asList(tags));
+                }
+            }
+        }
+        if (!userDefinedLocalAuthConfigs.isEmpty()) {
+            for (UserDefinedLocalAuthenticatorConfig config : userDefinedLocalAuthConfigs) {
                 String[] tags = config.getTags();
                 if (ArrayUtils.isNotEmpty(tags)) {
                     tagsList.addAll(Arrays.asList(tags));
