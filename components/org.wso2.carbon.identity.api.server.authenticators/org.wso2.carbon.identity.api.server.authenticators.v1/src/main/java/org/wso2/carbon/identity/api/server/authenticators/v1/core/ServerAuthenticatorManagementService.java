@@ -1010,13 +1010,15 @@ public class ServerAuthenticatorManagementService {
      */
     private APIError handleAuthenticatorException(AuthenticatorMgtException e) {
 
-        ErrorResponse errorResponse = new ErrorResponse.Builder()
+        ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
                 .withCode(e.getErrorCode())
                 .withMessage(e.getMessage())
-                .withDescription(e.getDescription()).build();
+                .withDescription(e.getDescription());
         Response.Status status;
+        ErrorResponse errorResponse;
 
         if (e instanceof AuthenticatorMgtClientException) {
+            errorResponse = errorResponseBuilder.build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -1027,6 +1029,7 @@ public class ServerAuthenticatorManagementService {
             errorResponse.setDescription(e.getDescription());
             status = Response.Status.BAD_REQUEST;
         } else if (e instanceof AuthenticatorMgtServerException) {
+            errorResponse = errorResponseBuilder.build(log, e, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -1037,6 +1040,7 @@ public class ServerAuthenticatorManagementService {
             errorResponse.setDescription(e.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
+            errorResponse = errorResponseBuilder.build(log, e, e.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);
