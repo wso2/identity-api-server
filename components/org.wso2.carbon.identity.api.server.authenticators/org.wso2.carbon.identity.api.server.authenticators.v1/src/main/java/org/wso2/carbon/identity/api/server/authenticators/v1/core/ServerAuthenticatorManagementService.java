@@ -184,15 +184,21 @@ public class ServerAuthenticatorManagementService {
                             .getTenantDomainFromContext());
 
             FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs = AuthenticatorsServiceHolder.getInstance()
-                    .getIdentityProviderManager().getAllFederatedAuthenticators();
+                    .getIdentityProviderManager()
+                    .getAllFederatedAuthenticators(ContextLoader.getTenantDomainFromContext());
+
+            List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs = getApplicationAuthenticatorService()
+                    .getAllUserDefinedLocalAuthenticators(ContextLoader.getTenantDomainFromContext());
 
             return buildTagsListResponse(localAuthenticatorConfigs, requestPathAuthenticatorConfigs,
-                    federatedAuthenticatorConfigs);
+                    federatedAuthenticatorConfigs, userDefinedLocalAuthConfigs);
         } catch (IdentityApplicationManagementException e) {
             throw handleApplicationMgtException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_AUTHENTICATORS,
                     null);
         } catch (IdentityProviderManagementException e) {
             throw handleIdPException(e, Constants.ErrorMessage.ERROR_CODE_ERROR_LISTING_IDPS, null);
+        } catch (AuthenticatorMgtException e) {
+            throw handleAuthenticatorException(e);
         }
     }
 
@@ -619,7 +625,8 @@ public class ServerAuthenticatorManagementService {
 
     private List<String> buildTagsListResponse(LocalAuthenticatorConfig[] localAuthenticatorConfigs,
                                                RequestPathAuthenticatorConfig[] requestPathAuthenticatorConfigs,
-                                               FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs) {
+                                               FederatedAuthenticatorConfig[] federatedAuthenticatorConfigs,
+                                               List<UserDefinedLocalAuthenticatorConfig> userDefinedLocalAuthConfigs) {
 
         ArrayList<String> tagsList = new ArrayList<>();
         if (localAuthenticatorConfigs != null) {
@@ -640,6 +647,14 @@ public class ServerAuthenticatorManagementService {
         }
         if (ArrayUtils.isNotEmpty(federatedAuthenticatorConfigs)) {
             for (FederatedAuthenticatorConfig config : federatedAuthenticatorConfigs) {
+                String[] tags = config.getTags();
+                if (ArrayUtils.isNotEmpty(tags)) {
+                    tagsList.addAll(Arrays.asList(tags));
+                }
+            }
+        }
+        if (!userDefinedLocalAuthConfigs.isEmpty()) {
+            for (UserDefinedLocalAuthenticatorConfig config : userDefinedLocalAuthConfigs) {
                 String[] tags = config.getTags();
                 if (ArrayUtils.isNotEmpty(tags)) {
                     tagsList.addAll(Arrays.asList(tags));
@@ -998,16 +1013,18 @@ public class ServerAuthenticatorManagementService {
      */
     private APIError handleAuthenticatorException(AuthenticatorMgtException e, Response.Status... responseStatus) {
 
-        ErrorResponse errorResponse = new ErrorResponse.Builder()
+        ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
                 .withCode(e.getErrorCode())
                 .withMessage(e.getMessage())
-                .withDescription(e.getDescription()).build();
+                .withDescription(e.getDescription());
         Response.Status status = null;
         if (responseStatus != null && responseStatus[0] != null) {
             status = responseStatus[0];
         }
+        ErrorResponse errorResponse;
 
         if (e instanceof AuthenticatorMgtClientException) {
+            errorResponse = errorResponseBuilder.build(log, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -1020,6 +1037,7 @@ public class ServerAuthenticatorManagementService {
                 status = Response.Status.BAD_REQUEST;
             }
         } else if (e instanceof AuthenticatorMgtServerException) {
+            errorResponse = errorResponseBuilder.build(log, e, e.getMessage());
             if (e.getErrorCode() != null) {
                 String errorCode = e.getErrorCode();
                 errorCode =
@@ -1030,6 +1048,7 @@ public class ServerAuthenticatorManagementService {
             errorResponse.setDescription(e.getDescription());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         } else {
+            errorResponse = errorResponseBuilder.build(log, e, e.getMessage());
             status = Response.Status.INTERNAL_SERVER_ERROR;
         }
         return new APIError(status, errorResponse);
