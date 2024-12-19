@@ -147,15 +147,15 @@ public class AdvancedApplicationConfiguration  {
     }
 
     /**
-     * Decides whether user needs to use external consent page.
-     **/
+    * Decides whether users should be presented with an external consent page.
+    **/
     public AdvancedApplicationConfiguration useExternalConsentPage(Boolean useExternalConsentPage) {
 
         this.useExternalConsentPage = useExternalConsentPage;
         return this;
     }
 
-    @ApiModelProperty(example = "false", value = "Decides whether user needs to use external consent page.")
+    @ApiModelProperty(example = "false", value = "Decides whether users should be presented with an external consent page.")
     @JsonProperty("useExternalConsentPage")
     @Valid
     public Boolean getUseExternalConsentPage() {
@@ -278,6 +278,7 @@ public class AdvancedApplicationConfiguration  {
     }
 
     /**
+    * Denotes additional properties of the application. It is only supported by getApplication and getAllApplications request.
     **/
     public AdvancedApplicationConfiguration additionalSpProperties(List<AdditionalSpProperty> additionalSpProperties) {
 
@@ -285,7 +286,7 @@ public class AdvancedApplicationConfiguration  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(value = "Denotes additional properties of the application. It is only supported by getApplication and getAllApplications request.")
     @JsonProperty("additionalSpProperties")
     @Valid
     public List<AdditionalSpProperty> getAdditionalSpProperties() {

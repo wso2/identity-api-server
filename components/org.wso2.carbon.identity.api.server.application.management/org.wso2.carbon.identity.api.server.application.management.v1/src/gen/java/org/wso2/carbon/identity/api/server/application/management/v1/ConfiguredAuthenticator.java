@@ -43,7 +43,7 @@ public class ConfiguredAuthenticator  {
         return this;
     }
     
-    @ApiModelProperty(example = "googleIdP", value = "")
+    @ApiModelProperty(example = "sampleIdP", value = "")
     @JsonProperty("name")
     @Valid
     public String getName() {
@@ -61,7 +61,7 @@ public class ConfiguredAuthenticator  {
         return this;
     }
     
-    @ApiModelProperty(example = "GoogleAuthenticator", value = "")
+    @ApiModelProperty(example = "SampleAuthenticator", value = "")
     @JsonProperty("type")
     @Valid
     public String getType() {

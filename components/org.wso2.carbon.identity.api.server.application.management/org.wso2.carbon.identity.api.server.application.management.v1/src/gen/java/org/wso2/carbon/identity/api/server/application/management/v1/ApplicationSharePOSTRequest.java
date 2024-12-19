@@ -64,7 +64,7 @@ public class ApplicationSharePOSTRequest  {
         return this;
     }
     
-    @ApiModelProperty(value = "")
+    @ApiModelProperty(example = "[\"682edf68-4835-4bb8-961f-0a16bc6cc866\",\"ghfbctgf-4318-46d4-8ee1-7t3s38e23098\"]", value = "")
     @JsonProperty("sharedOrganizations")
     @Valid
     public List<String> getSharedOrganizations() {

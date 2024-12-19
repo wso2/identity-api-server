@@ -96,7 +96,7 @@ public class ApplicationPatchModel  {
         return this;
     }
 
-    @ApiModelProperty(example = "This is the application version.", value = "")
+    @ApiModelProperty(example = "v1.0.0", value = "")
     @JsonProperty("applicationVersion")
     @Valid
     public String getApplicationVersion() {
@@ -187,7 +187,7 @@ public class ApplicationPatchModel  {
         return this;
     }
     
-    @ApiModelProperty(example = "v1.0.0", value = "Version of the template used to create the application.")
+    @ApiModelProperty(example = "v1.0.1", value = "Version of the template used to create the application.")
     @JsonProperty("templateVersion")
     @Valid
     public String getTemplateVersion() {
