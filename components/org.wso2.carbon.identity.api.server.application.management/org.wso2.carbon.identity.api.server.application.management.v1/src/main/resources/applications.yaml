@@ -3112,6 +3112,10 @@ components:
           type: boolean
           example: false
           description: Decides whether the application is visible for end users.
+        discoverableGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscoverableGroup'
         certificate:
           $ref: '#/components/schemas/Certificate'
         skipLoginConsent:
@@ -3223,6 +3227,19 @@ components:
           description: >-
             Certificate value. If type is JWKS, value should be jwks URL. If
             type is PEM, value should be the certificate in PEM format.
+    DiscoverableGroup:
+      type: object
+      properties:
+        userStore:
+          type: string
+          description: >-
+            ID of the user store the groups belong to
+        groups:
+          type: array
+          items:
+            type: string
+          description: >-
+            List of group IDs configured for discoverability
     InboundProtocols:
       type: object
       properties:
