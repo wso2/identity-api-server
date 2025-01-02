@@ -117,7 +117,6 @@ import org.wso2.carbon.idp.mgt.IdentityProviderManagementServerException;
 import org.wso2.carbon.idp.mgt.dao.IdPManagementDAO;
 import org.wso2.carbon.idp.mgt.model.ConnectedAppsResult;
 import org.wso2.carbon.idp.mgt.model.IdpSearchResult;
-import org.wso2.carbon.user.core.UserCoreConstants;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.TypeDescription;
@@ -2464,7 +2463,7 @@ public class ServerIdpManagementService {
             JustInTimeProvisioning.SchemeEnum provisioningType = getProvisioningType(jitProvisionConfig);
             jitConfig.setScheme(provisioningType);
             String provisioningUserStore = StringUtils.isNotBlank(jitProvisionConfig.getProvisioningUserStore()) ?
-                    jitProvisionConfig.getProvisioningUserStore() : UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME;
+                    jitProvisionConfig.getProvisioningUserStore() : IdentityUtil.getPrimaryDomainName();
             jitConfig.setUserstore(provisioningUserStore);
             jitConfig.setAssociateLocalUser(jitProvisionConfig.isAssociateLocalUserEnabled());
             String attributeSyncMethod = StringUtils.isNotBlank(jitProvisionConfig.getAttributeSyncMethod()) ?
