@@ -754,6 +754,8 @@ definitions:
         description: Define any additional properties if required.
         items:
           $ref: '#/definitions/Property'
+      profiles:
+        $ref: '#/definitions/Profiles'
 
   #-----------------------------------------------------
   # The Local Claim Response object
@@ -822,6 +824,8 @@ definitions:
             description: Define any additional properties if required.
             items:
               $ref: '#/definitions/Property'
+          profiles:
+            $ref: '#/definitions/Profiles'
 
   #-----------------------------------------------------
   # The Additional Attribute Mapping object
@@ -931,6 +935,38 @@ definitions:
             description: Define any additional properties if required.
             items:
               $ref: '#/definitions/Property'
+
+  #-----------------------------------------------------
+  # Profiles Object
+  #-----------------------------------------------------
+  Profiles:
+    type: object
+    description: Attribute pofiles.
+    additionalProperties:
+      type: object
+      properties:
+        readOnly:
+          type: boolean
+          example: false
+        required:
+          type: boolean
+          example: false
+        supportedByDefault:
+          type: boolean
+          example: true
+    example:
+      console:
+        readOnly: false
+        required: true
+        supportedByDefault: true
+      endUser:
+        readOnly: false
+        required: false
+        supportedByDefault: true
+      selfRegister:
+        readOnly: true
+        required: false
+        supportedByDefault: false
 
   #-----------------------------------------------------
   # Property Object
