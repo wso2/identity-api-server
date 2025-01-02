@@ -49,6 +49,7 @@ import org.wso2.carbon.identity.application.common.model.IdentityProvider;
 import org.wso2.carbon.identity.application.common.model.LocalAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.RequestPathAuthenticatorConfig;
 import org.wso2.carbon.identity.application.common.model.UserDefinedLocalAuthenticatorConfig;
+import org.wso2.carbon.identity.application.common.util.AuthenticatorMgtExceptionBuilder.AuthenticatorMgtError;
 import org.wso2.carbon.identity.base.AuthenticatorPropertyConstants.DefinedByType;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.model.ExpressionNode;
@@ -265,8 +266,10 @@ public class ServerAuthenticatorManagementService {
             LocalAuthenticatorConfig existingAuthenticator = getApplicationAuthenticatorService()
                     .getLocalAuthenticatorByName(authenticatorName, tenantDomain);
             if (existingAuthenticator == null) {
-                throw handleException(Response.Status.NOT_FOUND,
-                        Constants.ErrorMessage.ERROR_CODE_ERROR_AUTHENTICATOR_NOT_FOUND, authenticatorName);
+                AuthenticatorMgtError error = AuthenticatorMgtError.ERROR_CODE_ERROR_AUTHENTICATOR_NOT_FOUND;
+                throw handleAuthenticatorException(new AuthenticatorMgtClientException(error.getCode(),
+                                error.getMessage(), String.format(error.getMessage(), authenticatorName)),
+                        Response.Status.NOT_FOUND);
             }
             UserDefinedLocalAuthenticatorConfig updatedConfig = getApplicationAuthenticatorService()
                     .updateUserDefinedLocalAuthenticator(
@@ -1008,13 +1011,16 @@ public class ServerAuthenticatorManagementService {
      * @param e         IdentityProviderManagementException.
      * @return APIError.
      */
-    private APIError handleAuthenticatorException(AuthenticatorMgtException e) {
+    private APIError handleAuthenticatorException(AuthenticatorMgtException e, Response.Status... responseStatus) {
 
         ErrorResponse.Builder errorResponseBuilder = new ErrorResponse.Builder()
                 .withCode(e.getErrorCode())
                 .withMessage(e.getMessage())
                 .withDescription(e.getDescription());
-        Response.Status status;
+        Response.Status status = null;
+        if (ArrayUtils.isNotEmpty(responseStatus)) {
+            status = responseStatus[0];
+        }
         ErrorResponse errorResponse;
 
         if (e instanceof AuthenticatorMgtClientException) {
@@ -1027,7 +1033,9 @@ public class ServerAuthenticatorManagementService {
                 errorResponse.setCode(errorCode);
             }
             errorResponse.setDescription(e.getDescription());
-            status = Response.Status.BAD_REQUEST;
+            if (status == null) {
+                status = Response.Status.BAD_REQUEST;
+            }
         } else if (e instanceof AuthenticatorMgtServerException) {
             errorResponse = errorResponseBuilder.build(log, e, e.getMessage());
             if (e.getErrorCode() != null) {
