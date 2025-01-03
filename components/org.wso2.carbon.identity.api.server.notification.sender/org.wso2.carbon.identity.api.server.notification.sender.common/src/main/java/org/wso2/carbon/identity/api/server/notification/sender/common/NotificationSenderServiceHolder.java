@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2020-2024, WSO2 LLC. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.notification.sender.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementService;
 
 /**
@@ -25,7 +26,14 @@ import org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSe
  */
 public class NotificationSenderServiceHolder {
 
-    private static NotificationSenderManagementService notificationSenderManagementService;
+    private NotificationSenderServiceHolder() {}
+
+    private static class NotificationSenderManagementServiceHolder {
+
+        static final NotificationSenderManagementService SERVICE =
+                (NotificationSenderManagementService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(NotificationSenderManagementService.class, null);
+    }
 
     /**
      * Get Notification Sender Manager OSGi service.
@@ -34,17 +42,6 @@ public class NotificationSenderServiceHolder {
      */
     public static NotificationSenderManagementService getNotificationSenderManagementService() {
 
-        return notificationSenderManagementService;
-    }
-
-    /**
-     * Set Notification Sender Manager OSGi service.
-     *
-     * @param notificationSenderConfigManager Configuration Manager.
-     */
-    public static void setNotificationSenderManagementService(NotificationSenderManagementService
-                                                                      notificationSenderConfigManager) {
-
-        NotificationSenderServiceHolder.notificationSenderManagementService = notificationSenderConfigManager;
+        return NotificationSenderManagementServiceHolder.SERVICE;
     }
 }

@@ -18,10 +18,11 @@
 
 package org.wso2.carbon.identity.rest.api.server.email.template.v2.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.EmailApiService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.core.ApplicationEmailTemplatesService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.core.ServerEmailTemplatesService;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.factories.ApplicationEmailTemplatesServiceFactory;
+import org.wso2.carbon.identity.rest.api.server.email.template.v2.factories.ServerEmailTemplatesServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeOverview;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateTypeWithID;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.model.EmailTemplateWithID;
@@ -43,11 +44,18 @@ import static org.wso2.carbon.identity.api.server.email.template.common.Constant
  */
 public class EmailApiServiceImpl implements EmailApiService {
 
-    @Autowired
-    private ServerEmailTemplatesService emailTemplatesService;
+    private final ServerEmailTemplatesService emailTemplatesService;
+    private final ApplicationEmailTemplatesService applicationEmailTemplatesService;
 
-    @Autowired
-    private ApplicationEmailTemplatesService applicationEmailTemplatesService;
+    public EmailApiServiceImpl() {
+        try {
+            this.emailTemplatesService = ServerEmailTemplatesServiceFactory.getServerEmailTemplatesService();
+            this.applicationEmailTemplatesService = ApplicationEmailTemplatesServiceFactory
+                    .getApplicationEmailTemplatesService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating email template management services.", e);
+        }
+    }
 
     @Override
     public Response addAppEmailTemplate(

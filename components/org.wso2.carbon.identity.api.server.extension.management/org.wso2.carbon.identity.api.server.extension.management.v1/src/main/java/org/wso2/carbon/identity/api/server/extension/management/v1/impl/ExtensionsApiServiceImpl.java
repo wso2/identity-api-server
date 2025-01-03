@@ -48,7 +48,7 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
     @Override
     public Response listExtensions() {
 
-        List<ExtensionInfo> extensionInfoList = ExtensionManagementServiceHolder.getInstance().getExtensionManager()
+        List<ExtensionInfo> extensionInfoList = ExtensionManagementServiceHolder.getExtensionManager()
                 .getExtensions();
         return Response.ok().entity(extensionInfoList.stream().map(new
                 ExtensionListItemBuilder()).collect(Collectors.toList())).build();
@@ -66,7 +66,7 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
         // TODO: Add pagination support.
         validateExtensionType(extensionType);
         try {
-            List<ExtensionInfo> extensionInfoList = ExtensionManagementServiceHolder.getInstance().getExtensionManager()
+            List<ExtensionInfo> extensionInfoList = ExtensionManagementServiceHolder.getExtensionManager()
                     .getExtensionsByType(extensionType);
             return Response.ok().entity(extensionInfoList.stream().map(new
                     ExtensionListItemBuilder()).collect(Collectors.toList())).build();
@@ -88,7 +88,7 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
 
         validateExtensionType(extensionType);
         try {
-            ExtensionInfo extensionInfo = ExtensionManagementServiceHolder.getInstance().getExtensionManager()
+            ExtensionInfo extensionInfo = ExtensionManagementServiceHolder.getExtensionManager()
                     .getExtensionByTypeAndId(extensionType, extensionId);
             if (extensionInfo == null) {
                 throw ExtensionMgtUtils.handleClientException(Response.Status.NOT_FOUND,
@@ -113,7 +113,7 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
 
         validateExtensionType(extensionType);
         try {
-            JSONObject template = ExtensionManagementServiceHolder.getInstance().getExtensionManager()
+            JSONObject template = ExtensionManagementServiceHolder.getExtensionManager()
                     .getExtensionTemplate(extensionType, extensionId);
             if (template == null) {
                 throw ExtensionMgtUtils.handleClientException(Response.Status.NOT_FOUND,
@@ -138,7 +138,7 @@ public class ExtensionsApiServiceImpl implements ExtensionsApiService {
 
         validateExtensionType(extensionType);
         try {
-            JSONObject metadata = ExtensionManagementServiceHolder.getInstance().getExtensionManager()
+            JSONObject metadata = ExtensionManagementServiceHolder.getExtensionManager()
                     .getExtensionMetadata(extensionType, extensionId);
             if (metadata == null) {
                 throw ExtensionMgtUtils.handleClientException(Response.Status.NOT_FOUND,

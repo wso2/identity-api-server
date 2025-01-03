@@ -31,11 +31,9 @@ public class ActionManagementServiceFactory {
 
     static {
         ActionManagementService actionManagementService = ActionManagementServiceHolder.getActionManagementService();
-
         if (actionManagementService == null) {
             throw new IllegalStateException("ActionManagementService is not available from OSGi context.");
         }
-
         SERVICE = new ServerActionManagementService(actionManagementService);
     }
 
@@ -44,7 +42,7 @@ public class ActionManagementServiceFactory {
      *
      * @return ServerActionManagementService.
      */
-    public static ServerActionManagementService getActionManagementService() {
+    public static ServerActionManagementService getServerActionManagementService() {
 
         return SERVICE;
     }

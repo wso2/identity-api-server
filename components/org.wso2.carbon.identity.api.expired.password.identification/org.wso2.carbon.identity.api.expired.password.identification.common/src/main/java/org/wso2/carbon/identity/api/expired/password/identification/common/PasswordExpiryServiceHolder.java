@@ -29,6 +29,7 @@ public class PasswordExpiryServiceHolder {
     private PasswordExpiryServiceHolder() {}
 
     private static class ExpiredPasswordIdentificationServiceHolder {
+
         static final ExpiredPasswordIdentificationService SERVICE =
                 (ExpiredPasswordIdentificationService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(ExpiredPasswordIdentificationService.class, null);
@@ -40,6 +41,7 @@ public class PasswordExpiryServiceHolder {
      * @return ExpiredPassword identification Service.
      */
     public static ExpiredPasswordIdentificationService getExpiredPasswordIdentificationService() {
+
         return ExpiredPasswordIdentificationServiceHolder.SERVICE;
     }
 }
