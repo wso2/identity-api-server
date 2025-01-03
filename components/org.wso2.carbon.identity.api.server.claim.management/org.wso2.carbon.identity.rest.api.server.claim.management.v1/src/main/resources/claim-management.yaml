@@ -941,19 +941,9 @@ definitions:
   #-----------------------------------------------------
   Profiles:
     type: object
-    description: Attribute pofiles.
+    description: Attribute profiles.
     additionalProperties:
-      type: object
-      properties:
-        readOnly:
-          type: boolean
-          example: false
-        required:
-          type: boolean
-          example: false
-        supportedByDefault:
-          type: boolean
-          example: true
+      $ref: '#/definitions/ProfileAttributes'
     example:
       console:
         readOnly: false
@@ -967,6 +957,19 @@ definitions:
         readOnly: true
         required: false
         supportedByDefault: false
+
+  ProfileAttributes:
+    type: object
+    properties:
+      readOnly:
+        type: boolean
+        example: false
+      required:
+        type: boolean
+        example: false
+      supportedByDefault:
+        type: boolean
+        example: true
 
   #-----------------------------------------------------
   # Property Object
