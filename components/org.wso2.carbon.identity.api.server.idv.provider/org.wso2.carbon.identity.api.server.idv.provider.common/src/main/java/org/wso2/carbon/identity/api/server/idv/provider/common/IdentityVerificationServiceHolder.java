@@ -29,6 +29,7 @@ public class IdentityVerificationServiceHolder {
     private IdentityVerificationServiceHolder() {};
 
     private static class IdVProviderManagerHolder {
+
         static final IdVProviderManager SERVICE = (IdVProviderManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(IdVProviderManager.class, null);
     }

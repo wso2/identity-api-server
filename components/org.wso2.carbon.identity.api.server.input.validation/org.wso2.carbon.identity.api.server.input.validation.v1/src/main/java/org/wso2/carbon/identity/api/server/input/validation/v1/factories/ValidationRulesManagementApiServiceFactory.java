@@ -32,11 +32,9 @@ public class ValidationRulesManagementApiServiceFactory {
     static {
         InputValidationManagementService inputValidationManagementService = InputValidationServiceHolder
                 .getInputValidationMgtService();
-
         if (inputValidationManagementService == null) {
             throw new IllegalStateException("InputValidationManagementService is not available from OSGi context.");
         }
-
         SERVICE = new ValidationRulesManagementApiService(inputValidationManagementService);
     }
 

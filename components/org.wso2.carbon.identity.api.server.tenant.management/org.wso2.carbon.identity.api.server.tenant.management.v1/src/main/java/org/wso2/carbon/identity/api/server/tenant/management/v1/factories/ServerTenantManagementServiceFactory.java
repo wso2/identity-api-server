@@ -31,11 +31,9 @@ public class ServerTenantManagementServiceFactory {
 
     static {
         TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
-
         if (tenantMgtService == null) {
             throw new IllegalStateException("TenantMgtService is not available from OSGi context.");
         }
-
         SERVICE = new ServerTenantManagementService(tenantMgtService);
     }
 

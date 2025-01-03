@@ -32,11 +32,9 @@ public class ServerAdminAdvisoryManagementServiceFactory {
     static {
         AdminAdvisoryManagementService adminAdvisoryManagementService = AdminAdvisoryManagementServiceHolder
                 .getAdminAdvisoryManagementService();
-
         if (adminAdvisoryManagementService == null) {
             throw new IllegalStateException("AdminAdvisoryManagementService is not available from OSGi context.");
         }
-
         SERVICE = new ServerAdminAdvisoryManagementService(adminAdvisoryManagementService);
     }
 

@@ -32,11 +32,9 @@ public class PasswordExpiredUsersManagementApiServiceFactory {
     static {
         ExpiredPasswordIdentificationService expiredPasswordIdentificationService =
                 PasswordExpiryServiceHolder.getExpiredPasswordIdentificationService();
-
         if (expiredPasswordIdentificationService == null) {
             throw new IllegalStateException("ExpiredPasswordIdentificationService is not available from OSGi context.");
         }
-
         SERVICE = new PasswordExpiredUsersManagementApiService(expiredPasswordIdentificationService);
     }
 

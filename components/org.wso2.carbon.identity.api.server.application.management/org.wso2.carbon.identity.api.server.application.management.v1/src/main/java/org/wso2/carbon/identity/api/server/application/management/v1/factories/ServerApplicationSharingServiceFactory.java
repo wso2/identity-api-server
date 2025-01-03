@@ -30,13 +30,10 @@ public class ServerApplicationSharingServiceFactory {
     private static final ServerApplicationSharingService SERVICE;
 
     static {
-
         OrgApplicationManager orgApplicationManager = ApplicationManagementServiceHolder.getOrgApplicationManager();
-
         if (orgApplicationManager == null) {
             throw new IllegalStateException("OrgApplicationManager is not available from OSGi context.");
         }
-
         SERVICE = new ServerApplicationSharingService(orgApplicationManager);
     }
 

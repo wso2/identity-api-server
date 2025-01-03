@@ -29,6 +29,7 @@ public class KeyStoreManagamentDataHolder {
     public KeyStoreManagamentDataHolder() {}
 
     private static class KeyStoreManagementServiceHolder {
+
         static final KeyStoreManagementService SERVICE = (KeyStoreManagementService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(KeyStoreManagementService.class, null);
     }

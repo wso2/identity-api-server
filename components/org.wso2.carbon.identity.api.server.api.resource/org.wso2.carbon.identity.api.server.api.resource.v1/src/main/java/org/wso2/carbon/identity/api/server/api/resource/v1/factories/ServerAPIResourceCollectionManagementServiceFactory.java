@@ -32,11 +32,9 @@ public class ServerAPIResourceCollectionManagementServiceFactory {
     static {
         APIResourceCollectionManager apiResourceCollectionManager = APIResourceManagementServiceHolder
                 .getApiResourceCollectionManager();
-
         if (apiResourceCollectionManager == null) {
             throw new IllegalStateException("APIResourceCollectionManager is not available from OSGi context.");
         }
-
         SERVICE = new ServerAPIResourceCollectionManagementService(apiResourceCollectionManager);
     }
 

@@ -29,6 +29,7 @@ public class EmailTemplatesServiceHolder {
     private EmailTemplatesServiceHolder() {}
 
     private static class EmailTemplateManagerHolder {
+
         static final EmailTemplateManager SERVICE = (EmailTemplateManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(EmailTemplateManager.class, null);
     }

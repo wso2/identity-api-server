@@ -30,11 +30,13 @@ public class OrganizationRoleManagementServiceHolder {
     private OrganizationRoleManagementServiceHolder() {}
 
     private static class RoleManagerServiceHolder {
+
         static final RoleManager SERVICE = (RoleManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                 .getOSGiService(RoleManager.class, null);
     }
 
     private static class OrganizationUserResidentResolverServiceHolder {
+
         static final OrganizationUserResidentResolverService SERVICE =
                 (OrganizationUserResidentResolverService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(OrganizationUserResidentResolverService.class, null);

@@ -26,16 +26,14 @@ import org.wso2.carbon.identity.oauth.OAuthAdminServiceImpl;
  * Factory class for OidcScopeManagementService.
  */
 public class OidcScopeManagementServiceFactory {
+
     private static final OidcScopeManagementService SERVICE;
 
     static {
-        OAuthAdminServiceImpl oAuthAdminService = OIDCScopeManagementServiceHolder
-                .getOAuthAdminService();
-
+        OAuthAdminServiceImpl oAuthAdminService = OIDCScopeManagementServiceHolder.getOAuthAdminService();
         if (oAuthAdminService == null) {
             throw new IllegalStateException("OAuthAdminServiceImpl is not available from OSGi context.");
         }
-
         SERVICE = new OidcScopeManagementService(oAuthAdminService);
     }
 
@@ -45,6 +43,7 @@ public class OidcScopeManagementServiceFactory {
      * @return OidcScopeManagementService
      */
     public static OidcScopeManagementService getPermissionManagementService() {
+
         return SERVICE;
     }
 }

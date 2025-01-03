@@ -29,6 +29,7 @@ public class NotificationSenderServiceHolder {
     private NotificationSenderServiceHolder() {}
 
     private static class NotificationSenderManagementServiceHolder {
+
         static final NotificationSenderManagementService SERVICE =
                 (NotificationSenderManagementService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(NotificationSenderManagementService.class, null);

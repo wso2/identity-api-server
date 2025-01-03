@@ -31,11 +31,9 @@ public class ServerIdentityGovernanceServiceFactory {
 
     static {
         IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
-
         if (identityGovernanceService == null) {
             throw new IllegalStateException("RolePermissionManagementService is not available from OSGi context.");
         }
-
         SERVICE = new ServerIdentityGovernanceService(identityGovernanceService);
     }
 

@@ -32,11 +32,9 @@ public class InactiveUsersManagementApiServiceFactory {
     static {
         IdleAccountIdentificationService idleAccountIdentificationService = IdleAccountIdentificationServiceHolder
                 .getIdleAccountIdentificationService();
-
         if (idleAccountIdentificationService == null) {
             throw new IllegalStateException("IdleAccountIdentificationService is not available from OSGi context.");
         }
-
         SERVICE = new InactiveUsersManagementApiService(idleAccountIdentificationService);
     }
 

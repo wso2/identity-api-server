@@ -29,6 +29,7 @@ public class ActionManagementServiceHolder {
     private ActionManagementServiceHolder() {}
 
     private static class ActionServiceHolder {
+
         static final ActionManagementService SERVICE = (ActionManagementService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(ActionManagementService.class, null);
     }

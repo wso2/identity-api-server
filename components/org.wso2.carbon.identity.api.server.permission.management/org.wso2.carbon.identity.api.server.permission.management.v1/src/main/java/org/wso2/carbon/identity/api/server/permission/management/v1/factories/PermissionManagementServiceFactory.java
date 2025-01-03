@@ -32,11 +32,9 @@ public class PermissionManagementServiceFactory {
     static {
         RolePermissionManagementService rolePermissionManagementService = RolePermissionManagementServiceDataHolder
                 .getRolePermissionManagementService();
-
         if (rolePermissionManagementService == null) {
             throw new IllegalStateException("RolePermissionManagementService is not available from OSGi context.");
         }
-
         SERVICE = new PermissionManagementService(rolePermissionManagementService);
     }
 

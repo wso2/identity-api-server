@@ -32,11 +32,9 @@ public class ServerScriptLibrariesServiceFactory {
     static {
         FunctionLibraryManagementService functionLibraryManagementService = ScriptLibraryServiceHolder
                 .getScriptLibraryManagementService();
-
         if (functionLibraryManagementService == null) {
             throw new IllegalStateException("FunctionLibraryManagementService is not available from OSGi context.");
         }
-
         SERVICE = new ServerScriptLibrariesService(functionLibraryManagementService);
     }
 

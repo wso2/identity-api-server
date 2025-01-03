@@ -32,11 +32,9 @@ public class NotificationSenderManagementServiceFactory {
         org.wso2.carbon.identity.notification.sender.tenant.config.NotificationSenderManagementService
                 notificationSenderManagementService = NotificationSenderServiceHolder
                         .getNotificationSenderManagementService();
-
         if (notificationSenderManagementService == null) {
             throw new IllegalStateException("NotificationSenderManagementService is not available from OSGi context.");
         }
-
         SERVICE = new NotificationSenderManagementService(notificationSenderManagementService);
     }
 

@@ -32,11 +32,9 @@ public class OrganizationConfigsServiceFactory {
     static {
         OrganizationConfigManager organizationConfigManager = OrganizationConfigsServiceHolder
                 .getOrganizationConfigManager();
-
         if (organizationConfigManager == null) {
             throw new IllegalStateException("OrganizationConfigManager service is not available from OSGi context.");
         }
-
         SERVICE = new OrganizationConfigsService(organizationConfigManager);
     }
 
