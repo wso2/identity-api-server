@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.identity.api.server.organization.role.management.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.organization.role.management.v1.OrganizationsApiService;
+import org.wso2.carbon.identity.api.server.organization.role.management.v1.factories.RoleManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.role.management.v1.model.RolePatchRequest;
 import org.wso2.carbon.identity.api.server.organization.role.management.v1.model.RolePostRequest;
 import org.wso2.carbon.identity.api.server.organization.role.management.v1.model.RolePutRequest;
@@ -32,8 +32,15 @@ import javax.ws.rs.core.Response;
  */
 public class OrganizationsApiServiceImpl implements OrganizationsApiService {
 
-    @Autowired
-    private RoleManagementService roleManagementService;
+    private final RoleManagementService roleManagementService;
+
+    public OrganizationsApiServiceImpl() {
+        try {
+            this.roleManagementService = RoleManagementServiceFactory.getRoleManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating role management service.", e);
+        }
+    }
 
     @Override
     public Response createRole(String organizationId, RolePostRequest rolePostRequest) {
