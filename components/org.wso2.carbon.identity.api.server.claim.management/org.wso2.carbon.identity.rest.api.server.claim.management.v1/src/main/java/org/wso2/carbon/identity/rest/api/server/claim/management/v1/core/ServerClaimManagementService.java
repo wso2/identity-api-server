@@ -1011,11 +1011,13 @@ public class ServerClaimManagementService {
             }
         }
 
-        String sharedProfileValueResolvingMethod = claimProperties.remove(ClaimConstants.SHARED_PROFILE_VALUE_RESOLVING_METHOD);
+        String sharedProfileValueResolvingMethod =
+                claimProperties.remove(ClaimConstants.SHARED_PROFILE_VALUE_RESOLVING_METHOD);
         if (StringUtils.isNotBlank(sharedProfileValueResolvingMethod)) {
             try {
                 localClaimResDTO.setSharedProfileValueResolvingMethod(
-                        LocalClaimResDTO.SharedProfileValueResolvingMethodEnum.valueOf(sharedProfileValueResolvingMethod));
+                        LocalClaimResDTO.SharedProfileValueResolvingMethodEnum.valueOf(
+                                sharedProfileValueResolvingMethod));
             } catch (IllegalArgumentException e) {
                 // If the value is not a valid enum value, treat it as null.
                 localClaimResDTO.setSharedProfileValueResolvingMethod(null);
