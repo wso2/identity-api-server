@@ -71,7 +71,13 @@ public class LocalClaimResDTO extends ClaimResDTO {
     @Valid 
     private UniquenessScopeEnum uniquenessScope = null;
 
-    @Valid 
+    public enum SharedProfileValueResolvingMethodEnum {
+        FromOrigin, FromSharedProfile, FromFirstFoundInHierarchy,
+    };
+    @Valid
+    private SharedProfileValueResolvingMethodEnum sharedProfileValueResolvingMethod = null;
+
+    @Valid
     private List<AttributeMappingDTO> attributeMapping = new ArrayList<AttributeMappingDTO>();
 
     @Valid 
@@ -210,6 +216,20 @@ public class LocalClaimResDTO extends ClaimResDTO {
     }
 
     /**
+     * Specifies claim value resolving method for shared user profile.
+     **/
+    @ApiModelProperty(value = "Specifies claim value resolving method for shared user profile.")
+    @JsonProperty("sharedProfileValueResolvingMethod")
+    public SharedProfileValueResolvingMethodEnum getSharedProfileValueResolvingMethod() {
+        return sharedProfileValueResolvingMethod;
+    }
+
+    public void setSharedProfileValueResolvingMethod(
+            SharedProfileValueResolvingMethodEnum sharedProfileValueResolvingMethod) {
+        this.sharedProfileValueResolvingMethod = sharedProfileValueResolvingMethod;
+    }
+
+    /**
     * Userstore attribute mappings.
     **/
     @ApiModelProperty(value = "Userstore attribute mappings.")
@@ -251,6 +271,7 @@ public class LocalClaimResDTO extends ClaimResDTO {
         sb.append("    required: ").append(required).append("\n");
         sb.append("    supportedByDefault: ").append(supportedByDefault).append("\n");
         sb.append("    uniquenessScope: ").append(uniquenessScope).append("\n");
+        sb.append("    sharedProfileValueResolvingMethod: ").append(sharedProfileValueResolvingMethod).append("\n");
         sb.append("    attributeMapping: ").append(attributeMapping).append("\n");
         sb.append("    properties: ").append(properties).append("\n");
         
