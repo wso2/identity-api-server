@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -55,6 +56,8 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.External
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LinkDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalClaimReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalClaimResDTO;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ProfileAttributesDTO;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ProfilesDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.PropertyDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.model.ClaimDialectConfiguration;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.model.ClaimErrorDTO;
@@ -126,6 +129,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DESCRIPTION;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_NAME;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_DISPLAY_ORDER;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_PROFILES_PREFIX;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_READ_ONLY;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REG_EX;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REQUIRED;
@@ -358,7 +362,6 @@ public class ServerClaimManagementService {
      */
     public void deleteLocalClaim(String claimId) {
 
-
         String claimURI;
         try {
             validateClaimModificationEligibility();
@@ -468,10 +471,10 @@ public class ServerClaimManagementService {
     /**
      * Updates a claim dialect with related claims from an uploaded file.
      *
-     * @param fileInputStream   InputStream representing the uploaded claim dialect file.
-     * @param fileDetail        Attachment object with metadata about the uploaded claim dialect file.
-     * @param preserveClaims    Boolean value to indicate whether to merge and preserve the existing claims
-     *                          or completely replace the existing claims set.
+     * @param fileInputStream InputStream representing the uploaded claim dialect file.
+     * @param fileDetail      Attachment object with metadata about the uploaded claim dialect file.
+     * @param preserveClaims  Boolean value to indicate whether to merge and preserve the existing claims
+     *                        or completely replace the existing claims set.
      * @return a String representing the updated claim dialect's resource identifier.
      */
     public String updateClaimDialectFromFile(InputStream fileInputStream, Attachment fileDetail,
@@ -533,12 +536,12 @@ public class ServerClaimManagementService {
     private void deleteObsoleteLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList, List<ClaimErrorDTO> errors)
             throws ClaimMetadataException {
 
-        List<String> claimsToDelete =  getLocalClaimResDTOs(getClaimMetadataManagementService()
-                    .getLocalClaims(ContextLoader.getTenantDomainFromContext())).stream()
-                    .map(LocalClaimResDTO::getClaimURI)
-                    .filter(claimURI -> localClaimReqDTOList.stream()
-                            .noneMatch(reqDTO -> reqDTO.getClaimURI().equals(claimURI)))
-                    .collect(Collectors.toList());
+        List<String> claimsToDelete = getLocalClaimResDTOs(getClaimMetadataManagementService()
+                .getLocalClaims(ContextLoader.getTenantDomainFromContext())).stream()
+                .map(LocalClaimResDTO::getClaimURI)
+                .filter(claimURI -> localClaimReqDTOList.stream()
+                        .noneMatch(reqDTO -> reqDTO.getClaimURI().equals(claimURI)))
+                .collect(Collectors.toList());
 
         for (String claimURI : claimsToDelete) {
             try {
@@ -590,8 +593,8 @@ public class ServerClaimManagementService {
     /**
      * Exports a claim dialect with related claims in the specified file type.
      *
-     * @param dialectId     ID of the claim dialect to export.
-     * @param fileType      Type of file to export the claim dialect to.
+     * @param dialectId ID of the claim dialect to export.
+     * @param fileType  Type of file to export the claim dialect to.
      * @return a FileContent object representing the exported claim dialect file.
      */
     public FileContent exportClaimDialectToFile(String dialectId, String fileType) {
@@ -601,7 +604,7 @@ public class ServerClaimManagementService {
         }
         if (StringUtils.isBlank(fileType)) {
             throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_MISSING_MEDIA_TYPE, BAD_REQUEST,
-                                                   dialectId);
+                    dialectId);
         }
 
         ClaimDialectConfiguration dialectConfiguration = new ClaimDialectConfiguration(getClaimDialect(dialectId));
@@ -617,7 +620,7 @@ public class ServerClaimManagementService {
                 List<ExternalClaim> externalClaimList = getClaimMetadataManagementService().getExternalClaims(
                         base64DecodeId(dialectId),
                         ContextLoader.getTenantDomainFromContext());
-                List<ExternalClaimResDTO>  externalClaimResDTOList = getExternalClaimResDTOs(externalClaimList);
+                List<ExternalClaimResDTO> externalClaimResDTOList = getExternalClaimResDTOs(externalClaimList);
                 claimResDTOList.addAll(externalClaimResDTOList);
                 dialectConfiguration.setClaims(claimResDTOList);
             }
@@ -1011,6 +1014,8 @@ public class ServerClaimManagementService {
             }
         }
 
+        addAttributeProfilesToLocalClaimRes(claimProperties, localClaimResDTO);
+
         List<AttributeMappingDTO> attributeMappingDTOs = new ArrayList<>();
         for (AttributeMapping attributeMapping : localClaim.getMappedAttributes()) {
             AttributeMappingDTO attributeMappingDTO = new AttributeMappingDTO();
@@ -1024,6 +1029,51 @@ public class ServerClaimManagementService {
         localClaimResDTO.setProperties(mapToProperties(claimProperties));
 
         return localClaimResDTO;
+    }
+
+    /**
+     * Add attribute profiles to LocalClaimResDTO.
+     *
+     * @param claimProperties  Claim properties.
+     * @param localClaimResDTO Local claim response DTO.
+     */
+    private void addAttributeProfilesToLocalClaimRes(Map<String, String> claimProperties,
+                                                         LocalClaimResDTO localClaimResDTO) {
+
+        if (MapUtils.isEmpty(claimProperties)) {
+            return;
+        }
+        ProfilesDTO attributeProfiles = new ProfilesDTO();
+        claimProperties.forEach((propertyKey, propertyValue) -> {
+            if (StringUtils.isBlank(propertyKey) || StringUtils.isBlank(propertyValue)) {
+                return;
+            }
+            if (!StringUtils.startsWithIgnoreCase(propertyKey, PROP_PROFILES_PREFIX)) {
+                return;
+            }
+            String[] propertyKeyArray = propertyKey.split("\\.");
+            if (propertyKeyArray.length != 3) {
+                return;
+            }
+            String profileName = propertyKeyArray[1];
+            String claimPropertyName = propertyKeyArray[2];
+
+            ProfileAttributesDTO profileAttributes =
+                    attributeProfiles.computeIfAbsent(profileName, k -> new ProfileAttributesDTO());
+
+            switch (claimPropertyName) {
+                case PROP_READ_ONLY:
+                    profileAttributes.setReadOnly(Boolean.valueOf(propertyValue));
+                    break;
+                case PROP_REQUIRED:
+                    profileAttributes.setRequired(Boolean.valueOf(propertyValue));
+                    break;
+                case PROP_SUPPORTED_BY_DEFAULT:
+                    profileAttributes.setSupportedByDefault(Boolean.valueOf(propertyValue));
+                    break;
+            }
+        });
+        localClaimResDTO.setProfiles(attributeProfiles);
     }
 
     private List<LocalClaimResDTO> getLocalClaimResDTOs(List<LocalClaim> localClaimList) {
@@ -1063,6 +1113,8 @@ public class ServerClaimManagementService {
             claimProperties.put(PROP_UNIQUENESS_SCOPE, localClaimReqDTO.getUniquenessScope().toString());
         }
 
+        addAttributeProfilesToClaimProperties(localClaimReqDTO.getProfiles(), claimProperties);
+
         claimProperties.put(PROP_READ_ONLY, String.valueOf(localClaimReqDTO.getReadOnly()));
         claimProperties.put(PROP_REQUIRED, String.valueOf(localClaimReqDTO.getRequired()));
         claimProperties.put(PROP_SUPPORTED_BY_DEFAULT, String.valueOf(localClaimReqDTO.getSupportedByDefault()));
@@ -1075,6 +1127,36 @@ public class ServerClaimManagementService {
         }
 
         return new LocalClaim(localClaimReqDTO.getClaimURI(), attributeMappings, claimProperties);
+    }
+
+    /**
+     * Add profile attributes to claim properties.
+     *
+     * @param attributeProfiles - Profile attributes.
+     * @param claimProperties   - Claim properties.
+     */
+    private void addAttributeProfilesToClaimProperties(Map<String, ProfileAttributesDTO> attributeProfiles,
+                                                       Map<String, String> claimProperties) {
+
+        if (MapUtils.isEmpty(attributeProfiles)) {
+            return;
+        }
+        attributeProfiles.forEach((profileName, profileAttributes) -> {
+            addProfileAttributeValue(claimProperties, profileName, PROP_READ_ONLY, profileAttributes.getReadOnly());
+            addProfileAttributeValue(claimProperties, profileName, PROP_REQUIRED, profileAttributes.getRequired());
+            addProfileAttributeValue(claimProperties, profileName, PROP_SUPPORTED_BY_DEFAULT,
+                    profileAttributes.getSupportedByDefault());
+        });
+    }
+
+    private void addProfileAttributeValue(Map<String, String> claimProperties, String profileName, String propertyKey,
+                                          Object propertyValue) {
+
+        if (propertyValue == null) {
+            return;
+        }
+        String claimPropertyKey = PROP_PROFILES_PREFIX + profileName + "." + propertyKey;
+        claimProperties.put(claimPropertyKey, String.valueOf(propertyValue));
     }
 
     /**
@@ -1110,6 +1192,7 @@ public class ServerClaimManagementService {
             throw handleClaimManagementException(e, Constant.ErrorMessage.ERROR_CODE_ERROR_IMPORTING_CLAIM_DIALECT);
         }
     }
+
     private void importExternalClaims(String dialectID, List<ExternalClaimReqDTO> externalClaimReqDTOList) {
 
         List<ClaimErrorDTO> errors = new ArrayList<>();
