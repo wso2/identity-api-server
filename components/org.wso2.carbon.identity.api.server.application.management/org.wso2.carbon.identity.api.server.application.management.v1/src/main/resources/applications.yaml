@@ -3115,7 +3115,7 @@ components:
         discoverableGroups:
           type: array
           items:
-            $ref: '#/components/schemas/DiscoverableGroup'
+            $ref: '#/components/schemas/DiscoverableGroupModel'
         certificate:
           $ref: '#/components/schemas/Certificate'
         skipLoginConsent:
@@ -3227,7 +3227,7 @@ components:
           description: >-
             Certificate value. If type is JWKS, value should be jwks URL. If
             type is PEM, value should be the certificate in PEM format.
-    DiscoverableGroup:
+    DiscoverableGroupModel:
       type: object
       properties:
         userStore:

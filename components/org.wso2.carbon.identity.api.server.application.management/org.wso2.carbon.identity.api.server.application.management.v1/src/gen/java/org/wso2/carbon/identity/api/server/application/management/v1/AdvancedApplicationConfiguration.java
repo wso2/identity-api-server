@@ -27,7 +27,7 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalSpProperty;
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfigurationAttestationMetaData;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
-import org.wso2.carbon.identity.api.server.application.management.v1.DiscoverableGroup;
+import org.wso2.carbon.identity.api.server.application.management.v1.DiscoverableGroupModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.TrustedAppConfiguration;
 import javax.validation.constraints.*;
 
@@ -41,7 +41,7 @@ public class AdvancedApplicationConfiguration  {
   
     private Boolean saas;
     private Boolean discoverableByEndUsers;
-    private List<DiscoverableGroup> discoverableGroups = null;
+    private List<DiscoverableGroupModel> discoverableGroups = null;
 
     private Certificate certificate;
     private Boolean skipLoginConsent;
@@ -95,7 +95,7 @@ public class AdvancedApplicationConfiguration  {
 
     /**
     **/
-    public AdvancedApplicationConfiguration discoverableGroups(List<DiscoverableGroup> discoverableGroups) {
+    public AdvancedApplicationConfiguration discoverableGroups(List<DiscoverableGroupModel> discoverableGroups) {
 
         this.discoverableGroups = discoverableGroups;
         return this;
@@ -104,14 +104,14 @@ public class AdvancedApplicationConfiguration  {
     @ApiModelProperty(value = "")
     @JsonProperty("discoverableGroups")
     @Valid
-    public List<DiscoverableGroup> getDiscoverableGroups() {
+    public List<DiscoverableGroupModel> getDiscoverableGroups() {
         return discoverableGroups;
     }
-    public void setDiscoverableGroups(List<DiscoverableGroup> discoverableGroups) {
+    public void setDiscoverableGroups(List<DiscoverableGroupModel> discoverableGroups) {
         this.discoverableGroups = discoverableGroups;
     }
 
-    public AdvancedApplicationConfiguration addDiscoverableGroupsItem(DiscoverableGroup discoverableGroupsItem) {
+    public AdvancedApplicationConfiguration addDiscoverableGroupsItem(DiscoverableGroupModel discoverableGroupsItem) {
         if (this.discoverableGroups == null) {
             this.discoverableGroups = new ArrayList<>();
         }
