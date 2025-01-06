@@ -69,7 +69,14 @@ public class LocalClaimReqDTO {
     @Valid 
     private UniquenessScopeEnum uniquenessScope = null;
 
-    @Valid 
+    public enum SharedProfileValueResolvingMethodEnum {
+        FromOrigin, FromSharedProfile, FromFirstFoundInHierarchy,
+    };
+
+    @Valid
+    private SharedProfileValueResolvingMethodEnum sharedProfileValueResolvingMethod = null;
+
+    @Valid
     @NotNull(message = "Property attributeMapping cannot be null.") 
     private List<AttributeMappingDTO> attributeMapping = new ArrayList<AttributeMappingDTO>();
 
@@ -188,6 +195,20 @@ public class LocalClaimReqDTO {
     }
 
     /**
+     * Specifies claim value resolving method for shared user profile.
+     **/
+    @ApiModelProperty(value = "Specifies claim value resolving method for shared user profile.")
+    @JsonProperty("sharedProfileValueResolvingMethod")
+    public SharedProfileValueResolvingMethodEnum getSharedProfileValueResolvingMethod() {
+        return sharedProfileValueResolvingMethod;
+    }
+
+    public void setSharedProfileValueResolvingMethod(
+            SharedProfileValueResolvingMethodEnum sharedProfileValueResolvingMethod) {
+        this.sharedProfileValueResolvingMethod = sharedProfileValueResolvingMethod;
+    }
+
+    /**
     * Userstore attribute mappings.
     **/
     @ApiModelProperty(required = true, value = "Userstore attribute mappings.")
@@ -237,6 +258,7 @@ public class LocalClaimReqDTO {
         sb.append("    required: ").append(required).append("\n");
         sb.append("    supportedByDefault: ").append(supportedByDefault).append("\n");
         sb.append("    uniquenessScope: ").append(uniquenessScope).append("\n");
+        sb.append("    sharedProfileValueResolvingMethod: ").append(sharedProfileValueResolvingMethod).append("\n");
         sb.append("    attributeMapping: ").append(attributeMapping).append("\n");
         sb.append("    properties: ").append(properties).append("\n");
         sb.append("    profiles: ").append(profiles).append("\n");

@@ -536,12 +536,12 @@ public class ServerClaimManagementService {
     private void deleteObsoleteLocalClaims(List<LocalClaimReqDTO> localClaimReqDTOList, List<ClaimErrorDTO> errors)
             throws ClaimMetadataException {
 
-        List<String> claimsToDelete = getLocalClaimResDTOs(getClaimMetadataManagementService()
-                .getLocalClaims(ContextLoader.getTenantDomainFromContext())).stream()
-                .map(LocalClaimResDTO::getClaimURI)
-                .filter(claimURI -> localClaimReqDTOList.stream()
-                        .noneMatch(reqDTO -> reqDTO.getClaimURI().equals(claimURI)))
-                .collect(Collectors.toList());
+        List<String> claimsToDelete =  getLocalClaimResDTOs(getClaimMetadataManagementService()
+                    .getLocalClaims(ContextLoader.getTenantDomainFromContext())).stream()
+                    .map(LocalClaimResDTO::getClaimURI)
+                    .filter(claimURI -> localClaimReqDTOList.stream()
+                            .noneMatch(reqDTO -> reqDTO.getClaimURI().equals(claimURI)))
+                    .collect(Collectors.toList());
 
         for (String claimURI : claimsToDelete) {
             try {
@@ -593,8 +593,8 @@ public class ServerClaimManagementService {
     /**
      * Exports a claim dialect with related claims in the specified file type.
      *
-     * @param dialectId ID of the claim dialect to export.
-     * @param fileType  Type of file to export the claim dialect to.
+     * @param dialectId     ID of the claim dialect to export.
+     * @param fileType      Type of file to export the claim dialect to.
      * @return a FileContent object representing the exported claim dialect file.
      */
     public FileContent exportClaimDialectToFile(String dialectId, String fileType) {
@@ -604,7 +604,7 @@ public class ServerClaimManagementService {
         }
         if (StringUtils.isBlank(fileType)) {
             throw handleClaimManagementClientError(Constant.ErrorMessage.ERROR_CODE_MISSING_MEDIA_TYPE, BAD_REQUEST,
-                    dialectId);
+                                                   dialectId);
         }
 
         ClaimDialectConfiguration dialectConfiguration = new ClaimDialectConfiguration(getClaimDialect(dialectId));
@@ -620,7 +620,7 @@ public class ServerClaimManagementService {
                 List<ExternalClaim> externalClaimList = getClaimMetadataManagementService().getExternalClaims(
                         base64DecodeId(dialectId),
                         ContextLoader.getTenantDomainFromContext());
-                List<ExternalClaimResDTO> externalClaimResDTOList = getExternalClaimResDTOs(externalClaimList);
+                List<ExternalClaimResDTO>  externalClaimResDTOList = getExternalClaimResDTOs(externalClaimList);
                 claimResDTOList.addAll(externalClaimResDTOList);
                 dialectConfiguration.setClaims(claimResDTOList);
             }
@@ -1016,6 +1016,19 @@ public class ServerClaimManagementService {
 
         addAttributeProfilesToLocalClaimRes(claimProperties, localClaimResDTO);
 
+        String sharedProfileValueResolvingMethod =
+                claimProperties.remove(ClaimConstants.SHARED_PROFILE_VALUE_RESOLVING_METHOD);
+        if (StringUtils.isNotBlank(sharedProfileValueResolvingMethod)) {
+            try {
+                localClaimResDTO.setSharedProfileValueResolvingMethod(
+                        LocalClaimResDTO.SharedProfileValueResolvingMethodEnum.valueOf(
+                                sharedProfileValueResolvingMethod));
+            } catch (IllegalArgumentException e) {
+                // If the value is not a valid enum value, treat it as null.
+                localClaimResDTO.setSharedProfileValueResolvingMethod(null);
+            }
+        }
+
         List<AttributeMappingDTO> attributeMappingDTOs = new ArrayList<>();
         for (AttributeMapping attributeMapping : localClaim.getMappedAttributes()) {
             AttributeMappingDTO attributeMappingDTO = new AttributeMappingDTO();
@@ -1111,6 +1124,11 @@ public class ServerClaimManagementService {
 
         if (localClaimReqDTO.getUniquenessScope() != null) {
             claimProperties.put(PROP_UNIQUENESS_SCOPE, localClaimReqDTO.getUniquenessScope().toString());
+        }
+
+        if (localClaimReqDTO.getSharedProfileValueResolvingMethod() != null) {
+            claimProperties.put(ClaimConstants.SHARED_PROFILE_VALUE_RESOLVING_METHOD,
+                    String.valueOf(localClaimReqDTO.getSharedProfileValueResolvingMethod()));
         }
 
         addAttributeProfilesToClaimProperties(localClaimReqDTO.getProfiles(), claimProperties);
