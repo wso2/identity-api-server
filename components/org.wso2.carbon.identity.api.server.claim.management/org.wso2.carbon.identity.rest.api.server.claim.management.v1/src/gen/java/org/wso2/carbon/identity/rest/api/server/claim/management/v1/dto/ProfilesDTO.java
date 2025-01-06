@@ -35,6 +35,8 @@ import javax.validation.constraints.Pattern;
 @ApiModel(description = "Attribute profiles.")
 public class ProfilesDTO extends HashMap<String, ProfileAttributesDTO> {
 
+    private static final long serialVersionUID = -227086223053735979L;
+
     @Override
     public String toString() {
 
