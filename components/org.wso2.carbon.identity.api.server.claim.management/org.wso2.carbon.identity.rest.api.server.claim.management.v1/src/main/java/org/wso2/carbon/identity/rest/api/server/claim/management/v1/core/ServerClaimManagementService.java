@@ -48,6 +48,7 @@ import org.wso2.carbon.identity.claim.metadata.mgt.util.ClaimConstants;
 import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.organization.management.service.exception.OrganizationManagementException;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeMappingDTO;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeProfileDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimDialectResDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ClaimResDTO;
@@ -56,7 +57,6 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.External
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LinkDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalClaimReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalClaimResDTO;
-import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeProfileDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ProfilesDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.PropertyDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.model.ClaimDialectConfiguration;
@@ -80,6 +80,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -1057,16 +1058,22 @@ public class ServerClaimManagementService {
             return;
         }
         ProfilesDTO attributeProfiles = new ProfilesDTO();
-        claimProperties.forEach((propertyKey, propertyValue) -> {
+        Iterator<Map.Entry<String, String>> claimPropertyIterator = claimProperties.entrySet().iterator();
+
+        while (claimPropertyIterator.hasNext()) {
+            Map.Entry<String, String> property = claimPropertyIterator.next();
+            String propertyKey = property.getKey();
+            String propertyValue = property.getValue();
+
             if (StringUtils.isBlank(propertyKey) || StringUtils.isBlank(propertyValue)) {
-                return;
+                continue;
             }
             if (!StringUtils.startsWithIgnoreCase(propertyKey, PROP_PROFILES_PREFIX)) {
-                return;
+                continue;
             }
             String[] propertyKeyArray = propertyKey.split("\\.");
             if (propertyKeyArray.length != 3) {
-                return;
+                continue;
             }
             String profileName = propertyKeyArray[1];
             String claimPropertyName = propertyKeyArray[2];
@@ -1076,16 +1083,21 @@ public class ServerClaimManagementService {
 
             switch (claimPropertyName) {
                 case PROP_READ_ONLY:
+                    claimPropertyIterator.remove();
                     profileAttributes.setReadOnly(Boolean.valueOf(propertyValue));
                     break;
                 case PROP_REQUIRED:
+                    claimPropertyIterator.remove();
                     profileAttributes.setRequired(Boolean.valueOf(propertyValue));
                     break;
                 case PROP_SUPPORTED_BY_DEFAULT:
+                    claimPropertyIterator.remove();
                     profileAttributes.setSupportedByDefault(Boolean.valueOf(propertyValue));
                     break;
+                default:
+                    break;
             }
-        });
+        }
         localClaimResDTO.setProfiles(attributeProfiles);
     }
 
