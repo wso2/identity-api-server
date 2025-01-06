@@ -1011,6 +1011,19 @@ public class ServerClaimManagementService {
             }
         }
 
+        String sharedProfileValueResolvingMethod =
+                claimProperties.remove(ClaimConstants.SHARED_PROFILE_VALUE_RESOLVING_METHOD);
+        if (StringUtils.isNotBlank(sharedProfileValueResolvingMethod)) {
+            try {
+                localClaimResDTO.setSharedProfileValueResolvingMethod(
+                        LocalClaimResDTO.SharedProfileValueResolvingMethodEnum.valueOf(
+                                sharedProfileValueResolvingMethod));
+            } catch (IllegalArgumentException e) {
+                // If the value is not a valid enum value, treat it as null.
+                localClaimResDTO.setSharedProfileValueResolvingMethod(null);
+            }
+        }
+
         List<AttributeMappingDTO> attributeMappingDTOs = new ArrayList<>();
         for (AttributeMapping attributeMapping : localClaim.getMappedAttributes()) {
             AttributeMappingDTO attributeMappingDTO = new AttributeMappingDTO();
@@ -1061,6 +1074,11 @@ public class ServerClaimManagementService {
 
         if (localClaimReqDTO.getUniquenessScope() != null) {
             claimProperties.put(PROP_UNIQUENESS_SCOPE, localClaimReqDTO.getUniquenessScope().toString());
+        }
+
+        if (localClaimReqDTO.getSharedProfileValueResolvingMethod() != null) {
+            claimProperties.put(ClaimConstants.SHARED_PROFILE_VALUE_RESOLVING_METHOD,
+                    String.valueOf(localClaimReqDTO.getSharedProfileValueResolvingMethod()));
         }
 
         claimProperties.put(PROP_READ_ONLY, String.valueOf(localClaimReqDTO.getReadOnly()));
