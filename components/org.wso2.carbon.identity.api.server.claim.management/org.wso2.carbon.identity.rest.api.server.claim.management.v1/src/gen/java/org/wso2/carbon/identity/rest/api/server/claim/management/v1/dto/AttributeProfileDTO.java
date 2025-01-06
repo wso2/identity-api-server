@@ -25,8 +25,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-@ApiModel(description = "")
-public class ProfileAttributesDTO {
+@ApiModel(description = "Attribute profile.")
+public class AttributeProfileDTO {
 
     @Valid 
     private Boolean readOnly = null;
@@ -34,11 +34,10 @@ public class ProfileAttributesDTO {
     @Valid 
     private Boolean required = null;
 
-    @Valid
+    @Valid 
     private Boolean supportedByDefault = null;
 
     /**
-     * Specifies if the claim is read-only in given profile.
     **/
     @ApiModelProperty(value = "Specifies if the claim is read-only in given profile.")
     @JsonProperty("readOnly")
@@ -50,7 +49,6 @@ public class ProfileAttributesDTO {
     }
 
     /**
-     * Specifies if the claim is required in given profile.
     **/
     @ApiModelProperty(value = "Specifies if the claim is required in given profile.")
     @JsonProperty("required")
@@ -62,7 +60,6 @@ public class ProfileAttributesDTO {
     }
 
     /**
-     * Specifies if the claim will be displayed on the given profile.
     **/
     @ApiModelProperty(value = "Specifies if the claim will be displayed on the given profile.")
     @JsonProperty("supportedByDefault")
@@ -77,12 +74,12 @@ public class ProfileAttributesDTO {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class ProfileAttributesDTO {\n");
-
+        sb.append("class AttributeProfileDTO {\n");
+        
         sb.append("    readOnly: ").append(readOnly).append("\n");
         sb.append("    required: ").append(required).append("\n");
         sb.append("    supportedByDefault: ").append(supportedByDefault).append("\n");
-
+        
         sb.append("}\n");
         return sb.toString();
     }

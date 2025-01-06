@@ -56,7 +56,7 @@ import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.External
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LinkDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalClaimReqDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.LocalClaimResDTO;
-import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ProfileAttributesDTO;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeProfileDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ProfilesDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.PropertyDTO;
 import org.wso2.carbon.identity.rest.api.server.claim.management.v1.model.ClaimDialectConfiguration;
@@ -1071,8 +1071,8 @@ public class ServerClaimManagementService {
             String profileName = propertyKeyArray[1];
             String claimPropertyName = propertyKeyArray[2];
 
-            ProfileAttributesDTO profileAttributes =
-                    attributeProfiles.computeIfAbsent(profileName, k -> new ProfileAttributesDTO());
+            AttributeProfileDTO profileAttributes =
+                    attributeProfiles.computeIfAbsent(profileName, k -> new AttributeProfileDTO());
 
             switch (claimPropertyName) {
                 case PROP_READ_ONLY:
@@ -1153,7 +1153,7 @@ public class ServerClaimManagementService {
      * @param attributeProfiles - Profile attributes.
      * @param claimProperties   - Claim properties.
      */
-    private void addAttributeProfilesToClaimProperties(Map<String, ProfileAttributesDTO> attributeProfiles,
+    private void addAttributeProfilesToClaimProperties(Map<String, AttributeProfileDTO> attributeProfiles,
                                                        Map<String, String> claimProperties) {
 
         if (MapUtils.isEmpty(attributeProfiles)) {

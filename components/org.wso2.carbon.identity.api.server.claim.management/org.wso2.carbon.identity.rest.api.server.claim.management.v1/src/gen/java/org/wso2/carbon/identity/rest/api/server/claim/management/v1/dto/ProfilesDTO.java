@@ -21,7 +21,7 @@ package org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto;
 import io.swagger.annotations.ApiModel;
 import java.util.HashMap;
 import java.util.Map;
-import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.ProfileAttributesDTO;
+import org.wso2.carbon.identity.rest.api.server.claim.management.v1.dto.AttributeProfileDTO;
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.*;
 

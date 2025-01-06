@@ -959,7 +959,7 @@ definitions:
     type: object
     description: Attribute profiles.
     additionalProperties:
-      $ref: '#/definitions/ProfileAttributes'
+      $ref: '#/definitions/AttributeProfile'
     example:
       console:
         readOnly: false
@@ -974,7 +974,7 @@ definitions:
         required: false
         supportedByDefault: false
 
-  ProfileAttributes:
+  AttributeProfile:
     type: object
     properties:
       readOnly:
