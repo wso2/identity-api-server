@@ -21,12 +21,15 @@ import org.wso2.carbon.identity.api.server.application.management.v1.AdditionalS
 import org.wso2.carbon.identity.api.server.application.management.v1.AdvancedApplicationConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.Certificate;
 import org.wso2.carbon.identity.api.server.application.management.v1.TrustedAppConfiguration;
+import org.wso2.carbon.identity.api.server.application.management.v1.DiscoverableGroupModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.functions.UpdateFunction;
 import org.wso2.carbon.identity.application.common.model.ClientAttestationMetaData;
 import org.wso2.carbon.identity.application.common.model.LocalAndOutboundAuthenticationConfig;
 import org.wso2.carbon.identity.application.common.model.ServiceProvider;
+import org.wso2.carbon.identity.application.common.model.DiscoverableGroup;
 import org.wso2.carbon.identity.application.common.model.SpTrustedAppMetadata;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementConstants.ErrorMessage.ADDITIONAL_SP_PROP_NOT_SUPPORTED;
@@ -80,6 +83,20 @@ public class UpdateAdvancedConfigurations implements UpdateFunction<ServiceProvi
             }
             handleTrustedAppConfigurations(advancedConfigurations.getTrustedAppConfiguration(), serviceProvider);
             updateCertificate(advancedConfigurations.getCertificate(), serviceProvider);
+            updateDiscoverableGroups(serviceProvider, advancedConfigurations.getDiscoverableGroups());
+        }
+    }
+
+    private void updateDiscoverableGroups(ServiceProvider serviceProvider, List<DiscoverableGroupModel> discoverableGroups) {
+
+        List<DiscoverableGroup> discoverableGroupList = new ArrayList<>();
+
+        if(!discoverableGroups.isEmpty()) {
+            for (DiscoverableGroupModel discoverableGroupModelItem : discoverableGroups) {
+                DiscoverableGroup discoverableGroup = new DiscoverableGroup(discoverableGroupModelItem.getUserStore(),discoverableGroupModelItem.getGroups());
+                discoverableGroupList.add(discoverableGroup);
+            }
+            serviceProvider.setDiscoverableGroups(discoverableGroupList);
         }
     }
 

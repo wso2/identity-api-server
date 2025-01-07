@@ -32,15 +32,16 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.*;
 
-public class DiscoverableGroup  {
+public class DiscoverableGroupModel  {
   
     private String userStore;
     private List<String> groups = null;
 
+
     /**
     * ID of the user store the groups belong to
     **/
-    public DiscoverableGroup userStore(String userStore) {
+    public DiscoverableGroupModel userStore(String userStore) {
 
         this.userStore = userStore;
         return this;
@@ -59,7 +60,7 @@ public class DiscoverableGroup  {
     /**
     * List of group IDs configured for discoverability
     **/
-    public DiscoverableGroup groups(List<String> groups) {
+    public DiscoverableGroupModel groups(List<String> groups) {
 
         this.groups = groups;
         return this;
@@ -75,13 +76,15 @@ public class DiscoverableGroup  {
         this.groups = groups;
     }
 
-    public DiscoverableGroup addGroupsItem(String groupsItem) {
+    public DiscoverableGroupModel addGroupsItem(String groupsItem) {
         if (this.groups == null) {
             this.groups = new ArrayList<>();
         }
         this.groups.add(groupsItem);
         return this;
     }
+
+    
 
     @Override
     public boolean equals(java.lang.Object o) {
@@ -92,9 +95,9 @@ public class DiscoverableGroup  {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DiscoverableGroup discoverableGroup = (DiscoverableGroup) o;
-        return Objects.equals(this.userStore, discoverableGroup.userStore) &&
-            Objects.equals(this.groups, discoverableGroup.groups);
+        DiscoverableGroupModel discoverableGroupModel = (DiscoverableGroupModel) o;
+        return Objects.equals(this.userStore, discoverableGroupModel.userStore) &&
+            Objects.equals(this.groups, discoverableGroupModel.groups);
     }
 
     @Override
@@ -106,7 +109,7 @@ public class DiscoverableGroup  {
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("class DiscoverableGroup {\n");
+        sb.append("class DiscoverableGroupModel {\n");
         
         sb.append("    userStore: ").append(toIndentedString(userStore)).append("\n");
         sb.append("    groups: ").append(toIndentedString(groups)).append("\n");
@@ -126,3 +129,4 @@ public class DiscoverableGroup  {
         return o.toString().replace("\n", "\n");
     }
 }
+
