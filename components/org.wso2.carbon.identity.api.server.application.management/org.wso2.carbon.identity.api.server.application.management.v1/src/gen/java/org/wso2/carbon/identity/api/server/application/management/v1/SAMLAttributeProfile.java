@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -34,6 +34,7 @@ public class SAMLAttributeProfile  {
   
     private Boolean enabled = false;
     private Boolean alwaysIncludeAttributesInResponse = false;
+    private String nameFormat = "urn:oasis:names:tc:SAML:2.0:attrname-format:basic";
 
     /**
     **/
@@ -71,6 +72,25 @@ public class SAMLAttributeProfile  {
         this.alwaysIncludeAttributesInResponse = alwaysIncludeAttributesInResponse;
     }
 
+    /**
+    * The name format of attributes in the SAML assertion attribute statement.
+    **/
+    public SAMLAttributeProfile nameFormat(String nameFormat) {
+
+        this.nameFormat = nameFormat;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "The name format of attributes in the SAML assertion attribute statement.")
+    @JsonProperty("nameFormat")
+    @Valid
+    public String getNameFormat() {
+        return nameFormat;
+    }
+    public void setNameFormat(String nameFormat) {
+        this.nameFormat = nameFormat;
+    }
+
 
 
     @Override
@@ -84,12 +104,13 @@ public class SAMLAttributeProfile  {
         }
         SAMLAttributeProfile saMLAttributeProfile = (SAMLAttributeProfile) o;
         return Objects.equals(this.enabled, saMLAttributeProfile.enabled) &&
-            Objects.equals(this.alwaysIncludeAttributesInResponse, saMLAttributeProfile.alwaysIncludeAttributesInResponse);
+            Objects.equals(this.alwaysIncludeAttributesInResponse, saMLAttributeProfile.alwaysIncludeAttributesInResponse) &&
+            Objects.equals(this.nameFormat, saMLAttributeProfile.nameFormat);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabled, alwaysIncludeAttributesInResponse);
+        return Objects.hash(enabled, alwaysIncludeAttributesInResponse, nameFormat);
     }
 
     @Override
@@ -100,6 +121,7 @@ public class SAMLAttributeProfile  {
         
         sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
         sb.append("    alwaysIncludeAttributesInResponse: ").append(toIndentedString(alwaysIncludeAttributesInResponse)).append("\n");
+        sb.append("    nameFormat: ").append(toIndentedString(nameFormat)).append("\n");
         sb.append("}");
         return sb.toString();
     }
