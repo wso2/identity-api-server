@@ -3442,6 +3442,10 @@ components:
         alwaysIncludeAttributesInResponse:
           type: boolean
           default: false
+        nameFormat:
+          type: string
+          default: 'urn:oasis:names:tc:SAML:2.0:attrname-format:basic'
+          description: The name format of attributes in the SAML assertion attribute statement.
 
     SingleLogoutProfile:
       type: object
