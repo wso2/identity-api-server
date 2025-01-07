@@ -3,7 +3,7 @@ info:
   description: >
     This document specifies an **Action Management RESTful API** for **WSO2
     Identity Server**.
-  version: 1.0.0
+  version: v1
   title: WSO2 Identity Server - Action Management Rest API
   termsOfService: 'http://swagger.io/terms/'
   contact:
@@ -355,12 +355,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '500':
           description: Server Error
           content:
@@ -522,6 +516,8 @@ components:
           maxLength: 255
         endpoint:
           $ref: '#/components/schemas/Endpoint'
+        rule:
+          $ref: '#/components/schemas/ORRule'
 
     Endpoint:
       type: object
@@ -573,6 +569,8 @@ components:
             - INACTIVE
         endpoint:
           $ref: '#/components/schemas/EndpointResponse'
+        rule:
+          $ref: '#/components/schemas/ORRuleResponse'
 
     ActionBasicResponse:
       type: object
@@ -697,6 +695,8 @@ components:
           maxLength: 255
         endpoint:
           $ref: '#/components/schemas/EndpointUpdateModel'
+        rule:
+          $ref: '#/components/schemas/ORRule'
 
     EndpointUpdateModel:
       type: object
@@ -707,6 +707,96 @@ components:
           pattern: '^https?://.+'
         authentication:
           $ref: '#/components/schemas/AuthenticationType'
+
+    ORRule:
+      type: object
+      description: Rule configuration for the action. Combined with OR condition.
+      required:
+        - condition
+        - rules
+      properties:
+        condition:
+          type: string
+          enum: ["OR"]
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ANDRule'
+          minItems: 1
+
+    ORRuleResponse:
+      type: object
+      description: Rule configured for the action.
+      properties:
+        condition:
+          type: string
+          enum: ["OR"]
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ANDRuleResponse'
+          minItems: 1
+
+    ANDRule:
+      type: object
+      description: Expressions combined with AND condition.
+      required:
+        - condition
+        - expressions
+      properties:
+        condition:
+          type: string
+          enum: ["AND"]
+        expressions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Expression'
+          minItems: 1
+
+    ANDRuleResponse:
+      type: object
+      description: Expressions combined with AND condition.
+      properties:
+        condition:
+          type: string
+          enum: ["AND"]
+        expressions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpressionResponse'
+          minItems: 1
+
+    Expression:
+      type: object
+      description: Expressions in the rule.
+      required:
+        - field
+        - operator
+        - value
+      properties:
+        field:
+          type: string
+          example: application
+        operator:
+          type: string
+          example: equals
+        value:
+          type: string
+          example: myapp
+
+    ExpressionResponse:
+      type: object
+      description: Expressions in the rule.
+      properties:
+        field:
+          type: string
+          example: application
+        operator:
+          type: string
+          example: equals
+        value:
+          type: string
+          example: myapp
 
     Error:
       type: object
