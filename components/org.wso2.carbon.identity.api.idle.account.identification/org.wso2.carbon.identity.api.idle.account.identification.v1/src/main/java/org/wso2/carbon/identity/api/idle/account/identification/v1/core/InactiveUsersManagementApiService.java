@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -26,11 +26,16 @@ import org.wso2.carbon.identity.api.idle.account.identification.common.util.Idle
 import org.wso2.carbon.identity.api.idle.account.identification.v1.model.InactiveUser;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
+import org.wso2.carbon.identity.base.IdentityException;
+import org.wso2.carbon.identity.core.model.ExpressionNode;
+import org.wso2.carbon.identity.core.model.FilterTreeBuilder;
+import org.wso2.carbon.identity.core.model.Node;
 import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccountIdentificationClientException;
 import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccountIdentificationException;
 import org.wso2.carbon.identity.idle.account.identification.exception.IdleAccountIdentificationServerException;
 import org.wso2.carbon.identity.idle.account.identification.models.InactiveUserModel;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -44,6 +49,9 @@ import static org.wso2.carbon.identity.api.idle.account.identification.common.ut
 import static org.wso2.carbon.identity.api.idle.account.identification.common.util.IdleAccountIdentificationConstants.DATE_FORMAT_REGEX;
 import static org.wso2.carbon.identity.api.idle.account.identification.common.util.IdleAccountIdentificationConstants.DATE_INACTIVE_AFTER;
 import static org.wso2.carbon.identity.api.idle.account.identification.common.util.IdleAccountIdentificationConstants.ErrorMessage;
+import static org.wso2.carbon.identity.api.idle.account.identification.common.util.IdleAccountIdentificationConstants.FALSE_VALUE;
+import static org.wso2.carbon.identity.api.idle.account.identification.common.util.IdleAccountIdentificationConstants.IS_DISABLED;
+import static org.wso2.carbon.identity.api.idle.account.identification.common.util.IdleAccountIdentificationConstants.TRUE_VALUE;
 
 /**
  * Calls internal osgi services to perform idle account identification management related operations.
@@ -81,6 +89,41 @@ public class InactiveUsersManagementApiService {
         } catch (IdleAccountIdentificationException e) {
             throw handleIdleAccIdentificationException(e, ErrorMessage.ERROR_RETRIEVING_INACTIVE_USERS, tenantDomain);
         }
+    }
+
+    /**
+     * Get inactive users.
+     *
+     * @param inactiveAfter Latest active date of login.
+     * @param excludeBefore Date to exclude the oldest inactive users.
+     * @param tenantDomain  Tenant domain.
+     * @return List of inactive users.
+     * @throws IdleAccountIdentificationClientException If an error occurs while retrieving inactive users.
+     */
+    public List<InactiveUser> getInactiveUsers(String inactiveAfter, String excludeBefore, String tenantDomain,
+                                               String filter) throws IdleAccountIdentificationClientException {
+
+        List<ExpressionNode> expressionNodes = getExpressionNodes(filter);
+        if (validateExpressionNodes(expressionNodes)) {
+            boolean isDisabled = Boolean.parseBoolean(expressionNodes.get(0).getValue());
+            List<InactiveUserModel> inactiveUsers;
+            try {
+                validateDates(inactiveAfter, excludeBefore);
+                LocalDateTime inactiveAfterDate = convertToDateObject(inactiveAfter, DATE_INACTIVE_AFTER);
+                LocalDateTime excludeBeforeDate = convertToDateObject(excludeBefore, DATE_EXCLUDE_BEFORE);
+
+                validateDatesCombination(inactiveAfterDate, excludeBeforeDate);
+
+                inactiveUsers = IdleAccountIdentificationServiceHolder.getIdleAccountIdentificationService()
+                        .filterInactiveUsersIfDisabled(inactiveAfterDate, excludeBeforeDate, tenantDomain, isDisabled);
+
+                return buildResponse(inactiveUsers);
+            } catch (IdleAccountIdentificationException e) {
+                throw handleIdleAccIdentificationException(e, ErrorMessage.ERROR_RETRIEVING_INACTIVE_USERS,
+                        tenantDomain);
+            }
+        }
+        return getInactiveUsers(inactiveAfter, excludeBefore, tenantDomain);
     }
 
     /**
@@ -256,5 +299,81 @@ public class InactiveUsersManagementApiService {
             throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
                     String.format(error.getDescription()));
         }
+    }
+
+    /**
+     * Get the filter node as a list.
+     *
+     * @param filter value of the filter.
+     * @return node tree.
+     * @throws IdleAccountIdentificationClientException Error when validate filters.
+     */
+    private List<ExpressionNode> getExpressionNodes(String filter) throws IdleAccountIdentificationClientException {
+
+        // Filter example : isDisabled eq true.
+        List<ExpressionNode> expressionNodes = new ArrayList<>();
+        FilterTreeBuilder filterTreeBuilder;
+        try {
+            if (StringUtils.isNotBlank(filter)) {
+                filterTreeBuilder = new FilterTreeBuilder(filter);
+                Node rootNode = filterTreeBuilder.buildTree();
+                setExpressionNodeList(rootNode, expressionNodes);
+            }
+        } catch (IOException | IdentityException e) {
+            ErrorMessage error = ErrorMessage.ERROR_INVALID_FILTER;
+            throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
+                    String.format(error.getDescription()));
+        }
+        return expressionNodes;
+    }
+
+    /**
+     * Set the node values as list of expression.
+     *
+     * @param node       filter node.
+     * @param expression list of expression.
+     * @throws IdleAccountIdentificationClientException Error when passing invalid filter.
+     */
+    private void setExpressionNodeList(Node node, List<ExpressionNode> expression)
+            throws IdleAccountIdentificationClientException {
+
+        if (node instanceof ExpressionNode) {
+            if (StringUtils.isNotBlank(((ExpressionNode) node).getAttributeValue())) {
+                if (((ExpressionNode) node).getAttributeValue().contains(IS_DISABLED)) {
+                    if (TRUE_VALUE.contains(((ExpressionNode) node).getValue())) {
+                        ((ExpressionNode) node).setValue(TRUE_VALUE);
+                    } else if (FALSE_VALUE.contains(((ExpressionNode) node).getValue())) {
+                        ((ExpressionNode) node).setValue(FALSE_VALUE);
+                    } else {
+                        String message = "Invalid value: " + ((ExpressionNode) node).getValue() + "is passed for '" +
+                                IS_DISABLED + "' attribute in the filter. It should be '" + TRUE_VALUE + "' or '" +
+                                FALSE_VALUE + "'";
+                        ErrorMessage error = ErrorMessage.ERROR_INVALID_FILTER;
+                        throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
+                                message);
+                    }
+                }
+            }
+            expression.add((ExpressionNode) node);
+        }
+    }
+
+    /**
+     * Validate the expression nodes.
+     *
+     * @param expressionNodes List of expression nodes.
+     * @return boolean.
+     * @throws IdleAccountIdentificationClientException Error when validate filters.
+     */
+    private boolean validateExpressionNodes(List<ExpressionNode> expressionNodes)
+            throws IdleAccountIdentificationClientException {
+
+        if (expressionNodes.get(0).getAttributeValue().equals(IS_DISABLED)) {
+            return true;
+        }
+
+        ErrorMessage error = ErrorMessage.ERROR_INVALID_FILTER;
+        throw new IdleAccountIdentificationClientException(error.getCode(), error.getMessage(),
+                String.format(error.getDescription()));
     }
 }

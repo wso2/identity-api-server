@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -28,6 +28,9 @@ public class IdleAccountIdentificationConstants {
     public static final String DATE_INACTIVE_AFTER = "inactiveAfter";
     public static final String DATE_EXCLUDE_BEFORE = "excludeBefore";
     public static final String DATE_FORMAT_REGEX = "^\\d{4}-\\d{2}-\\d{2}$";
+    public static final String IS_DISABLED = "isDisabled";
+    public static final String TRUE_VALUE = "true";
+    public static final String FALSE_VALUE = "false";
 
     /**
      * Enums for error messages.
@@ -50,6 +53,10 @@ public class IdleAccountIdentificationConstants {
         ERROR_INVALID_DATE_COMBINATION("60004",
                 "Invalid date combination is provided.",
                 "The inactive after date must be before the exclude after date."),
+
+        ERROR_INVALID_FILTER("60005",
+                "Invalid filter value provided.",
+                "The filter value provided is invalid"),
 
         // Server errors 650xx.
         ERROR_RETRIEVING_INACTIVE_USERS("65001",
