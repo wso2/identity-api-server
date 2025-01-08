@@ -443,7 +443,6 @@ public class ServerClaimManagementService {
     public void updateLocalClaim(String claimId, LocalClaimReqDTO localClaimReqDTO) {
 
         try {
-            validateClaimModificationEligibility();
             if (!StringUtils.equals(base64DecodeId(claimId), localClaimReqDTO.getClaimURI())) {
                 throw handleClaimManagementClientError(ERROR_CODE_LOCAL_CLAIM_CONFLICT, CONFLICT,
                         base64DecodeId(claimId));
