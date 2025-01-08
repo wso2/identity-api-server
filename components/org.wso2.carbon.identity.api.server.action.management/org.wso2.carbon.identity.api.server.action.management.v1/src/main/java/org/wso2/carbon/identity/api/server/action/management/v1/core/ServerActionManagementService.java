@@ -274,8 +274,7 @@ public class ServerActionManagementService {
 
         ActionRule actionRule = null;
         if (actionModel.getRule() != null) {
-            actionRule = RuleMapper.toActionRule(actionModel.getRule(), actionType,
-                    tenantDomain);
+            actionRule = RuleMapper.toActionRule(actionModel.getRule(), actionType, tenantDomain);
         }
 
         return new Action.ActionRequestBuilder()

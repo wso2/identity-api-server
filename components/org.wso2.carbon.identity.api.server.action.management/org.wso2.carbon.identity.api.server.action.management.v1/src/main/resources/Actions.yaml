@@ -711,9 +711,6 @@ components:
     ORRule:
       type: object
       description: Rule configuration for the action. Combined with OR condition.
-      required:
-        - condition
-        - rules
       properties:
         condition:
           type: string

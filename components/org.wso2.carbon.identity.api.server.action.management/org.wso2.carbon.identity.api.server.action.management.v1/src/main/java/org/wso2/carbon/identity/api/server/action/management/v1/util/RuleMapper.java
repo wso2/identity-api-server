@@ -63,12 +63,10 @@ public class RuleMapper {
             List<Expression> expressionList = andCombinedRule.getExpressions();
             List<ExpressionResponse> expressionResponseList = new ArrayList<>();
             for (Expression expression : expressionList) {
-
                 ExpressionResponse expressionResponse = new ExpressionResponse().field(expression.getField())
                         .operator(expression.getOperator())
                         .value(expression.getValue().getFieldValue());
                 expressionResponseList.add(expressionResponse);
-
             }
             ANDRuleResponse andRuleResponse =
                     new ANDRuleResponse().condition(ANDRuleResponse.ConditionEnum.AND)
@@ -93,6 +91,10 @@ public class RuleMapper {
             throws ActionMgtException {
 
         List<ANDRule> andRuleList = ruleRequest.getRules();
+        if (andRuleList == null || andRuleList.isEmpty()) {
+            // Create an ActionRule object with null Rule to indicate to remove the Rule reference in Action.
+            return ActionRule.create(null);
+        }
 
         RuleBuilder ruleBuilder;
         try {

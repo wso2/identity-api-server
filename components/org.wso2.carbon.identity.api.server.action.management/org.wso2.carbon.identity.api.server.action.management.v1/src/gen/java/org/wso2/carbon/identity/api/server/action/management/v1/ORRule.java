@@ -72,7 +72,7 @@ public enum ConditionEnum {
 }
 
     private ConditionEnum condition;
-    private List<ANDRule> rules = new ArrayList<ANDRule>();
+    private List<ANDRule> rules = null;
 
 
     /**
@@ -83,11 +83,9 @@ public enum ConditionEnum {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("condition")
     @Valid
-    @NotNull(message = "Property condition cannot be null.")
-
     public ConditionEnum getCondition() {
         return condition;
     }
@@ -103,11 +101,9 @@ public enum ConditionEnum {
         return this;
     }
     
-    @ApiModelProperty(required = true, value = "")
+    @ApiModelProperty(value = "")
     @JsonProperty("rules")
-    @Valid
-    @NotNull(message = "Property rules cannot be null.")
-    @Size(min=1)
+    @Valid @Size(min=1)
     public List<ANDRule> getRules() {
         return rules;
     }
@@ -116,6 +112,9 @@ public enum ConditionEnum {
     }
 
     public ORRule addRulesItem(ANDRule rulesItem) {
+        if (this.rules == null) {
+            this.rules = new ArrayList<ANDRule>();
+        }
         this.rules.add(rulesItem);
         return this;
     }
