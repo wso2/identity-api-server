@@ -130,6 +130,7 @@ import static org.wso2.carbon.identity.api.server.claim.management.common.Consta
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REG_EX;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_REQUIRED;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_SUPPORTED_BY_DEFAULT;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.PROP_UNIQUENESS_SCOPE;
 import static org.wso2.carbon.identity.api.server.common.Constants.JSON_FILE_EXTENSION;
 import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_JSON;
 import static org.wso2.carbon.identity.api.server.common.Constants.MEDIA_TYPE_XML;
@@ -1001,6 +1002,28 @@ public class ServerClaimManagementService {
         localClaimResDTO.setRequired(Boolean.valueOf(claimProperties.remove(PROP_REQUIRED)));
         localClaimResDTO.setSupportedByDefault(Boolean.valueOf(claimProperties.remove(PROP_SUPPORTED_BY_DEFAULT)));
 
+        String uniquenessScope = claimProperties.remove(PROP_UNIQUENESS_SCOPE);
+        if (StringUtils.isNotBlank(uniquenessScope)) {
+            try {
+                localClaimResDTO.setUniquenessScope(LocalClaimResDTO.UniquenessScopeEnum.valueOf(uniquenessScope));
+            } catch (IllegalArgumentException e) {
+                localClaimResDTO.setUniquenessScope(LocalClaimResDTO.UniquenessScopeEnum.NONE);
+            }
+        }
+
+        String sharedProfileValueResolvingMethod =
+                claimProperties.remove(ClaimConstants.SHARED_PROFILE_VALUE_RESOLVING_METHOD);
+        if (StringUtils.isNotBlank(sharedProfileValueResolvingMethod)) {
+            try {
+                localClaimResDTO.setSharedProfileValueResolvingMethod(
+                        LocalClaimResDTO.SharedProfileValueResolvingMethodEnum.valueOf(
+                                sharedProfileValueResolvingMethod));
+            } catch (IllegalArgumentException e) {
+                // If the value is not a valid enum value, treat it as null.
+                localClaimResDTO.setSharedProfileValueResolvingMethod(null);
+            }
+        }
+
         List<AttributeMappingDTO> attributeMappingDTOs = new ArrayList<>();
         for (AttributeMapping attributeMapping : localClaim.getMappedAttributes()) {
             AttributeMappingDTO attributeMappingDTO = new AttributeMappingDTO();
@@ -1047,6 +1070,15 @@ public class ServerClaimManagementService {
             claimProperties.put(PROP_DISPLAY_ORDER, String.valueOf(localClaimReqDTO.getDisplayOrder()));
         } else {
             claimProperties.put(PROP_DISPLAY_ORDER, "0");
+        }
+
+        if (localClaimReqDTO.getUniquenessScope() != null) {
+            claimProperties.put(PROP_UNIQUENESS_SCOPE, localClaimReqDTO.getUniquenessScope().toString());
+        }
+
+        if (localClaimReqDTO.getSharedProfileValueResolvingMethod() != null) {
+            claimProperties.put(ClaimConstants.SHARED_PROFILE_VALUE_RESOLVING_METHOD,
+                    String.valueOf(localClaimReqDTO.getSharedProfileValueResolvingMethod()));
         }
 
         claimProperties.put(PROP_READ_ONLY, String.valueOf(localClaimReqDTO.getReadOnly()));

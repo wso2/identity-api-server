@@ -113,19 +113,22 @@ public class EmailApiServiceImpl implements EmailApiService {
     }
 
     @Override
-    public Response getAppEmailTemplate(String templateTypeId, String appUuid, String locale,
+    public Response getAppEmailTemplate(String templateTypeId, String appUuid, String locale, Boolean resolve,
                                         Integer limit, Integer offset, String sortOrder, String sortBy) {
 
-        return Response.ok().entity(applicationEmailTemplatesService.
-                getEmailTemplate(templateTypeId, locale, appUuid, limit, offset, sortOrder, sortBy)).build();
+        return Response.ok()
+                .entity(applicationEmailTemplatesService.getEmailTemplate(templateTypeId, locale, appUuid, resolve,
+                        limit, offset, sortOrder, sortBy)).build();
     }
 
     @Override
-    public Response getAppTemplatesListOfEmailTemplateType(
-            String templateTypeId, String appUuid, Integer limit, Integer offset, String sortOrder, String sortBy) {
+    public Response getAppTemplatesListOfEmailTemplateType(String templateTypeId, String appUuid, Boolean resolve,
+                                                           Integer limit, Integer offset, String sortOrder,
+                                                           String sortBy) {
 
-        return Response.ok().entity(applicationEmailTemplatesService.
-                getTemplatesListOfEmailTemplateType(templateTypeId, appUuid, limit, offset, sortOrder, sortBy)).build();
+        return Response.ok()
+                .entity(applicationEmailTemplatesService.getTemplatesListOfEmailTemplateType(templateTypeId, appUuid,
+                        resolve, limit, offset, sortOrder, sortBy)).build();
     }
 
     @Override

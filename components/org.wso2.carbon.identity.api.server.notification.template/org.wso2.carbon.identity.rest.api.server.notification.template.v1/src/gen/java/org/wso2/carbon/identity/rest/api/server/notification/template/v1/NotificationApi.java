@@ -361,9 +361,9 @@ public class NotificationApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response getAllAppTemplatesOfEmailTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid) {
+    public Response getAllAppTemplatesOfEmailTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid,     @Valid@ApiParam(value = "Specifies whether to return resolved template/s throughout the ancestor organization hierarchy.", defaultValue="false") @DefaultValue("false")  @QueryParam("resolve") Boolean resolve) {
 
-        return delegate.getAllAppTemplatesOfEmailTemplateType(templateTypeId,  appUuid );
+        return delegate.getAllAppTemplatesOfEmailTemplateType(templateTypeId,  appUuid,  resolve );
     }
 
     @Valid
@@ -385,9 +385,9 @@ public class NotificationApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response getAllAppTemplatesOfSMSTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid) {
+    public Response getAllAppTemplatesOfSMSTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid,     @Valid@ApiParam(value = "Specifies whether to return resolved template/s throughout the ancestor organization hierarchy.", defaultValue="false") @DefaultValue("false")  @QueryParam("resolve") Boolean resolve) {
 
-        return delegate.getAllAppTemplatesOfSMSTemplateType(templateTypeId,  appUuid );
+        return delegate.getAllAppTemplatesOfSMSTemplateType(templateTypeId,  appUuid,  resolve );
     }
 
     @Valid
@@ -432,9 +432,9 @@ public class NotificationApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response getAllOrgTemplatesOfEmailTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
+    public Response getAllOrgTemplatesOfEmailTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId,     @Valid@ApiParam(value = "Specifies whether to return resolved template/s throughout the ancestor organization hierarchy.", defaultValue="false") @DefaultValue("false")  @QueryParam("resolve") Boolean resolve) {
 
-        return delegate.getAllOrgTemplatesOfEmailTemplateType(templateTypeId );
+        return delegate.getAllOrgTemplatesOfEmailTemplateType(templateTypeId,  resolve );
     }
 
     @Valid
@@ -456,9 +456,9 @@ public class NotificationApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response getAllOrgTemplatesOfSMSTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId) {
+    public Response getAllOrgTemplatesOfSMSTemplateType(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId,     @Valid@ApiParam(value = "Specifies whether to return resolved template/s throughout the ancestor organization hierarchy.", defaultValue="false") @DefaultValue("false")  @QueryParam("resolve") Boolean resolve) {
 
-        return delegate.getAllOrgTemplatesOfSMSTemplateType(templateTypeId );
+        return delegate.getAllOrgTemplatesOfSMSTemplateType(templateTypeId,  resolve );
     }
 
     @Valid
@@ -551,9 +551,9 @@ public class NotificationApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response getAppEmailTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale) {
+    public Response getAppEmailTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale,     @Valid@ApiParam(value = "Specifies whether to return resolved template/s throughout the ancestor organization hierarchy.", defaultValue="false") @DefaultValue("false")  @QueryParam("resolve") Boolean resolve) {
 
-        return delegate.getAppEmailTemplate(templateTypeId,  appUuid,  locale );
+        return delegate.getAppEmailTemplate(templateTypeId,  appUuid,  locale,  resolve );
     }
 
     @Valid
@@ -575,9 +575,9 @@ public class NotificationApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response getAppSMSTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale) {
+    public Response getAppSMSTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "Application UUID.",required=true) @PathParam("app-uuid") String appUuid, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale,     @Valid@ApiParam(value = "Specifies whether to return resolved template/s throughout the ancestor organization hierarchy.", defaultValue="false") @DefaultValue("false")  @QueryParam("resolve") Boolean resolve) {
 
-        return delegate.getAppSMSTemplate(templateTypeId,  appUuid,  locale );
+        return delegate.getAppSMSTemplate(templateTypeId,  appUuid,  locale,  resolve );
     }
 
     @Valid
@@ -623,9 +623,9 @@ public class NotificationApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response getOrgEmailTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale) {
+    public Response getOrgEmailTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale,     @Valid@ApiParam(value = "Specifies whether to return resolved template/s throughout the ancestor organization hierarchy.", defaultValue="false") @DefaultValue("false")  @QueryParam("resolve") Boolean resolve) {
 
-        return delegate.getOrgEmailTemplate(templateTypeId,  locale );
+        return delegate.getOrgEmailTemplate(templateTypeId,  locale,  resolve );
     }
 
     @Valid
@@ -647,9 +647,9 @@ public class NotificationApi  {
         @ApiResponse(code = 404, message = "The specified resource is not found.", response = Error.class),
         @ApiResponse(code = 500, message = "Internal Server Error.", response = Error.class)
     })
-    public Response getOrgSMSTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale) {
+    public Response getOrgSMSTemplate(@ApiParam(value = "Template Type ID.",required=true) @PathParam("template-type-id") String templateTypeId, @ApiParam(value = "This should be a valid locale.",required=true) @PathParam("locale") String locale,     @Valid@ApiParam(value = "Specifies whether to return resolved template/s throughout the ancestor organization hierarchy.", defaultValue="false") @DefaultValue("false")  @QueryParam("resolve") Boolean resolve) {
 
-        return delegate.getOrgSMSTemplate(templateTypeId,  locale );
+        return delegate.getOrgSMSTemplate(templateTypeId,  locale,  resolve );
     }
 
     @Valid
