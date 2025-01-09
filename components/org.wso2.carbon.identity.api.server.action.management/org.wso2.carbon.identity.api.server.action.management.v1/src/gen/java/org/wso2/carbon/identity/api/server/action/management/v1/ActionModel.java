@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.wso2.carbon.identity.api.server.action.management.v1.Endpoint;
+import org.wso2.carbon.identity.api.server.action.management.v1.ORRule;
 import javax.validation.constraints.*;
 
 
@@ -36,6 +37,7 @@ public class ActionModel  {
     private String name;
     private String description;
     private Endpoint endpoint;
+    private ORRule rule;
 
     /**
     **/
@@ -95,6 +97,24 @@ public class ActionModel  {
         this.endpoint = endpoint;
     }
 
+    /**
+    **/
+    public ActionModel rule(ORRule rule) {
+
+        this.rule = rule;
+        return this;
+    }
+    
+    @ApiModelProperty(value = "")
+    @JsonProperty("rule")
+    @Valid
+    public ORRule getRule() {
+        return rule;
+    }
+    public void setRule(ORRule rule) {
+        this.rule = rule;
+    }
+
 
 
     @Override
@@ -109,12 +129,13 @@ public class ActionModel  {
         ActionModel actionModel = (ActionModel) o;
         return Objects.equals(this.name, actionModel.name) &&
             Objects.equals(this.description, actionModel.description) &&
-            Objects.equals(this.endpoint, actionModel.endpoint);
+            Objects.equals(this.endpoint, actionModel.endpoint) &&
+            Objects.equals(this.rule, actionModel.rule);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, endpoint);
+        return Objects.hash(name, description, endpoint, rule);
     }
 
     @Override
@@ -126,6 +147,7 @@ public class ActionModel  {
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    description: ").append(toIndentedString(description)).append("\n");
         sb.append("    endpoint: ").append(toIndentedString(endpoint)).append("\n");
+        sb.append("    rule: ").append(toIndentedString(rule)).append("\n");
         sb.append("}");
         return sb.toString();
     }
