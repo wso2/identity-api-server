@@ -41,6 +41,7 @@ public class SecretsApiServiceImpl implements SecretsApiService {
     private final SecretManagementService secretManagementService;
 
     public SecretsApiServiceImpl() {
+
         try {
             this.secretManagementService = SecretManagementServiceFactory.getSecretManagementService();
         } catch (IllegalStateException e) {

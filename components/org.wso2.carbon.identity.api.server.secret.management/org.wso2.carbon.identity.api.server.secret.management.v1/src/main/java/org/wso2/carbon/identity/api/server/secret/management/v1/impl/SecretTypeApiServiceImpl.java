@@ -40,6 +40,7 @@ public class SecretTypeApiServiceImpl implements SecretTypeApiService {
     private final SecretTypeManagementService secretTypeManagementService;
 
     public SecretTypeApiServiceImpl() {
+
         try {
             this.secretTypeManagementService = SecretTypeManagementServiceFactory.getSecretTypeManagementService();
         } catch (IllegalStateException e) {

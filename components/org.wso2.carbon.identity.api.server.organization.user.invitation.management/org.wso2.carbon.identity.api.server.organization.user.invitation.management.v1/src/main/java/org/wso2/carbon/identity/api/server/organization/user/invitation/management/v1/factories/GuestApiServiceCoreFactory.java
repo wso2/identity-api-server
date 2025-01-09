@@ -31,11 +31,9 @@ public class GuestApiServiceCoreFactory {
 
     static {
         InvitationCoreService invitationCoreService = UserInvitationMgtServiceHolder.getInvitationCoreService();
-
         if (invitationCoreService == null) {
             throw new IllegalStateException("InvitationCoreService is not available from OSGi context.");
         }
-
         SERVICE = new GuestApiServiceCore(invitationCoreService);
     }
 

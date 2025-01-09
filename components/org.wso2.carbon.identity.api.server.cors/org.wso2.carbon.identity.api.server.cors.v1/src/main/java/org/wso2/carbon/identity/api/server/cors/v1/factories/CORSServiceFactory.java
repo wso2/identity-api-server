@@ -31,11 +31,9 @@ public class CORSServiceFactory {
 
     static {
         CORSManagementService corsManagementService = CORSServiceHolder.getCorsManagementService();
-
         if (corsManagementService == null) {
             throw new IllegalStateException("CORSManagementService is not available from OSGi context.");
         }
-
         SERVICE = new CORSService(corsManagementService);
     }
 

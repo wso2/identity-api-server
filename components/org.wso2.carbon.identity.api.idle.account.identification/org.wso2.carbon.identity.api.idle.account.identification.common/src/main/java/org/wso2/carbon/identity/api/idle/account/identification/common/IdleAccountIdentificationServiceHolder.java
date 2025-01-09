@@ -29,9 +29,9 @@ public class IdleAccountIdentificationServiceHolder {
     private IdleAccountIdentificationServiceHolder() {}
 
     private static class IdleAccountServiceHolder {
+
         static final IdleAccountIdentificationService SERVICE =
-                (IdleAccountIdentificationService) PrivilegedCarbonContext
-                        .getThreadLocalCarbonContext()
+                (IdleAccountIdentificationService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                         .getOSGiService(IdleAccountIdentificationService.class, null);
     }
 

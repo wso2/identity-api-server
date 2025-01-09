@@ -31,11 +31,9 @@ public class ServerAPIResourceManagementServiceFactory {
 
     static {
         APIResourceManager apiResourceManager = APIResourceManagementServiceHolder.getApiResourceManager();
-
         if (apiResourceManager == null) {
             throw new IllegalStateException("APIResourceManager is not available from OSGi context.");
         }
-
         SERVICE = new ServerAPIResourceManagementService(apiResourceManager);
     }
 

@@ -31,11 +31,9 @@ public class IdVProviderServiceFactory {
 
     static {
         IdVProviderManager idvProviderManager = IdentityVerificationServiceHolder.getIdVProviderManager();
-
         if (idvProviderManager == null) {
             throw new IllegalStateException("IdVProviderManager is not available from OSGi context.");
         }
-
         SERVICE = new IdVProviderService(idvProviderManager);
     }
 

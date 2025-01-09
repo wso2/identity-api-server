@@ -32,11 +32,9 @@ public class BrandingPreferenceManagementServiceFactory {
     static {
         BrandingPreferenceManager brandingPreferenceManager = BrandingPreferenceServiceHolder
                 .getBrandingPreferenceManager();
-
         if (brandingPreferenceManager == null) {
             throw new IllegalStateException("BrandingPreferenceManager is not available from OSGi context.");
         }
-
         SERVICE = new BrandingPreferenceManagementService(brandingPreferenceManager);
     }
 

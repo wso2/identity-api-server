@@ -36,6 +36,7 @@ import java.nio.charset.StandardCharsets;
 import javax.ws.rs.core.Response;
 
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.CMT_PATH_COMPONENT;
+import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.CONTENT_DISPOSITION;
 import static org.wso2.carbon.identity.api.server.claim.management.common.Constant.LOCAL_DIALECT_PATH;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.common.ContextLoader.buildURIForHeader;
@@ -183,7 +184,7 @@ public class ClaimManagementApiServiceImpl extends ClaimManagementApiService {
 
         return Response.ok()
                 .type(fileContent.getFileType())
-                .header("Content-Disposition", "attachment; filename=\""
+                .header(CONTENT_DISPOSITION, "attachment; filename=\""
                         + fileContent.getFileName() + "\"")
                 .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
                 .header(HttpHeaders.PRAGMA, "no-cache")

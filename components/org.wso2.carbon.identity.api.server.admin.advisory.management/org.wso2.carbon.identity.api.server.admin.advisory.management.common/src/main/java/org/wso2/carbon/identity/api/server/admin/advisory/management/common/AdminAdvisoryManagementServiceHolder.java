@@ -29,6 +29,7 @@ public class AdminAdvisoryManagementServiceHolder {
     public AdminAdvisoryManagementServiceHolder() {}
 
     private static class AdminAdvisoryServiceHolder {
+
         static final AdminAdvisoryManagementService SERVICE = (AdminAdvisoryManagementService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(AdminAdvisoryManagementService.class, null);
     }

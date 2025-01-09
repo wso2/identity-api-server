@@ -28,11 +28,13 @@ import org.wso2.carbon.identity.organization.management.service.OrganizationMana
 public class ClaimManagementDataHolder {
 
     private static class OrganizationManagerHolder {
+
         static final OrganizationManager SERVICE = (OrganizationManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(OrganizationManager.class, null);
     }
 
     private static class ClaimMetadataManagementServiceHolder {
+
         static final ClaimMetadataManagementService SERVICE = (ClaimMetadataManagementService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(ClaimMetadataManagementService.class, null);
     }

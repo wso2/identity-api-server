@@ -31,11 +31,9 @@ public class KeyStoreServiceFactory {
 
     static {
         KeyStoreManagementService keyStoreManagementService = KeyStoreManagamentDataHolder.getKeyStoreManager();
-
         if (keyStoreManagementService == null) {
             throw new IllegalStateException("KeyStoreManagementService is not available from OSGi context.");
         }
-
         SERVICE = new KeyStoreService(keyStoreManagementService);
     }
 

@@ -32,11 +32,9 @@ public class SecretManagementServiceFactory {
     static {
         SecretManager secretManager = (SecretManager) PrivilegedCarbonContext.getThreadLocalCarbonContext()
                 .getOSGiService(SecretManager.class, null);
-
         if (secretManager == null) {
             throw new IllegalStateException("SecretManager is not available from OSGi context.");
         }
-
         SERVICE = new SecretManagementService(secretManager);
     }
 

@@ -31,11 +31,9 @@ public class ApplicationEmailTemplatesServiceFactory {
 
     static {
         EmailTemplateManager emailTemplateManager = EmailTemplatesServiceHolder.getEmailTemplateManager();
-
         if (emailTemplateManager == null) {
             throw new IllegalStateException("EmailTemplateManager is not available from OSGi context.");
         }
-
         SERVICE = new ApplicationEmailTemplatesService(emailTemplateManager);
     }
 

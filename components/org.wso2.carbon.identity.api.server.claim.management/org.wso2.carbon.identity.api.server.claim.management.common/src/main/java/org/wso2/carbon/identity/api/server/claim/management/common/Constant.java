@@ -29,6 +29,7 @@ public class Constant {
     public static final String CMT_PATH_COMPONENT = "/claim-dialects";
     public static final String LOCAL_DIALECT_PATH = "local";
     public static final String LOCAL_DIALECT = "http://wso2.org/claims";
+    public static final String CONTENT_DISPOSITION = "Content-Disposition";
 
     /**
      * Enum for error messages.

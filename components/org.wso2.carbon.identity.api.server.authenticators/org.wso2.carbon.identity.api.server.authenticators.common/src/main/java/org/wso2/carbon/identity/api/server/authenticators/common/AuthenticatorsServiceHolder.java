@@ -32,12 +32,14 @@ public class AuthenticatorsServiceHolder {
     }
 
     private static class ApplicationManagementServiceHolder {
+
         static final ApplicationManagementService SERVICE = (ApplicationManagementService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext()
                 .getOSGiService(ApplicationManagementService.class, null);
     }
 
     private static class IdentityProviderManagerHolder {
+
         static final IdpManager SERVICE = (IdpManager) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext()
                 .getOSGiService(IdpManager.class, null);
