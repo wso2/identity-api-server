@@ -3112,6 +3112,12 @@ components:
           type: boolean
           example: false
           description: Decides whether the application is visible for end users.
+        discoverableGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiscoverableGroup'
+          minItems: 1
+          description: List of groups from user stores where users in those groups can discover the application.
         certificate:
           $ref: '#/components/schemas/Certificate'
         skipLoginConsent:
@@ -3211,6 +3217,23 @@ components:
           type: string
           description: Decides the apple app id for the application.
           example: "APPLETEAMID.com.org.mobile.sample"
+    DiscoverableGroup:
+      type: object
+      required:
+        - userStore
+        - groups
+      properties:
+        userStore:
+          type: string
+          description: The user store domain to which the groups belong.
+          example: "PRIMARY"
+        groups:
+          type: array
+          items:
+            type: string
+            example: "bf5abd05-3667-4a2a-a6c2-2fb9f4d26e47"
+          minItems: 1
+          description: List of group IDs configured for discoverability.
     Certificate:
       type: object
       properties:
