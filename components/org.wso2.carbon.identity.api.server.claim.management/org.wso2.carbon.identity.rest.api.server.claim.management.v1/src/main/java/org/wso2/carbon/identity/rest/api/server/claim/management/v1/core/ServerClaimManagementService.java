@@ -1015,7 +1015,7 @@ public class ServerClaimManagementService {
             }
         }
 
-        addAttributeProfilesToLocalClaimRes(claimProperties, localClaimResDTO);
+        addAttributeProfilesToLocalClaimResponse(claimProperties, localClaimResDTO);
 
         String sharedProfileValueResolvingMethod =
                 claimProperties.remove(ClaimConstants.SHARED_PROFILE_VALUE_RESOLVING_METHOD);
@@ -1051,8 +1051,8 @@ public class ServerClaimManagementService {
      * @param claimProperties  Claim properties.
      * @param localClaimResDTO Local claim response DTO.
      */
-    private void addAttributeProfilesToLocalClaimRes(Map<String, String> claimProperties,
-                                                         LocalClaimResDTO localClaimResDTO) {
+    private void addAttributeProfilesToLocalClaimResponse(Map<String, String> claimProperties,
+                                                          LocalClaimResDTO localClaimResDTO) {
 
         if (MapUtils.isEmpty(claimProperties)) {
             return;
