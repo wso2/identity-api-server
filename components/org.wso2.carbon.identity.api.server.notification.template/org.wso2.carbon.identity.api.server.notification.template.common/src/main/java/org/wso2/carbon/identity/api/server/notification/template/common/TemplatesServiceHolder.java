@@ -19,6 +19,7 @@
 package org.wso2.carbon.identity.api.server.notification.template.common;
 
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.governance.service.notification.NotificationTemplateManager;
 
 /**
@@ -26,7 +27,13 @@ import org.wso2.carbon.identity.governance.service.notification.NotificationTemp
  */
 public class TemplatesServiceHolder {
 
-    private static NotificationTemplateManager notificationTemplateManager;
+    private TemplatesServiceHolder() {}
+
+    private static class NotificationTemplateMangerServiceHolder {
+
+        static final NotificationTemplateManager SERVICE = (NotificationTemplateManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(NotificationTemplateManager.class, null);
+    }
 
     /**
      * Get TemplateManager osgi service.
@@ -34,15 +41,6 @@ public class TemplatesServiceHolder {
      */
     public static NotificationTemplateManager getNotificationTemplateManager() {
 
-        return notificationTemplateManager;
-    }
-
-    /**
-     * Set TemplateManager osgi service.
-     * @param notificationTemplateManager TemplateManager
-     */
-    public static void setNotificationTemplateManager(NotificationTemplateManager notificationTemplateManager) {
-
-        TemplatesServiceHolder.notificationTemplateManager = notificationTemplateManager;
+        return NotificationTemplateMangerServiceHolder.SERVICE;
     }
 }

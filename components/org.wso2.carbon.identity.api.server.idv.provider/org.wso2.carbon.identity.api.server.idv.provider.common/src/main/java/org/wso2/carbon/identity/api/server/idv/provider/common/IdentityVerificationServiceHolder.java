@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.idv.provider.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.extension.identity.verification.provider.IdVProviderManager;
 
 /**
@@ -25,7 +26,13 @@ import org.wso2.carbon.extension.identity.verification.provider.IdVProviderManag
  */
 public class IdentityVerificationServiceHolder {
 
-    private static IdVProviderManager idVProviderManager;
+    private IdentityVerificationServiceHolder() {};
+
+    private static class IdVProviderManagerHolder {
+
+        static final IdVProviderManager SERVICE = (IdVProviderManager) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext().getOSGiService(IdVProviderManager.class, null);
+    }
 
     /**
      * Get IdVProviderManager osgi service.
@@ -34,16 +41,6 @@ public class IdentityVerificationServiceHolder {
      */
     public static IdVProviderManager getIdVProviderManager() {
 
-        return idVProviderManager;
-    }
-
-    /**
-     * Set IdVProviderManager osgi service.
-     *
-     * @param idVProviderManager IdVProviderManager.
-     */
-    public static void setIdVProviderManager(IdVProviderManager idVProviderManager) {
-
-        IdentityVerificationServiceHolder.idVProviderManager = idVProviderManager;
+        return IdVProviderManagerHolder.SERVICE;
     }
 }

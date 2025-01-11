@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2019-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.identity.governance.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.wso2.carbon.identity.api.server.identity.governance.v1.factories.IdentityGovernanceApiServiceFactory;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoriesRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.ConnectorRes;
@@ -28,7 +28,6 @@ import java.util.List;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.MultipleConnectorsPatchReq;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceResp;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.PreferenceSearchAttribute;
-import org.wso2.carbon.identity.api.server.identity.governance.v1.IdentityGovernanceApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -42,8 +41,12 @@ import javax.validation.constraints.*;
 
 public class IdentityGovernanceApi  {
 
-    @Autowired
-    private IdentityGovernanceApiService delegate;
+    private final IdentityGovernanceApiService delegate;
+
+    public IdentityGovernanceApi() {
+
+        this.delegate = IdentityGovernanceApiServiceFactory.getIdentityGovernanceApi();
+    }
 
     @Valid
     @GET

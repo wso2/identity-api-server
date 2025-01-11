@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.rest.api.server.notification.template.v1.factories.NotificationApiServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.EmailTemplate;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.EmailTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.Error;
@@ -47,8 +47,12 @@ import javax.validation.constraints.*;
 
 public class NotificationApi  {
 
-    @Autowired
-    private NotificationApiService delegate;
+    private final NotificationApiService delegate;
+
+    public NotificationApi() {
+
+        this.delegate = NotificationApiServiceFactory.getNotificationApi();
+    }
 
     @Valid
     @POST

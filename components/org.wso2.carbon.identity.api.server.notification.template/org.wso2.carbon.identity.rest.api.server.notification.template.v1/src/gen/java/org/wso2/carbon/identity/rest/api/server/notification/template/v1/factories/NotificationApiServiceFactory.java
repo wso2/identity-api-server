@@ -23,10 +23,10 @@ import org.wso2.carbon.identity.rest.api.server.notification.template.v1.impl.No
 
 public class NotificationApiServiceFactory {
 
-   private final static NotificationApiService service = new NotificationApiServiceImpl();
+   private final static NotificationApiService SERVICE = new NotificationApiServiceImpl();
 
    public static NotificationApiService getNotificationApi()
    {
-      return service;
+      return SERVICE;
    }
 }

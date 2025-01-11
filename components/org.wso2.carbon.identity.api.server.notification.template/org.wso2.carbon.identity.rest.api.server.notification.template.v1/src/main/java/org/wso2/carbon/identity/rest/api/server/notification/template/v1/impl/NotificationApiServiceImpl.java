@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,11 +18,12 @@
 
 package org.wso2.carbon.identity.rest.api.server.notification.template.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.NotificationApiService;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplateTypeService;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.core.TemplatesService;
+import org.wso2.carbon.identity.rest.api.server.notification.template.v1.factories.TemplateServiceFactory;
+import org.wso2.carbon.identity.rest.api.server.notification.template.v1.factories.TemplateTypeServiceFactory;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.EmailTemplate;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.EmailTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SMSTemplate;
@@ -53,11 +54,17 @@ import static org.wso2.carbon.identity.api.server.notification.template.common.C
  */
 public class NotificationApiServiceImpl implements NotificationApiService {
 
-    @Autowired
-    private TemplatesService templatesService;
-    @Autowired
-    private TemplateTypeService templateTypeService;
+    private final TemplatesService templatesService;
+    private final TemplateTypeService templateTypeService;
 
+    public NotificationApiServiceImpl() {
+        try {
+            this.templatesService = TemplateServiceFactory.getTemplatesService();
+            this.templateTypeService = TemplateTypeServiceFactory.getTemplateTypeService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating notification template service.", e);
+        }
+    }
     @Override
     public Response addAppEmailTemplate(String templateTypeId, String appUuid,
                                         EmailTemplateWithID emailTemplateWithID) {

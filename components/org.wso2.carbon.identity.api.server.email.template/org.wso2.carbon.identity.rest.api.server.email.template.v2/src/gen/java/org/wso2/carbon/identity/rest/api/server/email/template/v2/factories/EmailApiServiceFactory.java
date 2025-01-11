@@ -21,12 +21,19 @@ package org.wso2.carbon.identity.rest.api.server.email.template.v2.factories;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.EmailApiService;
 import org.wso2.carbon.identity.rest.api.server.email.template.v2.impl.EmailApiServiceImpl;
 
+/**
+ * Factory class for EmailApiService.
+ */
 public class EmailApiServiceFactory {
 
-   private final static EmailApiService service = new EmailApiServiceImpl();
+   private final static EmailApiService SERVICE = new EmailApiServiceImpl();
 
+   /**
+    * Get EmailApiService instance.
+    * @return EmailApiService instance
+    */
    public static EmailApiService getEmailApi()
    {
-      return service;
+      return SERVICE;
    }
 }

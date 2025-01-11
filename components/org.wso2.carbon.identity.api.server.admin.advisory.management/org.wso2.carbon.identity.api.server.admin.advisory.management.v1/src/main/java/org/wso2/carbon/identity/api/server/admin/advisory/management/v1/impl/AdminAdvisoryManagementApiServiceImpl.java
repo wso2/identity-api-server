@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.admin.advisory.management.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.AdminAdvisoryManagementApiService;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.core.ServerAdminAdvisoryManagementService;
+import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.factories.ServerAdminAdvisoryManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.model.AdminAdvisoryConfig;
 
 import javax.ws.rs.core.Response;
@@ -30,8 +30,16 @@ import javax.ws.rs.core.Response;
  **/
 public class AdminAdvisoryManagementApiServiceImpl implements AdminAdvisoryManagementApiService {
 
-    @Autowired
-    private ServerAdminAdvisoryManagementService adminAdvisoryManagementService;
+    private final ServerAdminAdvisoryManagementService adminAdvisoryManagementService;
+
+    public AdminAdvisoryManagementApiServiceImpl() {
+        try {
+            this.adminAdvisoryManagementService = ServerAdminAdvisoryManagementServiceFactory
+                    .getServerAdminAdvisoryManagementService();
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while initiating admin advisory management service.", e);
+        }
+    }
 
     /**
      * Endpoint to get the admin advisory banner configuration.

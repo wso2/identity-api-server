@@ -20,9 +20,9 @@ package org.wso2.carbon.identity.rest.api.server.notification.template.v1.core;
 
 import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.identity.api.server.notification.template.common.Constants;
-import org.wso2.carbon.identity.api.server.notification.template.common.TemplatesServiceHolder;
 import org.wso2.carbon.identity.governance.exceptions.notiification.NotificationTemplateManagerException;
 import org.wso2.carbon.identity.governance.model.NotificationTemplate;
+import org.wso2.carbon.identity.governance.service.notification.NotificationTemplateManager;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.EmailTemplate;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.EmailTemplateWithID;
 import org.wso2.carbon.identity.rest.api.server.notification.template.v1.model.SMSTemplate;
@@ -39,6 +39,12 @@ import static org.wso2.carbon.identity.api.server.common.ContextLoader.getTenant
  */
 public class TemplatesService {
 
+    private final NotificationTemplateManager notificationTemplateManager;
+
+    public TemplatesService(NotificationTemplateManager notificationTemplateManager) {
+
+        this.notificationTemplateManager = notificationTemplateManager;
+    }
     /**
      * Adds a new organization email template to the given template type. Template ID should not exist in the system.
      *
@@ -65,7 +71,7 @@ public class TemplatesService {
         try {
             NotificationTemplate notificationTemplate = Util.buildNotificationTemplateWithEmailTemplateWithID(
                     templateTypeId, emailTemplateWithID);
-            TemplatesServiceHolder.getNotificationTemplateManager().addNotificationTemplate(notificationTemplate,
+            notificationTemplateManager.addNotificationTemplate(notificationTemplate,
                     getTenantDomainFromContext(), applicationUuid);
 
             String templateOwner = StringUtils.isNotBlank(applicationUuid) ? Constants.NOTIFICATION_TEMPLATE_OWNER_APP :
@@ -111,7 +117,7 @@ public class TemplatesService {
         try {
             NotificationTemplate notificationTemplate = Util.buildNotificationTemplateWithSMSTemplateWithID(
                     templateTypeId, smsTemplateWithID);
-            TemplatesServiceHolder.getNotificationTemplateManager().addNotificationTemplate(notificationTemplate,
+            notificationTemplateManager.addNotificationTemplate(notificationTemplate,
                     getTenantDomainFromContext(), applicationUuid);
 
             String templateOwner = StringUtils.isNotBlank(applicationUuid) ? Constants.NOTIFICATION_TEMPLATE_OWNER_APP :
@@ -161,7 +167,7 @@ public class TemplatesService {
 
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
         try {
-            List<NotificationTemplate> templates = TemplatesServiceHolder.getNotificationTemplateManager()
+            List<NotificationTemplate> templates = notificationTemplateManager
                     .getNotificationTemplatesOfType(notificationChannel, templateTypeDisplayName,
                             getTenantDomainFromContext(), applicationUuid, resolve);
             String templateOwner = StringUtils.isNotBlank(applicationUuid) ? Constants.NOTIFICATION_TEMPLATE_OWNER_APP :
@@ -184,7 +190,7 @@ public class TemplatesService {
 
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
         try {
-            List<NotificationTemplate> templates = TemplatesServiceHolder.getNotificationTemplateManager()
+            List<NotificationTemplate> templates = notificationTemplateManager
                     .getAllSystemNotificationTemplatesOfType(notificationChannel, templateTypeDisplayName);
             return Util.buildSimpleTemplateList(templates, null,
                     Constants.NOTIFICATION_TEMPLATE_OWNER_SYSTEM, notificationChannel);
@@ -221,8 +227,8 @@ public class TemplatesService {
 
         try {
             String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
-            NotificationTemplate internalEmailTemplate = TemplatesServiceHolder.getNotificationTemplateManager().
-                    getNotificationTemplate(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeDisplayName, templateId,
+            NotificationTemplate internalEmailTemplate = notificationTemplateManager
+                    .getNotificationTemplate(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeDisplayName, templateId,
                             getTenantDomainFromContext(), applicationUuid, resolve);
             // NotificationTemplateManager sends the default template if no matching template found.
             // We need to check for the locale specifically.
@@ -264,8 +270,8 @@ public class TemplatesService {
 
         try {
             String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
-            NotificationTemplate internalEmailTemplate = TemplatesServiceHolder.getNotificationTemplateManager().
-                    getNotificationTemplate(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeDisplayName, templateId,
+            NotificationTemplate internalEmailTemplate = notificationTemplateManager
+                    .getNotificationTemplate(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeDisplayName, templateId,
                             getTenantDomainFromContext(), applicationUuid, resolve);
             // NotificationTemplateManager sends the default template if no matching template found.
             // We need to check for the locale specifically.
@@ -291,8 +297,8 @@ public class TemplatesService {
 
         try {
             String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
-            NotificationTemplate internalTemplate = TemplatesServiceHolder.getNotificationTemplateManager().
-                    getSystemNotificationTemplate(Constants.NOTIFICATION_CHANNEL_EMAIL,
+            NotificationTemplate internalTemplate = notificationTemplateManager
+                    .getSystemNotificationTemplate(Constants.NOTIFICATION_CHANNEL_EMAIL,
                             templateTypeDisplayName, templateId);
             // NotificationTemplateManager sends the default template if no matching template found.
             // We need to check for the locale specifically.
@@ -318,8 +324,8 @@ public class TemplatesService {
 
         try {
             String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
-            NotificationTemplate internalTemplate = TemplatesServiceHolder.getNotificationTemplateManager().
-                    getSystemNotificationTemplate(Constants.NOTIFICATION_CHANNEL_SMS,
+            NotificationTemplate internalTemplate = notificationTemplateManager
+                    .getSystemNotificationTemplate(Constants.NOTIFICATION_CHANNEL_SMS,
                             templateTypeDisplayName, templateId);
             // NotificationTemplateManager sends the default template if no matching template found.
             // We need to check for the locale specifically.
@@ -362,7 +368,7 @@ public class TemplatesService {
         try {
             NotificationTemplate notificationTemplate = Util.buildNotificationTemplateWithEmailTemplateWithID(
                     templateTypeId, emailTemplateWithID);
-            TemplatesServiceHolder.getNotificationTemplateManager().updateNotificationTemplate(notificationTemplate,
+            notificationTemplateManager.updateNotificationTemplate(notificationTemplate,
                     getTenantDomainFromContext(), applicationUuid);
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
@@ -398,7 +404,7 @@ public class TemplatesService {
         try {
             NotificationTemplate notificationTemplate = Util.buildNotificationTemplateWithSMSTemplateWithID(
                     templateTypeId, smsTemplateWithID);
-            TemplatesServiceHolder.getNotificationTemplateManager().updateNotificationTemplate(notificationTemplate,
+            notificationTemplateManager.updateNotificationTemplate(notificationTemplate,
                     getTenantDomainFromContext(), applicationUuid);
         } catch (NotificationTemplateManagerException e) {
             throw Util.handleNotificationTemplateManagerException(e,
@@ -429,11 +435,11 @@ public class TemplatesService {
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
         try {
             Util.verifyTemplateTypeExists(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeDisplayName);
-            boolean notificationTemplateExists = TemplatesServiceHolder.getNotificationTemplateManager()
+            boolean notificationTemplateExists = notificationTemplateManager
                     .isNotificationTemplateExists(Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeDisplayName,
                             locale, getTenantDomainFromContext(), applicationUuid);
             if (notificationTemplateExists) {
-                TemplatesServiceHolder.getNotificationTemplateManager().deleteNotificationTemplate(
+                notificationTemplateManager.deleteNotificationTemplate(
                         Constants.NOTIFICATION_CHANNEL_EMAIL, templateTypeDisplayName, locale,
                         getTenantDomainFromContext(), applicationUuid);
             } else {
@@ -468,11 +474,11 @@ public class TemplatesService {
         String templateTypeDisplayName = Util.decodeTemplateTypeId(templateTypeId);
         try {
             Util.verifyTemplateTypeExists(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeDisplayName);
-            boolean notificationTemplateExists = TemplatesServiceHolder.getNotificationTemplateManager()
+            boolean notificationTemplateExists = notificationTemplateManager
                     .isNotificationTemplateExists(Constants.NOTIFICATION_CHANNEL_SMS, templateTypeDisplayName,
                             locale, getTenantDomainFromContext(), applicationUuid);
             if (notificationTemplateExists) {
-                TemplatesServiceHolder.getNotificationTemplateManager().deleteNotificationTemplate(
+                notificationTemplateManager.deleteNotificationTemplate(
                         Constants.NOTIFICATION_CHANNEL_SMS, templateTypeDisplayName, locale,
                         getTenantDomainFromContext(), applicationUuid);
             } else {
