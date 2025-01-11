@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.identity.api.server.rule.metadata.common;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.rule.metadata.service.RuleMetadataService;
 
 /**
@@ -25,15 +26,17 @@ import org.wso2.carbon.identity.rule.metadata.service.RuleMetadataService;
  */
 public class RuleMetadataServiceHolder {
 
-    private static RuleMetadataService ruleMetadataService;
+    public RuleMetadataServiceHolder() {}
+
+    private static class ServerRuleMetadataServiceHolder {
+
+        static final RuleMetadataService SERVICE = (RuleMetadataService) PrivilegedCarbonContext
+                .getThreadLocalCarbonContext()
+                .getOSGiService(RuleMetadataService.class, null);
+    }
 
     public static RuleMetadataService getRuleMetadataService() {
 
-        return ruleMetadataService;
-    }
-
-    public static void setRuleMetadataService(RuleMetadataService ruleMetadataService) {
-
-        RuleMetadataServiceHolder.ruleMetadataService = ruleMetadataService;
+        return ServerRuleMetadataServiceHolder.SERVICE;
     }
 }

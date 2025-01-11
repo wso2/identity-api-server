@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2024-2025, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.rule.metadata.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.RulesApiService;
 import org.wso2.carbon.identity.api.server.rule.metadata.v1.core.ServerRuleMetadataService;
+import org.wso2.carbon.identity.api.server.rule.metadata.v1.factories.ServerRuleMetadataServiceFactory;
 
 import javax.ws.rs.core.Response;
 
@@ -29,8 +29,16 @@ import javax.ws.rs.core.Response;
  */
 public class RulesApiServiceImpl implements RulesApiService {
 
-    @Autowired
-    private ServerRuleMetadataService serverRuleMetadataService;
+    private final ServerRuleMetadataService serverRuleMetadataService;
+
+    public RulesApiServiceImpl() {
+
+        try {
+            this.serverRuleMetadataService = ServerRuleMetadataServiceFactory.getServerRuleMetadataService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating serverRuleMetadataService.", e);
+        }
+    }
 
     @Override
     public Response getExpressionMeta(String flow) {
