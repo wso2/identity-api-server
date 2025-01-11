@@ -18,9 +18,9 @@
 
 package org.wso2.carbon.identity.api.server.api.resource.v1.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.wso2.carbon.identity.api.server.api.resource.v1.ScopesApiService;
 import org.wso2.carbon.identity.api.server.api.resource.v1.core.ServerAPIResourceManagementService;
+import org.wso2.carbon.identity.api.server.api.resource.v1.factories.ServerAPIResourceManagementServiceFactory;
 
 import javax.ws.rs.core.Response;
 
@@ -29,8 +29,16 @@ import javax.ws.rs.core.Response;
  */
 public class ScopesApiServiceImpl implements ScopesApiService {
 
-    @Autowired
-    ServerAPIResourceManagementService serverAPIResourceManagementService;
+    private final ServerAPIResourceManagementService serverAPIResourceManagementService;
+
+    public ScopesApiServiceImpl() {
+        try {
+            this.serverAPIResourceManagementService = ServerAPIResourceManagementServiceFactory
+                    .getServerAPIResourceManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating API resource management service.", e);
+        }
+    }
 
     @Override
     public Response scopesGet(String filter) {

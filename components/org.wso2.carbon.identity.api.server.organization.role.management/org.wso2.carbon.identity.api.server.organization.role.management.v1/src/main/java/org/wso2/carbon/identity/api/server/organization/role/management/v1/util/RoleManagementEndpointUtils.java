@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -58,7 +58,7 @@ public class RoleManagementEndpointUtils {
      */
     public static RoleManager getRoleManager() {
 
-        return OrganizationRoleManagementServiceHolder.getInstance().getRoleManager();
+        return OrganizationRoleManagementServiceHolder.getRoleManager();
     }
 
     /**
@@ -66,7 +66,7 @@ public class RoleManagementEndpointUtils {
      */
     public static OrganizationUserResidentResolverService getOrganizationUserResidentResolverService() {
 
-        return OrganizationRoleManagementServiceHolder.getInstance().getOrganizationUserResidentResolverService();
+        return OrganizationRoleManagementServiceHolder.getOrganizationUserResidentResolverService();
     }
 
     /**

@@ -19,7 +19,6 @@
 package org.wso2.carbon.identity.api.server.application.management.v1.core;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.wso2.carbon.identity.api.server.application.management.common.ApplicationManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationSharePOSTRequest;
 import org.wso2.carbon.identity.api.server.application.management.v1.BasicOrganizationResponse;
 import org.wso2.carbon.identity.api.server.application.management.v1.SharedApplicationResponse;
@@ -52,6 +51,13 @@ import static org.wso2.carbon.identity.organization.management.service.util.Util
  */
 public class ServerApplicationSharingService {
 
+    private final OrgApplicationManager orgApplicationManager;
+
+    public ServerApplicationSharingService(OrgApplicationManager orgApplicationManager) {
+
+        this.orgApplicationManager = orgApplicationManager;
+    }
+
     /**
      * Returns the shared applications list of a given primary application, along with their organizations.
      *
@@ -61,8 +67,8 @@ public class ServerApplicationSharingService {
     public Response getSharedApplications(String applicationId) {
 
         try {
-            List<SharedApplication> sharedApplications =
-                    getOrgApplicationManager().getSharedApplications(getOrganizationId(), applicationId);
+            List<SharedApplication> sharedApplications = orgApplicationManager
+                    .getSharedApplications(getOrganizationId(), applicationId);
             return Response.ok(createSharedApplicationsResponse(sharedApplications)).build();
         } catch (OrganizationManagementClientException e) {
             throw Utils.buildClientError(e.getErrorCode(), e.getMessage(), e.getDescription());
@@ -81,7 +87,7 @@ public class ServerApplicationSharingService {
     public Response deleteSharedApplication(String applicationId, String sharedOrganizationId) {
 
         try {
-            getOrgApplicationManager().deleteSharedApplication(getOrganizationId(), applicationId,
+            orgApplicationManager.deleteSharedApplication(getOrganizationId(), applicationId,
                     sharedOrganizationId);
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
@@ -100,8 +106,8 @@ public class ServerApplicationSharingService {
     public Response getApplicationSharedOrganizations(String applicationId) {
 
         try {
-            List<BasicOrganization> basicOrganizations =
-                    getOrgApplicationManager().getApplicationSharedOrganizations(getOrganizationId(), applicationId);
+            List<BasicOrganization> basicOrganizations = orgApplicationManager
+                    .getApplicationSharedOrganizations(getOrganizationId(), applicationId);
             return Response.ok(createSharedOrgResponse(basicOrganizations)).build();
         } catch (OrganizationManagementClientException e) {
             throw Utils.buildClientError(e.getErrorCode(), e.getMessage(), e.getDescription());
@@ -124,7 +130,7 @@ public class ServerApplicationSharingService {
             validateApplicationSharePostRequestBody(requestBody);
             boolean shareWithAllChildren = (requestBody.getShareWithAllChildren() != null)
                     ? requestBody.getShareWithAllChildren() : false;
-            getOrgApplicationManager().shareOrganizationApplication(getOrganizationId(), applicationId,
+            orgApplicationManager.shareOrganizationApplication(getOrganizationId(), applicationId,
                     shareWithAllChildren, requestBody.getSharedOrganizations());
             return Response.ok().build();
         } catch (OrganizationManagementClientException e) {
@@ -143,7 +149,7 @@ public class ServerApplicationSharingService {
     public Response deleteAllSharedApplications(String applicationId) {
 
         try {
-            getOrgApplicationManager().deleteSharedApplication(getOrganizationId(), applicationId, null);
+            orgApplicationManager.deleteSharedApplication(getOrganizationId(), applicationId, null);
             return Response.noContent().build();
         } catch (OrganizationManagementClientException e) {
             throw Utils.buildClientError(e.getErrorCode(), e.getMessage(), e.getDescription());
@@ -198,10 +204,5 @@ public class ServerApplicationSharingService {
 
         return buildURIForBody(PATH_SEPARATOR + V1_API_PATH_COMPONENT + PATH_SEPARATOR + ORGANIZATION_PATH +
                 PATH_SEPARATOR + organizationId);
-    }
-
-    private OrgApplicationManager getOrgApplicationManager() {
-
-        return ApplicationManagementServiceHolder.getOrgApplicationManager();
     }
 }

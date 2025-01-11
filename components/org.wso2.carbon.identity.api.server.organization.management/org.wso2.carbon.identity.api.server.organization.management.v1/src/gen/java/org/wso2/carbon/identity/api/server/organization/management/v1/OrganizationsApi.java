@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.identity.api.server.organization.management.v1;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
 
+import org.wso2.carbon.identity.api.server.organization.management.v1.factories.OrganizationsApiServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.ApplicationSharePOSTRequest;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.GetOrganizationResponse;
@@ -44,7 +44,6 @@ import org.wso2.carbon.identity.api.server.organization.management.v1.model.Orga
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.OrganizationsResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.SharedApplicationsResponse;
 import org.wso2.carbon.identity.api.server.organization.management.v1.model.SharedOrganizationsResponse;
-import org.wso2.carbon.identity.api.server.organization.management.v1.OrganizationsApiService;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -58,8 +57,12 @@ import javax.validation.constraints.*;
 
 public class OrganizationsApi  {
 
-    @Autowired
-    private OrganizationsApiService delegate;
+    private final OrganizationsApiService delegate;
+
+    public OrganizationsApi() {
+
+        this.delegate = OrganizationsApiServiceFactory.getOrganizationsApi();
+    }
 
     @Valid
     @POST

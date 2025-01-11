@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,7 +21,6 @@ package org.wso2.carbon.identity.api.expired.password.identification.v1.core;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.identity.api.expired.password.identification.common.PasswordExpiryServiceHolder;
 import org.wso2.carbon.identity.api.expired.password.identification.common.util.ExpiredPasswordIdentificationConstants.ErrorMessage;
 import org.wso2.carbon.identity.api.expired.password.identification.v1.model.PasswordExpiredUser;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
@@ -31,6 +30,7 @@ import org.wso2.carbon.identity.password.expiry.exceptions.ExpiredPasswordIdenti
 import org.wso2.carbon.identity.password.expiry.exceptions.ExpiredPasswordIdentificationException;
 import org.wso2.carbon.identity.password.expiry.exceptions.ExpiredPasswordIdentificationServerException;
 import org.wso2.carbon.identity.password.expiry.models.PasswordExpiredUserModel;
+import org.wso2.carbon.identity.password.expiry.services.ExpiredPasswordIdentificationService;
 import org.wso2.carbon.identity.password.expiry.util.PasswordPolicyUtils;
 
 import java.time.LocalDate;
@@ -51,7 +51,14 @@ import static org.wso2.carbon.identity.api.expired.password.identification.commo
  */
 public class PasswordExpiredUsersManagementApiService {
 
+    private final ExpiredPasswordIdentificationService expiredPasswordIdentificationService;
     private static final Log LOG = LogFactory.getLog(PasswordExpiredUsersManagementApiService.class);
+
+    public PasswordExpiredUsersManagementApiService(
+            ExpiredPasswordIdentificationService expiredPasswordIdentificationService) {
+
+        this.expiredPasswordIdentificationService = expiredPasswordIdentificationService;
+    }
 
     /**
      * Get password expired users.
@@ -71,11 +78,11 @@ public class PasswordExpiredUsersManagementApiService {
             LocalDateTime expiredAfterDate = convertToDateObject(expiredAfter, DATE_EXPIRED_AFTER);
             LocalDateTime excludeAfterDate = convertToDateObject(excludeAfter, DATE_EXCLUDE_AFTER);
             if (excludeAfterDate == null) {
-                passwordExpiredUsers = PasswordExpiryServiceHolder.getExpiredPasswordIdentificationService().
-                        getPasswordExpiredUsersFromSpecificDate(expiredAfterDate, tenantDomain);
+                passwordExpiredUsers = expiredPasswordIdentificationService
+                        .getPasswordExpiredUsersFromSpecificDate(expiredAfterDate, tenantDomain);
             } else {
-                passwordExpiredUsers = PasswordExpiryServiceHolder.getExpiredPasswordIdentificationService().
-                        getPasswordExpiredUsersBetweenSpecificDates(expiredAfterDate, excludeAfterDate, tenantDomain);
+                passwordExpiredUsers = expiredPasswordIdentificationService
+                        .getPasswordExpiredUsersBetweenSpecificDates(expiredAfterDate, excludeAfterDate, tenantDomain);
             }
             return buildResponse(passwordExpiredUsers);
         } catch (ExpiredPasswordIdentificationException e) {

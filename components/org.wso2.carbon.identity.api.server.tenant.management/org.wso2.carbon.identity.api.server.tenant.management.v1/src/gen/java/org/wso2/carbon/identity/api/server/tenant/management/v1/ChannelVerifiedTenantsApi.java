@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2020-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,30 +18,34 @@
 
 package org.wso2.carbon.identity.api.server.tenant.management.v1;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import java.io.InputStream;
+import java.util.List;
+
+import org.wso2.carbon.identity.api.server.tenant.management.v1.factories.ChannelVerifiedTenantsApiServiceFactory;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.ChannelVerifiedTenantModel;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.model.Error;
+import org.wso2.carbon.identity.api.server.tenant.management.v1.ChannelVerifiedTenantsApiService;
 
 import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import io.swagger.annotations.*;
+
+import javax.validation.constraints.*;
 
 @Path("/channel-verified-tenants")
 @Api(description = "The channel-verified-tenants API")
 
 public class ChannelVerifiedTenantsApi  {
 
-    @Autowired
-    private ChannelVerifiedTenantsApiService delegate;
+    private final ChannelVerifiedTenantsApiService delegate;
+
+    public ChannelVerifiedTenantsApi() {
+
+        this.delegate = ChannelVerifiedTenantsApiServiceFactory.getChannelVerifiedTenantsApi();
+    }
 
     @Valid
     @POST

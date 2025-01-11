@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.com).
+ * Copyright (c) 2023-2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -22,8 +22,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.factories.AdminAdvisoryManagementApiServiceFactory;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.model.AdminAdvisoryConfig;
 import org.wso2.carbon.identity.api.server.admin.advisory.management.v1.model.Error;
 
@@ -44,8 +44,12 @@ import io.swagger.annotations.ApiParam;
 
 public class AdminAdvisoryManagementApi  {
 
-    @Autowired
-    private AdminAdvisoryManagementApiService delegate;
+    private final AdminAdvisoryManagementApiService delegate;
+
+    public AdminAdvisoryManagementApi() {
+
+        this.delegate = AdminAdvisoryManagementApiServiceFactory.getAdminAdvisoryManagementApi();
+    }
 
     @Valid
     @GET

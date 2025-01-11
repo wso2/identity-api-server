@@ -66,10 +66,10 @@ public class SelfServiceMgtConstants {
     public static final String PROPERTY_VALUE = "value";
 
     // Resource path constants.
-    public static final String CREATE_LITE_USER_STORE_REQUEST_JSON = "classpath:lite-userstore-request.json";
-    public static final String ENABLE_LITE_USER_REQUEST_JSON = "classpath:enable-lite-user.json";
-    public static final String DISABLE_LITE_USER_REQUEST_JSON = "classpath:disable-lite-user.json";
-    public static final String CREATE_SELF_SERVICE_APP_REQUEST_JSON = "classpath:create-app-request.json";
+    public static final String CREATE_LITE_USER_STORE_REQUEST_JSON = "lite-userstore-request.json";
+    public static final String ENABLE_LITE_USER_REQUEST_JSON = "enable-lite-user.json";
+    public static final String DISABLE_LITE_USER_REQUEST_JSON = "disable-lite-user.json";
+    public static final String CREATE_SELF_SERVICE_APP_REQUEST_JSON = "create-app-request.json";
 
     /**
      * Enums for error messages.

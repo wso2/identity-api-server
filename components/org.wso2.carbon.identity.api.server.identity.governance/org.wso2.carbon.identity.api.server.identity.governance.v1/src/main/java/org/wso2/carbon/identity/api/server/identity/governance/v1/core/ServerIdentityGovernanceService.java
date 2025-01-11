@@ -26,7 +26,6 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.server.common.error.APIError;
 import org.wso2.carbon.identity.api.server.common.error.ErrorResponse;
 import org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceConstants;
-import org.wso2.carbon.identity.api.server.identity.governance.common.GovernanceDataHolder;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoriesRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryConnectorsRes;
 import org.wso2.carbon.identity.api.server.identity.governance.v1.model.CategoryRes;
@@ -68,7 +67,13 @@ import static org.wso2.carbon.identity.password.expiry.constants.PasswordPolicyC
  */
 public class ServerIdentityGovernanceService {
 
+    private final IdentityGovernanceService identityGovernanceService;
     private static final Log LOG = LogFactory.getLog(ServerIdentityGovernanceService.class);
+
+    public ServerIdentityGovernanceService(IdentityGovernanceService identityGovernanceService) {
+
+        this.identityGovernanceService = identityGovernanceService;
+    }
 
     /**
      * Get all governance connector categories.
@@ -84,7 +89,6 @@ public class ServerIdentityGovernanceService {
         handleNotImplementedCapabilities(limit, offset, filter, sort);
 
         try {
-            IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             Map<String, List<ConnectorConfig>> connectorConfigs =
                     identityGovernanceService.getCategorizedConnectorListWithConfigs(tenantDomain);
@@ -125,7 +129,6 @@ public class ServerIdentityGovernanceService {
     public List<ConnectorRes> getGovernanceConnectorsByCategory(String categoryId) {
 
         try {
-            IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             String category = new String(Base64.getUrlDecoder().decode(categoryId), StandardCharsets.UTF_8);
             List<ConnectorConfig> connectorConfigs =
@@ -155,7 +158,6 @@ public class ServerIdentityGovernanceService {
     public ConnectorRes getGovernanceConnector(String categoryId, String connectorId) {
 
         try {
-            IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             String connectorName = new String(Base64.getUrlDecoder().decode(connectorId), StandardCharsets.UTF_8);
             ConnectorConfig connectorConfig =
@@ -188,7 +190,6 @@ public class ServerIdentityGovernanceService {
      */
     public List<PreferenceResp> getConfigPreference(List<PreferenceSearchAttribute> preferenceSearchAttribute) {
 
-        IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         List<PreferenceResp> preferenceRespList = new ArrayList<>();
         for (PreferenceSearchAttribute prefSearchAttr : preferenceSearchAttribute) {
@@ -288,7 +289,6 @@ public class ServerIdentityGovernanceService {
                                                   ConnectorsPatchReq governanceConnector) {
 
         try {
-            IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
             ConnectorRes connector = getGovernanceConnector(categoryId, connectorId);
@@ -330,7 +330,6 @@ public class ServerIdentityGovernanceService {
                                                     MultipleConnectorsPatchReq multipleConnectorsPatchReq) {
 
         try {
-            IdentityGovernanceService identityGovernanceService = GovernanceDataHolder.getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
             // Check whether the category ID exists.

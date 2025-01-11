@@ -24,9 +24,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.api.resource.mgt.APIResourceManager;
@@ -34,7 +31,7 @@ import org.wso2.carbon.identity.api.resource.mgt.APIResourceMgtException;
 import org.wso2.carbon.identity.api.resource.mgt.constant.APIResourceManagementConstants;
 import org.wso2.carbon.identity.api.server.application.management.v1.ApplicationModel;
 import org.wso2.carbon.identity.api.server.application.management.v1.core.ServerApplicationManagementService;
-import org.wso2.carbon.identity.api.server.organization.selfservice.common.SelfServiceMgtServiceHolder;
+import org.wso2.carbon.identity.api.server.application.management.v1.factories.ServerApplicationManagementServiceFactory;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.exceptions.SelfServiceMgtEndpointException;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.Error;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyPatchReq;
@@ -42,6 +39,7 @@ import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.Pro
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.model.PropertyRes;
 import org.wso2.carbon.identity.api.server.organization.selfservice.v1.util.SelfServiceMgtConstants;
 import org.wso2.carbon.identity.api.server.userstore.v1.core.ServerUserStoreService;
+import org.wso2.carbon.identity.api.server.userstore.v1.factories.ServerUserStoreServiceFactory;
 import org.wso2.carbon.identity.api.server.userstore.v1.model.UserStoreReq;
 import org.wso2.carbon.identity.application.common.IdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.common.model.APIResource;
@@ -69,20 +67,27 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 
 /**
- * Call internal osgi services to perform self service management related operations.
+ * Call internal osgi services to perform self-service management related operations.
  */
 public class SelfServiceMgtService {
 
+    private final IdentityGovernanceService identityGovernanceService;
+    private final ApplicationManagementService applicationManagementService;
+    private final APIResourceManager apiResourceManager;
+    private final AuthorizedAPIManagementService authorizedAPIManagementService;
+
     private static final Log LOG = LogFactory.getLog(SelfServiceMgtService.class);
 
-    @Autowired
-    private ServerApplicationManagementService applicationManagementService;
+    public SelfServiceMgtService(IdentityGovernanceService identityGovernanceService,
+                                 ApplicationManagementService applicationManagementService,
+                                 APIResourceManager apiResourceManager,
+                                 AuthorizedAPIManagementService authorizedAPIManagementService) {
 
-    @Autowired
-    private ResourceLoader resourceLoader;
-
-    @Autowired
-    private ServerUserStoreService serverUserStoreService;
+        this.identityGovernanceService = identityGovernanceService;
+        this.applicationManagementService = applicationManagementService;
+        this.apiResourceManager = apiResourceManager;
+        this.authorizedAPIManagementService = authorizedAPIManagementService;
+    }
 
     /**
      * Get organization governance configs.
@@ -92,7 +97,6 @@ public class SelfServiceMgtService {
     public List<PropertyRes> getOrganizationGovernanceConfigs() {
 
         try {
-            IdentityGovernanceService identityGovernanceService = getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             ConnectorConfig connectorConfig = identityGovernanceService.getConnectorWithConfigs(tenantDomain,
                     SelfServiceMgtConstants.SELF_SERVICE_GOVERNANCE_CONNECTOR);
@@ -120,13 +124,12 @@ public class SelfServiceMgtService {
                 configurationDetails.put(propertyReqDTO.getName(), propertyReqDTO.getValue());
             }
             Map<String, String> copiedConfigurationDetails = new HashMap<>(configurationDetails);
-            IdentityGovernanceService identityGovernanceService = getIdentityGovernanceService();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             identityGovernanceService.updateConfiguration(tenantDomain, configurationDetails);
             if (enablePostListener) {
                 doPostConfigurationUpdate(copiedConfigurationDetails);
             }
-        } catch (IdentityGovernanceException e) {
+        } catch (Exception e) {
             LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_UPDATING_SELF_SERVICE_CONFIG.getDescription(), e);
             throw new SelfServiceMgtEndpointException(Response.Status.INTERNAL_SERVER_ERROR,
                     getError(SelfServiceMgtConstants.ErrorMessage.ERROR_UPDATING_SELF_SERVICE_CONFIG.getCode(),
@@ -205,15 +208,15 @@ public class SelfServiceMgtService {
         String userStoreName = getConfigProperty(SelfServiceMgtConstants.LITE_USER_USER_STORE_NAME);
         String domainId = new String(Base64.getEncoder().encode(userStoreName.getBytes(StandardCharsets.UTF_8)),
                 StandardCharsets.UTF_8);
-        serverUserStoreService.deleteUserStore(domainId);
+        getServerUserStoreService().deleteUserStore(domainId);
         updateLiteUserStoreConnectorConfigs(false);
     }
 
     private void onboardLiteUserStore() {
 
         try {
-            Resource resource = resourceLoader.getResource(SelfServiceMgtConstants.CREATE_LITE_USER_STORE_REQUEST_JSON);
-            InputStream inputStream = resource.getInputStream();
+            InputStream inputStream = loadResourceFromClasspath(SelfServiceMgtConstants
+                    .CREATE_LITE_USER_STORE_REQUEST_JSON);
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(inputStream);
             // Update Lite user store configs.
@@ -221,7 +224,7 @@ public class SelfServiceMgtService {
             // Convert updated JSON to string and use it in the request body
             String requestBody = objectMapper.writeValueAsString(rootNode);
             UserStoreReq userStoreReq = objectMapper.readValue(requestBody, UserStoreReq.class);
-            serverUserStoreService.addUserStore(userStoreReq);
+            getServerUserStoreService().addUserStore(userStoreReq);
             updateLiteUserStoreConnectorConfigs(true);
         } catch (IOException e) {
             LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_ONBOARDING_LITE_USER_STORE.getDescription(), e);
@@ -235,13 +238,12 @@ public class SelfServiceMgtService {
     private void updateLiteUserStoreConnectorConfigs(boolean enableLiteUser) {
 
         try {
-            Resource resource;
+            InputStream inputStream;
             if (enableLiteUser) {
-                resource = resourceLoader.getResource(SelfServiceMgtConstants.ENABLE_LITE_USER_REQUEST_JSON);
+                inputStream = loadResourceFromClasspath(SelfServiceMgtConstants.ENABLE_LITE_USER_REQUEST_JSON);
             } else {
-                resource = resourceLoader.getResource(SelfServiceMgtConstants.DISABLE_LITE_USER_REQUEST_JSON);
+                inputStream = loadResourceFromClasspath(SelfServiceMgtConstants.DISABLE_LITE_USER_REQUEST_JSON);
             }
-            InputStream inputStream = resource.getInputStream();
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(inputStream);
             // Convert updated JSON to string and use it in the request body
@@ -270,9 +272,8 @@ public class SelfServiceMgtService {
             }
 
             // Load the request JSON template from a resource.
-            Resource resource = resourceLoader.getResource(
-                    SelfServiceMgtConstants.CREATE_SELF_SERVICE_APP_REQUEST_JSON);
-            InputStream inputStream = resource.getInputStream();
+            InputStream inputStream = loadResourceFromClasspath(SelfServiceMgtConstants
+                    .CREATE_SELF_SERVICE_APP_REQUEST_JSON);
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(inputStream);
 
@@ -284,7 +285,7 @@ public class SelfServiceMgtService {
             ApplicationModel model = objectMapper.readValue(requestBody, ApplicationModel.class);
 
             // Create the application using the Application Management Service.
-            applicationManagementService.createApplication(model, null);
+            getServerApplicationManagementService().createApplication(model, null);
 
             // If legacy authorization runtime is enabled, skip subscribing to APIs.
             if (isLegacyAuthzRuntime()) {
@@ -292,7 +293,7 @@ public class SelfServiceMgtService {
             }
 
             // Subscribe to APIs required for Organization Management Self Service.
-            ApplicationBasicInfo sSApplicationBasicInfo = getApplicationManagementService()
+            ApplicationBasicInfo sSApplicationBasicInfo = applicationManagementService
                     .getApplicationBasicInfoByName(appName, tenantDomain);
 
             if (sSApplicationBasicInfo == null) {
@@ -314,9 +315,9 @@ public class SelfServiceMgtService {
             }
 
             // Share the self-service app with all the child organizations.
-            ServiceProvider serviceProvider = getApplicationManagementService()
-                    .getServiceProvider(sSApplicationBasicInfo.getApplicationId());
-            getApplicationManagementService().updateApplication(serviceProvider, tenantDomain, userName);
+            ServiceProvider serviceProvider = applicationManagementService.getServiceProvider(sSApplicationBasicInfo
+                    .getApplicationId());
+            applicationManagementService.updateApplication(serviceProvider, tenantDomain, userName);
 
         } catch (IOException | IdentityApplicationManagementException e) {
             LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_CREATING_SYSTEM_APP.getDescription(), e);
@@ -336,7 +337,7 @@ public class SelfServiceMgtService {
         try {
             // Check if the self-service app exists, if yes, then delete it.
             if (isSSAppExists(tenantDomain, userName, appName)) {
-                getApplicationManagementService().deleteApplication(appName, tenantDomain, userName);
+                applicationManagementService.deleteApplication(appName, tenantDomain, userName);
             }
         } catch (IdentityApplicationManagementException e) {
             LOG.error(SelfServiceMgtConstants.ErrorMessage.ERROR_DELETING_SYSTEM_APP.getDescription(), e);
@@ -351,7 +352,7 @@ public class SelfServiceMgtService {
             throws IdentityApplicationManagementException {
 
         // Get the basic info of the self-service app using the Application Management Service.
-        ApplicationBasicInfo[] applicationBasicInfos = getApplicationManagementService()
+        ApplicationBasicInfo[] applicationBasicInfos = applicationManagementService
                 .getApplicationBasicInfo(tenantDomain, userName, appName);
         // Check if there is exactly one self-service app with the given name.
         return applicationBasicInfos.length == 1;
@@ -436,7 +437,6 @@ public class SelfServiceMgtService {
 
     private String getGovernanceConfigValue(String preferenceProperty) throws IdentityGovernanceException {
 
-        IdentityGovernanceService identityGovernanceService = getIdentityGovernanceService();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         return identityGovernanceService.getConfiguration(new String[]{preferenceProperty}, tenantDomain)[0].getValue();
     }
@@ -445,26 +445,6 @@ public class SelfServiceMgtService {
 
         return org.wso2.carbon.identity.organization.management.service.util.OrganizationManagementConfigUtil
                 .getProperty(propertyName);
-    }
-
-    private IdentityGovernanceService getIdentityGovernanceService() {
-
-        return SelfServiceMgtServiceHolder.getIdentityGovernanceService();
-    }
-
-    private ApplicationManagementService getApplicationManagementService() {
-
-        return SelfServiceMgtServiceHolder.getApplicationManagementService();
-    }
-
-    private APIResourceManager getAPIResourcesManager() {
-
-        return SelfServiceMgtServiceHolder.getAPIResourceManager();
-    }
-
-    private AuthorizedAPIManagementService getAuthorizedAPIManagementService() {
-
-        return SelfServiceMgtServiceHolder.getAuthorizedAPIManagementService();
     }
 
     private Error getError(String errorCode, String errorMessage, String errorDescription) {
@@ -508,7 +488,7 @@ public class SelfServiceMgtService {
 
         String aPIFilter = "identifier eq " + aPIIResourceIdentifier;
         try {
-            List<APIResource> apiResources = getAPIResourcesManager().getAPIResources(null, null, 1,
+            List<APIResource> apiResources = apiResourceManager.getAPIResources(null, null, 1,
                     aPIFilter, APIResourceManagementConstants.ASC,
                     tenantDomain).getAPIResources();
             if (apiResources != null && !apiResources.isEmpty()) {
@@ -516,7 +496,7 @@ public class SelfServiceMgtService {
                 APIResource apiResource = apiResources.get(0);
 
                 String policyId = APIResourceManagementConstants.RBAC_AUTHORIZATION;
-                List<Scope> scopes = getAPIResourcesManager().getAPIScopesById(apiResource.getId(), tenantDomain);
+                List<Scope> scopes = apiResourceManager.getAPIScopesById(apiResource.getId(), tenantDomain);
 
                 List<Scope> authorizedScopes = new ArrayList<>();
                 for (Scope scope : scopes) {
@@ -531,7 +511,7 @@ public class SelfServiceMgtService {
                         .scopes(authorizedScopes)
                         .policyId(policyId)
                         .build();
-                getAuthorizedAPIManagementService().addAuthorizedAPI(sSApplicationId,
+                authorizedAPIManagementService.addAuthorizedAPI(sSApplicationId,
                         authorizedAPI, tenantDomain);
             }
 
@@ -540,8 +520,52 @@ public class SelfServiceMgtService {
         }
     }
 
+    /**
+     * Load resource from the classpath.
+     *
+     * @param resourcePath Resource path.
+     * @return InputStream of the resource.
+     * @throws IOException If an error occurred while loading the resource.
+     */
+    private InputStream loadResourceFromClasspath(String resourcePath) throws IOException {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
+        if (inputStream == null) {
+            throw new IOException("Resource not found: " + resourcePath);
+        }
+
+        return inputStream;
+    }
+
     public static boolean isLegacyAuthzRuntime() {
 
         return CarbonConstants.ENABLE_LEGACY_AUTHZ_RUNTIME;
+    }
+
+    /**
+     * Get ServerApplicationManagementService instance.
+     *
+     * @return ServerApplicationManagementService.
+     */
+    private static ServerApplicationManagementService getServerApplicationManagementService() {
+
+        try {
+            return ServerApplicationManagementServiceFactory.getServerApplicationManagementService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating ServerApplicationManagementService.", e);
+        }
+    }
+
+    /**
+     * Get ServerUserStoreService instance.
+     *
+     * @return ServerUserStoreService.
+     */
+    private static ServerUserStoreService getServerUserStoreService() {
+
+        try {
+            return ServerUserStoreServiceFactory.getServerUserStoreService();
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Error occurred while initiating ServerUserStoreService.", e);
+        }
     }
 }
