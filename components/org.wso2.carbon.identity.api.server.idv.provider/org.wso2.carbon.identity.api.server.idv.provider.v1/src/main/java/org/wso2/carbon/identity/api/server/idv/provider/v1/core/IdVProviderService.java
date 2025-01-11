@@ -170,12 +170,12 @@ public class IdVProviderService {
 
         int tenantId = getTenantId();
         try {
-            int totalResults = idVProviderManager.getCountOfIdVProviders(tenantId, filter);
+            int totalResults = idvProviderManager.getCountOfIdVProviders(tenantId, filter);
 
             IdVProviderListResponse idVProviderListResponse = new IdVProviderListResponse();
 
             if (totalResults > 0) {
-                List<IdVProvider> idVProviders = idVProviderManager.getIdVProviders(limit, offset, filter, tenantId);
+                List<IdVProvider> idVProviders = idvProviderManager.getIdVProviders(limit, offset, filter, tenantId);
 
                 if (CollectionUtils.isNotEmpty(idVProviders)) {
                     List<IdVProviderResponse> idVProvidersList = new ArrayList<>();

@@ -32,8 +32,15 @@ public class TenantManagementServiceHolder {
     }
 
     private static class TenantMgtServiceHolder {
+
         static final TenantMgtService SERVICE = (TenantMgtService) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext().getOSGiService(TenantMgtService.class, null);
+    }
+
+    private static class RealmServiceHolder {
+
+        static final RealmService SERVICE = (RealmService) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .getOSGiService(RealmService.class, null);
     }
 
     /**
@@ -53,16 +60,6 @@ public class TenantManagementServiceHolder {
      */
     public static RealmService getRealmService() {
 
-        return realmService;
-    }
-
-    /**
-     * Set RealmService osgi service.
-     *
-     * @param realmService RealmService.
-     */
-    public static void setRealmService(RealmService realmService) {
-
-        TenantManagementServiceHolder.realmService = realmService;
+        return RealmServiceHolder.SERVICE;
     }
 }

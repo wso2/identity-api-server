@@ -79,7 +79,7 @@ public class OrganizationConfigsService {
                 .map(property -> new ConfigProperty(property.getKey(), property.getValue()))
                 .collect(Collectors.toList());
         try {
-            OrganizationConfigsServiceHolder.getOrganizationConfigManager().updateDiscoveryConfiguration
+            organizationConfigManager.updateDiscoveryConfiguration
                     (new DiscoveryConfig(configProperties));
         } catch (OrganizationConfigException e) {
             throw handleException(e);

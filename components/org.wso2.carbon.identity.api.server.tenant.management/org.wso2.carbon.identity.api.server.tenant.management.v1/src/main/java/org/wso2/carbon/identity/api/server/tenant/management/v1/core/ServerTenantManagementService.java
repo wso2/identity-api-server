@@ -67,6 +67,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static org.wso2.carbon.identity.api.server.common.Constants.ERROR_CODE_RESOURCE_LIMIT_REACHED;
 import static org.wso2.carbon.identity.api.server.common.Constants.V1_API_PATH_COMPONENT;
 import static org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementConstants.ErrorMessage.ERROR_CODE_PARTIALLY_CREATED_OR_UPDATED;
@@ -75,14 +76,13 @@ import static org.wso2.carbon.identity.api.server.tenant.management.common.Tenan
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_INVALID_EMAIL;
 import static org.wso2.carbon.stratos.common.constants.TenantConstants.ErrorMessage.ERROR_CODE_MISSING_REQUIRED_PARAMETER;
 
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-
 /**
  * Call internal osgi services to perform server tenant management related operations.
  */
 public class ServerTenantManagementService {
 
     private final TenantMgtService tenantMgtService;
+    private final RealmService realmService;
 
     private static final Log log = LogFactory.getLog(ServerTenantManagementService.class);
     private static final String VERIFIED_LITE_USER = "verified-lite-user";
@@ -90,9 +90,11 @@ public class ServerTenantManagementService {
     private static final String CODE = "code";
     private static final String PURPOSE = "purpose";
 
-    public ServerTenantManagementService(TenantMgtService tenantMgtService) {
+    public ServerTenantManagementService(TenantMgtService tenantMgtService,
+                                         RealmService realmService) {
 
         this.tenantMgtService = tenantMgtService;
+        this.realmService = realmService;
     }
 
     /**
@@ -207,7 +209,7 @@ public class ServerTenantManagementService {
     public OwnerInfoResponse getOwner(String tenantUniqueID, String ownerID, String additionalClaims) {
 
         try {
-            Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
+            Tenant tenant = tenantMgtService.getTenant(tenantUniqueID);
             validateTenantOwnerId(tenant, ownerID);
 
             String[] claimsList = StringUtils.split(additionalClaims, ",");
@@ -221,12 +223,12 @@ public class ServerTenantManagementService {
     public void updateOwner(String tenantUniqueID, String ownerID, OwnerPutModel ownerPutModel) {
 
         try {
-            Tenant tenant = TenantManagementServiceHolder.getTenantMgtService().getTenant(tenantUniqueID);
+            Tenant tenant = tenantMgtService.getTenant(tenantUniqueID);
             validateTenantOwnerId(tenant, ownerID);
 
             createTenantInfoBean(tenant, ownerPutModel);
 
-            TenantManagementServiceHolder.getTenantMgtService().updateOwner(tenant);
+            tenantMgtService.updateOwner(tenant);
         } catch (TenantMgtException e) {
             throw handleTenantManagementException(e, TenantManagementConstants.ErrorMessage.
                     ERROR_CODE_ERROR_UPDATING_OWNER, tenantUniqueID);
@@ -312,7 +314,6 @@ public class ServerTenantManagementService {
 
     private OwnerInfoResponse createOwnerInfoResponse(Tenant tenant, String[] claimsList) throws TenantMgtException {
 
-        RealmService realmService = TenantManagementServiceHolder.getRealmService();
         OwnerInfoResponse ownerInfoResponse = new OwnerInfoResponse();
         ownerInfoResponse.setId(tenant.getAdminUserId());
         ownerInfoResponse.setUsername(tenant.getAdminName());
@@ -625,6 +626,7 @@ public class ServerTenantManagementService {
 
     /**
      * Validate details attached to the code sent in email verification with the sent in details.
+     *
      * @param tenant tenant
      * @throws TenantManagementClientException error in validating code
      */
@@ -708,6 +710,7 @@ public class ServerTenantManagementService {
 
         return tenant;
     }
+
     /**
      * Convert {@link Date} instance to ISO-8601 format string.
      *
@@ -717,7 +720,7 @@ public class ServerTenantManagementService {
     private String getISOFormatDate(Date date) {
 
         ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())
-                                                   .withZoneSameInstant(ZoneId.of("UTC"));
+                .withZoneSameInstant(ZoneId.of("UTC"));
         return ISO_OFFSET_DATE_TIME.format(zonedDateTime);
     }
 }

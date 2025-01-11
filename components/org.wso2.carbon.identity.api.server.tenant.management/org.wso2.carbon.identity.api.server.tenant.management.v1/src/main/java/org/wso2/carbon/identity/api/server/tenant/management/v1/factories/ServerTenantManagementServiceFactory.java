@@ -21,6 +21,7 @@ package org.wso2.carbon.identity.api.server.tenant.management.v1.factories;
 import org.wso2.carbon.identity.api.server.tenant.management.common.TenantManagementServiceHolder;
 import org.wso2.carbon.identity.api.server.tenant.management.v1.core.ServerTenantManagementService;
 import org.wso2.carbon.tenant.mgt.services.TenantMgtService;
+import org.wso2.carbon.user.core.service.RealmService;
 
 /**
  * Factory class for ServerTenantManagementService.
@@ -31,10 +32,15 @@ public class ServerTenantManagementServiceFactory {
 
     static {
         TenantMgtService tenantMgtService = TenantManagementServiceHolder.getTenantMgtService();
+        RealmService realmService = TenantManagementServiceHolder.getRealmService();
+
         if (tenantMgtService == null) {
             throw new IllegalStateException("TenantMgtService is not available from OSGi context.");
         }
-        SERVICE = new ServerTenantManagementService(tenantMgtService);
+        if (realmService == null) {
+            throw new IllegalStateException("RealmService is not available from OSGi context.");
+        }
+        SERVICE = new ServerTenantManagementService(tenantMgtService, realmService);
     }
 
     /**
