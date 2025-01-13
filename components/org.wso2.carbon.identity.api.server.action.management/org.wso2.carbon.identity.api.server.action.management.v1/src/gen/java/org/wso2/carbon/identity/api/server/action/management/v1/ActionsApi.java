@@ -18,11 +18,14 @@
 
 package org.wso2.carbon.identity.api.server.action.management.v1;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionBasicResponse;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionModel;
@@ -32,7 +35,12 @@ import org.wso2.carbon.identity.api.server.action.management.v1.ActionUpdateMode
 import org.wso2.carbon.identity.api.server.action.management.v1.Error;
 import org.wso2.carbon.identity.api.server.action.management.v1.ActionsApiService;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
@@ -91,9 +99,33 @@ public class ActionsApi  {
         @ApiResponse(code = 500, message = "Server Error", response = Error.class),
         @ApiResponse(code = 501, message = "Not Implemented", response = Error.class)
     })
-    public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the action to be created." ,required=true) @Valid ActionModel actionModel) {
+    public Response createAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "This represents the action to be created." ,required=true) @Valid String jsonPayload)
+            throws JsonProcessingException {
 
-        return delegate.createAction(actionType,  actionModel );
+        ActionModel actionModel = null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        switch (actionType) {
+            case "preIssueAccessToken":
+                actionModel = objectMapper.readValue(jsonPayload, ActionModel.class);
+                break;
+            case "preUpdatePassword":
+                actionModel = objectMapper.readValue(jsonPayload, PreUpdatePasswordActionModel.class);
+                // Validate the object
+                ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+                Validator validator = factory.getValidator();
+                Set<ConstraintViolation<PreUpdatePasswordActionModel>> violations =
+                        validator.validate((PreUpdatePasswordActionModel) actionModel);
+
+                // Check for violations
+                if (!violations.isEmpty()) {
+                    throw new ConstraintViolationException(violations);
+                }
+                break;
+            default:
+                break;
+        }
+
+        return delegate.createAction(actionType,  actionModel);
     }
 
     @Valid
@@ -237,7 +269,31 @@ public class ActionsApi  {
         @ApiResponse(code = 404, message = "Not Found", response = Error.class),
         @ApiResponse(code = 500, message = "Server Error", response = Error.class)
     })
-    public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action information to be updated." ,required=true) @Valid ActionUpdateModel actionUpdateModel) {
+    public Response updateAction(@ApiParam(value = "Name of the Action Type.",required=true, allowableValues="preIssueAccessToken, preUpdatePassword, preUpdateProfile, preRegistration") @PathParam("actionType") String actionType, @ApiParam(value = "Id of the Action.",required=true) @PathParam("actionId") String actionId, @ApiParam(value = "This represents the action information to be updated." ,required=true) @Valid String jsonPayload)
+            throws JsonProcessingException {
+
+        ActionUpdateModel actionUpdateModel = null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        switch (actionType) {
+            case "preIssueAccessToken":
+                actionUpdateModel = objectMapper.readValue(jsonPayload, ActionUpdateModel.class);
+                break;
+            case "preUpdatePassword":
+                actionUpdateModel = objectMapper.readValue(jsonPayload, PreUpdatePasswordActionUpdateModel.class);
+                // Validate the object
+                ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+                Validator validator = factory.getValidator();
+                Set<ConstraintViolation<PreUpdatePasswordActionUpdateModel>> violations =
+                        validator.validate((PreUpdatePasswordActionUpdateModel) actionUpdateModel);
+
+                // Check for violations
+                if (!violations.isEmpty()) {
+                    throw new ConstraintViolationException(violations);
+                }
+                break;
+            default:
+                break;
+        }
 
         return delegate.updateAction(actionType,  actionId,  actionUpdateModel );
     }

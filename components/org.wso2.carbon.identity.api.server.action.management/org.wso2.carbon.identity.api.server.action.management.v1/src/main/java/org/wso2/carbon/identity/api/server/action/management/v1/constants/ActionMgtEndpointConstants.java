@@ -49,6 +49,8 @@ public class ActionMgtEndpointConstants {
                 "Action is not found.",
                 "No action is found for given action id and action type"),
         ERROR_INVALID_RULE("60013", "Invalid rule.", "%s"),
+        ERROR_NO_ACTION_BUILDER_FOUND("60014", "Action builder not found.",
+                "No action builder found for the given action type."),
 
         // Server errors.
         ERROR_NOT_IMPLEMENTED_ACTION_TYPE("650015",

@@ -44,6 +44,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
+            <artifactId>org.wso2.carbon.identity.user.pre.update.password.action</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
             <scope>provided</scope>
@@ -165,6 +170,7 @@
                         <configuration>
                             <sources>
                                 <source>src/gen/java</source>
+                                <source>src/extend/java</source>
                             </sources>
                         </configuration>
                     </execution>
