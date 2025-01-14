@@ -31,12 +31,12 @@ import org.wso2.carbon.identity.api.server.organization.user.sharing.management.
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareRequestBody;
 import org.wso2.carbon.identity.api.server.organization.user.sharing.management.v1.model.UserUnshareWithAllRequestBody;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.UserSharingPolicyHandlerServiceImpl;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.RoleWithAudienceDO;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.GeneralUserShareDO;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.SelectiveUserShareDO;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.SelectiveUserShareOrgDetailsDO;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.GeneralUserUnshareDO;
-import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.SelectiveUserUnshareDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.RoleWithAudienceDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserShareDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.SelectiveUserShareDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.SelectiveUserShareOrgDetailsDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.GeneralUserUnshareDO;
+import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.dos.SelectiveUserUnshareDO;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.usercriteria.UserCriteriaType;
 import org.wso2.carbon.identity.organization.management.organization.user.sharing.models.usercriteria.UserIds;
 import org.wso2.carbon.identity.organization.resource.sharing.policy.management.constant.PolicyEnum;
@@ -157,8 +157,9 @@ public class UsersApiServiceCore {
         SelectiveUserUnshareDO selectiveUserUnshareDO = new SelectiveUserUnshareDO();
 
         // Set user criteria.
-        Map<String, List<String>> userCriteria = new HashMap<>();
-        userCriteria.put("userIds", userUnshareRequestBody.getUserCriteria().getUserIds());
+        Map<String, UserCriteriaType> userCriteria = new HashMap<>();
+        UserCriteriaType userIds = new UserIds(userUnshareRequestBody.getUserCriteria().getUserIds());
+        userCriteria.put("userIds", userIds);
         selectiveUserUnshareDO.setUserCriteria(userCriteria);
 
         // Set organizations.
@@ -184,8 +185,9 @@ public class UsersApiServiceCore {
         GeneralUserUnshareDO generalUserUnshareDO = new GeneralUserUnshareDO();
 
         // Set user criteria.
-        Map<String, List<String>> userCriteria = new HashMap<>();
-        userCriteria.put("userIds", userUnshareWithAllRequestBody.getUserCriteria().getUserIds());
+        Map<String, UserCriteriaType> userCriteria = new HashMap<>();
+        UserCriteriaType userIds = new UserIds(userUnshareWithAllRequestBody.getUserCriteria().getUserIds());
+        userCriteria.put("userIds", userIds);
         generalUserUnshareDO.setUserCriteria(userCriteria);
 
         try {
