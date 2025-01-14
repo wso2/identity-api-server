@@ -36,6 +36,7 @@ import org.wso2.carbon.identity.api.server.application.management.v1.Certificate
 import org.wso2.carbon.identity.api.server.application.management.v1.Claim;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.ClaimMappings;
+import org.wso2.carbon.identity.api.server.application.management.v1.DiscoverableGroup;
 import org.wso2.carbon.identity.api.server.application.management.v1.InboundProtocolListItem;
 import org.wso2.carbon.identity.api.server.application.management.v1.ProvisioningConfiguration;
 import org.wso2.carbon.identity.api.server.application.management.v1.RequestedClaimConfiguration;
@@ -454,6 +455,7 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
         return new AdvancedApplicationConfiguration()
                 .saas(serviceProvider.isSaasApp())
                 .discoverableByEndUsers(serviceProvider.isDiscoverable())
+                .discoverableGroups(getDiscoverableGroups(serviceProvider))
                 .enableAuthorization(authConfig.isEnableAuthorization())
                 .returnAuthenticatedIdpList(authConfig.isAlwaysSendBackAuthenticatedListOfIdPs())
                 .skipLoginConsent(authConfig.isSkipConsent())
@@ -465,6 +467,30 @@ public class ServiceProviderToApiModel implements Function<ServiceProvider, Appl
                 .attestationMetaData(getAttestationMetaData(serviceProvider))
                 .trustedAppConfiguration(getTrustedAppConfiguration(serviceProvider))
                 .additionalSpProperties(getSpProperties(serviceProvider));
+    }
+
+    /**
+     * Retrieves the discoverable group list for an application's advanced configuration based on the provided
+     * service provider.
+     *
+     * @param serviceProvider The service provider for which discoverable group list is required.
+     * @return An instance of List<DiscoverableGroup> containing discoverable groups.
+     */
+    private List<DiscoverableGroup> getDiscoverableGroups(ServiceProvider serviceProvider) {
+
+        if (serviceProvider.getDiscoverableGroups() == null || serviceProvider.getDiscoverableGroups().length == 0) {
+            return null;
+        }
+
+        List<DiscoverableGroup> apiDiscoverableGroups = new ArrayList<>();
+        for (org.wso2.carbon.identity.application.common.model.DiscoverableGroup discoverableGroup
+                : serviceProvider.getDiscoverableGroups()) {
+            DiscoverableGroup apiDiscoverableGroup = new DiscoverableGroup();
+            apiDiscoverableGroup.setUserStore(discoverableGroup.getUserStore());
+            apiDiscoverableGroup.setGroups(Arrays.asList(discoverableGroup.getGroups()));
+            apiDiscoverableGroups.add(apiDiscoverableGroup);
+        }
+        return apiDiscoverableGroups;
     }
 
     /**

@@ -124,7 +124,7 @@ public class AdvancedApplicationConfiguration  {
         return this;
     }
 
-        /**
+    /**
     **/
     public AdvancedApplicationConfiguration certificate(Certificate certificate) {
 
